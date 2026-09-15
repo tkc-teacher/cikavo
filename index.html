@@ -47,22 +47,20 @@
 <section class="hero">
   <div class="hero-eyebrow">Інформатика · Інтерактивні уроки</div>
   <h1>Оберіть клас</h1>
-  <p>Уроки для асинхронного навчання: текст, практика й самоперевірка в одному місці.</p>
 </section>
 
 <div class="grid" id="gradesGrid"></div>
 
-<footer>Ткачук І. А., Гімназія №131, м. Київ</footer>
 
 <script>
   const grades = [1,2,3,4,5,6,7,8,9,10,11];
-  const active = new Set([5]);
+  const active = new Set([5,6]);
   const grid = document.getElementById('gradesGrid');
   grades.forEach(n=>{
     if(active.has(n)){
       const a = document.createElement('a');
       a.className = 'grade-card active';
-      a.href = '5/index.html';
+      a.href = `${n}/index.html`;
       a.innerHTML = `<span class="tag">Готово</span><span class="num">${n}</span><span class="lbl">клас</span>`;
       grid.appendChild(a);
     } else {
