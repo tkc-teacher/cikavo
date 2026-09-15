@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Як працює електронна пошта — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
+    --purple:#6C5CE7; --purple-dark:#5340c9; --teal:#16A3A0; --coral:#FF6B4A; --yellow:#FFC93C; --pink:#FF5D9E; --blue:#2D9CDB;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  .container{max-width:800px; margin:0 auto; padding:0 24px;}
+
+  .hud{position:sticky; top:0; z-index:50; background:rgba(246,245,251,.9); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
+  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--blue),var(--purple)); transition:width .3s ease;}
+  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:800px; margin:0 auto;}
+  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
+  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
+  .neuron-counter svg{width:24px;height:24px;}
+  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
+  #neuronCount.pop{transform:scale(1.35);}
+
+  .hero{padding:52px 24px 40px;}
+  .hero-inner{max-width:800px; margin:0 auto; display:flex; align-items:center; gap:30px;}
+  .hero-text{flex:1;}
+  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--blue); margin-bottom:10px;}
+  .hero h1{font-size:32px; line-height:1.18; margin-bottom:12px;}
+  .hero p{color:var(--ink-soft); font-size:16.5px; max-width:52ch; margin-bottom:22px;}
+  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--purple); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
+  .btn-primary:hover{background:var(--purple-dark);}
+  .btn-primary:active{transform:scale(.97);}
+  .mascot{width:130px; height:130px; flex-shrink:0;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:100px; height:100px;} }
+
+  section.block{padding:38px 0; border-top:1px solid var(--line);}
+  .step-label{font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:600; color:var(--blue); margin-bottom:8px;}
+  .block h2{font-size:21px; margin-bottom:10px; max-width:38ch;}
+  .block p{max-width:66ch; font-size:16px; margin:0 0 14px; color:var(--ink);}
+  .block p.soft{color:var(--ink-soft); font-size:15px;}
+  .trivia{background:#FFF7E9; border-left:4px solid var(--yellow); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14px; color:#8A6A1A; margin:16px 0;}
+  .note{background:#EAF5FC; border-left:4px solid var(--blue); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; color:#2A6B8C; margin:16px 0;}
+
+  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:22px; margin-top:18px;}
+
+  /* EMAIL ADDRESS ANATOMY */
+  .addr-display{display:flex; justify-content:center; flex-wrap:wrap; gap:4px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:20px; margin:10px 0 18px;}
+  .addr-part{cursor:pointer; padding:6px 4px; border-radius:8px; transition:background .15s ease;}
+  .addr-part.user{color:var(--purple);}
+  .addr-part.at{color:var(--coral);}
+  .addr-part.domain{color:var(--teal);}
+  .addr-part.active{background:var(--bg);}
+  .addr-explain{text-align:center; font-size:14.5px; color:var(--ink-soft); min-height:2.6em;}
+
+  /* MAIL FLOW */
+  .flow-track{position:relative; display:flex; justify-content:space-between; align-items:flex-start; margin:26px 0 10px; padding:0 4px;}
+  .flow-node{display:flex; flex-direction:column; align-items:center; gap:6px; width:19%; text-align:center;}
+  .flow-node .icon{width:40px; height:40px; border-radius:50%; background:var(--bg); border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:18px; transition:border-color .2s ease, background .2s ease;}
+  .flow-node.active .icon{border-color:var(--purple); background:#EDE9FF;}
+  .flow-node .lbl{font-size:10.5px; color:var(--ink-soft); line-height:1.2;}
+  .flow-line{position:absolute; top:20px; left:9%; right:9%; height:2px; background:var(--line); z-index:0;}
+  .envelope{position:absolute; top:2px; font-size:22px; transition:left .6s ease; z-index:2;}
+  .flow-status{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--purple-dark); min-height:1.4em; margin-top:14px;}
+
+  /* COMPOSE SIMULATION */
+  .compose-box{border:1.5px solid var(--line); border-radius:var(--radius-m); overflow:hidden;}
+  .compose-field{border-bottom:1px solid var(--line); padding:10px 14px; display:flex; align-items:center; gap:8px;}
+  .compose-field label{font-size:13px; color:var(--ink-soft); width:60px; flex-shrink:0;}
+  .compose-field input, .compose-field textarea{border:none; outline:none; flex:1; font-family:'Nunito Sans',sans-serif; font-size:14.5px; background:transparent; resize:none;}
+  .compose-field textarea{min-height:70px; padding-top:8px;}
+  .compose-send{padding:12px 14px; display:flex; justify-content:flex-end;}
+  .step-hint{font-size:11.5px; color:var(--blue); margin-left:auto;}
+
+  /* CLASSIFY / SCENARIO CARDS */
+  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:16px 18px; margin:12px 0;}
+  .classify-card p.q{font-weight:700; margin:0 0 10px; font-size:15px;}
+  .choice-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; padding:8px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease, color .15s ease;}
+  .choice-btn:hover{border-color:var(--purple);}
+  .choice-btn.correct{background:#E4F8E6; border-color:#3FAE58; color:#256B36;}
+  .choice-btn.wrong{background:#FDE6E1; border-color:var(--coral); color:#B8412A;}
+  .choice-feedback{margin-top:8px; font-size:13.5px; color:var(--ink-soft); min-height:1.2em;}
+
+  .insight{background:#FFF3E2; border-left:4px solid var(--yellow); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; margin-top:16px;}
+
+  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:26px 24px; margin-top:18px;}
+  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:13px; color:var(--ink-soft); margin-bottom:10px;}
+  .quiz-q{font-size:17px; font-weight:700; margin-bottom:16px;}
+  .quiz-options{display:flex; flex-direction:column; gap:10px;}
+  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:15px; font-weight:600; padding:12px 15px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .quiz-opt:hover{border-color:var(--purple);}
+  .quiz-opt.correct{background:#E4F8E6; border-color:#3FAE58;}
+  .quiz-opt.wrong{background:#FDE6E1; border-color:var(--coral);}
+  .quiz-nav{display:flex; justify-content:flex-end; margin-top:18px;}
+  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:11px 22px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
+  .btn-next.active{opacity:1; pointer-events:auto;}
+
+  .completion{display:none; text-align:center; padding:20px 10px 10px;}
+  .completion.show{display:block;}
+  .badge{width:90px; height:90px; margin:0 auto 16px;}
+  .completion h3{font-size:22px; margin-bottom:10px;}
+  .completion p{color:var(--ink-soft); max-width:50ch; margin:0 auto 18px; font-size:15px;}
+  .completion .total{font-family:'Baloo 2',sans-serif; font-size:30px; color:var(--purple-dark);}
+
+  footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
+  <div class="hud-row">
+    <span class="hud-title">6 клас · Електронна пошта</span>
+    <div class="neuron-counter">
+      <svg viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
+        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#E0A800" opacity="0.6"/>
+      </svg>
+      <span id="neuronCount">0</span>
+    </div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Електронна пошта</div>
+      <h1>Як працює електронна пошта</h1>
+      <p>Від козацьких сигнальних вогнів до листа, що долітає за секунди. Розбери адресу на частини, простеж шлях листа і сам склади та «надішли» перший лист.</p>
+      <button class="btn-primary" onclick="document.getElementById('addr').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 160 160" fill="none">
+      <rect x="25" y="45" width="110" height="75" rx="10" fill="#6C5CE7"/>
+      <path d="M25 50 L80 90 L135 50" stroke="#EDE9FF" stroke-width="4" fill="none"/>
+      <rect x="30" y="50" width="100" height="65" rx="4" fill="#EDE9FF" opacity="0.15"/>
+      <circle cx="118" cy="35" r="16" fill="#FFC93C"/>
+      <path d="M112 35 L116 40 L124 30" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block">
+    <div class="step-label">Перед стартом</div>
+    <h2>Люди завжди хотіли передавати новини швидко</h2>
+    <p>Гінці, поштові голуби, кінні кур'єри, потім паперова пошта — і зрештою електронний лист, який долітає до адресата за лічені секунди, хоч би куди він знаходився.</p>
+    <div class="trivia">В Україні козаки мали власну систему сповіщення: на високих вежах, розташованих за кілька кілометрів одна від одної, розпалювали великі вогнища, щоб попередити сусідні загони про наближення ворога. По суті, це була мережа передавання сигналу задовго до появи Інтернету.</div>
+  </section>
+
+  <section class="block" id="addr">
+    <div class="step-label">Крок 1 · Адреса</div>
+    <h2>З чого складається email-адреса</h2>
+    <p class="soft">Клацни на кожну частину адреси нижче.</p>
+    <div class="exercise">
+      <div class="addr-display">
+        <span class="addr-part user" data-part="user">ivanenko.o</span><span class="addr-part at" data-part="at">@</span><span class="addr-part domain" data-part="domain">gmail.com</span>
+      </div>
+      <div class="addr-explain" id="addrExplain">Клацни на будь-яку частину адреси вище</div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Шлях листа</div>
+    <h2>Куди насправді летить лист</h2>
+    <p class="soft">Натисни «Надіслати» і простеж шлях від одного комп'ютера до іншого.</p>
+    <div class="exercise">
+      <div class="flow-track" id="flowTrack">
+        <div class="flow-line"></div>
+        <span class="envelope" id="envelope">✉️</span>
+      </div>
+      <div class="flow-status" id="flowStatus">Готово до відправлення</div>
+      <div style="display:flex; justify-content:center; margin-top:10px;">
+        <button class="btn-primary" onclick="mailFlow.run()" style="padding:10px 20px; font-size:14px;">▶ Надіслати</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Практика</div>
+    <h2>Правильне ім'я для скриньки</h2>
+    <p class="soft">Обери, яке ім'я користувача складене правильно.</p>
+    <div id="usernameList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Практика</div>
+    <h2>Склади свій перший лист</h2>
+    <p class="soft">Заповни всі поля і натисни «Надіслати».</p>
+    <div class="exercise">
+      <div class="compose-box">
+        <div class="compose-field"><label>Кому</label><input type="text" id="fKomu" placeholder="адреса отримувача"></div>
+        <div class="compose-field"><label>Тема</label><input type="text" id="fTema" placeholder="коротко, про що лист"></div>
+        <div class="compose-field"><label>Текст</label><textarea id="fText" placeholder="текст листа"></textarea></div>
+        <div class="compose-send"><button class="btn-primary" onclick="compose.send()" style="padding:10px 20px; font-size:14px;">Надіслати</button></div>
+      </div>
+      <div class="choice-feedback" id="composeFeedback" style="text-align:center; margin-top:10px;"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Практика</div>
+    <h2>Відповісти чи Відповісти всім?</h2>
+    <p class="soft">Обери правильну дію в кожній ситуації.</p>
+    <div id="replyList"></div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div class="quiz-box" id="quizBox">
+      <div class="quiz-progress" id="quizProgress">Запитання 1 з 4</div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
+    </div>
+    <div class="completion" id="completion">
+      <svg class="badge" viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#6C5CE7"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#6C5CE7"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#6C5CE7"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#6C5CE7"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#6C5CE7"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#6C5CE7"/>
+        <circle cx="12" cy="12" r="4.4" fill="#6C5CE7"/><circle cx="12" cy="12" r="1.6" fill="#5340c9" opacity="0.6"/>
+      </svg>
+      <h3>Урок пройдено!</h3>
+      <p>Ти розібрав email-адресу на частини, простежив шлях листа, склав свій перший лист і навчився відрізняти «Відповісти» від «Відповісти всім».</p>
+      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Урок · «Поштові служби Інтернету. Створення скриньки. Надсилання повідомлень» · 6 клас</footer>
+
+<script>
+const STORAGE_KEY = "lesson6-email-basics-neurons";
+let neurons = 0;
+const neuronEl = document.getElementById('neuronCount');
+const hudFill = document.getElementById('hudFill');
+
+function addNeurons(n){
+  neurons += n;
+  neuronEl.textContent = neurons;
+  neuronEl.classList.add('pop');
+  setTimeout(()=>neuronEl.classList.remove('pop'), 250);
+  saveProgress();
+}
+async function saveProgress(){
+  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
+}
+async function loadProgress(){
+  try{
+    const res = await window.storage?.get(STORAGE_KEY, false);
+    if(res && res.value){
+      const d = JSON.parse(res.value);
+      if(typeof d.neurons === 'number'){ neurons = d.neurons; neuronEl.textContent = neurons; }
+    }
+  }catch(e){}
+}
+loadProgress();
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
+});
+
+/* ---------- ADDRESS ANATOMY ---------- */
+(function(){
+  const explain = document.getElementById('addrExplain');
+  const parts = document.querySelectorAll('.addr-part');
+  const texts = {
+    user: "Ім'я користувача — унікальне в межах цього сервера. Часто складають із прізвища та ініціалів.",
+    at: "Символ «@» (комерційне ет) розділяє ім'я користувача і назву поштового сервера.",
+    domain: "Доменне ім'я сервера — показує, яка служба обслуговує цю скриньку: Gmail, ukr.net, i.ua тощо."
+  };
+  const seen = new Set(); let rewarded = false;
+  parts.forEach(p=>{
+    p.addEventListener('click', ()=>{
+      parts.forEach(x=>x.classList.remove('active'));
+      p.classList.add('active');
+      explain.textContent = texts[p.dataset.part];
+      seen.add(p.dataset.part);
+      if(seen.size === 3 && !rewarded){ rewarded = true; addNeurons(1); }
+    });
+  });
+})();
+
+/* ---------- MAIL FLOW ---------- */
+const mailFlow = (function(){
+  const nodes = [
+    { icon:'💻', label:"Комп'ютер відправника" },
+    { icon:'📤', label:'Сервер вихідної пошти' },
+    { icon:'🌐', label:'Інтернет' },
+    { icon:'📥', label:'Сервер отримувача' },
+    { icon:'💻', label:"Комп'ютер отримувача" }
+  ];
+  const track = document.getElementById('flowTrack');
+  const status = document.getElementById('flowStatus');
+  const envelope = document.getElementById('envelope');
+  const nodeEls = [];
+  nodes.forEach(n=>{
+    const el = document.createElement('div');
+    el.className = 'flow-node';
+    el.innerHTML = `<div class="icon">${n.icon}</div><div class="lbl">${n.label}</div>`;
+    track.appendChild(el);
+    nodeEls.push(el);
+  });
+  let done = false;
+  function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+  async function run(){
+    if(done) return;
+    nodeEls.forEach(el=>el.classList.remove('active'));
+    for(let i=0;i<nodeEls.length;i++){
+      const rect = nodeEls[i].getBoundingClientRect();
+      const trackRect = track.getBoundingClientRect();
+      const left = rect.left - trackRect.left + rect.width/2 - 11;
+      envelope.style.left = left + 'px';
+      nodeEls[i].classList.add('active');
+      status.textContent = nodes[i].label;
+      await sleep(650);
+    }
+    status.textContent = 'Лист доставлено ✓';
+    done = true;
+    addNeurons(2);
+  }
+  // initial position
+  setTimeout(()=>{
+    const rect = nodeEls[0].getBoundingClientRect();
+    const trackRect = track.getBoundingClientRect();
+    envelope.style.left = (rect.left - trackRect.left + rect.width/2 - 11) + 'px';
+  }, 50);
+  return { run };
+})();
+
+/* ---------- USERNAME PRACTICE ---------- */
+(function(){
+  const items = [
+    { text:'ivanenko.o', correct:true },
+    { text:'Іваненко Олег 25', correct:false },
+    { text:'o_ivanenko', correct:true },
+    { text:'найкращийучень2011!!!', correct:false }
+  ];
+  const list = document.getElementById('usernameList');
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">
+        <button class="choice-btn" data-v="true">Гарне ім'я</button>
+        <button class="choice-btn" data-v="false">Не варто так називати</button>
+      </div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        const isCorrect = (btn.dataset.v === 'true') === item.correct;
+        if(isCorrect){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+})();
+
+/* ---------- COMPOSE SIMULATION ---------- */
+const compose = (function(){
+  let done = false;
+  function send(){
+    if(done) return;
+    const komu = document.getElementById('fKomu').value.trim();
+    const tema = document.getElementById('fTema').value.trim();
+    const text = document.getElementById('fText').value.trim();
+    const fb = document.getElementById('composeFeedback');
+    if(komu && tema && text){
+      fb.style.color = '#256B36';
+      fb.textContent = 'Лист «надіслано» ✓ Усі три поля заповнені — саме так і працює реальна форма.';
+      done = true;
+      addNeurons(2);
+    } else {
+      fb.style.color = '#B8412A';
+      const missing = [];
+      if(!komu) missing.push('«Кому»');
+      if(!tema) missing.push('«Тема»');
+      if(!text) missing.push('«Текст»');
+      fb.textContent = `Заповни ще поле: ${missing.join(', ')}`;
+    }
+  }
+  return { send };
+})();
+
+/* ---------- REPLY SCENARIOS ---------- */
+(function(){
+  const items = [
+    { text:'Учителька надіслала домашнє завдання всьому класу. Ти хочеш запитати щось лише в неї особисто.', opts:['Відповісти','Відповісти всім','Переслати'], correct:0 },
+    { text:'Друг організовує сюрприз на день народження й написав усім учасникам групи. Ти хочеш підтвердити свою участь так, щоб бачили всі.', opts:['Відповісти','Відповісти всім','Переслати'], correct:1 },
+    { text:'Ти отримав цікаву статтю й хочеш поділитися нею з однокласником, якого не було серед адресатів.', opts:['Відповісти','Відповісти всім','Переслати'], correct:2 }
+  ];
+  const list = document.getElementById('replyList');
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">${item.opts.map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i===item.correct){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Подумай ще раз, хто має це побачити'; }
+      });
+    });
+  });
+})();
+
+/* ---------- FINAL QUIZ ---------- */
+const questions = [
+  { q: "Що розділяє ім'я користувача й назву сервера в email-адресі?", opts: ["Крапка", "Символ @", "Пробіл"], correct: 1 },
+  { q: "Що потрібно зробити ПЕРШИМ, щоб написати нового листа?", opts: ["Натиснути «Написати»", "Ввести текст", "Натиснути «Надіслати»"], correct: 0 },
+  { q: "Друг написав щось особисте лише тобі в груповому листі. Що краще натиснути?", opts: ["Відповісти всім", "Відповісти", "Переслати"], correct: 1 },
+  { q: "Файл якого розширення Gmail не дозволяє вкладати в лист?", opts: [".jpg", ".exe", ".pdf"], correct: 1 }
+];
+let qi=0, currentAnswered=false;
+const quizQ = document.getElementById('quizQ');
+const quizOptions = document.getElementById('quizOptions');
+const quizProgress = document.getElementById('quizProgress');
+const btnNext = document.getElementById('btnNext');
+const quizBox = document.getElementById('quizBox');
+const completion = document.getElementById('completion');
+const totalNeuronsEl = document.getElementById('totalNeurons');
+
+function renderQuestion(){
+  currentAnswered=false; btnNext.classList.remove('active');
+  const item = questions[qi];
+  quizProgress.textContent = `Запитання ${qi+1} з ${questions.length}`;
+  quizQ.textContent = item.q;
+  quizOptions.innerHTML='';
+  item.opts.forEach((opt,i)=>{
+    const b=document.createElement('button'); b.className='quiz-opt'; b.textContent=opt;
+    b.addEventListener('click', ()=>{
+      if(currentAnswered) return; currentAnswered=true;
+      const all = quizOptions.querySelectorAll('.quiz-opt');
+      all.forEach((ob,oi)=>{ if(oi===item.correct) ob.classList.add('correct'); else if(oi===i) ob.classList.add('wrong'); });
+      if(i===item.correct) addNeurons(2);
+      btnNext.classList.add('active');
+      btnNext.textContent = (qi===questions.length-1) ? 'Завершити' : 'Далі';
+    });
+    quizOptions.appendChild(b);
+  });
+}
+btnNext.addEventListener('click', ()=>{
+  if(!btnNext.classList.contains('active')) return;
+  qi++;
+  if(qi<questions.length){ renderQuestion(); }
+  else {
+    quizBox.style.display='none';
+    completion.classList.add('show');
+    addNeurons(3);
+    totalNeuronsEl.textContent = neurons;
+  }
+});
+renderQuestion();
+</script>
+
+</body>
+</html>
