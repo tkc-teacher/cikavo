@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5 клас · Інформатика — Теми уроків</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
+    --purple:#6C5CE7; --purple-dark:#5340c9; --teal:#16A3A0; --coral:#FF6B4A; --yellow:#FFC93C; --blue:#2D9CDB;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  a{color:inherit;}
+  .container{max-width:820px; margin:0 auto; padding:0 24px;}
+
+  .topbar{padding:18px 24px; border-bottom:1px solid var(--line); background:rgba(246,245,251,.9); position:sticky; top:0; backdrop-filter:blur(6px);}
+  .topbar-inner{max-width:820px; margin:0 auto;}
+  .back-link{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--purple-dark); text-decoration:none;}
+  .back-link:hover{text-decoration:underline;}
+
+  .hero{padding:40px 24px 28px;}
+  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--purple-dark); margin-bottom:8px;}
+  .hero h1{font-size:30px; line-height:1.2; margin-bottom:10px;}
+  .hero p{color:var(--ink-soft); font-size:15.5px; max-width:60ch;}
+
+  .semester-title{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:13px; letter-spacing:.04em; color:var(--ink-soft); text-transform:uppercase; margin:34px 0 14px; padding-top:20px; border-top:1px solid var(--line);}
+  .semester-title:first-of-type{border-top:none; margin-top:6px;}
+
+  .theme-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:20px 22px; margin-bottom:18px;}
+  .theme-head{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:6px; flex-wrap:wrap;}
+  .theme-head h2{font-size:17px;}
+  .theme-hours{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; color:var(--ink-soft); background:var(--bg); border-radius:999px; padding:3px 10px; white-space:nowrap;}
+
+  .lesson-row{display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px solid var(--line);}
+  .lesson-row:first-of-type{border-top:none;}
+  .lesson-num{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--ink-soft); width:22px; flex-shrink:0;}
+  .lesson-body{flex:1; min-width:0;}
+  .lesson-title{font-size:14.5px;}
+  .lesson-action{flex-shrink:0;}
+  .btn-open{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; background:var(--purple); color:#fff; text-decoration:none; padding:8px 14px; border-radius:999px; white-space:nowrap; transition:background .15s ease;}
+  .btn-open:hover{background:var(--purple-dark);}
+  .tag-soon{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; color:var(--ink-soft); background:var(--bg); border:1px solid var(--line); padding:6px 12px; border-radius:999px; white-space:nowrap;}
+
+  footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="topbar-inner"><a class="back-link" href="../index.html">← Усі класи</a></div></div>
+
+<section class="hero container">
+  <div class="hero-eyebrow">5 клас · Інформатика</div>
+  <h1>Теми уроків</h1>
+  <p>Урок із кнопкою «Відкрити» вже має готову інтерактивну версію.</p>
+</section>
+
+<div class="container" id="plan"></div>
+
+<footer>5 клас · Інформатика · Інтерактивні уроки</footer>
+
+<script>
+const PLAN = [
+  { semester: "I семестр", themes: [
+    { title: "1. Інтернет та інформаційні процеси", hours: "11 год", lessons: [
+      { title: "Роль інформації у твоєму житті" },
+      { title: "Сучасні технології у побуті. Інформаційні технології у різних професіях. Квантовий комп'ютер. Штучний інтелект" },
+      { title: "Види сучасних комп'ютерів. Вибір комп'ютера для представників різних професій", link: "lesson-computer-systems.html" },
+      { title: "Інформаційні процеси та системи. Поняття передачі даних" },
+      { title: "Цифрові пристрої для передачі повідомлень. Дослідження пристроїв передачі даних" },
+      { title: "Види комп'ютерних мереж. Мережа Інтернет" },
+      { title: "Пошук інформації в Інтернеті. Пошукові системи. Ключові слова, запити" },
+      { title: "Порівняння інформації з різних сайтів. Властивості інформації. Авторське право. Достовірність інформації. Поняття фейку" },
+      { title: "Поняття апаратної і програмної складової комп'ютера. Програмне забезпечення комп'ютера. Поняття операційної системи" },
+      { title: "Поняття файлу та папки. Розширення файлів, шлях до файлу" },
+      { title: "Операції над файлами і папками" }
+    ]},
+    { title: "2. Комп'ютерні презентації", hours: "5 год", lessons: [
+      { title: "Представлення інформації та способи її опрацювання" },
+      { title: "Програмне забезпечення для створення презентацій. Слайдові і потокові презентації" },
+      { title: "Розроблення сценарію презентації та добір ілюстрацій. Створення презентації. Правила оформлення презентації" },
+      { title: "Робота в середовищі створення презентацій. Підсумкова робота" }
+    ]}
+  ]},
+  { semester: "II семестр", themes: [
+    { title: "3. Інформаційні моделі", hours: "5 год", lessons: [
+      { title: "Оформлення експерименту у вигляді презентації" },
+      { title: "Об'єкти та їх властивості. Поняття графічного об'єкта. Створюємо власний графічний об'єкт" },
+      { title: "Програмні середовища для створення графічних об'єктів" },
+      { title: "Поняття моделі. Створюємо моделі за допомогою діаграм" },
+      { title: "Поняття анімації" },
+      { title: "Створюємо анімаційну презентацію. Ефекти анімацій та робота з ними" }
+    ]},
+    { title: "4. Алгоритми та програми", hours: "13 год", lessons: [
+      { title: "Поняття алгоритмічної структури. Лінійні алгоритми" },
+      { title: "Алгоритми з розгалуженням і повторенням. Виконавець алгоритму. Створення алгоритмів" },
+      { title: "Зміна розташування виконавця на сцені. Створення геометричних фігур у середовищі Скретч" },
+      { title: "Зміна та рух спрайта в середовищі Скретч. Створення сузір'я у середовищі Скретч" },
+      { title: "Поняття алгоритмічної структури. Цикли у програмуванні. Складання алгоритмів з повторенням" },
+      { title: "Створення орнаментів у середовищі програмування" },
+      { title: "Визначені цикли. Зміна образу спрайта" },
+      { title: "Типова схема алгоритму з розгалуження. Складання алгоритмів з розгалуженням" },
+      { title: "Програмуємо гру. Працюємо з проєктами" }
+    ]}
+  ]}
+];
+
+const root = document.getElementById('plan');
+PLAN.forEach(sem=>{
+  const semTitle = document.createElement('div');
+  semTitle.className = 'semester-title';
+  semTitle.textContent = sem.semester;
+  root.appendChild(semTitle);
+
+  sem.themes.forEach(theme=>{
+    const card = document.createElement('div');
+    card.className = 'theme-card';
+    const head = document.createElement('div');
+    head.className = 'theme-head';
+    head.innerHTML = `<h2>${theme.title}</h2><span class="theme-hours">${theme.hours}</span>`;
+    card.appendChild(head);
+
+    theme.lessons.forEach((lesson, i)=>{
+      const row = document.createElement('div');
+      row.className = 'lesson-row';
+      const action = lesson.link
+        ? `<a class="btn-open" href="${lesson.link}">Відкрити →</a>`
+        : `<span class="tag-soon">Скоро</span>`;
+      row.innerHTML = `
+        <span class="lesson-num">${i+1}</span>
+        <div class="lesson-body">
+          <div class="lesson-title">${lesson.title}</div>
+        </div>
+        <div class="lesson-action">${action}</div>`;
+      card.appendChild(row);
+    });
+    root.appendChild(card);
+  });
+});
+</script>
+
+</body>
+</html>
