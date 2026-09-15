@@ -75,8 +75,16 @@
   .compose-box{border:1.5px solid var(--line); border-radius:var(--radius-m); overflow:hidden;}
   .compose-field{border-bottom:1px solid var(--line); padding:10px 14px; display:flex; align-items:center; gap:8px;}
   .compose-field label{font-size:13px; color:var(--ink-soft); width:60px; flex-shrink:0;}
-  .compose-field input, .compose-field textarea{border:none; outline:none; flex:1; font-family:'Nunito Sans',sans-serif; font-size:14.5px; background:transparent; resize:none;}
-  .compose-field textarea{min-height:70px; padding-top:8px;}
+  .compose-field input{border:none; outline:none; flex:1; font-family:'Nunito Sans',sans-serif; font-size:14.5px; background:transparent;}
+  .compose-field.text-field{align-items:flex-start;}
+  .compose-text-wrap{flex:1;}
+  .format-toolbar{display:flex; gap:4px; margin-bottom:6px;}
+  .fmt-btn{width:28px; height:28px; border:1.5px solid var(--line); border-radius:6px; background:var(--bg); cursor:pointer; font-family:'Nunito Sans',sans-serif; font-size:13px; display:flex; align-items:center; justify-content:center; color:var(--ink-soft); transition:border-color .15s ease, background .15s ease, color .15s ease;}
+  .fmt-btn:hover{border-color:var(--purple);}
+  .fmt-btn.active{background:#EDE9FF; border-color:var(--purple); color:var(--purple-dark);}
+  .compose-editable{min-height:70px; outline:none; font-family:'Nunito Sans',sans-serif; font-size:14.5px; padding-top:2px; line-height:1.5;}
+  .compose-editable:empty::before{content:attr(data-placeholder); color:#A9A6C2;}
+  .compose-editable ul{margin:4px 0 4px 20px; padding:0;}
   .compose-send{padding:12px 14px; display:flex; justify-content:flex-end;}
   .step-hint{font-size:11.5px; color:var(--blue); margin-left:auto;}
 
@@ -162,8 +170,16 @@
     <div class="trivia">В Україні козаки мали власну систему сповіщення: на високих вежах, розташованих за кілька кілометрів одна від одної, розпалювали великі вогнища, щоб попередити сусідні загони про наближення ворога. По суті, це була мережа передавання сигналу задовго до появи Інтернету.</div>
   </section>
 
+  <section class="block">
+    <div class="step-label">Крок 1 · Провайдери</div>
+    <h2>Де можна створити пошту</h2>
+    <p>Щоб отримати власну поштову скриньку, потрібно зареєструватися в одного з <b>поштових провайдерів</b> — сервісів, які надають місце для листів на своїх серверах. В Україні найчастіше користуються <b>Gmail</b> (від Google), <b>Ukr.net</b> та <b>i.ua</b>. Є ще й міжнародні варіанти, наприклад <b>Outlook</b> від Microsoft.</p>
+    <p class="soft">Кожен провайдер має свій домен — саме ту частину адреси, що йде після «@». Визнач, якому провайдеру належить кожна адреса.</p>
+    <div id="providerList"></div>
+  </section>
+
   <section class="block" id="addr">
-    <div class="step-label">Крок 1 · Адреса</div>
+    <div class="step-label">Крок 2 · Адреса</div>
     <h2>З чого складається email-адреса</h2>
     <p class="soft">Клацни на кожну частину адреси нижче.</p>
     <div class="exercise">
@@ -175,7 +191,7 @@
   </section>
 
   <section class="block">
-    <div class="step-label">Крок 2 · Шлях листа</div>
+    <div class="step-label">Крок 3 · Шлях листа</div>
     <h2>Куди насправді летить лист</h2>
     <p class="soft">Натисни «Надіслати» і простеж шлях від одного комп'ютера до іншого.</p>
     <div class="exercise">
@@ -191,21 +207,61 @@
   </section>
 
   <section class="block">
-    <div class="step-label">Крок 3 · Практика</div>
+    <div class="step-label">Крок 4 · Структура листа</div>
+    <h2>З чого складається лист і чому важлива тема</h2>
+    <p>Лист має кілька частин: <b>Кому</b> — адреса отримувача, <b>Тема</b> — коротко про що лист, <b>Текст</b> — сам зміст, і <b>Підпис</b> у кінці. Ще є поля <b>Копія</b> та <b>Прихована копія</b> — про них розповімо трохи згодом.</p>
+    <p>Тема — це перше, що бачить отримувач ще до відкриття листа. За темою людина вирішує, відкривати лист одразу чи пізніше — а іноді й чи відкривати взагалі.</p>
+    <div class="note">Погана тема: «Привіт». Гарна тема: «Розклад репетицій на п'ятницю». Друга одразу пояснює, про що йдеться, навіть якщо лист ще не відкрито.</div>
+    <p class="soft">Визнач, які теми листів складені вдало.</p>
+    <div id="subjectList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Практика</div>
     <h2>Правильне ім'я для скриньки</h2>
     <p class="soft">Обери, яке ім'я користувача складене правильно.</p>
     <div id="usernameList"></div>
   </section>
 
   <section class="block">
-    <div class="step-label">Крок 4 · Практика</div>
+    <div class="step-label">Крок 6 · Вкладення</div>
+    <h2>Картинки та файли в листі</h2>
+    <p>До листа можна додати не лише текст, а й файли: фото, документи, аудіо, відео. Такі файли називають <b>вкладеннями</b>. Малюнок можна вставити просто в текст листа як ілюстрацію або прикріпити окремим файлом.</p>
+    <div class="note">У Gmail є обмеження: вкладення разом не можуть важити більше 25 МБ, а файли з розширенням <b>.exe</b> заборонені — так сервіс захищає користувачів від вірусів.</div>
+    <p class="soft">Чи можна вкласти цей файл у лист?</p>
+    <div id="attachList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 7 · Кілька отримувачів</div>
+    <h2>Лист можна надіслати не лише одній людині</h2>
+    <p>Поле <b>Кому</b> — основні отримувачі, вони бачать одне одного. <b>Копія</b> — ті, кому лист надсилають «для інформації»; вони теж бачать усіх інших отримувачів. <b>Прихована копія</b> — отримувач бачить лист, але інші адресати навіть не здогадуються про нього.</p>
+    <p class="soft">Обери правильне поле для кожної ситуації.</p>
+    <div id="ccList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 8 · Практика</div>
     <h2>Склади свій перший лист</h2>
-    <p class="soft">Заповни всі поля і натисни «Надіслати».</p>
+    <p class="soft">Заповни обов'язкові поля (Кому, Тема, Текст) і натисни «Надіслати». Копію та приховану копію заповнювати не обов'язково. У полі «Текст» можна форматувати написане — виділи слово й натисни кнопку на панелі над полем.</p>
     <div class="exercise">
       <div class="compose-box">
         <div class="compose-field"><label>Кому</label><input type="text" id="fKomu" placeholder="адреса отримувача"></div>
+        <div class="compose-field"><label>Копія</label><input type="text" id="fCopy" placeholder="необов'язково"></div>
+        <div class="compose-field"><label>Прих. копія</label><input type="text" id="fBcc" placeholder="необов'язково"></div>
         <div class="compose-field"><label>Тема</label><input type="text" id="fTema" placeholder="коротко, про що лист"></div>
-        <div class="compose-field"><label>Текст</label><textarea id="fText" placeholder="текст листа"></textarea></div>
+        <div class="compose-field text-field">
+          <label>Текст</label>
+          <div class="compose-text-wrap">
+            <div class="format-toolbar">
+              <button type="button" class="fmt-btn" data-cmd="bold" title="Жирний"><b>Ж</b></button>
+              <button type="button" class="fmt-btn" data-cmd="italic" title="Курсив"><i>К</i></button>
+              <button type="button" class="fmt-btn" data-cmd="underline" title="Підкреслений"><u>П</u></button>
+              <button type="button" class="fmt-btn" data-cmd="insertUnorderedList" title="Список">☰</button>
+            </div>
+            <div class="compose-editable" id="fText" contenteditable="true" data-placeholder="текст листа"></div>
+          </div>
+        </div>
         <div class="compose-send"><button class="btn-primary" onclick="compose.send()" style="padding:10px 20px; font-size:14px;">Надіслати</button></div>
       </div>
       <div class="choice-feedback" id="composeFeedback" style="text-align:center; margin-top:10px;"></div>
@@ -213,8 +269,9 @@
   </section>
 
   <section class="block">
-    <div class="step-label">Крок 5 · Практика</div>
-    <h2>Відповісти чи Відповісти всім?</h2>
+    <div class="step-label">Крок 9 · Практика</div>
+    <h2>Відповісти, Відповісти всім чи Переслати?</h2>
+    <p><b>Відповісти</b> надсилає повідомлення назад лише тому, хто написав. <b>Відповісти всім</b> — усім, хто отримав оригінальний лист. <b>Переслати</b> — надсилає весь лист новій людині, якої серед адресатів не було.</p>
     <p class="soft">Обери правильну дію в кожній ситуації.</p>
     <div id="replyList"></div>
   </section>
@@ -223,7 +280,7 @@
     <div class="step-label">Підсумок</div>
     <h2>Коротка перевірка</h2>
     <div class="quiz-box" id="quizBox">
-      <div class="quiz-progress" id="quizProgress">Запитання 1 з 4</div>
+      <div class="quiz-progress" id="quizProgress">Запитання 1 з 6</div>
       <div class="quiz-q" id="quizQ"></div>
       <div class="quiz-options" id="quizOptions"></div>
       <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
@@ -239,7 +296,7 @@
         <circle cx="12" cy="12" r="4.4" fill="#6C5CE7"/><circle cx="12" cy="12" r="1.6" fill="#5340c9" opacity="0.6"/>
       </svg>
       <h3>Урок пройдено!</h3>
-      <p>Ти розібрав email-адресу на частини, простежив шлях листа, склав свій перший лист і навчився відрізняти «Відповісти» від «Відповісти всім».</p>
+      <p>Ти дізнався, де створюють пошту, розібрав адресу й структуру листа на частини, простежив його шлях, навчився працювати з вкладеннями, кількома отримувачами та різницею між «Відповісти» і «Переслати».</p>
       <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
     </div>
   </section>
@@ -381,6 +438,148 @@ const mailFlow = (function(){
   });
 })();
 
+/* ---------- PROVIDERS ---------- */
+(function(){
+  const items = [
+    { text:'taras.k@gmail.com', opts:['Google','Ukr.net','i.ua'], correct:0 },
+    { text:'info@ukr.net', opts:['Google','Ukr.net','i.ua'], correct:1 },
+    { text:'school131@i.ua', opts:['Google','Ukr.net','i.ua'], correct:2 }
+  ];
+  const list = document.getElementById('providerList');
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">${item.opts.map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i===item.correct){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Придивись до доменного імені після «@»'; }
+      });
+    });
+  });
+})();
+
+/* ---------- SUBJECT LINE PRACTICE ---------- */
+(function(){
+  const items = [
+    { text:'Привіт', correct:false },
+    { text:'Домашнє завдання на понеділок з математики', correct:true },
+    { text:'!!!!', correct:false },
+    { text:'Запрошення на шкільний концерт 25 травня', correct:true }
+  ];
+  const list = document.getElementById('subjectList');
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">«${item.text}»</p>
+      <div class="choice-row">
+        <button class="choice-btn" data-v="true">Гарна тема</button>
+        <button class="choice-btn" data-v="false">Невдала тема</button>
+      </div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        const isCorrect = (btn.dataset.v === 'true') === item.correct;
+        if(isCorrect){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+})();
+
+/* ---------- ATTACHMENTS PRACTICE ---------- */
+(function(){
+  const items = [
+    { text:'фото.jpg', correct:true },
+    { text:'setup.exe', correct:false },
+    { text:'документ.pdf', correct:true },
+    { text:'архів.exe', correct:false }
+  ];
+  const list = document.getElementById('attachList');
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">
+        <button class="choice-btn" data-v="true">Так, можна</button>
+        <button class="choice-btn" data-v="false">Ні, заблоковано</button>
+      </div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        const isCorrect = (btn.dataset.v === 'true') === item.correct;
+        if(isCorrect){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Подивись уважно на розширення файлу'; }
+      });
+    });
+  });
+})();
+
+/* ---------- CC / BCC PRACTICE ---------- */
+(function(){
+  const items = [
+    { text:'Лист напряму стосується цієї людини — вона повинна відповісти', opts:['Кому','Копія','Прихована копія'], correct:0 },
+    { text:'Людині просто цікаво бути в курсі, відповідати їй не обов\'язково', opts:['Кому','Копія','Прихована копія'], correct:1 },
+    { text:'Ти хочеш, щоб ця людина бачила лист, а інші отримувачі про це не здогадались', opts:['Кому','Копія','Прихована копія'], correct:2 }
+  ];
+  const list = document.getElementById('ccList');
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">${item.opts.map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i===item.correct){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+})();
+
+/* ---------- FORMATTING TOOLBAR ---------- */
+(function(){
+  const editable = document.getElementById('fText');
+  const buttons = document.querySelectorAll('.fmt-btn');
+  buttons.forEach(btn=>{
+    btn.addEventListener('mousedown', (e)=>{ e.preventDefault(); });
+    btn.addEventListener('click', ()=>{
+      editable.focus();
+      document.execCommand(btn.dataset.cmd, false, null);
+      updateToolbarState();
+    });
+  });
+  function updateToolbarState(){
+    buttons.forEach(btn=>{
+      try{
+        const active = document.queryCommandState(btn.dataset.cmd);
+        btn.classList.toggle('active', active);
+      }catch(e){}
+    });
+  }
+  editable.addEventListener('keyup', updateToolbarState);
+  editable.addEventListener('mouseup', updateToolbarState);
+})();
+
 /* ---------- COMPOSE SIMULATION ---------- */
 const compose = (function(){
   let done = false;
@@ -388,11 +587,11 @@ const compose = (function(){
     if(done) return;
     const komu = document.getElementById('fKomu').value.trim();
     const tema = document.getElementById('fTema').value.trim();
-    const text = document.getElementById('fText').value.trim();
+    const text = document.getElementById('fText').innerText.trim();
     const fb = document.getElementById('composeFeedback');
     if(komu && tema && text){
       fb.style.color = '#256B36';
-      fb.textContent = 'Лист «надіслано» ✓ Усі три поля заповнені — саме так і працює реальна форма.';
+      fb.textContent = 'Лист «надіслано» ✓ Усі обов\'язкові поля заповнені — саме так і працює реальна форма.';
       done = true;
       addNeurons(2);
     } else {
@@ -437,9 +636,11 @@ const compose = (function(){
 /* ---------- FINAL QUIZ ---------- */
 const questions = [
   { q: "Що розділяє ім'я користувача й назву сервера в email-адресі?", opts: ["Крапка", "Символ @", "Пробіл"], correct: 1 },
-  { q: "Що потрібно зробити ПЕРШИМ, щоб написати нового листа?", opts: ["Натиснути «Написати»", "Ввести текст", "Натиснути «Надіслати»"], correct: 0 },
+  { q: "Чому важливо вказувати конкретну тему листа?", opts: ["Отримувач одразу розуміє, про що лист", "Це вимога закону", "На зміст листа це не впливає"], correct: 0 },
+  { q: "Файл якого розширення Gmail не дозволяє вкладати в лист?", opts: [".jpg", ".exe", ".pdf"], correct: 1 },
+  { q: "Яке поле обереш, якщо хочеш, щоб отримувач бачив лист, а інші адресати про це не знали?", opts: ["Кому", "Копія", "Прихована копія"], correct: 2 },
   { q: "Друг написав щось особисте лише тобі в груповому листі. Що краще натиснути?", opts: ["Відповісти всім", "Відповісти", "Переслати"], correct: 1 },
-  { q: "Файл якого розширення Gmail не дозволяє вкладати в лист?", opts: [".jpg", ".exe", ".pdf"], correct: 1 }
+  { q: "Яка адреса належить провайдеру Ukr.net?", opts: ["taras@gmail.com", "taras@ukr.net", "taras@outlook.com"], correct: 1 }
 ];
 let qi=0, currentAnswered=false;
 const quizQ = document.getElementById('quizQ');

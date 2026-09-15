@@ -54,6 +54,29 @@
   /* EMAIL SNIPPET CARDS */
   .snippet{background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px; margin-bottom:10px; font-size:14px; font-style:italic; color:var(--ink-soft);}
 
+  /* PASSWORD STRENGTH */
+  .pw-input{width:100%; font-family:'Nunito Sans',sans-serif; font-size:15px; padding:12px 14px; border:1.5px solid var(--line); border-radius:var(--radius-s); outline:none; transition:border-color .15s ease;}
+  .pw-input:focus{border-color:var(--purple);}
+  .pw-criteria{display:flex; flex-direction:column; gap:7px; margin-top:16px;}
+  .pw-crit{display:flex; align-items:center; gap:9px; font-size:13.5px; color:var(--ink-soft); transition:color .15s ease;}
+  .pw-crit.met{color:var(--ink); font-weight:600;}
+  .pw-crit .dot{width:17px; height:17px; border-radius:50%; border:2px solid var(--line); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:10px; color:#fff; transition:background .15s ease, border-color .15s ease;}
+  .pw-crit.met .dot{background:#3FAE58; border-color:#3FAE58;}
+  .pw-crit.met .dot::after{content:'✓';}
+  .pw-meter-bar{height:8px; background:var(--line); border-radius:999px; overflow:hidden; margin-top:18px;}
+  .pw-meter-fill{height:100%; width:0%; transition:width .25s ease, background .25s ease; background:var(--coral);}
+  .pw-meter-label{margin-top:8px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; color:var(--ink-soft);}
+
+  /* SPAM EMAIL / RED FLAGS */
+  .email-preview{background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:16px 18px; font-size:14px; line-height:1.75; color:var(--ink);}
+  .email-preview .meta{font-size:12.5px; color:var(--ink-soft); margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--line);}
+  .flag{cursor:pointer; border-bottom:2px dotted var(--coral); transition:background .15s ease, border-color .15s ease;}
+  .flag.found{background:#E4F8E6; border-bottom:2px solid #3FAE58; border-radius:4px; padding:0 2px;}
+  .flag.wrong-try{background:#FDE6E1; border-radius:4px; padding:0 2px;}
+  @keyframes flagShake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-3px);} 75%{transform:translateX(3px);}}
+  .flag.wrong-try{animation:flagShake .3s ease;}
+  .flags-progress{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--purple-dark); margin-top:14px; min-height:1.4em;}
+
   .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:16px 18px; margin:12px 0;}
   .classify-card p.q{font-weight:700; margin:0 0 10px; font-size:15px;}
   .choice-row{display:flex; gap:8px; flex-wrap:wrap;}
@@ -161,18 +184,62 @@
   </section>
 
   <section class="block">
-    <div class="step-label">Крок 3 · Спам</div>
-    <h2>Як ховають адресу від ботів</h2>
+    <div class="step-label">Крок 3 · Паролі</div>
+    <h2>Що робить пароль надійним</h2>
+    <p>Надійний пароль має бути не коротшим за 8 символів і містити велику літеру, малу літеру, цифру та спеціальний символ. Не варто використовувати своє ім'я, вік чи клас — це найперше, що спробує підібрати зловмисник.</p>
+    <p class="soft">Спробуй ввести будь-який пароль нижче й подивись, як змінюється індикатор.</p>
+    <div class="exercise">
+      <input type="text" class="pw-input" id="pwInput" placeholder="Введи пароль тут...">
+      <div class="pw-criteria" id="pwCriteria">
+        <div class="pw-crit" data-c="len"><span class="dot"></span>Не менше 8 символів</div>
+        <div class="pw-crit" data-c="upper"><span class="dot"></span>Велика латинська літера</div>
+        <div class="pw-crit" data-c="lower"><span class="dot"></span>Маленька латинська літера</div>
+        <div class="pw-crit" data-c="digit"><span class="dot"></span>Цифра</div>
+        <div class="pw-crit" data-c="special"><span class="dot"></span>Спеціальний символ (#, $, !...)</div>
+      </div>
+      <div class="pw-meter-bar"><div class="pw-meter-fill" id="pwMeterFill"></div></div>
+      <div class="pw-meter-label" id="pwMeterLabel">Почни вводити пароль</div>
+    </div>
+
+    <p class="soft" style="margin-top:22px;">А тепер спробуй визначити на око, без підказок.</p>
+    <div id="pwQuizList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Спам та реклама</div>
+    <h2>Непроханий лист — це ще не завжди небезпека</h2>
+    <p><b>Спам</b> — масові непрохані листи: реклама, розсилки, а іноді й шахрайство. Тому корисно розрізняти три типи листів: звичайний лист, <b>рекламу, на яку ти сам підписався</b>, і <b>спам</b>.</p>
+
+    <h3 style="font-size:16px; margin:20px 0 8px;">Знайди ознаки підозрілого листа</h3>
+    <p class="soft">Серед позначених фрагментів листа лише 4 справді підозрілі — решта звичайні. Клацай тільки на ті, що здаються тобі ознакою шахрайства.</p>
+    <div class="exercise">
+      <div class="email-preview">
+        <div class="meta">Від: <span class="flag real" data-flag="sender">prize-winner2024@free-mail-bonus.ru</span></div>
+        <div><span class="flag real" data-flag="subject">ТЕРМІНОВО!! Ви виграли головний приз!!!</span></div>
+        <p style="margin:10px 0 6px;"><span class="flag decoy">Доброго дня!</span></p>
+        <p style="margin:0 0 6px;">Ваша електронна адреса стала переможцем розіграшу. Щоб отримати приз у розмірі <span class="flag real" data-flag="prize">50 000 грн</span>, <span class="flag real" data-flag="urgency">натисніть на посилання нижче протягом 24 годин, інакше приз згорить назавжди</span>.</p>
+        <p style="margin:0;"><span class="flag decoy">З повагою, Адміністрація лотереї</span></p>
+      </div>
+      <div class="flags-progress" id="flagsProgress">Знайдено: 0 з 4</div>
+    </div>
+
+    <h3 style="font-size:16px; margin:26px 0 8px;">Спам, реклама чи звичайний лист?</h3>
+    <p class="soft">Визнач тип кожного листа.</p>
+    <div id="spamTypeList"></div>
+
+    <h3 style="font-size:16px; margin:26px 0 8px;">Як ховають адресу від ботів</h3>
     <p>Спам-боти автоматично шукають адреси в Інтернеті за символом «@». Тому досвідчені користувачі іноді пишуть адресу так, щоб людина зрозуміла, а бот — ні: наприклад, <b>ivan[собака]gmail.com</b> замість <b>ivan@gmail.com</b>.</p>
     <div class="exercise">
       <p class="soft" style="margin-bottom:10px;">Яка адреса написана «замаскованим» способом проти ботів?</p>
       <div class="choice-row" id="spamChoices" style="justify-content:center;"></div>
       <div class="choice-feedback" id="spamFeedback" style="text-align:center; margin-top:10px;"></div>
     </div>
+
+    <div class="note">Поштові служби, зокрема Gmail, самі виявляють більшість спаму й одразу переносять такі листи в папку «Спам». Якщо туди потрапив лист, якого там бути не мало — це просто помилка фільтра, і його можна перемістити назад.</div>
   </section>
 
   <section class="block">
-    <div class="step-label">Крок 4 · Фішинг</div>
+    <div class="step-label">Крок 5 · Фішинг</div>
     <h2>Як працює шахрайська схема</h2>
     <p><b>Фішинг</b> — це коли шахраї створюють фальшивий сайт, схожий на справжній, і намагаються виманити твій пароль. Онови порядок кроків цієї схеми — клацай картки в правильній послідовності.</p>
     <div class="exercise">
@@ -187,7 +254,16 @@
   </section>
 
   <section class="block">
-    <div class="step-label">Крок 5 · Підсумок дій</div>
+    <div class="step-label">Крок 6 · Вкладення</div>
+    <h2>Файл теж може бути небезпечним</h2>
+    <p>Віруси часто ховаються саме у вкладених файлах. Найбільше остерігайся: виконуваних файлів (<b>.exe</b>, <b>.bat</b>), файлів із подвійним розширенням на кшталт <b>фото.jpg.exe</b> (це не фото, а замаскована програма), і архівів <b>.zip</b>/<b>.rar</b> від незнайомців.</p>
+    <div class="trivia">Небезпечний файл може прийти навіть від друга — якщо його поштову скриньку зламали, вірус розсилає копії себе усім контактам. Тому підозрілий файл (навіть від знайомого) краще уточнити іншим каналом, перш ніж відкривати.</div>
+    <p class="soft">Відкривати чи ні?</p>
+    <div id="attachRiskList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 7 · Підсумок дій</div>
     <h2>Безпечно чи ризиковано?</h2>
     <div id="riskList"></div>
   </section>
@@ -196,7 +272,7 @@
     <div class="step-label">Підсумок</div>
     <h2>Коротка перевірка</h2>
     <div class="quiz-box" id="quizBox">
-      <div class="quiz-progress" id="quizProgress">Запитання 1 з 4</div>
+      <div class="quiz-progress" id="quizProgress">Запитання 1 з 8</div>
       <div class="quiz-q" id="quizQ"></div>
       <div class="quiz-options" id="quizOptions"></div>
       <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
@@ -212,7 +288,7 @@
         <circle cx="12" cy="12" r="4.4" fill="#FF6B4A"/><circle cx="12" cy="12" r="1.6" fill="#B8412A" opacity="0.6"/>
       </svg>
       <h3>Урок пройдено!</h3>
-      <p>Ти навчився розпізнавати ввічливий лист, реагувати на ризиковані ситуації і розбирати схему фішингу крок за кроком.</p>
+      <p>Ти навчився розпізнавати ввічливий лист, складати надійний пароль, відрізняти спам від реклами, обережно ставитись до вкладених файлів і розбирати схему фішингу крок за кроком.</p>
       <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
     </div>
   </section>
@@ -314,6 +390,131 @@ makeClassify('etiquetteList', [
   });
 })();
 
+/* ---------- PASSWORD STRENGTH METER ---------- */
+function evaluatePassword(pw){
+  return {
+    len: pw.length >= 8,
+    upper: /[A-Z]/.test(pw),
+    lower: /[a-z]/.test(pw),
+    digit: /[0-9]/.test(pw),
+    special: /[^A-Za-z0-9]/.test(pw)
+  };
+}
+(function(){
+  const input = document.getElementById('pwInput');
+  const critEls = document.querySelectorAll('#pwCriteria .pw-crit');
+  const fill = document.getElementById('pwMeterFill');
+  const label = document.getElementById('pwMeterLabel');
+  let rewarded4 = false, rewarded5 = false;
+
+  input.addEventListener('input', ()=>{
+    const pw = input.value;
+    const r = evaluatePassword(pw);
+    let score = 0;
+    critEls.forEach(el=>{
+      const key = el.dataset.c;
+      if(r[key]){ el.classList.add('met'); score++; }
+      else{ el.classList.remove('met'); }
+    });
+    if(pw.length === 0){
+      fill.style.width = '0%'; fill.style.background = 'var(--line)';
+      label.textContent = 'Почни вводити пароль';
+      return;
+    }
+    const pct = (score/5)*100;
+    fill.style.width = pct + '%';
+    if(score <= 2){ fill.style.background = 'var(--coral)'; label.textContent = 'Слабкий пароль'; }
+    else if(score <= 4){ fill.style.background = 'var(--yellow)'; label.textContent = 'Середній пароль'; if(!rewarded4){ rewarded4 = true; addNeurons(1); } }
+    else { fill.style.background = '#3FAE58'; label.textContent = 'Надійний пароль ✓'; if(!rewarded5){ rewarded5 = true; addNeurons(2); } }
+  });
+})();
+
+/* ---------- PASSWORD QUICK CHECK ---------- */
+(function(){
+  const items = [
+    { text:'12345678', correct:false },
+    { text:'password', correct:false },
+    { text:'K9$mPz47', correct:true }
+  ];
+  const list = document.getElementById('pwQuizList');
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">
+        <button class="choice-btn" data-v="true">Надійний</button>
+        <button class="choice-btn" data-v="false">Слабкий</button>
+      </div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        const isCorrect = (btn.dataset.v === 'true') === item.correct;
+        if(isCorrect){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+})();
+
+/* ---------- FIND THE RED FLAGS ---------- */
+(function(){
+  const allSpans = document.querySelectorAll('.flag');
+  const realFlags = document.querySelectorAll('.flag.real');
+  const found = new Set();
+  const progress = document.getElementById('flagsProgress');
+  allSpans.forEach(f=>{
+    f.addEventListener('click', ()=>{
+      if(f.classList.contains('found')) return;
+      if(f.classList.contains('decoy')){
+        f.classList.add('wrong-try');
+        setTimeout(()=>f.classList.remove('wrong-try'), 400);
+        return;
+      }
+      f.classList.add('found');
+      found.add(f.dataset.flag);
+      progress.textContent = `Знайдено: ${found.size} з ${realFlags.length}`;
+      addNeurons(1);
+      if(found.size === realFlags.length){
+        progress.textContent = 'Усі ознаки знайдено ✓ Термінові обіцянки, приз "нізвідки" й дивна адреса відправника — три типові сигнали шахрайського листа.';
+        addNeurons(2);
+      }
+    });
+  });
+})();
+
+/* ---------- SPAM vs ADS vs NORMAL ---------- */
+(function(){
+  const items = [
+    { text:'«Знижка 90% на все — лише сьогодні!» від незнайомого відправника', opts:['Спам','Реклама, на яку я підписаний','Звичайний лист'], correct:0 },
+    { text:'Щотижнева розсилка новин від блогу, на який ти сам підписався', opts:['Спам','Реклама, на яку я підписаний','Звичайний лист'], correct:1 },
+    { text:'Нагадування від вчительки про завтрашню контрольну роботу', opts:['Спам','Реклама, на яку я підписаний','Звичайний лист'], correct:2 },
+    { text:'Лист нібито від банку з проханням негайно підтвердити пароль за посиланням', opts:['Спам','Реклама, на яку я підписаний','Звичайний лист'], correct:0 },
+    { text:'Підтвердження реєстрації на шкільну олімпіаду з інформатики', opts:['Спам','Реклама, на яку я підписаний','Звичайний лист'], correct:2 }
+  ];
+  const list = document.getElementById('spamTypeList');
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">${item.opts.map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i===item.correct){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+})();
+
 /* ---------- SPAM MASKING ---------- */
 (function(){
   const options = [
@@ -395,6 +596,14 @@ const phishOrder = (function(){
   return { reset, check };
 })();
 
+/* ---------- DANGEROUS ATTACHMENTS ---------- */
+makeClassify('attachRiskList', [
+  { text:'фото_з_дня_народження.jpg від друга, якого ти чекав', correct:true },
+  { text:'рахунок.pdf.exe від невідомого відправника', correct:false },
+  { text:'домашнє_завдання.docx від однокласниці, з яким ви домовлялись', correct:true },
+  { text:'архів.zip «твій приз» від адреси, яку ти бачиш вперше', correct:false }
+], 'Відкрити', 'Не відкривати');
+
 /* ---------- RISK SUMMARY ---------- */
 (function(){
   const items = [
@@ -430,7 +639,11 @@ const phishOrder = (function(){
 /* ---------- FINAL QUIZ ---------- */
 const questions = [
   { q: "Чому не варто писати ВЕЛИКИМИ ЛІТЕРАМИ в листі?", opts: ["Це сприймається як крик", "Це заборонено технічно", "Літери можуть не відобразитись"], correct: 0 },
+  { q: "Що НЕ варто використовувати як частину пароля?", opts: ["Своє ім'я або клас", "Велику й малу літери разом", "Спеціальний символ"], correct: 0 },
+  { q: "Чим реклама, на яку ти сам підписався, відрізняється від спаму?", opts: ["Нічим, це те саме", "Ти сам погодився її отримувати", "Реклама завжди небезпечна, а спам — ні"], correct: 1 },
+  { q: "Яка ознака НАЙБІЛЬШЕ схожа на типовий спам-лист?", opts: ["Спокійний тон і чітка адреса відправника", "«Терміново! Ти виграв приз, натисни зараз!»", "Прохання перевірити домашнє завдання"], correct: 1 },
   { q: "Що таке фішинг?", opts: ["Різновид спаму про знижки", "Шахрайська схема виманювання пароля через фальшивий сайт", "Помилка поштового сервера"], correct: 1 },
+  { q: "Чому файл «фото.jpg.exe» небезпечний, хоча в назві є «.jpg»?", opts: ["Насправді це програма, замаскована подвійним розширенням", "Це просто дуже велике фото", "Розширення .jpg.exe взагалі не існує"], correct: 0 },
   { q: "Як безпечніше перейти на відомий сайт, якщо лист виглядає підозріло?", opts: ["Клацнути посилання з листа", "Ввести адресу вручну в браузері", "Переслати лист другу й запитати"], correct: 1 },
   { q: "Що варто зробити, завершивши роботу на чужому комп'ютері?", opts: ["Нічого, просто закрити вкладку", "Вийти зі свого облікового запису", "Змінити мову інтерфейсу"], correct: 1 }
 ];
