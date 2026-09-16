@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Персональний цифровий простір — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
+    --purple:#6C5CE7; --purple-dark:#5340c9; --teal:#16A3A0; --coral:#FF6B4A; --yellow:#FFC93C; --pink:#FF5D9E; --blue:#2D9CDB;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  .container{max-width:800px; margin:0 auto; padding:0 24px;}
+
+  .hud{position:sticky; top:0; z-index:50; background:rgba(246,245,251,.9); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
+  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--blue),var(--purple)); transition:width .3s ease;}
+  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:800px; margin:0 auto;}
+  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
+  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
+  .neuron-counter svg{width:24px;height:24px;}
+  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
+  #neuronCount.pop{transform:scale(1.35);}
+
+  .hero{padding:52px 24px 40px;}
+  .hero-inner{max-width:800px; margin:0 auto; display:flex; align-items:center; gap:30px;}
+  .hero-text{flex:1;}
+  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--blue); margin-bottom:10px;}
+  .hero h1{font-size:32px; line-height:1.18; margin-bottom:12px;}
+  .hero p{color:var(--ink-soft); font-size:16.5px; max-width:54ch; margin-bottom:22px;}
+  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--purple); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
+  .btn-primary:hover{background:var(--purple-dark);}
+  .btn-primary:active{transform:scale(.97);}
+  .mascot{width:130px; height:130px; flex-shrink:0;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:100px; height:100px;} }
+
+  section.block{padding:38px 0; border-top:1px solid var(--line);}
+  .step-label{font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:600; color:var(--blue); margin-bottom:8px;}
+  .block h2{font-size:21px; margin-bottom:10px; max-width:38ch;}
+  .block h3{font-size:16px; margin:20px 0 8px;}
+  .block p{max-width:66ch; font-size:16px; margin:0 0 14px; color:var(--ink);}
+  .block p.soft{color:var(--ink-soft); font-size:15px;}
+  .block ul{max-width:66ch; margin:0 0 14px; padding-left:20px; font-size:15px;}
+  .block ul li{margin-bottom:4px;}
+  .note{background:#EAF5FC; border-left:4px solid var(--blue); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; color:#2A6B8C; margin:16px 0;}
+  .trivia{background:#FFF7E9; border-left:4px solid var(--yellow); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14px; color:#8A6A1A; margin:16px 0;}
+
+  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:22px; margin-top:18px;}
+
+  /* FLIP GALLERY */
+  .gallery{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:16px;}
+  @media (max-width:520px){ .gallery{grid-template-columns:1fr;} }
+  .flip-card{perspective:1200px; height:130px; cursor:pointer;}
+  .flip-inner{position:relative; width:100%; height:100%; transition:transform .6s cubic-bezier(.4,0,.2,1); transform-style:preserve-3d;}
+  .flip-card.flipped .flip-inner{transform:rotateY(180deg);}
+  .flip-face{position:absolute; inset:0; backface-visibility:hidden; border-radius:var(--radius-m); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:14px; text-align:center; border:2px solid var(--card-c, var(--line));}
+  .flip-front{background:var(--surface);}
+  .flip-front .icon{font-size:28px; margin-bottom:6px;}
+  .flip-front .name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14.5px;}
+  .flip-back{background:var(--card-c-light, #F0EFF9); transform:rotateY(180deg); font-size:12.5px; color:var(--ink-soft); line-height:1.35;}
+
+  /* CLASSIFY CARDS */
+  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:16px 18px; margin:12px 0;}
+  .classify-card p.q{font-weight:700; margin:0 0 10px; font-size:15px;}
+  .choice-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; padding:8px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease, color .15s ease;}
+  .choice-btn:hover{border-color:var(--purple);}
+  .choice-btn.correct{background:#E4F8E6; border-color:#3FAE58; color:#256B36;}
+  .choice-btn.wrong{background:#FDE6E1; border-color:var(--coral); color:#B8412A;}
+  .choice-feedback{margin-top:8px; font-size:13.5px; color:var(--ink-soft); min-height:1.2em;}
+
+  /* SORT INTO BUCKETS */
+  .sort-buckets{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  @media (max-width:480px){ .sort-buckets{grid-template-columns:1fr;} }
+  .bucket{border:2px dashed var(--line); border-radius:var(--radius-m); padding:12px; min-height:100px;}
+  .bucket-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--ink-soft); margin-bottom:8px; text-align:center;}
+  .bucket-items{display:flex; flex-wrap:wrap; gap:6px; min-height:36px;}
+  .bucket.hint{border-color:var(--purple);}
+  .sort-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:14px;}
+  .sort-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:8px 14px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .sort-chip:hover{transform:translateY(-2px);}
+  .sort-chip.selected{border-color:var(--purple); box-shadow:0 0 0 3px rgba(108,92,231,0.18);}
+  .sort-chip.placed{background:#E4F8E6; border-color:#3FAE58; cursor:default;}
+  .sort-chip.placed:hover{transform:none;}
+
+  /* DRAG AND DROP: RELIABLE VS FAKE */
+  .dd-board{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  @media (max-width:480px){ .dd-board{grid-template-columns:1fr;} }
+  .dd-zone{border:2px dashed var(--line); border-radius:var(--radius-m); padding:12px; min-height:90px; transition:border-color .15s ease, background .15s ease;}
+  .dd-zone.over{border-color:var(--purple); background:#F0EFF9;}
+  .dd-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--ink-soft); margin-bottom:8px; text-align:center;}
+  .dd-items{display:flex; flex-wrap:wrap; gap:6px; min-height:30px;}
+  .dd-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:14px;}
+  .dd-chip{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12.5px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-s); padding:8px 12px; cursor:grab; max-width:220px; transition:border-color .15s ease, opacity .15s ease, transform .12s ease;}
+  .dd-chip:hover{transform:translateY(-2px);}
+  .dd-chip.selected{border-color:var(--purple); box-shadow:0 0 0 3px rgba(108,92,231,0.18);}
+  .dd-chip.dragging{opacity:.4;}
+  .dd-chip.correct-placed{border-color:#3FAE58; background:#E4F8E6; cursor:default;}
+  .dd-chip.wrong-flash{animation:itemShake .35s ease; border-color:var(--coral);}
+  @keyframes itemShake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
+
+  .gallery-3{grid-template-columns:repeat(3,1fr);}
+  @media (max-width:640px){ .gallery-3{grid-template-columns:repeat(2,1fr);} }
+
+  /* FAKE SITE / RED FLAGS */
+  .site-preview{background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:16px 18px; font-size:14px; line-height:1.75; color:var(--ink);}
+  .site-preview .url{font-family:'Baloo 2',sans-serif; font-size:12.5px; color:var(--ink-soft); margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--line);}
+  .flag{cursor:pointer; border-bottom:2px dotted var(--coral); transition:background .15s ease, border-color .15s ease;}
+  .flag.found{background:#E4F8E6; border-bottom:2px solid #3FAE58; border-radius:4px; padding:0 2px;}
+  .flag.wrong-try{background:#FDE6E1; border-radius:4px; padding:0 2px;}
+  @keyframes flagShake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-3px);} 75%{transform:translateX(3px);}}
+  .flag.wrong-try{animation:flagShake .3s ease;}
+  .flags-progress{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--purple-dark); margin-top:14px; min-height:1.4em;}
+
+  /* TOOL MATCHING */
+  .tool-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:14px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:16px;}
+  .tool-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:8px 14px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .tool-chip:hover{transform:translateY(-2px);}
+  .tool-chip.selected{border-color:var(--purple); box-shadow:0 0 0 3px rgba(108,92,231,0.18);}
+  .tool-chip.placed{display:none;}
+  .func-card{display:flex; align-items:center; gap:12px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; margin-bottom:10px; transition:border-color .2s ease, background .2s ease;}
+  .func-card.matched{border-color:var(--yellow); background:#FFFBEE;}
+  .func-card.shake{animation:flagShake .35s ease;}
+  .func-text{flex:1; font-size:14px; color:var(--ink-soft);}
+  .func-slot{min-width:90px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12.5px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:8px 10px;}
+  .func-slot.filled{border-style:solid; border-color:var(--yellow); background:#FFF7E2; color:var(--ink);}
+
+  .insight{background:#FFF3E2; border-left:4px solid var(--yellow); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; margin-top:16px;}
+
+  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:26px 24px; margin-top:18px;}
+  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:13px; color:var(--ink-soft); margin-bottom:10px;}
+  .quiz-q{font-size:17px; font-weight:700; margin-bottom:16px;}
+  .quiz-options{display:flex; flex-direction:column; gap:10px;}
+  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:15px; font-weight:600; padding:12px 15px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .quiz-opt:hover{border-color:var(--purple);}
+  .quiz-opt.correct{background:#E4F8E6; border-color:#3FAE58;}
+  .quiz-opt.wrong{background:#FDE6E1; border-color:var(--coral);}
+  .quiz-nav{display:flex; justify-content:flex-end; margin-top:18px;}
+  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:11px 22px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
+  .btn-next.active{opacity:1; pointer-events:auto;}
+
+  .completion{display:none; text-align:center; padding:20px 10px 10px;}
+  .completion.show{display:block;}
+  .badge{width:90px; height:90px; margin:0 auto 16px;}
+  .completion h3{font-size:22px; margin-bottom:10px;}
+  .completion p{color:var(--ink-soft); max-width:52ch; margin:0 auto 18px; font-size:15px;}
+  .completion .total{font-family:'Baloo 2',sans-serif; font-size:30px; color:var(--purple-dark);}
+
+  footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
+  <div class="hud-row">
+    <span class="hud-title">7 клас · Персональний цифровий простір</span>
+    <div class="neuron-counter">
+      <svg viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
+        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#E0A800" opacity="0.6"/>
+      </svg>
+      <span id="neuronCount">0</span>
+    </div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Цифровий простір</div>
+      <h1>Персональний цифровий простір</h1>
+      <p>Усе, що ти зберігаєш, шукаєш і поширюєш у мережі, формує твій особистий цифровий простір. Навчись наповнювати його якісно: відрізняти правду від фейку, перевіряти факти й не тонути в інформаційному смітті.</p>
+      <button class="btn-primary" onclick="document.getElementById('space').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 160 160" fill="none">
+      <rect x="30" y="25" width="100" height="70" rx="10" fill="#20203A"/>
+      <rect x="36" y="31" width="88" height="58" rx="3" fill="#2D9CDB" opacity="0.15"/>
+      <circle cx="60" cy="55" r="12" fill="#6C5CE7"/>
+      <rect x="82" y="45" width="34" height="8" rx="2" fill="#FFC93C"/>
+      <rect x="82" y="58" width="26" height="8" rx="2" fill="#FF6B4A"/>
+      <rect x="52" y="100" width="56" height="8" rx="4" fill="#20203A"/>
+      <rect x="66" y="95" width="28" height="8" fill="#20203A"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="space">
+    <div class="step-label">Крок 1 · Простір</div>
+    <h2>Що таке персональний цифровий простір</h2>
+    <p><b>Персональний цифровий простір</b> — місце, де ти зберігаєш і обробляєш свою інформацію на власних пристроях.</p>
+    <p class="soft">Клацни на кожну картку — це чотири речі, які там можна робити.</p>
+    <div class="gallery" id="spaceGallery"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Потреби і джерела</div>
+    <h2>Навіщо шукати інформацію і де</h2>
+    <p><b>Інформаційні потреби</b> — те, що ти хочеш дізнатися.</p>
+    <p><b>Інформаційні джерела</b> — місця, де це шукати.</p>
+    <p class="soft">Розклади джерела на онлайн і офлайн.</p>
+    <div class="exercise">
+      <div class="sort-buckets">
+        <div class="bucket" id="bucketOnline"><div class="bucket-title">🌐 Онлайн</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bucketOffline"><div class="bucket-title">📕 Офлайн</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="sourcePool"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Достовірність</div>
+    <h2>Як відрізнити правду від фейку</h2>
+    <p><b>Достовірна інформація</b> підтверджена фактами чи кількома джерелами.</p>
+    <p><b>Недостовірна</b> — часто поширюється навмисно, щоб ввести в оману.</p>
+    <p class="soft">Формальні ознаки ненадійного сайту:</p>
+    <ul>
+      <li>немає дати публікації чи автора</li>
+      <li>немає способу зв'язатися з автором</li>
+      <li>дивна адреса сайту</li>
+      <li>помилки в тексті</li>
+      <li>надто категоричні фрази на кшталт «усі згодні на 100%»</li>
+    </ul>
+    <h3>Знайди ознаки ненадійного сайту</h3>
+    <p class="soft">Серед позначених фрагментів лише 4 справді підозрілі.</p>
+    <div class="exercise">
+      <div class="site-preview">
+        <div class="url">Адреса сайту: <span class="flag real" data-flag="url">news-truth-shock24.info</span></div>
+        <div><span class="flag decoy">Науковці зробили нове відкриття щодо клімату</span></div>
+        <p style="margin:10px 0 6px;">Автор: <span class="flag real" data-flag="author">Anonim_2020</span> · Опубліковано: <span class="flag real" data-flag="date">дата не вказана</span></p>
+        <p style="margin:0 0 6px;"><span class="flag decoy">У статті йдеться про результати останніх досліджень.</span> <span class="flag real" data-flag="claim">Усі науковці світу повністю згодні з цим на 100%.</span></p>
+        <p style="margin:0;"><span class="flag decoy">Дякуємо за увагу до нашого сайту.</span></p>
+      </div>
+      <div class="flags-progress" id="flagsProgress">Знайдено: 0 з 4</div>
+    </div>
+
+    <h3>Достовірна чи фейк?</h3>
+    <p class="soft">Перетягни кожну картку у відповідну колонку.</p>
+    <div class="exercise">
+      <div class="dd-board">
+        <div class="dd-zone" id="zoneTrue" data-zone="true"><div class="dd-title">✅ Достовірна</div><div class="dd-items"></div></div>
+        <div class="dd-zone" id="zoneFake" data-zone="false"><div class="dd-title">🚩 Фейк</div><div class="dd-items"></div></div>
+      </div>
+      <div class="dd-pool" id="ddPool"></div>
+      <div class="flags-progress" id="ddProgress">Розкладено: 0 з 8</div>
+    </div>
+
+    <h3>Що означає домен сайту</h3>
+    <p class="soft">Кінцівка адреси сайту — теж підказка, кому він належить:</p>
+    <ul>
+      <li><b>.gov</b> — державна установа</li>
+      <li><b>.edu</b> — навчальний заклад</li>
+      <li><b>.com</b> — комерційна організація</li>
+      <li><b>.org</b> — переважно неприбуткова організація</li>
+    </ul>
+    <p class="soft">Перевір себе:</p>
+    <div id="domainList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Пошук</div>
+    <h2>Як шукати ефективніше</h2>
+    <p>Ефективний пошук — це навичка, а не удача.</p>
+    <ul>
+      <li>Формулюй чіткі й конкретні ключові слова</li>
+      <li>Порівнюй інформацію в кількох незалежних джерелах</li>
+      <li>Перевіряй дату публікації — особливо для новин</li>
+    </ul>
+    <p class="soft">Це вдалий пошуковий запит?</p>
+    <div id="queryList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Перевірка фактів</div>
+    <h2>Цифрові інструменти перевірки</h2>
+    <p>Існують спеціальні сервіси для перевірки інформації.</p>
+    <p class="soft">Клацни на кожен інструмент, щоб дізнатись, що він робить.</p>
+    <div class="gallery gallery-3" id="toolGallery"></div>
+    <h3>А тепер по пам'яті</h3>
+    <p class="soft">Обери назву інструмента, потім клацни функцію, яку він виконує.</p>
+    <div class="exercise">
+      <div class="tool-pool" id="toolPool"></div>
+      <div id="funcList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Інформаційне сміття</div>
+    <h2>Як не тонути у непотрібному</h2>
+    <p><b>Інформаційне сміття</b> — це спам, фейки й нав'язлива реклама, що завалюють твою пошту й стрічки.</p>
+    <p class="soft">Чи допомагає ця дія зменшити інформаційне сміття?</p>
+    <div id="clutterList"></div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div class="quiz-box" id="quizBox">
+      <div class="quiz-progress" id="quizProgress">Запитання 1 з 6</div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
+    </div>
+    <div class="completion" id="completion">
+      <svg class="badge" viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#6C5CE7"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#6C5CE7"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#6C5CE7"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#6C5CE7"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#6C5CE7"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#6C5CE7"/>
+        <circle cx="12" cy="12" r="4.4" fill="#6C5CE7"/><circle cx="12" cy="12" r="1.6" fill="#5340c9" opacity="0.6"/>
+      </svg>
+      <h3>Урок пройдено!</h3>
+      <p>Ти розібрався, що таке персональний цифровий простір, навчився перевіряти достовірність інформації, шукати ефективніше й тримати цифрове середовище без зайвого сміття.</p>
+      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Урок · «Інформаційне наповнення персонального цифрового простору» · 7 клас</footer>
+
+<script>
+const STORAGE_KEY = "lesson7-digital-space-neurons";
+let neurons = 0;
+const neuronEl = document.getElementById('neuronCount');
+const hudFill = document.getElementById('hudFill');
+
+function addNeurons(n){
+  neurons += n;
+  neuronEl.textContent = neurons;
+  neuronEl.classList.add('pop');
+  setTimeout(()=>neuronEl.classList.remove('pop'), 250);
+  saveProgress();
+}
+async function saveProgress(){
+  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
+}
+async function loadProgress(){
+  try{
+    const res = await window.storage?.get(STORAGE_KEY, false);
+    if(res && res.value){
+      const d = JSON.parse(res.value);
+      if(typeof d.neurons === 'number'){ neurons = d.neurons; neuronEl.textContent = neurons; }
+    }
+  }catch(e){}
+}
+loadProgress();
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
+});
+
+function makeClassify(containerId, items, optA, optB){
+  const list = document.getElementById(containerId);
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">
+        <button class="choice-btn" data-v="true">${optA}</button>
+        <button class="choice-btn" data-v="false">${optB}</button>
+      </div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        const isCorrect = (btn.dataset.v === 'true') === item.correct;
+        if(isCorrect){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+}
+
+/* ---------- DIGITAL SPACE GALLERY ---------- */
+(function(){
+  const items = [
+    { icon:'💾', name:'Зберігати', color:'#6C5CE7', colorLight:'#EDE9FF', fact:'Файли, фото, документи — на пристрої чи в хмарі' },
+    { icon:'✏️', name:'Опрацьовувати', color:'#16A3A0', colorLight:'#E3F5F4', fact:'Редагувати фото, створювати документи чи презентації' },
+    { icon:'📚', name:'Навчатися', color:'#FF6B4A', colorLight:'#FFEFE9', fact:'Знаходити відповіді, вивчати нове за допомогою Інтернету' },
+    { icon:'📤', name:'Поширювати', color:'#2D9CDB', colorLight:'#EAF5FC', fact:'Надсилати файли поштою, ділитися в соцмережах' }
+  ];
+  const grid = document.getElementById('spaceGallery');
+  items.forEach(it=>{
+    const card = document.createElement('div');
+    card.className = 'flip-card';
+    card.style.setProperty('--card-c', it.color);
+    card.style.setProperty('--card-c-light', it.colorLight);
+    card.innerHTML = `<div class="flip-inner">
+      <div class="flip-face flip-front"><div class="icon">${it.icon}</div><div class="name">${it.name}</div></div>
+      <div class="flip-face flip-back">${it.fact}</div>
+    </div>`;
+    card.addEventListener('click', ()=>{
+      card.classList.toggle('flipped');
+    });
+    grid.appendChild(card);
+  });
+})();
+
+/* ---------- SORT SOURCES INTO BUCKETS ---------- */
+(function(){
+  const items = [
+    { text:'Інтернет', bucket:'online' },
+    { text:'Вебсайт медіа', bucket:'online' },
+    { text:'Бібліотека', bucket:'offline' },
+    { text:'Вчитель або експерт', bucket:'offline' },
+    { text:'Друкована газета', bucket:'offline' },
+    { text:'Онлайн-енциклопедія', bucket:'online' }
+  ];
+  const pool = document.getElementById('sourcePool');
+  const buckets = { online: document.getElementById('bucketOnline'), offline: document.getElementById('bucketOffline') };
+  let selected = null;
+  let placedCount = 0;
+
+  const shuffled = [...items].sort(()=>Math.random()-0.5);
+  shuffled.forEach(item=>{
+    const chip = document.createElement('div');
+    chip.className = 'sort-chip';
+    chip.textContent = item.text;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.sort-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = item;
+    });
+    pool.appendChild(chip);
+  });
+
+  Object.entries(buckets).forEach(([key, el])=>{
+    el.addEventListener('click', ()=>{
+      if(!selected) return;
+      if(selected.bucket === key){
+        const chip = [...pool.children].find(c=>c.textContent===selected.text && !c.classList.contains('placed'));
+        if(chip){
+          chip.classList.add('placed');
+          chip.classList.remove('selected');
+          el.querySelector('.bucket-items').appendChild(chip);
+        }
+        addNeurons(1);
+        placedCount++;
+        selected = null;
+        if(placedCount === items.length) addNeurons(2);
+      } else {
+        el.classList.add('hint');
+        setTimeout(()=>el.classList.remove('hint'), 350);
+      }
+    });
+  });
+})();
+
+/* ---------- DRAG & DROP: RELIABLE VS FAKE ---------- */
+(function(){
+  const items = [
+    { text:'Стаття з датою і вказаним автором', zone:'true' },
+    { text:'Пост без автора і без дати', zone:'false' },
+    { text:'Сайт державної установи (.gov)', zone:'true' },
+    { text:'Заголовок «ТЕРМІНОВО! Ви не повірите!»', zone:'false' },
+    { text:'Факт підтверджений кількома незалежними джерелами', zone:'true' },
+    { text:'Немає способу зв\'язатися з автором', zone:'false' },
+    { text:'Текст без помилок, з посиланнями на джерела', zone:'true' },
+    { text:'Фраза «Усі експерти згодні на 100%»', zone:'false' }
+  ];
+  const pool = document.getElementById('ddPool');
+  const zones = { 'true': document.getElementById('zoneTrue'), 'false': document.getElementById('zoneFake') };
+  const progress = document.getElementById('ddProgress');
+  let placed = 0;
+  let selected = null;
+
+  const shuffled = [...items].sort(()=>Math.random()-0.5);
+  shuffled.forEach(item=>{
+    const chip = document.createElement('div');
+    chip.className = 'dd-chip';
+    chip.textContent = item.text;
+    chip.draggable = true;
+    chip.dataset.zone = item.zone;
+
+    chip.addEventListener('dragstart', ()=>{ chip.classList.add('dragging'); });
+    chip.addEventListener('dragend', ()=>{ chip.classList.remove('dragging'); });
+
+    // click fallback for touch devices
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('correct-placed')) return;
+      pool.querySelectorAll('.dd-chip').forEach(c=>c.classList.remove('selected'));
+      document.querySelectorAll('.dd-zone .dd-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = chip;
+    });
+
+    pool.appendChild(chip);
+  });
+
+  function tryPlace(chip, zoneKey, zoneEl){
+    if(chip.classList.contains('correct-placed')) return;
+    if(chip.dataset.zone === zoneKey){
+      chip.classList.add('correct-placed');
+      chip.draggable = false;
+      zoneEl.querySelector('.dd-items').appendChild(chip);
+      addNeurons(1);
+      placed++;
+      progress.textContent = `Розкладено: ${placed} з ${items.length}`;
+      if(placed === items.length){ addNeurons(2); progress.textContent = 'Усі картки розкладено ✓'; }
+    } else {
+      chip.classList.add('wrong-flash');
+      setTimeout(()=>chip.classList.remove('wrong-flash'), 400);
+    }
+    selected = null;
+  }
+
+  Object.entries(zones).forEach(([key, el])=>{
+    el.addEventListener('dragover', (e)=>{ e.preventDefault(); el.classList.add('over'); });
+    el.addEventListener('dragleave', ()=>{ el.classList.remove('over'); });
+    el.addEventListener('drop', (e)=>{
+      e.preventDefault();
+      el.classList.remove('over');
+      const chip = document.querySelector('.dd-chip.dragging');
+      if(chip) tryPlace(chip, key, el);
+    });
+    // click fallback: click a zone after selecting a chip
+    el.addEventListener('click', ()=>{
+      if(!selected) return;
+      tryPlace(selected, key, el);
+    });
+  });
+})();
+
+/* ---------- FIND SITE RED FLAGS ---------- */
+(function(){
+  const allSpans = document.querySelectorAll('.flag');
+  const realFlags = document.querySelectorAll('.flag.real');
+  const found = new Set();
+  const progress = document.getElementById('flagsProgress');
+  allSpans.forEach(f=>{
+    f.addEventListener('click', ()=>{
+      if(f.classList.contains('found')) return;
+      if(f.classList.contains('decoy')){
+        f.classList.add('wrong-try');
+        setTimeout(()=>f.classList.remove('wrong-try'), 400);
+        return;
+      }
+      f.classList.add('found');
+      found.add(f.dataset.flag);
+      progress.textContent = `Знайдено: ${found.size} з ${realFlags.length}`;
+      addNeurons(1);
+      if(found.size === realFlags.length){
+        progress.textContent = 'Усі ознаки знайдено ✓ Немає дати, анонімний автор, дивна адреса й категорична фраза "усі згодні на 100%" — типові сигнали ненадійного сайту.';
+        addNeurons(2);
+      }
+    });
+  });
+})();
+
+/* ---------- DOMAIN SUFFIX ---------- */
+(function(){
+  const items = [
+    { text:'.gov', opts:['Державна установа','Комерційна компанія','Навчальний заклад'], correct:0 },
+    { text:'.edu', opts:['Неприбуткова організація','Навчальний заклад','Державна установа'], correct:1 },
+    { text:'.com', opts:['Комерційна організація','Університет','Уряд'], correct:0 },
+    { text:'.org', opts:['Комерційна компанія','Переважно неприбуткова організація','Особистий блог'], correct:1 }
+  ];
+  const list = document.getElementById('domainList');
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">${item.opts.map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i===item.correct){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+})();
+
+/* ---------- QUERY QUALITY ---------- */
+makeClassify('queryList', [
+  { text:'річка', correct:false },
+  { text:'найдовша річка Європи', correct:true },
+  { text:'які відеоігри найкращі у світі і чому вони подобаються стільком людям', correct:false },
+  { text:'прогноз погоди Київ завтра', correct:true }
+], 'Так, вдалий', 'Ні, занадто розмито');
+
+/* ---------- FACT-CHECK TOOLS ---------- */
+const TOOL_ICONS = {
+  tineye: (c)=>`<svg viewBox="0 0 48 48"><circle cx="20" cy="20" r="13" fill="none" stroke="${c}" stroke-width="3"/><rect x="16" y="14" width="8" height="12" rx="1" fill="${c}"/><line x1="29" y1="29" x2="40" y2="40" stroke="${c}" stroke-width="4" stroke-linecap="round"/></svg>`,
+  webmii: (c)=>`<svg viewBox="0 0 48 48"><circle cx="19" cy="16" r="6" fill="${c}"/><path d="M10 30C10 24 14 21 19 21C24 21 28 24 28 30" stroke="${c}" stroke-width="3" fill="none" stroke-linecap="round"/><line x1="27" y1="27" x2="38" y2="38" stroke="${c}" stroke-width="4" stroke-linecap="round"/><circle cx="20" cy="20" r="14" fill="none" stroke="${c}" stroke-width="2" opacity="0.4"/></svg>`,
+  hacked: (c)=>`<svg viewBox="0 0 48 48"><path d="M24 6 L38 12 V22 C38 32 32 38 24 42 C16 38 10 32 10 22 V12 Z" fill="${c}" opacity="0.15" stroke="${c}" stroke-width="2.5"/><path d="M18 24 L22 28 L30 18" stroke="${c}" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  phishing: (c)=>`<svg viewBox="0 0 48 48"><path d="M24 6 L44 40 H4 Z" fill="none" stroke="${c}" stroke-width="3" stroke-linejoin="round"/><line x1="24" y1="18" x2="24" y2="28" stroke="${c}" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="33" r="1.8" fill="${c}"/></svg>`,
+  virustotal: (c)=>`<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="9" fill="${c}"/><line x1="24" y1="6" x2="24" y2="13" stroke="${c}" stroke-width="2.5"/><line x1="24" y1="35" x2="24" y2="42" stroke="${c}" stroke-width="2.5"/><line x1="6" y1="24" x2="13" y2="24" stroke="${c}" stroke-width="2.5"/><line x1="35" y1="24" x2="42" y2="24" stroke="${c}" stroke-width="2.5"/><line x1="11" y1="11" x2="16" y2="16" stroke="${c}" stroke-width="2.5"/><line x1="32" y1="32" x2="37" y2="37" stroke="${c}" stroke-width="2.5"/><line x1="37" y1="11" x2="32" y2="16" stroke="${c}" stroke-width="2.5"/><line x1="16" y1="32" x2="11" y2="37" stroke="${c}" stroke-width="2.5"/></svg>`,
+  wot: (c)=>`<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="16" fill="none" stroke="${c}" stroke-width="2.5"/><path d="M24 15 L27 21 L34 22 L29 27 L30 34 L24 30 L18 34 L19 27 L14 22 L21 21 Z" fill="${c}"/></svg>`
+};
+
+const TOOLS = [
+  { key:'tineye', name:'TinEye', color:'#6C5CE7', colorLight:'#EDE9FF', func:'Зворотний пошук зображень — перевіряє, звідки насправді фото' },
+  { key:'webmii', name:'WebMii', color:'#16A3A0', colorLight:'#E3F5F4', func:'Шукає посилання, пов\'язані з іменем конкретної людини' },
+  { key:'hacked', name:'Is It Hacked', color:'#FF6B4A', colorLight:'#FFEFE9', func:'У реальному часі перевіряє, чи зламали обліковий запис' },
+  { key:'phishing', name:'IsItPhishing', color:'#FF5D9E', colorLight:'#FFE8F2', func:'Оцінює, чи посилання схоже на фішингове' },
+  { key:'virustotal', name:'VirusTotal', color:'#2D9CDB', colorLight:'#EAF5FC', func:'Перевіряє посилання чи файл на віруси' },
+  { key:'wot', name:'Web of Trust', color:'#FFC93C', colorLight:'#FFF7E2', func:'Міжнародний рейтинг довіри до сайтів' }
+];
+
+(function(){
+  const grid = document.getElementById('toolGallery');
+  TOOLS.forEach(t=>{
+    const card = document.createElement('div');
+    card.className = 'flip-card';
+    card.style.height = '150px';
+    card.style.setProperty('--card-c', t.color);
+    card.style.setProperty('--card-c-light', t.colorLight);
+    card.innerHTML = `<div class="flip-inner">
+      <div class="flip-face flip-front">
+        <div class="icon" style="width:34px;height:34px;">${TOOL_ICONS[t.key](t.color)}</div>
+        <div class="name">${t.name}</div>
+      </div>
+      <div class="flip-face flip-back">${t.func}</div>
+    </div>`;
+    card.addEventListener('click', ()=>{
+      card.classList.toggle('flipped');
+    });
+    grid.appendChild(card);
+  });
+})();
+
+/* ---------- FACT-CHECK TOOLS MATCHING ---------- */
+(function(){
+  const tools = TOOLS.map(t=>({ name:t.name, func:t.func }));
+  const pool = document.getElementById('toolPool');
+  const list = document.getElementById('funcList');
+  let selected = null;
+  let matched = 0;
+
+  const shuffledTools = [...tools].sort(()=>Math.random()-0.5);
+  shuffledTools.forEach(t=>{
+    const chip = document.createElement('div');
+    chip.className = 'tool-chip';
+    chip.textContent = t.name;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = t.name;
+    });
+    pool.appendChild(chip);
+  });
+
+  const shuffledFuncs = [...tools].sort(()=>Math.random()-0.5);
+  shuffledFuncs.forEach(t=>{
+    const card = document.createElement('div');
+    card.className = 'func-card';
+    card.innerHTML = `<div class="func-text">${t.func}</div><div class="func-slot">?</div>`;
+    card.addEventListener('click', ()=>{
+      if(card.classList.contains('matched') || !selected) return;
+      const slot = card.querySelector('.func-slot');
+      if(selected === t.name){
+        slot.textContent = selected;
+        slot.classList.add('filled');
+        card.classList.add('matched');
+        const chip = [...pool.children].find(c=>c.textContent===selected);
+        if(chip) chip.classList.add('placed');
+        addNeurons(1);
+        matched++;
+        selected = null;
+        pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+        if(matched === tools.length) addNeurons(2);
+      } else {
+        card.classList.add('shake');
+        setTimeout(()=>card.classList.remove('shake'), 350);
+      }
+    });
+    list.appendChild(card);
+  });
+})();
+
+/* ---------- INFO CLUTTER ---------- */
+makeClassify('clutterList', [
+  { text:'Пересилати непідтверджені новини знайомим «про всяк випадок»', correct:false },
+  { text:'Видалити підписки на розсилки, які вже не цікавлять', correct:true },
+  { text:'Використати одноразову адресу для реєстрації на незнайомому сайті', correct:true },
+  { text:'Публікувати свою особисту пошту на відкритих форумах', correct:false },
+  { text:'Налаштувати спам-фільтри в поштовій скриньці', correct:true }
+], 'Зменшує сміття', 'Не допомагає');
+
+/* ---------- FINAL QUIZ ---------- */
+const questions = [
+  { q: "Що таке персональний цифровий простір?", opts: ["Тільки папка на комп'ютері", "Віртуальний простір, де ти зберігаєш і обробляєш інформацію на своїх пристроях", "Соціальна мережа"], correct: 1 },
+  { q: "Яка ознака НАЙБІЛЬШЕ свідчить про ненадійний сайт?", opts: ["Вказана дата публікації та ім'я автора", "Немає автора, дати й є категоричні фрази на кшталт «усі згодні на 100%»", "Є посилання на джерела"], correct: 1 },
+  { q: "Що зазвичай означає домен .edu?", opts: ["Комерційну компанію", "Навчальний заклад", "Особистий блог"], correct: 1 },
+  { q: "Який інструмент допомагає перевірити, звідки насправді походить зображення?", opts: ["VirusTotal", "TinEye", "Web of Trust"], correct: 1 },
+  { q: "Що краще зробити з розсилкою, яка вже не цікавить?", opts: ["Ігнорувати листи, не читаючи", "Відписатися від неї", "Переслати всім друзям"], correct: 1 },
+  { q: "Чому важливо перевіряти інформацію в кількох незалежних джерелах?", opts: ["Так довше шукати", "Це підвищує впевненість у достовірності", "Це вимога закону"], correct: 1 }
+];
+let qi=0, currentAnswered=false;
+const quizQ = document.getElementById('quizQ');
+const quizOptions = document.getElementById('quizOptions');
+const quizProgress = document.getElementById('quizProgress');
+const btnNext = document.getElementById('btnNext');
+const quizBox = document.getElementById('quizBox');
+const completion = document.getElementById('completion');
+const totalNeuronsEl = document.getElementById('totalNeurons');
+
+function renderQuestion(){
+  currentAnswered=false; btnNext.classList.remove('active');
+  const item = questions[qi];
+  quizProgress.textContent = `Запитання ${qi+1} з ${questions.length}`;
+  quizQ.textContent = item.q;
+  quizOptions.innerHTML='';
+  item.opts.forEach((opt,i)=>{
+    const b=document.createElement('button'); b.className='quiz-opt'; b.textContent=opt;
+    b.addEventListener('click', ()=>{
+      if(currentAnswered) return; currentAnswered=true;
+      const all = quizOptions.querySelectorAll('.quiz-opt');
+      all.forEach((ob,oi)=>{ if(oi===item.correct) ob.classList.add('correct'); else if(oi===i) ob.classList.add('wrong'); });
+      if(i===item.correct) addNeurons(2);
+      btnNext.classList.add('active');
+      btnNext.textContent = (qi===questions.length-1) ? 'Завершити' : 'Далі';
+    });
+    quizOptions.appendChild(b);
+  });
+}
+btnNext.addEventListener('click', ()=>{
+  if(!btnNext.classList.contains('active')) return;
+  qi++;
+  if(qi<questions.length){ renderQuestion(); }
+  else {
+    quizBox.style.display='none';
+    completion.classList.add('show');
+    addNeurons(3);
+    totalNeuronsEl.textContent = neurons;
+  }
+});
+renderQuestion();
+</script>
+
+</body>
+</html>
