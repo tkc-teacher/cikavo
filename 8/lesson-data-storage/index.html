@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Збереження даних — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
+    --purple:#6C5CE7; --purple-dark:#5340c9; --teal:#16A3A0; --coral:#FF6B4A; --yellow:#FFC93C; --pink:#FF5D9E; --blue:#2D9CDB;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  .container{max-width:800px; margin:0 auto; padding:0 24px;}
+
+  .hud{position:sticky; top:0; z-index:50; background:rgba(246,245,251,.9); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
+  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--teal),var(--purple)); transition:width .3s ease;}
+  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:800px; margin:0 auto;}
+  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
+  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
+  .neuron-counter svg{width:24px;height:24px;}
+  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
+  #neuronCount.pop{transform:scale(1.35);}
+
+  .hero{padding:52px 24px 40px;}
+  .hero-inner{max-width:800px; margin:0 auto; display:flex; align-items:center; gap:30px;}
+  .hero-text{flex:1;}
+  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--teal); margin-bottom:10px;}
+  .hero h1{font-size:32px; line-height:1.18; margin-bottom:12px;}
+  .hero p{color:var(--ink-soft); font-size:16.5px; max-width:54ch; margin-bottom:22px;}
+  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--purple); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
+  .btn-primary:hover{background:var(--purple-dark);}
+  .btn-primary:active{transform:scale(.97);}
+  .mascot{width:130px; height:130px; flex-shrink:0;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:100px; height:100px;} }
+
+  section.block{padding:38px 0; border-top:1px solid var(--line);}
+  .step-label{font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:600; color:var(--teal); margin-bottom:8px;}
+  .block h2{font-size:21px; margin-bottom:10px; max-width:38ch;}
+  .block p{max-width:66ch; font-size:16px; margin:0 0 10px; color:var(--ink);}
+  .block p.soft{color:var(--ink-soft); font-size:15px;}
+  .note{background:#EAF5FC; border-left:4px solid var(--blue); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; color:#2A6B8C; margin:16px 0;}
+
+  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:22px; margin-top:18px;}
+
+  /* FILL-IN */
+  .fill-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:15.5px; margin-bottom:14px; padding:12px 14px; background:var(--bg); border-radius:var(--radius-s);}
+  .fill-row input{width:70px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; text-align:center; border:1.5px solid var(--line); border-radius:8px; padding:7px 4px; text-transform:uppercase;}
+  .fill-row input.ok{border-color:#3FAE58; background:#E4F8E6;}
+  .fill-row input.bad{border-color:var(--coral); background:#FDE6E1;}
+  .fill-check{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; color:var(--ink-soft); margin-left:auto;}
+
+  /* MEMO MATCH */
+  .memo-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin-top:16px;}
+  @media (max-width:480px){ .memo-grid{gap:6px;} }
+  .memo-card{perspective:1200px; height:112px; cursor:pointer;}
+  .flip-inner{position:relative; width:100%; height:100%; transition:transform .5s cubic-bezier(.4,0,.2,1); transform-style:preserve-3d;}
+  .memo-card.flipped .flip-inner{transform:rotateY(180deg);}
+  .flip-face{position:absolute; inset:0; backface-visibility:hidden; border-radius:var(--radius-m); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:8px; text-align:center;}
+  .memo-card .flip-front{background:linear-gradient(135deg,var(--purple),var(--purple-dark)); border:none;}
+  .memo-card .flip-front .neuron-mark{width:28px;height:28px;}
+  .memo-card .flip-back{border:2px solid var(--card-c, var(--line)); background:var(--card-c-light, #F0EFF9);}
+  .memo-card .flip-back svg{width:26px; height:26px; margin-bottom:3px;}
+  .memo-card .flip-back .name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:10.5px; line-height:1.2;}
+  .memo-card .flip-back .func{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:10.5px; color:var(--ink); line-height:1.2;}
+  .memo-card.matched{pointer-events:none;}
+  .memo-card.matched .flip-back{box-shadow:inset 0 0 0 3px var(--card-c, var(--teal));}
+  @keyframes cardShake{0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);}}
+  .memo-card.wrong{animation:cardShake .5s ease;}
+  @keyframes matchPop{0%{transform:scale(1);} 45%{transform:scale(1.15);} 100%{transform:scale(1);}}
+  .memo-card.pop{animation:matchPop .45s ease;}
+
+  /* SORT BUCKETS */
+  .sort-buckets{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  @media (max-width:480px){ .sort-buckets{grid-template-columns:1fr;} }
+  .bucket{border:2px dashed var(--line); border-radius:var(--radius-m); padding:12px; min-height:100px;}
+  .bucket-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--ink-soft); margin-bottom:8px; text-align:center;}
+  .bucket-items{display:flex; flex-wrap:wrap; gap:6px; min-height:36px;}
+  .bucket.hint{border-color:var(--purple);}
+  .sort-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:14px;}
+  .sort-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:8px 14px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .sort-chip:hover{transform:translateY(-2px);}
+  .sort-chip.selected{border-color:var(--purple); box-shadow:0 0 0 3px rgba(108,92,231,0.18);}
+  .sort-chip.placed{background:#E4F8E6; border-color:#3FAE58; cursor:default;}
+  .sort-chip.placed:hover{transform:none;}
+
+  /* CLASSIFY */
+  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:16px 18px; margin:12px 0;}
+  .classify-card p.q{font-weight:700; margin:0 0 10px; font-size:15px;}
+  .choice-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; padding:8px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease, color .15s ease;}
+  .choice-btn:hover{border-color:var(--purple);}
+  .choice-btn.correct{background:#E4F8E6; border-color:#3FAE58; color:#256B36;}
+  .choice-btn.wrong{background:#FDE6E1; border-color:var(--coral); color:#B8412A;}
+  .choice-feedback{margin-top:8px; font-size:13.5px; color:var(--ink-soft); min-height:1.2em;}
+
+  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:26px 24px; margin-top:18px;}
+  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:13px; color:var(--ink-soft); margin-bottom:10px;}
+  .quiz-q{font-size:17px; font-weight:700; margin-bottom:16px;}
+  .quiz-options{display:flex; flex-direction:column; gap:10px;}
+  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:15px; font-weight:600; padding:12px 15px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .quiz-opt:hover{border-color:var(--purple);}
+  .quiz-opt.correct{background:#E4F8E6; border-color:#3FAE58;}
+  .quiz-opt.wrong{background:#FDE6E1; border-color:var(--coral);}
+  .quiz-nav{display:flex; justify-content:flex-end; margin-top:18px;}
+  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:11px 22px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
+  .btn-next.active{opacity:1; pointer-events:auto;}
+
+  .completion{display:none; text-align:center; padding:20px 10px 10px;}
+  .completion.show{display:block;}
+  .badge{width:90px; height:90px; margin:0 auto 16px;}
+  .completion h3{font-size:22px; margin-bottom:10px;}
+  .completion p{color:var(--ink-soft); max-width:52ch; margin:0 auto 18px; font-size:15px;}
+  .completion .total{font-family:'Baloo 2',sans-serif; font-size:30px; color:var(--purple-dark);}
+
+  footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
+  <div class="hud-row">
+    <span class="hud-title">8 клас · Збереження даних</span>
+    <div class="neuron-counter">
+      <svg viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
+        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#E0A800" opacity="0.6"/>
+      </svg>
+      <span id="neuronCount">0</span>
+    </div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Дані</div>
+      <h1>Збереження даних</h1>
+      <p>Кожне фото, гра чи документ десь фізично зберігається — на диску, у флешці чи в хмарі. Розберемось, де саме, в яких одиницях це вимірюється і як не втратити важливе назавжди.</p>
+      <button class="btn-primary" onclick="document.getElementById('units').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 160 160" fill="none">
+      <rect x="30" y="50" width="45" height="60" rx="6" fill="#6C5CE7"/>
+      <circle cx="52" cy="80" r="14" fill="#EDE9FF"/>
+      <circle cx="52" cy="80" r="4" fill="#6C5CE7"/>
+      <path d="M95 55 C95 45 105 40 115 45 C120 35 135 38 137 50 C147 50 150 62 142 68 L100 68 C92 68 90 58 95 55 Z" fill="#2D9CDB"/>
+      <rect x="95" y="90" width="40" height="26" rx="4" fill="#16A3A0"/>
+      <circle cx="115" cy="103" r="6" fill="#E3F5F4"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="units">
+    <div class="step-label">Крок 1 · Одиниці виміру</div>
+    <h2>Доповни шкалу одиниць</h2>
+    <p>Найменша одиниця — <b>біт</b> (0 або 1). З бітів складаються більші одиниці, і кожна наступна в 1024 рази більша за попередню.</p>
+    <div class="exercise">
+      <div class="fill-row">8 бітів = 1 <input type="text" id="f1" maxlength="3"> <span class="fill-check" id="c1"></span></div>
+      <div class="fill-row">1024 байти = 1 <input type="text" id="f2" maxlength="3"> <span class="fill-check" id="c2"></span></div>
+      <div class="fill-row">1024 КБ = 1 <input type="text" id="f3" maxlength="3"> <span class="fill-check" id="c3"></span></div>
+      <div class="fill-row">1024 МБ = 1 <input type="text" id="f4" maxlength="3"> <span class="fill-check" id="c4"></span></div>
+      <div class="fill-row">1024 ГБ = 1 <input type="text" id="f5" maxlength="3"> <span class="fill-check" id="c5"></span></div>
+      <div style="text-align:center;"><button class="btn-primary" style="padding:9px 18px; font-size:14px;" onclick="checkUnits()">Перевірити</button></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Знайди пару</div>
+    <h2>Пристрої зберігання даних</h2>
+    <p class="soft">Під картками ховаються 4 типи носіїв і їхні описи. Знайди по дві картки, які пасують одна одній.</p>
+    <div class="memo-grid" id="deviceMemo"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Локально чи в хмарі</div>
+    <h2>Де краще зберігати</h2>
+    <p>Локальне сховище (диск, флешка) — швидке й не залежить від інтернету. Хмарне — доступне з будь-якого пристрою і легше ділитися файлами.</p>
+    <p class="soft">Розклади ситуації за типом сховища.</p>
+    <div class="exercise">
+      <div class="sort-buckets">
+        <div class="bucket" id="bucketLocal"><div class="bucket-title">💽 Локальне</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bucketCloud"><div class="bucket-title">☁️ Хмарне</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="storagePool"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Резервні копії</div>
+    <h2>Правило хорошого бекапу</h2>
+    <p><b>Резервна копія (бекап)</b> — додаткова копія файлів на випадок втрати оригіналу.</p>
+    <p class="soft">Це хороша практика резервного копіювання?</p>
+    <div id="backupList"></div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div class="quiz-box" id="quizBox">
+      <div class="quiz-progress" id="quizProgress">Запитання 1 з 5</div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
+    </div>
+    <div class="completion" id="completion">
+      <svg class="badge" viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#16A3A0" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#16A3A0"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#16A3A0" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#16A3A0"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#16A3A0" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#16A3A0"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#16A3A0" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#16A3A0"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#16A3A0" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#16A3A0"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#16A3A0" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#16A3A0"/>
+        <circle cx="12" cy="12" r="4.4" fill="#16A3A0"/><circle cx="12" cy="12" r="1.6" fill="#0E7A78" opacity="0.6"/>
+      </svg>
+      <h3>Урок пройдено!</h3>
+      <p>Ти розібрався в одиницях виміру даних, типах носіїв, різниці локального й хмарного сховища та правилах резервного копіювання.</p>
+      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Урок · «Збереження даних» · 8 клас</footer>
+
+<script>
+const STORAGE_KEY = "lesson8-data-storage-neurons";
+let neurons = 0;
+const neuronEl = document.getElementById('neuronCount');
+const hudFill = document.getElementById('hudFill');
+
+function addNeurons(n){
+  neurons += n;
+  neuronEl.textContent = neurons;
+  neuronEl.classList.add('pop');
+  setTimeout(()=>neuronEl.classList.remove('pop'), 250);
+  saveProgress();
+}
+async function saveProgress(){
+  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
+}
+async function loadProgress(){
+  try{
+    const res = await window.storage?.get(STORAGE_KEY, false);
+    if(res && res.value){
+      const d = JSON.parse(res.value);
+      if(typeof d.neurons === 'number'){ neurons = d.neurons; neuronEl.textContent = neurons; }
+    }
+  }catch(e){}
+}
+loadProgress();
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
+});
+
+const NEURON_MARK = `<svg class="neuron-mark" viewBox="0 0 24 24" fill="none">
+  <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/><circle cx="20.3" cy="12" r="1.2" fill="#fff" opacity="0.9"/>
+  <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/><circle cx="16.6" cy="20" r="1.2" fill="#fff" opacity="0.9"/>
+  <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/><circle cx="7.4" cy="20" r="1.2" fill="#fff" opacity="0.9"/>
+  <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/><circle cx="3.7" cy="12" r="1.2" fill="#fff" opacity="0.9"/>
+  <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/><circle cx="7.4" cy="4" r="1.2" fill="#fff" opacity="0.9"/>
+  <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/><circle cx="16.6" cy="4" r="1.2" fill="#fff" opacity="0.9"/>
+  <circle cx="12" cy="12" r="4.4" fill="#fff" opacity="0.95"/><circle cx="12" cy="12" r="1.6" fill="#6C5CE7" opacity="0.5"/>
+</svg>`;
+
+/* ---------- FILL IN UNITS ---------- */
+function checkUnits(){
+  const answers = {f1:'байт', f2:'кб', f3:'мб', f4:'гб', f5:'тб'};
+  let allOk = true;
+  Object.entries(answers).forEach(([id, correct])=>{
+    const input = document.getElementById(id);
+    const checkEl = document.getElementById('c'+id.slice(1));
+    const val = input.value.trim().toLowerCase();
+    if(val === correct){
+      input.classList.add('ok'); input.classList.remove('bad');
+      checkEl.textContent = '✓';
+    } else {
+      input.classList.add('bad'); input.classList.remove('ok');
+      checkEl.textContent = '';
+      allOk = false;
+    }
+  });
+  if(allOk) addNeurons(3);
+  else addNeurons(0);
+}
+
+/* ---------- DEVICE MEMO MATCH ---------- */
+const DEVICE_ICONS = {
+  ssd: (c)=>`<svg viewBox="0 0 48 48"><rect x="6" y="12" width="36" height="24" rx="3" fill="${c}"/><rect x="12" y="18" width="6" height="6" fill="#fff" opacity="0.85"/><rect x="21" y="18" width="6" height="6" fill="#fff" opacity="0.85"/><rect x="30" y="18" width="6" height="6" fill="#fff" opacity="0.85"/><rect x="12" y="27" width="6" height="6" fill="#fff" opacity="0.6"/><rect x="21" y="27" width="6" height="6" fill="#fff" opacity="0.6"/><rect x="30" y="27" width="6" height="6" fill="#fff" opacity="0.6"/></svg>`,
+  hdd: (c)=>`<svg viewBox="0 0 48 48"><rect x="6" y="12" width="36" height="24" rx="3" fill="${c}"/><circle cx="24" cy="24" r="8" fill="#fff" opacity="0.85"/><circle cx="24" cy="24" r="2.5" fill="${c}"/></svg>`,
+  usb: (c)=>`<svg viewBox="0 0 48 48"><rect x="14" y="6" width="20" height="10" rx="2" fill="${c}"/><rect x="18" y="16" width="12" height="26" rx="3" fill="${c}"/><rect x="21" y="10" width="6" height="3" fill="#fff" opacity="0.85"/></svg>`,
+  cloud: (c)=>`<svg viewBox="0 0 48 48"><path d="M14 32C8 32 4 28 4 23C4 18 8 15 12 15C13 9 19 5 25 6C31 7 35 12 35 17C40 17 44 21 44 26C44 30 40 32 36 32Z" fill="${c}"/></svg>`
+};
+(function(){
+  const items = [
+    { key:'ssd', name:'SSD', color:'#6C5CE7', colorLight:'#EDE9FF', func:'Твердотільний, дуже швидкий, без рухомих частин' },
+    { key:'hdd', name:'HDD', color:'#16A3A0', colorLight:'#E3F5F4', func:'Жорсткий диск із дисками, що обертаються, дешевший за обсяг' },
+    { key:'usb', name:'USB-флешка', color:'#FF6B4A', colorLight:'#FFEFE9', func:'Маленька, портативна, зручна для перенесення файлів' },
+    { key:'cloud', name:'Хмарне сховище', color:'#2D9CDB', colorLight:'#EAF5FC', func:'Дані на віддаленому сервері, доступні з будь-якого пристрою' }
+  ];
+  let cards = [];
+  items.forEach(it=>{
+    cards.push({ type:'name', key:it.key, item:it });
+    cards.push({ type:'func', key:it.key, item:it });
+  });
+  cards.sort(()=>Math.random()-0.5);
+
+  const grid = document.getElementById('deviceMemo');
+  let firstCard = null;
+  let lock = false;
+  let matchedCount = 0;
+
+  cards.forEach(data=>{
+    const it = data.item;
+    const card = document.createElement('div');
+    card.className = 'memo-card';
+    card.style.setProperty('--card-c', it.color);
+    card.style.setProperty('--card-c-light', it.colorLight);
+    const backContent = data.type === 'name'
+      ? `${DEVICE_ICONS[it.key](it.color)}<div class="name">${it.name}</div>`
+      : `<div class="func">${it.func}</div>`;
+    card.innerHTML = `<div class="flip-inner">
+      <div class="flip-face flip-front">${NEURON_MARK}</div>
+      <div class="flip-face flip-back">${backContent}</div>
+    </div>`;
+    card.addEventListener('click', ()=>{
+      if(lock || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+      card.classList.add('flipped');
+      if(!firstCard){ firstCard = card; firstCard._data = data; return; }
+      const secondCard = card;
+      lock = true;
+      const isMatch = data.key === firstCard._data.key && data.type !== firstCard._data.type;
+      if(isMatch){
+        addNeurons(1);
+        matchedCount++;
+        [firstCard, secondCard].forEach(c=>{ c.classList.add('matched','pop'); setTimeout(()=>c.classList.remove('pop'), 450); });
+        firstCard = null; lock = false;
+        if(matchedCount === items.length){ addNeurons(3); }
+      } else {
+        setTimeout(()=>{
+          [firstCard, secondCard].forEach(c=>c.classList.add('wrong'));
+          setTimeout(()=>{
+            [firstCard, secondCard].forEach(c=>c.classList.remove('flipped','wrong'));
+            firstCard = null; lock = false;
+          }, 550);
+        }, 550);
+      }
+    });
+    grid.appendChild(card);
+  });
+})();
+
+/* ---------- LOCAL VS CLOUD SORT ---------- */
+(function(){
+  const items = [
+    { text:'Учнівський проєкт, над яким працює вся команда одночасно', zone:'cloud' },
+    { text:'Дуже великий відеофайл для монтажу без затримок', zone:'local' },
+    { text:'Фото, які хочеш переглядати і зі смартфона, і з ноутбука', zone:'cloud' },
+    { text:'Ігри, що потребують миттєвого доступу до диска', zone:'local' },
+    { text:'Документ, яким треба поділитися з учителем без пересилання', zone:'cloud' }
+  ];
+  const pool = document.getElementById('storagePool');
+  const buckets = { local: document.getElementById('bucketLocal'), cloud: document.getElementById('bucketCloud') };
+  let selected = null;
+  let placedCount = 0;
+
+  const shuffled = [...items].sort(()=>Math.random()-0.5);
+  shuffled.forEach(item=>{
+    const chip = document.createElement('div');
+    chip.className = 'sort-chip';
+    chip.textContent = item.text;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.sort-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = item;
+    });
+    pool.appendChild(chip);
+  });
+
+  Object.entries(buckets).forEach(([key, el])=>{
+    el.addEventListener('click', ()=>{
+      if(!selected) return;
+      if(selected.zone === key){
+        const chip = [...pool.children].find(c=>c.textContent===selected.text && !c.classList.contains('placed'));
+        if(chip){ chip.classList.add('placed'); chip.classList.remove('selected'); el.querySelector('.bucket-items').appendChild(chip); }
+        addNeurons(1);
+        placedCount++;
+        selected = null;
+        if(placedCount === items.length) addNeurons(2);
+      } else {
+        el.classList.add('hint');
+        setTimeout(()=>el.classList.remove('hint'), 350);
+      }
+    });
+  });
+})();
+
+/* ---------- BACKUP PRACTICE ---------- */
+(function(){
+  const items = [
+    { text:'Зберігати єдину копію важливого проєкту тільки на одному ноутбуці', correct:false },
+    { text:'Тримати копію важливих файлів і на диску, і в хмарі', correct:true },
+    { text:'Регулярно перевіряти, чи бекап справді відновлюється', correct:true },
+    { text:'Робити резервну копію лише один раз — «і забути про це назавжди»', correct:false }
+  ];
+  const list = document.getElementById('backupList');
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">
+        <button class="choice-btn" data-v="true">Так</button>
+        <button class="choice-btn" data-v="false">Ні</button>
+      </div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        const isCorrect = (btn.dataset.v === 'true') === item.correct;
+        if(isCorrect){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+})();
+
+/* ---------- FINAL QUIZ ---------- */
+const questions = [
+  { q: "Скільки байтів у кілобайті?", opts: ["100", "1000", "1024"], correct: 2 },
+  { q: "Який носій найшвидший і не має рухомих частин?", opts: ["HDD", "SSD", "Оптичний диск"], correct: 1 },
+  { q: "Головна перевага хмарного сховища?", opts: ["Не потрібен інтернет", "Доступ з будь-якого пристрою", "Завжди безкоштовне"], correct: 1 },
+  { q: "Навіщо потрібна резервна копія?", opts: ["Щоб файл важив менше", "Щоб не втратити дані, якщо оригінал зникне", "Щоб прискорити комп'ютер"], correct: 1 },
+  { q: "Що з переліченого — приклад локального сховища?", opts: ["Google Диск", "USB-флешка", "Хмарний сервер"], correct: 1 }
+];
+let qi=0, currentAnswered=false;
+const quizQ = document.getElementById('quizQ');
+const quizOptions = document.getElementById('quizOptions');
+const quizProgress = document.getElementById('quizProgress');
+const btnNext = document.getElementById('btnNext');
+const quizBox = document.getElementById('quizBox');
+const completion = document.getElementById('completion');
+const totalNeuronsEl = document.getElementById('totalNeurons');
+
+function renderQuestion(){
+  currentAnswered=false; btnNext.classList.remove('active');
+  const item = questions[qi];
+  quizProgress.textContent = `Запитання ${qi+1} з ${questions.length}`;
+  quizQ.textContent = item.q;
+  quizOptions.innerHTML='';
+  item.opts.forEach((opt,i)=>{
+    const b=document.createElement('button'); b.className='quiz-opt'; b.textContent=opt;
+    b.addEventListener('click', ()=>{
+      if(currentAnswered) return; currentAnswered=true;
+      const all = quizOptions.querySelectorAll('.quiz-opt');
+      all.forEach((ob,oi)=>{ if(oi===item.correct) ob.classList.add('correct'); else if(oi===i) ob.classList.add('wrong'); });
+      if(i===item.correct) addNeurons(2);
+      btnNext.classList.add('active');
+      btnNext.textContent = (qi===questions.length-1) ? 'Завершити' : 'Далі';
+    });
+    quizOptions.appendChild(b);
+  });
+}
+btnNext.addEventListener('click', ()=>{
+  if(!btnNext.classList.contains('active')) return;
+  qi++;
+  if(qi<questions.length){ renderQuestion(); }
+  else {
+    quizBox.style.display='none';
+    completion.classList.add('show');
+    addNeurons(3);
+    totalNeuronsEl.textContent = neurons;
+  }
+});
+renderQuestion();
+</script>
+
+</body>
+</html>

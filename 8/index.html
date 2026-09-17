@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>8 клас · Інформатика — Теми уроків</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
+    --purple:#6C5CE7; --purple-dark:#5340c9; --teal:#16A3A0; --coral:#FF6B4A; --yellow:#FFC93C; --blue:#2D9CDB;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  a{color:inherit;}
+  .container{max-width:820px; margin:0 auto; padding:0 24px;}
+
+  .topbar{padding:18px 24px; border-bottom:1px solid var(--line); background:rgba(246,245,251,.9); position:sticky; top:0; backdrop-filter:blur(6px);}
+  .topbar-inner{max-width:820px; margin:0 auto;}
+  .back-link{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--purple-dark); text-decoration:none;}
+  .back-link:hover{text-decoration:underline;}
+
+  .hero{padding:40px 24px 28px;}
+  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--purple-dark); margin-bottom:8px;}
+  .hero h1{font-size:30px; line-height:1.2; margin-bottom:10px;}
+  .hero p{color:var(--ink-soft); font-size:15.5px; max-width:60ch;}
+
+  .theme-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:20px 22px; margin-bottom:18px;}
+  .theme-head{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:6px; flex-wrap:wrap;}
+  .theme-head h2{font-size:17px;}
+  .theme-hours{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; color:var(--ink-soft); background:var(--bg); border-radius:999px; padding:3px 10px; white-space:nowrap;}
+
+  .lesson-row{display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px solid var(--line);}
+  .lesson-row:first-of-type{border-top:none;}
+  .lesson-num{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--ink-soft); width:22px; flex-shrink:0;}
+  .lesson-body{flex:1; min-width:0;}
+  .lesson-title{font-size:14.5px;}
+  .lesson-action{flex-shrink:0;}
+  .btn-open{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; background:var(--purple); color:#fff; text-decoration:none; padding:8px 14px; border-radius:999px; white-space:nowrap; transition:background .15s ease;}
+  .btn-open:hover{background:var(--purple-dark);}
+  .tag-soon{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; color:var(--ink-soft); background:var(--bg); border:1px solid var(--line); padding:6px 12px; border-radius:999px; white-space:nowrap;}
+
+  footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="topbar-inner"><a class="back-link" href="../index.html">← Усі класи</a></div></div>
+
+<section class="hero container">
+  <div class="hero-eyebrow">8 клас · Інформатика</div>
+  <h1>Теми уроків</h1>
+  <p>Урок із кнопкою «Відкрити» вже має готову інтерактивну версію.</p>
+</section>
+
+<div class="container" id="plan"></div>
+
+<footer>8 клас · Інформатика · Інтерактивні уроки</footer>
+
+<script>
+const PLAN = [
+  { title: "1. Основи інформатики", hours: "7 год", lessons: [
+    { title: "Кодування даних. Системи числення" },
+    { title: "Архітектура комп'ютера. Пристрої вводу / виводу" },
+    { title: "Операційні системи. Файлова система" },
+    { title: "Збереження даних", link: "lesson-data-storage/index.html" },
+    { title: "Захист цифрових пристроїв та інформації", link: "lesson-device-security/index.html" },
+    { title: "Проблеми сучасних технологій" },
+    { title: "Технології та навколишнє середовище" }
+  ]},
+  { title: "2. Працюємо з числами", hours: "8 год", lessons: [
+    { title: "Збір даних" },
+    { title: "Додаткові параметри форматування. Перевірка даних" },
+    { title: "Прості обчислення" },
+    { title: "Складні розрахунки" },
+    { title: "Логічні та вкладені функції" },
+    { title: "Посилання" },
+    { title: "Графіки та діаграми" },
+    { title: "Моделювання. Дослідження та гіпотези" }
+  ]},
+  { title: "3. Програмування", hours: "8 год", lessons: [
+    { title: "Що таке програма" },
+    { title: "Програмний проєкт" },
+    { title: "Змінні та команди. Типи даних" },
+    { title: "Змінні та команди. Працюємо зі списками" },
+    { title: "Введення та виведення даних" },
+    { title: "Умови та розгалуження. Умови" },
+    { title: "Умови та розгалуження. Цикли" },
+    { title: "Функції. Глобальні та локальні змінні" }
+  ]},
+  { title: "4. Проєктування графічних інтерфейсів", hours: "8 год", lessons: [
+    { title: "Графічний інтерфейс продукту. UI/UX дизайн" },
+    { title: "Векторний графічний редактор" },
+    { title: "Графічні примітиви" },
+    { title: "Типографіка, ефекти та фільтри" },
+    { title: "Композиція" },
+    { title: "Макет" },
+    { title: "Прототип" },
+    { title: "Документація інформаційного продукту" }
+  ]},
+  { title: "5. Сайт та його верстка", hours: "13 год", lessons: [
+    { title: "Створення вебсторінки" },
+    { title: "Створення вебсторінки" },
+    { title: "HTML та CSS" },
+    { title: "HTML та CSS" },
+    { title: "HTML та CSS" },
+    { title: "Додаємо контент" },
+    { title: "Додаємо контент" },
+    { title: "Вебформи" },
+    { title: "Вебформи" },
+    { title: "Хостинг" },
+    { title: "SEO" },
+    { title: "Цільова аудиторія сайту. Зворотний зв'язок" },
+    { title: "Координація роботи команди. Система контролю версій" }
+  ]},
+  { title: "6. Дизайн-мислення", hours: "5 год", lessons: [
+    { title: "Бренд і фірмовий стиль" },
+    { title: "Елементи стилю" },
+    { title: "Брендбук та вплив інформації" },
+    { title: "Технології генерування ідей. Дизайн-мислення" },
+    { title: "Повторення та узагальнення вивченого" }
+  ]}
+];
+
+const root = document.getElementById('plan');
+PLAN.forEach(theme=>{
+  const card = document.createElement('div');
+  card.className = 'theme-card';
+  const head = document.createElement('div');
+  head.className = 'theme-head';
+  head.innerHTML = `<h2>${theme.title}</h2><span class="theme-hours">${theme.hours}</span>`;
+  card.appendChild(head);
+
+  theme.lessons.forEach((lesson, i)=>{
+    const row = document.createElement('div');
+    row.className = 'lesson-row';
+    const action = lesson.link
+      ? `<a class="btn-open" href="${lesson.link}">Відкрити →</a>`
+      : `<span class="tag-soon">Скоро</span>`;
+    row.innerHTML = `
+      <span class="lesson-num">${i+1}</span>
+      <div class="lesson-body"><div class="lesson-title">${lesson.title}</div></div>
+      <div class="lesson-action">${action}</div>`;
+    card.appendChild(row);
+  });
+  root.appendChild(card);
+});
+</script>
+
+</body>
+</html>
