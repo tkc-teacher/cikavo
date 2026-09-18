@@ -51,19 +51,18 @@
 
   .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:20px; margin-top:14px;}
 
-  /* ORDER-POOL */
-  .order-pool{display:flex; flex-direction:column; gap:8px; margin-top:6px;}
-  .order-item{display:flex; align-items:center; gap:12px; background:var(--bg); border:2px solid var(--line); border-radius:var(--radius-s); padding:11px 14px; cursor:pointer; transition:border-color .15s ease, background .15s ease;}
-  .order-item .num{width:24px; height:24px; border-radius:50%; background:var(--surface); border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12px; flex-shrink:0; color:var(--ink-soft);}
-  .order-item.picked{border-color:var(--purple);}
-  .order-item.picked .num{border-color:var(--purple); background:#EDE9FF; color:var(--purple-dark);}
-  .order-item .txt{font-size:14px;}
-  .order-controls{display:flex; justify-content:center; gap:10px; margin-top:14px;}
-  .ctrl-btn{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-s); padding:9px 15px; cursor:pointer;}
-  .ctrl-btn.check{background:var(--teal); color:#fff; border-color:var(--teal);}
-  .order-feedback{text-align:center; margin-top:10px; font-family:'Baloo 2',sans-serif; font-weight:600; min-height:1.4em;}
-  .order-feedback.ok{color:#256B36;}
-  .order-feedback.err{color:#B8412A;}
+  /* SEQUENTIAL STEP PICKER */
+  .seq-prompt{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; text-align:center; margin-bottom:12px;}
+  .seq-options{display:flex; flex-direction:column; gap:8px;}
+  .seq-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:14px; font-weight:600; padding:11px 14px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .seq-opt:hover{border-color:var(--purple);}
+  .seq-opt.wrong{animation:itemShake .35s ease; border-color:var(--coral); background:#FDE6E1;}
+  .seq-built{display:flex; flex-direction:column; gap:6px; margin-top:14px;}
+  .seq-built-item{display:flex; align-items:center; gap:10px; background:#E4F8E6; border:2px solid #3FAE58; border-radius:var(--radius-s); padding:9px 12px; font-size:13.5px;}
+  .seq-built-item .num{width:22px; height:22px; border-radius:50%; background:#3FAE58; color:#fff; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:11.5px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .seq-done{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; color:#256B36; margin-top:12px; display:none;}
+  .seq-done.show{display:block;}
+  @keyframes itemShake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
 
   /* SORT BOARD */
   .sort-buckets{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
@@ -98,53 +97,83 @@
   .func-card{display:flex; align-items:center; gap:10px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:10px 12px; margin-bottom:8px; transition:border-color .2s ease, background .2s ease;}
   .func-card.matched{border-color:var(--yellow); background:#FFFBEE;}
   .func-card.shake{animation:itemShake .35s ease;}
-  @keyframes itemShake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
   .func-text{flex:1; font-size:13px; color:var(--ink-soft);}
   .func-slot{min-width:64px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:11px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:7px 6px;}
   .func-slot.filled{border-style:solid; border-color:var(--yellow); background:#FFF7E2; color:var(--ink);}
 
-  .completion-mini{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:20px; margin-top:16px; text-align:center;}
-  .completion-mini .total{font-family:'Baloo 2',sans-serif; font-size:24px; color:var(--purple-dark); margin-top:6px;}
+  /* COMPONENT FLOW DEMO */
+  .flow-lane{position:relative; height:100px; margin:14px 0 6px;}
+  .flow-node{position:absolute; top:6px; width:80px; text-align:center; transform:translateX(-50%);}
+  .flow-node .ic{width:48px; height:48px; border-radius:50%; background:var(--bg); border:2px solid var(--line); display:flex; align-items:center; justify-content:center; margin:0 auto 4px; transition:border-color .3s ease, background .3s ease;}
+  .flow-node .ic svg{width:28px; height:28px;}
+  .flow-marker-dot{position:absolute; top:20px; width:12px; height:12px; margin-left:-6px; border-radius:50%; background:var(--yellow); box-shadow:0 0 0 5px rgba(255,201,60,0.35); transition:left .8s ease; z-index:3;}
+  .flow-node.active .ic{border-color:var(--purple); background:#EDE9FF;}
+  .flow-node .lbl{font-size:10.5px; color:var(--ink-soft); font-family:'Baloo 2',sans-serif; font-weight:600; line-height:1.2;}
+  .flow-conn{position:absolute; top:28px; font-size:10.5px; color:var(--ink-soft); font-family:'Baloo 2',sans-serif; font-weight:600; transform:translateX(-50%);}
+  .flow-marker{position:absolute; top:14px; font-size:18px; transition:left .8s ease; z-index:3;}
+  .flow-status{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; color:var(--purple-dark); margin-top:8px; min-height:1.4em;}
+
+  .completion-mini{text-align:center; margin-top:18px; padding:14px; font-family:'Baloo 2',sans-serif; font-weight:600; color:var(--ink-soft); font-size:14px;}
+  .completion-mini b{color:var(--purple-dark); font-size:16px;}
+
+  /* MEMO MATCH */
+  .memo-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:14px;}
+  @media (max-width:480px){ .memo-grid{gap:5px;} }
+  .memo-card{perspective:1200px; height:100px; cursor:pointer;}
+  .flip-inner{position:relative; width:100%; height:100%; transition:transform .5s cubic-bezier(.4,0,.2,1); transform-style:preserve-3d;}
+  .memo-card.flipped .flip-inner{transform:rotateY(180deg);}
+  .flip-face{position:absolute; inset:0; backface-visibility:hidden; border-radius:var(--radius-m); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:6px; text-align:center;}
+  .memo-card .flip-front{background:linear-gradient(135deg,var(--purple),var(--purple-dark)); border:none;}
+  .memo-card .flip-front .neuron-mark{width:24px;height:24px;}
+  .memo-card .flip-back{border:2px solid var(--card-c, var(--line)); background:var(--card-c-light, #F0EFF9); transform:rotateY(180deg);}
+  .memo-card .flip-back .icon{font-size:18px; margin-bottom:2px;}
+  .memo-card .flip-back .name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:9.5px; line-height:1.15;}
+  .memo-card .flip-back .func{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:8.8px; color:var(--ink); line-height:1.15;}
+  .memo-card.matched{pointer-events:none;}
+  .memo-card.matched .flip-back{box-shadow:inset 0 0 0 3px var(--card-c, var(--teal));}
+  @keyframes cardShake{0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);}}
+  .memo-card.wrong{animation:cardShake .5s ease;}
+  @keyframes matchPop{0%{transform:scale(1);} 45%{transform:scale(1.15);} 100%{transform:scale(1);}}
+  .memo-card.pop{animation:matchPop .45s ease;}
 
   /* CLASSROOM BUILDER EMULATOR */
   .room-wrap{margin-top:16px;}
-  .room{position:relative; width:100%; aspect-ratio:16/10; background:#F0EFF9; border:3px solid var(--ink); border-radius:14px; overflow:hidden; touch-action:none;}
-  .room-board{position:absolute; top:10px; left:50%; transform:translateX(-50%); width:34%; height:9%; background:#2E4A3E; border-radius:5px; display:flex; align-items:center; justify-content:center; color:#fff; font-family:'Baloo 2',sans-serif; font-size:11px; font-weight:600;}
-  .room-window{position:absolute; top:4%; right:6%; width:16%; height:5%; background:#BFE3FA; border:2px solid #fff; border-radius:3px;}
-  .room-window.w2{right:26%;}
-  .room-door{position:absolute; left:0; top:38%; width:1.5%; height:22%; background:#B08B5E;}
-  .desk{position:absolute; width:9%; height:8%; background:#E3D6C2; border:1.5px solid #C9B79A; border-radius:3px;}
-  .drop-hint{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; color:var(--ink-soft); opacity:.5; pointer-events:none; text-align:center; padding:20px;}
+  .room{position:relative; width:100%; aspect-ratio:16/11; background:#F7F6FC; border:3px solid var(--ink); border-radius:14px; overflow:hidden; touch-action:none;}
+  .room-el{position:absolute; display:flex; align-items:center; justify-content:center; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; line-height:1.1; border-radius:5px;}
+  .el-teacher{background:#C9A876; color:#4A3B22; font-size:9px;}
+  .el-board{background:#2E4A3E; color:#fff; font-size:9px;}
+  .el-iboard{background:#33406B; color:#fff; font-size:9px;}
+  .el-sink{background:#BFE3FA; border:2px solid #fff; font-size:16px;}
+  .el-door{background:#B08B5E;}
+  .el-window{background:#BFE3FA; border:2px solid #fff;}
+  .el-desk{background:#E3D6C2; border:1.5px solid #C9B79A; font-size:14px;}
+  .el-computer{background:#2B2B3D; color:#fff; font-size:14px;}
+  .drop-hint{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; color:var(--ink-soft); opacity:.55; pointer-events:none; text-align:center; padding:20px; z-index:1;}
   .room.has-devices .drop-hint{display:none;}
-  .placed-device{position:absolute; width:34px; height:34px; margin-left:-17px; margin-top:-17px; border-radius:50%; background:var(--surface); border:2px solid var(--purple); display:flex; align-items:center; justify-content:center; font-size:17px; cursor:pointer; z-index:5; transition:transform .15s ease;}
+  .placed-device{position:absolute; width:32px; height:32px; margin-left:-16px; margin-top:-16px; border-radius:50%; background:var(--surface); border:2px solid var(--purple); display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer; z-index:8; transition:transform .15s ease; box-shadow:0 2px 6px rgba(0,0,0,0.15);}
   .placed-device:hover{transform:scale(1.15);}
   .placed-device:active{transform:scale(0.9);}
 
   .device-palette{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-top:14px;}
-  .device-chip{display:flex; align-items:center; gap:6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; background:var(--surface); border:2px solid var(--line); border-radius:999px; padding:7px 12px 7px 8px; cursor:grab; transition:border-color .15s ease, transform .12s ease, opacity .15s ease;}
-  .device-chip .ic{font-size:16px;}
+  .device-chip{display:flex; align-items:center; gap:6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:11.5px; background:var(--surface); border:2px solid var(--line); border-radius:999px; padding:7px 12px 7px 8px; cursor:grab; transition:border-color .15s ease, transform .12s ease, opacity .15s ease;}
+  .device-chip .ic{font-size:15px;}
   .device-chip:hover{transform:translateY(-2px); border-color:var(--purple);}
   .device-chip.selected{border-color:var(--purple); box-shadow:0 0 0 3px rgba(108,92,231,0.18);}
   .device-chip.dragging{opacity:.4;}
 
   .room-controls{display:flex; justify-content:space-between; align-items:center; margin-top:10px; flex-wrap:wrap; gap:8px;}
   .room-status{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; color:var(--ink-soft);}
+  .ctrl-btn{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-s); padding:9px 15px; cursor:pointer;}
+  .ctrl-btn.check{background:var(--teal); color:#fff; border-color:var(--teal);}
 
   .legend{display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:16px;}
   @media (max-width:520px){ .legend{grid-template-columns:1fr;} }
-  .legend-item{display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--ink-soft); background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-s); padding:8px 10px;}
-  .legend-item .ic{font-size:16px;}
-  .legend-item b{color:var(--ink); font-family:'Baloo 2',sans-serif; font-size:12.5px;}
+  .legend-item{display:flex; align-items:center; gap:8px; font-size:12px; color:var(--ink-soft); background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-s); padding:7px 9px;}
+  .legend-item .ic{font-size:15px;}
+  .legend-item b{color:var(--ink); font-family:'Baloo 2',sans-serif; font-size:12px;}
 
   .insight{background:#FFF3E2; border-left:4px solid var(--yellow); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14px; margin-top:14px; display:none;}
   .insight.show{display:block;}
-
-  /* PROJECT GUIDE CARDS */
-  .guide-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:18px 20px; margin-bottom:12px;}
-  .guide-card h3{font-size:15px; margin-bottom:8px; display:flex; align-items:center; gap:8px;}
-  .guide-card h3 .n{width:24px; height:24px; border-radius:50%; background:#EDE9FF; color:var(--purple-dark); font-size:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
-  .guide-card p{margin:0 0 6px; font-size:13.5px;}
-  .guide-card p:last-child{margin-bottom:0;}
 
   footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
 </style>
@@ -175,7 +204,7 @@
     <div class="hero-text">
       <div class="hero-eyebrow">Інформатика · Інтернет речей</div>
       <h1>Життя з розумними пристроями</h1>
-      <p>Головне про інтернет речей (IoT) в одному уроці: що це, як влаштовано, де застосовують і чим ризикує. А наприкінці — власний віртуальний конструктор: збери розумний клас із доступних IoT-пристроїв.</p>
+      <p>Головне про інтернет речей (IoT): що це, як влаштовано, де застосовують і чим ризикує. А наприкінці — віртуальний конструктор: збери розумний клас із доступних IoT-пристроїв.</p>
       <button class="btn-primary" onclick="document.getElementById('s1').scrollIntoView()">Почати</button>
     </div>
     <svg class="mascot" viewBox="0 0 160 160" fill="none">
@@ -199,14 +228,13 @@
     <div class="step-label">Крок 1 · Що таке IoT</div>
     <h2>Інтернет речей і як він працює</h2>
     <p><b>Інтернет речей (IoT)</b> — мережа фізичних пристроїв із сенсорами, які обмінюються даними через інтернет без участі людини.</p>
-    <p class="soft">Онови порядок роботи будь-якого IoT-пристрою.</p>
+    <div class="note">Приклад — розумний термостат: датчик відчуває, що в кімнаті похолодало → дані летять по Wi-Fi на сервер → сервер вирішує, що треба тепліше → термостат вмикає обігрів. Це і є типовий шлях будь-якого IoT-пристрою.</div>
+    <p class="soft">Онови цей шлях по кроках — обирай, що відбувається на кожному етапі.</p>
     <div class="exercise">
-      <div class="order-pool" id="orderPool"></div>
-      <div class="order-controls">
-        <button class="ctrl-btn" onclick="stepOrder.reset()">Скинути</button>
-        <button class="ctrl-btn check" onclick="stepOrder.check()">Перевірити</button>
-      </div>
-      <div class="order-feedback" id="orderFeedback"></div>
+      <div class="seq-prompt" id="seqPrompt">Що відбувається ПЕРШИМ?</div>
+      <div class="seq-options" id="seqOptions"></div>
+      <div class="seq-built" id="seqBuilt"></div>
+      <div class="seq-done" id="seqDone">Правильний порядок ✓</div>
     </div>
   </section>
 
@@ -252,57 +280,50 @@
 
   <section class="block">
     <div class="step-label">Крок 5 · Компоненти</div>
-    <h2>З чого складається сама система</h2>
-    <p class="soft">Визнач, чим є кожен елемент.</p>
-    <div id="componentList"></div>
-
-    <div class="completion-mini">
-      <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px;">Теорію повторено 🎉</div>
-      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
+    <h2>Як поєднуються частини системи</h2>
+    <p>Будь-яка IoT-система складається з чотирьох ролей: <b>датчик</b> помічає зміну, <b>зв'язок</b> передає сигнал, <b>контролер</b> вирішує, що робити, а <b>виконавчий пристрій</b> діє.</p>
+    <p class="soft">Натисни «Запустити приклад» і подивись, як це працює разом.</p>
+    <div class="exercise">
+      <div class="flow-lane" id="compLane">
+        <div class="flow-node" id="nodeSensor" style="left:12%;"><div class="ic" id="icSensor"></div><div class="lbl">Датчик</div></div>
+        <div class="flow-node" id="nodeCtrl" style="left:50%;"><div class="ic" id="icCtrl"></div><div class="lbl">Контролер</div></div>
+        <div class="flow-node" id="nodeAct" style="left:88%;"><div class="ic" id="icAct"></div><div class="lbl">Виконавчий пристрій</div></div>
+        <div class="flow-conn" style="left:31%;">📶 Зв'язок</div>
+        <div class="flow-conn" style="left:69%;">📶 Зв'язок</div>
+        <span class="flow-marker-dot" id="compMarker"></span>
+      </div>
+      <div style="display:flex; justify-content:center;"><button class="btn-primary" style="padding:9px 18px; font-size:14px;" onclick="compFlow.run()">▶ Запустити приклад</button></div>
+      <div class="flow-status" id="compStatus">Приклад: розумний термостат</div>
     </div>
+    <p class="soft" style="margin-top:20px;">Тепер визнач, чим є кожен елемент.</p>
+    <div id="componentList"></div>
   </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Знайди пару</div>
+    <h2>Пристрій і його типовий ризик</h2>
+    <p class="soft">Під картками ховаються 8 IoT-пристроїв і типові ризики, пов'язані з кожним. Знайди пари.</p>
+    <div class="memo-grid" id="riskMemo"></div>
+  </section>
+
+  <div class="completion-mini">Зібрано вже <b><span id="totalNeurons">0</span></b> нейрончиків</div>
 
   <section class="block">
     <div class="step-label">Проєкт · Емулятор</div>
     <h2>Збери розумний клас</h2>
-    <p>Перетягни пристрої з палітри у клас — де завгодно. Побач, як виглядає твій розумний клас, ще до того, як почнеш справжній проєкт.</p>
+    <p>Перетягни пристрої з палітри у клас — де завгодно. Уже розміщений пристрій можна перетягнути в інше місце, а подвійний клац його видаляє.</p>
     <div class="room-wrap">
       <div class="room" id="roomArea">
-        <div class="room-board">Дошка</div>
-        <div class="room-window"></div>
-        <div class="room-window w2"></div>
-        <div class="room-door"></div>
-        <div class="desk" style="left:12%; top:60%;"></div>
-        <div class="desk" style="left:26%; top:60%;"></div>
-        <div class="desk" style="left:12%; top:78%;"></div>
-        <div class="desk" style="left:26%; top:78%;"></div>
         <div class="drop-hint">Перетягни сюди пристрої знизу</div>
       </div>
       <div class="room-controls">
-        <span class="room-status" id="roomStatus">Розміщено типів пристроїв: 0 з 8</span>
+        <span class="room-status" id="roomStatus">Розміщено типів пристроїв: 0 з 12</span>
         <button class="ctrl-btn" onclick="classroomBuilder.reset()">Очистити клас</button>
       </div>
       <div class="device-palette" id="devicePalette"></div>
-      <div class="insight" id="roomInsight">Клас готовий ✓ У тебе вже є чернетка — саме з такого набору пристроїв і почнеться справжній проєкт у Tinkercad, SketchUp чи Canva.</div>
+      <div class="insight" id="roomInsight">Клас готовий ✓ У тебе вже є чернетка з набором пристроїв.</div>
 
       <div class="legend" id="deviceLegend"></div>
-    </div>
-  </section>
-
-  <section class="block">
-    <div class="step-label">Далі</div>
-    <h2>Від чернетки до справжнього проєкту</h2>
-    <div class="guide-card">
-      <h3><span class="n">1</span>Мета</h3>
-      <p>Перенеси ідею з емулятора в повноцінний макет: 5-7 пристроїв, кожен розв'язує конкретну проблему класу (шум, повітря, освітлення, безпека, контроль часу, інклюзивність).</p>
-    </div>
-    <div class="guide-card">
-      <h3><span class="n">2</span>Інструменти</h3>
-      <p><b>Макет/3D:</b> Tinkercad або SketchUp. <b>Презентація:</b> Canva або Google Slides. <b>Тексти:</b> Google Документи.</p>
-    </div>
-    <div class="guide-card">
-      <h3><span class="n">3</span>Презентація команди</h3>
-      <p>3-5 хвилин: проблеми класу → рішення через IoT → опис пристроїв → схема → висновки. Недискримінаційна мова, кожен учасник знає свою частину.</p>
     </div>
   </section>
 
@@ -311,7 +332,7 @@
 <footer>Урок · «Життя з розумними пристроями» · 9 клас</footer>
 
 <script>
-const STORAGE_KEY = "lesson9-iot-combined-neurons";
+const STORAGE_KEY = "lesson9-iot-combined-neurons-v2";
 let neurons = 0;
 const neuronEl = document.getElementById('neuronCount');
 const hudFill = document.getElementById('hudFill');
@@ -344,6 +365,16 @@ window.addEventListener('scroll', ()=>{
   const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
   hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
 });
+
+const NEURON_MARK = `<svg class="neuron-mark" viewBox="0 0 24 24" fill="none">
+  <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/><circle cx="20.3" cy="12" r="1.2" fill="#fff" opacity="0.9"/>
+  <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/><circle cx="16.6" cy="20" r="1.2" fill="#fff" opacity="0.9"/>
+  <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/><circle cx="7.4" cy="20" r="1.2" fill="#fff" opacity="0.9"/>
+  <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/><circle cx="3.7" cy="12" r="1.2" fill="#fff" opacity="0.9"/>
+  <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/><circle cx="7.4" cy="4" r="1.2" fill="#fff" opacity="0.9"/>
+  <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/><circle cx="16.6" cy="4" r="1.2" fill="#fff" opacity="0.9"/>
+  <circle cx="12" cy="12" r="4.4" fill="#fff" opacity="0.95"/><circle cx="12" cy="12" r="1.6" fill="#6C5CE7" opacity="0.5"/>
+</svg>`;
 
 function makeSortBoard(poolId, buckets, items){
   const pool = document.getElementById(poolId);
@@ -447,60 +478,54 @@ function makeMatching(poolId, listId, items){
   });
 }
 
-/* ---------- STEP ORDER: IoT PRINCIPLE ---------- */
-const stepOrder = (function(){
+/* ---------- SEQUENTIAL STEP PICKER: IoT PRINCIPLE ---------- */
+(function(){
   const steps = [
     "Сенсор/пристрій збирає дані (температура, рух, звук тощо)",
     "Дані передаються через інтернет або локальну мережу",
     "Дані обробляються на сервері або в хмарі",
     "Пристрій реагує: вмикається, повідомляє, змінює стан"
   ];
-  const correctOrder = [0,1,2,3];
-  let picked = [];
-  const pool = document.getElementById('orderPool');
-  const feedback = document.getElementById('orderFeedback');
-  let solved = false;
+  const ordinals = ["ПЕРШИМ","ДРУГИМ","ТРЕТІМ","ЧЕТВЕРТИМ"];
+  let built = [];
+  const promptEl = document.getElementById('seqPrompt');
+  const optionsEl = document.getElementById('seqOptions');
+  const builtEl = document.getElementById('seqBuilt');
+  const doneEl = document.getElementById('seqDone');
 
-  const shuffled = [...steps.keys()].sort(()=>Math.random()-0.5);
-  const itemEls = {};
-  shuffled.forEach(idx=>{
-    const el = document.createElement('div');
-    el.className = 'order-item';
-    el.innerHTML = `<span class="num"></span><span class="txt">${steps[idx]}</span>`;
-    el.addEventListener('click', ()=>{
-      if(solved || el.classList.contains('picked')) return;
-      picked.push(idx);
-      el.classList.add('picked');
-      el.querySelector('.num').textContent = picked.length;
-    });
-    pool.appendChild(el);
-    itemEls[idx] = el;
-  });
-
-  function reset(){
-    if(solved) return;
-    picked = [];
-    Object.values(itemEls).forEach(el=>{ el.classList.remove('picked'); el.querySelector('.num').textContent=''; });
-    feedback.textContent = '';
-  }
-  function check(){
-    if(picked.length !== steps.length){
-      feedback.className = 'order-feedback err';
-      feedback.textContent = 'Спочатку клацни всі чотири картки';
+  function render(){
+    if(built.length === steps.length){
+      promptEl.textContent = '';
+      optionsEl.innerHTML = '';
+      doneEl.classList.add('show');
       return;
     }
-    const isCorrect = picked.every((idx,i)=>idx===correctOrder[i]);
-    if(isCorrect){
-      feedback.className = 'order-feedback ok';
-      feedback.textContent = 'Правильний порядок ✓';
-      solved = true;
-      addNeurons(3);
-    } else {
-      feedback.className = 'order-feedback err';
-      feedback.textContent = 'Ще не той порядок — спробуй ще раз';
-    }
+    promptEl.textContent = `Що відбувається ${ordinals[built.length]}?`;
+    const remaining = steps.map((s,i)=>i).filter(i=>!built.includes(i)).sort(()=>Math.random()-0.5);
+    optionsEl.innerHTML = '';
+    remaining.forEach(idx=>{
+      const btn = document.createElement('button');
+      btn.className = 'seq-opt';
+      btn.textContent = steps[idx];
+      btn.addEventListener('click', ()=>{
+        if(idx === built.length){
+          built.push(idx);
+          addNeurons(1);
+          const row = document.createElement('div');
+          row.className = 'seq-built-item';
+          row.innerHTML = `<span class="num">${built.length}</span><span>${steps[idx]}</span>`;
+          builtEl.appendChild(row);
+          if(built.length === steps.length) addNeurons(3);
+          render();
+        } else {
+          btn.classList.add('wrong');
+          setTimeout(()=>btn.classList.remove('wrong'), 400);
+        }
+      });
+      optionsEl.appendChild(btn);
+    });
   }
-  return { reset, check };
+  render();
 })();
 
 /* ---------- ARCHITECTURE 4-LEVEL SORT ---------- */
@@ -545,6 +570,51 @@ makeSortBoard('risksPool', {
   { text:'Низький рівень захисту багатьох IoT-пристроїв', zone:'risks' }
 ]);
 
+/* ---------- COMPONENT FLOW DEMO ---------- */
+const ROLE_ICONS = {
+  sensor: (c)=>`<svg viewBox="0 0 48 48" fill="none"><path d="M14 36 Q14 20 24 20 Q34 20 34 36 Z" fill="${c}"/><circle cx="24" cy="29" r="4" fill="#fff" opacity="0.9"/><path d="M9 15 Q24 2 39 15" stroke="${c}" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.55"/><path d="M15 12 Q24 5 33 12" stroke="${c}" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.85"/></svg>`,
+  ctrl: (c)=>`<svg viewBox="0 0 48 48" fill="none"><rect x="12" y="12" width="24" height="24" rx="3" fill="${c}"/><rect x="18" y="18" width="12" height="12" rx="1" fill="#fff" opacity="0.85"/><line x1="24" y1="3" x2="24" y2="12" stroke="${c}" stroke-width="2.5"/><line x1="24" y1="36" x2="24" y2="45" stroke="${c}" stroke-width="2.5"/><line x1="3" y1="24" x2="12" y2="24" stroke="${c}" stroke-width="2.5"/><line x1="36" y1="24" x2="45" y2="24" stroke="${c}" stroke-width="2.5"/><line x1="15" y1="5" x2="15" y2="12" stroke="${c}" stroke-width="2"/><line x1="33" y1="5" x2="33" y2="12" stroke="${c}" stroke-width="2"/><line x1="15" y1="36" x2="15" y2="43" stroke="${c}" stroke-width="2"/><line x1="33" y1="36" x2="33" y2="43" stroke="${c}" stroke-width="2"/></svg>`,
+  act: (c)=>`<svg viewBox="0 0 48 48" fill="none"><rect x="5" y="16" width="38" height="16" rx="8" fill="${c}"/><circle cx="32" cy="24" r="9" fill="#fff" opacity="0.95"/><circle cx="32" cy="24" r="3" fill="${c}"/></svg>`
+};
+document.getElementById('icSensor').innerHTML = ROLE_ICONS.sensor('#16A3A0');
+document.getElementById('icCtrl').innerHTML = ROLE_ICONS.ctrl('#6C5CE7');
+document.getElementById('icAct').innerHTML = ROLE_ICONS.act('#FF6B4A');
+
+const compFlow = (function(){
+  const lane = document.getElementById('compLane');
+  const marker = document.getElementById('compMarker');
+  const status = document.getElementById('compStatus');
+  const nodes = { sensor: document.getElementById('nodeSensor'), ctrl: document.getElementById('nodeCtrl'), act: document.getElementById('nodeAct') };
+  let running = false;
+  function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+  function pctLeft(el){ return parseFloat(el.style.left); }
+  setTimeout(()=>{ marker.style.left = pctLeft(nodes.sensor) + '%'; }, 50);
+
+  async function run(){
+    if(running) return;
+    running = true;
+    Object.values(nodes).forEach(n=>n.classList.remove('active'));
+    marker.style.left = pctLeft(nodes.sensor) + '%';
+    status.textContent = 'Датчик відчуває, що в кімнаті похолодало';
+    nodes.sensor.classList.add('active');
+    await sleep(900);
+    marker.style.left = pctLeft(nodes.ctrl) + '%';
+    status.textContent = 'Зв\'язок передає сигнал контролеру';
+    await sleep(900);
+    nodes.ctrl.classList.add('active');
+    status.textContent = 'Контролер вирішує: потрібно увімкнути обігрів';
+    await sleep(900);
+    marker.style.left = pctLeft(nodes.act) + '%';
+    status.textContent = 'Зв\'язок передає команду виконавчому пристрою';
+    await sleep(900);
+    nodes.act.classList.add('active');
+    status.textContent = 'Виконавчий пристрій вмикає обігрівач ✓';
+    addNeurons(2);
+    running = false;
+  }
+  return { run };
+})();
+
 /* ---------- SYSTEM COMPONENTS ---------- */
 makeClassify('componentList', [
   { text:'Термометр, що вимірює температуру повітря', correct:0 },
@@ -555,6 +625,113 @@ makeClassify('componentList', [
   { text:'Датчик руху', correct:0 }
 ], ['Датчик','Контролер','Виконавчий пристрій','Зв\'язок']);
 
+/* ---------- DEVICE-RISK MEMO MATCH ---------- */
+(function(){
+  const items = [
+    { icon:'📷', name:'Розумна камера', color:'#6C5CE7', colorLight:'#EDE9FF', func:'Може бути зламана й використана для стеження' },
+    { icon:'⌚', name:'Фітнес-браслет', color:'#16A3A0', colorLight:'#E3F5F4', func:'Збирає дуже особисті дані про здоров\'я' },
+    { icon:'🔒', name:'Розумний замок', color:'#FF6B4A', colorLight:'#FFEFE9', func:'Хакер може віддалено відчинити двері' },
+    { icon:'🔊', name:'Голосовий помічник', color:'#FF5D9E', colorLight:'#FFE8F2', func:'Постійно «слухає» розмови в кімнаті' },
+    { icon:'🧸', name:'Розумна іграшка', color:'#FFC93C', colorLight:'#FFF7E2', func:'Може записувати й передавати те, що каже дитина' },
+    { icon:'🧊', name:'Розумний холодильник', color:'#2D9CDB', colorLight:'#EAF5FC', func:'Рідко отримує оновлення безпеки' },
+    { icon:'📍', name:'GPS-трекер', color:'#6C5CE7', colorLight:'#EDE9FF', func:'Розкриває, де ти перебуваєш у реальному часі' },
+    { icon:'💡', name:'Розумна лампочка', color:'#16A3A0', colorLight:'#E3F5F4', func:'Може стати «ботом» у масштабній кібератаці' }
+  ];
+  let cards = [];
+  items.forEach(it=>{
+    cards.push({ type:'name', key:it.name, item:it });
+    cards.push({ type:'func', key:it.name, item:it });
+  });
+  cards.sort(()=>Math.random()-0.5);
+
+  const grid = document.getElementById('riskMemo');
+  let firstCard = null;
+  let lock = false;
+  let matchedCount = 0;
+
+  cards.forEach(data=>{
+    const it = data.item;
+    const card = document.createElement('div');
+    card.className = 'memo-card';
+    card.style.setProperty('--card-c', it.color);
+    card.style.setProperty('--card-c-light', it.colorLight);
+    const backContent = data.type === 'name'
+      ? `<div class="icon">${it.icon}</div><div class="name">${it.name}</div>`
+      : `<div class="func">${it.func}</div>`;
+    card.innerHTML = `<div class="flip-inner">
+      <div class="flip-face flip-front">${NEURON_MARK}</div>
+      <div class="flip-face flip-back">${backContent}</div>
+    </div>`;
+    card.addEventListener('click', ()=>{
+      if(lock || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+      card.classList.add('flipped');
+      if(!firstCard){ firstCard = card; firstCard._data = data; return; }
+      const secondCard = card;
+      lock = true;
+      const isMatch = data.key === firstCard._data.key && data.type !== firstCard._data.type;
+      if(isMatch){
+        addNeurons(1);
+        matchedCount++;
+        [firstCard, secondCard].forEach(c=>{ c.classList.add('matched','pop'); setTimeout(()=>c.classList.remove('pop'), 450); });
+        firstCard = null; lock = false;
+        if(matchedCount === items.length){ addNeurons(3); }
+      } else {
+        setTimeout(()=>{
+          [firstCard, secondCard].forEach(c=>c.classList.add('wrong'));
+          setTimeout(()=>{
+            [firstCard, secondCard].forEach(c=>c.classList.remove('flipped','wrong'));
+            firstCard = null; lock = false;
+          }, 900);
+        }, 1400);
+      }
+    });
+    grid.appendChild(card);
+  });
+})();
+
+/* ---------- ROOM LAYOUT (static furniture) ---------- */
+(function(){
+  const room = document.getElementById('roomArea');
+  const items = [
+    { cls:'el-teacher', text:'Вчительський стіл', left:5, top:8, w:13, h:11 },
+    { cls:'el-board', text:'Дошка', left:21, top:4, w:16, h:7 },
+    { cls:'el-iboard', text:'Інтерактивна дошка', left:40, top:4, w:20, h:8 },
+    { cls:'el-sink', text:'🚰', left:80, top:5, w:10, h:8 },
+    { cls:'el-door', text:'', left:93, top:20, w:3, h:18 },
+    { cls:'el-window', text:'', left:0, top:26, w:2.2, h:10 },
+    { cls:'el-window', text:'', left:0, top:44, w:2.2, h:10 },
+    { cls:'el-window', text:'', left:0, top:62, w:2.2, h:10 },
+    // desks: 3 rows x 3
+    { cls:'el-desk', text:'🪑', left:22, top:36, w:11, h:8 },
+    { cls:'el-desk', text:'🪑', left:40, top:36, w:11, h:8 },
+    { cls:'el-desk', text:'🪑', left:58, top:36, w:11, h:8 },
+    { cls:'el-desk', text:'🪑', left:22, top:54, w:11, h:8 },
+    { cls:'el-desk', text:'🪑', left:40, top:54, w:11, h:8 },
+    { cls:'el-desk', text:'🪑', left:58, top:54, w:11, h:8 },
+    { cls:'el-desk', text:'🪑', left:22, top:72, w:11, h:8 },
+    { cls:'el-desk', text:'🪑', left:40, top:72, w:11, h:8 },
+    { cls:'el-desk', text:'🪑', left:58, top:72, w:11, h:8 },
+    // computers bottom
+    { cls:'el-computer', text:'🖥️', left:14, top:88, w:9, h:9 },
+    { cls:'el-computer', text:'🖥️', left:28, top:88, w:9, h:9 },
+    { cls:'el-computer', text:'🖥️', left:42, top:88, w:9, h:9 },
+    // computers right
+    { cls:'el-computer', text:'🖥️', left:90, top:44, w:9, h:9 },
+    { cls:'el-computer', text:'🖥️', left:90, top:60, w:9, h:9 },
+    { cls:'el-computer', text:'🖥️', left:90, top:76, w:9, h:9 }
+  ];
+  items.forEach(it=>{
+    const el = document.createElement('div');
+    el.className = 'room-el ' + it.cls;
+    el.style.left = it.left + '%';
+    el.style.top = it.top + '%';
+    el.style.width = it.w + '%';
+    el.style.height = it.h + '%';
+    el.textContent = it.text;
+    room.appendChild(el);
+  });
+})();
+
 /* ---------- CLASSROOM BUILDER EMULATOR ---------- */
 const classroomBuilder = (function(){
   const DEVICES = [
@@ -563,9 +740,13 @@ const classroomBuilder = (function(){
     { key:'vent', icon:'🌬️', name:'Автопровітрювання', func:'Стежить за якістю повітря' },
     { key:'sched', icon:'📅', name:'Електронний розклад', func:'Автоматично оновлює заняття' },
     { key:'blinds', icon:'🪟', name:'Розумні жалюзі', func:'Реагують на рівень освітлення' },
-    { key:'light', icon:'💡', name:'Розумне світло', func:'Змінює яскравість протягом дня' },
+    { key:'light', icon:'💡', name:'Розумне освітлення', func:'Змінює яскравість протягом дня' },
     { key:'temp', icon:'🌡️', name:'Датчик температури', func:'Підтримує комфортний клімат' },
-    { key:'sound', icon:'🔊', name:'Звукове оповіщення', func:'Попереджає про важливі події' }
+    { key:'sound', icon:'🔊', name:'Звукове оповіщення', func:'Попереджає про важливі події' },
+    { key:'alarm', icon:'🚨', name:'Сигналізація', func:'Захищає клас поза уроками' },
+    { key:'assistant', icon:'🎤', name:'Голосовий помічник', func:'Керує пристроями голосом' },
+    { key:'smoke', icon:'🧯', name:'Датчик диму', func:'Попереджає про пожежну небезпеку' },
+    { key:'wifi', icon:'📶', name:'Wi-Fi точка доступу', func:'Забезпечує зв\'язок усіх пристроїв' }
   ];
 
   const room = document.getElementById('roomArea');
@@ -574,7 +755,6 @@ const classroomBuilder = (function(){
   const status = document.getElementById('roomStatus');
   const insight = document.getElementById('roomInsight');
   let selected = null;
-  const placedTypes = new Set();
   let rewarded = false;
 
   DEVICES.forEach(d=>{
@@ -605,21 +785,26 @@ const classroomBuilder = (function(){
     el.style.left = xPct + '%';
     el.style.top = yPct + '%';
     el.title = `${device.name} — ${device.func}`;
-    el.addEventListener('click', (e)=>{
+    el.draggable = true;
+    el.addEventListener('dragstart', (e)=>{
+      e.stopPropagation();
+      el.classList.add('dragging');
+    });
+    el.addEventListener('dragend', ()=>{ el.classList.remove('dragging'); });
+    el.addEventListener('dblclick', (e)=>{
       e.stopPropagation();
       el.remove();
       updateStatus();
     });
     room.appendChild(el);
     room.classList.add('has-devices');
-    placedTypes.add(device.key);
     updateStatus();
   }
 
   function updateStatus(){
-    const remaining = room.querySelectorAll('.placed-device').length;
-    if(remaining === 0) room.classList.remove('has-devices');
-    const uniqueNow = new Set([...room.querySelectorAll('.placed-device')].map(el=>el.textContent));
+    const placedEls = [...room.querySelectorAll('.placed-device')];
+    if(placedEls.length === 0) room.classList.remove('has-devices');
+    const uniqueNow = new Set(placedEls.map(el=>el.textContent));
     status.textContent = `Розміщено типів пристроїв: ${uniqueNow.size} з ${DEVICES.length}`;
     if(uniqueNow.size >= 5 && !rewarded){
       rewarded = true;
@@ -631,13 +816,20 @@ const classroomBuilder = (function(){
   room.addEventListener('dragover', (e)=>{ e.preventDefault(); });
   room.addEventListener('drop', (e)=>{
     e.preventDefault();
+    const rect = room.getBoundingClientRect();
+    const xPct = Math.max(4,Math.min(96, ((e.clientX - rect.left) / rect.width) * 100));
+    const yPct = Math.max(4,Math.min(96, ((e.clientY - rect.top) / rect.height) * 100));
+
+    const movingDevice = document.querySelector('.placed-device.dragging');
+    if(movingDevice){
+      movingDevice.style.left = xPct + '%';
+      movingDevice.style.top = yPct + '%';
+      return;
+    }
     const chip = document.querySelector('.device-chip.dragging');
     if(!chip) return;
     const device = DEVICES.find(d=>d.key===chip.dataset.key);
-    const rect = room.getBoundingClientRect();
-    const xPct = ((e.clientX - rect.left) / rect.width) * 100;
-    const yPct = ((e.clientY - rect.top) / rect.height) * 100;
-    placeDevice(device, Math.max(4,Math.min(96,xPct)), Math.max(4,Math.min(96,yPct)));
+    placeDevice(device, xPct, yPct);
     addNeurons(1);
   });
   room.addEventListener('click', (e)=>{
@@ -655,7 +847,6 @@ const classroomBuilder = (function(){
   function reset(){
     room.querySelectorAll('.placed-device').forEach(el=>el.remove());
     room.classList.remove('has-devices');
-    placedTypes.clear();
     status.textContent = `Розміщено типів пристроїв: 0 з ${DEVICES.length}`;
   }
 
