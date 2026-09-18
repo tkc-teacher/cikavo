@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Життя з розумними пристроями — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
+    --purple:#6C5CE7; --purple-dark:#5340c9; --teal:#16A3A0; --coral:#FF6B4A; --yellow:#FFC93C; --pink:#FF5D9E; --blue:#2D9CDB;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,h4,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  .container{max-width:820px; margin:0 auto; padding:0 24px;}
+
+  .hud{position:sticky; top:0; z-index:50; background:rgba(246,245,251,.9); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
+  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--blue),var(--purple)); transition:width .3s ease;}
+  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:820px; margin:0 auto;}
+  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
+  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
+  .neuron-counter svg{width:24px;height:24px;}
+  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
+  #neuronCount.pop{transform:scale(1.35);}
+
+  .hero{padding:52px 24px 40px;}
+  .hero-inner{max-width:820px; margin:0 auto; display:flex; align-items:center; gap:30px;}
+  .hero-text{flex:1;}
+  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--blue); margin-bottom:10px;}
+  .hero h1{font-size:30px; line-height:1.18; margin-bottom:12px;}
+  .hero p{color:var(--ink-soft); font-size:16.5px; max-width:56ch; margin-bottom:22px;}
+  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--purple); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
+  .btn-primary:hover{background:var(--purple-dark);}
+  .btn-primary:active{transform:scale(.97);}
+  .mascot{width:130px; height:130px; flex-shrink:0;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:100px; height:100px;} }
+
+  section.block{padding:36px 0; border-top:1px solid var(--line);}
+  .step-label{font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:600; color:var(--blue); margin-bottom:8px;}
+  .block h2{font-size:20px; margin-bottom:10px; max-width:38ch;}
+  .block p{max-width:66ch; font-size:15.5px; margin:0 0 10px; color:var(--ink);}
+  .block p.soft{color:var(--ink-soft); font-size:14.5px;}
+  .note{background:#EAF5FC; border-left:4px solid var(--blue); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; color:#2A6B8C; margin:16px 0;}
+
+  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:20px; margin-top:14px;}
+
+  /* ORDER-POOL */
+  .order-pool{display:flex; flex-direction:column; gap:8px; margin-top:6px;}
+  .order-item{display:flex; align-items:center; gap:12px; background:var(--bg); border:2px solid var(--line); border-radius:var(--radius-s); padding:11px 14px; cursor:pointer; transition:border-color .15s ease, background .15s ease;}
+  .order-item .num{width:24px; height:24px; border-radius:50%; background:var(--surface); border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12px; flex-shrink:0; color:var(--ink-soft);}
+  .order-item.picked{border-color:var(--purple);}
+  .order-item.picked .num{border-color:var(--purple); background:#EDE9FF; color:var(--purple-dark);}
+  .order-item .txt{font-size:14px;}
+  .order-controls{display:flex; justify-content:center; gap:10px; margin-top:14px;}
+  .ctrl-btn{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-s); padding:9px 15px; cursor:pointer;}
+  .ctrl-btn.check{background:var(--teal); color:#fff; border-color:var(--teal);}
+  .order-feedback{text-align:center; margin-top:10px; font-family:'Baloo 2',sans-serif; font-weight:600; min-height:1.4em;}
+  .order-feedback.ok{color:#256B36;}
+  .order-feedback.err{color:#B8412A;}
+
+  /* SORT BOARD */
+  .sort-buckets{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  @media (max-width:480px){ .sort-buckets{grid-template-columns:1fr;} }
+  .bucket{border:2px dashed var(--line); border-radius:var(--radius-m); padding:9px; min-height:80px;}
+  .bucket-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:11.5px; color:var(--ink-soft); margin-bottom:6px; text-align:center;}
+  .bucket-items{display:flex; flex-wrap:wrap; gap:5px; min-height:28px;}
+  .bucket.hint{border-color:var(--purple);}
+  .sort-pool{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-top:12px;}
+  .sort-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:7px 11px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .sort-chip:hover{transform:translateY(-2px);}
+  .sort-chip.selected{border-color:var(--purple); box-shadow:0 0 0 3px rgba(108,92,231,0.18);}
+  .sort-chip.placed{background:#E4F8E6; border-color:#3FAE58; cursor:default;}
+  .sort-chip.placed:hover{transform:none;}
+
+  /* CLASSIFY */
+  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px; margin:10px 0;}
+  .classify-card p.q{font-weight:700; margin:0 0 8px; font-size:14px;}
+  .choice-row{display:flex; gap:7px; flex-wrap:wrap;}
+  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12.5px; padding:7px 12px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease, color .15s ease;}
+  .choice-btn:hover{border-color:var(--purple);}
+  .choice-btn.correct{background:#E4F8E6; border-color:#3FAE58; color:#256B36;}
+  .choice-btn.wrong{background:#FDE6E1; border-color:var(--coral); color:#B8412A;}
+  .choice-feedback{margin-top:7px; font-size:12.5px; color:var(--ink-soft); min-height:1.2em;}
+
+  /* MATCHING */
+  .tool-pool{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; padding:12px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:14px;}
+  .tool-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:7px 12px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .tool-chip:hover{transform:translateY(-2px);}
+  .tool-chip.selected{border-color:var(--purple); box-shadow:0 0 0 3px rgba(108,92,231,0.18);}
+  .tool-chip.placed{display:none;}
+  .func-card{display:flex; align-items:center; gap:10px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:10px 12px; margin-bottom:8px; transition:border-color .2s ease, background .2s ease;}
+  .func-card.matched{border-color:var(--yellow); background:#FFFBEE;}
+  .func-card.shake{animation:itemShake .35s ease;}
+  @keyframes itemShake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
+  .func-text{flex:1; font-size:13px; color:var(--ink-soft);}
+  .func-slot{min-width:64px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:11px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:7px 6px;}
+  .func-slot.filled{border-style:solid; border-color:var(--yellow); background:#FFF7E2; color:var(--ink);}
+
+  .completion-mini{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:20px; margin-top:16px; text-align:center;}
+  .completion-mini .total{font-family:'Baloo 2',sans-serif; font-size:24px; color:var(--purple-dark); margin-top:6px;}
+
+  /* CLASSROOM BUILDER EMULATOR */
+  .room-wrap{margin-top:16px;}
+  .room{position:relative; width:100%; aspect-ratio:16/10; background:#F0EFF9; border:3px solid var(--ink); border-radius:14px; overflow:hidden; touch-action:none;}
+  .room-board{position:absolute; top:10px; left:50%; transform:translateX(-50%); width:34%; height:9%; background:#2E4A3E; border-radius:5px; display:flex; align-items:center; justify-content:center; color:#fff; font-family:'Baloo 2',sans-serif; font-size:11px; font-weight:600;}
+  .room-window{position:absolute; top:4%; right:6%; width:16%; height:5%; background:#BFE3FA; border:2px solid #fff; border-radius:3px;}
+  .room-window.w2{right:26%;}
+  .room-door{position:absolute; left:0; top:38%; width:1.5%; height:22%; background:#B08B5E;}
+  .desk{position:absolute; width:9%; height:8%; background:#E3D6C2; border:1.5px solid #C9B79A; border-radius:3px;}
+  .drop-hint{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; color:var(--ink-soft); opacity:.5; pointer-events:none; text-align:center; padding:20px;}
+  .room.has-devices .drop-hint{display:none;}
+  .placed-device{position:absolute; width:34px; height:34px; margin-left:-17px; margin-top:-17px; border-radius:50%; background:var(--surface); border:2px solid var(--purple); display:flex; align-items:center; justify-content:center; font-size:17px; cursor:pointer; z-index:5; transition:transform .15s ease;}
+  .placed-device:hover{transform:scale(1.15);}
+  .placed-device:active{transform:scale(0.9);}
+
+  .device-palette{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-top:14px;}
+  .device-chip{display:flex; align-items:center; gap:6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; background:var(--surface); border:2px solid var(--line); border-radius:999px; padding:7px 12px 7px 8px; cursor:grab; transition:border-color .15s ease, transform .12s ease, opacity .15s ease;}
+  .device-chip .ic{font-size:16px;}
+  .device-chip:hover{transform:translateY(-2px); border-color:var(--purple);}
+  .device-chip.selected{border-color:var(--purple); box-shadow:0 0 0 3px rgba(108,92,231,0.18);}
+  .device-chip.dragging{opacity:.4;}
+
+  .room-controls{display:flex; justify-content:space-between; align-items:center; margin-top:10px; flex-wrap:wrap; gap:8px;}
+  .room-status{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; color:var(--ink-soft);}
+
+  .legend{display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-top:16px;}
+  @media (max-width:520px){ .legend{grid-template-columns:1fr;} }
+  .legend-item{display:flex; align-items:center; gap:8px; font-size:12.5px; color:var(--ink-soft); background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-s); padding:8px 10px;}
+  .legend-item .ic{font-size:16px;}
+  .legend-item b{color:var(--ink); font-family:'Baloo 2',sans-serif; font-size:12.5px;}
+
+  .insight{background:#FFF3E2; border-left:4px solid var(--yellow); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14px; margin-top:14px; display:none;}
+  .insight.show{display:block;}
+
+  /* PROJECT GUIDE CARDS */
+  .guide-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:18px 20px; margin-bottom:12px;}
+  .guide-card h3{font-size:15px; margin-bottom:8px; display:flex; align-items:center; gap:8px;}
+  .guide-card h3 .n{width:24px; height:24px; border-radius:50%; background:#EDE9FF; color:var(--purple-dark); font-size:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .guide-card p{margin:0 0 6px; font-size:13.5px;}
+  .guide-card p:last-child{margin-bottom:0;}
+
+  footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
+  <div class="hud-row">
+    <span class="hud-title">9 клас · Життя з розумними пристроями</span>
+    <div class="neuron-counter">
+      <svg viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
+        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#E0A800" opacity="0.6"/>
+      </svg>
+      <span id="neuronCount">0</span>
+    </div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Інтернет речей</div>
+      <h1>Життя з розумними пристроями</h1>
+      <p>Головне про інтернет речей (IoT) в одному уроці: що це, як влаштовано, де застосовують і чим ризикує. А наприкінці — власний віртуальний конструктор: збери розумний клас із доступних IoT-пристроїв.</p>
+      <button class="btn-primary" onclick="document.getElementById('s1').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 160 160" fill="none">
+      <circle cx="80" cy="80" r="6" fill="#6C5CE7"/>
+      <circle cx="40" cy="45" r="8" fill="#16A3A0"/>
+      <circle cx="120" cy="45" r="8" fill="#FF6B4A"/>
+      <circle cx="30" cy="110" r="8" fill="#2D9CDB"/>
+      <circle cx="130" cy="110" r="8" fill="#FFC93C"/>
+      <line x1="80" y1="80" x2="40" y2="45" stroke="#20203A" stroke-width="2.5"/>
+      <line x1="80" y1="80" x2="120" y2="45" stroke="#20203A" stroke-width="2.5"/>
+      <line x1="80" y1="80" x2="30" y2="110" stroke="#20203A" stroke-width="2.5"/>
+      <line x1="80" y1="80" x2="130" y2="110" stroke="#20203A" stroke-width="2.5"/>
+      <circle cx="80" cy="80" r="14" fill="#20203A"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="s1">
+    <div class="step-label">Крок 1 · Що таке IoT</div>
+    <h2>Інтернет речей і як він працює</h2>
+    <p><b>Інтернет речей (IoT)</b> — мережа фізичних пристроїв із сенсорами, які обмінюються даними через інтернет без участі людини.</p>
+    <p class="soft">Онови порядок роботи будь-якого IoT-пристрою.</p>
+    <div class="exercise">
+      <div class="order-pool" id="orderPool"></div>
+      <div class="order-controls">
+        <button class="ctrl-btn" onclick="stepOrder.reset()">Скинути</button>
+        <button class="ctrl-btn check" onclick="stepOrder.check()">Перевірити</button>
+      </div>
+      <div class="order-feedback" id="orderFeedback"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Архітектура</div>
+    <h2>Чотири рівні системи IoT</h2>
+    <p>Від сенсора до екрана в твоєму додатку дані проходять чотири рівні.</p>
+    <p class="soft">Розклади приклади за рівнем.</p>
+    <div class="exercise">
+      <div class="sort-buckets">
+        <div class="bucket" id="bucketDevice"><div class="bucket-title">📡 Пристрої</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bucketNetwork"><div class="bucket-title">🌐 Мережа</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bucketProcessing"><div class="bucket-title">☁️ Обробка</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bucketApp"><div class="bucket-title">📱 Застосування</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="archPool"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Застосування</div>
+    <h2>Де вже працює IoT</h2>
+    <p class="soft">Обери сферу, потім клацни приклад, який їй відповідає.</p>
+    <div class="exercise">
+      <div class="tool-pool" id="spherePool"></div>
+      <div id="sphereList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Користь і ризики</div>
+    <h2>Не тільки зручність</h2>
+    <p>IoT економить час і ресурси, але водночас збирає багато особистих даних.</p>
+    <p class="soft">Розклади приклади на дві колонки.</p>
+    <div class="exercise">
+      <div class="sort-buckets">
+        <div class="bucket" id="bucketPros"><div class="bucket-title">✅ Переваги</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bucketRisks"><div class="bucket-title">⚠️ Ризики</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="risksPool"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Компоненти</div>
+    <h2>З чого складається сама система</h2>
+    <p class="soft">Визнач, чим є кожен елемент.</p>
+    <div id="componentList"></div>
+
+    <div class="completion-mini">
+      <div style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px;">Теорію повторено 🎉</div>
+      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Проєкт · Емулятор</div>
+    <h2>Збери розумний клас</h2>
+    <p>Перетягни пристрої з палітри у клас — де завгодно. Побач, як виглядає твій розумний клас, ще до того, як почнеш справжній проєкт.</p>
+    <div class="room-wrap">
+      <div class="room" id="roomArea">
+        <div class="room-board">Дошка</div>
+        <div class="room-window"></div>
+        <div class="room-window w2"></div>
+        <div class="room-door"></div>
+        <div class="desk" style="left:12%; top:60%;"></div>
+        <div class="desk" style="left:26%; top:60%;"></div>
+        <div class="desk" style="left:12%; top:78%;"></div>
+        <div class="desk" style="left:26%; top:78%;"></div>
+        <div class="drop-hint">Перетягни сюди пристрої знизу</div>
+      </div>
+      <div class="room-controls">
+        <span class="room-status" id="roomStatus">Розміщено типів пристроїв: 0 з 8</span>
+        <button class="ctrl-btn" onclick="classroomBuilder.reset()">Очистити клас</button>
+      </div>
+      <div class="device-palette" id="devicePalette"></div>
+      <div class="insight" id="roomInsight">Клас готовий ✓ У тебе вже є чернетка — саме з такого набору пристроїв і почнеться справжній проєкт у Tinkercad, SketchUp чи Canva.</div>
+
+      <div class="legend" id="deviceLegend"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Далі</div>
+    <h2>Від чернетки до справжнього проєкту</h2>
+    <div class="guide-card">
+      <h3><span class="n">1</span>Мета</h3>
+      <p>Перенеси ідею з емулятора в повноцінний макет: 5-7 пристроїв, кожен розв'язує конкретну проблему класу (шум, повітря, освітлення, безпека, контроль часу, інклюзивність).</p>
+    </div>
+    <div class="guide-card">
+      <h3><span class="n">2</span>Інструменти</h3>
+      <p><b>Макет/3D:</b> Tinkercad або SketchUp. <b>Презентація:</b> Canva або Google Slides. <b>Тексти:</b> Google Документи.</p>
+    </div>
+    <div class="guide-card">
+      <h3><span class="n">3</span>Презентація команди</h3>
+      <p>3-5 хвилин: проблеми класу → рішення через IoT → опис пристроїв → схема → висновки. Недискримінаційна мова, кожен учасник знає свою частину.</p>
+    </div>
+  </section>
+
+</div>
+
+<footer>Урок · «Життя з розумними пристроями» · 9 клас</footer>
+
+<script>
+const STORAGE_KEY = "lesson9-iot-combined-neurons";
+let neurons = 0;
+const neuronEl = document.getElementById('neuronCount');
+const hudFill = document.getElementById('hudFill');
+
+function addNeurons(n){
+  neurons += n;
+  neuronEl.textContent = neurons;
+  neuronEl.classList.add('pop');
+  setTimeout(()=>neuronEl.classList.remove('pop'), 250);
+  saveProgress();
+  const totalEl = document.getElementById('totalNeurons');
+  if(totalEl) totalEl.textContent = neurons;
+}
+async function saveProgress(){
+  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
+}
+async function loadProgress(){
+  try{
+    const res = await window.storage?.get(STORAGE_KEY, false);
+    if(res && res.value){
+      const d = JSON.parse(res.value);
+      if(typeof d.neurons === 'number'){ neurons = d.neurons; neuronEl.textContent = neurons; document.getElementById('totalNeurons').textContent = neurons; }
+    }
+  }catch(e){}
+}
+loadProgress();
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
+});
+
+function makeSortBoard(poolId, buckets, items){
+  const pool = document.getElementById(poolId);
+  let selected = null;
+  let placedCount = 0;
+  const shuffled = [...items].sort(()=>Math.random()-0.5);
+  shuffled.forEach(item=>{
+    const chip = document.createElement('div');
+    chip.className = 'sort-chip';
+    chip.textContent = item.text;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.sort-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = item;
+    });
+    pool.appendChild(chip);
+  });
+  Object.entries(buckets).forEach(([key, el])=>{
+    el.addEventListener('click', ()=>{
+      if(!selected) return;
+      if(selected.zone === key){
+        const chip = [...pool.children].find(c=>c.textContent===selected.text && !c.classList.contains('placed'));
+        if(chip){ chip.classList.add('placed'); chip.classList.remove('selected'); el.querySelector('.bucket-items').appendChild(chip); }
+        addNeurons(1);
+        placedCount++;
+        selected = null;
+        if(placedCount === items.length) addNeurons(2);
+      } else {
+        el.classList.add('hint');
+        setTimeout(()=>el.classList.remove('hint'), 350);
+      }
+    });
+  });
+}
+
+function makeClassify(containerId, items, opts){
+  const list = document.getElementById(containerId);
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">${opts.map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i===item.correct){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+}
+
+function makeMatching(poolId, listId, items){
+  const pool = document.getElementById(poolId);
+  const list = document.getElementById(listId);
+  let selected = null;
+  let matched = 0;
+  const shuffledNames = [...items].sort(()=>Math.random()-0.5);
+  shuffledNames.forEach(t=>{
+    const chip = document.createElement('div');
+    chip.className = 'tool-chip';
+    chip.textContent = t.name;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = t.name;
+    });
+    pool.appendChild(chip);
+  });
+  const shuffledFuncs = [...items].sort(()=>Math.random()-0.5);
+  shuffledFuncs.forEach(t=>{
+    const card = document.createElement('div');
+    card.className = 'func-card';
+    card.innerHTML = `<div class="func-text">${t.func}</div><div class="func-slot">?</div>`;
+    card.addEventListener('click', ()=>{
+      if(card.classList.contains('matched') || !selected) return;
+      const slot = card.querySelector('.func-slot');
+      if(selected === t.name){
+        slot.textContent = selected;
+        slot.classList.add('filled');
+        card.classList.add('matched');
+        const chip = [...pool.children].find(c=>c.textContent===selected);
+        if(chip) chip.classList.add('placed');
+        addNeurons(1);
+        matched++;
+        selected = null;
+        pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+        if(matched === items.length) addNeurons(2);
+      } else {
+        card.classList.add('shake');
+        setTimeout(()=>card.classList.remove('shake'), 350);
+      }
+    });
+    list.appendChild(card);
+  });
+}
+
+/* ---------- STEP ORDER: IoT PRINCIPLE ---------- */
+const stepOrder = (function(){
+  const steps = [
+    "Сенсор/пристрій збирає дані (температура, рух, звук тощо)",
+    "Дані передаються через інтернет або локальну мережу",
+    "Дані обробляються на сервері або в хмарі",
+    "Пристрій реагує: вмикається, повідомляє, змінює стан"
+  ];
+  const correctOrder = [0,1,2,3];
+  let picked = [];
+  const pool = document.getElementById('orderPool');
+  const feedback = document.getElementById('orderFeedback');
+  let solved = false;
+
+  const shuffled = [...steps.keys()].sort(()=>Math.random()-0.5);
+  const itemEls = {};
+  shuffled.forEach(idx=>{
+    const el = document.createElement('div');
+    el.className = 'order-item';
+    el.innerHTML = `<span class="num"></span><span class="txt">${steps[idx]}</span>`;
+    el.addEventListener('click', ()=>{
+      if(solved || el.classList.contains('picked')) return;
+      picked.push(idx);
+      el.classList.add('picked');
+      el.querySelector('.num').textContent = picked.length;
+    });
+    pool.appendChild(el);
+    itemEls[idx] = el;
+  });
+
+  function reset(){
+    if(solved) return;
+    picked = [];
+    Object.values(itemEls).forEach(el=>{ el.classList.remove('picked'); el.querySelector('.num').textContent=''; });
+    feedback.textContent = '';
+  }
+  function check(){
+    if(picked.length !== steps.length){
+      feedback.className = 'order-feedback err';
+      feedback.textContent = 'Спочатку клацни всі чотири картки';
+      return;
+    }
+    const isCorrect = picked.every((idx,i)=>idx===correctOrder[i]);
+    if(isCorrect){
+      feedback.className = 'order-feedback ok';
+      feedback.textContent = 'Правильний порядок ✓';
+      solved = true;
+      addNeurons(3);
+    } else {
+      feedback.className = 'order-feedback err';
+      feedback.textContent = 'Ще не той порядок — спробуй ще раз';
+    }
+  }
+  return { reset, check };
+})();
+
+/* ---------- ARCHITECTURE 4-LEVEL SORT ---------- */
+makeSortBoard('archPool', {
+  device: document.getElementById('bucketDevice'),
+  network: document.getElementById('bucketNetwork'),
+  processing: document.getElementById('bucketProcessing'),
+  app: document.getElementById('bucketApp')
+}, [
+  { text:'Датчик руху фіксує рух у кімнаті', zone:'device' },
+  { text:'Дані передаються через Wi-Fi на сервер', zone:'network' },
+  { text:'Хмара аналізує температуру і вирішує, коли полити рослини', zone:'processing' },
+  { text:'У мобільному додатку ти бачиш показники і натискаєш кнопку', zone:'app' },
+  { text:'Сенсор світла в розумній лампі', zone:'device' },
+  { text:'Bluetooth передає дані фітнес-браслета на телефон', zone:'network' },
+  { text:'Сервер визначає, що показники пульсу підвищені', zone:'processing' },
+  { text:'Панель керування розумним будинком на стіні', zone:'app' }
+]);
+
+/* ---------- SPHERES OF APPLICATION ---------- */
+makeMatching('spherePool', 'sphereList', [
+  { name:'Побут', func:'Смарт-розетка вмикає кавоварку за графіком' },
+  { name:'Медицина', func:'Фітнес-браслет передає лікарю пульс і сон пацієнта' },
+  { name:'Транспорт', func:'Датчики руху перемикають світлофор' },
+  { name:'Освіта', func:'Смарт-дошка фіксує активність на уроці' },
+  { name:'Виробництво', func:'Сенсори на заводі попереджають про поломку' },
+  { name:'Сільське господарство', func:'Сенсор вологості вмикає полив у теплиці' }
+]);
+
+/* ---------- BENEFITS VS RISKS ---------- */
+makeSortBoard('risksPool', {
+  pros: document.getElementById('bucketPros'),
+  risks: document.getElementById('bucketRisks')
+}, [
+  { text:'Автоматизація повсякденних дій', zone:'pros' },
+  { text:'Комфорт і зручність', zone:'pros' },
+  { text:'Збір і витік персональних даних', zone:'risks' },
+  { text:'Потенційне стеження за користувачем', zone:'risks' },
+  { text:'Економія ресурсів (електроенергії, води)', zone:'pros' },
+  { text:'Залежність від стабільного інтернет-з\'єднання', zone:'risks' },
+  { text:'Швидкий доступ до даних у реальному часі', zone:'pros' },
+  { text:'Низький рівень захисту багатьох IoT-пристроїв', zone:'risks' }
+]);
+
+/* ---------- SYSTEM COMPONENTS ---------- */
+makeClassify('componentList', [
+  { text:'Термометр, що вимірює температуру повітря', correct:0 },
+  { text:'Arduino, що обробляє сигнали і приймає рішення', correct:1 },
+  { text:'LED-лампа, що вмикається за командою', correct:2 },
+  { text:'Wi-Fi модуль, що передає дані на сервер', correct:3 },
+  { text:'Двигун, що відчиняє вікно', correct:2 },
+  { text:'Датчик руху', correct:0 }
+], ['Датчик','Контролер','Виконавчий пристрій','Зв\'язок']);
+
+/* ---------- CLASSROOM BUILDER EMULATOR ---------- */
+const classroomBuilder = (function(){
+  const DEVICES = [
+    { key:'face', icon:'📷', name:'Камера розпізнавання облич', func:'Контроль відвідуваності' },
+    { key:'sos', icon:'🆘', name:'Кнопка SOS', func:'Сигнал у небезпечній ситуації' },
+    { key:'vent', icon:'🌬️', name:'Автопровітрювання', func:'Стежить за якістю повітря' },
+    { key:'sched', icon:'📅', name:'Електронний розклад', func:'Автоматично оновлює заняття' },
+    { key:'blinds', icon:'🪟', name:'Розумні жалюзі', func:'Реагують на рівень освітлення' },
+    { key:'light', icon:'💡', name:'Розумне світло', func:'Змінює яскравість протягом дня' },
+    { key:'temp', icon:'🌡️', name:'Датчик температури', func:'Підтримує комфортний клімат' },
+    { key:'sound', icon:'🔊', name:'Звукове оповіщення', func:'Попереджає про важливі події' }
+  ];
+
+  const room = document.getElementById('roomArea');
+  const palette = document.getElementById('devicePalette');
+  const legend = document.getElementById('deviceLegend');
+  const status = document.getElementById('roomStatus');
+  const insight = document.getElementById('roomInsight');
+  let selected = null;
+  const placedTypes = new Set();
+  let rewarded = false;
+
+  DEVICES.forEach(d=>{
+    const chip = document.createElement('div');
+    chip.className = 'device-chip';
+    chip.draggable = true;
+    chip.dataset.key = d.key;
+    chip.innerHTML = `<span class="ic">${d.icon}</span>${d.name}`;
+    chip.addEventListener('dragstart', ()=>{ chip.classList.add('dragging'); });
+    chip.addEventListener('dragend', ()=>{ chip.classList.remove('dragging'); });
+    chip.addEventListener('click', ()=>{
+      palette.querySelectorAll('.device-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = d;
+    });
+    palette.appendChild(chip);
+
+    const leg = document.createElement('div');
+    leg.className = 'legend-item';
+    leg.innerHTML = `<span class="ic">${d.icon}</span><div><b>${d.name}</b> — ${d.func}</div>`;
+    legend.appendChild(leg);
+  });
+
+  function placeDevice(device, xPct, yPct){
+    const el = document.createElement('div');
+    el.className = 'placed-device';
+    el.textContent = device.icon;
+    el.style.left = xPct + '%';
+    el.style.top = yPct + '%';
+    el.title = `${device.name} — ${device.func}`;
+    el.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      el.remove();
+      updateStatus();
+    });
+    room.appendChild(el);
+    room.classList.add('has-devices');
+    placedTypes.add(device.key);
+    updateStatus();
+  }
+
+  function updateStatus(){
+    const remaining = room.querySelectorAll('.placed-device').length;
+    if(remaining === 0) room.classList.remove('has-devices');
+    const uniqueNow = new Set([...room.querySelectorAll('.placed-device')].map(el=>el.textContent));
+    status.textContent = `Розміщено типів пристроїв: ${uniqueNow.size} з ${DEVICES.length}`;
+    if(uniqueNow.size >= 5 && !rewarded){
+      rewarded = true;
+      addNeurons(3);
+      insight.classList.add('show');
+    }
+  }
+
+  room.addEventListener('dragover', (e)=>{ e.preventDefault(); });
+  room.addEventListener('drop', (e)=>{
+    e.preventDefault();
+    const chip = document.querySelector('.device-chip.dragging');
+    if(!chip) return;
+    const device = DEVICES.find(d=>d.key===chip.dataset.key);
+    const rect = room.getBoundingClientRect();
+    const xPct = ((e.clientX - rect.left) / rect.width) * 100;
+    const yPct = ((e.clientY - rect.top) / rect.height) * 100;
+    placeDevice(device, Math.max(4,Math.min(96,xPct)), Math.max(4,Math.min(96,yPct)));
+    addNeurons(1);
+  });
+  room.addEventListener('click', (e)=>{
+    if(!selected) return;
+    if(e.target.closest('.placed-device')) return;
+    const rect = room.getBoundingClientRect();
+    const xPct = ((e.clientX - rect.left) / rect.width) * 100;
+    const yPct = ((e.clientY - rect.top) / rect.height) * 100;
+    placeDevice(selected, Math.max(4,Math.min(96,xPct)), Math.max(4,Math.min(96,yPct)));
+    addNeurons(1);
+    selected = null;
+    palette.querySelectorAll('.device-chip').forEach(c=>c.classList.remove('selected'));
+  });
+
+  function reset(){
+    room.querySelectorAll('.placed-device').forEach(el=>el.remove());
+    room.classList.remove('has-devices');
+    placedTypes.clear();
+    status.textContent = `Розміщено типів пристроїв: 0 з ${DEVICES.length}`;
+  }
+
+  return { reset };
+})();
+</script>
+
+</body>
+</html>
