@@ -86,6 +86,19 @@
   .choice-btn.wrong{background:#FDE6E1; border-color:var(--coral); color:#B8412A;}
   .choice-feedback{margin-top:8px; font-size:13.5px; color:var(--ink-soft); min-height:1.2em;}
 
+  .tool-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:14px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:16px;}
+  .tool-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:8px 14px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .tool-chip:hover{transform:translateY(-2px);}
+  .tool-chip.selected{border-color:var(--purple); box-shadow:0 0 0 3px rgba(108,92,231,0.18);}
+  .tool-chip.placed{display:none;}
+  .func-card{display:flex; align-items:center; gap:12px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; margin-bottom:10px; transition:border-color .2s ease, background .2s ease;}
+  .func-card.matched{border-color:var(--yellow); background:#FFFBEE;}
+  .func-card.shake{animation:matchShake .35s ease;}
+  @keyframes matchShake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
+  .func-text{flex:1; font-size:14px; color:var(--ink-soft);}
+  .func-slot{min-width:90px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12.5px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:8px 10px;}
+  .func-slot.filled{border-style:solid; border-color:var(--yellow); background:#FFF7E2; color:var(--ink);}
+
   /* PHISHING ORDER EXERCISE */
   .order-pool{display:flex; flex-direction:column; gap:8px; margin-top:14px;}
   .order-item{display:flex; align-items:center; gap:12px; background:var(--bg); border:2px solid var(--line); border-radius:var(--radius-s); padding:12px 14px; cursor:pointer; transition:border-color .15s ease, background .15s ease;}
@@ -168,6 +181,16 @@
 
 <div class="container">
 
+  <section class="block" style="border-top:none; padding-top:0;">
+    <div class="step-label">Повторення · Поштові служби</div>
+    <h2>Пригадаймо минулу тему</h2>
+    <p class="soft">Обери поняття, потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="tool-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+    </div>
+  </section>
+
   <section class="block" id="etiquette">
     <div class="step-label">Крок 1 · Етикет</div>
     <h2>Правила ввічливого листа</h2>
@@ -227,14 +250,6 @@
     <p class="soft">Визнач тип кожного листа.</p>
     <div id="spamTypeList"></div>
 
-    <h3 style="font-size:16px; margin:26px 0 8px;">Як ховають адресу від ботів</h3>
-    <p>Спам-боти автоматично шукають адреси в Інтернеті за символом «@». Тому досвідчені користувачі іноді пишуть адресу так, щоб людина зрозуміла, а бот — ні: наприклад, <b>ivan[собака]gmail.com</b> замість <b>ivan@gmail.com</b>.</p>
-    <div class="exercise">
-      <p class="soft" style="margin-bottom:10px;">Яка адреса написана «замаскованим» способом проти ботів?</p>
-      <div class="choice-row" id="spamChoices" style="justify-content:center;"></div>
-      <div class="choice-feedback" id="spamFeedback" style="text-align:center; margin-top:10px;"></div>
-    </div>
-
     <div class="note">Поштові служби, зокрема Gmail, самі виявляють більшість спаму й одразу переносять такі листи в папку «Спам». Якщо туди потрапив лист, якого там бути не мало — це просто помилка фільтра, і його можна перемістити назад.</div>
   </section>
 
@@ -254,16 +269,7 @@
   </section>
 
   <section class="block">
-    <div class="step-label">Крок 6 · Вкладення</div>
-    <h2>Файл теж може бути небезпечним</h2>
-    <p>Віруси часто ховаються саме у вкладених файлах. Найбільше остерігайся: виконуваних файлів (<b>.exe</b>, <b>.bat</b>), файлів із подвійним розширенням на кшталт <b>фото.jpg.exe</b> (це не фото, а замаскована програма), і архівів <b>.zip</b>/<b>.rar</b> від незнайомців.</p>
-    <div class="trivia">Небезпечний файл може прийти навіть від друга — якщо його поштову скриньку зламали, вірус розсилає копії себе усім контактам. Тому підозрілий файл (навіть від знайомого) краще уточнити іншим каналом, перш ніж відкривати.</div>
-    <p class="soft">Відкривати чи ні?</p>
-    <div id="attachRiskList"></div>
-  </section>
-
-  <section class="block">
-    <div class="step-label">Крок 7 · Підсумок дій</div>
+    <div class="step-label">Крок 6 · Підсумок дій</div>
     <h2>Безпечно чи ризиковано?</h2>
     <div id="riskList"></div>
   </section>
@@ -272,7 +278,7 @@
     <div class="step-label">Підсумок</div>
     <h2>Коротка перевірка</h2>
     <div class="quiz-box" id="quizBox">
-      <div class="quiz-progress" id="quizProgress">Запитання 1 з 8</div>
+      <div class="quiz-progress" id="quizProgress">Запитання 1 з 7</div>
       <div class="quiz-q" id="quizQ"></div>
       <div class="quiz-options" id="quizOptions"></div>
       <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
@@ -288,7 +294,7 @@
         <circle cx="12" cy="12" r="4.4" fill="#FF6B4A"/><circle cx="12" cy="12" r="1.6" fill="#B8412A" opacity="0.6"/>
       </svg>
       <h3>Урок пройдено!</h3>
-      <p>Ти навчився розпізнавати ввічливий лист, складати надійний пароль, відрізняти спам від реклами, обережно ставитись до вкладених файлів і розбирати схему фішингу крок за кроком.</p>
+      <p>Ти навчився розпізнавати ввічливий лист, складати надійний пароль, відрізняти спам від реклами і розбирати схему фішингу крок за кроком.</p>
       <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
     </div>
   </section>
@@ -355,6 +361,64 @@ function makeClassify(containerId, items, optA, optB){
     });
   });
 }
+
+function makeMatching(poolId, listId, items){
+  const pool = document.getElementById(poolId);
+  const list = document.getElementById(listId);
+  let selected = null;
+  let matched = 0;
+  const shuffledNames = [...items].sort(()=>Math.random()-0.5);
+  shuffledNames.forEach(t=>{
+    const chip = document.createElement('div');
+    chip.className = 'tool-chip';
+    chip.textContent = t.name;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = t.name;
+    });
+    pool.appendChild(chip);
+  });
+  const shuffledFuncs = [...items].sort(()=>Math.random()-0.5);
+  shuffledFuncs.forEach(t=>{
+    const card = document.createElement('div');
+    card.className = 'func-card';
+    card.innerHTML = `<div class="func-text">${t.func}</div><div class="func-slot">?</div>`;
+    card.addEventListener('click', ()=>{
+      if(card.classList.contains('matched') || !selected) return;
+      const slot = card.querySelector('.func-slot');
+      if(selected === t.name){
+        slot.textContent = selected;
+        slot.classList.add('filled');
+        card.classList.add('matched');
+        const chip = [...pool.children].find(c=>c.textContent===selected);
+        if(chip) chip.classList.add('placed');
+        addNeurons(1);
+        matched++;
+        selected = null;
+        pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+        if(matched === items.length) addNeurons(2);
+      } else {
+        card.classList.add('shake');
+        setTimeout(()=>card.classList.remove('shake'), 350);
+      }
+    });
+    list.appendChild(card);
+  });
+}
+
+/* ---------- RECAP: PREVIOUS LESSON ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Провайдер', func:'Сервіс, де реєструють поштову скриньку — Gmail, Ukr.net, i.ua' },
+  { name:'Символ @', func:'Розділяє ім\'я користувача й назву сервера в адресі' },
+  { name:'Тема листа', func:'Коротко пояснює, про що лист, ще до його відкриття' },
+  { name:'Кому', func:'Основні отримувачі листа — вони бачать одне одного' },
+  { name:'Копія', func:'Отримувачі «для інформації» — теж бачать усіх інших' },
+  { name:'Прихована копія', func:'Отримувач бачить лист, а інші адресати про нього не знають' },
+  { name:'Відповісти', func:'Надсилає повідомлення назад лише тому, хто написав' },
+  { name:'Переслати', func:'Надсилає весь лист новій людині, якої серед адресатів не було' }
+]);
 
 /* ---------- ETIQUETTE ---------- */
 makeClassify('etiquetteList', [
@@ -515,29 +579,6 @@ function evaluatePassword(pw){
   });
 })();
 
-/* ---------- SPAM MASKING ---------- */
-(function(){
-  const options = [
-    { text:'ivan@gmail.com', correct:false },
-    { text:'ivan[собака]gmail.com', correct:true },
-    { text:'ivan.gmail.com', correct:false }
-  ];
-  const row = document.getElementById('spamChoices');
-  const fb = document.getElementById('spamFeedback');
-  let answered = false;
-  options.forEach(opt=>{
-    const btn = document.createElement('button');
-    btn.className = 'choice-btn';
-    btn.textContent = opt.text;
-    btn.addEventListener('click', ()=>{
-      if(answered) return;
-      if(opt.correct){ btn.classList.add('correct'); fb.textContent='Правильно ✓ Боти шукають символ «@», а людина легко здогадається, що мається на увазі.'; answered=true; addNeurons(1); }
-      else{ btn.classList.add('wrong'); fb.textContent='Це звичайна адреса — бот її прекрасно розпізнає'; }
-    });
-    row.appendChild(btn);
-  });
-})();
-
 /* ---------- PHISHING ORDER ---------- */
 const phishOrder = (function(){
   const steps = [
@@ -596,14 +637,6 @@ const phishOrder = (function(){
   return { reset, check };
 })();
 
-/* ---------- DANGEROUS ATTACHMENTS ---------- */
-makeClassify('attachRiskList', [
-  { text:'фото_з_дня_народження.jpg від друга, якого ти чекав', correct:true },
-  { text:'рахунок.pdf.exe від невідомого відправника', correct:false },
-  { text:'домашнє_завдання.docx від однокласниці, з яким ви домовлялись', correct:true },
-  { text:'архів.zip «твій приз» від адреси, яку ти бачиш вперше', correct:false }
-], 'Відкрити', 'Не відкривати');
-
 /* ---------- RISK SUMMARY ---------- */
 (function(){
   const items = [
@@ -643,7 +676,6 @@ const questions = [
   { q: "Чим реклама, на яку ти сам підписався, відрізняється від спаму?", opts: ["Нічим, це те саме", "Ти сам погодився її отримувати", "Реклама завжди небезпечна, а спам — ні"], correct: 1 },
   { q: "Яка ознака НАЙБІЛЬШЕ схожа на типовий спам-лист?", opts: ["Спокійний тон і чітка адреса відправника", "«Терміново! Ти виграв приз, натисни зараз!»", "Прохання перевірити домашнє завдання"], correct: 1 },
   { q: "Що таке фішинг?", opts: ["Різновид спаму про знижки", "Шахрайська схема виманювання пароля через фальшивий сайт", "Помилка поштового сервера"], correct: 1 },
-  { q: "Чому файл «фото.jpg.exe» небезпечний, хоча в назві є «.jpg»?", opts: ["Насправді це програма, замаскована подвійним розширенням", "Це просто дуже велике фото", "Розширення .jpg.exe взагалі не існує"], correct: 0 },
   { q: "Як безпечніше перейти на відомий сайт, якщо лист виглядає підозріло?", opts: ["Клацнути посилання з листа", "Ввести адресу вручну в браузері", "Переслати лист другу й запитати"], correct: 1 },
   { q: "Що варто зробити, завершивши роботу на чужому комп'ютері?", opts: ["Нічого, просто закрити вкладку", "Вийти зі свого облікового запису", "Змінити мову інтерфейсу"], correct: 1 }
 ];
