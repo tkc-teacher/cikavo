@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Проблеми сучасних технологій — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FBF6FA; --ink:#2B1B29; --ink-soft:#6B5568; --surface:#FFFFFF; --line:#EDDCE6;
+    --pri:#A32D6B; --pri-dark:#7D2153; --gold:#E8A33D; --teal:#1E8A82; --sky:#3B8FD1;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  .container{max-width:780px; margin:0 auto; padding:0 24px;}
+
+  .hud{position:sticky; top:0; z-index:50; background:rgba(251,246,250,.9); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
+  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--gold),var(--pri)); transition:width .3s ease;}
+  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:780px; margin:0 auto;}
+  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
+  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
+  .neuron-counter svg{width:24px;height:24px;}
+  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
+  #neuronCount.pop{transform:scale(1.35);}
+
+  .hero{padding:48px 24px 36px;}
+  .hero-inner{max-width:780px; margin:0 auto; display:flex; align-items:center; gap:26px;}
+  .hero-text{flex:1;}
+  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--pri); margin-bottom:10px;}
+  .hero h1{font-size:29px; line-height:1.2; margin-bottom:12px;}
+  .hero p{color:var(--ink-soft); font-size:16px; max-width:54ch; margin-bottom:20px;}
+  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--pri); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
+  .btn-primary:hover{background:var(--pri-dark);}
+  .btn-primary:active{transform:scale(.97);}
+  .mascot{width:110px; height:110px; flex-shrink:0;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:90px; height:90px;} }
+
+  section.block{padding:30px 0; border-top:1px solid var(--line);}
+  .step-label{font-family:'Baloo 2',sans-serif; font-size:12.5px; font-weight:700; color:var(--pri); margin-bottom:6px; text-transform:uppercase; letter-spacing:.03em;}
+  .block h2{font-size:19px; margin-bottom:8px; max-width:40ch;}
+  .block p{max-width:64ch; font-size:15px; margin:0 0 8px; color:var(--ink);}
+  .block p.soft{color:var(--ink-soft); font-size:13.5px;}
+  .block ul{max-width:64ch; margin:0 0 8px; padding-left:20px; font-size:15px;}
+  .block ul li{margin-bottom:4px;}
+  .note{background:#FFF6E8; border-left:4px solid var(--gold); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:#8A5E17; margin:12px 0;}
+  .problem-note{background:#FCEAF2; border-left:4px solid var(--pri); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:var(--pri-dark); margin:12px 0;}
+
+  .pic{width:100%; max-width:320px; border-radius:var(--radius-m); margin:10px 0; display:block; overflow:hidden; background:#F0E4EC; aspect-ratio:16/10;}
+  .pic img{width:100%; height:100%; object-fit:cover; display:block;}
+  .pic .fallback{width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:34px; color:#C9A9BC;}
+
+  .pic-row{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:10px 0;}
+  @media (max-width:480px){ .pic-row{grid-template-columns:1fr;} }
+  .pic-item{text-align:center;}
+  .pic-item .pic{max-width:none; aspect-ratio:4/3; margin:0 0 5px;}
+  .pic-item .pic-label{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:11px; color:var(--ink-soft);}
+
+  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:16px 18px; margin-top:10px;}
+
+  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:13px 15px; margin:8px 0;}
+  .classify-card p.q{font-weight:700; margin:0 0 8px; font-size:13.5px;}
+  .choice-row{display:flex; gap:6px; flex-wrap:wrap;}
+  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12px; padding:7px 11px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease, color .15s ease;}
+  .choice-btn:hover{border-color:var(--pri);}
+  .choice-btn.correct{background:#E4F5E9; border-color:#3FAE58; color:#256B36;}
+  .choice-btn.wrong{background:#FBE6E9; border-color:#D14B5E; color:#8C2D3A;}
+  .choice-feedback{margin-top:6px; font-size:12px; color:var(--ink-soft); min-height:1.2em;}
+
+  .sort-buckets{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  @media (max-width:480px){ .sort-buckets{grid-template-columns:1fr;} }
+  .bucket{border:2px dashed var(--line); border-radius:var(--radius-m); padding:9px; min-height:76px;}
+  .bucket-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:11.5px; color:var(--ink-soft); margin-bottom:6px; text-align:center;}
+  .bucket-items{display:flex; flex-wrap:wrap; gap:5px; min-height:28px;}
+  .bucket.hint{border-color:var(--pri);}
+  .sort-pool{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-top:12px;}
+  .sort-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:7px 11px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .sort-chip:hover{transform:translateY(-2px);}
+  .sort-chip.selected{border-color:var(--pri); box-shadow:0 0 0 3px rgba(163,45,107,0.18);}
+  .sort-chip.placed{background:#E4F5E9; border-color:#3FAE58; cursor:default;}
+  .sort-chip.placed:hover{transform:none;}
+
+  .tool-pool{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; padding:11px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:12px;}
+  .tool-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:7px 11px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .tool-chip:hover{transform:translateY(-2px);}
+  .tool-chip.selected{border-color:var(--pri); box-shadow:0 0 0 3px rgba(163,45,107,0.18);}
+  .tool-chip.placed{display:none;}
+  .func-card{display:flex; align-items:center; gap:10px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:9px 11px; margin-bottom:7px; transition:border-color .2s ease, background .2s ease;}
+  .func-card.matched{border-color:var(--gold); background:#FFF8EA;}
+  .func-card.shake{animation:itemShake .35s ease;}
+  @keyframes itemShake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
+  .func-text{flex:1; font-size:12.5px; color:var(--ink-soft);}
+  .func-slot{min-width:60px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:10.5px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:6px 6px;}
+  .func-slot.filled{border-style:solid; border-color:var(--gold); background:#FFF3D9; color:var(--ink);}
+
+  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:24px 22px; margin-top:16px;}
+  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:12.5px; color:var(--ink-soft); margin-bottom:9px;}
+  .quiz-q{font-size:16px; font-weight:700; margin-bottom:14px;}
+  .quiz-options{display:flex; flex-direction:column; gap:9px;}
+  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:14px; font-weight:600; padding:11px 14px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .quiz-opt:hover{border-color:var(--pri);}
+  .quiz-opt.correct{background:#E4F5E9; border-color:#3FAE58;}
+  .quiz-opt.wrong{background:#FBE6E9; border-color:#D14B5E;}
+  .quiz-nav{display:flex; justify-content:flex-end; margin-top:16px;}
+  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:10px 20px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
+  .btn-next.active{opacity:1; pointer-events:auto;}
+
+  .completion{display:none; text-align:center; padding:18px 10px 10px;}
+  .completion.show{display:block;}
+  .badge{width:80px; height:80px; margin:0 auto 14px;}
+  .completion h3{font-size:20px; margin-bottom:8px;}
+  .completion p{color:var(--ink-soft); max-width:50ch; margin:0 auto 16px; font-size:14px;}
+  .completion .total{font-family:'Baloo 2',sans-serif; font-size:28px; color:var(--pri-dark);}
+
+  footer{padding:32px 24px 56px; text-align:center; color:var(--ink-soft); font-size:13px;}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
+  <div class="hud-row">
+    <span class="hud-title">8 клас · Проблеми сучасних технологій</span>
+    <div class="neuron-counter">
+      <svg viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#E8A33D" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#E8A33D"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#E8A33D" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#E8A33D"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#E8A33D" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#E8A33D"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#E8A33D" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#E8A33D"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#E8A33D" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#E8A33D"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#E8A33D" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#E8A33D"/>
+        <circle cx="12" cy="12" r="4.4" fill="#E8A33D"/><circle cx="12" cy="12" r="1.6" fill="#B57A1F" opacity="0.6"/>
+      </svg>
+      <span id="neuronCount">0</span>
+    </div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Тема 6</div>
+      <h1>Проблеми сучасних технологій</h1>
+      <p>VR, хмара, IoT, біометрія, носимі гаджети, NFC-оплата — усе це вже частина життя. У кожної технології є зручність і своя «зворотна сторона». Коротко про кожну — і одразу перевірка.</p>
+      <button class="btn-primary" onclick="document.getElementById('s1').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <ellipse cx="70" cy="70" rx="46" ry="50" fill="#F4E8EF"/>
+      <ellipse cx="70" cy="68" rx="38" ry="42" fill="#FFFFFF"/>
+      <rect x="46" y="52" width="48" height="30" rx="6" fill="#2B1B29"/>
+      <rect x="51" y="57" width="6" height="6" fill="#E8A33D"/>
+      <rect x="61" y="57" width="6" height="6" fill="#3B8FD1"/>
+      <rect x="71" y="57" width="6" height="6" fill="#A32D6B"/>
+      <rect x="81" y="57" width="6" height="6" fill="#1E8A82"/>
+      <rect x="56" y="67" width="6" height="6" fill="#3B8FD1"/>
+      <rect x="66" y="67" width="6" height="6" fill="#A32D6B"/>
+      <rect x="76" y="67" width="6" height="6" fill="#E8A33D"/>
+      <path d="M50 96 C50 108 90 108 90 96" stroke="#2B1B29" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <line x1="70" y1="30" x2="70" y2="18" stroke="#2B1B29" stroke-width="3"/>
+      <circle cx="70" cy="14" r="5" fill="#A32D6B"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" style="border-top:none; padding-top:0;">
+    <div class="step-label">Повторення · Захист пристроїв</div>
+    <h2>Пригадаймо минулу тему</h2>
+    <p>Минулого разу йшлося про шкідливе ПЗ і способи захисту від нього.</p>
+    <p class="soft">Обери термін, потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="tool-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s1">
+    <div class="step-label">1 · VR, MR, AR</div>
+    <h2>Три способи змішати реальність із цифрою</h2>
+    <ul>
+      <li><b>VR — Virtual Reality</b> (віртуальна реальність) — повна симуляція вигаданого світу</li>
+      <li><b>MR — Mixed Reality</b> (змішана реальність) — реальний світ із доданими цифровими об'єктами</li>
+      <li><b>AR — Augmented Reality</b> (доповнена реальність) — цифровий контент поверх реальності, з яким можна взаємодіяти</li>
+    </ul>
+    <div class="note">MR і AR дуже схожі: в MR цифрові об'єкти ніби «вбудовані» в простір навколо тебе, а в AR — це радше шар поверх зображення, не пов'язаний із ним напряму. Межа тонка, тож не дивуйся, якщо в різних джерелах побачиш ці терміни трохи по-різному.</div>
+    <div class="pic-row">
+      <div class="pic-item"><div class="pic" id="picVR"><div class="fallback">🥽</div></div><div class="pic-label">VR</div></div>
+      <div class="pic-item"><div class="pic" id="picMR"><div class="fallback">🌆</div></div><div class="pic-label">MR</div></div>
+      <div class="pic-item"><div class="pic" id="picAR"><div class="fallback">📱</div></div><div class="pic-label">AR</div></div>
+    </div>
+    <p class="soft">Визнач, що це — VR, MR чи AR.</p>
+    <div id="vrList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">2 · Хмарні обчислення</div>
+    <h2>Дані в хмарі, а не тільки на диску</h2>
+    <p>Dropbox, OneDrive, iCloud, Google Drive — усе це хмарні сховища. До 2030 року очікується понад 30 млрд підключених пристроїв.</p>
+    <div class="problem-note">Проблема: без інтернету доступу до хмарних даних немає, а хто саме контролює й бачить ці дані — не завжди зрозуміло користувачу.</div>
+    <div class="pic" id="picCloud"><div class="fallback">☁️</div></div>
+    <p class="soft">Це перевага хмари чи її обмеження?</p>
+    <div class="exercise">
+      <div class="sort-buckets">
+        <div class="bucket" id="bucketPro"><div class="bucket-title">✅ Перевага</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bucketLim"><div class="bucket-title">⚠️ Обмеження</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="cloudPool"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">3 · Інтернет речей</div>
+    <h2>Розумні пристрої — зручні, та вразливі</h2>
+    <p>IoT-пристрої (камери, датчики, колонки) рідко мають такий самий рівень захисту, як звичайний комп'ютер чи сервер — тому їх найлегше зламати.</p>
+    <div class="pic" id="picIoT"><div class="fallback">📡</div></div>
+    <p class="soft">Це типова вразливість IoT-пристрою?</p>
+    <div id="iotList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">4 · Біометрія</div>
+    <h2>Коли твоє тіло стає паролем</h2>
+    <p>Відбиток пальця, обличчя, голос, райдужка ока — унікальні фізичні ознаки для підтвердження особи. На відміну від пароля, вкрадену біометрію не можна просто «змінити».</p>
+    <div class="pic" id="picBio"><div class="fallback">👁️</div></div>
+    <p class="soft">Що саме сканує кожен спосіб?</p>
+    <div class="exercise">
+      <div class="tool-pool" id="bioPool"></div>
+      <div id="bioList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">5 · Портативні пристрої</div>
+    <h2>Розумний годинник теж має недоліки</h2>
+    <p>Фітнес-трекери, розумні годинники й окуляри (як-от Google Glass) завжди на тобі й завжди онлайн — і в цьому їхня слабкість.</p>
+    <p class="soft">Зістав недолік із поясненням.</p>
+    <div class="exercise">
+      <div class="tool-pool" id="wearPool"></div>
+      <div id="wearList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">6 · NFC-оплата</div>
+    <h2>Радіус дії — лише кілька сантиметрів</h2>
+    <p>Мобільні платежі (смартфон, браслет, кільце) працюють через NFC — обмін даними на відстані не більш ніж 10 см.</p>
+    <div class="pic" id="picNFC"><div class="fallback">💳</div></div>
+    <p class="soft">На такій відстані оплата спрацює?</p>
+    <div id="nfcList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">7 · Зберігання даних</div>
+    <h2>Місця для даних ніколи не буде достатньо</h2>
+    <p>Що більший обсяг даних — то гостріші чотири проблеми: вартість за гігабайт, швидкість доступу, довговічність носія, енергоспоживання серверів.</p>
+    <div class="pic" id="picStorage"><div class="fallback">🗄️</div></div>
+    <p class="soft">Яка це проблема?</p>
+    <div id="storageList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">8 · Права людини</div>
+    <h2>Хто має право на твої дані</h2>
+    <p>Біометричні й особисті дані мають збиратись лише зі згоди людини, а доступ до них — бути обмеженим і законним.</p>
+    <p class="soft">Це порушення чи дотримання прав?</p>
+    <div id="rightsList"></div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div class="quiz-box" id="quizBox">
+      <div class="quiz-progress" id="quizProgress">Запитання 1 з 7</div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
+    </div>
+    <div class="completion" id="completion">
+      <svg class="badge" viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#A32D6B" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#A32D6B"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#A32D6B" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#A32D6B"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#A32D6B" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#A32D6B"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#A32D6B" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#A32D6B"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#A32D6B" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#A32D6B"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#A32D6B" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#A32D6B"/>
+        <circle cx="12" cy="12" r="4.4" fill="#A32D6B"/><circle cx="12" cy="12" r="1.6" fill="#7D2153" opacity="0.6"/>
+      </svg>
+      <h3>Урок пройдено!</h3>
+      <p>Ти розібрався, які проблеми ховаються за VR, хмарою, IoT, біометрією, носимими гаджетами, NFC-оплатою й зберіганням даних.</p>
+      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Урок · «Проблеми сучасних технологій» · 8 клас</footer>
+
+<script>
+const STORAGE_KEY = "lesson8-tech-problems-neurons";
+let neurons = 0;
+const neuronEl = document.getElementById('neuronCount');
+const hudFill = document.getElementById('hudFill');
+
+function addNeurons(n){
+  neurons += n;
+  neuronEl.textContent = neurons;
+  neuronEl.classList.add('pop');
+  setTimeout(()=>neuronEl.classList.remove('pop'), 250);
+  saveProgress();
+}
+async function saveProgress(){
+  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
+}
+async function loadProgress(){
+  try{
+    const res = await window.storage?.get(STORAGE_KEY, false);
+    if(res && res.value){
+      const d = JSON.parse(res.value);
+      if(typeof d.neurons === 'number'){ neurons = d.neurons; neuronEl.textContent = neurons; }
+    }
+  }catch(e){}
+}
+loadProgress();
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
+});
+
+/* ---------- IMAGE PLACEHOLDERS ---------- */
+function loadPic(containerId, file, fallbackEmoji){
+  const el = document.getElementById(containerId);
+  const img = document.createElement('img');
+  img.src = `images/${file}`;
+  img.alt = '';
+  img.addEventListener('error', ()=>{ el.innerHTML = `<div class="fallback">${fallbackEmoji}</div>`; });
+  el.innerHTML = '';
+  el.appendChild(img);
+}
+loadPic('picVR', 'vr-person.jpg', '🥽');
+loadPic('picMR', 'mr-scene.jpg', '🌆');
+loadPic('picAR', 'ar-overlay.jpg', '📱');
+loadPic('picCloud', 'cloud-computing.jpg', '☁️');
+loadPic('picIoT', 'iot-devices.jpg', '📡');
+loadPic('picBio', 'biometric-eye.jpg', '👁️');
+loadPic('picNFC', 'mobile-payment.jpg', '💳');
+loadPic('picStorage', 'data-storage.jpg', '🗄️');
+
+/* ---------- HELPERS ---------- */
+function makeClassify(containerId, items, opts){
+  const list = document.getElementById(containerId);
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">${opts.map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i===item.correct){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+}
+
+function makeYesNo(containerId, items, optYes, optNo){
+  const list = document.getElementById(containerId);
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">
+        <button class="choice-btn" data-v="true">${optYes}</button>
+        <button class="choice-btn" data-v="false">${optNo}</button>
+      </div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        const isCorrect = (btn.dataset.v === 'true') === item.correct;
+        if(isCorrect){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+}
+
+function makeSortBoard(poolId, buckets, items){
+  const pool = document.getElementById(poolId);
+  let selected = null;
+  let placedCount = 0;
+  const shuffled = [...items].sort(()=>Math.random()-0.5);
+  shuffled.forEach(item=>{
+    const chip = document.createElement('div');
+    chip.className = 'sort-chip';
+    chip.textContent = item.text;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.sort-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = item;
+    });
+    pool.appendChild(chip);
+  });
+  Object.entries(buckets).forEach(([key, el])=>{
+    el.addEventListener('click', ()=>{
+      if(!selected) return;
+      if(selected.zone === key){
+        const chip = [...pool.children].find(c=>c.textContent===selected.text && !c.classList.contains('placed'));
+        if(chip){ chip.classList.add('placed'); chip.classList.remove('selected'); el.querySelector('.bucket-items').appendChild(chip); }
+        addNeurons(1);
+        placedCount++;
+        selected = null;
+        if(placedCount === items.length) addNeurons(2);
+      } else {
+        el.classList.add('hint');
+        setTimeout(()=>el.classList.remove('hint'), 350);
+      }
+    });
+  });
+}
+
+function makeMatching(poolId, listId, items){
+  const pool = document.getElementById(poolId);
+  const list = document.getElementById(listId);
+  let selected = null;
+  let matched = 0;
+  const shuffledNames = [...items].sort(()=>Math.random()-0.5);
+  shuffledNames.forEach(t=>{
+    const chip = document.createElement('div');
+    chip.className = 'tool-chip';
+    chip.textContent = t.name;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = t.name;
+    });
+    pool.appendChild(chip);
+  });
+  const shuffledFuncs = [...items].sort(()=>Math.random()-0.5);
+  shuffledFuncs.forEach(t=>{
+    const card = document.createElement('div');
+    card.className = 'func-card';
+    card.innerHTML = `<div class="func-text">${t.func}</div><div class="func-slot">?</div>`;
+    card.addEventListener('click', ()=>{
+      if(card.classList.contains('matched') || !selected) return;
+      const slot = card.querySelector('.func-slot');
+      if(selected === t.name){
+        slot.textContent = selected;
+        slot.classList.add('filled');
+        card.classList.add('matched');
+        const chip = [...pool.children].find(c=>c.textContent===selected);
+        if(chip) chip.classList.add('placed');
+        addNeurons(1);
+        matched++;
+        selected = null;
+        pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+        if(matched === items.length) addNeurons(2);
+      } else {
+        card.classList.add('shake');
+        setTimeout(()=>card.classList.remove('shake'), 350);
+      }
+    });
+    list.appendChild(card);
+  });
+}
+
+/* ---------- RECAP: TERM MATCHING ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Вірус', func:'Програма, що саморозмножується і шкодить роботі комп\'ютера' },
+  { name:'Троян', func:'Маскується під звичайну програму та надає доступ третім особам' },
+  { name:'Хробак', func:'Розсилає свою копію контактами, без дії користувача' },
+  { name:'Ботнет', func:'Мережа заражених комп\'ютерів, якою керують без відома власників' },
+  { name:'Шпигунське ПЗ', func:'Непомітно збирає інформацію про користувача' },
+  { name:'Рекламне ПЗ', func:'Показує рекламу без дозволу користувача' },
+  { name:'Програма-вимагач', func:'Блокує систему й вимагає оплату за розблокування' },
+  { name:'Фішинг', func:'Виманює особисті дані через фальшиві сайти чи листи' },
+  { name:'Листи щастя', func:'Просять переслати лист іншим, щоб зібрати адреси для спаму' },
+  { name:'Перехоплення трафіку', func:'Прослуховування даних у незахищеній Wi-Fi мережі' },
+  { name:'DDoS-атака', func:'Перевантажує сервер запитами одночасно з великої кількості пристроїв' },
+  { name:'Брандмауер', func:'Перевіряє мережевий трафік і блокує підозрілі пакети' },
+  { name:'Антивірус', func:'Сканує пристрій і виявляє шкідливі програми' }
+]);
+
+/* ---------- 1. VR/MR/AR ---------- */
+(function(){
+  const items = [
+    { text:'Тренування пілотів у повній симуляції кабіни літака', opts:['VR','MR','AR'], correct:0 },
+    { text:'Навігаційні стрілки поверх вулиці в застосунку телефону', opts:['VR','MR','AR'], correct:1 },
+    { text:'3D-модель серця, накладена на тіло пацієнта для лікаря', opts:['VR','MR','AR'], correct:2 },
+    { text:'Повністю вигадана гра у шоломі, що заміняє весь реальний світ', opts:['VR','MR','AR'], correct:0 }
+  ];
+  const list = document.getElementById('vrList');
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">${item.opts.map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i===item.correct){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+})();
+
+/* ---------- 2. CLOUD PROS/LIMITS ---------- */
+makeSortBoard('cloudPool', { pro: document.getElementById('bucketPro'), lim: document.getElementById('bucketLim') }, [
+  { text:'Автоматичне резервне копіювання без локального диска', zone:'pro' },
+  { text:'Доступ до файлів з різних пристроїв і платформ', zone:'pro' },
+  { text:'Деякі застосунки працюють офлайн і синхронізуються пізніше', zone:'pro' },
+  { text:'Дані зазвичай надійніше захищені, ніж на домашньому диску', zone:'pro' },
+  { text:'Без інтернету доступу до даних немає', zone:'lim' },
+  { text:'Не завжди зрозуміло, хто саме контролює твої дані', zone:'lim' },
+  { text:'Швидкість роботи залежить від якості з\'єднання', zone:'lim' },
+  { text:'Безкоштовний обсяг сховища зазвичай обмежений', zone:'lim' }
+]);
+
+/* ---------- 3. IoT VULNERABILITY ---------- */
+makeYesNo('iotList', [
+  { text:'Розумна камера зі стандартним заводським паролем', correct:true },
+  { text:'Комп\'ютер з увімкненим і регулярно оновлюваним антивірусом', correct:false },
+  { text:'Розумна колонка без жодних оновлень безпеки роками', correct:true },
+  { text:'Сервер компанії з професійним захистом і брандмауером', correct:false }
+], 'Так, вразливо', 'Ні, це захищено');
+
+/* ---------- 4. BIOMETRICS MATCHING ---------- */
+makeMatching('bioPool', 'bioList', [
+  { name:'Відбиток пальця', func:'Сканує унікальний візерунок шкіри руки' },
+  { name:'Розпізнавання обличчя', func:'Порівнює зображення з камери з базою даних' },
+  { name:'Голосова автентифікація', func:'Аналізує тембр і частоту звуку твого голосу' },
+  { name:'Скан райдужки ока', func:'Аналізує кольорові візерунки навколо зіниці' }
+]);
+
+/* ---------- 5. WEARABLES DOWNSIDES ---------- */
+makeMatching('wearPool', 'wearList', [
+  { name:'Проблема конфіденційності', func:'Пристрій може випадково зняти на фото чи відео людей поруч' },
+  { name:'Ризик віддаленого доступу', func:'Дані можуть бути вкрадені, якщо пристрій зламають' },
+  { name:'Обмежена автономність', func:'Без щоденної зарядки пристрій швидко лишається без зв\'язку' }
+]);
+
+/* ---------- 6. NFC DISTANCE ---------- */
+makeYesNo('nfcList', [
+  { text:'Прикласти браслет впритул до термінала', correct:true },
+  { text:'Тримати телефон за 5 см від термінала', correct:true },
+  { text:'Тримати телефон за 50 см від термінала', correct:false },
+  { text:'Піднести картку за 1 метр до термінала', correct:false }
+], 'Так, спрацює', 'Ні, задалеко');
+
+/* ---------- 7. STORAGE PROBLEMS ---------- */
+(function(){
+  const items = [
+    { text:'Щоб зберегти сімейний архів фото за розумні гроші, доводиться довго підбирати найвигідніший варіант', opts:['Вартість','Швидкість','Довговічність','Енергія'], correct:0 },
+    { text:'Фотографії з дитинства на старій флешці вже не відкриваються', opts:['Вартість','Швидкість','Довговічність','Енергія'], correct:2 },
+    { text:'Будівлю, напхану серверами, доводиться цілодобово охолоджувати спеціальними системами', opts:['Вартість','Швидкість','Довговічність','Енергія'], correct:3 },
+    { text:'Відкриваєш папку з тисячами файлів і довго чекаєш, поки вона завантажиться', opts:['Вартість','Швидкість','Довговічність','Енергія'], correct:1 }
+  ];
+  const list = document.getElementById('storageList');
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">${item.opts.map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i===item.correct){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+})();
+
+/* ---------- 8. RIGHTS ---------- */
+makeYesNo('rightsList', [
+  { text:'Компанія збирає біометричні дані без відома і згоди користувача', correct:true },
+  { text:'Сервіс питає дозволу перед скануванням обличчя', correct:false },
+  { text:'Доступ до особистих даних обмежений і регламентований', correct:false },
+  { text:'Дані передають третім особам без пояснення мети', correct:true }
+], 'Так, порушення', 'Ні, усе гаразд');
+
+/* ---------- FINAL QUIZ ---------- */
+const questions = [
+  { q: "Чим MR відрізняється від AR?", opts: ["MR — це те саме, що VR", "В MR користувач бачить реальний світ із доданими об'єктами, в AR контент накладається поверх, не пов'язаний із ним напряму", "AR завжди повністю замінює реальність"], correct: 1 },
+  { q: "Головна проблема хмарних сховищ?", opts: ["Вони завжди безкоштовні", "Без інтернету доступу до даних немає", "Вони не підтримують смартфони"], correct: 1 },
+  { q: "Чому IoT-пристрої часто вразливіші за комп'ютери?", opts: ["Вони не мають такого самого рівня захисту", "Вони не підключені до інтернету", "Вони завжди дорожчі"], correct: 0 },
+  { q: "Чому вкрадену біометрію не можна просто «змінити», на відміну від пароля?", opts: ["Бо біометрія — це фізична частина тебе", "Бо біометрія завжди безкоштовна", "Бо біометрію ніхто не використовує"], correct: 0 },
+  { q: "На якій відстані працює технологія NFC?", opts: ["До 10 см", "До 10 метрів", "Без обмежень"], correct: 0 },
+  { q: "Яка з проблем зберігання даних про довговічність носія?", opts: ["Скільки коштує гігабайт", "Чи збереже носій дані через роки", "Скільки електрики споживає сервер"], correct: 1 },
+  { q: "За яких умов збір біометричних даних є прийнятним?", opts: ["Завжди, без обмежень", "Лише зі згоди людини й з обмеженим доступом", "Тільки якщо це безкоштовно"], correct: 1 }
+];
+let qi=0, currentAnswered=false;
+const quizQ = document.getElementById('quizQ');
+const quizOptions = document.getElementById('quizOptions');
+const quizProgress = document.getElementById('quizProgress');
+const btnNext = document.getElementById('btnNext');
+const quizBox = document.getElementById('quizBox');
+const completion = document.getElementById('completion');
+const totalNeuronsEl = document.getElementById('totalNeurons');
+
+function renderQuestion(){
+  currentAnswered=false; btnNext.classList.remove('active');
+  const item = questions[qi];
+  quizProgress.textContent = `Запитання ${qi+1} з ${questions.length}`;
+  quizQ.textContent = item.q;
+  quizOptions.innerHTML='';
+  item.opts.forEach((opt,i)=>{
+    const b=document.createElement('button'); b.className='quiz-opt'; b.textContent=opt;
+    b.addEventListener('click', ()=>{
+      if(currentAnswered) return; currentAnswered=true;
+      const all = quizOptions.querySelectorAll('.quiz-opt');
+      all.forEach((ob,oi)=>{ if(oi===item.correct) ob.classList.add('correct'); else if(oi===i) ob.classList.add('wrong'); });
+      if(i===item.correct) addNeurons(2);
+      btnNext.classList.add('active');
+      btnNext.textContent = (qi===questions.length-1) ? 'Завершити' : 'Далі';
+    });
+    quizOptions.appendChild(b);
+  });
+}
+btnNext.addEventListener('click', ()=>{
+  if(!btnNext.classList.contains('active')) return;
+  qi++;
+  if(qi<questions.length){ renderQuestion(); }
+  else {
+    quizBox.style.display='none';
+    completion.classList.add('show');
+    addNeurons(3);
+    totalNeuronsEl.textContent = neurons;
+  }
+});
+renderQuestion();
+</script>
+
+</body>
+</html>
