@@ -274,6 +274,13 @@
     <div id="riskList"></div>
   </section>
 
+  <section class="block">
+    <div class="step-label">Крок 7 · Практика</div>
+    <h2>Спам-детектив</h2>
+    <p class="soft">Для кожного листа визнач тип — і дізнайся, яка ознака його видає.</p>
+    <div id="detectiveList"></div>
+  </section>
+
   <section class="block" id="finalQuizSection">
     <div class="step-label">Підсумок</div>
     <h2>Коротка перевірка</h2>
@@ -663,6 +670,66 @@ const phishOrder = (function(){
         if(answered) return;
         const isCorrect = (btn.dataset.v === 'true') === item.correct;
         if(isCorrect){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+})();
+
+/* ---------- SPAM DETECTIVE ---------- */
+(function(){
+  const items = [
+    {
+      from: 'тренер_настільного_тенісу@school.ua', subj: 'Розклад тренувань на цей тиждень',
+      opts: ['Звичайний','Реклама','Спам','Фішинг'], correct: 0,
+      why: 'Знайомий відправник і конкретна тема без жодного тиску — звичайний лист.'
+    },
+    {
+      from: 'newsletter@favoriteblog.com', subj: 'Новий випуск подкасту вже на сайті',
+      opts: ['Звичайний','Реклама','Спам','Фішинг'], correct: 1,
+      why: 'Ти сам підписався на цю розсилку — це реклама, а не спам.'
+    },
+    {
+      from: 'win-prize-2024@free-gifts.ru', subj: '🎉 ТИ ВИГРАВ НАВУШНИКИ! Забери зараз!!!',
+      opts: ['Звичайний','Реклама','Спам','Фішинг'], correct: 2,
+      why: 'Незнайома адреса, надмірні емодзі й обіцянка призу нізвідки — типовий спам.'
+    },
+    {
+      from: 'security@bank-secure-login.com', subj: 'Термінове підтвердження акаунта',
+      snippet: 'Перейдіть за посиланням і введіть пароль протягом 24 годин, інакше акаунт буде заблоковано.',
+      opts: ['Звичайний','Реклама','Спам','Фішинг'], correct: 3,
+      why: 'Прохання ввести пароль за посиланням і тиск терміновістю — ознаки фішингу.'
+    },
+    {
+      from: 'мама', subj: 'Не забудь купити хліб',
+      opts: ['Звичайний','Реклама','Спам','Фішинг'], correct: 0,
+      why: 'Особистий лист від знайомої людини на просте прохання — звичайний лист.'
+    },
+    {
+      from: 'info@favoriteshop.com', subj: 'Знижка 20% тільки сьогодні для наших клієнтів',
+      opts: ['Звичайний','Реклама','Спам','Фішинг'], correct: 1,
+      why: 'Термін у темі є, але це знайомий магазин, де ти вже купував — легітимна реклама. Терміновість сама собою ще не доказ спаму, важливо й те, чи ти справді клієнт.'
+    }
+  ];
+  const list = document.getElementById('detectiveList');
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    const snippetHtml = item.snippet ? `<div class="snippet">«${item.snippet}»</div>` : '';
+    card.innerHTML = `<div class="email-preview" style="margin-bottom:10px;">
+        <div class="meta">Від: ${item.from}</div>
+        <div><b>${item.subj}</b></div>
+        ${snippetHtml}
+      </div>
+      <div class="choice-row">${item.opts.map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i===item.correct){ btn.classList.add('correct'); fb.textContent=`Правильно ✓ ${item.why}`; answered=true; addNeurons(1); }
         else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
       });
     });
