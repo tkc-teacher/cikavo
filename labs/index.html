@@ -41,6 +41,7 @@
   .lab-item{display:flex; flex-direction:column; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:20px; text-decoration:none; transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;}
   .lab-item:hover{transform:translateY(-3px); border-color:var(--teal); box-shadow:0 8px 20px rgba(22,163,160,0.15);}
   .lab-item .emoji{font-size:34px; line-height:1;}
+  .lab-item .logo{width:84px; height:72px;}
   .lab-item h3{font-size:18px; line-height:1.25;}
   .lab-item .desc{font-size:14px; color:var(--ink-soft); flex:1;}
   .lab-meta{display:flex; flex-wrap:wrap; gap:6px;}
@@ -84,8 +85,11 @@
 <script>
 // Кожна вправа — окрема тека labs/{slug}/index.html.
 // kind: 'game' | 'crossword' | 'exercise'; grades — рядок на кшталт "5–7" або "усі класи".
+// logo — шлях до SVG-логотипу гри (якщо немає — показується emoji).
 // Приклад: { title:"Кросворд «Пристрої комп'ютера»", kind:"crossword", grades:"5–6", emoji:"🧩", desc:"...", link:"crossword-devices/index.html" }
 const LABS = [
+  { title:"Знайди пару: English Alphabet", kind:"game", grades:"усі класи", logo:"memo-alphabet/logo.svg",
+    desc:"Велика й маленька літера — знайди пару.", link:"memo-alphabet/index.html" }
 ];
 
 const KINDS = { game:'Гра', crossword:'Кросворд', exercise:'Вправа' };
@@ -101,7 +105,7 @@ function render(){
   }
   labsEl.innerHTML = `<div class="lab-grid">${items.map(l=>`
     <a class="lab-item" href="${l.link}">
-      <span class="emoji">${l.emoji||'🧪'}</span>
+      ${l.logo ? `<img class="logo" src="${l.logo}" alt="">` : `<span class="emoji">${l.emoji||'🧪'}</span>`}
       <h3>${l.title}</h3>
       <span class="desc">${l.desc}</span>
       <span class="lab-meta"><span class="badge kind-${l.kind}">${KINDS[l.kind]}</span><span class="badge">${l.grades}</span></span>
