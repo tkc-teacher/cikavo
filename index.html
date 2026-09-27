@@ -39,6 +39,16 @@
   .grade-card.disabled{background:var(--surface); border:2px dashed var(--line); color:var(--ink-soft); cursor:not-allowed; opacity:.7;}
   .grade-card.disabled .num{color:var(--ink-soft);}
 
+  .lab-card{grid-column:1/-1; position:relative; display:flex; align-items:center; gap:20px; padding:22px 26px; margin-top:6px; background:linear-gradient(120deg,#E3F7F6 0%,#F1EEFF 100%); border:2px solid var(--teal); border-radius:var(--radius-l); color:var(--ink); text-decoration:none; transition:transform .15s ease, box-shadow .15s ease;}
+  .lab-card:hover{transform:translateY(-3px); box-shadow:0 8px 20px rgba(22,163,160,0.2);}
+  .lab-card svg{flex-shrink:0; width:64px; height:64px;}
+  .lab-card .lab-text{flex:1; min-width:0;}
+  .lab-card .lab-title{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:24px; line-height:1.2; color:#0E7C7A;}
+  .lab-card .lab-sub{font-size:14.5px; color:var(--ink-soft);}
+  .lab-card .lab-go{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; color:#fff; background:var(--teal); padding:8px 16px; border-radius:999px; white-space:nowrap;}
+  .lab-card .tag{position:absolute; top:-10px; right:18px; background:var(--coral); color:#fff; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:10.5px; padding:4px 9px; border-radius:999px; transform:rotate(4deg);}
+  @media (max-width:480px){ .lab-card{flex-wrap:wrap; padding:20px;} .lab-card svg{width:48px; height:48px;} .lab-card .lab-go{width:100%; text-align:center;} }
+
   footer{padding:20px 24px 56px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
 </style>
 </head>
@@ -72,6 +82,21 @@
       grid.appendChild(d);
     }
   });
+  grid.insertAdjacentHTML('beforeend', `
+    <a class="lab-card" href="labs/index.html">
+      <span class="tag">Нове</span>
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <rect x="24" y="6" width="16" height="6" rx="2" fill="#0E7C7A"/>
+        <path d="M27 12 V26 L12 50 Q9 56 16 56 H48 Q55 56 52 50 L37 26 V12 Z" fill="#fff" stroke="#0E7C7A" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M19 40 H45 L51 50 Q53 54 48 54 H16 Q11 54 13 50 Z" fill="#16A3A0"/>
+        <circle cx="26" cy="47" r="3" fill="#FFC93C"/><circle cx="37" cy="44" r="2" fill="#fff"/><circle cx="32" cy="33" r="2.5" fill="#FF5D9E"/><circle cx="36" cy="22" r="1.8" fill="#6C5CE7"/>
+      </svg>
+      <span class="lab-text">
+        <span class="lab-title">Лабораторія</span><br>
+        <span class="lab-sub">Ігри, кросворди й інтерактивні вправи — поза темами уроків, для будь-якого класу</span>
+      </span>
+      <span class="lab-go">Зайти →</span>
+    </a>`);
 </script>
 
 </body>

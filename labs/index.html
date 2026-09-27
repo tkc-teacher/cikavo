@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Лабораторія · Інформатика</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
+    --purple:#6C5CE7; --purple-dark:#5340c9; --teal:#16A3A0; --teal-dark:#0E7C7A; --coral:#FF6B4A; --yellow:#FFC93C; --pink:#FF5D9E; --blue:#2D9CDB;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  a{color:inherit;}
+  .container{max-width:900px; margin:0 auto; padding:0 24px;}
+
+  .topbar{padding:18px 24px; border-bottom:1px solid var(--line); background:rgba(246,245,251,.9); position:sticky; top:0; backdrop-filter:blur(6px); z-index:5;}
+  .topbar-inner{max-width:900px; margin:0 auto;}
+  .back-link{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--teal-dark); text-decoration:none;}
+  .back-link:hover{text-decoration:underline;}
+
+  .hero{display:flex; align-items:center; gap:28px; padding:40px 24px 24px;}
+  .hero-text{flex:1; min-width:0;}
+  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--teal-dark); margin-bottom:8px;}
+  .hero h1{font-size:32px; line-height:1.2; margin-bottom:10px;}
+  .hero p{color:var(--ink-soft); font-size:15.5px; max-width:56ch; margin:0;}
+  .hero svg{flex-shrink:0; width:120px; height:120px;}
+  @media (max-width:560px){ .hero svg{display:none;} }
+
+  .filters{display:flex; flex-wrap:wrap; gap:8px; margin:8px 0 22px;}
+  .chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink-soft); padding:6px 14px; border-radius:999px; cursor:pointer; transition:all .15s ease;}
+  .chip:hover{border-color:var(--teal);}
+  .chip.on{background:var(--teal); border-color:var(--teal); color:#fff;}
+
+  .lab-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:16px; padding-bottom:20px;}
+  .lab-item{display:flex; flex-direction:column; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:20px; text-decoration:none; transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;}
+  .lab-item:hover{transform:translateY(-3px); border-color:var(--teal); box-shadow:0 8px 20px rgba(22,163,160,0.15);}
+  .lab-item .emoji{font-size:34px; line-height:1;}
+  .lab-item h3{font-size:18px; line-height:1.25;}
+  .lab-item .desc{font-size:14px; color:var(--ink-soft); flex:1;}
+  .lab-meta{display:flex; flex-wrap:wrap; gap:6px;}
+  .badge{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; padding:3px 10px; border-radius:999px; background:var(--bg); color:var(--ink-soft);}
+  .badge.kind-game{background:#FFE9F2; color:#C2185B;}
+  .badge.kind-crossword{background:#FFF4D6; color:#8A6200;}
+  .badge.kind-exercise{background:#E3F7F6; color:var(--teal-dark);}
+
+  .empty{text-align:center; background:var(--surface); border:2px dashed var(--line); border-radius:var(--radius-l); padding:44px 24px; color:var(--ink-soft);}
+  .empty .emoji{font-size:44px; margin-bottom:6px;}
+  .empty h2{font-size:20px; margin-bottom:6px;}
+
+  footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="topbar-inner"><a class="back-link" href="../index.html">← Усі класи</a></div></div>
+
+<section class="hero container">
+  <div class="hero-text">
+    <div class="hero-eyebrow">Інформатика · Лабораторія</div>
+    <h1>Лабораторія</h1>
+    <p>Ігри, кросворди й інтерактивні вправи, які не прив'язані до конкретного уроку. Обирай будь-що й експериментуй!</p>
+  </div>
+  <svg viewBox="0 0 64 64" aria-hidden="true">
+    <rect x="24" y="6" width="16" height="6" rx="2" fill="#0E7C7A"/>
+    <path d="M27 12 V26 L12 50 Q9 56 16 56 H48 Q55 56 52 50 L37 26 V12 Z" fill="#fff" stroke="#0E7C7A" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M19 40 H45 L51 50 Q53 54 48 54 H16 Q11 54 13 50 Z" fill="#16A3A0"/>
+    <circle cx="26" cy="47" r="3" fill="#FFC93C"/><circle cx="37" cy="44" r="2" fill="#fff"/><circle cx="32" cy="33" r="2.5" fill="#FF5D9E"/><circle cx="36" cy="22" r="1.8" fill="#6C5CE7"/>
+  </svg>
+</section>
+
+<div class="container">
+  <div class="filters" id="filters"></div>
+  <div id="labs"></div>
+</div>
+
+<footer>Лабораторія · Інформатика · Інтерактивні вправи</footer>
+
+<script>
+// Кожна вправа — окрема тека labs/{slug}/index.html.
+// kind: 'game' | 'crossword' | 'exercise'; grades — рядок на кшталт "5–7" або "усі класи".
+// Приклад: { title:"Кросворд «Пристрої комп'ютера»", kind:"crossword", grades:"5–6", emoji:"🧩", desc:"...", link:"crossword-devices/index.html" }
+const LABS = [
+];
+
+const KINDS = { game:'Гра', crossword:'Кросворд', exercise:'Вправа' };
+const filtersEl = document.getElementById('filters');
+const labsEl = document.getElementById('labs');
+let current = 'all';
+
+function render(){
+  const items = LABS.filter(l => current==='all' || l.kind===current);
+  if(!LABS.length){
+    labsEl.innerHTML = `<div class="empty"><div class="emoji">🧪</div><h2>Лабораторія відкривається</h2><div>Перші ігри та кросворди вже готуються — зазирни трохи згодом.</div></div>`;
+    return;
+  }
+  labsEl.innerHTML = `<div class="lab-grid">${items.map(l=>`
+    <a class="lab-item" href="${l.link}">
+      <span class="emoji">${l.emoji||'🧪'}</span>
+      <h3>${l.title}</h3>
+      <span class="desc">${l.desc}</span>
+      <span class="lab-meta"><span class="badge kind-${l.kind}">${KINDS[l.kind]}</span><span class="badge">${l.grades}</span></span>
+    </a>`).join('')}</div>`;
+}
+
+function renderFilters(){
+  if(!LABS.length) return;
+  const used = Object.keys(KINDS).filter(k => LABS.some(l=>l.kind===k));
+  filtersEl.innerHTML = ['all',...used].map(k=>
+    `<button class="chip${k===current?' on':''}" data-k="${k}">${k==='all'?'Усе':KINDS[k]}</button>`).join('');
+  filtersEl.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>{
+    current = b.dataset.k; renderFilters(); render();
+  }));
+}
+
+renderFilters();
+render();
+</script>
+
+</body>
+</html>
