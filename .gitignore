@@ -5,3 +5,6 @@ _materials/
 
 # macOS
 .DS_Store
+
+# IDE (JetBrains)
+.idea/

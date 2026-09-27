@@ -249,7 +249,7 @@ async function loadProgress(){
 
 ---
 
-## 11. Поточний стан (станом на 23.09.2026)
+## 11. Поточний стан (станом на 27.09.2026)
 
 Готові уроки в репозиторії:
 
@@ -259,9 +259,14 @@ async function loadProgress(){
 | 6 | Як працює електронна пошта | `6/lesson-email-basics/` |
 | 6 | Етикет та безпека листування | `6/lesson-email-safety/` |
 | 7 | Персональний цифровий простір | `7/lesson-digital-space/` |
+| 7 | Операційні системи та програмне забезпечення | `7/lesson-os-software/` |
 | 8 | Збереження даних | `8/lesson-data-storage/` |
 | 8 | Захист цифрових пристроїв та інформації | `8/lesson-device-security/` |
 | 8 | Проблеми сучасних технологій | `8/lesson-tech-problems/` |
 | 9 | Життя з розумними пристроями | `9/lesson-smart-classroom/` |
 
-Класи, активовані на головній: 5, 6, 7, 8, 9. Фото-заготовки є в `5/lesson-computer-systems/images/` та `8/lesson-tech-problems/images/`.
+Класи, активовані на головній: 5, 6, 7, 8, 9. Фото-заготовки є в `5/lesson-computer-systems/images/`, `7/lesson-os-software/images/` та `8/lesson-tech-problems/images/`.
+
+Ще не додані фото (урок показує емодзі-заглушки):
+- `7/lesson-os-software/images/`: `server.png`, `embedded.png` (деталі й вимоги — у `images/README.md` цієї теки);
+- `8/lesson-tech-problems/images/`: `cloud-computing.jpg`, `iot-devices.jpg`, `biometric-eye.jpg`, `mobile-payment.jpg`, `data-storage.jpg`.
