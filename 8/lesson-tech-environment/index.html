@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Технології та навколишнє середовище — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F3F8F3; --ink:#1B2B22; --ink-soft:#557061; --surface:#FFFFFF; --line:#DCEBDF;
+    --pri:#2E8B57; --pri-dark:#1F6641; --gold:#E0A526; --earth:#9A6440; --sky:#3B8FD1; --coral:#E0604A;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  .container{max-width:780px; margin:0 auto; padding:0 24px;}
+
+  .hud{position:sticky; top:0; z-index:50; background:rgba(243,248,243,.9); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
+  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--gold),var(--pri)); transition:width .3s ease;}
+  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:780px; margin:0 auto;}
+  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
+  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
+  .neuron-counter svg{width:24px;height:24px;}
+  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
+  #neuronCount.pop{transform:scale(1.35);}
+
+  .hero{padding:48px 24px 36px;}
+  .hero-inner{max-width:780px; margin:0 auto; display:flex; align-items:center; gap:26px;}
+  .hero-text{flex:1;}
+  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--pri); margin-bottom:10px;}
+  .hero h1{font-size:29px; line-height:1.2; margin-bottom:12px;}
+  .hero p{color:var(--ink-soft); font-size:16px; max-width:54ch; margin-bottom:20px;}
+  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--pri); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
+  .btn-primary:hover{background:var(--pri-dark);}
+  .btn-primary:active{transform:scale(.97);}
+  .btn-primary:disabled{opacity:.45; cursor:default;}
+  .mascot{width:120px; height:120px; flex-shrink:0;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:96px; height:96px;} }
+
+  section.block{padding:30px 0; border-top:1px solid var(--line);}
+  .step-label{font-family:'Baloo 2',sans-serif; font-size:12.5px; font-weight:700; color:var(--pri); margin-bottom:6px; text-transform:uppercase; letter-spacing:.03em;}
+  .block h2{font-size:19px; margin-bottom:8px; max-width:40ch;}
+  .block p{max-width:64ch; font-size:15px; margin:0 0 8px; color:var(--ink);}
+  .block p.soft{color:var(--ink-soft); font-size:13.5px;}
+  .block ul{max-width:64ch; margin:0 0 8px; padding-left:20px; font-size:15px;}
+  .block ul li{margin-bottom:4px;}
+  .note{background:#FFF6E3; border-left:4px solid var(--gold); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:#855F12; margin:12px 0;}
+  .problem-note{background:#FCECE8; border-left:4px solid var(--coral); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:#8E3526; margin:12px 0;}
+
+  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:16px 18px; margin-top:10px;}
+
+  /* CLASSIFY / YES-NO */
+  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:13px 15px; margin:8px 0;}
+  .classify-card p.q{font-weight:700; margin:0 0 8px; font-size:13.5px;}
+  .choice-row{display:flex; gap:6px; flex-wrap:wrap;}
+  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12px; padding:7px 11px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease, color .15s ease;}
+  .choice-btn:hover{border-color:var(--pri);}
+  .choice-btn.correct{background:#E4F5E9; border-color:#3FAE58; color:#256B36;}
+  .choice-btn.wrong{background:#FBE6E9; border-color:#D14B5E; color:#8C2D3A;}
+  .choice-feedback{margin-top:6px; font-size:12px; color:var(--ink-soft); min-height:1.2em;}
+
+  /* CASE FILES */
+  .case-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:13px 15px; margin:10px 0; transition:border-color .2s ease;}
+  .case-card.solved{border-color:#3FAE58;}
+  .case-card.shake{animation:itemShake .35s ease;}
+  .case-head{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+  .case-icon{font-size:26px;}
+  .case-no{font-family:'Baloo 2',sans-serif; font-size:11px; font-weight:700; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.04em;}
+  .case-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; line-height:1.2;}
+  .case-clues{list-style:none; padding:0 !important; margin:0 0 10px !important;}
+  .case-clues li{font-size:13px !important; padding:5px 10px; margin-bottom:4px !important; background:var(--bg); border-radius:var(--radius-s);}
+  .case-clues li::before{content:'🔍 '; font-size:11px;}
+  .case-q{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; margin-bottom:6px;}
+  .case-verdict{display:none; margin-top:9px; font-size:12.5px; background:#EAF7ED; border-radius:var(--radius-s); padding:8px 11px; color:#256B36;}
+  .case-verdict.show{display:block;}
+  .case-fb{margin-top:6px; font-size:12px; color:var(--ink-soft); min-height:1.2em;}
+  .case-status{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--pri-dark); margin-top:12px;}
+
+  /* SEQUENCE */
+  .seq-prompt{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; text-align:center; margin-bottom:12px;}
+  .seq-options{display:flex; flex-direction:column; gap:8px;}
+  .seq-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:14px; font-weight:600; padding:11px 14px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .seq-opt:hover{border-color:var(--pri);}
+  .seq-opt.wrong{animation:itemShake .35s ease; border-color:var(--coral); background:#FDE6E1;}
+  .seq-built{display:flex; flex-direction:column; gap:6px; margin-top:14px;}
+  .seq-built-item{display:flex; align-items:center; gap:10px; background:#E4F8E6; border:2px solid #3FAE58; border-radius:var(--radius-s); padding:9px 12px; font-size:13.5px;}
+  .seq-built-item .num{width:22px; height:22px; border-radius:50%; background:#3FAE58; color:#fff; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:11.5px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .seq-done{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; color:#256B36; margin-top:12px; display:none;}
+  .seq-done.show{display:block;}
+
+  /* FLIP GALLERY */
+  .gallery{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px;}
+  @media (max-width:600px){ .gallery{grid-template-columns:repeat(2,1fr);} }
+  .flip-card{perspective:1200px; height:130px; cursor:pointer;}
+  .flip-card .flip-inner{position:relative; width:100%; height:100%; transition:transform .6s cubic-bezier(.4,0,.2,1); transform-style:preserve-3d;}
+  .flip-card.flipped .flip-inner{transform:rotateY(180deg);}
+  .flip-card .flip-face{position:absolute; inset:0; backface-visibility:hidden; border-radius:var(--radius-m); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:10px; text-align:center; border:2px solid var(--card-c, var(--line));}
+  .flip-card .flip-front{background:var(--surface);}
+  .flip-card .flip-front .icon{font-size:26px; margin-bottom:5px;}
+  .flip-card .flip-front .name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12.5px;}
+  .flip-card .flip-back{background:var(--card-c-light, #EEF6EF); transform:rotateY(180deg); font-size:11.5px; color:var(--ink); line-height:1.3;}
+
+  /* NUMBER GUESS */
+  .num-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:13px 15px; margin:8px 0;}
+  .num-card p.q{font-weight:700; margin:0 0 8px; font-size:13.5px;}
+  .num-reveal{display:none; margin-top:8px; font-size:12.5px; color:var(--ink-soft);}
+  .num-reveal.show{display:block;}
+  .num-reveal b{font-family:'Baloo 2',sans-serif; font-size:17px; color:var(--pri-dark);}
+
+  /* SORT BOARD */
+  .sort-buckets{display:grid; grid-template-columns:repeat(3,1fr); gap:8px;}
+  @media (max-width:560px){ .sort-buckets{grid-template-columns:1fr;} }
+  .bucket{border:2px dashed var(--line); border-radius:var(--radius-m); padding:9px; min-height:96px; cursor:pointer;}
+  .bucket-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12px; color:var(--ink-soft); margin-bottom:6px; text-align:center;}
+  .bucket-sub{font-size:10.5px; color:var(--ink-soft); text-align:center; margin:-4px 0 6px;}
+  .bucket-items{display:flex; flex-wrap:wrap; gap:5px; min-height:28px;}
+  .bucket.hint{border-color:var(--coral);}
+  .sort-pool{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-top:12px;}
+  .sort-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:7px 11px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .sort-chip:hover{transform:translateY(-2px);}
+  .sort-chip.selected{border-color:var(--pri); box-shadow:0 0 0 3px rgba(46,139,87,0.2);}
+  .sort-chip.placed{background:#E4F5E9; border-color:#3FAE58; cursor:default; font-size:11px;}
+  .sort-chip.placed:hover{transform:none;}
+
+  /* MATCHING */
+  .tool-pool{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; padding:11px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:12px;}
+  .tool-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:7px 11px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .tool-chip:hover{transform:translateY(-2px);}
+  .tool-chip.selected{border-color:var(--pri); box-shadow:0 0 0 3px rgba(46,139,87,0.2);}
+  .tool-chip.placed{display:none;}
+  .func-card{display:flex; align-items:center; gap:10px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:9px 11px; margin-bottom:7px; cursor:pointer; transition:border-color .2s ease, background .2s ease;}
+  .func-card.matched{border-color:var(--gold); background:#FFF8EA; cursor:default;}
+  .func-card.shake{animation:itemShake .35s ease;}
+  @keyframes itemShake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
+  .func-text{flex:1; font-size:12.5px; color:var(--ink-soft);}
+  .func-slot{min-width:60px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:10.5px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:6px 6px;}
+  .func-slot.filled{border-style:solid; border-color:var(--gold); background:#FFF3D9; color:var(--ink);}
+
+  /* 3D PRINT EMULATOR */
+  .fab-panels{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  @media (max-width:520px){ .fab-panels{grid-template-columns:1fr;} }
+  .fab-panel{background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px; text-align:center;}
+  .fab-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; margin-bottom:8px;}
+  .fab-grid{display:grid; grid-template-columns:repeat(8,1fr); gap:2px; max-width:200px; margin:0 auto;}
+  .fab-cell{aspect-ratio:1; border-radius:3px; background:transparent; transition:background .25s ease, opacity .25s ease, transform .25s ease;}
+  .fab-cell.solid{background:#B9C9BE;}
+  .fab-cell.part{background:var(--pri);}
+  .fab-cell.waste{background:var(--coral); opacity:0; transform:scale(.3);}
+  .fab-stats{font-family:'Baloo 2',sans-serif; font-size:12.5px; color:var(--ink-soft); margin-top:8px; min-height:2.6em; line-height:1.3;}
+  .fab-stats b{color:var(--ink);}
+  .fab-controls{display:flex; justify-content:center; margin-top:12px;}
+  .fab-status{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--pri-dark); margin-top:10px; min-height:1.4em;}
+
+  /* DATA CENTER PICKER */
+  .dc-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(210px,1fr)); gap:9px;}
+  .dc-card{background:var(--bg); border:2px solid var(--line); border-radius:var(--radius-m); padding:11px 12px; cursor:pointer; text-align:left; font-family:'Nunito Sans',sans-serif; color:var(--ink); transition:border-color .2s ease, background .2s ease;}
+  .dc-card:hover{border-color:var(--pri);}
+  .dc-head{display:flex; align-items:center; gap:9px;}
+  .dc-icon{font-size:26px;}
+  .dc-name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13.5px; line-height:1.2;}
+  .dc-temp{font-size:11.5px; color:var(--ink-soft);}
+  .dc-meter{height:8px; background:var(--line); border-radius:999px; overflow:hidden; margin-top:9px; display:none;}
+  .dc-meter span{display:block; height:100%; width:0; border-radius:999px; transition:width .7s ease;}
+  .dc-verdict{font-size:11.5px; margin-top:6px; display:none; line-height:1.35;}
+  .dc-card.open .dc-meter, .dc-card.open .dc-verdict{display:block;}
+  .dc-card.good{border-color:#3FAE58; background:#EAF7ED; cursor:default;}
+  .dc-card.bad{border-color:#D14B5E; background:#FBEDEF;}
+  .dc-status{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--pri-dark); margin-top:12px;}
+
+  /* QUIZ */
+  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:24px 22px; margin-top:16px;}
+  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:12.5px; color:var(--ink-soft); margin-bottom:9px;}
+  .quiz-q{font-size:16px; font-weight:700; margin-bottom:14px;}
+  .quiz-options{display:flex; flex-direction:column; gap:9px;}
+  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:14px; font-weight:600; padding:11px 14px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .quiz-opt:hover{border-color:var(--pri);}
+  .quiz-opt.correct{background:#E4F5E9; border-color:#3FAE58;}
+  .quiz-opt.wrong{background:#FBE6E9; border-color:#D14B5E;}
+  .quiz-nav{display:flex; justify-content:flex-end; margin-top:16px;}
+  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:10px 20px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
+  .btn-next.active{opacity:1; pointer-events:auto;}
+
+  .completion{display:none; text-align:center; padding:18px 10px 10px;}
+  .completion.show{display:block;}
+  .badge{width:80px; height:80px; margin:0 auto 14px;}
+  .completion h3{font-size:20px; margin-bottom:8px;}
+  .completion p{color:var(--ink-soft); max-width:50ch; margin:0 auto 16px; font-size:14px;}
+  .completion .total{font-family:'Baloo 2',sans-serif; font-size:28px; color:var(--pri-dark);}
+
+  footer{padding:32px 24px 56px; text-align:center; color:var(--ink-soft); font-size:13px;}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
+  <div class="hud-row">
+    <span class="hud-title">8 клас · Технології та довкілля</span>
+    <div class="neuron-counter">
+      <svg viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
+        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#B57A1F" opacity="0.6"/>
+      </svg>
+      <span id="neuronCount">0</span>
+    </div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Тема 7</div>
+      <h1>Технології та навколишнє середовище</h1>
+      <p>Новий смартфон раз на два роки — звична справа. Та куди зникають старі пристрої, що з ними стається на звалищі і як технології можуть не шкодити, а допомагати довкіллю?</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="76" r="48" fill="#DDEFE2"/>
+      <circle cx="70" cy="76" r="40" fill="#3B8FD1"/>
+      <path d="M44 62 C52 52 64 56 62 66 C60 74 50 72 46 78 C42 72 40 66 44 62Z" fill="#2E8B57"/>
+      <path d="M78 46 C90 48 102 58 104 70 C96 72 90 64 84 66 C78 60 74 52 78 46Z" fill="#2E8B57"/>
+      <path d="M74 96 C82 92 94 94 96 100 C90 110 80 112 72 110 C70 104 70 100 74 96Z" fill="#2E8B57"/>
+      <circle cx="58" cy="80" r="4" fill="#1B2B22"/>
+      <circle cx="82" cy="80" r="4" fill="#1B2B22"/>
+      <circle cx="59.3" cy="78.7" r="1.3" fill="#fff"/>
+      <circle cx="83.3" cy="78.7" r="1.3" fill="#fff"/>
+      <path d="M60 92 C64 97 76 97 80 92" stroke="#1B2B22" stroke-width="3" stroke-linecap="round"/>
+      <line x1="70" y1="36" x2="70" y2="22" stroke="#1F6641" stroke-width="3" stroke-linecap="round"/>
+      <path d="M70 26 C70 14 82 8 92 10 C92 22 82 28 70 26Z" fill="#6CC08B"/>
+      <path d="M70 30 C70 20 60 14 50 16 C50 26 60 32 70 30Z" fill="#2E8B57"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap" style="border-top:none; padding-top:0;">
+    <div class="step-label">Повторення · Проблеми сучасних технологій</div>
+    <h2>Пригадаймо минулу тему</h2>
+    <p>Минулого разу йшлося про сучасні технології та їхню «зворотну сторону».</p>
+    <p class="soft">Обери термін, потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="tool-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s1">
+    <div class="step-label">1 · Життя пристрою</div>
+    <h2>Чому гаджети так швидко «старіють»</h2>
+    <p>Колись телевізор служив понад десять років, а зараз смартфон чи ноутбук зазвичай міняють уже за 2–3 роки. Причин кілька:</p>
+    <ul>
+      <li><b>поломка</b> — буває непоправна, а буває дрібна, яку легко усунути;</li>
+      <li><b>бажання новинки</b> — старий працює, але хочеться кращу камеру чи більший екран;</li>
+      <li><b>політика виробника</b> — пристрій перестають підтримувати або роблять ремонт майже таким дорогим, як нова покупка.</li>
+    </ul>
+    <div class="note">Приблизно половина викинутих пристроїв ще цілком робоча.</div>
+    <p class="soft">Розслідуй п'ять справ: уважно прочитай підказки й визнач, чому насправді пристрій замінили. Не кожна підказка важлива!</p>
+    <div id="caseList"></div>
+    <div class="case-status" id="caseStatus">Розкрито справ: 0 з 5</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">2 · Що всередині</div>
+    <h2>Отрута в гарному корпусі</h2>
+    <p>Зростання кількості гаджетів має два наслідки для довкілля:</p>
+    <ul>
+      <li>видобувають усе більше рідкісної та цінної сировини для нових пристроїв;</li>
+      <li>з'являється гора <b>електронних відходів</b> (англ. <i>e-waste</i>) — викинутих телефонів, комп'ютерів, батарейок.</li>
+    </ul>
+    <p>Електроніка містить шкідливі речовини. Клацни картку, щоб дізнатися більше.</p>
+    <div class="gallery" id="toxicGallery"></div>
+    <div class="problem-note">Одна викинута батарея від смартфона здатна забруднити від 600 літрів води.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">3 · Шлях забруднення</div>
+    <h2>Як старий телефон потрапляє у твою тарілку</h2>
+    <p>Пристрій, викинутий у звичайне сміття, не зникає. Важкі метали з нього поступово переходять у природу й накопичуються в живих організмах.</p>
+    <p class="soft">Відтвори ланцюжок крок за кроком.</p>
+    <div class="exercise">
+      <div class="seq-prompt" id="seqPrompt">Що відбувається ПЕРШИМ?</div>
+      <div class="seq-options" id="seqOptions"></div>
+      <div class="seq-built" id="seqBuilt"></div>
+      <div class="seq-done" id="seqDone">Ланцюжок відтворено ✓</div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">4 · Масштаб проблеми</div>
+    <h2>Цифри, у які важко повірити</h2>
+    <p>Електронних відходів у світі щороку десятки мільйонів тонн, і більшість із них не переробляють, а звозять на звалища.</p>
+    <p class="soft">Спробуй вгадати правильне число.</p>
+    <div id="numList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">5 · Три принципи</div>
+    <h2>Зменшуй, використовуй повторно, переробляй</h2>
+    <ul>
+      <li><b>Зменшуй</b> — купуй менше нової техніки, міняй лише тоді, коли справді треба.</li>
+      <li><b>Використовуй повторно</b> — ремонтуй, продавай, обмінюй чи даруй, поки пристрій придатний.</li>
+      <li><b>Переробляй</b> — віддавай техніку туди, де з неї дістануть матеріали для нових виробів.</li>
+    </ul>
+    <div class="note">В Україні батарейки й акумулятори можна здати в спеціальні бокси у великих магазинах, а деякі магазини техніки приймають старий телефон зі знижкою на новий (<i>trade-in</i>).</div>
+    <p class="soft">Клацни дію, потім — принцип, до якого вона належить.</p>
+    <div class="exercise">
+      <div class="sort-buckets">
+        <div class="bucket" id="bucketReduce"><div class="bucket-title">📉 Зменшуй</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bucketReuse"><div class="bucket-title">🔁 Використовуй повторно</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bucketRecycle"><div class="bucket-title">♻️ Переробляй</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="rrrPool"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">6 · Правильна утилізація</div>
+    <h2>Не кожна «переробка» корисна</h2>
+    <p>Частина техніки, яку здали «на переробку», потрапляє на нелегальні звалища в інших країнах. Там її розбирають вручну й спалюють, щоб дістати мідь та інші метали.</p>
+    <div class="problem-note">Дим від спалених плат і дротів отруює повітря, ґрунт і людей, які живуть поруч.</div>
+    <p class="soft">Це безпечно для довкілля?</p>
+    <div id="safeList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">7 · 3D-друк</div>
+    <h2>Друкуємо рівно стільки, скільки треба</h2>
+    <p>Звичайну деталь часто вирізають із цілого бруска — решта йде у стружку. <b>3D-принтер</b> будує предмет шар за шаром, тож матеріалу витрачається рівно стільки, скільки потрібно.</p>
+    <p class="soft">Запусти обидва способи й порівняй відходи.</p>
+    <div class="exercise">
+      <div class="fab-panels">
+        <div class="fab-panel">
+          <div class="fab-title">🪚 Вирізання з бруска</div>
+          <div class="fab-grid" id="gridCut"></div>
+          <div class="fab-stats" id="statsCut">Брусок: <b>48</b> кубиків</div>
+        </div>
+        <div class="fab-panel">
+          <div class="fab-title">🖨️ 3D-друк</div>
+          <div class="fab-grid" id="gridPrint"></div>
+          <div class="fab-stats" id="statsPrint">Матеріал: <b>0</b> кубиків</div>
+        </div>
+      </div>
+      <div class="fab-controls"><button class="btn-primary" id="btnFab">Виготовити деталь</button></div>
+      <div class="fab-status" id="fabStatus"></div>
+    </div>
+    <p style="margin-top:18px;">3D-друк застосовують і для крихітних речей, і для цілих будинків.</p>
+    <ul>
+      <li><b>Малі масштаби</b> — запчастини там, куди їх важко довезти, протези й імплантати під конкретну людину, <b>біодрук</b> (шари живих клітин на гелевій основі).</li>
+      <li><b>Великі масштаби</b> — 3D-будівельний друк стін із бетону чи полімеру: менше праці, швидше, менше відходів.</li>
+    </ul>
+    <div class="note">У Львові за допомогою будівельного 3D-принтера звели школу.</div>
+    <p class="soft">Зістав застосування 3D-друку з ситуацією.</p>
+    <div class="exercise">
+      <div class="tool-pool" id="printPool"></div>
+      <div id="printList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">8 · Енергоощадні дата-центри</div>
+    <h2>Де «жити» мільйону серверів</h2>
+    <p>Хмарні сервіси працюють у <b>центрах обробки даних</b> — будівлях із тисячами серверів. Щоб вони споживали менше енергії:</p>
+    <ul>
+      <li>ставлять компактні <b>блейд-сервери</b>, які ділять між собою живлення й охолодження;</li>
+      <li>замінюють жорсткі диски на ощадливіші SSD;</li>
+      <li>програми «присипляють» частини системи, які зараз не потрібні.</li>
+    </ul>
+    <div class="note">Раніше на охолодження серверів ішло приблизно стільки ж енергії, скільки на їхню роботу. Тому місце для дата-центру тепер обирають дуже ретельно.</div>
+    <p class="soft">Знайди всі <b>три</b> вдалі місця для нового дата-центру.</p>
+    <div class="exercise">
+      <div class="dc-grid" id="dcGrid"></div>
+      <div class="dc-status" id="dcStatus">Знайдено: 0 з 3</div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div class="quiz-box" id="quizBox">
+      <div class="quiz-progress" id="quizProgress">Запитання 1 з 7</div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
+    </div>
+    <div class="completion" id="completion">
+      <svg class="badge" viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#2E8B57" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#2E8B57"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#2E8B57" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#2E8B57"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#2E8B57" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#2E8B57"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#2E8B57" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#2E8B57"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#2E8B57" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#2E8B57"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#2E8B57" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#2E8B57"/>
+        <circle cx="12" cy="12" r="4.4" fill="#2E8B57"/><circle cx="12" cy="12" r="1.6" fill="#1F6641" opacity="0.6"/>
+      </svg>
+      <h3>Урок пройдено!</h3>
+      <p>Тепер ти знаєш, чому електронні відходи небезпечні, як діють принципи «зменшуй — використовуй повторно — переробляй» і як 3D-друк та розумні дата-центри допомагають берегти ресурси.</p>
+      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Урок · «Технології та навколишнє середовище» · 8 клас</footer>
+
+<script>
+const STORAGE_KEY = "lesson8-tech-environment-neurons";
+let neurons = 0;
+const neuronEl = document.getElementById('neuronCount');
+const hudFill = document.getElementById('hudFill');
+
+function addNeurons(n){
+  neurons += n;
+  neuronEl.textContent = neurons;
+  neuronEl.classList.add('pop');
+  setTimeout(()=>neuronEl.classList.remove('pop'), 250);
+  saveProgress();
+}
+async function saveProgress(){
+  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
+}
+async function loadProgress(){
+  try{
+    const res = await window.storage?.get(STORAGE_KEY, false);
+    if(res && res.value){
+      const d = JSON.parse(res.value);
+      if(typeof d.neurons === 'number'){ neurons = d.neurons; neuronEl.textContent = neurons; }
+    }
+  }catch(e){}
+}
+loadProgress();
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
+});
+
+/* ---------- HELPERS ---------- */
+function makeClassify(containerId, items, opts){
+  const list = document.getElementById(containerId);
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">${opts.map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i===item.correct){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+}
+
+function makeYesNo(containerId, items, optYes, optNo){
+  const list = document.getElementById(containerId);
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">
+        <button class="choice-btn" data-v="true">${optYes}</button>
+        <button class="choice-btn" data-v="false">${optNo}</button>
+      </div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        const isCorrect = (btn.dataset.v === 'true') === item.correct;
+        if(isCorrect){ btn.classList.add('correct'); fb.textContent = item.why ? `Правильно ✓ ${item.why}` : 'Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+}
+
+function makeSortBoard(poolId, buckets, items){
+  const pool = document.getElementById(poolId);
+  let selected = null;
+  let placedCount = 0;
+  const shuffled = [...items].sort(()=>Math.random()-0.5);
+  shuffled.forEach(item=>{
+    const chip = document.createElement('div');
+    chip.className = 'sort-chip';
+    chip.textContent = item.text;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.sort-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = item;
+    });
+    pool.appendChild(chip);
+  });
+  Object.entries(buckets).forEach(([key, el])=>{
+    el.addEventListener('click', ()=>{
+      if(!selected) return;
+      if(selected.zone === key){
+        const chip = [...pool.children].find(c=>c.textContent===selected.text && !c.classList.contains('placed'));
+        if(chip){ chip.classList.add('placed'); chip.classList.remove('selected'); el.querySelector('.bucket-items').appendChild(chip); }
+        addNeurons(1);
+        placedCount++;
+        selected = null;
+        if(placedCount === items.length) addNeurons(2);
+      } else {
+        el.classList.add('hint');
+        setTimeout(()=>el.classList.remove('hint'), 350);
+      }
+    });
+  });
+}
+
+function makeMatching(poolId, listId, items){
+  const pool = document.getElementById(poolId);
+  const list = document.getElementById(listId);
+  let selected = null;
+  let matched = 0;
+  const shuffledNames = [...items].sort(()=>Math.random()-0.5);
+  shuffledNames.forEach(t=>{
+    const chip = document.createElement('div');
+    chip.className = 'tool-chip';
+    chip.textContent = t.name;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = t.name;
+    });
+    pool.appendChild(chip);
+  });
+  const shuffledFuncs = [...items].sort(()=>Math.random()-0.5);
+  shuffledFuncs.forEach(t=>{
+    const card = document.createElement('div');
+    card.className = 'func-card';
+    card.innerHTML = `<div class="func-text">${t.func}</div><div class="func-slot">?</div>`;
+    card.addEventListener('click', ()=>{
+      if(card.classList.contains('matched') || !selected) return;
+      const slot = card.querySelector('.func-slot');
+      if(selected === t.name){
+        slot.textContent = selected;
+        slot.classList.add('filled');
+        card.classList.add('matched');
+        const chip = [...pool.children].find(c=>c.textContent===selected);
+        if(chip) chip.classList.add('placed');
+        addNeurons(1);
+        matched++;
+        selected = null;
+        pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+        if(matched === items.length) addNeurons(2);
+      } else {
+        card.classList.add('shake');
+        setTimeout(()=>card.classList.remove('shake'), 350);
+      }
+    });
+    list.appendChild(card);
+  });
+}
+
+/* ---------- RECAP: TERM MATCHING ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'VR', func:'Повна симуляція вигаданого світу, яка заміняє реальність навколо' },
+  { name:'AR', func:'Цифрові підказки й об\'єкти поверх зображення з камери' },
+  { name:'Хмарне сховище', func:'Файли лежать на віддалених серверах і відкриваються з будь-якого пристрою' },
+  { name:'Інтернет речей', func:'Побутові прилади, що самі обмінюються даними через мережу' },
+  { name:'Біометрія', func:'Підтвердження особи за відбитком пальця, обличчям чи голосом' },
+  { name:'NFC', func:'Безконтактна оплата, коли телефон майже торкається термінала' },
+  { name:'Носимий гаджет', func:'Годинник чи трекер, що завжди на тобі й завжди онлайн' }
+]);
+
+/* ---------- 1. WHY DEVICES ARE REPLACED ---------- */
+(function(){
+  const CAUSES = ['Непоправна поломка','Дрібна несправність','Бажання новинки','Кінець підтримки','Дорогий ремонт'];
+  const cases = [
+    { icon:'📱', title:'Телефон Олега',
+      clues:['Куплений чотири роки тому, екран без жодної подряпини','Батарея досі тримає цілий день','Остання версія Android для цієї моделі вийшла два роки тому','Банківський застосунок пише: «Ваша система застаріла, вхід неможливий»'],
+      correct:3, verdict:'Телефон цілком справний. Його можна віддати тому, кому вистачить дзвінків і месенджерів, або здати за програмою обміну.' },
+    { icon:'💻', title:'Ноутбук Марти',
+      clues:['Вентилятор гуде, а під час ігор ноутбук сам вимикається','Корпус знизу гарячий, у решітках видно пил','Майстер оцінив роботу в 300 грн і пів години часу','Марта все одно купила новий за 25 000 грн'],
+      correct:1, verdict:'Досить було почистити систему охолодження. Заміна була зайвою, і з\'явилося ще одне джерело е-відходів.' },
+    { icon:'🎧', title:'Навушники Даші',
+      clues:['Звук чистий, шумозаглушення працює','Заряду вистачає на тиждень','Майже весь клас ходить у моделі іншої фірми','У Даші скоро день народження'],
+      correct:2, verdict:'Пристрій повністю робочий. Старі навушники варто продати або подарувати, а не закидати в шухляду.' },
+    { icon:'📱', title:'Смартфон Андрія',
+      clues:['Два роки тому купив, камера й екран у порядку','Заряду вистачає лише до обіду','Акумулятор приклеєно всередині, самостійно не дістати','Офіційний сервіс назвав суму — 70% від ціни нового телефону'],
+      correct:4, verdict:'Проблема розв\'язна, але виробник зробив її невигідною. Варто пошукати незалежну майстерню — там заміна часто дешевша.' },
+    { icon:'📟', title:'Планшет бабусі Ніни',
+      clues:['Упав із балкона третього поверху на бетон','Материнська плата тріснула навпіл','Троє майстрів сказали, що відновити не вдасться','Бабуся користувалася ним сім років'],
+      correct:0, verdict:'Тут заміна справді виправдана. Старий планшет треба віднести в пункт приймання електроніки, а не у смітник.' }
+  ];
+  const list = document.getElementById('caseList');
+  const status = document.getElementById('caseStatus');
+  let solved = 0;
+  cases.forEach((c,ci)=>{
+    const card = document.createElement('div');
+    card.className = 'case-card';
+    card.innerHTML = `<div class="case-head"><span class="case-icon">${c.icon}</span><span><div class="case-no">Справа №${ci+1}</div><div class="case-title">${c.title}</div></span></div>
+      <ul class="case-clues">${c.clues.map(t=>`<li>${t}</li>`).join('')}</ul>
+      <div class="case-q">Чому насправді його замінили?</div>
+      <div class="choice-row">${CAUSES.map(o=>`<button class="choice-btn">${o}</button>`).join('')}</div>
+      <div class="case-fb"></div>
+      <div class="case-verdict">🌱 ${c.verdict}</div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.case-fb');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i===c.correct){
+          answered = true;
+          btn.classList.add('correct');
+          card.classList.add('solved');
+          fb.textContent = 'Справу розкрито ✓';
+          card.querySelector('.case-verdict').classList.add('show');
+          addNeurons(1);
+          solved++;
+          status.textContent = `Розкрито справ: ${solved} з ${cases.length}`;
+          if(solved === cases.length){ status.textContent = 'Усі справи розкрито ✓'; addNeurons(2); }
+        } else {
+          btn.classList.add('wrong');
+          fb.textContent = 'Перечитай підказки ще раз';
+          card.classList.add('shake');
+          setTimeout(()=>card.classList.remove('shake'), 350);
+        }
+      });
+    });
+  });
+})();
+
+/* ---------- 2. TOXIC SUBSTANCES GALLERY ---------- */
+(function(){
+  const items = [
+    { icon:'🔩', name:'Свинець', color:'#7A8B99', colorLight:'#EEF2F5', func:'Є в старих паяних з\'єднаннях плат. Шкодить нервовій системі, особливо дитячій.' },
+    { icon:'🌡️', name:'Ртуть', color:'#9FA8B3', colorLight:'#F1F3F6', func:'Була в лампах підсвітки старих моніторів. Отруйні пари вражають мозок і нирки.' },
+    { icon:'🔋', name:'Кадмій', color:'#E0A526', colorLight:'#FFF6E3', func:'Трапляється в старих акумуляторах. Роками накопичується в організмі.' },
+    { icon:'🪙', name:'Нікель', color:'#9A6440', colorLight:'#F6EDE6', func:'Входить до складу батарей і контактів. Може спричиняти алергію.' },
+    { icon:'☠️', name:'Миш\'як', color:'#E0604A', colorLight:'#FCECE8', func:'Використовують у деяких мікросхемах. Дуже отруйний навіть у малих дозах.' },
+    { icon:'⚙️', name:'Берилій', color:'#3B8FD1', colorLight:'#EAF3FB', func:'Додають у сплави для роз\'ємів. Його пил небезпечний для легень.' }
+  ];
+  const grid = document.getElementById('toxicGallery');
+  let seen = new Set();
+  items.forEach(it=>{
+    const card = document.createElement('div');
+    card.className = 'flip-card';
+    card.style.setProperty('--card-c', it.color);
+    card.style.setProperty('--card-c-light', it.colorLight);
+    card.innerHTML = `<div class="flip-inner">
+      <div class="flip-face flip-front"><div class="icon">${it.icon}</div><div class="name">${it.name}</div></div>
+      <div class="flip-face flip-back">${it.func}</div>
+    </div>`;
+    card.addEventListener('click', ()=>{
+      card.classList.toggle('flipped');
+      if(!seen.has(it.name)){ seen.add(it.name); if(seen.size === items.length) addNeurons(2); }
+    });
+    grid.appendChild(card);
+  });
+})();
+
+/* ---------- 3. POLLUTION CHAIN SEQUENCE ---------- */
+(function(){
+  const steps = [
+    'Старий телефон викидають у звичайний сміттєвий бак',
+    'Його вивозять на звалище разом з іншим сміттям',
+    'Дощі поступово вимивають важкі метали з корпусу й батареї',
+    'Отруйні речовини просочуються в ґрунт і підземні води',
+    'Рослини вбирають їх із ґрунту та води',
+    'Тварини й люди отримують ці метали з їжею та водою'
+  ];
+  const ordinals = ['ПЕРШИМ','ДРУГИМ','ТРЕТІМ','ЧЕТВЕРТИМ','П\'ЯТИМ','ШОСТИМ'];
+  let built = [];
+  const promptEl = document.getElementById('seqPrompt');
+  const optionsEl = document.getElementById('seqOptions');
+  const builtEl = document.getElementById('seqBuilt');
+  const doneEl = document.getElementById('seqDone');
+
+  function render(){
+    if(built.length === steps.length){
+      promptEl.textContent = '';
+      optionsEl.innerHTML = '';
+      doneEl.classList.add('show');
+      return;
+    }
+    promptEl.textContent = `Що відбувається ${ordinals[built.length]}?`;
+    const remaining = steps.map((s,i)=>i).filter(i=>!built.includes(i)).sort(()=>Math.random()-0.5);
+    optionsEl.innerHTML = '';
+    remaining.forEach(idx=>{
+      const btn = document.createElement('button');
+      btn.className = 'seq-opt';
+      btn.textContent = steps[idx];
+      btn.addEventListener('click', ()=>{
+        if(idx === built.length){
+          built.push(idx);
+          addNeurons(1);
+          const row = document.createElement('div');
+          row.className = 'seq-built-item';
+          row.innerHTML = `<span class="num">${built.length}</span><span>${steps[idx]}</span>`;
+          builtEl.appendChild(row);
+          if(built.length === steps.length) addNeurons(3);
+          render();
+        } else {
+          btn.classList.add('wrong');
+          setTimeout(()=>btn.classList.remove('wrong'), 400);
+        }
+      });
+      optionsEl.appendChild(btn);
+    });
+  }
+  render();
+})();
+
+/* ---------- 4. NUMBER GUESS ---------- */
+(function(){
+  const items = [
+    { q:'Скільки літрів води може забруднити одна батарея від смартфона?', opts:['Близько 6 л','Близько 60 л','Від 600 л'], correct:2,
+      reveal:'<b>Від 600 л</b> — це щонайменше 4 повні ванни води.' },
+    { q:'Яка частка викинутих пристроїв насправді ще працює?', opts:['Кожен десятий','Майже половина','Жоден'], correct:1,
+      reveal:'<b>Майже половина</b> — їх міняють не через поломку, а заради новинки.' },
+    { q:'Електронні відходи світу лише за 2016 рік важили стільки ж, скільки…', opts:['45 Ейфелевих веж','4 500 Ейфелевих веж','450 000 Ейфелевих веж'], correct:1,
+      reveal:'<b>4 500 Ейфелевих веж</b> — або дев\'ять Великих пірамід у Гізі.' },
+    { q:'Яку частку всіх токсичних відходів на звалищах становить електроніка?', opts:['Близько 7%','Близько 30%','Близько 70%'], correct:2,
+      reveal:'<b>Близько 70%</b> — хоча за об\'ємом електроніка займає на звалищі зовсім мало місця.' }
+  ];
+  const list = document.getElementById('numList');
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'num-card';
+    card.innerHTML = `<p class="q">${item.q}</p>
+      <div class="choice-row">${item.opts.map((o,i)=>`<button class="choice-btn">${o}</button>`).join('')}</div>
+      <div class="num-reveal">${item.reveal}</div>`;
+    list.appendChild(card);
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        answered = true;
+        card.querySelectorAll('.choice-btn').forEach((b,bi)=>{ if(bi===item.correct) b.classList.add('correct'); else if(bi===i) b.classList.add('wrong'); });
+        card.querySelector('.num-reveal').classList.add('show');
+        if(i===item.correct) addNeurons(1);
+      });
+    });
+  });
+})();
+
+/* ---------- 5. REDUCE / REUSE / RECYCLE ---------- */
+makeSortBoard('rrrPool', {
+  reduce: document.getElementById('bucketReduce'),
+  reuse: document.getElementById('bucketReuse'),
+  recycle: document.getElementById('bucketRecycle')
+}, [
+  { text:'Не купувати новий телефон, поки старий добре служить', zone:'reduce' },
+  { text:'Обійтися одними навушниками замість трьох пар', zone:'reduce' },
+  { text:'Вимикати зарядку з розетки, коли вона не потрібна', zone:'reduce' },
+  { text:'Замінити розбитий екран у майстерні', zone:'reuse' },
+  { text:'Віддати старий ноутбук молодшому брату', zone:'reuse' },
+  { text:'Продати планшет через оголошення', zone:'reuse' },
+  { text:'Кинути використані батарейки в бокс у супермаркеті', zone:'recycle' },
+  { text:'Віднести зламаний принтер у пункт приймання старої техніки', zone:'recycle' }
+]);
+
+/* ---------- 6. SAFE DISPOSAL ---------- */
+makeYesNo('safeList', [
+  { text:'Викинути стару батарейку разом із кухонним сміттям', correct:false, why:'Метали з неї потраплять у ґрунт і воду.' },
+  { text:'Спалити старі дроти на вогнищі, щоб дістати мідь', correct:false, why:'Токсичний дим отруює повітря й людей.' },
+  { text:'Здати телефон у магазин за програмою обміну на новий', correct:true, why:'Його відремонтують або передадуть на справжню переробку.' },
+  { text:'Віднести старий монітор у сертифікований пункт приймання електроніки', correct:true, why:'Там техніку розбирають за правилами.' },
+  { text:'Закопати зламаний роутер у городі', correct:false, why:'Важкі метали накопичуватимуться в ґрунті роками.' }
+], 'Так, безпечно', 'Ні, шкодить');
+
+/* ---------- 7. 3D-PRINT EMULATOR ---------- */
+(function(){
+  // 8 x 6 detail shape (1 = part), rows top → bottom
+  const SHAPE = [
+    '00011000',
+    '00111100',
+    '00011000',
+    '00011000',
+    '01111110',
+    '11111111'
+  ];
+  const cells = SHAPE.join('').split('').map(c=>c==='1');
+  const total = cells.length;
+  const partCount = cells.filter(Boolean).length;
+  const gridCut = document.getElementById('gridCut');
+  const gridPrint = document.getElementById('gridPrint');
+  const statsCut = document.getElementById('statsCut');
+  const statsPrint = document.getElementById('statsPrint');
+  const btn = document.getElementById('btnFab');
+  const status = document.getElementById('fabStatus');
+  const cutEls = [], printEls = [];
+  cells.forEach(()=>{
+    const a = document.createElement('div'); a.className = 'fab-cell solid'; gridCut.appendChild(a); cutEls.push(a);
+    const b = document.createElement('div'); b.className = 'fab-cell'; gridPrint.appendChild(b); printEls.push(b);
+  });
+  let rewarded = false;
+
+  function reset(){
+    cutEls.forEach(el=>el.className = 'fab-cell solid');
+    printEls.forEach(el=>el.className = 'fab-cell');
+    statsCut.innerHTML = `Брусок: <b>${total}</b> кубиків`;
+    statsPrint.innerHTML = 'Матеріал: <b>0</b> кубиків';
+  }
+
+  btn.addEventListener('click', ()=>{
+    btn.disabled = true;
+    reset();
+    status.textContent = 'Виготовлення…';
+    const wasteIdx = cells.map((p,i)=>p?null:i).filter(i=>i!==null);
+    // print order: bottom row first, left to right
+    const printIdx = [];
+    for(let r = SHAPE.length-1; r >= 0; r--){ for(let c = 0; c < 8; c++){ const i = r*8+c; if(cells[i]) printIdx.push(i); } }
+    const steps = Math.max(wasteIdx.length, printIdx.length);
+    let k = 0, waste = 0, used = 0;
+    const timer = setInterval(()=>{
+      if(k < wasteIdx.length){ cutEls[wasteIdx[k]].className = 'fab-cell waste'; waste++; }
+      if(k < printIdx.length){ printEls[printIdx[k]].className = 'fab-cell part'; used++; }
+      statsCut.innerHTML = `Деталь: <b>${partCount}</b> · у стружку: <b style="color:var(--coral)">${waste}</b>`;
+      statsPrint.innerHTML = `Матеріал: <b>${used}</b> · відходи: <b>0</b>`;
+      k++;
+      if(k >= steps){
+        clearInterval(timer);
+        cutEls.forEach((el,i)=>{ if(cells[i]) el.className = 'fab-cell part'; });
+        status.textContent = `Однакова деталь: вирізання змарнувало ${wasteIdx.length} з ${total} кубиків, 3D-друк — жодного.`;
+        btn.textContent = 'Ще раз';
+        btn.disabled = false;
+        if(!rewarded){ rewarded = true; addNeurons(2); }
+      }
+    }, 140);
+  });
+})();
+
+makeMatching('printPool', 'printList', [
+  { name:'Запчастина на місці', func:'На полярній станції зламалась деталь, а найближчий магазин — за тисячі кілометрів' },
+  { name:'Протез', func:'Хлопчикові потрібна штучна кисть, що точно відповідає розміру його руки' },
+  { name:'Біодрук', func:'Дослідники вирощують зразок тканини, наносячи клітини шар за шаром' },
+  { name:'Будівельний друк', func:'Стіни одноповерхового будинку зводять за кілька днів машиною, що вичавлює бетон' }
+]);
+
+/* ---------- 8. DATA CENTER LOCATION PICKER ---------- */
+(function(){
+  const places = [
+    { icon:'🏜️', name:'Пустеля', temp:'До +45 °C удень', good:false, meter:95,
+      verdict:'Невдало: сервери доведеться охолоджувати цілодобово — енергії піде чи не більше, ніж на їхню роботу.' },
+    { icon:'❄️', name:'Північ Скандинавії', temp:'Більшу частину року холодно', good:true, meter:20,
+      verdict:'Вдало: холодне повітря ззовні охолоджує сервери майже безкоштовно.' },
+    { icon:'🏙️', name:'Центр спекотного мегаполісу', temp:'Асфальт, тіснява, +35 °C улітку', good:false, meter:85,
+      verdict:'Невдало: у місті ще спекотніше, а місця для охолоджувальних систем обмаль.' },
+    { icon:'🏞️', name:'Берег холодної річки', temp:'Вода близько +10 °C', good:true, meter:30,
+      verdict:'Вдало: річкова вода відводить тепло від серверів.' },
+    { icon:'🌊', name:'Дно океану', temp:'Стабільно холодна вода', good:true, meter:15,
+      verdict:'Вдало: температура стала, немає штормів і течій. Такий підводний дата-центр уже випробовували.' }
+  ];
+  const grid = document.getElementById('dcGrid');
+  const status = document.getElementById('dcStatus');
+  const goodTotal = places.filter(p=>p.good).length;
+  let found = 0;
+  places.forEach(p=>{
+    const card = document.createElement('div');
+    card.className = 'dc-card';
+    card.innerHTML = `<div class="dc-head"><span class="dc-icon">${p.icon}</span><span><div class="dc-name">${p.name}</div><div class="dc-temp">${p.temp}</div></span></div>
+      <div class="dc-meter"><span></span></div>
+      <div class="dc-verdict">⚡ Енергія на охолодження. ${p.verdict}</div>`;
+    card.addEventListener('click', ()=>{
+      if(card.classList.contains('open')) return;
+      card.classList.add('open', p.good ? 'good' : 'bad');
+      const bar = card.querySelector('.dc-meter span');
+      bar.style.background = p.good ? '#3FAE58' : '#D14B5E';
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{ bar.style.width = p.meter + '%'; }));
+      if(p.good){
+        found++;
+        addNeurons(1);
+        status.textContent = `Знайдено: ${found} з ${goodTotal}`;
+        if(found === goodTotal){ status.textContent = 'Усі вдалі місця знайдено ✓'; addNeurons(2); }
+      }
+    });
+    grid.appendChild(card);
+  });
+})();
+
+/* ---------- FINAL QUIZ ---------- */
+const questions = [
+  { q: "Що таке e-waste?", opts: ["Електронні листи зі спамом", "Викинуті електронні пристрої та їхні частини", "Енергія, яку споживає комп'ютер"], correct: 1 },
+  { q: "Чому не можна викидати батарейки у звичайне сміття?", opts: ["Вони займають забагато місця", "Метали з них забруднюють ґрунт і воду", "Їх можна заряджати ще раз"], correct: 1 },
+  { q: "Який вчинок стосується принципу «Використовуй повторно»?", opts: ["Полагодити старий телефон замість купівлі нового", "Купити два однакові планшети", "Викинути справний ноутбук"], correct: 0 },
+  { q: "Чому спалювання техніки на нелегальних звалищах — погана «переробка»?", opts: ["Бо так метали не вдається дістати", "Бо токсичний дим отруює людей і довкілля", "Бо це надто дорого"], correct: 1 },
+  { q: "Чим 3D-друк ощадливіший за вирізання деталі з бруска?", opts: ["Він витрачає лише потрібну кількість матеріалу", "Він працює без електрики", "Він завжди швидший"], correct: 0 },
+  { q: "Що таке блейд-сервер?", opts: ["Сервер для ігор", "Компактний енергоощадний серверний модуль у спільній стійці", "Сервер, що працює лише вночі"], correct: 1 },
+  { q: "Чому дата-центри будують у холодних краях чи біля річок?", opts: ["Там дешевший інтернет", "Природний холод і вода економлять енергію на охолодження", "Там менше людей користується хмарою"], correct: 1 }
+];
+let qi=0, currentAnswered=false;
+const quizQ = document.getElementById('quizQ');
+const quizOptions = document.getElementById('quizOptions');
+const quizProgress = document.getElementById('quizProgress');
+const btnNext = document.getElementById('btnNext');
+const quizBox = document.getElementById('quizBox');
+const completion = document.getElementById('completion');
+const totalNeuronsEl = document.getElementById('totalNeurons');
+
+function renderQuestion(){
+  currentAnswered=false; btnNext.classList.remove('active');
+  const item = questions[qi];
+  quizProgress.textContent = `Запитання ${qi+1} з ${questions.length}`;
+  quizQ.textContent = item.q;
+  quizOptions.innerHTML='';
+  item.opts.forEach((opt,i)=>{
+    const b=document.createElement('button'); b.className='quiz-opt'; b.textContent=opt;
+    b.addEventListener('click', ()=>{
+      if(currentAnswered) return; currentAnswered=true;
+      const all = quizOptions.querySelectorAll('.quiz-opt');
+      all.forEach((ob,oi)=>{ if(oi===item.correct) ob.classList.add('correct'); else if(oi===i) ob.classList.add('wrong'); });
+      if(i===item.correct) addNeurons(2);
+      btnNext.classList.add('active');
+      btnNext.textContent = (qi===questions.length-1) ? 'Завершити' : 'Далі';
+    });
+    quizOptions.appendChild(b);
+  });
+}
+btnNext.addEventListener('click', ()=>{
+  if(!btnNext.classList.contains('active')) return;
+  qi++;
+  if(qi<questions.length){ renderQuestion(); }
+  else {
+    quizBox.style.display='none';
+    completion.classList.add('show');
+    addNeurons(3);
+    totalNeuronsEl.textContent = neurons;
+  }
+});
+renderQuestion();
+</script>
+
+</body>
+</html>
