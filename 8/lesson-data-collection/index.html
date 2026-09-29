@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Збір даних — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F4F7FB; --ink:#18263A; --ink-soft:#546680; --surface:#FFFFFF; --line:#DDE5F0;
+    --pri:#1F6FB2; --pri-dark:#16548A; --accent:#F08A24; --green:#2E9E5B; --coral:#E0604A;
+    --cell-line:#D5DCE6; --head-bg:#EEF2F7;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  .container{max-width:780px; margin:0 auto; padding:0 24px;}
+  @media (max-width:480px){ .container{padding:0 16px;} }
+
+  .hud{position:sticky; top:0; z-index:50; background:rgba(244,247,251,.9); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
+  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--pri)); transition:width .3s ease;}
+  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:780px; margin:0 auto;}
+  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
+  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
+  .neuron-counter svg{width:24px;height:24px;}
+  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
+  #neuronCount.pop{transform:scale(1.35);}
+
+  .hero{padding:48px 24px 36px;}
+  .hero-inner{max-width:780px; margin:0 auto; display:flex; align-items:center; gap:26px;}
+  .hero-text{flex:1;}
+  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--pri); margin-bottom:10px;}
+  .hero h1{font-size:29px; line-height:1.2; margin-bottom:12px;}
+  .hero p{color:var(--ink-soft); font-size:16px; max-width:54ch; margin-bottom:20px;}
+  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--pri); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
+  .btn-primary:hover{background:var(--pri-dark);}
+  .btn-primary:active{transform:scale(.97);}
+  .mascot{width:120px; height:120px; flex-shrink:0;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:96px; height:96px;} }
+
+  section.block{padding:30px 0; border-top:1px solid var(--line);}
+  .step-label{font-family:'Baloo 2',sans-serif; font-size:12.5px; font-weight:700; color:var(--pri); margin-bottom:6px; text-transform:uppercase; letter-spacing:.03em;}
+  .block h2{font-size:19px; margin-bottom:8px; max-width:40ch;}
+  .block p{max-width:64ch; font-size:15px; margin:0 0 8px; color:var(--ink);}
+  .block p.soft{color:var(--ink-soft); font-size:13.5px;}
+  .block ul{max-width:64ch; margin:0 0 8px; padding-left:20px; font-size:15px;}
+  .block ul li{margin-bottom:4px;}
+  .note{background:#FFF4E6; border-left:4px solid var(--accent); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:#8A4F0F; margin:12px 0;}
+  .trivia{background:#EAF2FB; border-left:4px solid var(--pri); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:var(--pri-dark); margin:12px 0;}
+  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:16px 18px; margin-top:10px;}
+  @media (max-width:480px){ .exercise{padding:14px 12px;} }
+  @keyframes itemShake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
+  .status-line{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--pri-dark); margin-top:12px; min-height:1.4em;}
+
+  /* CLASSIFY / YES-NO */
+  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:13px 15px; margin:8px 0;}
+  .classify-card p.q{font-weight:700; margin:0 0 8px; font-size:13.5px;}
+  .choice-row{display:flex; gap:6px; flex-wrap:wrap;}
+  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12px; padding:7px 11px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease, color .15s ease;}
+  .choice-btn:hover{border-color:var(--pri);}
+  .choice-btn.correct{background:#E4F5E9; border-color:#3FAE58; color:#256B36;}
+  .choice-btn.wrong{background:#FBE6E9; border-color:#D14B5E; color:#8C2D3A;}
+  .choice-feedback{margin-top:6px; font-size:12px; color:var(--ink-soft); min-height:1.2em;}
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; background:var(--head-bg); padding:1px 6px; border-radius:5px;}
+
+  /* SEQUENCE */
+  .seq-prompt{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; text-align:center; margin-bottom:12px;}
+  .seq-options{display:flex; flex-direction:column; gap:8px;}
+  .seq-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:14px; font-weight:600; padding:11px 14px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .seq-opt:hover{border-color:var(--pri);}
+  .seq-opt.wrong{animation:itemShake .35s ease; border-color:var(--coral); background:#FDE6E1;}
+  .seq-built{display:flex; flex-direction:column; gap:6px; margin-top:14px;}
+  .seq-built-item{display:flex; align-items:center; gap:10px; background:#E4F8E6; border:2px solid #3FAE58; border-radius:var(--radius-s); padding:9px 12px; font-size:13.5px;}
+  .seq-built-item .num{width:22px; height:22px; border-radius:50%; background:#3FAE58; color:#fff; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:11.5px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .seq-done{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; color:#256B36; margin-top:12px; display:none;}
+  .seq-done.show{display:block;}
+
+  /* MATCHING */
+  .tool-pool{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; padding:11px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:12px;}
+  .tool-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:7px 11px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .tool-chip:hover{transform:translateY(-2px);}
+  .tool-chip.selected{border-color:var(--pri); box-shadow:0 0 0 3px rgba(31,111,178,0.2);}
+  .tool-chip.placed{display:none;}
+  .func-card{display:flex; align-items:center; gap:10px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:9px 11px; margin-bottom:7px; cursor:pointer; transition:border-color .2s ease, background .2s ease;}
+  .func-card.matched{border-color:var(--accent); background:#FFF6EA; cursor:default;}
+  .func-card.shake{animation:itemShake .35s ease;}
+  .func-text{flex:1; font-size:12.5px; color:var(--ink-soft);}
+  .func-slot{min-width:60px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:10.5px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:6px 6px;}
+  .func-slot.filled{border-style:solid; border-color:var(--accent); background:#FFEBD4; color:var(--ink);}
+
+  /* SPREADSHEET MOCK (shared) */
+  .sheet{background:var(--surface); border:1.5px solid var(--cell-line); border-radius:var(--radius-s); overflow:hidden; font-size:12px; user-select:none;}
+  .sheet-title{background:var(--pri); color:#fff; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; padding:5px 10px; text-align:center;}
+  .sheet-bar{display:flex; align-items:center; gap:6px; padding:6px; border-bottom:1px solid var(--cell-line); background:#FAFBFD;}
+  .name-box{width:74px; flex-shrink:0; border:1px solid var(--cell-line); border-radius:4px; padding:3px 6px; font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; font-size:12px; background:#fff; min-height:24px;}
+  .fx{font-style:italic; font-weight:700; color:var(--ink-soft); font-family:Georgia,serif;}
+  .formula-bar{flex:1; border:1px solid var(--cell-line); border-radius:4px; padding:3px 6px; background:#fff; min-height:24px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;}
+  .sheet-grid{border-collapse:collapse; width:100%; table-layout:fixed;}
+  .sheet-grid th, .sheet-grid td{border:1px solid var(--cell-line); height:26px; padding:0 5px; overflow:hidden; white-space:nowrap;}
+  .sheet-grid th{background:var(--head-bg); font-weight:700; color:var(--ink-soft); font-size:11px; text-align:center;}
+  .sheet-grid th.corner{width:28px;}
+  .sheet-grid td{background:#fff;}
+  .sheet-tabs{display:flex; gap:2px; padding:4px 6px 0; background:#FAFBFD; border-top:1px solid var(--cell-line);}
+  .sheet-tab{font-size:11px; font-weight:700; padding:4px 12px; border-radius:6px 6px 0 0; background:var(--head-bg); color:var(--ink-soft);}
+  .sheet-tab.active{background:#fff; color:var(--pri); border:1px solid var(--cell-line); border-bottom:none;}
+  .hot{cursor:pointer; transition:box-shadow .15s ease, background .15s ease;}
+  .hot:hover{box-shadow:inset 0 0 0 2px rgba(31,111,178,.35);}
+  .hot.found{box-shadow:inset 0 0 0 3px #3FAE58 !important; background:#E9F7EE !important;}
+  .hot.miss{animation:itemShake .35s ease; box-shadow:inset 0 0 0 3px var(--coral) !important;}
+
+  .part-list{list-style:none; padding:0 !important; display:grid; grid-template-columns:1fr 1fr; gap:6px; max-width:none !important;}
+  @media (max-width:560px){ .part-list{grid-template-columns:1fr;} }
+  .part-list li{font-size:13px !important; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-s); padding:7px 10px; margin:0 !important;}
+  .part-list b{color:var(--pri-dark);}
+  .hot-prompt{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; text-align:center; margin-bottom:10px; color:var(--ink);}
+  .hot-prompt span{color:var(--pri);}
+
+  /* SEA BATTLE */
+  .sea td{cursor:pointer; text-align:center; font-size:14px; transition:background .15s ease;}
+  .sea td:hover{background:#EAF2FB;}
+  .sea td.hit{background:#E9F7EE;}
+  .sea td.miss{animation:itemShake .35s ease; background:#FCE9E6;}
+  .sea td.active{box-shadow:inset 0 0 0 2px var(--pri);}
+  .sea th.lit{background:#D6E6F5; color:var(--pri-dark);}
+
+  /* RANGE */
+  .rng td{cursor:pointer; transition:background .12s ease;}
+  .rng td.anchor{background:#FFE7CC; box-shadow:inset 0 0 0 2px var(--accent);}
+  .rng td.sel{background:#D6E6F5;}
+  .rng td.sel.ok{background:#D7F0DF;}
+
+  /* SORT BOARD */
+  .sort-buckets{display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px;}
+  .bucket{border:2px dashed var(--line); border-radius:var(--radius-m); padding:9px; min-height:90px; cursor:pointer; background:var(--surface);}
+  .bucket-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12px; color:var(--ink-soft); margin-bottom:6px; text-align:center;}
+  .bucket-items{display:flex; flex-wrap:wrap; gap:5px; min-height:28px; justify-content:center;}
+  .bucket.hint{border-color:var(--coral);}
+  .sort-pool{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-top:12px;}
+  .sort-chip{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; font-size:12.5px; background:var(--bg); border:2px solid var(--line); border-radius:8px; padding:6px 10px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .sort-chip:hover{transform:translateY(-2px);}
+  .sort-chip.selected{border-color:var(--pri); box-shadow:0 0 0 3px rgba(31,111,178,0.2);}
+  .sort-chip.placed{background:#E4F5E9; border-color:#3FAE58; cursor:default; font-size:11.5px;}
+  .sort-chip.placed:hover{transform:none;}
+
+  /* FORMAT EMULATOR */
+  .fmt-task{background:#EAF2FB; border-radius:var(--radius-s); padding:10px 12px; font-size:13.5px; margin-bottom:10px;}
+  .fmt-task b{font-family:'Baloo 2',sans-serif; color:var(--pri-dark);}
+  .toolbar{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px;}
+  .tool-btn{display:flex; align-items:center; gap:6px; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:11.5px; padding:6px 10px; border-radius:8px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:border-color .15s ease, background .15s ease;}
+  .tool-btn:hover{border-color:var(--pri);}
+  .tool-btn .ic{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:800; color:var(--pri); min-width:18px; text-align:center;}
+  .tool-btn.wrong{animation:itemShake .35s ease; border-color:var(--coral); background:#FDE6E1;}
+  .tool-btn.good{border-color:#3FAE58; background:#E4F5E9;}
+  .fmt .sheet-grid td{position:relative;}
+  .fmt td.num{text-align:right;}
+  .fmt td.spill{overflow:visible; z-index:1;}
+  .fmt td.merged{text-align:center; font-weight:800; font-size:13px; color:var(--pri-dark);}
+  .fmt td.wrap{white-space:normal; line-height:1.25; padding-top:3px; padding-bottom:3px;}
+  .fmt td.target{background:#FFF1DE; box-shadow:inset 0 0 0 2px var(--accent);}
+  .fmt td.head{font-weight:800; background:#F7F9FC;}
+
+  /* QUIZ */
+  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:24px 22px; margin-top:16px;}
+  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:12.5px; color:var(--ink-soft); margin-bottom:9px;}
+  .quiz-q{font-size:16px; font-weight:700; margin-bottom:14px;}
+  .quiz-options{display:flex; flex-direction:column; gap:9px;}
+  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:14px; font-weight:600; padding:11px 14px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .quiz-opt:hover{border-color:var(--pri);}
+  .quiz-opt.correct{background:#E4F5E9; border-color:#3FAE58;}
+  .quiz-opt.wrong{background:#FBE6E9; border-color:#D14B5E;}
+  .quiz-nav{display:flex; justify-content:flex-end; margin-top:16px;}
+  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:10px 20px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
+  .btn-next.active{opacity:1; pointer-events:auto;}
+
+  .completion{display:none; text-align:center; padding:18px 10px 10px;}
+  .completion.show{display:block;}
+  .badge{width:80px; height:80px; margin:0 auto 14px;}
+  .completion h3{font-size:20px; margin-bottom:8px;}
+  .completion p{color:var(--ink-soft); max-width:50ch; margin:0 auto 16px; font-size:14px;}
+  .completion .total{font-family:'Baloo 2',sans-serif; font-size:28px; color:var(--pri-dark);}
+
+  footer{padding:32px 24px 56px; text-align:center; color:var(--ink-soft); font-size:13px;}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
+  <div class="hud-row">
+    <span class="hud-title">8 клас · Збір даних</span>
+    <div class="neuron-counter">
+      <svg viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
+        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#B57A1F" opacity="0.6"/>
+      </svg>
+      <span id="neuronCount">0</span>
+    </div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Працюємо з числами · Тема 1</div>
+      <h1>Збір даних</h1>
+      <p>Як із купи окремих чисел і відповідей отримати корисний висновок? Спершу дані треба зібрати й акуратно розкласти по комірках електронної таблиці. Розберімося, як це зробити.</p>
+      <button class="btn-primary" onclick="document.getElementById('s1').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <rect x="22" y="26" width="96" height="92" rx="14" fill="#DCE8F5"/>
+      <rect x="28" y="32" width="84" height="80" rx="10" fill="#FFFFFF"/>
+      <rect x="28" y="32" width="84" height="16" rx="10" fill="#1F6FB2"/>
+      <rect x="28" y="40" width="84" height="8" fill="#1F6FB2"/>
+      <line x1="56" y1="48" x2="56" y2="112" stroke="#D5DCE6" stroke-width="2"/>
+      <line x1="84" y1="48" x2="84" y2="112" stroke="#D5DCE6" stroke-width="2"/>
+      <line x1="28" y1="70" x2="112" y2="70" stroke="#D5DCE6" stroke-width="2"/>
+      <line x1="28" y1="92" x2="112" y2="92" stroke="#D5DCE6" stroke-width="2"/>
+      <circle cx="49" cy="61" r="5" fill="#18263A"/>
+      <circle cx="91" cy="61" r="5" fill="#18263A"/>
+      <circle cx="50.5" cy="59.5" r="1.6" fill="#fff"/>
+      <circle cx="92.5" cy="59.5" r="1.6" fill="#fff"/>
+      <path d="M58 78 C64 86 76 86 82 78" stroke="#18263A" stroke-width="3.5" stroke-linecap="round"/>
+      <rect x="60" y="96" width="20" height="12" rx="3" fill="#F08A24"/>
+      <text x="70" y="105" text-anchor="middle" font-family="Arial" font-weight="700" font-size="9" fill="#fff">B3</text>
+      <circle cx="38" cy="40" r="2.5" fill="#fff" opacity=".8"/><circle cx="46" cy="40" r="2.5" fill="#fff" opacity=".8"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="s1" style="border-top:none; padding-top:0;">
+    <div class="step-label">1 · Дані та інформація</div>
+    <h2>Сирі факти чи готовий висновок?</h2>
+    <ul>
+      <li><b>Дані</b> — необроблені факти й спостереження: числа, слова, виміри.</li>
+      <li><b>Інформація</b> — дані, які впорядкували й опрацювали так, що з них можна зробити висновок.</li>
+    </ul>
+    <div class="note">Одне число «24» саме по собі нічого не каже. А от «24 °C — найтепліший день тижня» — це вже інформація.</div>
+    <p class="soft">Це ще необроблені дані чи вже інформація?</p>
+    <div id="dataList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">2 · Від даних до висновку</div>
+    <h2>Як клас обирав новий гурток</h2>
+    <p>Щоб дані стали інформацією, їх спочатку збирають, потім упорядковують і аналізують. Зараз це зазвичай роблять у <b>електронних таблицях</b>.</p>
+    <p class="soft">Школа хоче відкрити новий гурток. Відтвори, як вона діяла, крок за кроком.</p>
+    <div class="exercise">
+      <div class="seq-prompt" id="seqPrompt">Що відбувається ПЕРШИМ?</div>
+      <div class="seq-options" id="seqOptions"></div>
+      <div class="seq-built" id="seqBuilt"></div>
+      <div class="seq-done" id="seqDone">Від даних до рішення ✓</div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">3 · Способи збору даних</div>
+    <h2>Звідки беруться дані</h2>
+    <p>Дані збирають по-різному:</p>
+    <ul>
+      <li>опитування й анкетування;</li>
+      <li>аналітика відвідувань вебсайтів;</li>
+      <li>мобільні застосунки й носимі гаджети;</li>
+      <li>твої дії в інтернет-магазинах;</li>
+      <li>аналіз великої кількості текстів.</li>
+    </ul>
+    <div class="trivia">Збирати дані про людей можна лише чесно: з їхньої згоди та за законом.</div>
+    <p class="soft">Зістав спосіб збору даних із ситуацією.</p>
+    <div class="exercise">
+      <div class="tool-pool" id="methodPool"></div>
+      <div id="methodList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">4 · Вікно електронної таблиці</div>
+    <h2>Із чого складається таблиця</h2>
+    <p>Excel, Google Таблиці, LibreOffice Calc мають схожий вигляд. Ось головні частини:</p>
+    <ul class="part-list">
+      <li><b>Робоча книга</b> — увесь файл; назва за замовчуванням «Книга1».</li>
+      <li><b>Аркуш</b> — окрема сторінка книги; вкладки аркушів — унизу.</li>
+      <li><b>Стовпці</b> — позначені великими англійськими літерами A, B, C…</li>
+      <li><b>Рядки</b> — пронумеровані зліва: 1, 2, 3…</li>
+      <li><b>Комірка</b> — клітинка на перетині рядка й стовпця.</li>
+      <li><b>Поле Ім'я</b> — зліва вгорі, показує адресу вибраної комірки.</li>
+      <li><b>Рядок формул</b> — поруч із <span class="fx">fx</span>, показує вміст вибраної комірки.</li>
+    </ul>
+    <p class="soft">Перевір себе: клацни на частину вікна, яку назвуть.</p>
+    <div class="exercise">
+      <div class="hot-prompt" id="hotPrompt"></div>
+      <div class="sheet" id="hotSheet">
+        <div class="sheet-title hot" data-part="book">Книга1 — Excel</div>
+        <div class="sheet-bar">
+          <div class="name-box hot" data-part="name">C2</div>
+          <span class="fx">fx</span>
+          <div class="formula-bar hot" data-part="formula">Олівець</div>
+        </div>
+        <table class="sheet-grid" id="hotGrid"></table>
+        <div class="sheet-tabs"><span class="sheet-tab active hot" data-part="tab">Аркуш1</span><span class="sheet-tab hot" data-part="tab">Аркуш2</span></div>
+      </div>
+      <div class="status-line" id="hotStatus"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">5 · Адреса комірки</div>
+    <h2>Як у морському бої</h2>
+    <p>Кожна комірка має власне ім'я — <b>адресу</b>: спершу літера стовпця, потім номер рядка. Наприклад, <span class="mono">D6</span> — стовпець D, рядок 6.</p>
+    <div class="note">Клацнута комірка стає <b>активною</b>: її межі товщають, а адреса з'являється в полі Ім'я.</div>
+    <p class="soft">Стріляй по названих комірках!</p>
+    <div class="exercise">
+      <div class="hot-prompt" id="seaPrompt"></div>
+      <div class="sheet">
+        <div class="sheet-bar"><div class="name-box" id="seaName"></div><span class="fx">fx</span><div class="formula-bar" id="seaFormula"></div></div>
+        <table class="sheet-grid sea" id="seaGrid"></table>
+      </div>
+      <div class="status-line" id="seaStatus"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">6 · Діапазон комірок</div>
+    <h2>Прямокутник із двох адрес</h2>
+    <ul>
+      <li><b>Діапазон</b> — прямокутна група комірок. Записують через двокрапку: <span class="mono">A1:C2</span> — від A1 до C2.</li>
+      <li><b>Окремі комірки</b> перелічують через крапку з комою: <span class="mono">A1;B2;C3</span> (у деяких програмах — через кому).</li>
+    </ul>
+    <p class="soft">Виділи потрібний діапазон: клацни на першу кутову комірку, потім — на протилежну.</p>
+    <div class="exercise">
+      <div class="hot-prompt" id="rngPrompt"></div>
+      <div class="sheet">
+        <div class="sheet-bar"><div class="name-box" id="rngName"></div><span class="fx">fx</span><div class="formula-bar"></div></div>
+        <table class="sheet-grid rng" id="rngGrid"></table>
+      </div>
+      <div class="status-line" id="rngStatus"></div>
+    </div>
+    <p class="soft" style="margin-top:16px;">Як правильно записати виділення?</p>
+    <div id="notationList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">7 · Типи даних</div>
+    <h2>Число, дата чи текст?</h2>
+    <p>Таблиця сама розпізнає, що ти ввів. Числові дані бувають різних типів:</p>
+    <ul>
+      <li><b>числа</b> — цілі й дробові: <span class="mono">-37</span>, <span class="mono">3,14</span>;</li>
+      <li><b>відсотки</b>: <span class="mono">25%</span>;</li>
+      <li><b>валюта</b>: <span class="mono">100,00 грн</span>;</li>
+      <li><b>дата й час</b>: <span class="mono">15.09.2025</span>, <span class="mono">15:57</span>.</li>
+    </ul>
+    <div class="note">Якщо в одній комірці є і літери, і цифри (наприклад, «12 шт.»), таблиця сприйме все як <b>текст</b> і рахувати з ним не зможе. Текст вирівнюється за лівим краєм комірки, а числа — за правим.</div>
+    <p class="soft">Клацни значення, потім — тип, як його розпізнає таблиця.</p>
+    <div class="exercise">
+      <div class="sort-buckets">
+        <div class="bucket" id="bNum"><div class="bucket-title">🔢 Число</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bPct"><div class="bucket-title">％ Відсоток</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bCur"><div class="bucket-title">💰 Валюта</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bDate"><div class="bucket-title">📅 Дата й час</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bText"><div class="bucket-title">🔤 Текст</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="typePool"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">8 · Просте форматування</div>
+    <h2>Робимо таблицю зручною для читання</h2>
+    <p>Форматування не змінює самі дані — лише те, як вони виглядають.</p>
+    <ul>
+      <li><b>Переносити текст</b> — довгий текст розбивається на кілька рядків у межах комірки.</li>
+      <li><b>Об'єднати та розташувати в центрі</b> — кілька комірок стають однією, текст — посередині.</li>
+      <li><b>Грошовий формат</b> — число показується як сума з валютою.</li>
+      <li><b>Відсотковий формат</b> — 0,25 перетворюється на 25%.</li>
+      <li><b>Формат із роздільниками</b> — між розрядами великого числа з'являються пропуски.</li>
+    </ul>
+    <div class="note">Пам'ятай: спочатку виділи комірки, а потім натискай кнопку форматування.</div>
+    <p class="soft">Виділені комірки вже підсвічено. Обери потрібну кнопку.</p>
+    <div class="exercise">
+      <div class="fmt-task" id="fmtTask"></div>
+      <div class="toolbar" id="fmtToolbar"></div>
+      <div class="sheet fmt"><table class="sheet-grid" id="fmtGrid"></table></div>
+      <div class="status-line" id="fmtStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div class="quiz-box" id="quizBox">
+      <div class="quiz-progress" id="quizProgress">Запитання 1 з 8</div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
+    </div>
+    <div class="completion" id="completion">
+      <svg class="badge" viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#1F6FB2" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#1F6FB2"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#1F6FB2" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#1F6FB2"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#1F6FB2" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#1F6FB2"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#1F6FB2" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#1F6FB2"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#1F6FB2" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#1F6FB2"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#1F6FB2" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#1F6FB2"/>
+        <circle cx="12" cy="12" r="4.4" fill="#1F6FB2"/><circle cx="12" cy="12" r="1.6" fill="#16548A" opacity="0.6"/>
+      </svg>
+      <h3>Урок пройдено!</h3>
+      <p>Тепер ти розрізняєш дані й інформацію, знаєш способи збору даних, орієнтуєшся у вікні електронної таблиці, адресах і діапазонах комірок, типах даних і простому форматуванні.</p>
+      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Урок · «Збір даних» · 8 клас</footer>
+
+<script>
+const STORAGE_KEY = "lesson8-data-collection-neurons";
+let neurons = 0;
+const neuronEl = document.getElementById('neuronCount');
+const hudFill = document.getElementById('hudFill');
+
+function addNeurons(n){
+  neurons += n;
+  neuronEl.textContent = neurons;
+  neuronEl.classList.add('pop');
+  setTimeout(()=>neuronEl.classList.remove('pop'), 250);
+  saveProgress();
+}
+async function saveProgress(){
+  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
+}
+async function loadProgress(){
+  try{
+    const res = await window.storage?.get(STORAGE_KEY, false);
+    if(res && res.value){
+      const d = JSON.parse(res.value);
+      if(typeof d.neurons === 'number'){ neurons = d.neurons; neuronEl.textContent = neurons; }
+    }
+  }catch(e){}
+}
+loadProgress();
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
+});
+
+/* ---------- HELPERS ---------- */
+const COLS = 'ABCDEFGH'.split('');
+function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
+function flash(el, cls){ el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), 380); }
+
+// Порожня сітка-таблиця: cols стовпців, rows рядків; повертає масив комірок [row][col]
+function buildGrid(table, cols, rows, headAttrs){
+  let html = '<tr><th class="corner"></th>';
+  for(let c=0;c<cols;c++) html += `<th ${headAttrs?headAttrs('col',c):''}>${COLS[c]}</th>`;
+  html += '</tr>';
+  for(let r=0;r<rows;r++){
+    html += `<tr><th ${headAttrs?headAttrs('row',r):''}>${r+1}</th>`;
+    for(let c=0;c<cols;c++) html += `<td data-r="${r}" data-c="${c}"></td>`;
+    html += '</tr>';
+  }
+  table.innerHTML = html;
+  const cells = [];
+  table.querySelectorAll('td').forEach(td=>{
+    const r = +td.dataset.r, c = +td.dataset.c;
+    (cells[r] = cells[r] || [])[c] = td;
+  });
+  return cells;
+}
+function addr(r,c){ return COLS[c] + (r+1); }
+
+function makeClassify(containerId, items, opts){
+  const list = document.getElementById(containerId);
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">${(item.opts||opts).map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i===item.correct){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+}
+
+function makeYesNo(containerId, items, optYes, optNo){
+  const list = document.getElementById(containerId);
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">
+        <button class="choice-btn" data-v="true">${optYes}</button>
+        <button class="choice-btn" data-v="false">${optNo}</button>
+      </div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        const isCorrect = (btn.dataset.v === 'true') === item.correct;
+        if(isCorrect){ btn.classList.add('correct'); fb.textContent = item.why ? `Правильно ✓ ${item.why}` : 'Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+}
+
+function makeSortBoard(poolId, buckets, items){
+  const pool = document.getElementById(poolId);
+  let selected = null;
+  let placedCount = 0;
+  shuffle(items).forEach(item=>{
+    const chip = document.createElement('div');
+    chip.className = 'sort-chip';
+    chip.textContent = item.text;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.sort-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = item;
+    });
+    pool.appendChild(chip);
+  });
+  Object.entries(buckets).forEach(([key, el])=>{
+    el.addEventListener('click', ()=>{
+      if(!selected) return;
+      if(selected.zone === key){
+        const chip = [...pool.children].find(c=>c.textContent===selected.text && !c.classList.contains('placed'));
+        if(chip){ chip.classList.add('placed'); chip.classList.remove('selected'); el.querySelector('.bucket-items').appendChild(chip); }
+        addNeurons(1);
+        placedCount++;
+        selected = null;
+        if(placedCount === items.length) addNeurons(2);
+      } else {
+        el.classList.add('hint');
+        setTimeout(()=>el.classList.remove('hint'), 350);
+      }
+    });
+  });
+}
+
+function makeMatching(poolId, listId, items){
+  const pool = document.getElementById(poolId);
+  const list = document.getElementById(listId);
+  let selected = null;
+  let matched = 0;
+  shuffle(items).forEach(t=>{
+    const chip = document.createElement('div');
+    chip.className = 'tool-chip';
+    chip.textContent = t.name;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = t.name;
+    });
+    pool.appendChild(chip);
+  });
+  shuffle(items).forEach(t=>{
+    const card = document.createElement('div');
+    card.className = 'func-card';
+    card.innerHTML = `<div class="func-text">${t.func}</div><div class="func-slot">?</div>`;
+    card.addEventListener('click', ()=>{
+      if(card.classList.contains('matched') || !selected) return;
+      const slot = card.querySelector('.func-slot');
+      if(selected === t.name){
+        slot.textContent = selected;
+        slot.classList.add('filled');
+        card.classList.add('matched');
+        const chip = [...pool.children].find(c=>c.textContent===selected);
+        if(chip) chip.classList.add('placed');
+        addNeurons(1);
+        matched++;
+        selected = null;
+        pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+        if(matched === items.length) addNeurons(2);
+      } else {
+        card.classList.add('shake');
+        setTimeout(()=>card.classList.remove('shake'), 350);
+      }
+    });
+    list.appendChild(card);
+  });
+}
+
+/* ---------- 1. DATA vs INFORMATION ---------- */
+makeYesNo('dataList', [
+  { text:'18, 21, 17, 24, 20', correct:true, why:'Просто числа — без пояснень і висновку.' },
+  { text:'Найтепліше цього тижня було в четвер', correct:false, why:'Це висновок, зроблений із вимірів температури.' },
+  { text:'Відповіді 30 учнів на питання «Твій улюблений предмет?»', correct:true, why:'Відповіді ще ніхто не впорядкував і не порахував.' },
+  { text:'Інформатику обрала третина класу — це найпопулярніший предмет', correct:false, why:'Відповіді вже порахували й порівняли.' },
+  { text:'Зріст кожного учня 8-А в сантиметрах', correct:true, why:'Окремі виміри без обробки.' },
+  { text:'Середній зріст учнів 8-А — 162 см', correct:false, why:'Середнє значення — результат опрацювання вимірів.' }
+], 'Необроблені дані', 'Інформація');
+
+/* ---------- 2. DATA → DECISION SEQUENCE ---------- */
+(function(){
+  const steps = [
+    'Опитати учнів, який гурток вони хотіли б відвідувати',
+    'Внести всі відповіді в електронну таблицю',
+    'Згрупувати однакові відповіді й порахувати, скільки кожної',
+    'Порівняти результати й знайти найпопулярніший варіант',
+    'Ухвалити рішення: відкрити гурток робототехніки'
+  ];
+  const ordinals = ['ПЕРШИМ','ДРУГИМ','ТРЕТІМ','ЧЕТВЕРТИМ','П\'ЯТИМ'];
+  let built = [];
+  const promptEl = document.getElementById('seqPrompt');
+  const optionsEl = document.getElementById('seqOptions');
+  const builtEl = document.getElementById('seqBuilt');
+  const doneEl = document.getElementById('seqDone');
+  function render(){
+    if(built.length === steps.length){
+      promptEl.textContent = '';
+      optionsEl.innerHTML = '';
+      doneEl.classList.add('show');
+      return;
+    }
+    promptEl.textContent = `Що відбувається ${ordinals[built.length]}?`;
+    const remaining = shuffle(steps.map((s,i)=>i).filter(i=>!built.includes(i)));
+    optionsEl.innerHTML = '';
+    remaining.forEach(idx=>{
+      const btn = document.createElement('button');
+      btn.className = 'seq-opt';
+      btn.textContent = steps[idx];
+      btn.addEventListener('click', ()=>{
+        if(idx === built.length){
+          built.push(idx);
+          addNeurons(1);
+          const row = document.createElement('div');
+          row.className = 'seq-built-item';
+          row.innerHTML = `<span class="num">${built.length}</span><span>${steps[idx]}</span>`;
+          builtEl.appendChild(row);
+          if(built.length === steps.length) addNeurons(3);
+          render();
+        } else {
+          btn.classList.add('wrong');
+          setTimeout(()=>btn.classList.remove('wrong'), 400);
+        }
+      });
+      optionsEl.appendChild(btn);
+    });
+  }
+  render();
+})();
+
+/* ---------- 3. COLLECTION METHODS ---------- */
+makeMatching('methodPool', 'methodList', [
+  { name:'Опитування', func:'Класна керівниця по черзі розмовляє з кожним учнем і записує, куди він хоче поїхати на екскурсію' },
+  { name:'Анкетування', func:'Учні заповнюють Google Форму, обираючи варіанти відповідей' },
+  { name:'Аналітика сайту', func:'Школа дізнається, скільки людей щодня відкриває її сторінку в інтернеті' },
+  { name:'Мобільний застосунок', func:'Програма в смартфоні щодня рахує кроки й години сну' },
+  { name:'Дії в інтернет-магазині', func:'Тобі радять кросівки, бо вчора ти переглядав спортивний одяг' },
+  { name:'Аналіз текстів', func:'Програма перебирає тисячі відгуків і визначає, скільки з них схвальних' }
+]);
+
+/* ---------- 4. INTERFACE HOTSPOTS ---------- */
+(function(){
+  const grid = document.getElementById('hotGrid');
+  const DATA = [['Товар','К-сть','Ціна'],['Ручка','3','10'],['Олівець','2','5'],['Маркер','2','15']];
+  let html = '<tr><th class="corner"></th>' + ['A','B','C','D'].map(l=>`<th class="hot" data-part="col">${l}</th>`).join('') + '</tr>';
+  for(let r=0;r<4;r++){
+    html += `<tr><th class="hot" data-part="row">${r+1}</th>`;
+    for(let c=0;c<4;c++){
+      const v = c<3 ? DATA[r][c] : '';
+      const isNum = r>0 && (c===1||c===2);
+      const active = (r===2 && c===0) ? ' style="box-shadow:inset 0 0 0 2px #1F6FB2"' : '';
+      html += `<td class="hot" data-part="cell"${active}><span style="display:block;text-align:${isNum?'right':'left'}">${v}</span></td>`;
+    }
+    html += '</tr>';
+  }
+  grid.innerHTML = html;
+  // активна комірка — A3 з «Олівець»
+  document.querySelector('#hotSheet .name-box').textContent = 'A3';
+
+  const TASKS = [
+    { part:'name',    label:'поле Ім\'я' },
+    { part:'formula', label:'рядок формул' },
+    { part:'col',     label:'назву будь-якого стовпця' },
+    { part:'row',     label:'номер будь-якого рядка' },
+    { part:'cell',    label:'будь-яку комірку' },
+    { part:'tab',     label:'вкладку аркуша' },
+    { part:'book',    label:'назву робочої книги' }
+  ];
+  const order = shuffle(TASKS);
+  let k = 0;
+  const prompt = document.getElementById('hotPrompt');
+  const status = document.getElementById('hotStatus');
+  function show(){
+    if(k >= order.length){ prompt.textContent = 'Усі частини знайдено ✓'; status.textContent=''; return; }
+    prompt.innerHTML = `Клацни: <span>${order[k].label}</span>`;
+    status.textContent = `${k} з ${order.length}`;
+  }
+  document.querySelectorAll('#hotSheet .hot').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      if(k >= order.length) return;
+      if(el.dataset.part === order[k].part){
+        el.classList.add('found');
+        setTimeout(()=>el.classList.remove('found'), 700);
+        addNeurons(1);
+        k++;
+        if(k === order.length) addNeurons(2);
+        show();
+      } else {
+        flash(el, 'miss');
+      }
+    });
+  });
+  show();
+})();
+
+/* ---------- 5. SEA BATTLE (cell addresses) ---------- */
+(function(){
+  const table = document.getElementById('seaGrid');
+  const ROWS = 8, NC = 8;
+  const cells = buildGrid(table, NC, ROWS, (kind,i)=>`data-${kind}="${i}"`);
+  const nameBox = document.getElementById('seaName');
+  const formula = document.getElementById('seaFormula');
+  const prompt = document.getElementById('seaPrompt');
+  const status = document.getElementById('seaStatus');
+  // 6 випадкових різних цілей
+  const all = [];
+  for(let r=0;r<ROWS;r++) for(let c=0;c<NC;c++) all.push([r,c]);
+  const targets = shuffle(all).slice(0,6);
+  let k = 0;
+  let activeTd = null;
+  function show(){
+    if(k >= targets.length){ prompt.textContent = 'Флот потоплено ✓'; return; }
+    prompt.innerHTML = `Постріл у комірку <span>${addr(...targets[k])}</span>!`;
+    status.textContent = `Влучань: ${k} з ${targets.length}`;
+  }
+  function light(r,c){
+    table.querySelectorAll('th.lit').forEach(t=>t.classList.remove('lit'));
+    table.querySelector(`th[data-col="${c}"]`).classList.add('lit');
+    table.querySelector(`th[data-row="${r}"]`).classList.add('lit');
+  }
+  cells.forEach((row,r)=>row.forEach((td,c)=>{
+    td.addEventListener('click', ()=>{
+      if(activeTd) activeTd.classList.remove('active');
+      td.classList.add('active'); activeTd = td;
+      nameBox.textContent = addr(r,c);
+      formula.textContent = td.textContent;
+      light(r,c);
+      if(k >= targets.length || td.classList.contains('hit')) return;
+      const [tr,tc] = targets[k];
+      if(r===tr && c===tc){
+        td.classList.add('hit'); td.textContent = '💥';
+        formula.textContent = '💥';
+        addNeurons(1);
+        k++;
+        status.textContent = `Влучив! ${k} з ${targets.length}`;
+        if(k === targets.length){ addNeurons(2); status.textContent = 'Усі цілі знищено ✓'; }
+        setTimeout(show, 600);
+      } else {
+        flash(td, 'miss');
+        status.textContent = `Мимо: це ${addr(r,c)}, а треба ${addr(tr,tc)}`;
+      }
+    });
+  }));
+  show();
+})();
+
+/* ---------- 6. RANGE SELECTION ---------- */
+(function(){
+  const table = document.getElementById('rngGrid');
+  const cells = buildGrid(table, 6, 6);
+  const nameBox = document.getElementById('rngName');
+  const prompt = document.getElementById('rngPrompt');
+  const status = document.getElementById('rngStatus');
+  const TASKS = [ [[1,1],[3,3]], [[0,0],[1,2]], [[2,2],[2,5]], [[0,4],[5,4]] ]; // [[r1,c1],[r2,c2]]
+  let k = 0, anchor = null, busy = false;
+  function norm(a,b){ return [[Math.min(a[0],b[0]),Math.min(a[1],b[1])],[Math.max(a[0],b[0]),Math.max(a[1],b[1])]]; }
+  function rangeName(a,b){ const [p,q]=norm(a,b); return addr(...p)+':'+addr(...q); }
+  function clear(){ table.querySelectorAll('td').forEach(td=>td.classList.remove('anchor','sel','ok')); }
+  function show(){
+    if(k >= TASKS.length){ prompt.textContent = 'Усі діапазони виділено ✓'; return; }
+    prompt.innerHTML = `Виділи діапазон <span>${rangeName(...TASKS[k])}</span>`;
+    status.textContent = `${k} з ${TASKS.length}`;
+  }
+  cells.forEach((row,r)=>row.forEach((td,c)=>{
+    td.addEventListener('click', ()=>{
+      if(busy || k >= TASKS.length) return;
+      if(!anchor){
+        clear();
+        anchor = [r,c];
+        td.classList.add('anchor');
+        nameBox.textContent = addr(r,c);
+        return;
+      }
+      const [p,q] = norm(anchor,[r,c]);
+      for(let i=p[0];i<=q[0];i++) for(let j=p[1];j<=q[1];j++) cells[i][j].classList.add('sel');
+      const got = rangeName(anchor,[r,c]);
+      nameBox.textContent = got;
+      anchor = null;
+      const want = rangeName(...TASKS[k]);
+      busy = true;
+      if(got === want){
+        table.querySelectorAll('td.sel').forEach(t=>t.classList.add('ok'));
+        addNeurons(1);
+        k++;
+        status.textContent = 'Точно ✓';
+        if(k === TASKS.length) addNeurons(2);
+        setTimeout(()=>{ busy=false; clear(); show(); }, 900);
+      } else {
+        status.textContent = `Це діапазон ${got}, а треба ${want}. Спробуй ще раз.`;
+        setTimeout(()=>{ busy=false; clear(); }, 1200);
+      }
+    });
+  }));
+  show();
+})();
+
+makeClassify('notationList', [
+  { text:'Виділено прямокутник: від комірки B2 до комірки D5', opts:['B2:D5','B2;D5','B2-D5'], correct:0 },
+  { text:'Виділено три окремі комірки, які не стоять поруч: A1, C3 і E5', opts:['A1:E5','A1;C3;E5','A1-E5'], correct:1 },
+  { text:'Скільки комірок у діапазоні A1:B3?', opts:['2','4','6'], correct:2 }
+]);
+
+/* ---------- 7. DATA TYPES SORT ---------- */
+makeSortBoard('typePool', {
+  num: document.getElementById('bNum'),
+  pct: document.getElementById('bPct'),
+  cur: document.getElementById('bCur'),
+  date: document.getElementById('bDate'),
+  text: document.getElementById('bText')
+}, [
+  { text:'-37', zone:'num' },
+  { text:'3,14', zone:'num' },
+  { text:'25%', zone:'pct' },
+  { text:'0,5%', zone:'pct' },
+  { text:'100,00 грн', zone:'cur' },
+  { text:'18,76 €', zone:'cur' },
+  { text:'15.09.2025', zone:'date' },
+  { text:'15:57', zone:'date' },
+  { text:'Ручка', zone:'text' },
+  { text:'12 шт.', zone:'text' },
+  { text:'8-А', zone:'text' }
+]);
+
+/* ---------- 8. FORMATTING EMULATOR ---------- */
+(function(){
+  const grid = document.getElementById('fmtGrid');
+  const toolbar = document.getElementById('fmtToolbar');
+  const taskEl = document.getElementById('fmtTask');
+  const status = document.getElementById('fmtStatus');
+  const state = { merge:false, wrap:false, currency:false, percent:false, sep:false };
+
+  const TOOLS = [
+    { id:'wrap',     ic:'↵',   label:'Переносити текст' },
+    { id:'merge',    ic:'⇔',   label:'Об\'єднати та розташувати в центрі' },
+    { id:'currency', ic:'₴',   label:'Грошовий формат' },
+    { id:'percent',  ic:'%',   label:'Відсотковий формат' },
+    { id:'sep',      ic:'000', label:'Формат із роздільниками' },
+    { id:'decUp',    ic:'.00', label:'Збільшити розрядність' },
+    { id:'bold',     ic:'Ж',   label:'Жирний' }
+  ];
+  const TASKS = [
+    { tool:'merge',    cells:['A1','B1','C1','D1','E1'], text:'Назва таблиці в <b>A1</b> вилазить за межі комірки. Треба зробити з <b>A1:E1</b> одну широку комірку з назвою посередині.' },
+    { tool:'wrap',     cells:['B3'], text:'Опис ручки в <b>B3</b> обрізано. Стовпець розширювати не хочемо — нехай опис займе кілька рядків у своїй комірці.' },
+    { tool:'currency', cells:['D3','D4','D5'], text:'Ціни в <b>D3:D5</b> — у гривнях, але з таблиці цього ніяк не видно.' },
+    { tool:'percent',  cells:['E3','E4','E5'], text:'Частка витрат у <b>E3:E5</b> записана як 0,25. Покажи її так, як звикли люди: 25%.' },
+    { tool:'sep',      cells:['C6'], text:'Число в <b>C6</b> важко прочитати з першого погляду: там шість нулів чи сім?' }
+  ];
+  let k = 0;
+
+  function money(n){ return n.toFixed(2).replace('.', ',') + ' ₴'; }
+  function render(){
+    const target = k < TASKS.length ? TASKS[k].cells : [];
+    const t = id => target.includes(id) ? ' target' : '';
+    const pr = [10, 5, 15], sh = [0.25, 0.1, 0.3];
+    const names = ['Ручка','Олівець','Маркер'];
+    const desc = ['Синя, з гумовою накладкою для пальців','Простий','Жовтий'];
+    const qty = [3, 2, 2];
+    let h = '<colgroup><col style="width:28px"><col style="width:20%"><col style="width:24%"><col style="width:17%"><col style="width:18%"><col style="width:17%"></colgroup>';
+    h += '<tr><th></th>' + ['A','B','C','D','E'].map(l=>`<th>${l}</th>`).join('') + '</tr>';
+    // row 1
+    if(state.merge) h += `<tr><th>1</th><td colspan="5" class="merged${t('A1')}">Потреба в канцтоварах на 1 вересня</td></tr>`;
+    else h += `<tr><th>1</th><td class="spill${t('A1')}">Потреба в канцтоварах на 1 вересня</td><td class="${t('B1')}"></td><td class="${t('C1')}"></td><td class="${t('D1')}"></td><td class="${t('E1')}"></td></tr>`;
+    // row 2 — headers
+    h += '<tr><th>2</th>' + ['Товар','Опис','К-сть','Ціна','Частка'].map(v=>`<td class="head">${v}</td>`).join('') + '</tr>';
+    // rows 3–5
+    for(let i=0;i<3;i++){
+      const r = i+3;
+      h += `<tr><th>${r}</th><td>${names[i]}</td>` +
+           `<td class="${state.wrap && i===0 ? 'wrap' : ''}${t('B'+r)}">${desc[i]}</td>` +
+           `<td class="num">${qty[i]}</td>` +
+           `<td class="num${t('D'+r)}">${state.currency ? money(pr[i]) : pr[i]}</td>` +
+           `<td class="num${t('E'+r)}">${state.percent ? Math.round(sh[i]*100)+'%' : String(sh[i]).replace('.', ',')}</td></tr>`;
+    }
+    // row 6
+    h += `<tr><th>6</th><td>На складі</td><td></td><td class="num${t('C6')}">${state.sep ? '1 250 000' : '1250000'}</td><td></td><td></td></tr>`;
+    grid.innerHTML = h;
+    if(k < TASKS.length){ taskEl.innerHTML = `Завдання ${k+1} з ${TASKS.length}. ${TASKS[k].text}`; }
+    else { taskEl.innerHTML = '<b>Таблицю відформатовано ✓</b> Порівняй: дані ті самі, а читати — значно легше.'; }
+  }
+  TOOLS.forEach(tool=>{
+    const b = document.createElement('button');
+    b.className = 'tool-btn';
+    b.innerHTML = `<span class="ic">${tool.ic}</span>${tool.label}`;
+    b.addEventListener('click', ()=>{
+      if(k >= TASKS.length) return;
+      if(tool.id === TASKS[k].tool){
+        state[tool.id] = true;
+        flash(b, 'good');
+        addNeurons(1);
+        k++;
+        status.textContent = k === TASKS.length ? '' : 'Правильно ✓';
+        if(k === TASKS.length) addNeurons(3);
+        render();
+      } else {
+        flash(b, 'wrong');
+        status.textContent = 'Ця кнопка тут не допоможе';
+      }
+    });
+    toolbar.appendChild(b);
+  });
+  render();
+})();
+
+/* ---------- FINAL QUIZ ---------- */
+const questions = [
+  { q: "Чим інформація відрізняється від даних?", opts: ["Інформація — це дані, які впорядкували й опрацювали", "Інформація завжди складається лише з чисел", "Нічим, це одне й те саме"], correct: 0 },
+  { q: "Як називається файл електронної таблиці, у якому може бути кілька аркушів?", opts: ["Робоча книга", "Рядок формул", "Діапазон"], correct: 0 },
+  { q: "Як позначаються стовпці в електронній таблиці?", opts: ["Числами 1, 2, 3…", "Великими англійськими літерами A, B, C…", "Кольорами"], correct: 1 },
+  { q: "Що означає адреса комірки F4?", opts: ["Рядок F, стовпець 4", "Стовпець F, рядок 4", "Четвертий аркуш книги F"], correct: 1 },
+  { q: "Де можна побачити адресу вибраної комірки?", opts: ["У полі Ім'я", "На вкладці аркуша", "У назві файлу"], correct: 0 },
+  { q: "Що означає запис C2:E4?", opts: ["Дві окремі комірки C2 і E4", "Прямокутний діапазон від C2 до E4", "Ділення C2 на E4"], correct: 1 },
+  { q: "У комірку ввели «5 кг». Як таблиця це сприйме?", opts: ["Як число 5", "Як текст", "Як дату"], correct: 1 },
+  { q: "Яка кнопка перетворить 0,25 на 25%?", opts: ["Грошовий формат", "Відсотковий формат", "Переносити текст"], correct: 1 }
+];
+let qi=0, currentAnswered=false;
+const quizQ = document.getElementById('quizQ');
+const quizOptions = document.getElementById('quizOptions');
+const quizProgress = document.getElementById('quizProgress');
+const btnNext = document.getElementById('btnNext');
+const quizBox = document.getElementById('quizBox');
+const completion = document.getElementById('completion');
+const totalNeuronsEl = document.getElementById('totalNeurons');
+
+function renderQuestion(){
+  currentAnswered=false; btnNext.classList.remove('active');
+  const item = questions[qi];
+  quizProgress.textContent = `Запитання ${qi+1} з ${questions.length}`;
+  quizQ.textContent = item.q;
+  quizOptions.innerHTML='';
+  item.opts.forEach((opt,i)=>{
+    const b=document.createElement('button'); b.className='quiz-opt'; b.textContent=opt;
+    b.addEventListener('click', ()=>{
+      if(currentAnswered) return; currentAnswered=true;
+      const all = quizOptions.querySelectorAll('.quiz-opt');
+      all.forEach((ob,oi)=>{ if(oi===item.correct) ob.classList.add('correct'); else if(oi===i) ob.classList.add('wrong'); });
+      if(i===item.correct) addNeurons(2);
+      btnNext.classList.add('active');
+      btnNext.textContent = (qi===questions.length-1) ? 'Завершити' : 'Далі';
+    });
+    quizOptions.appendChild(b);
+  });
+}
+btnNext.addEventListener('click', ()=>{
+  if(!btnNext.classList.contains('active')) return;
+  qi++;
+  if(qi<questions.length){ renderQuestion(); }
+  else {
+    quizBox.style.display='none';
+    completion.classList.add('show');
+    addNeurons(3);
+    totalNeuronsEl.textContent = neurons;
+  }
+});
+renderQuestion();
+</script>
+
+</body>
+</html>

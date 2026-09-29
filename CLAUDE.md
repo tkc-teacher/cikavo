@@ -273,6 +273,7 @@ async function loadProgress(){
 | 8 | Захист цифрових пристроїв та інформації | `8/lesson-device-security/` |
 | 8 | Проблеми сучасних технологій | `8/lesson-tech-problems/` |
 | 8 | Технології та навколишнє середовище | `8/lesson-tech-environment/` |
+| 8 | Збір даних | `8/lesson-data-collection/` |
 | 9 | Життя з розумними пристроями | `9/lesson-smart-classroom/` |
 
 Класи, активовані на головній: 5, 6, 7, 8, 9. Розділ «Лабораторія» (`labs/`) створено, поки без вправ. Фото-заготовки є в `5/lesson-computer-systems/images/`, `7/lesson-os-software/images/` та `8/lesson-tech-problems/images/`.
