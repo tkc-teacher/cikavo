@@ -264,6 +264,7 @@ async function loadProgress(){
 
 | Клас | Урок | Тека |
 |---|---|---|
+| 5 | Як працювати в Google Classroom (вступний, поза календарним планом) | `5/lesson-classroom-intro/` |
 | 5 | З чого складається комп'ютер | `5/lesson-computer-systems/` |
 | 5 | Як пристрої передають повідомлення | `5/lesson-data-transfer/` |
 | 6 | Як працює електронна пошта | `6/lesson-email-basics/` |
