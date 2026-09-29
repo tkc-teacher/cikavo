@@ -267,6 +267,7 @@ async function loadProgress(){
 | 5 | З чого складається комп'ютер | `5/lesson-computer-systems/` |
 | 6 | Як працює електронна пошта | `6/lesson-email-basics/` |
 | 6 | Етикет та безпека листування | `6/lesson-email-safety/` |
+| 6 | Етикет електронного листування (підсумок розділу «Електронна пошта») | `6/lesson-email-etiquette/` |
 | 7 | Персональний цифровий простір | `7/lesson-digital-space/` |
 | 7 | Операційні системи та програмне забезпечення | `7/lesson-os-software/` |
 | 8 | Збереження даних | `8/lesson-data-storage/` |
