@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Як пристрої передають повідомлення — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
+    --purple:#6C5CE7; --purple-dark:#5340c9; --teal:#16A3A0; --coral:#FF6B4A; --yellow:#FFC93C; --pink:#FF5D9E; --blue:#2D9CDB;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+    /* акцентна гама уроку: «сигнал» — синьо-помаранчева */
+    --accent:#1E6FD9; --accent-dark:#1553A6; --accent-light:#E6F0FC; --orange:#FF8A00; --orange-light:#FFF1E0;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} }
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  .container{max-width:800px; margin:0 auto; padding:0 24px;}
+
+  .hud{position:sticky; top:0; z-index:50; background:rgba(246,245,251,.9); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
+  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--orange),var(--accent)); transition:width .3s ease;}
+  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:800px; margin:0 auto;}
+  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
+  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
+  .neuron-counter svg{width:24px;height:24px;}
+  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
+  #neuronCount.pop{transform:scale(1.35);}
+
+  .hero{padding:52px 24px 40px;}
+  .hero-inner{max-width:800px; margin:0 auto; display:flex; align-items:center; gap:30px;}
+  .hero-text{flex:1;}
+  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--orange); margin-bottom:10px;}
+  .hero h1{font-size:32px; line-height:1.18; margin-bottom:12px;}
+  .hero p{color:var(--ink-soft); font-size:16.5px; max-width:62ch; margin-bottom:22px;}
+  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--accent); color:#fff; border:none; padding:12px 22px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
+  .btn-primary:hover{background:var(--accent-dark);}
+  .btn-primary:active{transform:scale(.97);}
+  .btn-primary:disabled{opacity:.4; cursor:default;}
+  .mascot{width:140px; height:140px; flex-shrink:0;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:100px; height:100px;} }
+
+  section.block{padding:38px 0; border-top:1px solid var(--line);}
+  .step-label{font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:600; color:var(--orange); margin-bottom:8px;}
+  .block h2{font-size:22px; margin-bottom:10px;}
+  .block p{max-width:62ch; font-size:16px; margin:0 0 12px;}
+  .block p.soft{color:var(--ink-soft); font-size:15px;}
+  .note{background:#EAF5FC; border-left:4px solid var(--blue); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; color:#2A6B8C; margin:16px 0;}
+  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:22px; margin-top:16px;}
+  .progress-line{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--accent-dark); margin-top:14px; min-height:1.4em;}
+  @keyframes shake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
+  .shake{animation:shake .35s ease;}
+
+  /* MATCHING */
+  .tool-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:14px; border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:16px;}
+  .tool-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:8px 14px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .tool-chip:hover{transform:translateY(-2px);}
+  .tool-chip.selected{border-color:var(--accent); box-shadow:0 0 0 3px rgba(30,111,217,.18);}
+  .tool-chip.placed{display:none;}
+  .func-card{display:flex; align-items:center; gap:12px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; margin-bottom:10px; cursor:pointer; transition:border-color .2s ease, background .2s ease;}
+  .func-card.matched{border-color:var(--yellow); background:#FFFBEE; cursor:default;}
+  .func-text{flex:1; font-size:14.5px;}
+  .func-slot{min-width:120px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:8px 10px;}
+  .func-slot.filled{border-style:solid; border-color:var(--yellow); background:#FFF7E2; color:var(--ink);}
+
+  /* SIGNAL EMULATOR */
+  .tabs{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;}
+  .tab{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:8px 16px; cursor:pointer; transition:border-color .15s ease, background .15s ease;}
+  .tab.active{border-color:var(--accent); background:var(--accent-light); color:var(--accent-dark);}
+  .tab.tried::after{content:' ✓'; color:#3FAE58;}
+  .sig-stage{display:flex; align-items:center; gap:12px; padding:22px 6px;}
+  .dev{font-size:40px; line-height:1; flex-shrink:0;}
+  .sig-line{position:relative; flex:1; height:14px; border-radius:7px; transition:background .3s ease;}
+  .sig-line.wire{background:repeating-linear-gradient(90deg,#C77B3A 0 10px,#9E5B26 10px 20px);}
+  .sig-line.fiber{background:#DDF4F7; border:2px solid #9FD9E0;}
+  .sig-line.radio{background:transparent; border-top:2px dashed #C9C6E3; height:0; border-radius:0;}
+  .pulse{position:absolute; top:50%; left:0; transform:translate(-50%,-50%); animation:travel 1.6s linear forwards; pointer-events:none;}
+  @keyframes travel{from{left:0%;} to{left:100%;}}
+  .pulse.wire{width:12px; height:12px; border-radius:50%; background:var(--yellow); box-shadow:0 0 8px 2px rgba(255,201,60,.9);}
+  .pulse.fiber{width:14px; height:14px; border-radius:50%; background:#fff; box-shadow:0 0 12px 5px rgba(80,220,255,.95);}
+  .pulse.radio{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:22px; color:var(--accent); top:-2px;}
+  .sig-info{display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap;}
+  .sig-status{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px; color:var(--ink-soft);}
+  .sig-status b{color:var(--accent-dark);}
+
+  /* CLASSIFY */
+  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px; margin:10px 0;}
+  .classify-card p.q{font-weight:700; margin:0 0 10px; font-size:15px;}
+  .choice-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; padding:8px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .choice-btn:hover{border-color:var(--accent);}
+  .choice-btn.correct{background:#E4F8E6; border-color:#3FAE58; color:#256B36;}
+  .choice-btn.wrong{background:#FDE6E1; border-color:var(--coral); color:#B8412A;}
+  .choice-feedback{margin-top:8px; font-size:13.5px; color:var(--ink-soft); min-height:1.2em;}
+
+  /* BINARY ENCODER */
+  .enc-input{width:100%; font-family:'Baloo 2',sans-serif; font-size:22px; font-weight:600; padding:10px 14px; border:2px solid var(--line); border-radius:var(--radius-s); outline:none; letter-spacing:.05em;}
+  .enc-input:focus{border-color:var(--accent);}
+  .bit-tiles{display:flex; flex-wrap:wrap; gap:8px; margin:14px 0; min-height:40px;}
+  .bit-tile{background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-s); padding:6px 10px; text-align:center;}
+  .bit-tile .ch{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px;}
+  .bit-tile .bits{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:11.5px; color:var(--ink-soft); word-break:break-all; max-width:150px;}
+  .bit-tile .bits .on{color:var(--accent-dark); font-weight:700;}
+  .enc-stage{display:flex; align-items:center; gap:14px; justify-content:space-between; background:#1B1B3A; border-radius:var(--radius-m); padding:18px; color:#fff; margin-top:6px;}
+  .lamp{width:46px; height:46px; border-radius:50%; background:#3A3960; flex-shrink:0; transition:background .04s linear, box-shadow .04s linear;}
+  .lamp.on{background:#FFE27A; box-shadow:0 0 22px 8px rgba(255,226,122,.75);}
+  .enc-bit{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:28px; font-weight:700; width:30px; text-align:center; color:#FFE27A;}
+  .enc-recv{flex:1; min-height:44px; background:#2A2950; border-radius:var(--radius-s); padding:8px 14px; font-family:'Baloo 2',sans-serif; font-size:24px; font-weight:700; letter-spacing:.05em;}
+  .enc-recv .lbl{display:block; font-family:'Nunito Sans',sans-serif; font-size:11px; font-weight:600; color:#A9A7D6; letter-spacing:0;}
+
+  /* FLIP GALLERY */
+  .flip-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:12px;}
+  .flip-card{perspective:900px; height:165px; cursor:pointer;}
+  .flip-inner{position:relative; width:100%; height:100%; transition:transform .5s ease; transform-style:preserve-3d;}
+  .flip-inner.flipped{transform:rotateY(180deg);}
+  .flip-front,.flip-back{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:var(--radius-m); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:12px; text-align:center;}
+  .flip-front{background:var(--surface); border:2px solid var(--line);}
+  .flip-front .ico{font-size:40px; line-height:1; margin-bottom:8px;}
+  .flip-front .nm{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; line-height:1.2;}
+  .flip-front .tag{font-size:11.5px; margin-top:6px; padding:1px 9px; border-radius:999px; background:var(--bg); color:var(--ink-soft);}
+  .flip-back{background:var(--accent-light); border:2px solid var(--accent); font-size:13.5px; transform:rotateY(180deg); /* без цього рядка — баг */}
+  .flip-back .sig{margin-top:8px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12.5px; color:var(--accent-dark);}
+  .flip-card.seen .flip-front{border-color:var(--accent);}
+
+  /* DEVICE CARDS */
+  .dev-cards{display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:10px; margin:6px 0 4px;}
+  .dev-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px; text-align:center;}
+  .dev-card .ico{font-size:30px; line-height:1;}
+  .dev-card .nm{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14.5px; margin:4px 0 2px;}
+  .dev-card .ds{font-size:12.5px; color:var(--ink-soft); line-height:1.4;}
+
+  /* NETWORK BUILDER */
+  .dnd-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:12px; border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:18px; min-height:52px;}
+  .dnd-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:7px 14px; cursor:grab; user-select:none;}
+  .dnd-chip.selected{border-color:var(--accent); box-shadow:0 0 0 3px rgba(30,111,217,.18);}
+  .dnd-chip.dragging{opacity:.4;}
+  .net{display:flex; flex-direction:column; align-items:center;}
+  .node{background:var(--bg); border:2px solid var(--line); border-radius:var(--radius-m); padding:8px 14px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; text-align:center;}
+  .node .big{font-size:26px; display:block; line-height:1.1;}
+  .nslot{width:210px; max-width:100%; min-height:62px; border:2px dashed #B9C9E6; border-radius:var(--radius-m); padding:8px 10px; text-align:center; background:var(--surface); cursor:pointer; transition:border-color .15s ease, background .15s ease;}
+  .nslot .hint{font-size:12px; color:var(--ink-soft); line-height:1.35;}
+  .nslot .got{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:var(--accent-dark);}
+  .nslot.over{border-color:var(--accent); background:var(--accent-light);}
+  .nslot.filled{border-style:solid; border-color:var(--accent); background:var(--accent-light); cursor:default;}
+  .nslot.bad{border-color:var(--coral); background:#FDE6E1;}
+  .wire-v{width:4px; height:24px; background:var(--line); position:relative; overflow:hidden; margin:0 auto;}
+  .air{font-size:20px; height:30px; line-height:30px; text-align:center; opacity:.35;}
+  .net-branches{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; width:100%; margin-top:0;}
+  .branch{display:flex; flex-direction:column; align-items:center;}
+  .branch .wire-top{width:4px; height:24px; background:var(--line); position:relative; overflow:hidden;}
+  .net-bus{height:4px; background:var(--line); width:67%; position:relative; overflow:hidden;}
+  @media (max-width:640px){ .net-branches{grid-template-columns:1fr;} .net-bus{display:none;} }
+  .net.live .wire-v,.net.live .wire-top,.net.live .net-bus{background:#BFD6F6;}
+  .net.live .wire-v::after,.net.live .wire-top::after{content:''; position:absolute; left:-2px; width:8px; height:8px; border-radius:50%; background:var(--accent); animation:down .8s linear infinite;}
+  .net.live .net-bus::after{content:''; position:absolute; top:-2px; width:8px; height:8px; border-radius:50%; background:var(--accent); animation:across 1.2s linear infinite;}
+  @keyframes down{from{top:-8px;} to{top:100%;}}
+  @keyframes across{from{left:-8px;} to{left:100%;}}
+  .net.live .air{opacity:1; animation:blink 1s ease infinite;}
+  @keyframes blink{50%{opacity:.3;}}
+  .net-controls{display:flex; align-items:center; gap:14px; justify-content:center; margin-top:18px; flex-wrap:wrap;}
+
+  /* RACE */
+  .predict{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;}
+  .lane{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+  .lane .ln{width:120px; flex-shrink:0; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px;}
+  .track{flex:1; height:40px; background:var(--bg); border:1.5px solid var(--line); border-radius:999px; position:relative;}
+  .track::after{content:'🏁'; position:absolute; right:8px; top:50%; transform:translateY(-50%); font-size:18px;}
+  .runner{position:absolute; left:4px; top:50%; transform:translateY(-50%); font-size:24px; transition-property:left; transition-timing-function:linear;}
+  .lane .time{width:92px; flex-shrink:0; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13.5px; color:var(--accent-dark); text-align:right;}
+  @media (max-width:640px){ .lane .ln{width:84px; font-size:12.5px;} .lane .time{width:70px; font-size:12px;} }
+
+  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:26px 24px; margin-top:16px;}
+  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:13px; color:var(--ink-soft); margin-bottom:10px;}
+  .quiz-q{font-size:17px; font-weight:700; margin-bottom:16px;}
+  .quiz-options{display:flex; flex-direction:column; gap:10px;}
+  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:15px; font-weight:600; padding:12px 15px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .quiz-opt:hover{border-color:var(--accent);}
+  .quiz-opt.correct{background:#E4F8E6; border-color:#3FAE58;}
+  .quiz-opt.wrong{background:#FDE6E1; border-color:var(--coral);}
+  .quiz-nav{display:flex; justify-content:flex-end; margin-top:18px;}
+  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:11px 22px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
+  .btn-next.active{opacity:1; pointer-events:auto;}
+
+  .completion{display:none; text-align:center; padding:20px 10px 10px;}
+  .completion.show{display:block;}
+  .badge{width:90px; height:90px; margin:0 auto 16px;}
+  .completion h3{font-size:22px; margin-bottom:10px;}
+  .completion p{color:var(--ink-soft); max-width:50ch; margin:0 auto 18px; font-size:15px;}
+  .completion .total{font-family:'Baloo 2',sans-serif; font-size:30px; color:var(--purple-dark);}
+
+  footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
+  <div class="hud-row">
+    <span class="hud-title">5 клас · Передавання даних</span>
+    <div class="neuron-counter">
+      <svg viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
+        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#E0A800" opacity="0.6"/>
+      </svg>
+      <span id="neuronCount">0</span>
+    </div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Інформаційні процеси</div>
+      <h1>Як пристрої передають повідомлення</h1>
+      <p>Як фото з телефона потрапляє на комп'ютер, а твоє «Привіт» — другові? Запускай сигнали, шифруй слова й будуй шкільну мережу!</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 160 160" fill="none">
+      <circle cx="80" cy="84" r="62" fill="#E6F0FC"/>
+      <path d="M52 40 Q40 52 52 64" stroke="#FF8A00" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M44 32 Q26 52 44 72" stroke="#FF8A00" stroke-width="4" fill="none" stroke-linecap="round" opacity=".55"/>
+      <path d="M108 40 Q120 52 108 64" stroke="#FF8A00" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <path d="M116 32 Q134 52 116 72" stroke="#FF8A00" stroke-width="4" fill="none" stroke-linecap="round" opacity=".55"/>
+      <rect x="60" y="36" width="6" height="42" rx="3" fill="#1553A6"/>
+      <rect x="94" y="36" width="6" height="42" rx="3" fill="#1553A6"/>
+      <circle cx="63" cy="36" r="5" fill="#FF8A00"/><circle cx="97" cy="36" r="5" fill="#FF8A00"/>
+      <rect x="36" y="76" width="88" height="46" rx="12" fill="#1E6FD9"/>
+      <circle cx="64" cy="96" r="6" fill="#fff"/><circle cx="96" cy="96" r="6" fill="#fff"/>
+      <circle cx="65" cy="97" r="3" fill="#1B1B3A"/><circle cx="97" cy="97" r="3" fill="#1B1B3A"/>
+      <path d="M72 108 Q80 114 88 108" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="48" cy="112" r="3" fill="#7CF29A"/><circle cx="112" cy="112" r="3" fill="#FFC93C"/>
+      <rect x="50" y="122" width="10" height="8" rx="2" fill="#1553A6"/><rect x="100" y="122" width="10" height="8" rx="2" fill="#1553A6"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap" style="border-top:none; padding-top:0;">
+    <div class="step-label">Повторення · Інформаційні процеси</div>
+    <h2>Що відбувається з інформацією?</h2>
+    <p class="soft">Обери процес, потім клацни ситуацію, яка йому відповідає.</p>
+    <div class="exercise">
+      <div class="tool-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Сигнали</div>
+    <h2>Чим «біжить» повідомлення?</h2>
+    <p>Дані мчать від пристрою до пристрою у вигляді <b>сигналів</b>. Шлях, яким вони біжать, називають <b>каналом зв'язку</b>.</p>
+    <div class="exercise">
+      <div class="tabs" id="sigTabs">
+        <button class="tab active" data-ch="wire">🔌 Мідний дріт</button>
+        <button class="tab" data-ch="fiber">💡 Оптоволокно</button>
+        <button class="tab" data-ch="radio">📡 Без дротів</button>
+      </div>
+      <div class="sig-stage">
+        <div class="dev">💻</div>
+        <div class="sig-line wire" id="sigLine"></div>
+        <div class="dev">🖥️</div>
+      </div>
+      <div class="sig-info">
+        <div class="sig-status" id="sigStatus">Обери канал і натисни «Надіслати»</div>
+        <button class="btn-primary" id="sigSend">▶ Надіслати</button>
+      </div>
+    </div>
+
+    <p class="soft" style="margin-top:22px;">А тепер без підказок: який сигнал біжить у кожному випадку?</p>
+    <div id="sigQuiz"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Шифратор</div>
+    <h2>Мова 0 і 1</h2>
+    <p>Будь-яке повідомлення пристрій перетворює на <b>двійковий код</b> — ланцюжок нулів і одиниць. «1» — є сигнал, «0» — немає.</p>
+    <p class="soft">Напиши коротке слово й передай його «лампочкою».</p>
+    <div class="exercise">
+      <input class="enc-input" id="encInput" maxlength="6" value="Привіт" autocomplete="off">
+      <div class="bit-tiles" id="bitTiles"></div>
+      <div class="enc-stage">
+        <div class="lamp" id="lamp"></div>
+        <div class="enc-bit" id="encBit"></div>
+        <div class="enc-recv"><span class="lbl">Отримувач розшифрував:</span><span id="encRecv"></span></div>
+      </div>
+      <div class="progress-line"><button class="btn-primary" id="encSend">💡 Передати</button></div>
+    </div>
+    <div class="note">Кожна українська літера — це 16 нулів і одиниць, а латинська — лише 8.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Канали зв'язку</div>
+    <h2>Дротом чи повітрям</h2>
+    <p class="soft">Переверни кожну картку.</p>
+    <div class="exercise">
+      <div class="flip-grid" id="flipGrid"></div>
+      <div class="progress-line" id="flipProgress">Переглянуто: 0 з 7</div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Обери канал</div>
+    <h2>Що тут спрацює?</h2>
+    <div id="chanQuiz"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Мережеві пристрої</div>
+    <h2>Збери мережу школи</h2>
+    <p>Щоб дані дійшли куди треба, потрібні особливі пристрої.</p>
+    <div class="dev-cards">
+      <div class="dev-card"><div class="ico">📟</div><div class="nm">Модем</div><div class="ds">«Перекладач» між лінією провайдера й комп'ютерами</div></div>
+      <div class="dev-card"><div class="ico">📡</div><div class="nm">Роутер</div><div class="ds">«Диспетчер»: вирішує, куди відправити дані, часто роздає Wi-Fi</div></div>
+      <div class="dev-card"><div class="ico">🔀</div><div class="nm">Комутатор</div><div class="ds">«Подовжувач» на багато мережевих кабелів</div></div>
+      <div class="dev-card"><div class="ico">🧩</div><div class="nm">Мережева карта</div><div class="ds">Плата всередині комп'ютера з гніздом для кабелю</div></div>
+      <div class="dev-card"><div class="ico">📶</div><div class="nm">Wi-Fi-адаптер</div><div class="ds">Антена для комп'ютера, щоб ловити бездротову мережу</div></div>
+    </div>
+    <p class="soft" style="margin-top:16px;">Перетягни пристрої на місця (або клацни пристрій, а потім місце). Потім увімкни мережу!</p>
+    <div class="exercise">
+      <div class="dnd-pool" id="netPool"></div>
+      <div class="net" id="net">
+        <div class="node"><span class="big">🌐</span>Кабель провайдера</div>
+        <div class="wire-v"></div>
+        <div class="nslot" data-accept="Модем"><div class="hint">Приймає сигнал із лінії провайдера й перетворює його для комп'ютерів</div></div>
+        <div class="wire-v"></div>
+        <div class="nslot" data-accept="Роутер"><div class="hint">Розподіляє дані між усіма пристроями школи</div></div>
+        <div class="wire-v"></div>
+        <div class="net-bus"></div>
+        <div class="net-branches">
+          <div class="branch">
+            <div class="air">📶</div>
+            <div class="node"><span class="big">📱</span>Телефон учителя</div>
+          </div>
+          <div class="branch">
+            <div class="wire-top"></div>
+            <div class="nslot" data-accept="Комутатор"><div class="hint">Сюди сходяться кабелі від усіх ПК класу</div></div>
+            <div class="wire-v"></div>
+            <div class="node"><span class="big">🖥️🖥️🖥️</span>Комп'ютерний клас</div>
+            <div class="wire-v"></div>
+            <div class="nslot" data-accept="Мережева карта"><div class="hint">Деталь у кожному ПК, куди вставляють кабель</div></div>
+          </div>
+          <div class="branch">
+            <div class="air">📶</div>
+            <div class="nslot" data-accept="Wi-Fi-адаптер"><div class="hint">Без нього старий ПК не бачить бездротової мережі</div></div>
+            <div class="wire-v"></div>
+            <div class="node"><span class="big">🖥️</span>Старий ПК у бібліотеці</div>
+          </div>
+        </div>
+      </div>
+      <div class="net-controls">
+        <button class="btn-primary" id="netOn" disabled>⚡ Увімкнути мережу</button>
+        <span class="sig-status" id="netStatus">Встановлено: 0 з 5</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Гонка каналів</div>
+    <h2>Хто швидше передасть мультфільм?</h2>
+    <p class="soft">Файл мультфільму важить 1 ГБ. Зроби ставку, а потім дивись гонку!</p>
+    <div class="exercise">
+      <div class="predict" id="predict">
+        <button class="choice-btn" data-lane="bt">🎧 Bluetooth</button>
+        <button class="choice-btn" data-lane="wifi">📶 Wi-Fi</button>
+        <button class="choice-btn" data-lane="fiber">💡 Оптоволокно</button>
+      </div>
+      <div class="lane"><div class="ln">🎧 Bluetooth</div><div class="track"><span class="runner" id="run-bt">🎬</span></div><div class="time" id="time-bt"></div></div>
+      <div class="lane"><div class="ln">📶 Wi-Fi</div><div class="track"><span class="runner" id="run-wifi">🎬</span></div><div class="time" id="time-wifi"></div></div>
+      <div class="lane"><div class="ln">💡 Оптоволокно</div><div class="track"><span class="runner" id="run-fiber">🎬</span></div><div class="time" id="time-fiber"></div></div>
+      <div class="choice-feedback" id="raceFeedback" style="text-align:center; font-weight:700;">Спершу обери, хто переможе</div>
+    </div>
+    <div class="note">Час приблизний — він залежить від конкретних пристроїв. Але оптоволокно майже завжди найшвидше, а Bluetooth — для дрібниць поруч.</div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div class="quiz-box" id="quizBox">
+      <div class="quiz-progress" id="quizProgress">Запитання 1 з 8</div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
+    </div>
+    <div class="completion" id="completion">
+      <svg class="badge" viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#6C5CE7"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#6C5CE7"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#6C5CE7"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#6C5CE7"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#6C5CE7"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#6C5CE7"/>
+        <circle cx="12" cy="12" r="4.4" fill="#6C5CE7"/><circle cx="12" cy="12" r="1.6" fill="#3F2FB0" opacity="0.6"/>
+      </svg>
+      <h3>Урок пройдено!</h3>
+      <p>Ти запускав сигнали різними каналами, шифрував слова нулями й одиницями, зібрав мережу школи й дізнався, який канал найшвидший.</p>
+      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Урок · «Цифрові пристрої для передачі повідомлень» · 5 клас</footer>
+
+<script>
+const STORAGE_KEY = "lesson5-data-transfer-neurons";
+let neurons = 0;
+const neuronEl = document.getElementById('neuronCount');
+const hudFill = document.getElementById('hudFill');
+
+function addNeurons(n){
+  neurons += n;
+  neuronEl.textContent = neurons;
+  neuronEl.classList.add('pop'); setTimeout(()=>neuronEl.classList.remove('pop'), 250);
+  saveProgress();
+}
+async function saveProgress(){
+  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
+}
+async function loadProgress(){
+  try{
+    const res = await window.storage?.get(STORAGE_KEY, false);
+    if(res?.value){ const d = JSON.parse(res.value); if(typeof d.neurons==='number'){ neurons=d.neurons; neuronEl.textContent=neurons; } }
+  }catch(e){}
+}
+loadProgress();
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
+});
+
+const shuffle = arr => [...arr].sort(()=>Math.random()-0.5);
+function shakeEl(el){ el.classList.add('shake'); setTimeout(()=>el.classList.remove('shake'), 350); }
+
+/* ---------- MATCHING ---------- */
+function makeMatching(poolId, listId, items){
+  const pool = document.getElementById(poolId);
+  const list = document.getElementById(listId);
+  let selected = null, matched = 0;
+  shuffle(items).forEach(t=>{
+    const chip = document.createElement('div');
+    chip.className = 'tool-chip';
+    chip.textContent = t.name;
+    chip.addEventListener('click', ()=>{
+      pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = t.name;
+    });
+    pool.appendChild(chip);
+  });
+  shuffle(items).forEach(t=>{
+    const card = document.createElement('div');
+    card.className = 'func-card';
+    card.innerHTML = `<div class="func-text">${t.func}</div><div class="func-slot">?</div>`;
+    card.addEventListener('click', ()=>{
+      if(card.classList.contains('matched') || !selected) return;
+      if(selected === t.name){
+        const slot = card.querySelector('.func-slot');
+        slot.textContent = selected; slot.classList.add('filled');
+        card.classList.add('matched');
+        [...pool.children].find(c=>c.textContent===selected)?.classList.add('placed');
+        selected = null;
+        addNeurons(1);
+        if(++matched === items.length) addNeurons(2);
+      } else shakeEl(card);
+    });
+    list.appendChild(card);
+  });
+}
+
+makeMatching('recapPool', 'recapList', [
+  { name:'Отримання', func:'🔊 Слухаєш оголошення по шкільному гучномовцю' },
+  { name:'Опрацювання', func:'🧮 Калькулятор рахує 25 × 4' },
+  { name:'Зберігання', func:'🖼️ Фото з екскурсії лежить у галереї телефону' },
+  { name:'Передавання', func:'🎙️ Надсилаєш другові голосове повідомлення' }
+]);
+
+/* ---------- CLASSIFY ---------- */
+function makeChoice(containerId, items){
+  const list = document.getElementById(containerId);
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">${item.opts.map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i === item.correct){ btn.classList.add('correct'); fb.textContent = 'Правильно ✓' + (item.why ? ' ' + item.why : ''); answered = true; addNeurons(1); }
+        else { btn.classList.add('wrong'); fb.textContent = 'Спробуй ще раз'; }
+      });
+    });
+  });
+}
+
+/* ---------- SIGNAL EMULATOR ---------- */
+(function(){
+  const info = {
+    wire:  { cls:'wire',  text:'Мідним дротом біжать <b>електричні імпульси</b> ⚡' },
+    fiber: { cls:'fiber', text:'Скляною ниткою оптоволокна мчать <b>спалахи світла</b> 💡' },
+    radio: { cls:'radio', text:'Повітрям летять <b>радіохвилі</b> — так працюють Wi-Fi, Bluetooth, мобільний зв\'язок 📡' }
+  };
+  const line = document.getElementById('sigLine');
+  const status = document.getElementById('sigStatus');
+  const sendBtn = document.getElementById('sigSend');
+  const tabs = document.querySelectorAll('#sigTabs .tab');
+  let ch = 'wire', busy = false;
+  const tried = new Set();
+  tabs.forEach(t=>t.addEventListener('click', ()=>{
+    if(busy) return;
+    tabs.forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    ch = t.dataset.ch;
+    line.className = 'sig-line ' + info[ch].cls;
+    status.textContent = 'Натисни «Надіслати»';
+  }));
+  sendBtn.addEventListener('click', ()=>{
+    if(busy) return;
+    busy = true; sendBtn.disabled = true;
+    status.innerHTML = info[ch].text;
+    for(let i=0;i<6;i++){
+      setTimeout(()=>{
+        const p = document.createElement('span');
+        p.className = 'pulse ' + info[ch].cls;
+        if(ch==='radio') p.textContent = ')))';
+        line.appendChild(p);
+        p.addEventListener('animationend', ()=>p.remove());
+      }, i*220);
+    }
+    setTimeout(()=>{
+      busy = false; sendBtn.disabled = false;
+      if(!tried.has(ch)){
+        tried.add(ch);
+        document.querySelector(`#sigTabs .tab[data-ch="${ch}"]`).classList.add('tried');
+        addNeurons(1);
+        if(tried.size === 3) addNeurons(2);
+      }
+    }, 6*220 + 1600);
+  });
+})();
+
+const SIG = ['⚡ Електричні імпульси','💡 Спалахи світла','📡 Радіохвилі'];
+makeChoice('sigQuiz', [
+  { text:'🎧 Бездротові навушники грають музику з телефона', opts:SIG, correct:2 },
+  { text:'🔌 Кабель із мідних дротиків, скручених попарно, з\'єднує ПК з роутером', opts:SIG, correct:0 },
+  { text:'🧵 Кабель із тонкою скляною ниткою всередині веде інтернет у будинок', opts:SIG, correct:1 },
+  { text:'📱 Смартфон дзвонить через вежу мобільного зв\'язку', opts:SIG, correct:2 },
+  { text:'📺 Товстий «телевізійний» кабель від антени до телевізора', opts:SIG, correct:0 }
+]);
+
+/* ---------- BINARY ENCODER ---------- */
+(function(){
+  const input = document.getElementById('encInput');
+  const tiles = document.getElementById('bitTiles');
+  const lamp = document.getElementById('lamp');
+  const bitEl = document.getElementById('encBit');
+  const recv = document.getElementById('encRecv');
+  const btn = document.getElementById('encSend');
+  const enc = new TextEncoder();
+  let rewarded = false, busy = false;
+
+  function codeOf(ch){ return [...enc.encode(ch)].map(b=>b.toString(2).padStart(8,'0')).join(''); }
+  function render(){
+    tiles.innerHTML = '';
+    [...input.value].forEach(ch=>{
+      const bits = codeOf(ch);
+      const t = document.createElement('div');
+      t.className = 'bit-tile';
+      t.innerHTML = `<div class="ch">${ch === ' ' ? '␣' : ch}</div><div class="bits">${[...bits].map(b=>b==='1'?'<span class="on">1</span>':'0').join('')}</div>`;
+      tiles.appendChild(t);
+    });
+  }
+  input.addEventListener('input', ()=>{ if(!busy){ render(); recv.textContent=''; } });
+  render();
+
+  btn.addEventListener('click', ()=>{
+    const chars = [...input.value];
+    if(busy || !chars.length) return;
+    busy = true; btn.disabled = true; input.disabled = true;
+    recv.textContent = '';
+    const seq = [];
+    chars.forEach((ch,ci)=>{ [...codeOf(ch)].forEach((b,bi,arr)=>seq.push({ b, ch, last: bi===arr.length-1, ci })); });
+    let i = 0;
+    const tileEls = tiles.children;
+    const timer = setInterval(()=>{
+      if(i >= seq.length){
+        clearInterval(timer);
+        lamp.classList.remove('on'); bitEl.textContent = '';
+        busy = false; btn.disabled = false; input.disabled = false;
+        [...tileEls].forEach(t=>t.style.borderColor='');
+        if(!rewarded){ rewarded = true; addNeurons(2); }
+        return;
+      }
+      const s = seq[i];
+      [...tileEls].forEach((t,ti)=>t.style.borderColor = ti===s.ci ? 'var(--accent)' : '');
+      lamp.classList.toggle('on', s.b === '1');
+      bitEl.textContent = s.b;
+      if(s.last) recv.textContent += s.ch;
+      i++;
+    }, 70);
+  });
+})();
+
+/* ---------- FLIP GALLERY ---------- */
+(function(){
+  const cards = [
+    { ico:'🔌', nm:'Вита пара', tag:'дріт', back:'Пари мідних дротиків, скручені між собою. Нею під\'єднують комп\'ютери до мережі.', sig:'⚡ електричні імпульси' },
+    { ico:'📺', nm:'Коаксіальний кабель', tag:'дріт', back:'Товстий кабель, яким раніше під\'єднували антену до телевізора.', sig:'⚡ електричні імпульси' },
+    { ico:'🧵', nm:'Оптоволокно', tag:'дріт', back:'Тонесенька скляна нитка в оболонці. Найшвидший канал!', sig:'💡 спалахи світла' },
+    { ico:'📶', nm:'Wi-Fi', tag:'без дротів', back:'Бездротовий інтернет удома, у школі, у кав\'ярні. До однієї точки під\'єднується багато пристроїв.', sig:'📡 радіохвилі' },
+    { ico:'🎧', nm:'Bluetooth', tag:'без дротів', back:'Зв\'язок на кілька метрів: навушники, колонка, смарт-годинник.', sig:'📡 радіохвилі' },
+    { ico:'🗼', nm:'Мобільний зв\'язок', tag:'без дротів', back:'Вежі-антени по всьому місту передають дзвінки й мобільний інтернет.', sig:'📡 радіохвилі' },
+    { ico:'🛰️', nm:'Супутниковий зв\'язок', tag:'без дротів', back:'Сигнал летить через супутник у космосі — працює навіть в океані чи в горах.', sig:'📡 радіохвилі' }
+  ];
+  const grid = document.getElementById('flipGrid');
+  const progress = document.getElementById('flipProgress');
+  const seen = new Set();
+  cards.forEach((c,i)=>{
+    const el = document.createElement('div');
+    el.className = 'flip-card';
+    el.innerHTML = `<div class="flip-inner">
+        <div class="flip-front"><div class="ico">${c.ico}</div><div class="nm">${c.nm}</div><div class="tag">${c.tag}</div></div>
+        <div class="flip-back">${c.back}<div class="sig">${c.sig}</div></div>
+      </div>`;
+    el.addEventListener('click', ()=>{
+      el.querySelector('.flip-inner').classList.toggle('flipped');
+      if(!seen.has(i)){
+        seen.add(i); el.classList.add('seen');
+        progress.textContent = `Переглянуто: ${seen.size} з ${cards.length}`;
+        if(seen.size === cards.length){ progress.textContent = 'Усі канали переглянуто ✓'; addNeurons(2); }
+      }
+    });
+    grid.appendChild(el);
+  });
+})();
+
+/* ---------- CHOOSE A CHANNEL ---------- */
+const CH = ['🎧 Bluetooth','📶 Wi-Fi','🗼 Мобільний зв\'язок','🛰️ Супутник'];
+makeChoice('chanQuiz', [
+  { text:'⌚ Смарт-годинник показує повідомлення з телефона, що лежить у кишені', opts:CH, correct:0 },
+  { text:'🏠 Уся родина під\'єднує до домашнього інтернету телефони, планшет і телевізор', opts:CH, correct:1 },
+  { text:'👵 Бабуся з іншого міста дзвонить тобі на смартфон', opts:CH, correct:2 },
+  { text:'🐧 Полярники в Антарктиді, де немає ні веж, ні кабелів, виходять в інтернет', opts:CH, correct:3 },
+  { text:'🔊 Колонка на пікніку грає пісні з телефона', opts:CH, correct:0 }
+]);
+
+/* ---------- NETWORK BUILDER ---------- */
+(function(){
+  const names = ['Модем','Роутер','Комутатор','Мережева карта','Wi-Fi-адаптер'];
+  const pool = document.getElementById('netPool');
+  const slots = document.querySelectorAll('#net .nslot');
+  const onBtn = document.getElementById('netOn');
+  const status = document.getElementById('netStatus');
+  let selected = null, filled = 0;
+
+  shuffle(names).forEach(n=>{
+    const el = document.createElement('div');
+    el.className = 'dnd-chip';
+    el.textContent = n;
+    el.draggable = true;
+    el.addEventListener('dragstart', e=>{ selected = el; el.classList.add('dragging'); e.dataTransfer.setData('text/plain', n); });
+    el.addEventListener('dragend', ()=>el.classList.remove('dragging'));
+    el.addEventListener('click', ()=>{
+      pool.querySelectorAll('.dnd-chip').forEach(x=>x.classList.remove('selected'));
+      el.classList.add('selected');
+      selected = el;
+    });
+    pool.appendChild(el);
+  });
+
+  function place(slot){
+    if(!selected || slot.classList.contains('filled')) return;
+    if(selected.textContent === slot.dataset.accept){
+      slot.classList.add('filled');
+      slot.insertAdjacentHTML('afterbegin', `<div class="got">${selected.textContent}</div>`);
+      selected.remove(); selected = null;
+      addNeurons(1);
+      filled++;
+      status.textContent = `Встановлено: ${filled} з ${slots.length}`;
+      if(filled === slots.length){ onBtn.disabled = false; status.textContent = 'Усе на місці — вмикай!'; }
+    } else {
+      slot.classList.add('bad');
+      setTimeout(()=>slot.classList.remove('bad'), 450);
+    }
+  }
+  slots.forEach(slot=>{
+    slot.addEventListener('dragover', e=>{ e.preventDefault(); slot.classList.add('over'); });
+    slot.addEventListener('dragleave', ()=>slot.classList.remove('over'));
+    slot.addEventListener('drop', e=>{ e.preventDefault(); slot.classList.remove('over'); place(slot); });
+    slot.addEventListener('click', ()=>place(slot));
+  });
+  onBtn.addEventListener('click', ()=>{
+    document.getElementById('net').classList.add('live');
+    onBtn.disabled = true;
+    onBtn.textContent = '✅ Мережа працює';
+    status.textContent = 'Дані побігли до кожного пристрою!';
+    addNeurons(3);
+  }, { once:true });
+})();
+
+/* ---------- RACE ---------- */
+(function(){
+  const lanes = {
+    fiber: { dur:1.5, time:'≈ 8 секунд' },
+    wifi:  { dur:4,   time:'≈ 1,5 хвилини' },
+    bt:    { dur:10,  time:'понад 1 годину' }
+  };
+  const fb = document.getElementById('raceFeedback');
+  const btns = document.querySelectorAll('#predict .choice-btn');
+  let running = false, rewarded = false;
+  btns.forEach(b=>b.addEventListener('click', ()=>{
+    if(running) return;
+    running = true;
+    btns.forEach(x=>x.classList.remove('correct','wrong'));
+    const bet = b.dataset.lane;
+    fb.textContent = 'Старт! 🏁';
+    Object.keys(lanes).forEach(k=>{
+      const r = document.getElementById('run-'+k);
+      document.getElementById('time-'+k).textContent = '';
+      r.style.transitionDuration = '0s';
+      r.style.left = '4px';
+    });
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      Object.entries(lanes).forEach(([k,l])=>{
+        const r = document.getElementById('run-'+k);
+        r.style.transitionDuration = l.dur + 's';
+        r.style.left = 'calc(100% - 64px)';
+        setTimeout(()=>{ document.getElementById('time-'+k).textContent = l.time; }, l.dur*1000);
+      });
+    }));
+    setTimeout(()=>{
+      if(bet === 'fiber'){
+        b.classList.add('correct');
+        fb.textContent = 'Вгадав ✓ Світло в оптоволокні — чемпіон швидкості!';
+        if(!rewarded){ rewarded = true; addNeurons(2); }
+      } else {
+        b.classList.add('wrong');
+        fb.textContent = 'Цього разу переміг інший канал. Спробуй ще раз — обери переможця!';
+      }
+      running = false;
+    }, 1600);
+  }));
+})();
+
+/* ---------- FINAL QUIZ ---------- */
+const questions = [
+  { q: "💡 Що біжить оптоволоконним кабелем?", opts: ["Спалахи світла", "Електричні імпульси", "Звукові хвилі"], correct: 0 },
+  { q: "🔢 У якому вигляді пристрої передають будь-яке повідомлення?", opts: ["Як ланцюжок нулів і одиниць", "Як маленькі малюнки", "Як звичайні літери"], correct: 0 },
+  { q: "🎧 Як бездротові навушники зазвичай з'єднуються з телефоном?", opts: ["Через оптоволокно", "Через Bluetooth", "Через коаксіальний кабель"], correct: 1 },
+  { q: "🚢 Як вийти в інтернет на кораблі посеред океану?", opts: ["Через Bluetooth", "Через виту пару", "Через супутниковий зв'язок"], correct: 2 },
+  { q: "📡 Який пристрій вирішує, куди відправити дані, і роздає Wi-Fi удома?", opts: ["Роутер", "Комутатор", "Мережева карта"], correct: 0 },
+  { q: "🔀 Навіщо в комп'ютерному класі комутатор?", opts: ["Щоб друкувати документи", "Щоб з'єднати кабелями всі комп'ютери класу", "Щоб заряджати ноутбуки"], correct: 1 },
+  { q: "📟 Що робить модем?", opts: ["Перетворює сигнал із лінії провайдера для комп'ютерів", "Зберігає фотографії", "Показує зображення на екрані"], correct: 0 },
+  { q: "🏎️ Який канал зазвичай найшвидший?", opts: ["Bluetooth", "Оптоволокно", "Мобільний зв'язок"], correct: 1 }
+];
+let qi = 0, currentAnswered = false;
+const quizQ = document.getElementById('quizQ');
+const quizOptions = document.getElementById('quizOptions');
+const quizProgress = document.getElementById('quizProgress');
+const btnNext = document.getElementById('btnNext');
+const quizBox = document.getElementById('quizBox');
+const completion = document.getElementById('completion');
+const totalNeuronsEl = document.getElementById('totalNeurons');
+
+function renderQuestion(){
+  currentAnswered = false; btnNext.classList.remove('active');
+  const item = questions[qi];
+  quizProgress.textContent = `Запитання ${qi+1} з ${questions.length}`;
+  quizQ.textContent = item.q;
+  quizOptions.innerHTML = '';
+  item.opts.forEach((opt,i)=>{
+    const b = document.createElement('button'); b.className = 'quiz-opt'; b.textContent = opt;
+    b.addEventListener('click', ()=>{
+      if(currentAnswered) return; currentAnswered = true;
+      quizOptions.querySelectorAll('.quiz-opt').forEach((ob,oi)=>{ if(oi===item.correct) ob.classList.add('correct'); else if(oi===i) ob.classList.add('wrong'); });
+      if(i === item.correct) addNeurons(2);
+      btnNext.classList.add('active');
+      btnNext.textContent = (qi === questions.length-1) ? 'Завершити' : 'Далі';
+    });
+    quizOptions.appendChild(b);
+  });
+}
+btnNext.addEventListener('click', ()=>{
+  if(!btnNext.classList.contains('active')) return;
+  qi++;
+  if(qi < questions.length){ renderQuestion(); }
+  else {
+    quizBox.style.display = 'none';
+    completion.classList.add('show');
+    addNeurons(3);
+    totalNeuronsEl.textContent = neurons;
+  }
+});
+renderQuestion();
+</script>
+
+</body>
+</html>
