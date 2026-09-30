@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Де ця літера? English Alphabet · Лабораторія</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
+    --purple:#6C5CE7; --purple-dark:#5340c9; --teal:#16A3A0; --teal-dark:#0E7C7A; --coral:#FF6B4A;
+    --yellow:#FFC93C; --pink:#FF5D9E; --blue:#2D9CDB;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  button{font:inherit;}
+
+  /* ---------- Top bar ---------- */
+  .topbar{position:sticky; top:0; z-index:10; background:rgba(246,245,251,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .topbar-inner{max-width:1100px; margin:0 auto; padding:12px 16px; display:flex; align-items:center; gap:12px;}
+  .back-link{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--teal-dark); text-decoration:none; white-space:nowrap;}
+  .back-link:hover{text-decoration:underline;}
+  .game-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .progress{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; color:var(--teal-dark); background:#E3F7F6; border-radius:999px; padding:4px 12px; white-space:nowrap; margin-left:auto;}
+  .restart-btn{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; border:1.5px solid var(--teal); background:var(--surface); color:var(--teal-dark); border-radius:999px; padding:4px 14px; cursor:pointer; white-space:nowrap;}
+  .restart-btn:hover{background:#E3F7F6;}
+  .restart-btn .short{display:none;}
+  @media (max-width:560px){ .game-title{display:none;} .restart-btn .long{display:none;} .restart-btn .short{display:inline;} .restart-btn{padding:4px 11px;} .topbar-inner{gap:8px;} }
+
+  /* ---------- Поле: сітка літер + лоток із завданням ---------- */
+  .game{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; min-height:calc(100dvh - 60px); padding:14px 16px 20px;}
+  /* Ширина розрахована так, щоб 3 ряди літер + картка-завдання вміщались на екран без прокрутки */
+  .grid{display:grid; grid-template-columns:repeat(9,1fr); gap:10px; width:min(100%, 1068px, calc((100dvh - 170px) * 2.25 + 80px));}
+  @media (max-width:700px){
+    .game{padding:12px 10px 16px; gap:14px;}
+    .grid{grid-template-columns:repeat(6,1fr); gap:7px; width:min(100%, calc(100dvh - 140px));}
+  }
+
+  .letter-card{position:relative; aspect-ratio:1; border:2px solid var(--line); border-radius:var(--radius-m); background:var(--surface); box-shadow:0 3px 0 var(--line); cursor:pointer; padding:0; container-type:inline-size; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:background .3s ease, border-color .3s ease, transform .15s ease;}
+  .letter-card .letter{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:40cqw; line-height:1; color:#B0AEC4; text-box:trim-both cap alphabetic; transition:transform .3s ease, color .3s ease;}
+  .letter-card .name{position:absolute; left:0; right:0; bottom:6%; text-align:center; white-space:nowrap; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17cqw; line-height:1.2; color:var(--card-c); opacity:0; transition:opacity .3s ease;}
+  .letter-card:hover:not(.solved){border-color:var(--teal);}
+  .letter-card:focus-visible{outline:3px solid var(--purple); outline-offset:3px;}
+  .letter-card.hover{border-color:var(--teal); background:#E3F7F6; transform:scale(1.08);}
+  .letter-card.solved{background:var(--card-light); border-color:var(--card-c); box-shadow:0 3px 0 var(--card-c); animation:pop .4s ease;}
+  .letter-card.solved .letter{color:var(--card-c); transform:translateY(-14%);}
+  .letter-card.solved .name{opacity:1;}
+  .letter-card.wrong{animation:shake .35s ease; border-color:var(--coral); background:#FFEFE9;}
+  @keyframes pop{50%{transform:scale(1.15);}}
+  @keyframes shake{25%{translate:-5px 0;} 75%{translate:5px 0;}}
+
+  /* Хмаринка-підказка з українською вимовою при натисканні на літеру */
+  .tip{position:absolute; left:50%; bottom:calc(100% + 10px); translate:-50% 0; z-index:6; pointer-events:none; white-space:nowrap; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; line-height:1.2; color:var(--card-c); background:var(--card-light); border:2px solid var(--card-c); border-radius:999px; padding:5px 14px 3px; opacity:0; transform:scale(.6); transform-origin:50% 100%; transition:opacity .2s ease, transform .2s ease;}
+  .tip::after{content:""; position:absolute; left:50%; top:100%; width:10px; height:10px; margin:-5px 0 0 -6px; background:var(--card-light); border-right:2px solid var(--card-c); border-bottom:2px solid var(--card-c); transform:rotate(45deg);}
+  .tip.below{bottom:auto; top:calc(100% + 10px); transform-origin:50% 0;}
+  .tip.below::after{top:auto; bottom:100%; margin:0 0 -5px -6px; transform:rotate(-135deg);}
+  .letter-card.tip-on{z-index:6;}
+  .letter-card.tip-on .tip{opacity:1; transform:scale(1);}
+
+  .tray{display:flex; flex-direction:column; align-items:center; gap:8px;}
+  .hint{font-size:14px; color:var(--ink-soft); text-align:center; margin:0;}
+  /* Картка-завдання: того ж розміру, що й картки літер (--cell ставиться з JS), плоска */
+  .task{position:relative; z-index:5; width:var(--cell, 100px); aspect-ratio:1; border:2px solid #E8AE1C; border-radius:var(--radius-m); background:var(--yellow); padding:0; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; container-type:inline-size; display:flex; align-items:center; justify-content:center; color:var(--ink); animation:task-in .35s ease;}
+  .task .word{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:20cqw; line-height:1.1;}
+  .task:focus-visible{outline:3px solid var(--purple); outline-offset:4px;}
+  .task.dragging{cursor:grabbing; transition:none;}
+  .task.back{transition:transform .25s ease;}
+  .task.gone{transition:transform .25s ease, opacity .25s ease; opacity:0;}
+  .task.speaking .word{animation:ring .5s ease;}
+  @keyframes task-in{from{transform:translateY(30px) scale(.8); opacity:0;}}
+  @keyframes ring{40%{transform:scale(1.25);}}
+
+  /* ---------- Win dialog ---------- */
+  .overlay{position:fixed; inset:0; z-index:20; background:rgba(27,27,58,.45); display:none; align-items:center; justify-content:center; padding:16px;}
+  .overlay.show{display:flex;}
+  .win{background:var(--surface); border-radius:var(--radius-l); padding:26px 24px; max-width:440px; width:100%; text-align:center; box-shadow:0 20px 50px rgba(27,27,58,.25); max-height:90vh; overflow:auto;}
+  .win h2{font-size:26px; margin-bottom:4px;}
+  .win .big{font-size:56px; line-height:1; margin-bottom:6px; animation:bounce 1s ease infinite alternate;}
+  @keyframes bounce{to{transform:translateY(-8px) rotate(-6deg);}}
+  .confetti{position:fixed; top:-20px; width:10px; height:16px; border-radius:3px; z-index:30; pointer-events:none; animation:fall linear forwards;}
+  @keyframes fall{to{transform:translateY(110vh) rotate(720deg);}}
+  .stars{font-size:44px; letter-spacing:6px; line-height:1; margin:10px 0 14px;}
+  .stars span{display:inline-block; animation:star-in .4s ease both;}
+  .stars span:nth-child(2){animation-delay:.25s;} .stars span:nth-child(3){animation-delay:.5s;}
+  .stars .dim{filter:grayscale(1); opacity:.25;}
+  @keyframes star-in{from{transform:scale(0) rotate(-90deg);} to{transform:scale(1) rotate(0);}}
+  .result{display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:20px;}
+  .result div{background:var(--bg); border-radius:var(--radius-m); padding:8px 18px; min-width:110px;}
+  .result b{display:block; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:26px; line-height:1.1; color:var(--teal-dark);}
+  .result small{font-size:13px; color:var(--ink-soft);}
+  .win-actions{display:flex; gap:10px; justify-content:center; flex-wrap:wrap;}
+  .btn{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; border:none; border-radius:999px; padding:10px 20px; cursor:pointer;}
+  .btn-primary{background:var(--teal); color:#fff;}
+  .btn-primary:hover{background:var(--teal-dark);}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="back-link" href="../index.html">← Лабораторія</a>
+  <span class="game-title">Де ця літера? English Alphabet</span>
+  <span class="progress" id="progress">0 / 26</span>
+  <button class="restart-btn" id="restartBtn" title="Почати знову"><span class="long">↻ Почати знову</span><span class="short">↻</span></button>
+</div></div>
+
+<div class="game">
+  <div class="grid" id="grid"></div>
+  <div class="tray">
+    <button class="task" id="task" aria-label="Картка-завдання"><span class="word" id="taskWord"></span></button>
+    <p class="hint">Перетягни жовту картку на потрібну літеру. Натисни на картку чи літеру — почуєш, як вона звучить</p>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="win" role="dialog" aria-labelledby="winTitle">
+    <div class="big">🏆</div>
+    <h2 id="winTitle">Вітаємо!</h2>
+    <div class="stars" id="wStars"></div>
+    <div class="result">
+      <div><b id="wMistakes">0</b><small>помилок</small></div>
+      <div><b id="wTime">0:00</b><small>час</small></div>
+    </div>
+    <div class="win-actions">
+      <button class="btn btn-primary" id="againBtn">Грати ще раз</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+// Назви літер українськими літерами (британська вимова: Z — «зед»)
+const NAMES = {A:'ей',B:'бі',C:'сі',D:'ді',E:'і',F:'еф',G:'джі',H:'ейч',I:'ай',J:'джей',K:'кей',L:'ел',M:'ем',
+  N:'ен',O:'оу',P:'пі',Q:"к'ю",R:'ар',S:'ес',T:'ті',U:'ю',V:'ві',W:'дабл-ю',X:'екс',Y:'вай',Z:'зед'};
+// Як вимовляти: англійська назва літери, щоб синтезатор не читав «a» як артикль
+const SPEAK = {A:'A.',B:'bee',C:'see',D:'dee',E:'E.',F:'eff',G:'gee',H:'aitch',I:'eye',J:'jay',K:'kay',L:'ell',M:'em',
+  N:'en',O:'oh',P:'pee',Q:'cue',R:'ar',S:'ess',T:'tee',U:'you',V:'vee',W:'W.',X:'ex',Y:'why',Z:'zed'};
+const COLORS = [
+  ['#6C5CE7','#F0EDFF'],['#16A3A0','#E3F7F6'],['#FF6B4A','#FFEFE9'],
+  ['#2D9CDB','#E6F3FB'],['#FF5D9E','#FFE9F2'],['#C98A12','#FFF4D6']
+];
+// Межі для зірок (помилки на 26 літер)
+const STARS_3 = 2, STARS_2 = 7;
+
+const gridEl = document.getElementById('grid');
+const taskEl = document.getElementById('task');
+const taskWord = document.getElementById('taskWord');
+const progressEl = document.getElementById('progress');
+const overlay = document.getElementById('overlay');
+
+let keyboardArmed = false;
+let queue = [], current = null, solved = 0, mistakes = 0, startTime = 0, busy = false;
+
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+/* ---------- Вимова ---------- */
+let enVoice = null;
+function pickVoice(){
+  const voices = speechSynthesis.getVoices();
+  enVoice = voices.find(v=>v.lang==='en-GB') || voices.find(v=>v.lang && v.lang.startsWith('en')) || null;
+}
+if('speechSynthesis' in window){ pickVoice(); speechSynthesis.addEventListener?.('voiceschanged', pickVoice); }
+function say(text){
+  if(!('speechSynthesis' in window)) return;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = enVoice?.lang || 'en-GB';
+    if(enVoice) u.voice = enVoice;
+    u.rate = 0.85;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function sayCurrent(){
+  if(!current) return;
+  say(SPEAK[current]);
+  taskEl.classList.remove('speaking'); void taskEl.offsetWidth; taskEl.classList.add('speaking');
+}
+
+/* ---------- Звук правильної відповіді: коротке арпеджіо «дзінь» (Web Audio, без файлів) ---------- */
+let audioCtx = null;
+function chime(){
+  try{
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    const t0 = audioCtx.currentTime;
+    [1046.5, 1318.5, 1568].forEach((freq, i)=>{          // до — мі — соль (6-та октава)
+      const t = t0 + i * 0.09;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.18, t + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.5);
+    });
+  }catch(e){}
+}
+
+/* ---------- Гра ---------- */
+function newGame(){
+  queue = shuffle(ALPHABET.slice());
+  solved = 0; mistakes = 0; startTime = 0; busy = false;
+  overlay.classList.remove('show');
+  gridEl.innerHTML = '';
+  ALPHABET.forEach((L, i)=>{
+    const btn = document.createElement('button');
+    btn.className = 'letter-card';
+    // Колір літери відомий заздалегідь: хмаринка-підказка вже має колір, яким літера засвітиться
+    const [col, light] = COLORS[i % COLORS.length];
+    btn.style.setProperty('--card-c', col);
+    btn.style.setProperty('--card-light', light);
+    btn.dataset.letter = L;
+    btn.setAttribute('aria-label', `Літера ${L}`);
+    btn.innerHTML = `<span class="letter">${L}${L.toLowerCase()}</span><span class="name"></span><span class="tip">${NAMES[L]}</span>`;
+    btn.addEventListener('click', e=>{
+      // Клавіатура (detail===0) після Enter на картці-завданні — покласти картку сюди; інакше — послухати літеру
+      if(e.detail===0 && keyboardArmed){ keyboardArmed = false; drop(btn); }
+      else showTip(btn);
+    });
+    gridEl.appendChild(btn);
+  });
+  syncCell();
+  nextTask();
+}
+
+let tipTimer = null;
+function showTip(card){
+  say(SPEAK[card.dataset.letter]);
+  gridEl.querySelectorAll('.tip-on').forEach(c=>c.classList.remove('tip-on'));
+  const tip = card.querySelector('.tip');
+  tip.classList.remove('below');
+  card.classList.add('tip-on');
+  // Верхній ряд: хмаринка не повинна ховатися під верхньою панеллю
+  const barBottom = document.querySelector('.topbar').getBoundingClientRect().bottom;
+  if(card.getBoundingClientRect().top - tip.offsetHeight - 12 < barBottom) tip.classList.add('below');
+  clearTimeout(tipTimer);
+  tipTimer = setTimeout(()=>card.classList.remove('tip-on'), 1600);
+}
+
+// Картка-завдання завжди того ж розміру, що й картки літер
+function syncCell(){
+  const first = gridEl.querySelector('.letter-card');
+  if(first) taskEl.style.setProperty('--cell', first.offsetWidth + 'px');
+}
+window.addEventListener('resize', syncCell);
+
+function nextTask(){
+  current = queue.shift() || null;
+  progressEl.textContent = `${solved} / ${ALPHABET.length}`;
+  taskEl.className = 'task';
+  taskEl.style.transform = '';
+  if(!current){ taskEl.style.visibility = 'hidden'; return; }
+  taskEl.style.visibility = '';
+  taskWord.textContent = NAMES[current];
+  taskEl.setAttribute('aria-label', `Завдання: ${NAMES[current]}. Натисни, щоб послухати`);
+  // перезапуск анімації появи
+  taskEl.style.animation = 'none'; void taskEl.offsetWidth; taskEl.style.animation = '';
+}
+
+function drop(card){
+  if(busy || !current || card.classList.contains('solved')) { snapBack(); return; }
+  if(!startTime) startTime = Date.now();
+  if(card.dataset.letter === current){
+    busy = true;
+    card.querySelector('.name').textContent = NAMES[current];
+    card.classList.add('solved');
+    chime();
+    card.setAttribute('aria-label', `Літера ${current} — ${NAMES[current]}, знайдено`);
+    solved++;
+    taskEl.classList.add('gone');
+    setTimeout(()=>{
+      busy = false;
+      if(solved === ALPHABET.length){ nextTask(); setTimeout(win, 400); }
+      else nextTask();
+    }, 450);
+  } else {
+    mistakes++;
+    card.classList.remove('wrong'); void card.offsetWidth; card.classList.add('wrong');
+    setTimeout(()=>card.classList.remove('wrong'), 400);
+    snapBack();
+  }
+}
+
+function snapBack(){
+  taskEl.classList.remove('dragging');
+  taskEl.classList.add('back');
+  taskEl.style.transform = '';
+  setTimeout(()=>taskEl.classList.remove('back'), 260);
+}
+
+/* ---------- Перетягування (миша й дотик через Pointer Events) + клік-резерв ---------- */
+let drag = null, hoverCard = null;
+function cardAt(x, y){
+  return document.elementsFromPoint(x, y).find(el=>el.matches('.letter-card:not(.solved)')) || null;
+}
+function setHover(card){
+  if(hoverCard === card) return;
+  hoverCard?.classList.remove('hover');
+  hoverCard = card;
+  hoverCard?.classList.add('hover');
+}
+taskEl.addEventListener('pointerdown', e=>{
+  if(busy || !current || e.button > 0) return;
+  drag = { x:e.clientX, y:e.clientY, moved:false, id:e.pointerId };
+  taskEl.setPointerCapture(e.pointerId);
+});
+taskEl.addEventListener('pointermove', e=>{
+  if(!drag || e.pointerId !== drag.id) return;
+  const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+  if(!drag.moved && Math.hypot(dx, dy) < 8) return;
+  if(!drag.moved){ drag.moved = true; taskEl.classList.add('dragging'); }
+  taskEl.style.transform = `translate(${dx}px, ${dy}px) rotate(${Math.max(-8, Math.min(8, dx/30))}deg)`;
+  setHover(cardAt(e.clientX, e.clientY));
+});
+function endDrag(e, cancelled){
+  if(!drag || e.pointerId !== drag.id) return;
+  const wasMoved = drag.moved;
+  drag = null;
+  const target = hoverCard;
+  setHover(null);
+  if(!wasMoved){
+    // Простий дотик — послухати
+    if(!cancelled) sayCurrent();
+    return;
+  }
+  taskEl.classList.remove('dragging');
+  if(target && !cancelled) drop(target); else snapBack();
+}
+taskEl.addEventListener('pointerup', e=>endDrag(e, false));
+taskEl.addEventListener('pointercancel', e=>endDrag(e, true));
+// Клавіатура: Enter/Space на картці — послухати й узяти, далі Tab до літери й Enter
+taskEl.addEventListener('keydown', e=>{
+  if(e.key==='Enter' || e.key===' '){ e.preventDefault(); sayCurrent(); keyboardArmed = true; }
+});
+
+function win(){
+  say('Well done!');
+  confetti();
+  const sec = Math.round((Date.now() - startTime) / 1000);
+  const stars = mistakes <= STARS_3 ? 3 : mistakes <= STARS_2 ? 2 : 1;
+  document.getElementById('winTitle').textContent = ['Усі літери знайдено!','Молодець!','Чудово! Ти знаєш абетку!'][stars-1];
+  document.getElementById('wStars').innerHTML = [1,2,3].map(i=>`<span class="${i<=stars?'':'dim'}">⭐</span>`).join('');
+  document.getElementById('wMistakes').textContent = mistakes;
+  document.getElementById('wTime').textContent = `${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;
+  overlay.classList.add('show');
+  document.getElementById('againBtn').focus();
+}
+
+function confetti(){
+  const colors = ['#6C5CE7','#16A3A0','#FF6B4A','#FFC93C','#FF5D9E','#2D9CDB'];
+  for(let i=0;i<70;i++){
+    const d = document.createElement('div');
+    d.className = 'confetti';
+    d.style.left = Math.random()*100 + 'vw';
+    d.style.background = colors[i % colors.length];
+    d.style.animationDuration = (2 + Math.random()*2) + 's';
+    d.style.animationDelay = Math.random()*0.6 + 's';
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(), 5000);
+  }
+}
+
+document.getElementById('restartBtn').addEventListener('click', newGame);
+document.getElementById('againBtn').addEventListener('click', newGame);
+
+newGame();
+</script>
+
+</body>
+</html>
