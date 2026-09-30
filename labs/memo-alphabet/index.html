@@ -26,10 +26,12 @@
   .back-link{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--teal-dark); text-decoration:none; white-space:nowrap;}
   .back-link:hover{text-decoration:underline;}
   .game-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
-  .restart-btn{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; border:1.5px solid var(--teal); background:var(--surface); color:var(--teal-dark); border-radius:999px; padding:4px 14px; cursor:pointer; white-space:nowrap; margin-left:auto;}
-  .restart-btn:hover{background:#E3F7F6;}
-  .restart-btn .short{display:none;}
-  @media (max-width:560px){ .game-title{display:none;} .restart-btn .long{display:none;} .restart-btn .short{display:inline;} .restart-btn{padding:4px 11px;} .topbar-inner{gap:8px;} }
+  .restart-btn, .sound-btn{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; border:1.5px solid var(--teal); background:var(--surface); color:var(--teal-dark); border-radius:999px; padding:4px 14px; cursor:pointer; white-space:nowrap;}
+  .restart-btn:hover, .sound-btn:hover{background:#E3F7F6;}
+  .sound-btn{margin-left:auto;}
+  .sound-btn[aria-pressed="false"]{border-color:var(--line); color:var(--ink-soft);}
+  .restart-btn .short, .sound-btn .short{display:none;}
+  @media (max-width:560px){ .game-title{display:none;} .restart-btn .long, .sound-btn .long{display:none;} .restart-btn .short, .sound-btn .short{display:inline;} .restart-btn, .sound-btn{padding:4px 11px;} .topbar-inner{gap:8px;} }
 
   /* ---------- Board ---------- */
   .game{display:flex; align-items:center; justify-content:center; gap:18px; min-height:calc(100dvh - 60px); padding:12px 16px;}
@@ -63,9 +65,12 @@
     background:var(--card-c-light, #FFFFFF);
     transform:rotateY(180deg); /* без цього рядка — баг */
   }
-  .flip-back .letter{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:46cqw; line-height:1; color:var(--card-c, var(--ink)); text-box:trim-both cap alphabetic; transition:transform .3s ease;}
-  .card.matched .flip-back .letter{transform:translateY(-14%);}
-  .flip-back .name{position:absolute; left:0; right:0; bottom:4%; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:11cqw; line-height:1.2; color:var(--card-c, var(--ink-soft)); opacity:0; transition:opacity .3s ease;}
+  .flip-back .face{display:flex; align-items:center; justify-content:center; gap:5cqw; transition:transform .3s ease;}
+  .flip-back .pic{font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif; font-size:30cqw; line-height:1;}
+  .flip-back .pic svg{width:1em; height:1em; display:block;}
+  .flip-back .letter{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:42cqw; line-height:1; color:var(--card-c, var(--ink)); text-box:trim-both cap alphabetic;}
+  .card.matched .flip-back .face{transform:translateY(-12%);}
+  .flip-back .name{position:absolute; left:0; right:0; bottom:4%; text-align:center; white-space:nowrap; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:9.5cqw; line-height:1.2; color:var(--card-c, var(--ink-soft)); opacity:0; transition:opacity .3s ease;}
   .card.matched .flip-back .name{opacity:1;}
   .card.matched .flip-inner{animation:pop .35s ease .35s;}
   .card.wrong .flip-back{animation:shake .35s ease;}
@@ -104,6 +109,7 @@
 <div class="topbar"><div class="topbar-inner">
   <a class="back-link" href="../index.html">← Лабораторія</a>
   <span class="game-title">Знайди пару: English Alphabet</span>
+  <button class="sound-btn" id="soundBtn" aria-pressed="true" title="Вимова літер і слів"><span class="long">🔊 Вимова</span><span class="short">🔊</span></button>
   <button class="restart-btn" id="restartBtn" title="Почати знову"><span class="long">↻ Почати знову</span><span class="short">↻</span></button>
 </div></div>
 
@@ -137,6 +143,41 @@ const NAMES = {A:'ей',B:'бі',C:'сі',D:'ді',E:'і',F:'еф',G:'джі',H:
 // Як вимовляти: англійська назва літери, щоб синтезатор не казав «capital R» і не читав «a» як артикль
 const SPEAK = {A:'ay',B:'bee',C:'see',D:'dee',E:'ee',F:'eff',G:'gee',H:'aitch',I:'eye',J:'jay',K:'kay',L:'ell',M:'em',
   N:'en',O:'oh',P:'pee',Q:'cue',R:'ar',S:'ess',T:'tee',U:'you',V:'vee',W:'double you',X:'ex',Y:'why',Z:'zed'};
+// Малюнки: слово англійською, що починається на цю літеру. На кожну гру для літери обирається випадковий,
+// і той самий малюнок показується на обох картках пари (велика й маленька літера).
+const XYLOPHONE = `<svg viewBox="0 0 64 64" aria-hidden="true"><rect x="6" y="40" width="52" height="5" rx="2.5" fill="#8B5A2B" transform="rotate(-8 32 42)"/><rect x="6" y="22" width="52" height="5" rx="2.5" fill="#8B5A2B" transform="rotate(8 32 24)"/><rect x="9" y="14" width="8" height="40" rx="3" fill="#FF5D9E"/><rect x="19" y="17" width="8" height="34" rx="3" fill="#FFC93C"/><rect x="29" y="20" width="8" height="28" rx="3" fill="#16A3A0"/><rect x="39" y="23" width="8" height="22" rx="3" fill="#2D9CDB"/><rect x="49" y="26" width="8" height="16" rx="3" fill="#6C5CE7"/><line x1="40" y1="60" x2="58" y2="6" stroke="#8B5A2B" stroke-width="3" stroke-linecap="round"/><circle cx="58" cy="6" r="5" fill="#FF6B4A"/></svg>`;
+// Zero: повітряна кулька-цифра «0» на мотузочці (емодзі 0️⃣ виглядає як просто кнопка)
+const ZERO = `<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M32 52 Q28 57 33 60 Q37 62 34 64" fill="none" stroke="#8C88A8" stroke-width="1.6" stroke-linecap="round"/><path d="M29.5 49 L34.5 49 L32 53 Z" fill="#E0457F"/><ellipse cx="32" cy="27" rx="19" ry="23" fill="#FF5D9E"/><ellipse cx="32" cy="27" rx="8" ry="12.5" fill="#FFFFFF"/><ellipse cx="32" cy="27" rx="19" ry="23" fill="none" stroke="#E0457F" stroke-width="2"/><ellipse cx="32" cy="27" rx="8" ry="12.5" fill="none" stroke="#E0457F" stroke-width="2"/><path d="M19 17 Q21 9 28 6.5" fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" opacity=".75"/><circle cx="18.4" cy="22" r="1.8" fill="#FFFFFF" opacity=".75"/></svg>`;
+// Nest: гніздо з яєчками (емодзі 🪺 нове й не скрізь відображається)
+const NEST = `<svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="24" cy="33" rx="7" ry="9" fill="#9ED8F5" stroke="#5FB4DF" stroke-width="1.5"/><ellipse cx="40" cy="33" rx="7" ry="9" fill="#9ED8F5" stroke="#5FB4DF" stroke-width="1.5"/><ellipse cx="32" cy="30" rx="7" ry="9" fill="#BDE6FA" stroke="#5FB4DF" stroke-width="1.5"/><circle cx="29.5" cy="27" r="1.6" fill="#FFFFFF"/><path d="M6 36 Q32 42 58 36 Q56 54 32 55 Q8 54 6 36 Z" fill="#B7793F"/><path d="M8 39 Q32 46 56 39 M10 45 Q32 51 54 45 M14 50 Q32 55 50 50" fill="none" stroke="#8B5A2B" stroke-width="2" stroke-linecap="round"/><path d="M5 36 Q32 43 59 36" fill="none" stroke="#8B5A2B" stroke-width="3" stroke-linecap="round"/><path d="M12 38 L6 33 M52 38 L59 32 M20 41 L17 35" stroke="#8B5A2B" stroke-width="2" stroke-linecap="round"/></svg>`;
+const PICS = {
+  A:[['🍎','apple'],['🐜','ant'],['🥑','avocado'],['✈️','airplane']],
+  B:[['🎈','balloon'],['🐻','bear'],['🍌','banana'],['🐝','bee'],['🚌','bus'],['🦋','butterfly']],
+  C:[['🐱','cat'],['🎂','cake'],['🚗','car'],['🐮','cow'],['🥕','carrot'],['🍪','cookie']],
+  D:[['🐶','dog'],['🦆','duck'],['🐬','dolphin'],['🍩','donut'],['🥁','drum']],
+  E:[['🐘','elephant'],['🥚','egg'],['🦅','eagle'],['🌍','Earth']],
+  F:[['🐟','fish'],['🐸','frog'],['🌸','flower'],['🦊','fox']],
+  G:[['🍇','grapes'],['🦒','giraffe'],['🎁','gift'],['🎸','guitar'],['🐐','goat']],
+  H:[['🐴','horse'],['🏠','house'],['❤️','heart'],['🎩','hat'],['🦔','hedgehog'],['🐹','hamster']],
+  I:[['🍦','ice cream'],['🏝️','island'],['⛸️','ice skate']],
+  J:[['🧃','juice'],['👖','jeans'],['🧥','jacket']],
+  K:[['🦘','kangaroo'],['🔑','key'],['🥝','kiwi'],['🐨','koala'],['🪁','kite']],
+  L:[['🦁','lion'],['🍋','lemon'],['🍃','leaf'],['🐞','ladybug'],['🍭','lollipop']],
+  M:[['🐵','monkey'],['🌙','moon'],['🐭','mouse'],['🍄','mushroom'],['🥛','milk']],
+  N:[[NEST,'nest'],['🥜','nut'],['📓','notebook'],['🍜','noodles']],
+  O:[['🍊','orange'],['🦉','owl'],['🐙','octopus']],
+  P:[['🐷','pig'],['🐧','penguin'],['🍕','pizza'],['🍐','pear'],['🐼','panda'],['🍍','pineapple']],
+  Q:[['👸','queen'],['❓','question']],
+  R:[['🐰','rabbit'],['🌈','rainbow'],['🚀','rocket'],['🤖','robot'],['🌹','rose']],
+  S:[['☀️','sun'],['⭐','star'],['🐌','snail'],['🍓','strawberry'],['⛄','snowman'],['🐑','sheep']],
+  T:[['🐯','tiger'],['🌳','tree'],['🚂','train'],['🐢','turtle'],['🍅','tomato'],['🧸','teddy bear']],
+  U:[['☂️','umbrella'],['🦄','unicorn'],['🛸','UFO']],
+  V:[['🎻','violin'],['🚐','van']],
+  W:[['🐳','whale'],['🍉','watermelon'],['⌚','watch']],
+  X:[[XYLOPHONE,'xylophone'],['🎄','Xmas tree']],
+  Y:[['🪀','yo-yo'],['🧶','yarn'],['⛵','yacht']],
+  Z:[['🦓','zebra'],[ZERO,'zero']]
+};
 const PAIR_COLORS = [
   ['#6C5CE7','#F0EDFF'],['#16A3A0','#E3F7F6'],['#FF6B4A','#FFEFE9'],
   ['#2D9CDB','#E6F3FB'],['#FF5D9E','#FFE9F2'],['#C98A12','#FFF4D6']
@@ -147,7 +188,7 @@ const leftEl = document.getElementById('pairsLeft');
 const rightEl = document.getElementById('pairsRight');
 const overlay = document.getElementById('overlay');
 
-let letters = [], opened = [], matched = 0, locked = false;
+let letters = [], pics = {}, opened = [], matched = 0, locked = false;
 let moves = 0, startTime = 0;   // спроба = відкрито дві картки; час — від першого перевороту
 // Межі для зірок (12 пар)
 const STARS_3 = 20, STARS_2 = 30;
@@ -158,6 +199,22 @@ function shuffle(a){
 }
 
 /* ---------- Вимова ---------- */
+let soundOn = true;
+try{ soundOn = localStorage.getItem('memo-alphabet-sound') !== 'off'; }catch(e){}
+const soundBtn = document.getElementById('soundBtn');
+function renderSound(){
+  soundBtn.setAttribute('aria-pressed', soundOn);
+  soundBtn.querySelector('.long').textContent = soundOn ? '🔊 Вимова' : '🔇 Без вимови';
+  soundBtn.querySelector('.short').textContent = soundOn ? '🔊' : '🔇';
+}
+soundBtn.addEventListener('click', ()=>{
+  soundOn = !soundOn;
+  if(!soundOn && 'speechSynthesis' in window) speechSynthesis.cancel();
+  try{ localStorage.setItem('memo-alphabet-sound', soundOn ? 'on' : 'off'); }catch(e){}
+  renderSound();
+});
+renderSound();
+
 let enVoice = null;
 function pickVoice(){
   const voices = speechSynthesis.getVoices();
@@ -165,7 +222,7 @@ function pickVoice(){
 }
 if('speechSynthesis' in window){ pickVoice(); speechSynthesis.addEventListener?.('voiceschanged', pickVoice); }
 function say(letter, phrase){
-  if(!('speechSynthesis' in window)) return;
+  if(!soundOn || !('speechSynthesis' in window)) return;
   try{
     speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(phrase ? letter : SPEAK[letter.toUpperCase()]);
@@ -179,6 +236,8 @@ function say(letter, phrase){
 /* ---------- Гра ---------- */
 function newGame(){
   letters = shuffle(ALPHABET.slice()).slice(0, PAIRS);
+  pics = {};
+  letters.forEach(L=>{ const v = PICS[L]; pics[L] = v[Math.floor(Math.random()*v.length)]; });
   opened = []; matched = 0; locked = false; moves = 0; startTime = 0;
   overlay.classList.remove('show');
 
@@ -199,7 +258,7 @@ function newGame(){
     btn.setAttribute('aria-label', 'Закрита картка');
     btn.innerHTML = `<div class="flip-inner">
         <div class="flip-front"><span>Aa</span></div>
-        <div class="flip-back"><span class="letter">${c.text}</span><span class="name"></span></div>
+        <div class="flip-back"><span class="face"><span class="pic">${pics[c.pair][0]}</span><span class="letter">${c.text}</span></span><span class="name"></span></div>
       </div>`;
     btn.addEventListener('click', ()=>flip(btn, c));
     boardEl.appendChild(btn);
@@ -210,13 +269,15 @@ function flip(btn, c){
   if(locked || btn.disabled || opened.some(o=>o.btn===btn)) return;
   if(!startTime) startTime = Date.now();
   btn.querySelector('.flip-inner').classList.add('flipped');
-  btn.setAttribute('aria-label', `Літера ${c.text}`);
-  say(c.pair);
+  btn.setAttribute('aria-label', `Літера ${c.text}, ${pics[c.pair][1]}`);
   opened.push({ btn, c });
+  const [a, b] = opened;
+  // Пару знайдено — кажемо літеру й слово-малюнок, інакше лише літеру
+  if(b && a.c.pair === b.c.pair) say(`${SPEAK[c.pair]}, ${pics[c.pair][1]}`, true);
+  else say(c.pair);
   if(opened.length < 2) return;
   moves++;
 
-  const [a, b] = opened;
   if(a.c.pair === b.c.pair){
     const [col, light] = PAIR_COLORS[matched % PAIR_COLORS.length];
     [a.btn, b.btn].forEach(el=>{
@@ -224,7 +285,7 @@ function flip(btn, c){
       el.classList.add('matched');
       el.style.setProperty('--card-c', col);
       el.style.setProperty('--card-c-light', light);
-      el.querySelector('.name').textContent = NAMES[a.c.pair];
+      el.querySelector('.name').textContent = `${NAMES[a.c.pair]} · ${pics[a.c.pair][1]}`;
     });
     const chipEl = document.getElementById(`chip-${a.c.pair}`);
     chipEl.style.setProperty('--chip-c', col);
