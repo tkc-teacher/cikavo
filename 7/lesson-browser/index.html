@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Браузер: налаштування, розширення, облікові записи — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F5F7FC; --ink:#172036; --ink-soft:#4F5B78; --surface:#FFFFFF; --line:#DFE5F2;
+    --accent:#2F6FE4; --accent-dark:#1F55B8; --accent-soft:#E6EEFD;
+    --amber:#F28A1E; --amber-soft:#FEF0E0; --indigo:#8C5BE8; --indigo-soft:#F1EAFD;
+    --coral:#FF6B4A; --yellow:#FFC93C; --ok:#3FAE58; --ok-soft:#E4F8E6;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  .container{max-width:800px; margin:0 auto; padding:0 24px;}
+  @media (max-width:520px){ .container{padding:0 16px;} }
+
+  .hud{position:sticky; top:0; z-index:50; background:rgba(245,247,252,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
+  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--amber),var(--accent)); transition:width .3s ease;}
+  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:800px; margin:0 auto;}
+  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
+  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
+  .neuron-counter svg{width:24px;height:24px;}
+  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
+  #neuronCount.pop{transform:scale(1.35);}
+
+  .hero{padding:52px 24px 40px;}
+  .hero-inner{max-width:800px; margin:0 auto; display:flex; align-items:center; gap:30px;}
+  .hero-text{flex:1;}
+  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--accent); margin-bottom:10px;}
+  .hero h1{font-size:32px; line-height:1.18; margin-bottom:12px;}
+  .hero p{color:var(--ink-soft); font-size:16.5px; max-width:54ch; margin-bottom:22px;}
+  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--accent); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
+  .btn-primary:hover{background:var(--accent-dark);}
+  .btn-primary:active{transform:scale(.97);}
+  .mascot{width:130px; height:130px; flex-shrink:0;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:100px; height:100px;} }
+
+  section.block{padding:38px 0; border-top:1px solid var(--line);}
+  .step-label{font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:600; color:var(--accent); margin-bottom:8px;}
+  .step-label.recap{color:var(--amber);}
+  .block h2{font-size:21px; margin-bottom:10px; max-width:38ch;}
+  .block h3{font-size:16px; margin:20px 0 8px;}
+  .block p{max-width:66ch; font-size:16px; margin:0 0 14px; color:var(--ink);}
+  .block p.soft{color:var(--ink-soft); font-size:15px;}
+  .block ul{max-width:66ch; margin:0 0 14px; padding-left:20px; font-size:15px;}
+  .block ul li{margin-bottom:4px;}
+  .note{background:var(--indigo-soft); border-left:4px solid var(--indigo); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; color:#4B2F8A; margin:16px 0;}
+  .trivia{background:var(--amber-soft); border-left:4px solid var(--amber); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14px; color:#8A4E0F; margin:16px 0;}
+
+  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:22px; margin-top:18px;}
+  @media (max-width:520px){ .exercise{padding:16px;} }
+  .progress-line{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--accent-dark); margin-top:14px; min-height:1.4em;}
+
+  /* РУШІЇ БРАУЗЕРІВ */
+  .engines{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:14px 0 6px;}
+  @media (max-width:560px){ .engines{grid-template-columns:1fr;} }
+  .engine{border:2px solid var(--line); border-top-width:6px; border-radius:var(--radius-m); background:var(--surface); padding:12px 14px;}
+  .engine b{font-family:'Baloo 2',sans-serif; font-size:16px; display:block;}
+  .engine span{font-size:13.5px; color:var(--ink-soft);}
+
+  /* FLIP GALLERY */
+  .gallery{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:16px;}
+  .gallery-3{grid-template-columns:repeat(3,1fr);}
+  @media (max-width:640px){ .gallery-3{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:520px){ .gallery{grid-template-columns:1fr;} .gallery-3{grid-template-columns:1fr;} }
+  .flip-card{perspective:1200px; height:200px; cursor:pointer;}
+  .flip-inner{position:relative; width:100%; height:100%; transition:transform .6s cubic-bezier(.4,0,.2,1); transform-style:preserve-3d;}
+  .flip-card.flipped .flip-inner{transform:rotateY(180deg);}
+  .flip-face{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:var(--radius-m); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:14px; text-align:center; border:2px solid var(--card-c, var(--line));}
+  .flip-front{background:var(--surface);}
+  .flip-front .logo{width:64px; height:64px; margin-bottom:10px; display:flex; align-items:center; justify-content:center;}
+  .flip-front .logo img{max-width:100%; max-height:100%; object-fit:contain;}
+  .flip-front .name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px;}
+  .flip-front .tap{font-size:12px; color:var(--ink-soft); margin-top:2px;}
+  .flip-back{background:var(--card-c-light, var(--accent-soft)); transform:rotateY(180deg); color:var(--ink-soft); line-height:1.45; align-items:flex-start; text-align:left;}
+  .flip-back ul{margin:0; padding-left:16px; font-size:13.5px;}
+  .flip-back li{margin-bottom:3px;}
+
+  /* MEMO: ЗНАЙДИ ПАРУ */
+  .memo-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:10px;}
+  @media (max-width:640px){ .memo-grid{grid-template-columns:repeat(2,1fr);} }
+  .memo-card{perspective:1000px; height:128px; cursor:pointer;}
+  .memo-card .flip-face{padding:9px;}
+  .memo-card .flip-front{background:linear-gradient(145deg,var(--accent),var(--accent-dark)); border-color:var(--accent-dark);}
+  .memo-card .memo-cover{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:24px; color:#fff; opacity:.9;}
+  .memo-card .flip-back{border:2px solid var(--card-c, var(--line)); background:var(--card-c-light, #F0EFF9); transform:rotateY(180deg); align-items:center; text-align:center;}
+  .memo-card .memo-logo{width:40px; height:40px; object-fit:contain; margin-bottom:4px;}
+  .memo-card .memo-name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14.5px; color:var(--ink);}
+  .memo-card .memo-feat{font-size:13px; color:var(--ink-soft); line-height:1.35;}
+  .memo-card.matched{cursor:default;}
+  .memo-card.matched .flip-back{border-color:var(--ok); background:var(--ok-soft);}
+  .memo-card.miss .flip-back{border-color:var(--coral); background:#FDE6E1;}
+
+  /* CHOICE CARDS */
+  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:16px 18px; margin:12px 0;}
+  .classify-card p.q{font-weight:700; margin:0 0 10px; font-size:15px;}
+  .choice-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; padding:8px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; color:var(--ink); text-align:left; transition:background .15s ease, border-color .15s ease, color .15s ease;}
+  .choice-btn:hover{border-color:var(--accent);}
+  .choice-btn.correct{background:var(--ok-soft); border-color:var(--ok); color:#256B36;}
+  .choice-btn.wrong{background:#FDE6E1; border-color:var(--coral); color:#B8412A;}
+  .choice-feedback{margin-top:8px; font-size:13.5px; color:var(--ink-soft); min-height:1.2em;}
+  .yn-grid{display:grid; grid-template-columns:1fr 1fr; gap:0 12px;}
+  @media (max-width:560px){ .yn-grid{grid-template-columns:1fr;} }
+  .yn-grid .classify-card{margin:6px 0;}
+
+  /* РОЗШИРЕННЯ: КАРТКА ДЛЯ ПЕРЕВІРКИ Й РЕКОМЕНДАЦІЇ */
+  .ext-meta{display:block; font-weight:600; font-size:13.5px; color:var(--ink-soft); margin-top:6px; line-height:1.5;}
+  .ext-meta i{font-style:normal; color:var(--ink);}
+  .rec-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px;}
+  @media (max-width:640px){ .rec-grid{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:440px){ .rec-grid{grid-template-columns:1fr;} }
+  .rec{background:var(--surface); border:2px solid var(--line); border-top:5px solid var(--rc,var(--accent)); border-radius:var(--radius-m); padding:12px 14px;}
+  .rec-tag{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; color:var(--rc,var(--accent)); text-transform:uppercase; letter-spacing:.03em;}
+  .rec-name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; margin:2px 0 4px;}
+  .rec-what{font-size:13.5px; color:var(--ink-soft); line-height:1.45;}
+
+  /* РЕЖИМИ CHROME */
+  .mode-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:14px 0;}
+  @media (max-width:640px){ .mode-grid{grid-template-columns:1fr;} }
+  .mode{background:var(--surface); border:2px solid var(--mc); border-radius:var(--radius-m); padding:14px;}
+  .mode-head{display:flex; align-items:center; gap:8px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16.5px; margin-bottom:8px;}
+  .mode-head span{font-size:22px;}
+  .mode ul{list-style:none; padding:0 !important; margin:0 0 10px !important; font-size:13.5px !important;}
+  .mode li{padding-left:22px; position:relative; margin-bottom:5px; line-height:1.4;}
+  .mode li.y::before{content:'✓'; position:absolute; left:2px; color:var(--ok); font-weight:800;}
+  .mode li.n::before{content:'✕'; position:absolute; left:2px; color:var(--coral); font-weight:800;}
+  .mode-for{background:var(--mc-soft); border-radius:8px; padding:7px 10px; font-size:13px; font-weight:700; color:var(--ink);}
+  .when{display:grid; gap:8px; margin:6px 0 16px;}
+  .when-row{display:grid; grid-template-columns:170px 1fr; gap:12px; align-items:center; background:var(--surface); border:1.5px solid var(--line); border-left:6px solid var(--mc); border-radius:var(--radius-s); padding:10px 14px; font-size:14.5px;}
+  .when-row b{font-family:'Baloo 2',sans-serif; font-size:15.5px;}
+  .when-row span{color:var(--ink-soft);}
+  @media (max-width:560px){ .when-row{grid-template-columns:1fr; gap:2px;} }
+  .class-tip{background:linear-gradient(135deg,#FEF0E0,#FFF8EF); border:2px solid var(--amber); border-radius:var(--radius-m); padding:14px 18px; margin:0 0 8px;}
+  .class-tip-head{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; margin-bottom:6px;}
+  .class-tip ul{margin:0 !important; font-size:14.5px !important;}
+  .howto-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:12px;}
+  @media (max-width:700px){ .howto-grid{grid-template-columns:1fr;} }
+  .howto{background:var(--surface); border:2px solid var(--line); border-top:5px solid var(--mc); border-radius:var(--radius-m); padding:12px; display:flex; flex-direction:column;}
+  .howto-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; margin:10px 2px 4px;}
+  .howto ol{margin:0; padding-left:20px; font-size:13.5px; color:var(--ink-soft);}
+  .howto ol li{margin-bottom:5px;}
+  .shot{aspect-ratio:16/10; border-radius:var(--radius-s); overflow:hidden; background:#EDF1F9; border:1px solid var(--line);}
+  .shot img, .shot svg{width:100%; height:100%; display:block; object-fit:cover;}
+  kbd{font-family:'Nunito Sans',sans-serif; font-size:12px; font-weight:700; background:var(--bg); border:1px solid var(--line); border-bottom-width:2px; border-radius:5px; padding:0 5px;}
+
+  /* MATCHING */
+  .match-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:14px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:16px;}
+  .match-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:8px 14px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .match-chip:hover{transform:translateY(-2px);}
+  .match-chip.selected{border-color:var(--accent); box-shadow:0 0 0 3px rgba(47,111,228,.18);}
+  .match-chip.placed{display:none;}
+  .desc-card{display:flex; align-items:center; gap:12px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; margin-bottom:10px; cursor:pointer; transition:border-color .2s ease, background .2s ease;}
+  .desc-card.matched{border-color:var(--accent); background:var(--accent-soft); cursor:default;}
+  .desc-card.shake{animation:shakeX .35s ease;}
+  .desc-text{flex:1; font-size:14px; color:var(--ink-soft);}
+  .desc-slot{min-width:100px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13.5px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:8px 10px;}
+  .desc-slot.filled{border-style:solid; border-color:var(--accent); background:#fff; color:var(--accent-dark);}
+  @keyframes shakeX{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
+
+  /* QUIZ (опитування на початку й фінальний квіз) */
+  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:26px 24px; margin-top:18px;}
+  @media (max-width:520px){ .quiz-box{padding:20px 16px;} }
+  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:13px; color:var(--ink-soft); margin-bottom:10px;}
+  .quiz-q{font-size:17px; font-weight:700; margin-bottom:16px;}
+  .quiz-img{display:block; height:96px; max-width:160px; object-fit:contain; margin:4px auto 16px;}
+  .quiz-options{display:flex; flex-direction:column; gap:10px;}
+  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:15px; font-weight:600; padding:12px 15px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .quiz-opt:hover{border-color:var(--accent);}
+  .quiz-opt.correct{background:var(--ok-soft); border-color:var(--ok);}
+  .quiz-opt.wrong{background:#FDE6E1; border-color:var(--coral);}
+  .quiz-why{margin-top:12px; font-size:14px; color:var(--ink-soft); min-height:1.3em;}
+  .quiz-nav{display:flex; justify-content:flex-end; margin-top:14px;}
+  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:11px 22px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
+  .btn-next.active{opacity:1; pointer-events:auto;}
+  .quiz-result{display:none; text-align:center; padding:6px 0;}
+  .quiz-result.show{display:block;}
+  .quiz-result .score{font-family:'Baloo 2',sans-serif; font-size:26px; color:var(--accent-dark);}
+  .quiz-result p{color:var(--ink-soft); margin:6px auto 0; font-size:15px;}
+
+  .completion{display:none; text-align:center; padding:20px 10px 10px;}
+  .completion.show{display:block;}
+  .badge{width:90px; height:90px; margin:0 auto 16px;}
+  .completion h3{font-size:22px; margin-bottom:10px;}
+  .completion p{color:var(--ink-soft); max-width:52ch; margin:0 auto 18px; font-size:15px;}
+  .completion .total{font-family:'Baloo 2',sans-serif; font-size:30px; color:var(--accent-dark);}
+
+  /* GUIDE (без гейміфікації) */
+  .guide{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:24px; margin-top:18px;}
+  .guide-part{border:2px solid var(--line); border-left-width:6px; border-radius:var(--radius-s); padding:12px 16px; margin-bottom:12px;}
+  .guide-part h4{font-family:'Baloo 2',sans-serif; font-size:15.5px; margin:0 0 6px;}
+  .guide-req{list-style:none; padding:0 !important; margin:0; font-size:14px;}
+  .guide-req li{padding:6px 0 6px 26px; position:relative; border-top:1px solid var(--line); color:var(--ink-soft);}
+  .guide-req li:first-child{border-top:none;}
+  .guide-req li::before{content:'☐'; position:absolute; left:4px; color:var(--accent); font-size:15px;}
+
+  footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
+  footer .credits{display:block; max-width:62ch; margin:12px auto 0; font-size:11.5px; line-height:1.55; opacity:.8;}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
+  <div class="hud-row">
+    <span class="hud-title">7 клас · Браузер</span>
+    <div class="neuron-counter">
+      <svg viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
+        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#E0A800" opacity="0.6"/>
+      </svg>
+      <span id="neuronCount">0</span>
+    </div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Цифрове середовище</div>
+      <h1>Браузер: твоє вікно в інтернет</h1>
+      <p>Ти користуєшся браузером щодня. Дізнайся, чим браузери різняться між собою, що вони про тебе пам’ятають і як зробити браузер зручнішим і безпечнішим.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 160 160" fill="none">
+      <rect x="12" y="24" width="136" height="112" rx="14" fill="#172036"/>
+      <circle cx="28" cy="38" r="4" fill="#FF6B4A"/>
+      <circle cx="40" cy="38" r="4" fill="#FFC93C"/>
+      <circle cx="52" cy="38" r="4" fill="#3FAE58"/>
+      <rect x="64" y="32" width="72" height="12" rx="6" fill="#F5F7FC" opacity="0.9"/>
+      <rect x="20" y="52" width="120" height="76" rx="7" fill="#F5F7FC"/>
+      <circle cx="80" cy="90" r="27" fill="#2F6FE4"/>
+      <ellipse cx="80" cy="90" rx="11" ry="27" stroke="#F5F7FC" stroke-width="3"/>
+      <line x1="53" y1="90" x2="107" y2="90" stroke="#F5F7FC" stroke-width="3"/>
+      <path d="M58 76 Q80 82 102 76" stroke="#F5F7FC" stroke-width="2.5" fill="none"/>
+      <path d="M58 104 Q80 98 102 104" stroke="#F5F7FC" stroke-width="2.5" fill="none"/>
+      <path d="M104 100 L104 128 L111 121 L116 132 L121 130 L116 119 L125 119 Z" fill="#F28A1E" stroke="#172036" stroke-width="2.5" stroke-linejoin="round"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Операційні системи та програмне забезпечення</div>
+    <h2>Опитування за минулою темою</h2>
+    <p>Перш ніж почати, перевір, чи пам’ятаєш, як працюють операційні системи та програми. Після кожної відповіді з’явиться коротке пояснення.</p>
+    <div class="quiz-box">
+      <div id="recapQuiz">
+        <div class="quiz-progress" id="recapProgress"></div>
+        <div class="quiz-q" id="recapQ"></div>
+        <div class="quiz-options" id="recapOptions"></div>
+        <div class="quiz-why" id="recapWhy"></div>
+        <div class="quiz-nav"><button class="btn-next" id="recapNext">Далі</button></div>
+      </div>
+      <div class="quiz-result" id="recapResult"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Що таке браузер</div>
+    <h2>Програма, крізь яку ти бачиш інтернет</h2>
+    <p><b>Веббраузер</b> — програма для перегляду вебсторінок і роботи з ними: читання, відео, ігор, заповнення форм. Онлайнові програми з минулого уроку теж працюють усередині браузера.</p>
+    <p>Головні інструменти браузера:</p>
+    <ul>
+      <li><b>Вкладки</b> — кілька сайтів відкрито в одному вікні</li>
+      <li><b>Закладки</b> — збережені посилання на улюблені сайти. У <b>диспетчері закладок</b> їх розкладають по папках</li>
+      <li><b>Історія</b> — список сторінок, які ти вже відвідав</li>
+      <li><b>Адресний рядок</b> — сюди вводять і адресу сайту, і пошуковий запит</li>
+      <li><b>Автоматичне оновлення</b> — браузер сам встановлює нові версії з виправленнями безпеки</li>
+    </ul>
+    <p class="soft">Яка можливість браузера допоможе в кожній ситуації?</p>
+    <div id="featList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Порівняння браузерів</div>
+    <h2>Популярні браузери та їхні особливості</h2>
+    <p>Кожен браузер має <b>рушій</b> — програму всередині, яка перетворює код сайту на сторінку, яку ти бачиш. Хоча браузерів десятки, великих рушіїв лише три:</p>
+    <div class="engines">
+      <div class="engine" style="border-top-color:#2F6FE4;"><b>Chromium</b><span>Chrome, Edge, Opera та більшість інших</span></div>
+      <div class="engine" style="border-top-color:#F28A1E;"><b>Gecko</b><span>Firefox</span></div>
+      <div class="engine" style="border-top-color:#4F5B78;"><b>WebKit</b><span>Safari</span></div>
+    </div>
+    <p class="soft">Клацни на картку, щоб дізнатися про браузер більше.</p>
+    <div class="gallery gallery-3" id="brGallery"></div>
+    <h3>Знайди пари</h3>
+    <p class="soft">Перевертай по дві картки: шукай браузер і його особливість.</p>
+    <div class="exercise">
+      <div class="memo-grid" id="memoGrid"></div>
+      <div class="progress-line" id="memoProgress"></div>
+    </div>
+    <h3>Настільний і мобільний</h3>
+    <ul>
+      <li><b>Настільні браузери</b> (Windows, macOS, Linux) мають найбільше можливостей: розширення, десятки вкладок, повні версії сайтів</li>
+      <li><b>Мобільні браузери</b> (Android, iOS) пристосовані до маленького сенсорного екрана й бережуть заряд та трафік</li>
+    </ul>
+    <div class="note">Найкращого для всіх браузера немає. Порівнюють за швидкістю, захистом приватності, вибором розширень і тим, чи є версія для всіх твоїх пристроїв.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Налаштування</div>
+    <h2>Слова, які трапляються в налаштуваннях</h2>
+    <p>Усі налаштування — у меню браузера «⋮» або «☰» → <b>Налаштування</b>. Щоб там не загубитись, знай ці терміни:</p>
+    <ul>
+      <li><b>Домашня сторінка</b> — сайт, що відкривається при запуску браузера</li>
+      <li><b>Тема оформлення</b> — кольори й фон вікна браузера</li>
+      <li><b>HTTPS</b> — захищений обмін даними з сайтом; його видно за значком замка біля адреси</li>
+      <li><b>Кеш</b> — збережені копії картинок і файлів сайтів, щоб сторінки відкривались швидше</li>
+      <li><b>Кукі (cookie)</b> — невеликі записи від сайтів, за якими вони тебе впізнають</li>
+      <li><b>Автозаповнення</b> — браузер сам підставляє у форми дані, які ти вже вводив</li>
+    </ul>
+    <p class="soft">Обери термін, а потім клацни ситуацію, яка його описує.</p>
+    <div class="exercise">
+      <div class="match-pool" id="termPool"></div>
+      <div id="termList"></div>
+      <div class="progress-line" id="termProgress"></div>
+    </div>
+    <div class="trivia">Якщо сайт став показуватись дивно, часто допомагає очистити кеш і кукі. Але після цього доведеться знову входити в облікові записи на сайтах.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Розширення</div>
+    <h2>Розширення: корисні, але не всі безпечні</h2>
+    <p><b>Розширення</b> — невеликі додаткові програми, які дають браузеру нові функції. Встановлюють їх з <b>Chrome Web Store</b> (Chrome, Edge, Opera) або <b>Mozilla Add-ons</b> (Firefox).</p>
+    <p>Розширення працює всередині браузера й може бачити сторінки, які ти відкриваєш, і те, що ти на них вводиш. Тому шахраї часто маскують під розширення програми для стеження й крадіжки паролів.</p>
+    <h3>Правила безпеки</h3>
+    <ul>
+      <li>встановлюй <b>лише з офіційного магазину</b> — ніколи з вікон на сайтах чи з надісланих файлів</li>
+      <li>перевір <b>розробника, кількість користувачів і відгуки</b></li>
+      <li>читай <b>дозволи</b>: вони мають відповідати призначенню розширення</li>
+      <li>жодне розширення <b>не повинно просити твій пароль</b></li>
+      <li>менше розширень — менше ризику: непотрібні вимикай і видаляй</li>
+    </ul>
+    <p class="soft">Перевір кожне розширення: встановлювати чи ні?</p>
+    <div id="extCheck"></div>
+    <div class="trivia">Буває, що популярне безпечне розширення продають новому власнику, і після чергового оновлення воно починає стежити за користувачами. Тому раз на кілька місяців переглядай свій список розширень.</div>
+    <h3>Цікаві розширення, які варто спробувати</h3>
+    <p class="soft">Усі вони є в Chrome Web Store. Перш ніж встановити, перевір, що розробник — саме той, а не підробка з подібною назвою.</p>
+    <div class="rec-grid">
+      <div class="rec" style="--rc:#2F6FE4;"><div class="rec-tag">Навчання</div><div class="rec-name">LanguageTool</div><div class="rec-what">Перевіряє граматику й правопис, зокрема українською. Знадобиться для творів і рефератів.</div></div>
+      <div class="rec" style="--rc:#0E9A8C;"><div class="rec-tag">Мови</div><div class="rec-name">Google Перекладач</div><div class="rec-what">Перекладає цілу сторінку або лише виділене слово.</div></div>
+      <div class="rec" style="--rc:#3FAE58;"><div class="rec-tag">Зосередженість</div><div class="rec-name">Forest</div><div class="rec-what">Поки ти не відволікаєшся на соцмережі й ігри, росте віртуальне дерево.</div></div>
+      <div class="rec" style="--rc:#4F5B78;"><div class="rec-tag">Зручність</div><div class="rec-name">Dark Reader</div><div class="rec-what">Робить темною будь-яку сторінку — очі менше втомлюються ввечері.</div></div>
+      <div class="rec" style="--rc:#E0364A;"><div class="rec-tag">Безпека</div><div class="rec-name">uBlock Origin Lite</div><div class="rec-what">Блокує рекламу й трекери, сторінки стають чистішими.</div></div>
+      <div class="rec" style="--rc:#F28A1E;"><div class="rec-tag">Дизайн</div><div class="rec-name">ColorZilla</div><div class="rec-what">Піпетка: показує код будь-якого кольору на сайті.</div></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Обліковий запис браузера</div>
+    <h2>Твій браузер на всіх пристроях</h2>
+    <p><b>Обліковий запис браузера</b> пов’язує браузер з тобою. Увійди в нього на ноутбуці й телефоні — і отримаєш <b>синхронізацію</b>:</p>
+    <ul>
+      <li>закладка, додана на ноутбуці, за мить з’являється на телефоні</li>
+      <li>на новому пристрої одразу є твої паролі, історія й налаштування</li>
+      <li>дані передаються зашифрованими</li>
+    </ul>
+    <p class="soft">Чи перенесе обліковий запис браузера ці дані на інший пристрій?</p>
+    <div class="yn-grid" id="syncList"></div>
+    <div class="trivia">Саме тому на чужому комп’ютері не варто входити у свій профіль браузера: разом із тобою туди «переїдуть» твої паролі та історія. Як працювати на чужому пристрої — у наступному кроці.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Режими Google Chrome</div>
+    <h2>Звичайний профіль, інкогніто чи Гість</h2>
+    <p>Chrome дає три способи працювати в браузері. Вони різняться тим, що браузер бачить і що запам’ятовує.</p>
+    <div class="mode-grid">
+      <div class="mode" style="--mc:#2F6FE4; --mc-soft:#E6EEFD;">
+        <div class="mode-head"><span>👤</span>Звичайний профіль</div>
+        <ul>
+          <li class="y">зберігає історію, закладки й паролі</li>
+          <li class="y">синхронізує їх з іншими твоїми пристроями</li>
+        </ul>
+        <div class="mode-for">Для твого власного пристрою</div>
+      </div>
+      <div class="mode" style="--mc:#4F5B78; --mc-soft:#ECEFF5;">
+        <div class="mode-head"><span>🕶️</span>Інкогніто</div>
+        <ul>
+          <li class="n">після закриття вікна видаляє історію, кукі й дані форм</li>
+          <li class="y">закладки, які ти створиш, і завантажені файли лишаються</li>
+        </ul>
+        <div class="mode-for">Для свого пристрою, коли не хочеш лишати слідів</div>
+      </div>
+      <div class="mode" style="--mc:#F28A1E; --mc-soft:#FEF0E0;">
+        <div class="mode-head"><span>🧳</span>Гість</div>
+        <ul>
+          <li class="n">не бачить закладок, паролів та історії власника комп’ютера</li>
+          <li class="n">після закриття вікна все видаляється</li>
+        </ul>
+        <div class="mode-for">Для чужого чи спільного комп’ютера — або коли даєш свій комусь іншому</div>
+      </div>
+    </div>
+    <h3>Коли який режим обрати</h3>
+    <div class="when">
+      <div class="when-row" style="--mc:#2F6FE4;"><b>Звичайний профіль</b><span>вдома на своєму комп’ютері чи телефоні, щоб закладки, паролі й налаштування завжди були з тобою</span></div>
+      <div class="when-row" style="--mc:#4F5B78;"><b>Інкогніто</b><span>на своєму пристрої, коли треба щось знайти без слідів в історії або на хвилину зайти в інший обліковий запис</span></div>
+      <div class="when-row" style="--mc:#F28A1E;"><b>Гість</b><span>на чужому чи спільному комп’ютері: у бібліотеці, в гостях, у копіцентрі — і коли даєш свій ноутбук комусь іншому</span></div>
+    </div>
+    <div class="class-tip">
+      <div class="class-tip-head">🏫 В кабінеті інформатики рекомендуємо використовувати режим <b>Гість</b></div>
+      <ul>
+        <li>шкільні комп’ютери спільні: після тебе за ними сидітимуть інші класи</li>
+        <li>у вікні Гостя входь у шкільний обліковий запис лише на потрібному сайті, наприклад у Classroom, а не в сам браузер</li>
+        <li>не погоджуйся, коли браузер пропонує зберегти пароль</li>
+        <li>наприкінці уроку просто закрий вікно Гостя — і всі твої дані зникнуть з комп’ютера</li>
+      </ul>
+    </div>
+
+    <h3>Як увімкнути кожен режим</h3>
+    <div class="howto-grid">
+      <div class="howto" style="--mc:#2F6FE4;">
+        <div class="shot" id="shotProfile"></div>
+        <div class="howto-title">👤 Звичайний профіль</div>
+        <ol>
+          <li>Натисни круглий значок профілю праворуч від адресного рядка.</li>
+          <li>Обери «Увійти» і введи пошту та пароль свого облікового запису Google.</li>
+          <li>Якщо Chrome запропонує синхронізацію — погоджуйся лише на своєму пристрої.</li>
+        </ol>
+      </div>
+      <div class="howto" style="--mc:#4F5B78;">
+        <div class="shot" id="shotIncognito"></div>
+        <div class="howto-title">🕶️ Інкогніто</div>
+        <ol>
+          <li>Натисни меню «⋮» у правому верхньому куті.</li>
+          <li>Обери «Нове вікно в режимі анонімного перегляду». Швидше — <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd> (на Mac — <kbd>⌘</kbd> + <kbd>Shift</kbd> + <kbd>N</kbd>).</li>
+          <li>Відкриється темне вікно. Щоб завершити, закрий усі такі вікна.</li>
+        </ol>
+      </div>
+      <div class="howto" style="--mc:#F28A1E;">
+        <div class="shot" id="shotGuest"></div>
+        <div class="howto-title">🧳 Гість</div>
+        <ol>
+          <li>Натисни круглий значок профілю праворуч від адресного рядка.</li>
+          <li>Унизу меню обери «Гість» — відкриється нове чисте вікно.</li>
+          <li>Коли закінчиш, закрий вікно Гостя — історія, кукі й файли сеансу зникнуть.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="note">Якщо на шкільному комп’ютері пункту «Гість» немає, його міг вимкнути адміністратор. Тоді працюй в інкогніто й наприкінці обов’язково закрий усі вікна.</div>
+    <p class="soft">Який режим обрати в кожній ситуації?</p>
+    <div id="modeList"></div>
+    <div class="trivia">Ні інкогніто, ні Гість не роблять тебе невидимим. Сайти, адміністратор шкільної мережі та інтернет-провайдер усе одно бачать, куди ти заходиш. Ці режими лише не лишають слідів на самому комп’ютері.</div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div class="quiz-box" id="quizBox">
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-why" id="quizWhy"></div>
+      <div class="quiz-nav"><button class="btn-next" id="quizNext">Далі</button></div>
+    </div>
+    <div class="completion" id="completion">
+      <svg class="badge" viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#6C5CE7"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#6C5CE7"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#6C5CE7"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#6C5CE7"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#6C5CE7"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#6C5CE7"/>
+        <circle cx="12" cy="12" r="4.4" fill="#6C5CE7"/><circle cx="12" cy="12" r="1.6" fill="#5340c9" opacity="0.6"/>
+      </svg>
+      <h3>Урок пройдено!</h3>
+      <p>Тепер ти знаєш, чим різняться популярні браузери, що означають терміни в налаштуваннях, як безпечно встановлювати розширення, навіщо обліковий запис браузера і коли обирати звичайний профіль, інкогніто чи Гість.</p>
+      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Гід · Практична робота №5</div>
+    <h2>Налаштуй свій справжній браузер</h2>
+    <p>Цю частину виконують без нейрончиків — у Google Chrome на своєму комп’ютері. Познач для себе кожен виконаний пункт.</p>
+    <div class="guide">
+      <div class="guide-part" style="border-left-color:#2F6FE4;">
+        <h4>Частина 1. Налаштування</h4>
+        <ul class="guide-req">
+          <li><b>Мови:</b> є українська, увімкнено перевірку правопису та переклад сторінок українською</li>
+          <li><b>Завантаження:</b> обрано папку для файлів</li>
+          <li><b>Після запуску:</b> відкриваються 3 сторінки на твій вибір; пошукова система — Google</li>
+          <li><b>Стиль і тема:</b> кнопка головної сторінки, тема, панель закладок</li>
+          <li><b>Конфіденційність і безпека:</b> очищено історію, обрано покращений захист</li>
+          <li><b>Автозаповнення та паролі:</b> переглянуто паролі, вимкнено пропозицію їх зберігати</li>
+          <li><b>Ви й Google:</b> вхід у шкільний обліковий запис, синхронізація, назва профілю й аватар</li>
+        </ul>
+      </div>
+      <div class="guide-part" style="border-left-color:#F28A1E;">
+        <h4>Частина 2. Диспетчер закладок</h4>
+        <ul class="guide-req">
+          <li>3 нові папки із закладками на панелі закладок</li>
+          <li>перейменовано папку й відредаговано закладку</li>
+        </ul>
+      </div>
+      <div class="guide-part" style="border-left-color:#8C5BE8;">
+        <h4>Частина 3. Розширення</h4>
+        <ul class="guide-req">
+          <li>PageMarker — позначки на сайтах і знімок екрана з ними</li>
+          <li>LanguageTool — перевірка граматики й правопису</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Урок · «Браузер. Порівняння браузерів. Налаштування. Розширення. Облікові записи» · 7 клас
+  <span class="credits">Логотипи браузерів є торговельними марками їхніх власників і використані тут із навчальною метою. Джерело — Вікісховище: Google Chrome та Opera — суспільне надбання, Microsoft Edge — ліцензія MIT, Firefox — Mozilla, MPL 2.0. Логотип Safari — Apple Inc., англійська Вікіпедія.</span>
+</footer>
+
+<script>
+const STORAGE_KEY = "lesson7-browser-neurons";
+let neurons = 0;
+const neuronEl = document.getElementById('neuronCount');
+const hudFill = document.getElementById('hudFill');
+
+function addNeurons(n){
+  neurons += n;
+  neuronEl.textContent = neurons;
+  neuronEl.classList.add('pop');
+  setTimeout(()=>neuronEl.classList.remove('pop'), 250);
+  saveProgress();
+}
+async function saveProgress(){
+  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
+}
+async function loadProgress(){
+  try{
+    const res = await window.storage?.get(STORAGE_KEY, false);
+    if(res && res.value){
+      const d = JSON.parse(res.value);
+      if(typeof d.neurons === 'number'){ neurons = d.neurons; neuronEl.textContent = neurons; }
+    }
+  }catch(e){}
+}
+loadProgress();
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
+});
+
+/* ---------- УНІВЕРСАЛЬНІ МЕХАНІКИ ---------- */
+
+function makeChoices(containerId, items){
+  const list = document.getElementById(containerId);
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p><div class="choice-row"></div><div class="choice-feedback"></div>`;
+    const row = card.querySelector('.choice-row');
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    item.opts.forEach((opt,i)=>{
+      const btn = document.createElement('button');
+      btn.className = 'choice-btn';
+      btn.textContent = opt;
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i === item.correct){
+          btn.classList.add('correct');
+          answered = true;
+          fb.textContent = 'Правильно ✓ ' + (item.why || '');
+          addNeurons(1);
+        } else {
+          btn.classList.add('wrong');
+          fb.textContent = 'Ще раз подумай';
+        }
+      });
+      row.appendChild(btn);
+    });
+    list.appendChild(card);
+  });
+}
+
+function makeMatching(poolId, listId, pairs, progressId, bonus){
+  const pool = document.getElementById(poolId);
+  const list = document.getElementById(listId);
+  const progress = document.getElementById(progressId);
+  let selected = null, matched = 0;
+
+  function updateProgress(){
+    progress.textContent = (matched === pairs.length)
+      ? 'Усі пари знайдено ✓'
+      : `Зіставлено: ${matched} з ${pairs.length}`;
+  }
+
+  [...pairs].sort(()=>Math.random()-0.5).forEach(p=>{
+    const chip = document.createElement('div');
+    chip.className = 'match-chip';
+    chip.textContent = p.name;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.match-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = p.name;
+    });
+    pool.appendChild(chip);
+  });
+
+  [...pairs].sort(()=>Math.random()-0.5).forEach(p=>{
+    const card = document.createElement('div');
+    card.className = 'desc-card';
+    card.innerHTML = `<div class="desc-text">${p.desc}</div><div class="desc-slot">?</div>`;
+    card.addEventListener('click', ()=>{
+      if(card.classList.contains('matched') || !selected) return;
+      const slot = card.querySelector('.desc-slot');
+      if(selected === p.name){
+        slot.textContent = selected;
+        slot.classList.add('filled');
+        card.classList.add('matched');
+        const chip = [...pool.children].find(c=>c.textContent === selected);
+        if(chip) chip.classList.add('placed');
+        selected = null;
+        matched++;
+        addNeurons(1);
+        updateProgress();
+        if(matched === pairs.length) addNeurons(bonus || 2);
+      } else {
+        card.classList.add('shake');
+        setTimeout(()=>card.classList.remove('shake'), 350);
+      }
+    });
+    list.appendChild(card);
+  });
+  updateProgress();
+}
+
+function makeGallery(gridId, items){
+  const grid = document.getElementById(gridId);
+  items.forEach(it=>{
+    const card = document.createElement('div');
+    card.className = 'flip-card';
+    card.style.setProperty('--card-c', it.color);
+    card.style.setProperty('--card-c-light', it.colorLight);
+    card.innerHTML = `<div class="flip-inner">
+      <div class="flip-face flip-front"><div class="logo"><img src="images/${it.logo}" alt=""></div><div class="name">${it.name}</div><div class="tap">клацни ↻</div></div>
+      <div class="flip-face flip-back"><ul>${it.facts.map(f=>`<li>${f}</li>`).join('')}</ul></div>
+    </div>`;
+    card.addEventListener('click', ()=>{ card.classList.toggle('flipped'); });
+    grid.appendChild(card);
+  });
+}
+
+function makeMemo(gridId, pairs, progressId, bonus){
+  const grid = document.getElementById(gridId);
+  const progress = document.getElementById(progressId);
+  const cards = [];
+  pairs.forEach((p,i)=>{
+    cards.push({ pid:i, color:p.color, light:p.light, html:`<img class="memo-logo" src="images/${p.logo}" alt=""><div class="memo-name">${p.name}</div>` });
+    cards.push({ pid:i, color:p.color, light:p.light, html:`<div class="memo-feat">${p.feat}</div>` });
+  });
+  let opened = [], busy = false, matched = 0;
+
+  function updateProgress(){
+    progress.textContent = (matched === pairs.length)
+      ? 'Усі пари знайдено ✓'
+      : `Знайдено пар: ${matched} з ${pairs.length}`;
+  }
+
+  cards.sort(()=>Math.random()-0.5).forEach(c=>{
+    const card = document.createElement('div');
+    card.className = 'flip-card memo-card';
+    card.style.setProperty('--card-c', c.color);
+    card.style.setProperty('--card-c-light', c.light);
+    card.dataset.pid = c.pid;
+    card.innerHTML = `<div class="flip-inner">
+      <div class="flip-face flip-front"><div class="memo-cover">?</div></div>
+      <div class="flip-face flip-back">${c.html}</div>
+    </div>`;
+    card.addEventListener('click', ()=>{
+      if(busy || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+      card.classList.add('flipped');
+      opened.push(card);
+      if(opened.length < 2) return;
+      busy = true;
+      const [a, b] = opened;
+      if(a.dataset.pid === b.dataset.pid){
+        setTimeout(()=>{
+          a.classList.add('matched'); b.classList.add('matched');
+          opened = []; busy = false;
+          matched++;
+          addNeurons(1);
+          updateProgress();
+          if(matched === pairs.length) addNeurons(bonus || 3);
+        }, 400);
+      } else {
+        a.classList.add('miss'); b.classList.add('miss');
+        setTimeout(()=>{
+          a.classList.remove('flipped'); a.classList.remove('miss');
+          b.classList.remove('flipped'); b.classList.remove('miss');
+          opened = []; busy = false;
+        }, 950);
+      }
+    });
+    grid.appendChild(card);
+  });
+  updateProgress();
+}
+
+/* Питання по одному з кнопкою «Далі» — для опитування на початку і фінального квізу */
+function makeQuiz(prefix, questions, perCorrect, onDone){
+  const qEl = document.getElementById(prefix + 'Q');
+  const optsEl = document.getElementById(prefix + 'Options');
+  const progEl = document.getElementById(prefix + 'Progress');
+  const whyEl = document.getElementById(prefix + 'Why');
+  const nextBtn = document.getElementById(prefix + 'Next');
+  const imgEl = document.createElement('img');
+  imgEl.className = 'quiz-img';
+  imgEl.alt = '';
+  qEl.before(imgEl);
+  let qi = 0, answered = false, score = 0;
+
+  function render(){
+    answered = false;
+    nextBtn.classList.remove('active');
+    const item = questions[qi];
+    progEl.textContent = `Запитання ${qi+1} з ${questions.length}`;
+    imgEl.style.display = item.img ? 'block' : 'none';
+    if(item.img) imgEl.src = item.img;
+    qEl.textContent = item.q;
+    whyEl.textContent = '';
+    optsEl.innerHTML = '';
+    item.opts.forEach((opt,i)=>{
+      const b = document.createElement('button');
+      b.className = 'quiz-opt';
+      b.textContent = opt;
+      b.addEventListener('click', ()=>{
+        if(answered) return;
+        answered = true;
+        optsEl.querySelectorAll('.quiz-opt').forEach((ob,oi)=>{
+          if(oi === item.correct) ob.classList.add('correct');
+          else if(oi === i) ob.classList.add('wrong');
+        });
+        if(i === item.correct){ score++; addNeurons(perCorrect); }
+        if(item.why) whyEl.textContent = (i === item.correct ? '✓ ' : 'Правильну відповідь підсвічено. ') + item.why;
+        nextBtn.classList.add('active');
+        nextBtn.textContent = (qi === questions.length-1) ? 'Завершити' : 'Далі';
+      });
+      optsEl.appendChild(b);
+    });
+  }
+  nextBtn.addEventListener('click', ()=>{
+    if(!nextBtn.classList.contains('active')) return;
+    qi++;
+    if(qi < questions.length) render();
+    else onDone(score, questions.length);
+  });
+  render();
+}
+
+/* ---------- ПОВТОРЕННЯ: ОПИТУВАННЯ ---------- */
+const OS_IMG = '../lesson-os-software/images/';
+makeQuiz('recap', [
+  { q:'Ти двічі клацнув на фото, і воно відкрилося. Хто знайшов файл на диску й виділив для нього пам’ять?',
+    opts:['Сам файл','Операційна система','Монітор'], correct:1,
+    why:'Програми не звертаються до обладнання напряму — усе проходить через ОС.' },
+  { q:'Принтер під’єднали кабелем, але друк не починається. Чого найімовірніше бракує?',
+    opts:['Нового монітора','Швидшого інтернету','Драйвера'], correct:2,
+    why:'Драйвер перекладає команди системи мовою конкретного пристрою.' },
+  { img:OS_IMG+'windows.png', q:'Яка компанія створила цю операційну систему?',
+    opts:['Apple','Google','Microsoft'], correct:2,
+    why:'Windows від Microsoft — найпоширеніша система для персональних комп’ютерів.' },
+  { img:OS_IMG+'linux.png', q:'Цей пінгвін — символ якої системи?',
+    opts:['Windows','Linux','iOS'], correct:1,
+    why:'Пінгвін Tux — талісман Linux, безкоштовної й відкритої системи з багатьма дистрибутивами: Ubuntu, Fedora, Debian.' },
+  { img:OS_IMG+'macos.png', q:'Що правда про цю систему?',
+    opts:['Працює лише на комп’ютерах Mac від Apple','Вона безкоштовна й відкрита','Її встановлюють на будь-який смартфон'], correct:0,
+    why:'macOS встановлюється тільки на обладнання Apple.' },
+  { img:OS_IMG+'android.png', q:'Звідки зазвичай встановлюють програми в цій системі?',
+    opts:['З Google Play','З App Store','Лише з компакт-диска'], correct:0,
+    why:'Android — мобільна система від Google, її магазин застосунків — Google Play.' },
+  { img:OS_IMG+'ios.png', q:'На яких пристроях працює ця система?',
+    opts:['На ноутбуках будь-яких виробників','На iPhone та iPad','На розумних годинниках будь-яких марок'], correct:1,
+    why:'iOS — система Apple для смартфонів і планшетів, відома суворими правилами безпеки.' },
+  { q:'До якої групи належить система в розумному годиннику чи автомобілі?',
+    opts:['Серверні ОС','Мобільні ОС','Вбудовані ОС'], correct:2,
+    why:'Вбудовані системи працюють усередині техніки, і ми їх майже не помічаємо.' },
+  { q:'Комп’ютер цілодобово роздає шкільний сайт сотням учнів. Яка система йому потрібна?',
+    opts:['Серверна','Вбудована','Мобільна'], correct:0,
+    why:'Серверні ОС працюють без перерви й роздають послуги та ресурси мережі.' },
+  { q:'Мама щодня працює з програмою, яку випускають лише для Windows. Що для неї головне у виборі ноутбука?',
+    opts:['Колір корпусу','Сумісність системи з потрібною програмою','Кількість USB-роз’ємів'], correct:1,
+    why:'Якщо потрібна програма не працює в системі, решта переваг не допоможе.' },
+  { q:'Гра не запускається: у ноутбуці 4 ГБ оперативної пам’яті, а їй потрібно 16. Про що йдеться?',
+    opts:['Про ліцензію','Про системні вимоги','Про вид програмного забезпечення'], correct:1,
+    why:'Системні вимоги — мінімальне обладнання, з яким програма запуститься.' },
+  { q:'Комп’ютер ледь дотягує до мінімальних вимог програми. Що найімовірніше станеться?',
+    opts:['Програма запуститься, але може гальмувати','Програма працюватиме швидше, ніж на потужному ПК','Комп’ютер зламається'], correct:0,
+    why:'Для зручної роботи орієнтуються на рекомендовані вимоги.' },
+  { q:'Ви з однокласниками редагуєте один документ просто у вкладці, нічого не встановлюючи. Який це вид ПЗ?',
+    opts:['Десктопна програма','Мобільний застосунок','Онлайнова версія'], correct:2,
+    why:'Онлайнові програми працюють у браузері — саме про нього сьогоднішній урок.' },
+  { q:'Звідки безпечно завантажувати нову програму?',
+    opts:['З будь-якого сайту, де вона безкоштовна','З офіційного сайту розробника або магазину застосунків','З посилання від незнайомця'], correct:1,
+    why:'«Безкоштовні» копії платних програм часто містять шкідливе ПЗ.' }
+], 1, (score, total)=>{
+  document.getElementById('recapQuiz').style.display = 'none';
+  const res = document.getElementById('recapResult');
+  const msg = (score >= Math.ceil(total * 0.85)) ? 'Чудово, минулу тему ти пам’ятаєш!' : 'Непогано! Якщо щось забулось — зазирни в минулий урок.';
+  res.innerHTML = `<div class="score">${score} з ${total}</div><p>${msg} Переходь до браузерів.</p>`;
+  res.classList.add('show');
+  addNeurons(2);
+});
+
+/* ---------- КРОК 1: МОЖЛИВОСТІ БРАУЗЕРА ---------- */
+makeChoices('featList', [
+  { text:'Учора ввечері ти читав статтю про вулкани, але не зберіг посилання й не пам’ятаєш назви сайту. Як її знайти?',
+    opts:['Переглянути історію','Відкрити нову вкладку','Перезапустити браузер'], correct:0,
+    why:'Браузер записує всі сторінки, які ти відвідав.' },
+  { text:'Сайт з розкладом гуртків потрібен щотижня. Як відкривати його одним клацанням?',
+    opts:['Щоразу шукати в пошуковику','Додати в закладки','Очистити історію'], correct:1,
+    why:'Закладку можна ще й покласти в папку «Гуртки» через диспетчер закладок.' },
+  { text:'Для реферату треба одночасно тримати відкритими три сайти й перемикатися між ними.',
+    opts:['Відкрити їх у вкладках','Записати адреси в зошит','Щоразу вводити адресу заново'], correct:0,
+    why:'Вкладки тримають багато сторінок в одному вікні.' },
+  { text:'Браузер повідомляє, що готова нова версія, і просить перезапуститись. Навіщо це?',
+    opts:['Щоб видалити твої закладки','Щоб закрити знайдені вразливості й додати нові функції','Це реклама, її варто ігнорувати'], correct:1,
+    why:'Оновлення — одна з головних умов безпеки в інтернеті.' }
+]);
+
+/* ---------- КРОК 2: ПОРІВНЯННЯ БРАУЗЕРІВ ---------- */
+const BROWSERS = [
+  { name:'Google Chrome', logo:'chrome.png', color:'#2F6FE4', colorLight:'#E6EEFD',
+    facts:['Розробник — Google, з 2008 року','Найпоширеніший у світі: ним користуються близько двох третин людей','Рушій Chromium, розширення — у Chrome Web Store'],
+    feat:'Найпоширеніший браузер у світі' },
+  { name:'Microsoft Edge', logo:'edge.png', color:'#0E9A8C', colorLight:'#E0F4F1',
+    facts:['Розробник — Microsoft, з 2015 року','Уже встановлений у Windows','З 2020 року на рушії Chromium, тому підтримує розширення для Chrome','Вміє читати сторінки вголос'],
+    feat:'Одразу встановлений у Windows' },
+  { name:'Mozilla Firefox', logo:'firefox.png', color:'#F28A1E', colorLight:'#FEF0E0',
+    facts:['Створений некомерційною організацією Mozilla у 2004 році','Власний рушій Gecko і відкритий код','Вбудований захист від стеження'],
+    feat:'Від некомерційної організації, з власним рушієм' },
+  { name:'Safari', logo:'safari.png', color:'#4F5B78', colorLight:'#ECEFF5',
+    facts:['Розробник — Apple, з 2003 року','Основний браузер на iPhone, iPad і Mac','Рушій WebKit','Для Windows не випускається'],
+    feat:'Основний браузер на iPhone та Mac' },
+  { name:'Opera', logo:'opera.png', color:'#E0364A', colorLight:'#FCE6E9',
+    facts:['Один із найстаріших браузерів — з 1995 року','Вбудований безкоштовний VPN і блокувальник реклами','Сьогодні теж на рушії Chromium'],
+    feat:'Має вбудований безкоштовний VPN' }
+];
+makeGallery('brGallery', BROWSERS);
+makeMemo('memoGrid', BROWSERS.map(b=>({ name:b.name, logo:b.logo, feat:b.feat, color:b.color, light:b.colorLight })), 'memoProgress', 3);
+
+/* ---------- КРОК 3: СЛОВНИК НАЛАШТУВАНЬ ---------- */
+makeMatching('termPool', 'termList', [
+  { name:'Домашня сторінка', desc:'Щойно ти запускаєш браузер, перед тобою одразу з’являється шкільний сайт' },
+  { name:'Тема оформлення', desc:'Вікно браузера стало темно-синім із зірками на верхній панелі' },
+  { name:'HTTPS', desc:'Навіть якщо хтось перехопить дані в мережі кафе, прочитати їх не зможе — вони зашифровані' },
+  { name:'Кеш', desc:'Сайт, на який ти заходиш щодня, відкривається миттєво: логотип і картинки вже лежать на твоєму диску' },
+  { name:'Кукі (cookie)', desc:'Інтернет-магазин пам’ятає, що ти поклав у кошик, навіть після перезапуску браузера' },
+  { name:'Автозаповнення', desc:'Починаєш вводити ім’я в анкеті, а браузер пропонує дописати решту даних сам' }
+], 'termProgress', 3);
+
+/* ---------- КРОК 4: БЕЗПЕКА РОЗШИРЕНЬ ---------- */
+const EXT_OPTS = ['Можна встановити','Краще не встановлювати'];
+const ext = (name, meta) => `«${name}»<span class="ext-meta">${meta}</span>`;
+makeChoices('extCheck', [
+  { text:ext('Темний режим для всіх сайтів','Chrome Web Store · мільйони користувачів · ★ 4,7<br>Дозвіл: <i>читати й змінювати дані на всіх сайтах</i>'),
+    opts:EXT_OPTS, correct:0,
+    why:'Щоб перефарбувати будь-який сайт, розширенню справді треба змінювати сторінки. До того ж у нього багато користувачів і добрі відгуки.' },
+  { text:ext('Калькулятор PRO','Chrome Web Store · 900 користувачів · ★ 2,1<br>Дозвіл: <i>читати й змінювати дані на всіх сайтах, читати історію перегляду</i>'),
+    opts:EXT_OPTS, correct:1,
+    why:'Калькулятору не потрібні ні твої сайти, ні історія. Такі самі дозволи, як у попереднього, але тут вони не відповідають призначенню.' },
+  { text:ext('Завантажувач відео','На сайті з фільмами вискакує вікно: «Встанови розширення, щоб дивитися безкоштовно» і кнопка «Завантажити файл»'),
+    opts:EXT_OPTS, correct:1,
+    why:'Встановлення не з офіційного магазину, та ще й з нав’язливого вікна — класична пастка.' },
+  { text:ext('Google Перекладач','Chrome Web Store · розробник Google · мільйони користувачів<br>Дозвіл: <i>читати сторінку, яку ти перекладаєш</i>'),
+    opts:EXT_OPTS, correct:0,
+    why:'Відомий розробник, офіційний магазин, і дозвіл потрібен саме для перекладу.' },
+  { text:ext('Безкоштовні робукси','Chrome Web Store · ★ 4,9 · одразу після встановлення просить увійти у свій обліковий запис Google просто у вікні розширення'),
+    opts:EXT_OPTS, correct:1,
+    why:'Обіцянки безкоштовної ігрової валюти — приманка для крадіжки облікових записів. Жодне розширення не має просити пароль, а високий рейтинг можна накрутити.' }
+]);
+
+/* ---------- КРОК 5: СИНХРОНІЗАЦІЯ ---------- */
+makeChoices('syncList', [
+  { text:'Закладки, додані на ноутбуці', opts:['Так','Ні'], correct:0 },
+  { text:'Паролі, збережені в браузері', opts:['Так','Ні'], correct:0 },
+  { text:'Фото з галереї телефону', opts:['Так','Ні'], correct:1,
+    why:'Це робота окремих хмарних сервісів, а не браузера.' },
+  { text:'Історія відвіданих сайтів', opts:['Так','Ні'], correct:0 },
+  { text:'Документи з робочого столу ноутбука', opts:['Так','Ні'], correct:1,
+    why:'Браузер синхронізує лише власні дані.' },
+  { text:'Встановлені розширення й тема', opts:['Так','Ні'], correct:0 }
+]);
+
+/* ---------- КРОК 6: РЕЖИМИ CHROME ---------- */
+/* Знімок екрана з images/. Поки файлу немає — показується спрощена схема. */
+function loadPic(containerId, file, fallback){
+  const el = document.getElementById(containerId);
+  const img = document.createElement('img');
+  img.src = `images/${file}`;
+  img.alt = '';
+  img.addEventListener('error', ()=>{ el.innerHTML = fallback; });
+  el.innerHTML = '';
+  el.appendChild(img);
+}
+/* Схема: смужка панелі інструментів + меню, де підсвічено потрібний пункт */
+function modeScheme(hl, items, pick, dark){
+  const bar = dark ? '#3C4043' : '#FFFFFF';
+  const x = hl === 'avatar' ? 262 : 292;
+  const rows = items.map((txt,i)=>{
+    const y = 58 + i*26;
+    const on = i === pick;
+    return `<rect x="120" y="${y}" width="186" height="22" rx="5" fill="${on ? '#FEF0E0' : '#FFFFFF'}" ${on ? 'stroke="#F28A1E" stroke-width="2"' : ''}/>
+      <text x="130" y="${y+15}" font-family="Nunito Sans, sans-serif" font-size="11" font-weight="${on ? 800 : 600}" fill="#172036">${txt}</text>`;
+  }).join('');
+  return `<svg viewBox="0 0 320 200" xmlns="http://www.w3.org/2000/svg">
+    <rect width="320" height="200" fill="#EDF1F9"/>
+    <rect x="0" y="0" width="320" height="40" fill="${bar}"/>
+    <rect x="14" y="10" width="200" height="20" rx="10" fill="${dark ? '#5F6368' : '#EDF1F9'}"/>
+    <circle cx="262" cy="20" r="10" fill="#8C5BE8"/>
+    <circle cx="292" cy="13" r="2" fill="${dark ? '#fff' : '#4F5B78'}"/><circle cx="292" cy="20" r="2" fill="${dark ? '#fff' : '#4F5B78'}"/><circle cx="292" cy="27" r="2" fill="${dark ? '#fff' : '#4F5B78'}"/>
+    <circle cx="${x}" cy="20" r="14" fill="none" stroke="#F28A1E" stroke-width="3"/>
+    <rect x="112" y="48" width="202" height="${items.length*26 + 14}" rx="8" fill="#FFFFFF" stroke="#DFE5F2"/>
+    ${rows}
+  </svg>`;
+}
+loadPic('shotProfile', 'mode-profile.png', modeScheme('avatar', ['Ти ще не ввійшов у Chrome','Увійти','Гість'], 1, false));
+loadPic('shotIncognito', 'mode-incognito.png', modeScheme('menu', ['Нова вкладка','Нове вікно','Нове вікно в режимі анонімного…','Історія'], 2, false));
+loadPic('shotGuest', 'mode-guest.png', modeScheme('avatar', ['Твій профіль','Керувати профілями','Гість'], 2, false));
+
+const MODE_OPTS = ['Звичайний профіль','Інкогніто','Гість'];
+makeChoices('modeList', [
+  { text:'Однокласник попросив твій ноутбук на 10 хвилин, щоб перевірити свою пошту.',
+    opts:MODE_OPTS, correct:2,
+    why:'Він не побачить твоїх закладок і паролів, а його дані зникнуть після закриття вікна.' },
+  { text:'Ти за спільним комп’ютером у шкільній бібліотеці й хочеш зайти в Classroom.',
+    opts:MODE_OPTS, correct:2,
+    why:'На чужому пристрої — лише Гість. Після роботи просто закрий вікно.' },
+  { text:'Вдома на своєму ноутбуці вибираєш подарунок мамі й не хочеш, щоб вона випадково побачила його в історії.',
+    opts:MODE_OPTS, correct:1,
+    why:'Пристрій твій, треба лише не лишити слідів у історії.' },
+  { text:'Щодня робиш домашні завдання на своєму комп’ютері й хочеш, щоб закладки були і на телефоні.',
+    opts:MODE_OPTS, correct:0,
+    why:'Синхронізація працює лише у звичайному профілі з обліковим записом.' },
+  { text:'На своєму ноутбуці треба на хвилину зайти в другий обліковий запис Google, не виходячи з основного.',
+    opts:MODE_OPTS, correct:1,
+    why:'Вікно інкогніто не бачить кукі основного профілю, тож можна увійти під іншим обліковим записом.' }
+]);
+
+/* ---------- ФІНАЛЬНИЙ КВІЗ ---------- */
+makeQuiz('quiz', [
+  { q:'Що таке веббраузер?', opts:['Пошукова система, наприклад Google','Програма для перегляду вебсторінок і роботи з ними','Сайт, на якому зберігаються всі інші сайти'], correct:1 },
+  { q:'Що об’єднує Chrome, Edge та Opera?', opts:['Спільний рушій Chromium','Один розробник','Вони працюють лише на телефонах'], correct:0 },
+  { q:'Що означає значок замка й https перед адресою сайту?', opts:['Сайт платний','Сайт заблоковано','Дані між тобою й сайтом передаються зашифрованими'], correct:2 },
+  { q:'Ти закрив вікно інкогніто. Що зникне з пристрою?', opts:['Завантажені файли','Історія відвіданих сторінок цього сеансу','Закладки, які ти створив'], correct:1 },
+  { q:'Розширення-калькулятор просить дозвіл читати всі дані на всіх сайтах. Що це означає?', opts:['Так працюють усі розширення','Дозвіл не відповідає призначенню — розширення підозріле','Калькулятор рахуватиме точніше'], correct:1 },
+  { q:'Ти за спільним комп’ютером у бібліотеці. Який режим Chrome найкраще підходить?', opts:['Звичайний профіль з твоїм обліковим записом','Будь-який, різниці немає','Гість'], correct:2 },
+  { q:'Навіщо входити в обліковий запис браузера?', opts:['Щоб сайти відкривались швидше','Щоб закладки, паролі й налаштування були однакові на всіх твоїх пристроях','Щоб вимкнути рекламу'], correct:1 }
+], 2, ()=>{
+  document.getElementById('quizBox').style.display = 'none';
+  document.getElementById('completion').classList.add('show');
+  addNeurons(3);
+  document.getElementById('totalNeurons').textContent = neurons;
+});
+</script>
+
+</body>
+</html>
