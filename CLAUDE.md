@@ -280,6 +280,7 @@ async function loadProgress(){
 | 8 | Збір даних | `8/lesson-data-collection/` |
 | 9 | Життя з розумними пристроями | `9/lesson-smart-classroom/` |
 | 9 | Поняття бази даних | `9/lesson-database-basics/` |
+| 9 | Поняття реляційної бази даних. Зв'язані аркуші в Google Таблицях | `9/lesson-relational-db/` |
 
 Класи, активовані на головній: 5, 6, 7, 8, 9. Розділ «Лабораторія» (`labs/`) створено, поки без вправ. Фото-заготовки є в `5/lesson-computer-systems/images/`, `7/lesson-os-software/images/`, `7/lesson-browser/images/` (логотипи браузерів) та `8/lesson-tech-problems/images/`.
 

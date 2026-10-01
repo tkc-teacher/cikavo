@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Реляційна база даних — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F3F8F6; --ink:#16302A; --ink-soft:#4E6660; --surface:#FFFFFF; --line:#D8E8E2;
+    --pri:#1A7F64; --pri-dark:#11604B; --accent:#4C6EF5; --accent-dark:#3651C9; --warm:#F2A93B; --coral:#E0604A;
+    --cell-line:#D3DEDA; --head-bg:#EDF4F1;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  .container{max-width:780px; margin:0 auto; padding:0 24px;}
+  @media (max-width:480px){ .container{padding:0 16px;} }
+
+  .hud{position:sticky; top:0; z-index:50; background:rgba(243,248,246,.9); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
+  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--pri)); transition:width .3s ease;}
+  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:780px; margin:0 auto;}
+  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
+  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
+  .neuron-counter svg{width:24px;height:24px;}
+  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
+  #neuronCount.pop{transform:scale(1.35);}
+
+  .hero{padding:48px 24px 36px;}
+  .hero-inner{max-width:780px; margin:0 auto; display:flex; align-items:center; gap:26px;}
+  .hero-text{flex:1;}
+  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--pri); margin-bottom:10px;}
+  .hero h1{font-size:29px; line-height:1.2; margin-bottom:12px;}
+  .hero p{color:var(--ink-soft); font-size:16px; max-width:54ch; margin-bottom:20px;}
+  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--pri); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
+  .btn-primary:hover{background:var(--pri-dark);}
+  .btn-primary:active{transform:scale(.97);}
+  .mascot{width:130px; height:130px; flex-shrink:0;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:100px; height:100px;} }
+
+  section.block{padding:30px 0; border-top:1px solid var(--line);}
+  .step-label{font-family:'Baloo 2',sans-serif; font-size:12.5px; font-weight:700; color:var(--pri); margin-bottom:6px; text-transform:uppercase; letter-spacing:.03em;}
+  .block h2{font-size:19px; margin-bottom:8px; max-width:40ch;}
+  .block p{max-width:64ch; font-size:15px; margin:0 0 8px; color:var(--ink);}
+  .block p.soft{color:var(--ink-soft); font-size:13.5px;}
+  .block ul, .block ol{max-width:64ch; margin:0 0 8px; padding-left:20px; font-size:15px;}
+  .block li{margin-bottom:4px;}
+  .note{background:#EEF2FF; border-left:4px solid var(--accent); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:var(--accent-dark); margin:12px 0;}
+  .trivia{background:#E4F3EE; border-left:4px solid var(--pri); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:var(--pri-dark); margin:12px 0;}
+  .problem-note{background:#FDEDEA; border-left:4px solid var(--coral); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:#8C3424; margin:12px 0;}
+  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:16px 18px; margin-top:10px;}
+  @media (max-width:480px){ .exercise{padding:14px 10px;} }
+  @keyframes itemShake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
+  .shake{animation:itemShake .35s ease;}
+  .status-line{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--pri-dark); margin-top:12px; min-height:1.4em;}
+  .hot-prompt{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; text-align:center; margin-bottom:10px;}
+  .hot-prompt span{color:var(--accent-dark);}
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; background:var(--head-bg); padding:1px 6px; border-radius:5px; font-size:.92em; white-space:nowrap;}
+
+  /* CLASSIFY */
+  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:13px 15px; margin:8px 0;}
+  .classify-card p.q{font-weight:700; margin:0 0 8px; font-size:13.5px;}
+  .choice-row{display:flex; gap:6px; flex-wrap:wrap;}
+  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12px; padding:7px 11px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease, color .15s ease;}
+  .choice-btn:hover{border-color:var(--pri);}
+  .choice-btn.correct{background:#E4F5E9; border-color:#3FAE58; color:#256B36;}
+  .choice-btn.wrong{background:#FBE6E9; border-color:#D14B5E; color:#8C2D3A;}
+  .choice-feedback{margin-top:6px; font-size:12px; color:var(--ink-soft); min-height:1.2em;}
+
+  /* MATCHING */
+  .tool-pool{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; padding:11px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:12px;}
+  .tool-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:7px 12px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .tool-chip:hover{transform:translateY(-2px);}
+  .tool-chip.selected{border-color:var(--pri); box-shadow:0 0 0 3px rgba(26,127,100,0.2);}
+  .tool-chip.placed{display:none;}
+  .func-card{display:flex; align-items:center; gap:10px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:9px 11px; margin-bottom:7px; cursor:pointer; transition:border-color .2s ease, background .2s ease;}
+  .func-card.matched{border-color:var(--pri); background:#EEF8F4; cursor:default;}
+  .func-text{flex:1; font-size:13px; color:var(--ink-soft);}
+  .func-slot{min-width:80px; max-width:40%; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:11.5px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:6px 6px;}
+  .func-slot.filled{border-style:solid; border-color:var(--pri); background:#D9F0E7; color:var(--ink);}
+
+  /* SORT BOARD */
+  .sort-buckets{display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:8px;}
+  .bucket{border:2px dashed var(--line); border-radius:var(--radius-m); padding:9px; min-height:110px; cursor:pointer; background:var(--surface);}
+  .bucket-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--ink-soft); text-align:center;}
+  .bucket-sub{font-size:11px; color:var(--ink-soft); text-align:center; margin-bottom:6px;}
+  .bucket-items{display:flex; flex-wrap:wrap; gap:5px; min-height:28px; justify-content:center;}
+  .bucket.hint{border-color:var(--coral);}
+  .sort-pool{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-top:12px;}
+  .sort-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:7px 11px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .sort-chip:hover{transform:translateY(-2px);}
+  .sort-chip.selected{border-color:var(--pri); box-shadow:0 0 0 3px rgba(26,127,100,0.2);}
+  .sort-chip.placed{background:#E4F5E9; border-color:#3FAE58; cursor:default; font-size:11px;}
+  .sort-chip.placed:hover{transform:none;}
+
+  /* SPREADSHEET MOCK */
+  .sheet{background:var(--surface); border:1.5px solid var(--cell-line); border-radius:var(--radius-s); overflow:hidden; font-size:12px; user-select:none;}
+  .sheet-title{display:flex; align-items:center; gap:8px; background:#FAFCFB; border-bottom:1px solid var(--cell-line); padding:6px 10px; font-weight:700; font-size:12.5px;}
+  .sheet-title .doc{width:16px; height:20px; border-radius:3px; background:#1FA463; position:relative; flex-shrink:0;}
+  .sheet-title .doc::after{content:''; position:absolute; left:3px; right:3px; top:6px; height:8px; border:1.5px solid #fff; border-radius:1px;}
+  .sheet-scroll{overflow-x:auto;}
+  .sheet-grid{border-collapse:collapse; width:100%; min-width:420px; table-layout:fixed;}
+  .sheet-grid th, .sheet-grid td{border:1px solid var(--cell-line); height:28px; padding:0 6px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;}
+  .sheet-grid th{background:var(--head-bg); font-weight:700; color:var(--ink-soft); font-size:11px; text-align:center;}
+  .sheet-grid th.corner{width:30px;}
+  .sheet-grid td{background:#fff;}
+  .sheet-grid td.fname{font-weight:800; background:#F4F9F7;}
+  .sheet-grid td.num{text-align:right;}
+  .sheet-grid td.ctr{text-align:center;}
+  .sheet-grid td.calc{color:var(--accent-dark); font-weight:700;}
+  .sheet-grid td.err{color:#C0392B; font-weight:800;}
+  .clk{cursor:pointer; transition:background .15s ease, box-shadow .15s ease;}
+  .clk:hover{box-shadow:inset 0 0 0 2px rgba(26,127,100,.35);}
+  .sheet-grid .ok{background:#DFF3E6 !important; color:#1E6B3A;}
+  .sheet-grid .bad{animation:itemShake .35s ease; background:#FCE6E2 !important;}
+  .sheet-grid .found{background:#FFE9C7 !important; box-shadow:inset 0 0 0 2px var(--warm); font-weight:800;}
+  .sheet-grid .sel{box-shadow:inset 0 0 0 2px var(--accent) !important;}
+  .sheet-grid .flash{animation:cellFlash 1.2s ease;}
+  @keyframes cellFlash{0%{background:#C9D5FF;} 100%{background:#fff;}}
+  .sheet-grid select{width:100%; font:inherit; font-weight:700; border:1px solid var(--cell-line); border-radius:4px; background:#F7F9FF; padding:1px 2px; cursor:pointer;}
+  .two-sheets{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .two-sheets .sheet-grid{min-width:0;}
+  @media (max-width:640px){ .two-sheets{grid-template-columns:1fr;} }
+  .fbar{display:flex; align-items:center; border-bottom:1px solid var(--cell-line); font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px; background:#fff;}
+  .fbar .ref{width:46px; text-align:center; border-right:1px solid var(--cell-line); padding:5px 0; color:var(--ink-soft); font-weight:700;}
+  .fbar .fx{padding:0 8px; color:var(--ink-soft); font-style:italic; border-right:1px solid var(--cell-line);}
+  .fbar .val{padding:5px 8px; overflow-x:auto; white-space:nowrap; flex:1;}
+  .tabs{display:flex; gap:2px; background:#F1F4F3; border-top:1px solid var(--cell-line); padding:4px 8px 0;}
+  .tab{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12px; border:none; background:transparent; padding:6px 14px; border-radius:6px 6px 0 0; cursor:pointer; color:var(--ink-soft);}
+  .tab.active{background:#fff; color:var(--pri-dark); box-shadow:inset 0 -3px 0 var(--pri);}
+
+  /* TYPE CARDS */
+  .rel-cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; margin:10px 0 14px;}
+  .rel-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px;}
+  .rel-card .tag{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:20px; color:var(--accent-dark);}
+  .rel-card .nm{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; margin-bottom:6px;}
+  .rel-card svg{width:100%; height:54px; display:block; margin:4px 0 6px;}
+  .rel-card p{font-size:12.5px !important; color:var(--ink-soft) !important; margin:0 !important;}
+
+  /* FORMULA BUILDER */
+  .formula-line{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:15px; font-weight:700; display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:6px; padding:14px 8px; background:#F7F9FF; border:1.5px solid #D7DEFA; border-radius:var(--radius-m);}
+  .fslot{min-width:96px; min-height:34px; display:inline-flex; align-items:center; justify-content:center; border:2px dashed #A9B8F2; border-radius:8px; padding:2px 8px; cursor:pointer; background:#fff; font-size:13px; position:relative;}
+  .fslot .n{position:absolute; top:-9px; left:-7px; width:18px; height:18px; border-radius:50%; background:var(--accent); color:#fff; font-family:'Baloo 2',sans-serif; font-size:11px; display:flex; align-items:center; justify-content:center;}
+  .fslot.over{background:#EEF2FF;}
+  .fslot.filled{border-style:solid; border-color:var(--pri); background:#D9F0E7; cursor:default;}
+  .slot-legend{list-style:none; padding:0 !important; margin:12px 0 0 !important; font-size:13px !important;}
+  .slot-legend li{display:flex; gap:8px; align-items:center; margin-bottom:4px;}
+  .slot-legend .n{width:18px; height:18px; border-radius:50%; background:var(--accent); color:#fff; font-family:'Baloo 2',sans-serif; font-size:11px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .fchip{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; font-size:13px; background:var(--bg); border:2px solid var(--line); border-radius:8px; padding:6px 10px; cursor:grab; transition:border-color .15s ease, transform .12s ease;}
+  .fchip:hover{transform:translateY(-2px);}
+  .fchip.selected{border-color:var(--accent); box-shadow:0 0 0 3px rgba(76,110,245,0.2);}
+  .fchip.placed{display:none;}
+
+  /* SEQUENCE */
+  .seq-done{list-style:none; padding:0 !important; margin:0 0 10px !important;}
+  .seq-done li{display:flex; gap:10px; align-items:center; background:#EEF8F4; border:1.5px solid #BFE3D5; border-radius:var(--radius-s); padding:8px 12px; margin-bottom:6px !important; font-size:14px;}
+  .seq-done .n{width:24px; height:24px; border-radius:50%; background:var(--pri); color:#fff; font-family:'Baloo 2',sans-serif; font-size:13px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .seq-ask{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; margin:6px 0 8px;}
+  .seq-ask b{color:var(--accent-dark);}
+  .seq-opts{display:flex; flex-direction:column; gap:7px;}
+  .seq-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:14px; font-weight:600; padding:10px 13px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer;}
+  .seq-opt:hover{border-color:var(--pri);}
+  .seq-opt.wrong{background:#FBE6E9; border-color:#D14B5E;}
+
+  /* QUIZ */
+  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:24px 22px; margin-top:16px;}
+  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:12.5px; color:var(--ink-soft); margin-bottom:9px;}
+  .quiz-q{font-size:16px; font-weight:700; margin-bottom:14px;}
+  .quiz-options{display:flex; flex-direction:column; gap:9px;}
+  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:14px; font-weight:600; padding:11px 14px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .quiz-opt:hover{border-color:var(--pri);}
+  .quiz-opt.correct{background:#E4F5E9; border-color:#3FAE58;}
+  .quiz-opt.wrong{background:#FBE6E9; border-color:#D14B5E;}
+  .quiz-nav{display:flex; justify-content:flex-end; margin-top:16px;}
+  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:10px 20px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
+  .btn-next.active{opacity:1; pointer-events:auto;}
+
+  .completion{display:none; text-align:center; padding:18px 10px 10px;}
+  .completion.show{display:block;}
+  .badge{width:80px; height:80px; margin:0 auto 14px;}
+  .completion h3{font-size:20px; margin-bottom:8px;}
+  .completion p{color:var(--ink-soft); max-width:50ch; margin:0 auto 16px; font-size:14px;}
+  .completion .total{font-family:'Baloo 2',sans-serif; font-size:28px; color:var(--pri-dark);}
+
+  /* PRACTICAL GUIDE */
+  .guide{background:var(--surface); border:2px solid var(--pri); border-radius:var(--radius-l); padding:20px 20px 16px; margin-top:12px;}
+  @media (max-width:480px){ .guide{padding:16px 12px 12px;} }
+  .guide-head{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:6px;}
+  .guide-head h2{margin:0;}
+  .btn-print, .btn-copy{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; background:var(--bg); color:var(--pri-dark); border:1.5px solid var(--line); padding:6px 14px; border-radius:var(--radius-s); cursor:pointer;}
+  .btn-copy{margin:6px 6px 0 0;}
+  .btn-copy.done{background:#E4F5E9; border-color:#3FAE58; color:#256B36;}
+  .guide-card{border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; margin:10px 0; background:#FBFDFC;}
+  .guide-card h3{font-size:15px; margin-bottom:4px; display:flex; align-items:center; gap:8px;}
+  .guide-card h3 .n{width:24px; height:24px; border-radius:50%; background:var(--pri); color:#fff; font-size:12.5px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .guide-card p, .guide-card li{font-size:14px !important;}
+  .guide-card .mini{margin-top:8px;}
+  .guide-card .mini .sheet-grid{min-width:0;}
+  .menu{font-family:'Baloo 2',sans-serif; font-weight:700; color:var(--pri-dark); white-space:nowrap;}
+  .checklist{list-style:none; padding:0 !important;}
+  .checklist li{display:flex; gap:10px; align-items:flex-start; font-size:14px; padding:6px 0; border-bottom:1px dashed var(--line); margin:0 !important;}
+  .checklist input{width:18px; height:18px; margin-top:3px; accent-color:var(--pri); flex-shrink:0;}
+
+  footer{padding:32px 24px 56px; text-align:center; color:var(--ink-soft); font-size:13px;}
+
+  @media print{
+    .hud, .hero, footer, section.block:not(#practice), .btn-print, .btn-copy{display:none !important;}
+    body{background:#fff;}
+    #practice{border-top:none; padding-top:0;}
+    .guide{border:none; padding:0;}
+    .guide-card{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
+  <div class="hud-row">
+    <span class="hud-title">9 клас · Реляційна база даних</span>
+    <div class="neuron-counter">
+      <svg viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
+        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#B57A1F" opacity="0.6"/>
+      </svg>
+      <span id="neuronCount">0</span>
+    </div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Впорядкування даних · Тема 12</div>
+      <h1>Реляційна база даних: таблиці, що тримаються за руки</h1>
+      <p>Одна велика таблиця швидко стає безладною. Дізнаймося, як розкласти дані по кількох таблицях, зв'язати їх ключами й зробити такий зв'язок у Google Таблицях.</p>
+      <button class="btn-primary" onclick="document.getElementById('rev').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <!-- ліва таблиця -->
+      <rect x="6" y="24" width="54" height="70" rx="9" fill="#1A7F64"/>
+      <rect x="6" y="24" width="54" height="17" rx="9" fill="#11604B"/>
+      <rect x="6" y="33" width="54" height="8" fill="#11604B"/>
+      <line x1="24" y1="24" x2="24" y2="41" stroke="#1A7F64" stroke-width="2"/>
+      <circle cx="24" cy="58" r="4.5" fill="#16302A"/><circle cx="42" cy="58" r="4.5" fill="#16302A"/>
+      <circle cx="25.4" cy="56.6" r="1.4" fill="#fff"/><circle cx="43.4" cy="56.6" r="1.4" fill="#fff"/>
+      <path d="M26 70 C30 75 36 75 40 70" stroke="#16302A" stroke-width="3" stroke-linecap="round"/>
+      <line x1="14" y1="84" x2="52" y2="84" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".55"/>
+      <!-- права таблиця -->
+      <rect x="80" y="46" width="54" height="70" rx="9" fill="#4C6EF5"/>
+      <rect x="80" y="46" width="54" height="17" rx="9" fill="#3651C9"/>
+      <rect x="80" y="55" width="54" height="8" fill="#3651C9"/>
+      <line x1="98" y1="46" x2="98" y2="63" stroke="#4C6EF5" stroke-width="2"/>
+      <circle cx="98" cy="80" r="4.5" fill="#16302A"/><circle cx="116" cy="80" r="4.5" fill="#16302A"/>
+      <circle cx="99.4" cy="78.6" r="1.4" fill="#fff"/><circle cx="117.4" cy="78.6" r="1.4" fill="#fff"/>
+      <path d="M100 92 C104 97 110 97 114 92" stroke="#16302A" stroke-width="3" stroke-linecap="round"/>
+      <line x1="88" y1="106" x2="126" y2="106" stroke="#fff" stroke-width="2.5" stroke-linecap="round" opacity=".55"/>
+      <!-- зв'язок -->
+      <path d="M60 66 C70 66 70 88 80 88" stroke="#F2A93B" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="70" cy="77" r="11" fill="#F2A93B"/>
+      <text x="70" y="81" text-anchor="middle" font-family="Arial" font-weight="700" font-size="10" fill="#fff">ID</text>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="rev" style="border-top:none; padding-top:0;">
+    <div class="step-label">Повторення · Поняття бази даних</div>
+    <h2>Що ми вже знаємо</h2>
+    <p>Минулого уроку ми зробили базу даних з однієї таблиці. Пригадаймо головні поняття.</p>
+    <p class="soft">Клацни термін, потім — пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="tool-pool" id="revPool"></div>
+      <div id="revList"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s1">
+    <div class="step-label">Крок 1 · Одна таблиця на все?</div>
+    <h2>Коли дані повторюються</h2>
+    <p>Якщо зберігати все в одній таблиці, ті самі відомості доводиться вписувати знову й знову. Наприклад, ім'я класного керівника — у рядку кожного учня.</p>
+    <div class="problem-note">Повтори — це не лише зайва робота. Виправиш один рядок, а другий забудеш, — і база почне «суперечити сама собі».</div>
+    <div class="exercise">
+      <div class="hot-prompt">Класним керівником <span>9-А</span> тепер буде Г. Сидоренко. Клацни всі комірки, які доведеться виправити.</div>
+      <div class="sheet">
+        <div class="sheet-title"><span class="doc"></span>Учні (усе в одній таблиці)</div>
+        <div class="sheet-scroll"><table class="sheet-grid" id="dupGrid"></table></div>
+      </div>
+      <div class="status-line" id="dupStatus">Виправлено: 0</div>
+    </div>
+  </section>
+
+  <section class="block" id="s2">
+    <div class="step-label">Крок 2 · Предметна область</div>
+    <h2>Розкласти світ по таблицях</h2>
+    <ul>
+      <li><b>Реляційна база даних</b> — база, у якій дані зберігаються в кількох таблицях, пов'язаних між собою.</li>
+      <li><b>Предметна область</b> — частина реального світу, про яку збираємо дані: шкільна бібліотека, кафе, спортклуб.</li>
+      <li><b>Об'єкти предметної області</b> — головні «речі» чи учасники, про які зберігаємо відомості. Кожен об'єкт отримує <b>свою таблицю</b>.</li>
+      <li><b>Властивості об'єкта</b> стають <b>полями</b> (стовпцями) його таблиці.</li>
+    </ul>
+    <div class="note">Слово «реляційна» походить від англійського <i>relation</i> — «відношення, зв'язок».</div>
+    <p class="soft">Предметна область — <b>онлайн-кінотеатр</b>. Що з цього стане окремою таблицею, а що — полем у таблиці?</p>
+    <div class="exercise">
+      <div class="sort-buckets">
+        <div class="bucket" id="bObj"><div class="bucket-title">🗂 Об'єкт</div><div class="bucket-sub">окрема таблиця</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bProp"><div class="bucket-title">🏷 Властивість</div><div class="bucket-sub">поле (стовпець) таблиці</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="objPool"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s3">
+    <div class="step-label">Крок 3 · Ключі</div>
+    <h2>Первинний і зовнішній ключ</h2>
+    <p>Таблиці реляційної бази з'єднуються за допомогою ключів:</p>
+    <ul>
+      <li><b>Первинний ключ</b> — поле з унікальним значенням для кожного запису таблиці (наприклад, ID класу в таблиці «Класи»).</li>
+      <li><b>Зовнішній ключ</b> — поле в іншій таблиці, яке зберігає значення первинного ключа і так «вказує» на потрібний запис.</li>
+    </ul>
+    <p>У таблиці «Учні» не пишуть назву класу й керівника — лише номер класу. Решту можна знайти в таблиці «Класи» за цим номером.</p>
+    <div class="exercise">
+      <div class="hot-prompt" id="keyPrompt"></div>
+      <div class="two-sheets">
+        <div class="sheet">
+          <div class="sheet-title"><span class="doc"></span>Учні</div>
+          <div class="sheet-scroll"><table class="sheet-grid" id="kU"></table></div>
+        </div>
+        <div class="sheet">
+          <div class="sheet-title"><span class="doc"></span>Класи</div>
+          <div class="sheet-scroll"><table class="sheet-grid" id="kK"></table></div>
+        </div>
+      </div>
+      <div class="status-line" id="keyStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s4">
+    <div class="step-label">Крок 4 · Типи зв'язків</div>
+    <h2>Скільки з одного боку — скільки з іншого</h2>
+    <p>Зв'язок показує, скільки записів однієї таблиці може відповідати одному запису іншої. Буває три типи:</p>
+    <div class="rel-cards">
+      <div class="rel-card">
+        <div class="tag">1 : 1</div>
+        <div class="nm">Один до одного</div>
+        <svg viewBox="0 0 200 54"><circle cx="40" cy="27" r="12" fill="#1A7F64"/><circle cx="160" cy="27" r="12" fill="#4C6EF5"/><line x1="52" y1="27" x2="148" y2="27" stroke="#F2A93B" stroke-width="3"/></svg>
+        <p>Учень — його учнівський квиток. У кожного лише один, і кожен квиток — лише одного учня.</p>
+      </div>
+      <div class="rel-card">
+        <div class="tag">1 : М</div>
+        <div class="nm">Один до багатьох</div>
+        <svg viewBox="0 0 200 54"><circle cx="40" cy="27" r="12" fill="#1A7F64"/><circle cx="160" cy="9" r="8" fill="#4C6EF5"/><circle cx="160" cy="27" r="8" fill="#4C6EF5"/><circle cx="160" cy="45" r="8" fill="#4C6EF5"/><line x1="52" y1="27" x2="152" y2="9" stroke="#F2A93B" stroke-width="3"/><line x1="52" y1="27" x2="152" y2="27" stroke="#F2A93B" stroke-width="3"/><line x1="52" y1="27" x2="152" y2="45" stroke="#F2A93B" stroke-width="3"/></svg>
+        <p>Клас — учні. У класі багато учнів, але кожен учень — лише в одному класі. Найпоширеніший тип.</p>
+      </div>
+      <div class="rel-card">
+        <div class="tag">М : М</div>
+        <div class="nm">Багато до багатьох</div>
+        <svg viewBox="0 0 200 54"><circle cx="40" cy="12" r="8" fill="#1A7F64"/><circle cx="40" cy="42" r="8" fill="#1A7F64"/><circle cx="160" cy="9" r="8" fill="#4C6EF5"/><circle cx="160" cy="27" r="8" fill="#4C6EF5"/><circle cx="160" cy="45" r="8" fill="#4C6EF5"/><line x1="48" y1="12" x2="152" y2="9" stroke="#F2A93B" stroke-width="3"/><line x1="48" y1="12" x2="152" y2="27" stroke="#F2A93B" stroke-width="3"/><line x1="48" y1="42" x2="152" y2="27" stroke="#F2A93B" stroke-width="3"/><line x1="48" y1="42" x2="152" y2="45" stroke="#F2A93B" stroke-width="3"/></svg>
+        <p>Учні — гуртки. Учень ходить на кілька гуртків, і в кожному гуртку кілька учнів.</p>
+      </div>
+    </div>
+    <div class="trivia">Зв'язок «багато до багатьох» зазвичай роблять через третю, проміжну таблицю. Наприклад, «Записи на гуртки»: у кожному рядку — ID учня та ID гуртка.</div>
+    <p class="soft">Визнач тип зв'язку між об'єктами.</p>
+    <div id="relList"></div>
+  </section>
+
+  <section class="block" id="s5">
+    <div class="step-label">Крок 5 · Зв'язок у Google Таблицях</div>
+    <h2>Аркуші як таблиці, підстановка за ID</h2>
+    <p>Google Таблиці — не справжня реляційна СУБД, але зв'язок можна змоделювати (емулювати):</p>
+    <ul>
+      <li>кожна таблиця бази — окремий <b>аркуш</b> одного файлу («Учні», «Класи»);</li>
+      <li>в аркуші «Учні» зберігаємо лише <b>ID класу</b> — зовнішній ключ;</li>
+      <li>назву класу й керівника <b>підставляє формула</b> — вона знаходить цей ID в аркуші «Класи».</li>
+    </ul>
+    <p class="soft">Попрацюй у моделі Google Таблиці: виконуй завдання по черзі. Аркуші перемикаються вкладками внизу.</p>
+    <div class="exercise">
+      <div class="hot-prompt" id="emPrompt"></div>
+      <div class="sheet">
+        <div class="sheet-title"><span class="doc"></span>Школа · база даних</div>
+        <div class="fbar"><span class="ref" id="emRef">A1</span><span class="fx">fx</span><span class="val" id="emVal"></span></div>
+        <div class="sheet-scroll"><table class="sheet-grid" id="emGrid"></table></div>
+        <div class="tabs">
+          <button class="tab active" data-sheet="u">Учні</button>
+          <button class="tab" data-sheet="k">Класи</button>
+        </div>
+      </div>
+      <div class="status-line" id="emStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s6">
+    <div class="step-label">Крок 6 · Формула підстановки</div>
+    <h2>Як читати VLOOKUP</h2>
+    <p>Функція <span class="mono">VLOOKUP</span> («вертикальний пошук») шукає значення в першому стовпці діапазону й повертає дані з того самого рядка. У неї чотири аргументи:</p>
+    <ol>
+      <li><b>що шукаємо</b> — комірка з ID (зовнішній ключ);</li>
+      <li><b>де шукаємо</b> — діапазон іншого аркуша, перший стовпець якого — первинний ключ;</li>
+      <li><b>номер стовпця</b> цього діапазону, з якого взяти відповідь;</li>
+      <li><b>0</b> — шукати тільки точний збіг.</li>
+    </ol>
+    <div class="note">У формулі назву аркуша беруть в апострофи й ставлять знак оклику: <span class="mono">'Класи'!A:C</span> — стовпці A–C аркуша «Класи».</div>
+    <p class="soft">У стовпці F аркуша «Учні» має з'явитися класний керівник. Збери формулу для F2: перетягни або клацни фрагмент, потім клацни пропуск.</p>
+    <div class="exercise">
+      <div class="two-sheets" style="margin-bottom:12px;">
+        <div class="sheet">
+          <div class="sheet-title"><span class="doc"></span>Учні (рядок 2)</div>
+          <div class="sheet-scroll"><table class="sheet-grid">
+            <tr><th class="corner"></th><th>A</th><th>B</th><th>D</th><th>F</th></tr>
+            <tr><th>1</th><td class="fname">ID учня</td><td class="fname">Прізвище</td><td class="fname">ID класу</td><td class="fname">Керівник</td></tr>
+            <tr><th>2</th><td class="num">101</td><td>Мельник</td><td class="num">2</td><td class="ctr calc">?</td></tr>
+          </table></div>
+        </div>
+        <div class="sheet">
+          <div class="sheet-title"><span class="doc"></span>Класи</div>
+          <div class="sheet-scroll"><table class="sheet-grid">
+            <tr><th class="corner"></th><th>A</th><th>B</th><th>C</th></tr>
+            <tr><th>1</th><td class="fname">ID класу</td><td class="fname">Назва</td><td class="fname">Керівник</td></tr>
+            <tr><th>2</th><td class="num">1</td><td>9-А</td><td>О. Петренко</td></tr>
+            <tr><th>3</th><td class="num">2</td><td>9-Б</td><td>Л. Бондар</td></tr>
+          </table></div>
+        </div>
+      </div>
+      <div class="formula-line" id="fLine">
+        <span>=VLOOKUP(</span>
+        <span class="fslot" data-s="0"><span class="n">1</span></span><span>;</span>
+        <span class="fslot" data-s="1"><span class="n">2</span></span><span>;</span>
+        <span class="fslot" data-s="2"><span class="n">3</span></span><span>; 0)</span>
+      </div>
+      <ul class="slot-legend">
+        <li><span class="n">1</span>що шукаємо</li>
+        <li><span class="n">2</span>де шукаємо</li>
+        <li><span class="n">3</span>номер стовпця з відповіддю</li>
+      </ul>
+      <div class="tool-pool" id="fPool" style="margin-top:10px;"></div>
+      <div class="status-line" id="fStatus"></div>
+    </div>
+    <div class="trivia">У Google Таблицях є й новіша функція <span class="mono">XLOOKUP</span>, яка вміє шукати в будь-якому стовпці. Але <span class="mono">VLOOKUP</span> працює всюди, тож почнемо з неї.</div>
+  </section>
+
+  <section class="block" id="s7">
+    <div class="step-label">Крок 7 · Порядок дій</div>
+    <h2>Як зв'язати два аркуші</h2>
+    <p>Тепер збери весь процес. Обирай дії по одній — що робимо далі?</p>
+    <div class="exercise">
+      <ul class="seq-done" id="seqDone"></ul>
+      <div class="seq-ask" id="seqAsk"></div>
+      <div class="seq-opts" id="seqOpts"></div>
+      <div class="status-line" id="seqStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div class="quiz-box" id="quizBox">
+      <div class="quiz-progress" id="quizProgress">Запитання 1 з 8</div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
+    </div>
+    <div class="completion" id="completion">
+      <svg class="badge" viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#6C5CE7"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#6C5CE7"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#6C5CE7"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#6C5CE7"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#6C5CE7"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#6C5CE7"/>
+        <circle cx="12" cy="12" r="4.4" fill="#6C5CE7"/><circle cx="12" cy="12" r="1.6" fill="#5340c9" opacity="0.6"/>
+      </svg>
+      <h3>Урок пройдено!</h3>
+      <p>Ти знаєш, що таке реляційна база даних, предметна область, первинний і зовнішній ключі, типи зв'язків — і вмієш зв'язати аркуші Google Таблиць формулою. Тепер — практична робота нижче.</p>
+      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
+    </div>
+  </section>
+
+  <section class="block" id="practice">
+    <div class="guide">
+      <div class="guide-head">
+        <div>
+          <div class="step-label">Практична робота №5</div>
+          <h2>Зв'язані аркуші: учні та класи</h2>
+        </div>
+        <button class="btn-print" onclick="window.print()">🖨 Надрукувати</button>
+      </div>
+      <p>Зв'яжи два аркуші Google Таблиці так, щоб назва класу й класний керівник підставлялися самі за ID класу.</p>
+
+      <div class="guide-card">
+        <h3><span class="n">1</span>Відкрий шаблон</h3>
+        <p>Відкрий шаблон, який вчитель додав у Google Classroom, і створи свою копію (<span class="menu">Файл → Створити копію</span>).</p>
+        <p>Немає шаблону? Створи його сам за хвилину:</p>
+        <ul>
+          <li>відкрий <span class="mono">sheets.new</span>, назви файл «Зв'язані аркуші — Прізвище»;</li>
+          <li>перейменуй аркуш на «Учні», а кнопкою <b>+</b> унизу додай аркуш «Класи»;</li>
+          <li>скопіюй дані кнопками нижче, клацни комірку <b>A1</b> потрібного аркуша й встав (<b>Ctrl+V</b>).</li>
+        </ul>
+        <button class="btn-copy" data-copy="k">📋 Копіювати дані «Класи»</button>
+        <button class="btn-copy" data-copy="u">📋 Копіювати дані «Учні»</button>
+      </div>
+
+      <div class="guide-card">
+        <h3><span class="n">2</span>Розглянь структуру</h3>
+        <p>Аркуш «Класи» — довідник, аркуш «Учні» посилається на нього через стовпець <b>D (ID класу)</b>.</p>
+        <div class="mini sheet"><div class="sheet-title"><span class="doc"></span>Класи</div><div class="sheet-scroll"><table class="sheet-grid" id="pK"></table></div></div>
+        <div class="mini sheet"><div class="sheet-title"><span class="doc"></span>Учні</div><div class="sheet-scroll"><table class="sheet-grid" id="pU"></table></div></div>
+      </div>
+
+      <div class="guide-card">
+        <h3><span class="n">3</span>Підстав назву класу</h3>
+        <p>В аркуші «Учні» у комірку <b>E1</b> впиши заголовок «Клас», а в <b>E2</b> — формулу:</p>
+        <p><span class="mono">=VLOOKUP(D2;'Класи'!A:C;2;0)</span></p>
+        <p>Наведи курсор на правий нижній кутик E2 і протягни формулу вниз до останнього учня.</p>
+        <p class="soft">Якщо Таблиця не приймає формулу, заміни «;» на «,» — роздільник залежить від мовних налаштувань файлу.</p>
+      </div>
+
+      <div class="guide-card">
+        <h3><span class="n">4</span>Підстав класного керівника</h3>
+        <p>У <b>F1</b> — заголовок «Класний керівник», у <b>F2</b> — така сама формула, але з номером стовпця <b>3</b>. Протягни її вниз.</p>
+      </div>
+
+      <div class="guide-card">
+        <h3><span class="n">5</span>Захисти зв'язок спадним списком</h3>
+        <p>Виділи D2:D30 → <span class="menu">Дані → Перевірка даних</span> → правило «Спадне меню (з діапазону)» → діапазон <span class="mono">'Класи'!A2:A</span>. Тепер у ID класу можна вибрати лише наявний клас.</p>
+      </div>
+
+      <div class="guide-card">
+        <h3><span class="n">6</span>Перевір, що зв'язок працює</h3>
+        <ul>
+          <li>Переведи будь-якого учня в інший клас — зміни лише його ID класу.</li>
+          <li>Зміни класного керівника 9-В в аркуші «Класи» — подивись, що сталося в «Учнях».</li>
+          <li>Додай у «Класи» новий клас 9-Г з ID 4 і запиши туди одного учня.</li>
+        </ul>
+      </div>
+
+      <div class="guide-card">
+        <h3><span class="n">7</span>Дай відповіді в аркуші «Відповіді»</h3>
+        <ul>
+          <li>Яке поле — первинний ключ аркуша «Класи», а яке — зовнішній ключ в аркуші «Учні»?</li>
+          <li>Який тип зв'язку між класами й учнями? Чому?</li>
+          <li>Скільки комірок ти змінив(-ла), щоб оновити керівника в усіх учнів 9-В?</li>
+        </ul>
+      </div>
+
+      <h3 style="font-size:16px; margin:16px 0 4px;">Перевір себе перед здачею</h3>
+      <ul class="checklist">
+        <li><input type="checkbox" id="c1"><label for="c1">У файлі два аркуші з даними: «Учні» і «Класи».</label></li>
+        <li><input type="checkbox" id="c2"><label for="c2">Стовпці «Клас» і «Класний керівник» заповнюються формулою, а не вручну.</label></li>
+        <li><input type="checkbox" id="c3"><label for="c3">Формули протягнуто до кожного учня, помилок #N/A немає.</label></li>
+        <li><input type="checkbox" id="c4"><label for="c4">ID класу вибирається зі спадного списку.</label></li>
+        <li><input type="checkbox" id="c5"><label for="c5">Додано клас 9-Г і учня в ньому.</label></li>
+        <li><input type="checkbox" id="c6"><label for="c6">Аркуш «Відповіді» з відповідями на три запитання.</label></li>
+        <li><input type="checkbox" id="c7"><label for="c7">Доступ до файлу надано вчителю (<span class="menu">Надати доступ</span>).</label></li>
+      </ul>
+    </div>
+  </section>
+
+</div>
+
+<footer>Урок · «Реляційна база даних» · 9 клас</footer>
+
+<script>
+const STORAGE_KEY = "lesson9-relational-db-neurons";
+let neurons = 0;
+const neuronEl = document.getElementById('neuronCount');
+const hudFill = document.getElementById('hudFill');
+
+function addNeurons(n){
+  neurons += n;
+  neuronEl.textContent = neurons;
+  neuronEl.classList.add('pop');
+  setTimeout(()=>neuronEl.classList.remove('pop'), 250);
+  saveProgress();
+}
+async function saveProgress(){
+  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
+}
+async function loadProgress(){
+  try{
+    const res = await window.storage?.get(STORAGE_KEY, false);
+    if(res && res.value){
+      const d = JSON.parse(res.value);
+      if(typeof d.neurons === 'number'){ neurons = d.neurons; neuronEl.textContent = neurons; }
+    }
+  }catch(e){}
+}
+loadProgress();
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
+});
+
+/* ---------- HELPERS ---------- */
+const COLS = 'ABCDEFGH'.split('');
+function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
+function flash(el, cls){ el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), 380); }
+
+/* Таблиця-макет: r=0 — рядок назв полів, r=1.. — записи */
+function sheetHTML(fields, rows, opts={}){
+  const num = opts.num || [];
+  const clk = opts.clickable ? ' clk' : '';
+  let html = opts.widths ? `<colgroup><col style="width:30px">${opts.widths.map(w=>`<col style="width:${w}">`).join('')}</colgroup>` : '';
+  html += '<tr><th class="corner"></th>' + fields.map((f,c)=>`<th class="${clk.trim()}" data-kind="col" data-c="${c}">${COLS[c]}</th>`).join('') + '</tr>';
+  html += `<tr><th class="${clk.trim()}" data-kind="row" data-r="0">1</th>` + fields.map((f,c)=>`<td class="fname${clk}" data-kind="cell" data-r="0" data-c="${c}">${f}</td>`).join('') + '</tr>';
+  rows.forEach((row,i)=>{
+    const r = i+1;
+    html += `<tr><th class="${clk.trim()}" data-kind="row" data-r="${r}">${r+1}</th>` +
+      row.map((v,c)=>`<td class="${num.includes(c)?'num':''}${clk}" data-kind="cell" data-r="${r}" data-c="${c}">${v}</td>`).join('') + '</tr>';
+  });
+  return html;
+}
+
+function makeClassify(containerId, items, opts){
+  const list = document.getElementById(containerId);
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">${(item.opts||opts).map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i===item.correct){ btn.classList.add('correct'); fb.textContent = item.why ? `Правильно ✓ ${item.why}` : 'Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+}
+
+function makeSortBoard(poolId, buckets, items){
+  const pool = document.getElementById(poolId);
+  let selected = null;
+  let placedCount = 0;
+  shuffle(items).forEach(item=>{
+    const chip = document.createElement('div');
+    chip.className = 'sort-chip';
+    chip.textContent = item.text;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.sort-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = item;
+    });
+    pool.appendChild(chip);
+  });
+  Object.entries(buckets).forEach(([key, el])=>{
+    el.addEventListener('click', ()=>{
+      if(!selected) return;
+      if(selected.zone === key){
+        const chip = [...pool.children].find(c=>c.textContent===selected.text && !c.classList.contains('placed'));
+        if(chip){ chip.classList.add('placed'); chip.classList.remove('selected'); el.querySelector('.bucket-items').appendChild(chip); }
+        addNeurons(1);
+        placedCount++;
+        selected = null;
+        if(placedCount === items.length) addNeurons(2);
+      } else {
+        el.classList.add('hint');
+        setTimeout(()=>el.classList.remove('hint'), 350);
+      }
+    });
+  });
+}
+
+function makeMatching(poolId, listId, items){
+  const pool = document.getElementById(poolId);
+  const list = document.getElementById(listId);
+  let selected = null;
+  let matched = 0;
+  shuffle(items).forEach(t=>{
+    const chip = document.createElement('div');
+    chip.className = 'tool-chip';
+    chip.textContent = t.name;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = t.name;
+    });
+    pool.appendChild(chip);
+  });
+  shuffle(items).forEach(t=>{
+    const card = document.createElement('div');
+    card.className = 'func-card';
+    card.innerHTML = `<div class="func-text">${t.func}</div><div class="func-slot">?</div>`;
+    card.addEventListener('click', ()=>{
+      if(card.classList.contains('matched') || !selected) return;
+      const slot = card.querySelector('.func-slot');
+      if(selected === t.name){
+        slot.textContent = selected;
+        slot.classList.add('filled');
+        card.classList.add('matched');
+        const chip = [...pool.children].find(c=>c.textContent===selected);
+        if(chip) chip.classList.add('placed');
+        addNeurons(1);
+        matched++;
+        selected = null;
+        pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+        if(matched === items.length) addNeurons(2);
+      } else {
+        card.classList.add('shake');
+        setTimeout(()=>card.classList.remove('shake'), 350);
+      }
+    });
+    list.appendChild(card);
+  });
+}
+
+/* ---------- REVIEW ---------- */
+makeMatching('revPool', 'revList', [
+  { name:'База даних', func:'Впорядкований набір відомостей, де про кожен об\'єкт зберігаються ті самі характеристики' },
+  { name:'Поле', func:'Стовпець таблиці: одна характеристика всіх об\'єктів' },
+  { name:'Запис', func:'Рядок таблиці: усі відомості про один об\'єкт' },
+  { name:'Ключове поле', func:'Значення в ньому ніколи не повторюються, тож за ним точно знаходять потрібний рядок' },
+  { name:'Тип даних', func:'Визначає, що можна вписати в стовпець: текст, число, дату чи «так/ні»' }
+]);
+
+/* ---------- 1. DUPLICATES ---------- */
+(function(){
+  const fields = ['ID', 'Учень', 'Клас', 'Класний керівник', 'Кабінет'];
+  const rows = [
+    ['1', 'Мельник Остап', '9-А', 'О. Петренко', '21'],
+    ['2', 'Коваль Дарина', '9-Б', 'Л. Бондар', '14'],
+    ['3', 'Шевчук Марко', '9-А', 'О. Петренко', '21'],
+    ['4', 'Ткаченко Софія', '9-В', 'Т. Кравець', '32'],
+    ['5', 'Бойко Назар', '9-А', 'О. Петренко', '21'],
+    ['6', 'Лисенко Ірина', '9-Б', 'Л. Бондар', '14']
+  ];
+  const table = document.getElementById('dupGrid');
+  const status = document.getElementById('dupStatus');
+  table.innerHTML = sheetHTML(fields, rows, { num:[0,4], widths:['8%','28%','12%','30%','14%'] });
+  const TARGETS = rows.filter(r=>r[2]==='9-А').length;
+  let fixed = 0;
+  table.querySelectorAll('td[data-r]').forEach(td=>{
+    const r = +td.dataset.r, c = +td.dataset.c;
+    if(r===0) return;
+    td.classList.add('clk');
+    td.addEventListener('click', ()=>{
+      if(fixed >= TARGETS || td.classList.contains('found')) return;
+      const row = rows[r-1];
+      if(c===3 && row[2]==='9-А'){
+        td.classList.add('found');
+        td.textContent = 'Г. Сидоренко';
+        fixed++;
+        addNeurons(1);
+        status.textContent = `Виправлено: ${fixed}`;
+        if(fixed === TARGETS){
+          addNeurons(2);
+          status.textContent = `Готово ✓ Довелося правити ${TARGETS} комірки заради одного факту. А якщо в класі 30 учнів?`;
+        }
+      } else {
+        flash(td, 'bad');
+        status.textContent = c===3 ? 'Цей учень не з 9-А — його керівник не змінюється.'
+          : c===2 && row[2]==='9-А' ? 'Назва класу лишається тією самою — змінюється лише керівник.'
+          : 'Ця комірка не стосується зміни керівника.';
+      }
+    });
+  });
+})();
+
+/* ---------- 2. OBJECTS / PROPERTIES ---------- */
+makeSortBoard('objPool', {
+  obj: document.getElementById('bObj'),
+  prop: document.getElementById('bProp')
+}, [
+  { text:'Фільми', zone:'obj' },
+  { text:'Глядачі', zone:'obj' },
+  { text:'Перегляди', zone:'obj' },
+  { text:'Підписки', zone:'obj' },
+  { text:'Тривалість', zone:'prop' },
+  { text:'Рік виходу', zone:'prop' },
+  { text:'Email', zone:'prop' },
+  { text:'Дата перегляду', zone:'prop' },
+  { text:'Ціна за місяць', zone:'prop' }
+]);
+
+/* ---------- 3. KEYS ---------- */
+(function(){
+  const uF = ['ID учня', 'Прізвище', 'ID класу'];
+  const uR = [['101','Мельник','1'], ['102','Коваль','2'], ['103','Шевчук','1'], ['104','Ткаченко','3'], ['105','Бойко','2']];
+  const kF = ['ID класу', 'Назва', 'Керівник'];
+  const kR = [['1','9-А','О. Петренко'], ['2','9-Б','Л. Бондар'], ['3','9-В','Т. Кравець']];
+  const tU = document.getElementById('kU'), tK = document.getElementById('kK');
+  tU.innerHTML = sheetHTML(uF, uR, { clickable:true, num:[0,2], widths:['30%','38%','32%'] });
+  tK.innerHTML = sheetHTML(kF, kR, { clickable:true, num:[0], widths:['30%','24%','46%'] });
+  const isField = (k,r,c,col)=> (k==='col' && c===col) || (k==='cell' && r===0 && c===col);
+  const TASKS = [
+    { text:'Покажи <span>первинний ключ</span> таблиці «Учні»', ok:(t,k,r,c)=> t==='u' && isField(k,r,c,0), hl:()=>[[tU,'c',0]],
+      hint:'Шукай поле, значення якого не повторюються в жодному рядку «Учнів».', done:'ID учня — у кожного свій.' },
+    { text:'Покажи <span>первинний ключ</span> таблиці «Класи»', ok:(t,k,r,c)=> t==='k' && isField(k,r,c,0), hl:()=>[[tK,'c',0]],
+      hint:'Яке поле однозначно визначає кожен клас?', done:'ID класу — унікальний для кожного класу.' },
+    { text:'Покажи <span>зовнішній ключ</span> — поле, що зв\'язує таблиці', ok:(t,k,r,c)=> t==='u' && isField(k,r,c,2), hl:()=>[[tU,'c',2],[tK,'c',0]],
+      hint:'Шукай у «Учнях» поле, яке зберігає значення з іншої таблиці.', done:'ID класу в «Учнях» вказує на ID класу в «Класах».' },
+    { text:'У якому класі навчається <span>Ткаченко</span>? Клацни потрібний запис у таблиці «Класи»', ok:(t,k,r)=> t==='k' && r===3, hl:()=>[[tU,'r',4],[tK,'r',3]],
+      hint:'Подивись, яке число в Ткаченка в стовпці ID класу, і знайди цей ID у «Класах».', done:'У Ткаченка ID класу 3 — це 9-В, керівник Т. Кравець.' },
+    { text:'Клацни будь-кого з учнів, у кого класний керівник — <span>Л. Бондар</span>', ok:(t,k,r)=> t==='u' && r>0 && uR[r-1][2]==='2', hl:(r)=>[[tU,'r',r],[tK,'r',2]],
+      hint:'Спершу знайди в «Класах» ID класу Л. Бондар, а потім — учнів із таким ID.', done:'Л. Бондар керує класом з ID 2 — це Коваль і Бойко.' }
+  ];
+  const prompt = document.getElementById('keyPrompt');
+  const status = document.getElementById('keyStatus');
+  let i = 0, busy = false;
+  function clearHl(){ document.querySelectorAll('#kU .ok, #kK .ok').forEach(e=>e.classList.remove('ok')); }
+  function highlight(list){
+    list.forEach(([tbl, kind, n])=>{
+      tbl.querySelectorAll(kind==='c' ? `[data-c="${n}"]` : `[data-r="${n}"]`).forEach(e=>e.classList.add('ok'));
+    });
+  }
+  function show(){
+    prompt.innerHTML = i < TASKS.length ? `${i+1}/${TASKS.length}. ${TASKS[i].text}` : 'Усі завдання виконано ✓';
+  }
+  [[tU,'u'],[tK,'k']].forEach(([tbl, t])=>{
+    tbl.querySelectorAll('.clk').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        if(busy || i >= TASKS.length) return;
+        const k = el.dataset.kind, r = +el.dataset.r, c = +el.dataset.c;
+        const task = TASKS[i];
+        if(task.ok(t, k, r, c)){
+          busy = true;
+          clearHl(); highlight(task.hl(r));
+          status.textContent = '✓ ' + task.done;
+          addNeurons(1);
+          i++;
+          if(i === TASKS.length) addNeurons(2);
+          setTimeout(()=>{ busy = false; clearHl(); show(); }, 1700);
+        } else {
+          flash(el, 'bad');
+          status.textContent = task.hint;
+        }
+      });
+    });
+  });
+  show();
+})();
+
+/* ---------- 4. RELATION TYPES ---------- */
+makeClassify('relList', [
+  { text:'Країна — її столиця', correct:0, why:'У країни одна столиця, і кожне місто є столицею лише однієї країни.' },
+  { text:'Футбольна команда — футболісти в її складі', correct:1, why:'У команді багато гравців, а гравець у сезоні грає за одну команду.' },
+  { text:'Актори — фільми', correct:2, why:'Актор знімається в багатьох фільмах, і в кожному фільмі грає багато акторів.' },
+  { text:'Клієнт інтернет-магазину — його замовлення', correct:1, why:'Клієнт робить багато замовлень, а кожне замовлення належить одному клієнту.' },
+  { text:'Громадянин — номер його паспорта', correct:0, why:'Кожен номер документа належить лише одній людині.' },
+  { text:'Учні — предмети в розкладі', correct:2, why:'Учень вивчає багато предметів, і кожен предмет вивчає багато учнів.' }
+], ['1 : 1', '1 : М', 'М : М']);
+
+/* ---------- 5. GOOGLE SHEETS EMULATOR ---------- */
+(function(){
+  const classes = [
+    { id:'1', name:'9-А', teacher:'О. Петренко' },
+    { id:'2', name:'9-Б', teacher:'Л. Бондар' },
+    { id:'3', name:'9-В', teacher:'Т. Кравець' }
+  ];
+  const students = [
+    { id:'101', last:'Мельник', first:'Остап', cls:'1' },
+    { id:'102', last:'Коваль', first:'Дарина', cls:'2' },
+    { id:'103', last:'Шевчук', first:'Марко', cls:'1' },
+    { id:'104', last:'Ткаченко', first:'Софія', cls:'3' },
+    { id:'105', last:'Бойко', first:'Назар', cls:'1' }
+  ];
+  function lookup(id, col){
+    const k = classes.find(x=>x.id===id);
+    return k ? (col===2 ? k.name : k.teacher) : '#N/A';
+  }
+  const grid = document.getElementById('emGrid');
+  const refEl = document.getElementById('emRef');
+  const valEl = document.getElementById('emVal');
+  const prompt = document.getElementById('emPrompt');
+  const status = document.getElementById('emStatus');
+  const tabs = document.querySelectorAll('#s5 .tab');
+  let sheet = 'u';
+
+  const TASKS = [
+    { text:'Клацни комірку <span>E2</span> — клас Остапа Мельника — і подивись у рядок формул над таблицею',
+      ok:(e)=> e.type==='cell' && e.sheet==='u' && e.r===1 && e.c===4,
+      hint:'E2 — стовпець E, рядок 2.',
+      done:'Назву класу ніхто не вписував — її підставляє формула за ID класу з D2.' },
+    { text:'Остап переходить до <span>9-Б</span>. Зміни лише його ID класу',
+      ok:(e)=> e.type==='set' && e.r===1 && e.v==='2',
+      hint:'Скористайся спадним списком у стовпці D рядка Остапа. Який ID у 9-Б — підглянь на аркуші «Класи».',
+      done:'Клас і керівник змінились самі — формули знайшли новий ID.' },
+    { text:'У 9-А новий класний керівник. Перейди на аркуш <span>«Класи»</span> і клацни комірку керівника 9-А, щоб вписати «Г. Сидоренко»',
+      ok:(e)=> e.type==='cell' && e.sheet==='k' && e.r===1 && e.c===2,
+      hint:'Потрібен аркуш «Класи», рядок класу 9-А, стовпець «Класний керівник».',
+      act:()=>{ classes[0].teacher = 'Г. Сидоренко'; },
+      done:'Змінено одну-єдину комірку.' },
+    { text:'Повернися на аркуш <span>«Учні»</span> і клацни керівника Марка Шевчука — чи оновився він?',
+      ok:(e)=> e.type==='cell' && e.sheet==='u' && e.r===3 && e.c===5,
+      hint:'Марко Шевчук — рядок 4, керівник — стовпець F.',
+      done:'Оновилось у всіх учнів 9-А одразу. У цьому й сила зв\'язку!' },
+    { text:'А що буде, якщо Софії Ткаченко поставити <span>ID класу 4</span>?',
+      ok:(e)=> e.type==='set' && e.r===4 && e.v==='4',
+      hint:'Софія — рядок 5, стовпець D.',
+      done:'Класу з ID 4 в аркуші «Класи» немає — формула показує помилку #N/A. Тому ID краще вибирати зі спадного списку наявних значень.' }
+  ];
+  let ti = 0;
+  function showTask(){
+    prompt.innerHTML = ti < TASKS.length ? `${ti+1}/${TASKS.length}. ${TASKS[ti].text}` : 'Усі завдання виконано ✓ Спробуй ще змінювати ID — це вже без балів.';
+  }
+  function check(e){
+    if(ti >= TASKS.length) return false;
+    const t = TASKS[ti];
+    if(t.ok(e)){
+      if(t.act) t.act();
+      status.textContent = '✓ ' + t.done;
+      addNeurons(1);
+      ti++;
+      if(ti === TASKS.length) addNeurons(3);
+      showTask();
+      return true;
+    }
+    return false;
+  }
+
+  function cellInfo(r, c){
+    const ref = COLS[c] + (r+1);
+    if(r===0) return [ref, (sheet==='u' ? ['ID учня','Прізвище','Ім\'я','ID класу','Клас','Класний керівник'] : ['ID класу','Назва','Класний керівник'])[c]];
+    if(sheet==='u'){
+      const s = students[r-1];
+      if(c===4) return [ref, `=VLOOKUP(D${r+1};'Класи'!A:C;2;0)`];
+      if(c===5) return [ref, `=VLOOKUP(D${r+1};'Класи'!A:C;3;0)`];
+      return [ref, [s.id, s.last, s.first, s.cls][c]];
+    }
+    const k = classes[r-1];
+    return [ref, [k.id, k.name, k.teacher][c]];
+  }
+
+  function render(changedRow){
+    let html;
+    if(sheet==='u'){
+      html = '<colgroup><col style="width:30px"><col style="width:11%"><col style="width:18%"><col style="width:14%"><col style="width:14%"><col style="width:13%"><col style="width:30%"></colgroup>';
+      html += '<tr><th class="corner"></th>' + 'ABCDEF'.split('').map(l=>`<th>${l}</th>`).join('') + '</tr>';
+      html += '<tr><th>1</th>' + ['ID учня','Прізвище','Ім\'я','ID класу','Клас','Класний керівник'].map((f,c)=>`<td class="fname clk" data-r="0" data-c="${c}">${f}</td>`).join('') + '</tr>';
+      students.forEach((s,i)=>{
+        const r = i+1;
+        const nm = lookup(s.cls, 2), tc = lookup(s.cls, 3);
+        const fl = changedRow===r ? ' flash' : '';
+        html += `<tr><th>${r+1}</th>
+          <td class="num clk" data-r="${r}" data-c="0">${s.id}</td>
+          <td class="clk" data-r="${r}" data-c="1">${s.last}</td>
+          <td class="clk" data-r="${r}" data-c="2">${s.first}</td>
+          <td class="clk" data-r="${r}" data-c="3"><select data-r="${r}" aria-label="ID класу, рядок ${r+1}">${['1','2','3','4'].map(v=>`<option${v===s.cls?' selected':''}>${v}</option>`).join('')}</select></td>
+          <td class="clk ctr calc${nm==='#N/A'?' err':''}${fl}" data-r="${r}" data-c="4">${nm}</td>
+          <td class="clk calc${tc==='#N/A'?' err':''}${fl}" data-r="${r}" data-c="5">${tc}</td></tr>`;
+      });
+    } else {
+      html = '<colgroup><col style="width:30px"><col style="width:22%"><col style="width:22%"><col style="width:56%"></colgroup>';
+      html += '<tr><th class="corner"></th><th>A</th><th>B</th><th>C</th></tr>';
+      html += '<tr><th>1</th>' + ['ID класу','Назва','Класний керівник'].map((f,c)=>`<td class="fname clk" data-r="0" data-c="${c}">${f}</td>`).join('') + '</tr>';
+      classes.forEach((k,i)=>{
+        const r = i+1;
+        const fl = changedRow===r ? ' flash' : '';
+        html += `<tr><th>${r+1}</th><td class="num clk" data-r="${r}" data-c="0">${k.id}</td><td class="clk" data-r="${r}" data-c="1">${k.name}</td><td class="clk${fl}" data-r="${r}" data-c="2">${k.teacher}</td></tr>`;
+      });
+    }
+    grid.innerHTML = html;
+    grid.querySelectorAll('td.clk').forEach(td=>{
+      td.addEventListener('click', (ev)=>{
+        if(ev.target.tagName==='SELECT') return;
+        const r = +td.dataset.r, c = +td.dataset.c;
+        grid.querySelectorAll('.sel').forEach(x=>x.classList.remove('sel'));
+        td.classList.add('sel');
+        const before = sheet==='k' && r===1 && c===2 ? classes[0].teacher : null;
+        const passed = check({ type:'cell', sheet, r, c });
+        if(passed && before !== null && classes[0].teacher !== before){
+          render(1);
+          grid.querySelector('td[data-r="1"][data-c="2"]').classList.add('sel');
+        } else if(!passed && ti < TASKS.length){
+          status.textContent = TASKS[ti].hint;
+        }
+        const [ref, val] = cellInfo(r, c);
+        refEl.textContent = ref; valEl.textContent = val;
+      });
+    });
+    grid.querySelectorAll('select').forEach(sel=>{
+      sel.addEventListener('change', ()=>{
+        const r = +sel.dataset.r;
+        students[r-1].cls = sel.value;
+        render(r);
+        refEl.textContent = 'D' + (r+1); valEl.textContent = sel.value;
+        if(!check({ type:'set', r, v:sel.value }) && ti < TASKS.length) status.textContent = TASKS[ti].hint;
+      });
+    });
+  }
+  tabs.forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      sheet = tab.dataset.sheet;
+      tabs.forEach(t=>t.classList.toggle('active', t===tab));
+      refEl.textContent = 'A1'; valEl.textContent = cellInfo(0,0)[1];
+      render();
+    });
+  });
+  render();
+  valEl.textContent = cellInfo(0,0)[1];
+  showTask();
+})();
+
+/* ---------- 6. FORMULA BUILDER ---------- */
+(function(){
+  const pool = document.getElementById('fPool');
+  const status = document.getElementById('fStatus');
+  const slots = document.querySelectorAll('#fLine .fslot');
+  const ANSWERS = ['D2', "'Класи'!A:C", '3'];
+  const WHY = {
+    'B2': 'B2 — це прізвище. Шукаємо в «Класах» не прізвище, а ID класу.',
+    'A2': 'A2 — ID учня. У «Класах» шукаємо інший ключ — ID класу.',
+    "'Учні'!A:F": 'Відповідь лежить на іншому аркуші — там, де ID класу є первинним ключем.',
+    '2': 'Другий стовпець «Класів» — назва класу, а потрібен керівник.',
+    'D2': 'D2 — це те, що шукаємо, а не діапазон чи номер стовпця.',
+    "'Класи'!A:C": 'Це діапазон, де шукаємо, — йому інше місце.',
+    '3': 'Номер стовпця — третій аргумент.'
+  };
+  const CHIPS = ['D2', 'B2', 'A2', "'Класи'!A:C", "'Учні'!A:F", '2', '3'];
+  let selected = null, filled = 0;
+  shuffle(CHIPS).forEach(v=>{
+    const chip = document.createElement('div');
+    chip.className = 'fchip';
+    chip.textContent = v;
+    chip.draggable = true;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.fchip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = chip;
+    });
+    chip.addEventListener('dragstart', (e)=>{ selected = chip; e.dataTransfer.setData('text/plain', v); });
+    pool.appendChild(chip);
+  });
+  function tryPlace(slot){
+    if(!selected || slot.classList.contains('filled')) return;
+    const s = +slot.dataset.s, v = selected.textContent;
+    if(ANSWERS[s] === v){
+      slot.classList.add('filled');
+      slot.innerHTML = `<span class="n">${s+1}</span>${v}`;
+      selected.classList.add('placed');
+      selected = null;
+      filled++;
+      addNeurons(1);
+      status.textContent = '✓';
+      if(filled === ANSWERS.length){
+        addNeurons(2);
+        status.textContent = "Готово ✓ Формула знайде ID 2 у «Класах» і поверне 3-й стовпець — Л. Бондар.";
+        document.querySelector('#s6 td.calc').textContent = 'Л. Бондар';
+      }
+    } else {
+      flash(slot, 'shake');
+      status.textContent = WHY[v] || 'Спробуй ще раз.';
+    }
+  }
+  slots.forEach(slot=>{
+    slot.addEventListener('click', ()=>tryPlace(slot));
+    slot.addEventListener('dragover', (e)=>{ e.preventDefault(); slot.classList.add('over'); });
+    slot.addEventListener('dragleave', ()=>slot.classList.remove('over'));
+    slot.addEventListener('drop', (e)=>{ e.preventDefault(); slot.classList.remove('over'); tryPlace(slot); });
+  });
+})();
+
+/* ---------- 7. SEQUENCE ---------- */
+(function(){
+  const STEPS = [
+    'Створити аркуш «Класи» і дати кожному класу унікальний ID',
+    'В аркуші «Учні» додати стовпець «ID класу»',
+    'Записати кожному учню ID його класу',
+    'У першому рядку стовпця «Клас» написати формулу VLOOKUP',
+    'Протягнути формулу вниз на всіх учнів'
+  ];
+  const ORD = ['ПЕРШИМ', 'ДРУГИМ', 'ТРЕТІМ', 'ЧЕТВЕРТИМ', 'П\'ЯТИМ'];
+  const done = document.getElementById('seqDone');
+  const ask = document.getElementById('seqAsk');
+  const opts = document.getElementById('seqOpts');
+  const status = document.getElementById('seqStatus');
+  let k = 0;
+  function render(){
+    opts.innerHTML = '';
+    if(k >= STEPS.length){
+      ask.textContent = '';
+      status.textContent = 'Готово ✓ Саме так ти зробиш у практичній роботі.';
+      return;
+    }
+    ask.innerHTML = `Що робимо <b>${ORD[k]}</b>?`;
+    shuffle(STEPS.slice(k)).forEach(s=>{
+      const b = document.createElement('button');
+      b.className = 'seq-opt';
+      b.textContent = s;
+      b.addEventListener('click', ()=>{
+        if(s === STEPS[k]){
+          const li = document.createElement('li');
+          li.innerHTML = `<span class="n">${k+1}</span>${s}`;
+          done.appendChild(li);
+          k++;
+          addNeurons(1);
+          status.textContent = '';
+          if(k === STEPS.length) addNeurons(2);
+          render();
+        } else {
+          b.classList.add('wrong');
+          flash(b, 'shake');
+          status.textContent = 'Ще зарано — чого бракує для цього кроку?';
+        }
+      });
+      opts.appendChild(b);
+    });
+  }
+  render();
+})();
+
+/* ---------- PRACTICAL: DATA ---------- */
+const P_K = { f:['ID класу','Назва','Класний керівник','Кабінет'], r:[
+  ['1','9-А','Олена Петренко','21'],
+  ['2','9-Б','Лідія Бондар','14'],
+  ['3','9-В','Тарас Кравець','32']
+]};
+const P_U = { f:['ID учня','Прізвище','Ім\'я','ID класу'], r:[
+  ['101','Мельник','Остап','1'], ['102','Коваль','Дарина','2'], ['103','Шевчук','Марко','1'],
+  ['104','Ткаченко','Софія','3'], ['105','Бойко','Назар','1'], ['106','Лисенко','Ірина','2'],
+  ['107','Гончаренко','Артем','3'], ['108','Савчук','Злата','2'], ['109','Кравчук','Денис','1'],
+  ['110','Романенко','Аліна','3']
+]};
+document.getElementById('pK').innerHTML = sheetHTML(P_K.f, P_K.r, { num:[0,3] });
+document.getElementById('pU').innerHTML = sheetHTML(P_U.f, P_U.r.slice(0,4).concat([['…','…','…','…']]), { num:[0,3] });
+function toTSV(d){ return [d.f, ...d.r].map(r=>r.join('\t')).join('\n'); }
+async function copyText(text){
+  try{ await navigator.clipboard.writeText(text); return true; }
+  catch(e){
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    let ok = false;
+    try{ ok = document.execCommand('copy'); }catch(err){}
+    ta.remove();
+    return ok;
+  }
+}
+document.querySelectorAll('.btn-copy').forEach(btn=>{
+  const label = btn.textContent;
+  btn.addEventListener('click', async ()=>{
+    const ok = await copyText(toTSV(btn.dataset.copy==='k' ? P_K : P_U));
+    btn.textContent = ok ? '✓ Скопійовано — встав у A1' : 'Не вдалося скопіювати';
+    btn.classList.toggle('done', ok);
+    setTimeout(()=>{ btn.textContent = label; btn.classList.remove('done'); }, 2500);
+  });
+});
+
+/* ---------- FINAL QUIZ ---------- */
+const questions = [
+  { q: "Що таке реляційна база даних?", opts: ["База, де дані зберігаються в кількох пов'язаних між собою таблицях", "Одна велика таблиця з усіма даними", "Папка з текстовими файлами"], correct: 0 },
+  { q: "Що таке предметна область?", opts: ["Шкільний предмет, з якого створено базу", "Частина реального світу, про яку збирають дані", "Назва першого стовпця таблиці"], correct: 1 },
+  { q: "Чим погано зберігати ім'я класного керівника в рядку кожного учня?", opts: ["Таблиця стане надто короткою", "Дані повторюються, і під час змін легко щось пропустити", "Google Таблиці таке забороняють"], correct: 1 },
+  { q: "Що таке зовнішній ключ?", opts: ["Пароль до бази даних", "Поле, що зберігає значення первинного ключа іншої таблиці", "Останній стовпець таблиці"], correct: 1 },
+  { q: "Який тип зв'язку між таблицями «Класи» і «Учні»?", opts: ["Один до одного", "Один до багатьох", "Багато до багатьох"], correct: 1 },
+  { q: "Як у Google Таблицях моделюють кілька таблиць бази даних?", opts: ["Кожна таблиця — окремий аркуш одного файлу", "Усе пишуть на одному аркуші різними кольорами", "Створюють окремий файл для кожного рядка"], correct: 0 },
+  { q: "Що поверне формула =VLOOKUP(D2;'Класи'!A:C;2;0)?", opts: ["Значення з другого стовпця «Класів» у рядку, де знайдено ID із D2", "Суму стовпців A–C", "Номер рядка, у якому стоїть D2"], correct: 0 },
+  { q: "Чому формула показала #N/A?", opts: ["В аркуші «Класи» немає такого ID класу", "Аркуш «Учні» занадто довгий", "У файлі немає інтернету"], correct: 0 }
+];
+let qi=0, currentAnswered=false;
+const quizQ = document.getElementById('quizQ');
+const quizOptions = document.getElementById('quizOptions');
+const quizProgress = document.getElementById('quizProgress');
+const btnNext = document.getElementById('btnNext');
+const quizBox = document.getElementById('quizBox');
+const completion = document.getElementById('completion');
+const totalNeuronsEl = document.getElementById('totalNeurons');
+
+function renderQuestion(){
+  currentAnswered=false; btnNext.classList.remove('active');
+  const item = questions[qi];
+  quizProgress.textContent = `Запитання ${qi+1} з ${questions.length}`;
+  quizQ.textContent = item.q;
+  quizOptions.innerHTML='';
+  item.opts.forEach((opt,i)=>{
+    const b=document.createElement('button'); b.className='quiz-opt'; b.textContent=opt;
+    b.addEventListener('click', ()=>{
+      if(currentAnswered) return; currentAnswered=true;
+      const all = quizOptions.querySelectorAll('.quiz-opt');
+      all.forEach((ob,oi)=>{ if(oi===item.correct) ob.classList.add('correct'); else if(oi===i) ob.classList.add('wrong'); });
+      if(i===item.correct) addNeurons(2);
+      btnNext.classList.add('active');
+      btnNext.textContent = (qi===questions.length-1) ? 'Завершити' : 'Далі';
+    });
+    quizOptions.appendChild(b);
+  });
+}
+btnNext.addEventListener('click', ()=>{
+  if(!btnNext.classList.contains('active')) return;
+  qi++;
+  if(qi<questions.length){ renderQuestion(); }
+  else {
+    quizBox.style.display='none';
+    completion.classList.add('show');
+    addNeurons(3);
+    totalNeuronsEl.textContent = neurons;
+  }
+});
+renderQuestion();
+</script>
+
+</body>
+</html>
