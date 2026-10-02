@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Форматування й перевірка даних — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FBF6F2; --ink:#2A1C14; --ink-soft:#6B5649; --surface:#FFFFFF; --line:#EEDFD4;
+    --pri:#D0592A; --pri-dark:#A8431B; --accent:#2B8AC4; --accent-dark:#1E6A99; --green:#2E9E5B; --coral:#D14B5E;
+    --cell-line:#E0D6CE; --head-bg:#F6EFE9;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  .container{max-width:780px; margin:0 auto; padding:0 24px;}
+  @media (max-width:480px){ .container{padding:0 16px;} }
+
+  .hud{position:sticky; top:0; z-index:50; background:rgba(251,246,242,.9); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
+  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--pri)); transition:width .3s ease;}
+  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:780px; margin:0 auto;}
+  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
+  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
+  .neuron-counter svg{width:24px;height:24px;}
+  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
+  #neuronCount.pop{transform:scale(1.35);}
+
+  .hero{padding:48px 24px 36px;}
+  .hero-inner{max-width:780px; margin:0 auto; display:flex; align-items:center; gap:26px;}
+  .hero-text{flex:1;}
+  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--pri); margin-bottom:10px;}
+  .hero h1{font-size:29px; line-height:1.2; margin-bottom:12px;}
+  .hero p{color:var(--ink-soft); font-size:16px; max-width:54ch; margin-bottom:20px;}
+  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--pri); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
+  .btn-primary:hover{background:var(--pri-dark);}
+  .btn-primary:active{transform:scale(.97);}
+  .mascot{width:130px; height:130px; flex-shrink:0;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:100px; height:100px;} }
+
+  section.block{padding:30px 0; border-top:1px solid var(--line);}
+  .step-label{font-family:'Baloo 2',sans-serif; font-size:12.5px; font-weight:700; color:var(--pri); margin-bottom:6px; text-transform:uppercase; letter-spacing:.03em;}
+  .block h2{font-size:19px; margin-bottom:8px; max-width:40ch;}
+  .block p{max-width:64ch; font-size:15px; margin:0 0 8px; color:var(--ink);}
+  .block p.soft{color:var(--ink-soft); font-size:13.5px;}
+  .block ul, .block ol{max-width:64ch; margin:0 0 8px; padding-left:20px; font-size:15px;}
+  .block li{margin-bottom:4px;}
+  .note{background:#EAF4FB; border-left:4px solid var(--accent); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:var(--accent-dark); margin:12px 0;}
+  .trivia{background:#FCEDE5; border-left:4px solid var(--pri); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:var(--pri-dark); margin:12px 0;}
+  .problem-note{background:#FBE6E9; border-left:4px solid var(--coral); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:#8C2D3A; margin:12px 0;}
+  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:16px 18px; margin-top:10px;}
+  @media (max-width:480px){ .exercise{padding:14px 10px;} }
+  @keyframes itemShake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
+  .shake{animation:itemShake .35s ease;}
+  .status-line{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--pri-dark); margin-top:12px; min-height:1.4em;}
+  .hot-prompt{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; text-align:center; margin-bottom:10px;}
+  .hot-prompt span{color:var(--accent-dark);}
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; background:var(--head-bg); padding:1px 6px; border-radius:5px; font-size:.92em; white-space:nowrap;}
+  .menu{font-family:'Baloo 2',sans-serif; font-weight:700; color:var(--pri-dark); white-space:nowrap;}
+  .mini-cap{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12px; color:var(--ink-soft); margin-bottom:4px; text-transform:uppercase; letter-spacing:.03em;}
+
+  /* CLASSIFY */
+  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:13px 15px; margin:8px 0;}
+  .classify-card p.q{font-weight:700; margin:0 0 8px; font-size:13.5px;}
+  .choice-row{display:flex; gap:6px; flex-wrap:wrap;}
+  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12px; padding:7px 11px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease, color .15s ease;}
+  .choice-btn:hover{border-color:var(--pri);}
+  .choice-btn.correct{background:#E4F5E9; border-color:#3FAE58; color:#256B36;}
+  .choice-btn.wrong{background:#FBE6E9; border-color:#D14B5E; color:#8C2D3A;}
+  .choice-feedback{margin-top:6px; font-size:12px; color:var(--ink-soft); min-height:1.2em;}
+
+  /* MATCHING */
+  .tool-pool{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; padding:11px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:12px;}
+  .tool-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:7px 12px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .tool-chip:hover{transform:translateY(-2px);}
+  .tool-chip.selected{border-color:var(--pri); box-shadow:0 0 0 3px rgba(208,89,42,0.2);}
+  .tool-chip.placed{display:none;}
+  .func-card{display:flex; align-items:center; gap:10px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:9px 11px; margin-bottom:7px; cursor:pointer; transition:border-color .2s ease, background .2s ease;}
+  .func-card.matched{border-color:var(--pri); background:#FDF1EA; cursor:default;}
+  .func-text{flex:1; font-size:13px; color:var(--ink-soft);}
+  .func-text svg{width:96px; height:56px; display:block;}
+  .func-slot{min-width:80px; max-width:44%; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:11.5px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:6px 6px;}
+  .func-slot.filled{border-style:solid; border-color:var(--pri); background:#FBE3D6; color:var(--ink);}
+  .grid-match{display:grid; grid-template-columns:1fr 1fr; gap:7px;}
+  .grid-match .func-card{margin:0;}
+  @media (max-width:560px){ .grid-match{grid-template-columns:1fr;} }
+
+  /* SPREADSHEET MOCK */
+  .sheet{background:var(--surface); border:1.5px solid var(--cell-line); border-radius:var(--radius-s); overflow:hidden; font-size:12px; user-select:none;}
+  .sheet-title{display:flex; align-items:center; gap:8px; background:#FCFAF8; border-bottom:1px solid var(--cell-line); padding:6px 10px; font-weight:700; font-size:12.5px;}
+  .sheet-title .doc{width:16px; height:20px; border-radius:3px; background:#1D7A45; position:relative; flex-shrink:0;}
+  .sheet-title .doc::after{content:'X'; position:absolute; inset:0; color:#fff; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; font-family:Arial,sans-serif;}
+  .sheet-scroll{overflow-x:auto;}
+  .sheet-grid{border-collapse:collapse; width:100%; table-layout:fixed;}
+  .sheet-grid th, .sheet-grid td{border:1px solid var(--cell-line); height:28px; padding:0 6px; overflow:hidden; white-space:nowrap; text-overflow:clip;}
+  .sheet-grid th{background:var(--head-bg); font-weight:700; color:var(--ink-soft); font-size:11px; text-align:center;}
+  .sheet-grid th.corner{width:30px;}
+  .sheet-grid td{background:#fff;}
+  .sheet-grid td.fname{font-weight:800;}
+  .sheet-grid td.num{text-align:right;}
+  .sheet-grid td.colsel{background:#EAF4FB; box-shadow:inset 2px 0 0 var(--accent), inset -2px 0 0 var(--accent);}
+  .acc{display:flex; justify-content:space-between; gap:6px;}
+  .acc span:first-child{flex:1; text-align:right;}
+  .fbar{display:flex; align-items:center; border-bottom:1px solid var(--cell-line); font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px; background:#fff;}
+  .fbar .ref{width:46px; text-align:center; border-right:1px solid var(--cell-line); padding:5px 0; color:var(--ink-soft); font-weight:700;}
+  .fbar .fx{padding:0 8px; color:var(--ink-soft); font-style:italic; border-right:1px solid var(--cell-line);}
+  .fbar .val{padding:5px 8px; white-space:nowrap; flex:1;}
+  .clk{cursor:pointer;}
+  .clk:hover{box-shadow:inset 0 0 0 2px rgba(208,89,42,.35);}
+  .sheet-grid .ok{background:#DFF3E6 !important; color:#1E6B3A;}
+  .sheet-grid .bad{animation:itemShake .35s ease; background:#FCE6E2 !important;}
+  .sheet-grid .found{background:#FFE3D3 !important; text-decoration:line-through; color:#A8431B;}
+  .sheet-grid tr.gone td, .sheet-grid tr.gone th{display:none;}
+
+  /* NUMBER FORMATS */
+  .nf-wrap{display:grid; grid-template-columns:150px 1fr; gap:12px; align-items:end;}
+  @media (max-width:520px){ .nf-wrap{grid-template-columns:1fr;} }
+  .nf-target .sheet-grid td{background:#FFFBEA;}
+  .toolbar{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:12px;}
+  .tb-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12.5px; padding:7px 12px; border-radius:8px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer;}
+  .tb-btn:hover{border-color:var(--pri);}
+  .tb-btn.on{background:var(--pri); color:#fff; border-color:var(--pri);}
+
+  /* ALIGN EMULATOR */
+  .al-wrap{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  @media (max-width:640px){ .al-wrap{grid-template-columns:1fr;} }
+  .al-sheet .sheet-grid td{transition:background .2s ease;}
+  .al-sheet .sheet-grid td.rsel{box-shadow:inset 0 0 0 2px var(--pri);}
+  .al-sheet .sheet-grid td.spill{overflow:visible;}
+  .al-sheet .sheet-grid td.wrapc{white-space:normal; line-height:1.15;}
+  .al-sheet.target .sheet-grid td{background:#FFFBEA;}
+  .dialog{border:1.5px solid #C9BFB6; border-radius:8px; background:#FBFAF9; box-shadow:0 6px 18px rgba(42,28,20,.08); font-size:13px; margin-top:12px; overflow:hidden;}
+  .dlg-title{background:#fff; border-bottom:1px solid #E5DDD6; padding:6px 10px; font-weight:800; font-size:12.5px; display:flex; justify-content:space-between;}
+  .dlg-tabs{display:flex; gap:2px; padding:6px 8px 0; border-bottom:1px solid #E5DDD6; flex-wrap:wrap;}
+  .dlg-tab{font-family:'Nunito Sans',sans-serif; font-size:12px; font-weight:700; padding:5px 10px; border:1px solid transparent; border-bottom:none; border-radius:6px 6px 0 0; background:transparent; color:#9C8E84; cursor:default;}
+  .dlg-tab.live{cursor:pointer; color:var(--ink-soft);}
+  .dlg-tab.active{background:#fff; border-color:#E5DDD6; color:var(--ink); margin-bottom:-1px;}
+  .dlg-body{padding:12px 14px; background:#fff;}
+  .dlg-row{display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
+  .dlg-row label.lbl{min-width:118px; font-weight:700; color:var(--ink-soft); font-size:12.5px;}
+  .dlg-row select{font:inherit; font-size:13px; padding:4px 6px; border:1.5px solid var(--cell-line); border-radius:6px; background:#fff; min-width:150px;}
+  .dlg-row input[type=checkbox], .dlg-row input[type=radio]{width:16px; height:16px; accent-color:var(--pri);}
+  .dlg-check{display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:13px; cursor:pointer;}
+  .dlg-foot{display:flex; justify-content:flex-end; gap:8px; padding:8px 12px; border-top:1px solid #E5DDD6;}
+  .dlg-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12.5px; padding:6px 18px; border-radius:6px; border:1.5px solid var(--cell-line); background:#fff; cursor:pointer;}
+  .dlg-btn.prim{background:var(--pri); border-color:var(--pri); color:#fff;}
+  .dlg-pane{display:none;}
+  .dlg-pane.show{display:block;}
+  .radio-list label{display:flex; gap:8px; align-items:center; padding:5px 0; font-size:13px; cursor:pointer;}
+
+  /* VALIDATION TEST */
+  .vt{display:none; margin-top:14px;}
+  .vt.show{display:block;}
+  .vt-cell-wrap{position:relative; display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap;}
+  .vt-cell{width:150px;}
+  .vt-tip{background:#FFFBEA; border:1px solid #E5CF7A; border-radius:6px; padding:6px 9px; font-size:12px; max-width:220px; box-shadow:0 2px 6px rgba(0,0,0,.06);}
+  .vt-tip b{display:block; font-size:11px; color:var(--ink-soft);}
+  .vt-pool{display:flex; flex-wrap:wrap; gap:7px; margin-top:12px; justify-content:center;}
+  .vt-chip{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; font-size:13px; background:var(--bg); border:2px solid var(--line); border-radius:8px; padding:6px 10px; cursor:pointer;}
+  .vt-chip.tested-ok{border-color:#3FAE58; background:#E4F5E9;}
+  .vt-chip.tested-bad{border-color:#D14B5E; background:#FBE6E9;}
+  .vt-popup{display:none; border:1.5px solid #C9BFB6; border-radius:8px; background:#fff; max-width:340px; margin:12px auto 0; box-shadow:0 8px 22px rgba(42,28,20,.15); overflow:hidden;}
+  .vt-popup.show{display:block;}
+  .vt-popup .pt{background:#FCFAF8; border-bottom:1px solid #E5DDD6; padding:5px 10px; font-weight:800; font-size:12px;}
+  .vt-popup .pb{display:flex; gap:10px; align-items:center; padding:12px; font-size:13px;}
+  .vt-popup .pb .x{width:28px; height:28px; border-radius:50%; background:#D14B5E; color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .vt-popup .pf{display:flex; justify-content:flex-end; gap:6px; padding:0 12px 10px;}
+
+  /* SEQUENCE */
+  .seq-done{list-style:none; padding:0 !important; margin:0 0 10px !important;}
+  .seq-done li{display:flex; gap:10px; align-items:center; background:#FDF1EA; border:1.5px solid #F2CDB9; border-radius:var(--radius-s); padding:8px 12px; margin-bottom:6px !important; font-size:14px;}
+  .seq-done .n{width:24px; height:24px; border-radius:50%; background:var(--pri); color:#fff; font-family:'Baloo 2',sans-serif; font-size:13px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .seq-ask{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; margin:6px 0 8px;}
+  .seq-ask b{color:var(--accent-dark);}
+  .seq-opts{display:flex; flex-direction:column; gap:7px;}
+  .seq-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:14px; font-weight:600; padding:10px 13px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer;}
+  .seq-opt:hover{border-color:var(--pri);}
+  .seq-opt.wrong{background:#FBE6E9; border-color:#D14B5E;}
+
+  /* QUIZ */
+  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:24px 22px; margin-top:16px;}
+  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:12.5px; color:var(--ink-soft); margin-bottom:9px;}
+  .quiz-q{font-size:16px; font-weight:700; margin-bottom:14px;}
+  .quiz-options{display:flex; flex-direction:column; gap:9px;}
+  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:14px; font-weight:600; padding:11px 14px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .quiz-opt:hover{border-color:var(--pri);}
+  .quiz-opt.correct{background:#E4F5E9; border-color:#3FAE58;}
+  .quiz-opt.wrong{background:#FBE6E9; border-color:#D14B5E;}
+  .quiz-nav{display:flex; justify-content:flex-end; margin-top:16px;}
+  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:10px 20px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
+  .btn-next.active{opacity:1; pointer-events:auto;}
+
+  .completion{display:none; text-align:center; padding:18px 10px 10px;}
+  .completion.show{display:block;}
+  .badge{width:80px; height:80px; margin:0 auto 14px;}
+  .completion h3{font-size:20px; margin-bottom:8px;}
+  .completion p{color:var(--ink-soft); max-width:50ch; margin:0 auto 16px; font-size:14px;}
+  .completion .total{font-family:'Baloo 2',sans-serif; font-size:28px; color:var(--pri-dark);}
+
+  /* ILLUSTRATED REVIEW */
+  .ill-card{display:grid; grid-template-columns:210px 1fr; gap:14px; align-items:center; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; margin:8px 0;}
+  @media (max-width:560px){ .ill-card{grid-template-columns:1fr;} }
+  .ill-card p.q{font-weight:700; margin:0 0 8px; font-size:14px;}
+  .ill-pic{display:flex; justify-content:center;}
+  .mg{border-collapse:collapse; font-size:11px; background:#fff;}
+  .mg th, .mg td{border:1px solid var(--cell-line); height:22px; min-width:34px; padding:0 4px; text-align:center;}
+  .mg th{background:var(--head-bg); color:var(--ink-soft); font-weight:700; min-width:18px;}
+  .mg td.hl{background:#CFE6F5; box-shadow:inset 0 0 0 2px var(--accent);}
+  .mwin{border:1.5px solid var(--cell-line); border-radius:6px; overflow:hidden; background:#fff;}
+  .mbar{display:flex; align-items:center; gap:0; border-bottom:1px solid var(--cell-line); font-size:11px; font-family:ui-monospace,Menlo,Consolas,monospace;}
+  .mbar .nb{width:40px; text-align:center; padding:3px 0; border-right:1px solid var(--cell-line); font-weight:700;}
+  .mbar .fxs{padding:0 6px; font-style:italic; color:var(--ink-soft); border-right:1px solid var(--cell-line);}
+  .mbar .fb{padding:3px 6px; flex:1;}
+  .mbar .on{background:#CFE6F5; box-shadow:inset 0 0 0 2px var(--accent);}
+
+  /* ILLUSTRATIONS */
+  .ill-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(128px,1fr)); gap:10px; margin:10px 0 14px;}
+  .ill{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 12px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .ill .t{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; line-height:1.2;}
+  .ill .c{font-size:12px; color:var(--ink-soft); line-height:1.35;}
+  .ill .vis{min-height:64px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;}
+  .ill-grid.three{grid-template-columns:repeat(auto-fit,minmax(200px,1fr));}
+  .mcell{display:inline-block; min-width:84px; height:28px; line-height:26px; border:1.5px solid var(--cell-line); background:#fff; padding:0 8px; font-size:13px; text-align:right; white-space:nowrap; overflow:hidden; vertical-align:middle;}
+  .mcell.txt{text-align:left;}
+  .mcell.ok{border-color:#3FAE58; background:#E4F5E9;}
+  .mcell.no{border-color:#D14B5E; background:#FBE6E9; text-decoration:line-through;}
+  .ba{display:flex; align-items:center; justify-content:center; gap:6px; flex-wrap:wrap;}
+  .arr{color:var(--pri); font-weight:800; font-size:16px; line-height:1;}
+  .ill .vis.ba{flex-direction:row;}
+  .tall{display:flex; width:96px; height:52px; border:1.5px solid var(--cell-line); background:#fff; padding:2px 6px; font-size:12px; line-height:1.15; text-align:left;}
+  .numline{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin:10px 0 14px;}
+  .nl-item{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-s); padding:6px 10px; text-align:center; font-size:12.5px;}
+  .nl-item b{display:block; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:15px; color:var(--accent-dark);}
+  .nl-item.dots{border:none; background:transparent; align-self:center; font-size:18px; color:var(--ink-soft);}
+  .ribbon{background:var(--surface); border:1.5px solid var(--cell-line); border-radius:8px; overflow:hidden; font-size:12px; margin:10px 0 14px;}
+  .rb-tabs{display:flex; gap:2px; background:#F4EEE9; padding:4px 6px 0; flex-wrap:wrap;}
+  .rb-tabs span{padding:4px 10px; border-radius:5px 5px 0 0; color:var(--ink-soft); font-weight:700;}
+  .rb-tabs span.on{background:#fff; color:var(--pri-dark); box-shadow:inset 0 -3px 0 var(--pri);}
+  .rb-body{display:flex; gap:14px; padding:10px 12px; align-items:flex-start; flex-wrap:wrap;}
+  .rb-group{border:1.5px dashed var(--pri); border-radius:8px; padding:6px 10px; text-align:center;}
+  .rb-group .gl{font-size:11px; color:var(--ink-soft); margin-top:4px;}
+  .rb-btn{display:inline-flex; flex-direction:column; align-items:center; font-weight:700; padding:2px 8px;}
+  .rb-btn .ic{font-size:22px;}
+  .rb-menu{border:1.5px solid var(--cell-line); border-radius:6px; background:#fff; box-shadow:0 4px 10px rgba(0,0,0,.08); text-align:left;}
+  .rb-menu div{padding:5px 12px;}
+  .rb-menu div.on{background:#FCEDE5; font-weight:800;}
+  .dd{display:inline-block; text-align:left; font-size:12px;}
+  .dd .mcell{min-width:96px;}
+  .dd .lst{border:1.5px solid var(--cell-line); border-top:none; background:#fff;}
+  .dd .lst div{padding:2px 8px;}
+  .dd .lst div.on{background:#CFE6F5;}
+  .tipbox{background:#FFFBEA; border:1px solid #E5CF7A; border-radius:6px; padding:5px 8px; font-size:11.5px; max-width:150px; text-align:left;}
+  .errbox{border:1.5px solid #C9BFB6; border-radius:6px; background:#fff; font-size:11.5px; max-width:170px; text-align:left; overflow:hidden;}
+  .errbox .h{background:#FCFAF8; border-bottom:1px solid #E5DDD6; padding:2px 6px; font-weight:800;}
+  .errbox .b{display:flex; gap:6px; align-items:center; padding:6px;}
+  .errbox .x{width:18px; height:18px; border-radius:50%; background:#D14B5E; color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:10px;}
+  .paper{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0 0;}
+  .paper .ill svg{width:120px; height:66px;}
+
+  footer{padding:32px 24px 56px; text-align:center; color:var(--ink-soft); font-size:13px;}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
+  <div class="hud-row">
+    <span class="hud-title">8 клас · Форматування й перевірка даних</span>
+    <div class="neuron-counter">
+      <svg viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
+        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#B57A1F" opacity="0.6"/>
+      </svg>
+      <span id="neuronCount">0</span>
+    </div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Працюємо з числами · Тема 2</div>
+      <h1>Додаткові параметри форматування. Перевірка даних</h1>
+      <p>Гроші, відсотки, дати, рамки й кольори роблять таблицю зрозумілою. Перевірка даних не дає ввести в неї дурниці. Розберемося з обома інструментами.</p>
+      <button class="btn-primary" onclick="document.getElementById('rev').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <!-- таблиця з обличчям -->
+      <rect x="14" y="34" width="84" height="84" rx="10" fill="#fff" stroke="#D0592A" stroke-width="4"/>
+      <rect x="14" y="34" width="84" height="20" rx="10" fill="#D0592A"/>
+      <rect x="14" y="44" width="84" height="10" fill="#D0592A"/>
+      <line x1="42" y1="54" x2="42" y2="118" stroke="#EEDFD4" stroke-width="2"/>
+      <line x1="70" y1="54" x2="70" y2="118" stroke="#EEDFD4" stroke-width="2"/>
+      <line x1="14" y1="96" x2="98" y2="96" stroke="#EEDFD4" stroke-width="2"/>
+      <circle cx="42" cy="72" r="5" fill="#2A1C14"/><circle cx="70" cy="72" r="5" fill="#2A1C14"/>
+      <circle cx="43.6" cy="70.4" r="1.6" fill="#fff"/><circle cx="71.6" cy="70.4" r="1.6" fill="#fff"/>
+      <path d="M46 84 C51 90 61 90 66 84" stroke="#2A1C14" stroke-width="3.5" stroke-linecap="round"/>
+      <rect x="24" y="102" width="12" height="10" rx="2" fill="#FFC93C"/>
+      <!-- валик -->
+      <rect x="64" y="10" width="46" height="16" rx="6" fill="#2B8AC4"/>
+      <path d="M110 18 H118 V36 H90 V44" stroke="#6B5649" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <!-- щит перевірки -->
+      <path d="M112 64 L132 70 V88 C132 102 122 110 112 114 C102 110 92 102 92 88 V70 Z" fill="#2E9E5B"/>
+      <path d="M103 88 L110 95 L122 80" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="rev" style="border-top:none; padding-top:0;">
+    <div class="step-label">Повторення · Збір даних</div>
+    <h2>Пригадаймо електронні таблиці</h2>
+    <p>Минулого уроку ми познайомилися з вікном електронної таблиці, адресами комірок і простим форматуванням.</p>
+    <p class="soft">Подивись на малюнок і обери правильну відповідь.</p>
+    <div id="revList"></div>
+    <div class="status-line" id="revStatus"></div>
+  </section>
+
+  <section class="block" id="s1">
+    <div class="step-label">Крок 1 · Числові формати</div>
+    <h2>Одне число — різний вигляд</h2>
+    <p>У комірці записано число <b>38,5</b>. Формат змінює лише те, <b>як воно виглядає</b>:</p>
+    <div class="ill-grid">
+      <div class="ill"><div class="vis"><span class="mcell">38,5</span></div><div class="t">Загальний</div><div class="c">як ввели</div></div>
+      <div class="ill"><div class="vis"><span class="mcell">38,50</span></div><div class="t">Числовий</div><div class="c">2 знаки після коми</div></div>
+      <div class="ill"><div class="vis"><span class="mcell">38,50 ₴</span></div><div class="t">Грошовий</div><div class="c">із символом валюти</div></div>
+      <div class="ill"><div class="vis"><span class="mcell"><span class="acc"><span>38,50</span><span>₴</span></span></span><span class="mcell"><span class="acc"><span>–</span><span>₴</span></span></span></div><div class="t">Фінансовий</div><div class="c">₴ у стовпчик, нуль — риска</div></div>
+      <div class="ill"><div class="vis"><span class="mcell">0,1</span><span class="arr">↓</span><span class="mcell">10%</span></div><div class="t">Відсотковий</div><div class="c">× 100 і знак %</div></div>
+    </div>
+    <div class="note">Де шукати: вкладка <span class="menu">Основне</span> → розділ <span class="menu">Число</span>. Спершу виділи комірки, потім обери формат.</div>
+    <p class="soft">Зроби стовпчик таким, як на зразку: обирай формат кнопками внизу. Поглядай у рядок формул — число там не змінюється!</p>
+    <div class="exercise">
+      <div class="hot-prompt" id="nfPrompt"></div>
+      <div class="nf-wrap">
+        <div class="nf-target">
+          <div class="mini-cap">Зразок</div>
+          <div class="sheet"><table class="sheet-grid" id="nfTarget"></table></div>
+        </div>
+        <div>
+          <div class="mini-cap">Твоя таблиця</div>
+          <div class="sheet">
+            <div class="fbar"><span class="ref" id="nfRef">B2</span><span class="fx">fx</span><span class="val" id="nfVal"></span></div>
+            <div class="sheet-scroll"><table class="sheet-grid" id="nfGrid" style="min-width:320px;"></table></div>
+          </div>
+        </div>
+      </div>
+      <div class="toolbar" id="nfBar"></div>
+      <div class="status-line" id="nfStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s2">
+    <div class="step-label">Крок 2 · Дата й час</div>
+    <h2>Чому дата — це число</h2>
+    <p>Таблиця нумерує всі дні по порядку, починаючи з 1 січня 1900 року. Дата — це просто <b>номер дня</b>, який ми бачимо в зручному вигляді:</p>
+    <div class="numline">
+      <div class="nl-item"><b>1</b>01.01.1900</div>
+      <div class="nl-item"><b>2</b>02.01.1900</div>
+      <div class="nl-item dots">…</div>
+      <div class="nl-item"><b>45901</b>01.09.2025</div>
+      <div class="nl-item"><b>45902</b>02.09.2025</div>
+    </div>
+    <p>Тому з датами можна рахувати: <b>+1</b> — це наступний день.</p>
+    <div class="ill-grid">
+      <div class="ill"><div class="vis"><span class="mcell">10.09.2025</span></div><div class="t">📅 Дата</div><div class="c">через крапку</div></div>
+      <div class="ill"><div class="vis"><span class="mcell" style="font-size:11.5px">10 вересня 2025 р.</span></div><div class="t">📅 Довга дата</div><div class="c">та сама дата, інший формат</div></div>
+      <div class="ill"><div class="vis"><span class="mcell">8:30</span></div><div class="t">⏰ Час</div><div class="c">через двокрапку</div></div>
+    </div>
+    <div class="trivia">У різних країнах дату записують по-різному. У США спершу йде місяць: 09/10/2025 там означає 10 вересня, а не 9 жовтня.</div>
+    <p class="soft">У комірці A1 записано дату <span class="mono">01.09.2025</span>. Що побачимо?</p>
+    <div id="dateList"></div>
+  </section>
+
+  <section class="block" id="s3">
+    <div class="step-label">Крок 3 · Вирівнювання</div>
+    <h2>Об'єднати, перенести, вирівняти</h2>
+    <p>Вирівнювання вирішує, <b>де саме</b> в комірці стоїть текст. Подивись, як змінюється комірка:</p>
+    <div class="ill-grid">
+      <div class="ill"><div class="vis"><span class="mcell txt" style="min-width:64px">Ціна</span><span class="arr">↓</span><span class="mcell" style="min-width:64px;text-align:center">Ціна</span></div><div class="t">По горизонталі</div><div class="c">ліворуч, по центру, праворуч</div></div>
+      <div class="ill"><div class="vis"><span class="tall" style="align-items:flex-end; width:56px">Ціна</span><span class="arr">↓</span><span class="tall" style="align-items:center; width:56px">Ціна</span></div><div class="t">По вертикалі</div><div class="c">зверху, по центру, знизу</div></div>
+      <div class="ill"><div class="vis"><span class="mcell txt" style="min-width:60px;width:60px">Кількість товару</span><span class="arr">↓</span><span class="tall" style="align-items:center; width:70px">Кількість товару</span></div><div class="t">Переносити по словах</div><div class="c">довгий текст — у кілька рядків</div></div>
+      <div class="ill"><div class="vis"><span><span class="mcell txt" style="min-width:40px;width:40px;overflow:visible;position:relative;z-index:1">Список</span><span class="mcell" style="min-width:40px;width:40px"></span><span class="mcell" style="min-width:40px;width:40px"></span></span><span class="arr">↓</span><span class="mcell" style="min-width:124px;text-align:center">Список</span></div><div class="t">Об'єднання клітинок</div><div class="c">кілька комірок → одна</div></div>
+    </div>
+    <div class="note">Усе це — у вікні <span class="menu">Формат клітинок</span> на вкладці <span class="menu">Вирівнювання</span>. Відкривається кнопкою-стрілочкою в кутку розділу <span class="menu">Число</span>.</div>
+    <p class="soft">Налаштуй вирівнювання так, щоб таблиця стала як на зразку, і натисни «OK».</p>
+    <div class="exercise">
+      <div class="hot-prompt" id="alPrompt"></div>
+      <div class="al-wrap">
+        <div><div class="mini-cap">Зразок</div><div class="sheet al-sheet target"><table class="sheet-grid" id="alTarget"></table></div></div>
+        <div><div class="mini-cap">Твоя таблиця</div><div class="sheet al-sheet"><table class="sheet-grid" id="alGrid"></table></div></div>
+      </div>
+      <div class="dialog">
+        <div class="dlg-title"><span>Формат клітинок</span><span>✕</span></div>
+        <div class="dlg-tabs">
+          <span class="dlg-tab">Число</span><span class="dlg-tab active">Вирівнювання</span><span class="dlg-tab">Шрифт</span><span class="dlg-tab">Межі</span><span class="dlg-tab">Заливка</span>
+        </div>
+        <div class="dlg-body">
+          <div class="dlg-row"><label class="lbl" for="alH">По горизонталі:</label>
+            <select id="alH"><option value="general">звичайне</option><option value="left">за лівим краєм</option><option value="center">по центру</option><option value="right">за правим краєм</option></select></div>
+          <div class="dlg-row"><label class="lbl" for="alV">По вертикалі:</label>
+            <select id="alV"><option value="top">зверху</option><option value="middle">по центру</option><option value="bottom">знизу</option></select></div>
+          <label class="dlg-check"><input type="checkbox" id="alWrap">переносити по словах</label>
+          <label class="dlg-check"><input type="checkbox" id="alMerge">об'єднання клітинок</label>
+        </div>
+        <div class="dlg-foot"><button class="dlg-btn prim" id="alOk">OK</button></div>
+      </div>
+      <div class="status-line" id="alStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s4">
+    <div class="step-label">Крок 4 · Межі та заливка</div>
+    <h2>Рамки й кольори</h2>
+    <ul>
+      <li><b>Межі</b> — лінії-рамки навколо комірок.</li>
+      <li><b>Заливка</b> — колір фону комірок.</li>
+    </ul>
+    <p>Обидві вкладки — у тому самому вікні <span class="menu">Формат клітинок</span>. Навіщо межі, якщо сітку й так видно? Порівняй:</p>
+    <div class="paper">
+      <div class="ill"><div class="vis"><svg viewBox="0 0 120 66"><g stroke="#D9CEC6" stroke-dasharray="2 2" fill="none"><rect x="6" y="6" width="108" height="54"/><line x1="42" y1="6" x2="42" y2="60"/><line x1="78" y1="6" x2="78" y2="60"/><line x1="6" y1="24" x2="114" y2="24"/><line x1="6" y1="42" x2="114" y2="42"/></g><g font-size="8" fill="#2A1C14" font-family="Arial"><text x="10" y="18">Товар</text><text x="46" y="18">Ціна</text><text x="10" y="36">Сир</text><text x="46" y="36">127,90</text></g></svg></div><div class="t">🖥 На екрані</div><div class="c">видно бліду сітку</div></div>
+      <div class="ill"><div class="vis"><svg viewBox="0 0 120 66"><g font-size="8" fill="#2A1C14" font-family="Arial"><text x="10" y="18">Товар</text><text x="46" y="18">Ціна</text><text x="10" y="36">Сир</text><text x="46" y="36">127,90</text></g></svg></div><div class="t">🖨 На папері</div><div class="c">сітки немає — без меж таблиця «розсипається»</div></div>
+    </div>
+    <p class="soft">Зістав назву з тим, як виглядає таблиця. Пунктир — сітка, яка не друкується.</p>
+    <div class="exercise">
+      <div class="tool-pool" id="bdPool"></div>
+      <div class="grid-match" id="bdList"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s5">
+    <div class="step-label">Крок 5 · Зображення</div>
+    <h2>Картинка в таблиці</h2>
+    <p>У таблицю можна вставити зображення, наприклад фото товару в списку покупок. Ось де шукати кнопку:</p>
+    <div class="ribbon">
+      <div class="rb-tabs"><span>Файл</span><span>Основне</span><span class="on">Вставлення</span><span>Розмітка</span><span>Формули</span><span>Дані</span></div>
+      <div class="rb-body">
+        <div class="rb-group"><span class="rb-btn"><span class="ic">🖼</span>Зображення ▾</span><div class="gl">Ілюстрації</div></div>
+        <div class="rb-menu"><div>Цей пристрій…</div><div class="on">Зображення з Інтернету…</div></div>
+      </div>
+    </div>
+    <div class="note">Розмір картинки змінюють на панелі <span class="menu">Формат зображення</span> — вона відкривається через праву кнопку миші.</div>
+    <p class="soft">Як вставити зображення з інтернету й підігнати його розмір? Обирай дії по одній.</p>
+    <div class="exercise">
+      <ul class="seq-done" id="seqDone"></ul>
+      <div class="seq-ask" id="seqAsk"></div>
+      <div class="seq-opts" id="seqOpts"></div>
+      <div class="status-line" id="seqStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s6">
+    <div class="step-label">Крок 6 · Перевірка даних</div>
+    <h2>Охоронець для комірок</h2>
+    <p><b>Перевірка (валідація) даних</b> — правило для комірки: що в неї можна вписати, а що ні. Як охоронець на вході: пропускає лише «своїх».</p>
+    <p>Де шукати: <span class="menu">Дані → Знаряддя даних → Перевірка даних</span>. Ось які бувають правила:</p>
+    <div class="ill-grid three">
+      <div class="ill"><div class="vis"><span class="mcell ok">14</span><span class="mcell no">13,5</span></div><div class="t">Ціле число</div><div class="c">тільки цілі, напр. від 12 до 15</div></div>
+      <div class="ill"><div class="vis"><span class="mcell ok">1,68</span></div><div class="t">Дійсне</div><div class="c">числа з комою</div></div>
+      <div class="ill"><div class="vis"><span class="dd"><span class="mcell txt">8-Б ▾</span><span class="lst" style="display:block"><div>8-А</div><div class="on">8-Б</div><div>8-В</div></span></span></div><div class="t">Список</div><div class="c">вибір із готового переліку</div></div>
+      <div class="ill"><div class="vis"><span class="mcell ok">15.03.2012</span></div><div class="t">Дата</div><div class="c">лише дата з проміжку</div></div>
+      <div class="ill"><div class="vis"><span class="mcell ok">8:30</span></div><div class="t">Час</div><div class="c">лише час із проміжку</div></div>
+      <div class="ill"><div class="vis"><span class="mcell ok txt">Kotyk_12</span><span class="mcell no txt" style="font-size:11px">SuperMegaKotyk2012</span></div><div class="t">Довжина тексту</div><div class="c">не більше N символів</div></div>
+    </div>
+    <p class="soft">Яке правило перевірки підійде?</p>
+    <div id="valList"></div>
+  </section>
+
+  <section class="block" id="s7">
+    <div class="step-label">Крок 7 · Налаштування перевірки</div>
+    <h2>Три вкладки вікна «Перевірка даних»</h2>
+    <p>У вікна перевірки три вкладки. Ось що кожна з них робить:</p>
+    <div class="ill-grid">
+      <div class="ill"><div class="vis"><span class="mcell txt" style="font-size:11.5px">Ціле число: 12…15</span></div><div class="t">① Параметри</div><div class="c">яке правило діє</div></div>
+      <div class="ill"><div class="vis ba"><span class="mcell" style="min-width:40px; box-shadow:inset 0 0 0 2px var(--accent)"></span><span class="tipbox"><b>Вік</b><br>Введіть ціле число від 12 до 15</span></div><div class="t">② Підказка про вміст</div><div class="c">з'являється, коли клацнеш комірку</div></div>
+      <div class="ill"><div class="vis"><span class="errbox"><span class="h" style="display:block">Помилка введення</span><span class="b"><span class="x">✕</span>Вік має бути від 12 до 15</span></span></div><div class="t">③ Повідомлення про помилку</div><div class="c">вискакує, якщо ввели не те</div></div>
+    </div>
+    <div class="exercise">
+      <div class="hot-prompt">Завдання: у комірки «Вік» учнів 8 класу можна вводити лише <span>цілі числа від 12 до 15</span>. Додай зрозумілу підказку й повідомлення про помилку.</div>
+      <div class="dialog">
+        <div class="dlg-title"><span>Перевірка даних</span><span>✕</span></div>
+        <div class="dlg-tabs">
+          <button class="dlg-tab live active" data-pane="vp1">Параметри</button>
+          <button class="dlg-tab live" data-pane="vp2">Підказка про вміст</button>
+          <button class="dlg-tab live" data-pane="vp3">Повідомлення про помилку</button>
+        </div>
+        <div class="dlg-body">
+          <div class="dlg-pane show" id="vp1">
+            <div class="dlg-row"><label class="lbl" for="vType">Тип даних:</label>
+              <select id="vType"><option value="any">Будь-яке значення</option><option value="int">Ціле число</option><option value="dec">Дійсне</option><option value="list">Список</option><option value="date">Дата</option><option value="time">Час</option><option value="len">Довжина тексту</option><option value="custom">Інший</option></select></div>
+            <div class="dlg-row"><label class="lbl" for="vOp">Значення:</label>
+              <select id="vOp"><option value="between">між</option><option value="notbetween">не між</option><option value="eq">дорівнює</option><option value="gt">більше ніж</option><option value="lt">менше ніж</option></select></div>
+            <div class="dlg-row"><label class="lbl" for="vMin">Мінімум:</label>
+              <select id="vMin"><option>0</option><option>10</option><option>12</option><option>13</option><option>15</option></select></div>
+            <div class="dlg-row"><label class="lbl" for="vMax">Максимум:</label>
+              <select id="vMax"><option>12</option><option>14</option><option>15</option><option>18</option><option>100</option></select></div>
+          </div>
+          <div class="dlg-pane" id="vp2">
+            <label class="dlg-check"><input type="checkbox" id="vShow">Відображати підказку, коли клітинку виділено</label>
+            <div class="radio-list" id="vHints"></div>
+          </div>
+          <div class="dlg-pane" id="vp3">
+            <p style="font-size:13px; margin:0 0 4px; color:var(--ink-soft);">Текст повідомлення:</p>
+            <div class="radio-list" id="vErrs"></div>
+          </div>
+        </div>
+        <div class="dlg-foot"><button class="dlg-btn prim" id="vOk">OK</button></div>
+      </div>
+      <div class="status-line" id="vStatus"></div>
+
+      <div class="vt" id="vTest">
+        <div class="hot-prompt">Перевірка готова! Тепер «введи» в комірку B2 кожне значення — клацай по черзі.</div>
+        <div class="vt-cell-wrap">
+          <div class="sheet vt-cell"><table class="sheet-grid">
+            <tr><th class="corner"></th><th>B</th></tr>
+            <tr><th>1</th><td class="fname">Вік</td></tr>
+            <tr><th>2</th><td class="num" id="vCell" style="box-shadow:inset 0 0 0 2px var(--accent);"></td></tr>
+          </table></div>
+          <div class="vt-tip" id="vTip"></div>
+        </div>
+        <div class="vt-pool" id="vPool"></div>
+        <div class="vt-popup" id="vPopup">
+          <div class="pt">Помилка введення</div>
+          <div class="pb"><span class="x">✕</span><span id="vPopMsg"></span></div>
+          <div class="pf"><button class="dlg-btn" id="vRetry">Повторити</button><button class="dlg-btn" id="vCancel">Скасувати</button></div>
+        </div>
+        <div class="status-line" id="vtStatus"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="s8">
+    <div class="step-label">Крок 8 · Видалення повторів</div>
+    <h2>Прибираємо дублікати</h2>
+    <p>Коли таблицю складають із кількох списків, у ній з'являються однакові рядки. Їх прибирає команда <span class="menu">Дані → Знаряддя даних → Видалити повтори</span>.</p>
+    <div class="ill-grid">
+      <div class="ill"><div class="vis"><span class="mcell txt">Олена · Київ</span><span class="mcell txt no">Олена · Київ</span></div><div class="t">Повтор ✂</div><div class="c">усе збігається — друга копія зникне, перша лишиться</div></div>
+      <div class="ill"><div class="vis"><span class="mcell txt">Олена · Київ</span><span class="mcell txt ok">Олена · Львів</span></div><div class="t">Не повтор ✓</div><div class="c">хоч одне значення інше — обидва рядки лишаються</div></div>
+    </div>
+    <div class="problem-note">Видалені повтори не можна автоматично повернути. Перед видаленням збережи копію даних на іншому аркуші чи в іншому файлі.</div>
+    <p class="soft">Перевіряються всі три стовпці. Клацни рядки, які буде видалено.</p>
+    <div class="exercise">
+      <div class="sheet">
+        <div class="sheet-title"><span class="doc"></span>Контакти гуртка</div>
+        <div class="sheet-scroll"><table class="sheet-grid" id="dupGrid" style="min-width:380px;"></table></div>
+      </div>
+      <div class="status-line" id="dupStatus">Знайдено повторів: 0 з 2</div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div class="quiz-box" id="quizBox">
+      <div class="quiz-progress" id="quizProgress">Запитання 1 з 8</div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
+    </div>
+    <div class="completion" id="completion">
+      <svg class="badge" viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#6C5CE7"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#6C5CE7"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#6C5CE7"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#6C5CE7"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#6C5CE7"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#6C5CE7"/>
+        <circle cx="12" cy="12" r="4.4" fill="#6C5CE7"/><circle cx="12" cy="12" r="1.6" fill="#5340c9" opacity="0.6"/>
+      </svg>
+      <h3>Урок пройдено!</h3>
+      <p>Ти вмієш застосовувати числові формати, працювати з датами й часом, вирівнювати текст, додавати межі, заливку й зображення, налаштовувати перевірку даних і прибирати повтори.</p>
+      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Урок · «Додаткові параметри форматування. Перевірка даних» · 8 клас</footer>
+
+<script>
+const STORAGE_KEY = "lesson8-formatting-validation-neurons";
+let neurons = 0;
+const neuronEl = document.getElementById('neuronCount');
+const hudFill = document.getElementById('hudFill');
+
+function addNeurons(n){
+  neurons += n;
+  neuronEl.textContent = neurons;
+  neuronEl.classList.add('pop');
+  setTimeout(()=>neuronEl.classList.remove('pop'), 250);
+  saveProgress();
+}
+async function saveProgress(){
+  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
+}
+async function loadProgress(){
+  try{
+    const res = await window.storage?.get(STORAGE_KEY, false);
+    if(res && res.value){
+      const d = JSON.parse(res.value);
+      if(typeof d.neurons === 'number'){ neurons = d.neurons; neuronEl.textContent = neurons; }
+    }
+  }catch(e){}
+}
+loadProgress();
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
+});
+
+/* ---------- HELPERS ---------- */
+const COLS = 'ABCDEFGH'.split('');
+function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
+function flash(el, cls){ el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), 380); }
+
+function makeClassify(containerId, items, opts){
+  const list = document.getElementById(containerId);
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">${(item.opts||opts).map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i===item.correct){ btn.classList.add('correct'); fb.textContent = item.why ? `Правильно ✓ ${item.why}` : 'Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+}
+
+function makeMatching(poolId, listId, items){
+  const pool = document.getElementById(poolId);
+  const list = document.getElementById(listId);
+  let selected = null;
+  let matched = 0;
+  shuffle(items).forEach(t=>{
+    const chip = document.createElement('div');
+    chip.className = 'tool-chip';
+    chip.textContent = t.name;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = t.name;
+    });
+    pool.appendChild(chip);
+  });
+  shuffle(items).forEach(t=>{
+    const card = document.createElement('div');
+    card.className = 'func-card';
+    card.innerHTML = `<div class="func-text">${t.func}</div><div class="func-slot">?</div>`;
+    card.addEventListener('click', ()=>{
+      if(card.classList.contains('matched') || !selected) return;
+      const slot = card.querySelector('.func-slot');
+      if(selected === t.name){
+        slot.textContent = selected;
+        slot.classList.add('filled');
+        card.classList.add('matched');
+        const chip = [...pool.children].find(c=>c.textContent===selected);
+        if(chip) chip.classList.add('placed');
+        addNeurons(1);
+        matched++;
+        selected = null;
+        pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+        if(matched === items.length) addNeurons(2);
+      } else {
+        card.classList.add('shake');
+        setTimeout(()=>card.classList.remove('shake'), 350);
+      }
+    });
+    list.appendChild(card);
+  });
+}
+
+/* ---------- REVIEW (з малюнками) ---------- */
+// Міні-таблиця: hl — підсвічені адреси, vals — значення {адреса: [текст, стиль]}
+function miniGrid(o){
+  const cols = o.cols || 4, rows = o.rows || 4, hl = o.hl || [], vals = o.vals || {};
+  let h = '<table class="mg"><tr><th></th>' + COLS.slice(0, cols).map(c=>`<th>${c}</th>`).join('') + '</tr>';
+  for(let r=1; r<=rows; r++){
+    h += `<tr><th>${r}</th>`;
+    for(let c=0; c<cols; c++){
+      const a = COLS[c] + r, v = vals[a] || ['', ''];
+      h += `<td class="${hl.includes(a)?'hl':''}" style="${v[1]}">${v[0]}</td>`;
+    }
+    h += '</tr>';
+  }
+  return h + '</table>';
+}
+function rangeCells(from, to){
+  const out = [];
+  for(let c=COLS.indexOf(from[0]); c<=COLS.indexOf(to[0]); c++)
+    for(let r=+from.slice(1); r<=+to.slice(1); r++) out.push(COLS[c]+r);
+  return out;
+}
+function miniWin(part){
+  const on = p => part===p ? ' on' : '';
+  return `<div class="mwin"><div class="mbar"><span class="nb${on('name')}">B2</span><span class="fxs">fx</span><span class="fb${on('formula')}">Олівець</span></div>
+    ${miniGrid({ cols:3, rows:3, hl:['B2'], vals:{ B1:['Товар',''], B2:['Олівець','text-align:left'] } })}</div>`;
+}
+const cell = (t, st='') => `<span class="mcell" style="min-width:70px;${st}">${t}</span>`;
+const ba = (a, b) => `<span class="ba">${a}<span class="arr">→</span>${b}</span>`;
+
+(function(){
+  const items = [
+    { pic: miniGrid({ hl:['C3'] }), q:'Яка адреса виділеної комірки?', opts:['3C','C3','CC33'], correct:1, why:'Спершу літера стовпця, потім номер рядка.' },
+    { pic: miniGrid({ hl: rangeCells('B2','D3') }), q:'Як записати виділений діапазон?', opts:['B2;D3','B2:D3','B-D 2-3'], correct:1, why:'Діапазон — дві протилежні кутові комірки через двокрапку.' },
+    { pic: miniGrid({ hl:['A1','C2','D4'] }), q:'Як записати виділені окремі комірки?', opts:['A1:D4','A1;C2;D4','A1-C2-D4'], correct:1, why:'Окремі комірки перелічують через крапку з комою.' },
+    { pic: miniWin('name'), q:'Як називається підсвічена частина вікна?', opts:['Рядок формул','Поле Ім\'я','Вкладка аркуша'], correct:1, why:'Поле Ім\'я показує адресу вибраної комірки.' },
+    { pic: miniWin('formula'), q:'А як називається ця частина?', opts:['Рядок формул','Поле Ім\'я','Рядок стану'], correct:0, why:'Рядок формул показує справжній вміст комірки.' },
+    { pic: miniGrid({ cols:1, rows:3, hl:['A2'], vals:{ A1:['45','text-align:right'], A2:['12 шт.','text-align:left'], A3:['3,5','text-align:right'] } }),
+      q:'Чому «12 шт.» притиснуте до лівого краю, а інші значення — до правого?', opts:['Таблиця сприйняла його як текст','Це найбільше число','Так завжди з цілими числами'], correct:0, why:'Літери поруч із цифрами роблять значення текстом — рахувати з ним не можна.' },
+    { pic: ba(cell('0,25'), cell('25%')), q:'Яке форматування застосували?', opts:['Грошовий формат','Відсотковий формат','Переносити текст'], correct:1, why:'0,25 — це чверть, тобто 25%.' },
+    { pic: `<span style="display:flex;flex-direction:column;align-items:center;gap:2px"><span style="display:flex">${cell('Список покупок','min-width:42px;width:42px;text-align:left;overflow:visible;position:relative;z-index:1')}${cell('','min-width:42px;width:42px')}${cell('','min-width:42px;width:42px')}</span><span class="arr" style="color:var(--pri);font-weight:800">↓</span>${cell('Список покупок','min-width:126px;text-align:center')}</span>`,
+      q:'Яку кнопку натиснули для заголовка над кількома стовпцями?', opts:['Переносити текст','Об\'єднати та розташувати в центрі','Відсотковий формат'], correct:1, why:'Кілька комірок стали однією, а текст — посередині.' },
+    { pic: ba(cell('Назва продукту','min-width:56px;width:56px;text-align:left'), '<span class="tall" style="width:62px">Назва продукту</span>'),
+      q:'А тут що зробили?', opts:['Об\'єднали комірки','Увімкнули «Переносити текст»','Змінили шрифт'], correct:1, why:'Текст розбився на два рядки всередині тієї самої комірки.' },
+    { pic: '<span style="font-size:30px">🌡</span>' + cell('18 · 21 · 24 · 19','min-width:120px;text-align:center'), q:'Ряд чисел без підписів і пояснень — це…', opts:['Дані','Інформація'], correct:0, why:'Це сирі факти: незрозуміло, що вони означають.' },
+    { pic: '<span style="font-size:30px">📊</span><span class="tipbox" style="max-width:130px">Найтепліше було в середу — 24 °C</span>', q:'А висновок, зроблений із цих чисел, — це…', opts:['Дані','Інформація'], correct:1, why:'Дані опрацювали — і з\'явився висновок.' }
+  ];
+  const list = document.getElementById('revList');
+  const status = document.getElementById('revStatus');
+  let done = 0;
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'ill-card';
+    card.innerHTML = `<div class="ill-pic">${item.pic}</div>
+      <div><p class="q">${item.q}</p>
+      <div class="choice-row">${item.opts.map((o,i)=>`<button class="choice-btn">${o}</button>`).join('')}</div>
+      <div class="choice-feedback"></div></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i===item.correct){
+          btn.classList.add('correct'); fb.textContent = `Правильно ✓ ${item.why}`; answered = true; addNeurons(1);
+          done++;
+          if(done === items.length){ addNeurons(2); status.textContent = 'Повторення завершено ✓ Переходимо до нового!'; }
+        }
+        else{ btn.classList.add('wrong'); fb.textContent = 'Спробуй ще раз'; }
+      });
+    });
+  });
+})();
+
+/* ---------- 1. NUMBER FORMATS ---------- */
+(function(){
+  const rows = [['Молоко', 38.5, 0.1], ['Сир', 127.9, 0.05], ['Пакет', 0, 0], ['Яблука', 64, 0.25]];
+  const FORMATS = { general:'Загальний', number:'Числовий', currency:'Грошовий', accounting:'Фінансовий', percent:'Відсотковий' };
+  const fmt = { 1:'general', 2:'general' };
+  const TASKS = [
+    { col:1, target:'number' },
+    { col:1, target:'currency' },
+    { col:2, target:'percent' }
+  ];
+  const HINT = {
+    general:'Загальний формат показує число як є — без зайвих нулів і символів.',
+    number:'Знаки після коми є, але чого ще бракує порівняно зі зразком?',
+    currency:'З\'явився символ ₴ одразу після числа. Чи так на зразку?',
+    accounting:'Це фінансовий: ₴ стоїть по краю, а нуль став рискою. Чи так на зразку?',
+    percent:'Число помножилось на 100 і отримало знак %. Чи так на зразку?'
+  };
+  function show(v, f){
+    const n2 = v.toFixed(2).replace('.', ',');
+    switch(f){
+      case 'general': return String(v).replace('.', ',');
+      case 'number': return n2;
+      case 'currency': return n2 + ' ₴';
+      case 'accounting': return `<span class="acc"><span>${v===0 ? '–' : n2}</span><span>₴</span></span>`;
+      case 'percent': return Math.round(v*100) + '%';
+    }
+  }
+  const grid = document.getElementById('nfGrid');
+  const target = document.getElementById('nfTarget');
+  const bar = document.getElementById('nfBar');
+  const prompt = document.getElementById('nfPrompt');
+  const status = document.getElementById('nfStatus');
+  const refEl = document.getElementById('nfRef'), valEl = document.getElementById('nfVal');
+  let ti = 0, busy = false;
+  const curCol = ()=> TASKS[Math.min(ti, TASKS.length-1)].col;
+
+  function render(){
+    const c = curCol();
+    let html = '<colgroup><col style="width:30px"><col style="width:34%"><col style="width:36%"><col style="width:30%"></colgroup>';
+    html += '<tr><th class="corner"></th><th>A</th><th>B</th><th>C</th></tr>';
+    html += `<tr><th>1</th><td class="fname">Товар</td><td class="fname${c===1?' colsel':''}">Ціна</td><td class="fname${c===2?' colsel':''}">Знижка</td></tr>`;
+    rows.forEach((r,i)=>{
+      html += `<tr><th>${i+2}</th><td>${r[0]}</td>
+        <td class="num clk${c===1?' colsel':''}" data-r="${i}" data-c="1">${show(r[1], fmt[1])}</td>
+        <td class="num clk${c===2?' colsel':''}" data-r="${i}" data-c="2">${show(r[2], fmt[2])}</td></tr>`;
+    });
+    grid.innerHTML = html;
+    grid.querySelectorAll('td.clk').forEach(td=>{
+      td.addEventListener('click', ()=>{
+        const r = +td.dataset.r, cc = +td.dataset.c;
+        refEl.textContent = COLS[cc] + (r+2);
+        valEl.textContent = String(rows[r][cc]).replace('.', ',');
+      });
+    });
+    refEl.textContent = COLS[c] + '2';
+    valEl.textContent = String(rows[0][c]).replace('.', ',');
+    if(ti < TASKS.length){
+      const t = TASKS[ti];
+      target.innerHTML = `<tr><td class="fname">${t.col===1?'Ціна':'Знижка'}</td></tr>` + rows.map(r=>`<tr><td class="num">${show(r[t.col], t.target)}</td></tr>`).join('');
+    }
+    bar.querySelectorAll('.tb-btn').forEach(b=>b.classList.toggle('on', b.dataset.f===fmt[c]));
+  }
+  function showTask(){
+    prompt.innerHTML = ti < TASKS.length
+      ? `${ti+1}/${TASKS.length}. Зроби стовпчик <span>«${TASKS[ti].col===1?'Ціна':'Знижка'}»</span> таким, як на зразку`
+      : 'Усі завдання виконано ✓ Можеш ще погратися форматами.';
+  }
+  Object.entries(FORMATS).forEach(([key, name])=>{
+    const b = document.createElement('button');
+    b.className = 'tb-btn'; b.dataset.f = key; b.textContent = name;
+    b.addEventListener('click', ()=>{
+      if(busy) return;
+      const c = curCol();
+      fmt[c] = key;
+      render();
+      if(ti >= TASKS.length) return;
+      if(key === TASKS[ti].target){
+        busy = true;
+        status.textContent = `✓ Це ${name.toLowerCase()} формат. А в рядку формул — те саме число ${String(rows[0][c]).replace('.', ',')}!`;
+        addNeurons(1);
+        ti++;
+        if(ti === TASKS.length) addNeurons(2);
+        setTimeout(()=>{ busy = false; showTask(); render(); }, 1500);
+      } else {
+        status.textContent = HINT[key];
+      }
+    });
+    bar.appendChild(b);
+  });
+  render();
+  showTask();
+})();
+
+/* ---------- 2. DATES ---------- */
+makeClassify('dateList', [
+  { text:'Формула <span class="mono">=A1+1</span>', opts:['02.09.2025','01.09.2026','01.10.2025'], correct:0, why:'Додаємо одиницю — це один день.' },
+  { text:'Формула <span class="mono">=A1+30</span>', opts:['01.09.2055','01.10.2025','31.09.2025'], correct:1, why:'У вересні 30 днів, тож через 30 днів настане 1 жовтня.' },
+  { text:'Комірці A1 задали формат «Загальний»', opts:['01.09.2025','Помилку','Число 45901'], correct:2, why:'Стільки днів минуло від 1 січня 1900 року — так дата зберігається насправді.' },
+  { text:'Як правильно ввести в комірку час «сім годин сорок п\'ять хвилин»?', opts:['7.45','7:45','7,45'], correct:1, why:'Години, хвилини й секунди розділяють двокрапкою.' }
+]);
+
+/* ---------- 3. ALIGNMENT ---------- */
+(function(){
+  const DEF = { h:'general', v:'bottom', wrap:false, merge:false };
+  const st = { title:{...DEF}, head:{...DEF} };
+  const TASKS = [
+    { key:'title', range:'A1:D1', text:'Виділено <span>A1:D1</span>. Зроби заголовок таблиці, як на зразку', target:{ merge:true, h:'center' },
+      hints:{ merge:'Заголовок на зразку займає одну велику комірку на всю ширину.', h:'Подивись, де стоїть заголовок по горизонталі.' } },
+    { key:'head', range:'B2', text:'Виділено <span>B2</span>. Зроби, щоб назва стовпчика була видна повністю, як на зразку', target:{ wrap:true, v:'middle', merge:false },
+      hints:{ merge:'Одну комірку нема з чим об\'єднувати — зніми цю позначку.', wrap:'Текст має розбитися на рядки всередині комірки.', v:'Подивись, де текст по вертикалі: зверху, посередині чи знизу?' } }
+  ];
+  let ti = 0;
+  const grid = document.getElementById('alGrid'), tgt = document.getElementById('alTarget');
+  const selH = document.getElementById('alH'), selV = document.getElementById('alV');
+  const cbWrap = document.getElementById('alWrap'), cbMerge = document.getElementById('alMerge');
+  const prompt = document.getElementById('alPrompt'), status = document.getElementById('alStatus');
+
+  function cellStyle(s, isText){
+    const h = s.h==='general' ? (isText ? 'left' : 'right') : s.h;
+    return `text-align:${h}; vertical-align:${s.v};`;
+  }
+  function tableHTML(state, selKey){
+    const t = state.title, hd = state.head;
+    const sel = k => k===selKey ? ' rsel' : '';
+    let html = '<colgroup><col style="width:26px"><col><col><col><col></colgroup>';
+    html += '<tr><th class="corner"></th><th>A</th><th>B</th><th>C</th><th>D</th></tr>';
+    html += '<tr style="height:30px"><th>1</th>';
+    if(t.merge) html += `<td colspan="4" class="fname${sel('title')}" style="${cellStyle(t,true)}">Список покупок</td>`;
+    else html += `<td class="fname spill${sel('title')}" style="${cellStyle(t,true)}">Список покупок</td><td class="${sel('title')}"></td><td class="${sel('title')}"></td><td class="${sel('title')}"></td>`;
+    html += '</tr>';
+    html += `<tr style="height:58px"><th>2</th><td class="fname">Товар</td>
+      <td class="fname${hd.wrap?' wrapc':''}${sel('head')}" style="${cellStyle(hd,true)}">Кількість одиниць товару</td>
+      <td class="fname">Ціна</td><td class="fname">Разом</td></tr>`;
+    html += '<tr><th>3</th><td>Молоко</td><td class="num">2</td><td class="num">38,50 ₴</td><td class="num">77,00 ₴</td></tr>';
+    return html;
+  }
+  function render(){
+    const key = ti < TASKS.length ? TASKS[ti].key : null;
+    grid.innerHTML = tableHTML(st, key);
+    if(ti < TASKS.length){
+      const goal = { title:{...st.title}, head:{...st.head} };
+      Object.assign(goal[key], TASKS[ti].target);
+      if(key==='head'){ goal.head = { ...DEF, ...TASKS[ti].target }; }
+      tgt.innerHTML = tableHTML(goal, null);
+    }
+  }
+  function loadControls(){
+    if(ti >= TASKS.length) return;
+    const s = st[TASKS[ti].key];
+    selH.value = s.h; selV.value = s.v; cbWrap.checked = s.wrap; cbMerge.checked = s.merge;
+  }
+  function showTask(){
+    prompt.innerHTML = ti < TASKS.length ? `${ti+1}/${TASKS.length}. ${TASKS[ti].text}` : 'Таблиця як на зразку ✓';
+  }
+  function onChange(){
+    if(ti >= TASKS.length) return;
+    const s = st[TASKS[ti].key];
+    s.h = selH.value; s.v = selV.value; s.wrap = cbWrap.checked; s.merge = cbMerge.checked;
+    render();
+  }
+  [selH, selV, cbWrap, cbMerge].forEach(el=>el.addEventListener('change', onChange));
+  document.getElementById('alOk').addEventListener('click', ()=>{
+    if(ti >= TASKS.length) return;
+    const t = TASKS[ti], s = st[t.key];
+    const wrong = Object.keys(t.target).find(k=>s[k] !== t.target[k]);
+    if(wrong){ status.textContent = 'Ще не як на зразку. ' + t.hints[wrong]; return; }
+    addNeurons(t.key==='title' ? 1 : 2);
+    status.textContent = t.key==='title' ? '✓ Чотири комірки стали однією, заголовок — посередині.' : '✓ Текст переноситься й стоїть посередині по висоті.';
+    ti++;
+    if(ti === TASKS.length) addNeurons(2);
+    showTask(); loadControls(); render();
+  });
+  render(); loadControls(); showTask();
+})();
+
+/* ---------- 4. BORDERS ---------- */
+(function(){
+  // Малюнок 3×3 таблиці: grid — бліда сітка, opts визначають межі
+  function pic(o){
+    const x0=6, y0=6, w=84, h=44, cw=w/3, rh=h/3;
+    let s = `<svg viewBox="0 0 96 56">`;
+    if(o.fill) s += `<rect x="${x0}" y="${y0}" width="${w}" height="${rh}" fill="#F6C9B3"/>`;
+    for(let i=1;i<3;i++){
+      s += `<line x1="${x0+cw*i}" y1="${y0}" x2="${x0+cw*i}" y2="${y0+h}" stroke="#D9CEC6" stroke-dasharray="2 2"/>`;
+      s += `<line x1="${x0}" y1="${y0+rh*i}" x2="${x0+w}" y2="${y0+rh*i}" stroke="#D9CEC6" stroke-dasharray="2 2"/>`;
+    }
+    s += `<rect x="${x0}" y="${y0}" width="${w}" height="${h}" fill="none" stroke="#D9CEC6" stroke-dasharray="2 2"/>`;
+    if(o.inner){
+      for(let i=1;i<3;i++){
+        s += `<line x1="${x0+cw*i}" y1="${y0}" x2="${x0+cw*i}" y2="${y0+h}" stroke="#2A1C14" stroke-width="1.2"/>`;
+        s += `<line x1="${x0}" y1="${y0+rh*i}" x2="${x0+w}" y2="${y0+rh*i}" stroke="#2A1C14" stroke-width="1.2"/>`;
+      }
+    }
+    if(o.outer) s += `<rect x="${x0}" y="${y0}" width="${w}" height="${h}" fill="none" stroke="#2A1C14" stroke-width="${o.outer}"/>`;
+    if(o.bottom) s += `<line x1="${x0}" y1="${y0+h}" x2="${x0+w}" y2="${y0+h}" stroke="#2A1C14" stroke-width="2"/>`;
+    return s + '</svg>';
+  }
+  makeMatching('bdPool', 'bdList', [
+    { name:'Усі межі', func:pic({ outer:1.2, inner:true }) },
+    { name:'Зовнішні межі', func:pic({ outer:1.2 }) },
+    { name:'Товста зовнішня межа', func:pic({ outer:3.5 }) },
+    { name:'Нижня межа', func:pic({ bottom:true }) },
+    { name:'Без меж', func:pic({}) },
+    { name:'Заливка + усі межі', func:pic({ outer:1.2, inner:true, fill:true }) }
+  ]);
+})();
+
+/* ---------- 5. IMAGE SEQUENCE ---------- */
+(function(){
+  const STEPS = [
+    'Відкрити вкладку «Вставлення»',
+    'Натиснути «Зображення» → «Зображення з Інтернету»',
+    'Ввести в пошуку ключове слово, наприклад «яблуко»',
+    'Вибрати картинку й натиснути «Вставити»',
+    'Клацнути картинку правою кнопкою → «Формат зображення» і задати розмір'
+  ];
+  const ORD = ['ПЕРШИМ', 'ДРУГИМ', 'ТРЕТІМ', 'ЧЕТВЕРТИМ', 'П\'ЯТИМ'];
+  const done = document.getElementById('seqDone');
+  const ask = document.getElementById('seqAsk');
+  const opts = document.getElementById('seqOpts');
+  const status = document.getElementById('seqStatus');
+  let k = 0;
+  function render(){
+    opts.innerHTML = '';
+    if(k >= STEPS.length){
+      ask.textContent = '';
+      status.textContent = 'Готово ✓ Картинка на аркуші й потрібного розміру.';
+      return;
+    }
+    ask.innerHTML = `Що робимо <b>${ORD[k]}</b>?`;
+    shuffle(STEPS.slice(k)).forEach(s=>{
+      const b = document.createElement('button');
+      b.className = 'seq-opt';
+      b.textContent = s;
+      b.addEventListener('click', ()=>{
+        if(s === STEPS[k]){
+          const li = document.createElement('li');
+          li.innerHTML = `<span class="n">${k+1}</span>${s}`;
+          done.appendChild(li);
+          k++;
+          addNeurons(1);
+          status.textContent = '';
+          if(k === STEPS.length) addNeurons(2);
+          render();
+        } else {
+          b.classList.add('wrong');
+          flash(b, 'shake');
+          status.textContent = 'Ще зарано — що має статися перед цим?';
+        }
+      });
+      opts.appendChild(b);
+    });
+  }
+  render();
+})();
+
+/* ---------- 6. VALIDATION TYPES ---------- */
+makeClassify('valList', [
+  { text:'Скільки учнів прийшло на гурток: від 0 до 30', correct:0, why:'Людей рахують поштучно — дробів тут не буває.' },
+  { text:'Зріст спортсмена в метрах, наприклад 1,68', correct:1, why:'Потрібні числа з дробовою частиною.' },
+  { text:'Клас учня: лише 8-А, 8-Б або 8-В', correct:2, why:'Учень обирає готове значення зі спадного переліку — і не помилиться в написанні.' },
+  { text:'Коли учень народився: у проміжку з 2010 по 2013 рік', correct:3, why:'Обмежуємо календарний проміжок.' },
+  { text:'Нікнейм у грі — не більше 12 символів', correct:5, why:'Обмежуємо кількість символів.' },
+  { text:'Початок тренування — не раніше 8:00 і не пізніше 18:00', correct:4, why:'Обмежуємо проміжок протягом доби.' }
+], ['Ціле число', 'Дійсне', 'Список', 'Дата', 'Час', 'Довжина тексту']);
+
+/* ---------- 7. VALIDATION DIALOG ---------- */
+(function(){
+  const HINTS = ['Заповніть комірку', 'Введіть вік — ціле число від 12 до 15', 'Увага!'];
+  const ERRS = ['Щось пішло не так', 'Вік має бути цілим числом від 12 до 15. Спробуйте ще раз.', 'Помилка!!!'];
+  const H_OK = 1, E_OK = 1;
+  const hBox = document.getElementById('vHints'), eBox = document.getElementById('vErrs');
+  hBox.innerHTML = HINTS.map((h,i)=>`<label><input type="radio" name="vh" value="${i}">${h}</label>`).join('');
+  eBox.innerHTML = ERRS.map((h,i)=>`<label><input type="radio" name="ve" value="${i}">${h}</label>`).join('');
+  document.querySelectorAll('#s7 .dlg-tab.live').forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      document.querySelectorAll('#s7 .dlg-tab.live').forEach(t=>t.classList.toggle('active', t===tab));
+      document.querySelectorAll('#s7 .dlg-pane').forEach(p=>p.classList.toggle('show', p.id===tab.dataset.pane));
+    });
+  });
+  const status = document.getElementById('vStatus');
+  let configured = false;
+  document.getElementById('vOk').addEventListener('click', ()=>{
+    if(configured) return;
+    const type = document.getElementById('vType').value;
+    const op = document.getElementById('vOp').value;
+    const mn = document.getElementById('vMin').value, mx = document.getElementById('vMax').value;
+    const show = document.getElementById('vShow').checked;
+    const h = document.querySelector('input[name="vh"]:checked');
+    const e = document.querySelector('input[name="ve"]:checked');
+    let msg = '';
+    if(type !== 'int') msg = 'Параметри: тип даних не підходить. Вік не буває дробовим, це не дата й не текст.';
+    else if(op !== 'between') msg = 'Параметри: «від 12 до 15» — яка умова описує проміжок?';
+    else if(mn !== '12' || mx !== '15') msg = 'Параметри: перевір мінімум і максимум.';
+    else if(!show) msg = 'Вкладка «Підказка про вміст»: підказка вимкнена — увімкни її.';
+    else if(!h || +h.value !== H_OK) msg = 'Вкладка «Підказка про вміст»: обери підказку, яка пояснює, що саме вводити.';
+    else if(!e || +e.value !== E_OK) msg = 'Вкладка «Повідомлення про помилку»: обери текст, з якого зрозуміло, що не так і як виправити.';
+    if(msg){ status.textContent = msg; return; }
+    configured = true;
+    addNeurons(3);
+    status.textContent = '✓ Перевірку налаштовано.';
+    startTest(HINTS[H_OK], ERRS[E_OK]);
+  });
+
+  function startTest(hint, err){
+    const box = document.getElementById('vTest');
+    const cell = document.getElementById('vCell');
+    const tip = document.getElementById('vTip');
+    const pool = document.getElementById('vPool');
+    const popup = document.getElementById('vPopup');
+    const tstatus = document.getElementById('vtStatus');
+    box.classList.add('show');
+    tip.innerHTML = `<b>Вік</b>${hint}`;
+    const VALUES = ['14', '16', '13,5', 'чотирнадцять', '12', '15'];
+    const WHY = {
+      '14': 'Ціле число в межах — прийнято.',
+      '12': 'Межі входять у проміжок «між» — 12 прийнято.',
+      '15': 'Межі входять у проміжок «між» — 15 прийнято.',
+      '16': 'Більше за максимум 15.',
+      '13,5': 'Не ціле число.',
+      'чотирнадцять': 'Це текст, а не число.'
+    };
+    const tested = new Set();
+    VALUES.forEach(v=>{
+      const chip = document.createElement('button');
+      chip.className = 'vt-chip';
+      chip.textContent = v;
+      chip.addEventListener('click', ()=>{
+        if(popup.classList.contains('show')) return;
+        const num = Number(v.replace(',', '.'));
+        const ok = Number.isInteger(num) && num >= 12 && num <= 15;
+        if(ok){
+          cell.textContent = v;
+          chip.classList.add('tested-ok');
+        } else {
+          document.getElementById('vPopMsg').textContent = err;
+          popup.classList.add('show');
+          chip.classList.add('tested-bad');
+        }
+        tstatus.textContent = `«${v}»: ${WHY[v]}`;
+        if(!tested.has(v)){
+          tested.add(v);
+          if(tested.size === VALUES.length){
+            addNeurons(2);
+            tstatus.textContent = `«${v}»: ${WHY[v]} Усі значення перевірено ✓ Охоронець працює!`;
+          }
+        }
+      });
+      pool.appendChild(chip);
+    });
+    const close = ()=> popup.classList.remove('show');
+    document.getElementById('vRetry').addEventListener('click', close);
+    document.getElementById('vCancel').addEventListener('click', close);
+  }
+})();
+
+/* ---------- 8. DUPLICATES ---------- */
+(function(){
+  const fields = ['Ім\'я', 'Телефон', 'Місто'];
+  // dup: true — рядок буде видалено; why — пояснення для хибного кліку
+  const rows = [
+    { d:['Олена Коваль', '0671112233', 'Київ'], why:'Це перша така Олена — вона лишається, видаляються лише наступні копії.' },
+    { d:['Андрій Мороз', '0503334455', 'Львів'], why:'Це перший такий Андрій — він лишається.' },
+    { d:['Олена Коваль', '0671112233', 'Київ'], dup:true },
+    { d:['Ірина Ткач', '0935556677', 'Одеса'], why:'Ірина Ткач тут уперше.' },
+    { d:['Олена Коваль', '0989990011', 'Київ'], why:'Ім\'я те саме, але телефон інший — рядок не повтор.' },
+    { d:['Андрій Мороз', '0503334455', 'Львів'], dup:true },
+    { d:['Ірина Ткач', '0935556677', 'Харків'], why:'Ім\'я й телефон збігаються, але місто інше — у всіх стовпцях збігу немає.' }
+  ];
+  const table = document.getElementById('dupGrid');
+  const status = document.getElementById('dupStatus');
+  let html = '<colgroup><col style="width:30px"><col style="width:38%"><col style="width:34%"><col style="width:28%"></colgroup>';
+  html += '<tr><th class="corner"></th>' + fields.map((f,c)=>`<th>${COLS[c]}</th>`).join('') + '</tr>';
+  html += '<tr><th>1</th>' + fields.map(f=>`<td class="fname">${f}</td>`).join('') + '</tr>';
+  rows.forEach((r,i)=>{
+    html += `<tr data-i="${i}"><th class="clk">${i+2}</th>` + r.d.map((v,c)=>`<td class="clk${c===1?' num':''}">${v}</td>`).join('') + '</tr>';
+  });
+  table.innerHTML = html;
+  const TOTAL = rows.filter(r=>r.dup).length;
+  let found = 0;
+  table.querySelectorAll('tr[data-i]').forEach(tr=>{
+    const r = rows[+tr.dataset.i];
+    tr.querySelectorAll('.clk').forEach(cell=>{
+      cell.addEventListener('click', ()=>{
+        if(found >= TOTAL || tr.classList.contains('marked')) return;
+        if(r.dup){
+          tr.classList.add('marked');
+          tr.querySelectorAll('td').forEach(td=>td.classList.add('found'));
+          found++;
+          addNeurons(1);
+          status.textContent = `Знайдено повторів: ${found} з ${TOTAL}. Цей рядок повністю збігається з рядком вище.`;
+          if(found === TOTAL){
+            addNeurons(2);
+            setTimeout(()=>{
+              table.querySelectorAll('tr.marked').forEach(t=>t.classList.add('gone'));
+              status.textContent = `Видалено повторів: ${TOTAL}. Лишилося ${rows.length - TOTAL} унікальних рядків ✓`;
+            }, 1200);
+          }
+        } else {
+          tr.querySelectorAll('td').forEach(td=>flash(td, 'bad'));
+          status.textContent = r.why;
+        }
+      });
+    });
+  });
+})();
+
+/* ---------- FINAL QUIZ ---------- */
+const questions = [
+  { q: "Що змінює числовий формат комірки?", opts: ["Лише вигляд числа, а значення лишається тим самим", "Саме число в комірці", "Розмір комірки"], correct: 0 },
+  { q: "У комірці записано 0,25. Що покаже відсотковий формат?", opts: ["0,25%", "25%", "250%"], correct: 1 },
+  { q: "Чим фінансовий формат відрізняється від грошового?", opts: ["Він не показує символ валюти", "Він вирівнює валюту й коми в стовпчик, а нуль показує рискою", "Він округлює до цілих гривень"], correct: 1 },
+  { q: "Як електронна таблиця зберігає дату?", opts: ["Як текст", "Як номер дня, відлічений від 1 січня 1900 року", "Як малюнок календаря"], correct: 1 },
+  { q: "Що зробить параметр «переносити по словах»?", opts: ["Розіб'є довгий текст на рядки всередині комірки", "Перенесе текст у сусідню комірку", "Перекладе текст іншою мовою"], correct: 0 },
+  { q: "Навіщо задавати межі, якщо на екрані вже видно сітку?", opts: ["Сітка не друкується, а межі — так", "Межі прискорюють обчислення", "Без меж не можна вводити дані"], correct: 0 },
+  { q: "Який тип перевірки даних дозволяє обирати значення зі спадного переліку?", opts: ["Довжина тексту", "Ціле число", "Список"], correct: 2 },
+  { q: "Що варто зробити перед видаленням повторів?", opts: ["Зберегти копію даних", "Видалити заголовки стовпців", "Об'єднати всі комірки"], correct: 0 }
+];
+let qi=0, currentAnswered=false;
+const quizQ = document.getElementById('quizQ');
+const quizOptions = document.getElementById('quizOptions');
+const quizProgress = document.getElementById('quizProgress');
+const btnNext = document.getElementById('btnNext');
+const quizBox = document.getElementById('quizBox');
+const completion = document.getElementById('completion');
+const totalNeuronsEl = document.getElementById('totalNeurons');
+
+function renderQuestion(){
+  currentAnswered=false; btnNext.classList.remove('active');
+  const item = questions[qi];
+  quizProgress.textContent = `Запитання ${qi+1} з ${questions.length}`;
+  quizQ.textContent = item.q;
+  quizOptions.innerHTML='';
+  item.opts.forEach((opt,i)=>{
+    const b=document.createElement('button'); b.className='quiz-opt'; b.textContent=opt;
+    b.addEventListener('click', ()=>{
+      if(currentAnswered) return; currentAnswered=true;
+      const all = quizOptions.querySelectorAll('.quiz-opt');
+      all.forEach((ob,oi)=>{ if(oi===item.correct) ob.classList.add('correct'); else if(oi===i) ob.classList.add('wrong'); });
+      if(i===item.correct) addNeurons(2);
+      btnNext.classList.add('active');
+      btnNext.textContent = (qi===questions.length-1) ? 'Завершити' : 'Далі';
+    });
+    quizOptions.appendChild(b);
+  });
+}
+btnNext.addEventListener('click', ()=>{
+  if(!btnNext.classList.contains('active')) return;
+  qi++;
+  if(qi<questions.length){ renderQuestion(); }
+  else {
+    quizBox.style.display='none';
+    completion.classList.add('show');
+    addNeurons(3);
+    totalNeuronsEl.textContent = neurons;
+  }
+});
+renderQuestion();
+</script>
+
+</body>
+</html>

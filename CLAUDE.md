@@ -278,6 +278,7 @@ async function loadProgress(){
 | 8 | Проблеми сучасних технологій | `8/lesson-tech-problems/` |
 | 8 | Технології та навколишнє середовище | `8/lesson-tech-environment/` |
 | 8 | Збір даних | `8/lesson-data-collection/` |
+| 8 | Додаткові параметри форматування. Перевірка даних | `8/lesson-formatting-validation/` |
 | 9 | Життя з розумними пристроями | `9/lesson-smart-classroom/` |
 | 9 | Поняття бази даних | `9/lesson-database-basics/` |
 | 9 | Поняття реляційної бази даних. Зв'язані аркуші в Google Таблицях | `9/lesson-relational-db/` |
