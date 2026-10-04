@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Етика й безпека спілкування — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F3F8F6; --ink:#14302A; --ink-soft:#4D655F; --surface:#FFFFFF; --line:#D8E8E2;
+    --pri:#0E7C66; --pri-dark:#0A5C4C; --pri-light:#DFF2EC;
+    --accent:#E4572E; --accent-dark:#B23C18; --accent-light:#FDE9E2;
+    --green:#2E9E5B; --coral:#D14B5E;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  .container{max-width:780px; margin:0 auto; padding:0 24px;}
+  @media (max-width:480px){ .container{padding:0 16px;} }
+
+  .hud{position:sticky; top:0; z-index:50; background:rgba(244,247,251,.9); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
+  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--pri),var(--accent)); transition:width .3s ease;}
+  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:780px; margin:0 auto;}
+  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
+  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
+  .neuron-counter svg{width:24px;height:24px;}
+  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
+  #neuronCount.pop{transform:scale(1.35);}
+
+  .hero{padding:48px 24px 36px;}
+  .hero-inner{max-width:780px; margin:0 auto; display:flex; align-items:center; gap:26px;}
+  .hero-text{flex:1;}
+  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--pri); margin-bottom:10px;}
+  .hero h1{font-size:29px; line-height:1.2; margin-bottom:12px;}
+  .hero p{color:var(--ink-soft); font-size:16px; max-width:54ch; margin-bottom:20px;}
+  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--pri); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
+  .btn-primary:hover{background:var(--pri-dark);}
+  .btn-primary:active{transform:scale(.97);}
+  .btn-primary:disabled{opacity:.4; cursor:default;}
+  .mascot{width:130px; height:130px; flex-shrink:0;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:100px; height:100px;} }
+
+  section.block{padding:30px 0; border-top:1px solid var(--line);}
+  .step-label{font-family:'Baloo 2',sans-serif; font-size:12.5px; font-weight:700; color:var(--pri); margin-bottom:6px; text-transform:uppercase; letter-spacing:.03em;}
+  .block h2{font-size:19px; margin-bottom:8px; max-width:40ch;}
+  .block p{max-width:64ch; font-size:15px; margin:0 0 8px;}
+  .block p.soft{color:var(--ink-soft); font-size:13.5px;}
+  .block ul{max-width:64ch; margin:0 0 8px; padding-left:20px; font-size:15px;}
+  .block li{margin-bottom:4px;}
+  .note{background:var(--pri-light); border-left:4px solid var(--pri); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:var(--pri-dark); margin:12px 0;}
+  .trivia{background:var(--accent-light); border-left:4px solid var(--accent); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:var(--accent-dark); margin:12px 0;}
+  .problem-note{background:#FBE6E9; border-left:4px solid var(--coral); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:#8C2D3A; margin:12px 0;}
+  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:16px 18px; margin-top:10px;}
+  @media (max-width:480px){ .exercise{padding:14px 10px;} }
+  @keyframes itemShake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
+  .shake{animation:itemShake .35s ease;}
+  .status-line{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--pri-dark); margin-top:12px; min-height:1.4em;}
+  .hot-prompt{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; text-align:center; margin-bottom:12px;}
+  .hot-prompt span{color:var(--accent-dark);}
+  .menu{font-family:'Baloo 2',sans-serif; font-weight:700; color:var(--pri-dark); white-space:nowrap;}
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; background:var(--pri-light); padding:1px 6px; border-radius:5px; font-size:.92em; white-space:nowrap;}
+
+  /* CLASSIFY */
+  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:13px 15px; margin:8px 0;}
+  .classify-card p.q{font-weight:700; margin:0 0 8px; font-size:14px;}
+  .choice-row{display:flex; gap:6px; flex-wrap:wrap;}
+  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12.5px; padding:7px 12px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .choice-btn:hover{border-color:var(--pri);}
+  .choice-btn.correct{background:#E4F5E9; border-color:#3FAE58; color:#256B36;}
+  .choice-btn.wrong{background:#FBE6E9; border-color:#D14B5E; color:#8C2D3A;}
+  .choice-feedback{margin-top:6px; font-size:12.5px; color:var(--ink-soft); min-height:1.2em;}
+
+  /* MATCHING */
+  .tool-pool{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; padding:11px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:12px;}
+  .tool-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:6px 13px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .tool-chip:hover{transform:translateY(-2px);}
+  .tool-chip.selected{border-color:var(--pri); box-shadow:0 0 0 3px rgba(31,111,178,.2);}
+  .tool-chip.placed{display:none;}
+  .func-card{display:flex; align-items:center; gap:10px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:9px 11px; margin-bottom:7px; cursor:pointer; transition:border-color .2s ease, background .2s ease;}
+  .func-card.matched{border-color:var(--pri); background:var(--pri-light); cursor:default;}
+  .func-text{flex:1; font-size:13.5px; color:var(--ink-soft);}
+  .func-slot{min-width:96px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:6px;}
+  .func-slot.filled{border-style:solid; border-color:var(--pri); background:#CFE2F5; color:var(--ink);}
+
+
+  /* FLIP-ГАЛЕРЕЯ */
+  .flip-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:10px;}
+  @media (max-width:520px){ .flip-grid{grid-template-columns:repeat(2,1fr);} }
+  .flip-card{perspective:1000px; height:170px; cursor:pointer; background:none; border:none; padding:0; font:inherit; text-align:inherit;}
+  .flip-inner{position:relative; width:100%; height:100%; transition:transform .6s cubic-bezier(.4,0,.2,1); transform-style:preserve-3d;}
+  .flip-card.flipped .flip-inner{transform:rotateY(180deg);}
+  .flip-face{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:var(--radius-m); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:12px; text-align:center; border:2px solid var(--line);}
+  .flip-front{background:var(--surface);}
+  .flip-front .ic{font-size:36px; line-height:1; margin-bottom:8px;}
+  .flip-front .nm{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; color:var(--ink);}
+  .flip-front .tap{font-size:11.5px; color:var(--ink-soft);}
+  .flip-back{background:var(--pri-light); border-color:var(--pri); transform:rotateY(180deg); font-size:13px; color:var(--pri-dark); line-height:1.45;}
+  .flip-card.seen .flip-front{border-color:var(--pri);}
+
+  /* GMAIL */
+  .mail{border:1.5px solid var(--line); border-radius:var(--radius-m); overflow:hidden; background:#fff; font-size:13.5px;}
+  .mail-top{display:flex; align-items:center; gap:8px; padding:8px 12px; background:#F8FAFB; border-bottom:1px solid var(--line); font-weight:700; color:var(--ink-soft); font-size:12.5px;}
+  .gm{display:inline-flex; align-items:center; gap:6px; font-family:'Baloo 2',sans-serif; font-size:15px; color:#5F6368; font-weight:600;}
+  .gm svg{width:22px; height:17px;}
+  .gm-path{margin-left:auto; font-size:12px; color:var(--ink-soft);}
+  .c-row{display:flex; gap:10px; padding:8px 14px; border-bottom:1px solid #EEF3F1; font-size:13.5px; align-items:baseline;}
+  .c-row .k{width:52px; color:var(--ink-soft); font-weight:700; flex-shrink:0;}
+  .c-body{padding:12px 14px 16px; font-size:14px; line-height:1.9;}
+
+  /* ЗНАЙДИ ПОМИЛКИ */
+  .hunt{border-bottom:1.5px dashed #9FB7AF; cursor:pointer; padding:1px 2px; border-radius:4px; transition:background .15s ease;}
+  .hunt:hover{background:#F0F6F4;}
+  .hunt.found{background:var(--accent-light); border-bottom-color:transparent; color:var(--accent-dark); font-weight:700;}
+  .hunt.nope{animation:itemShake .35s ease; background:#EEF3F1;}
+  .hunt-log{list-style:none; padding:0 !important; margin:10px 0 0 !important; display:grid; gap:6px;}
+  .hunt-log li{background:var(--accent-light); border:1.5px solid #F5C4B3; border-radius:var(--radius-s); padding:7px 11px; font-size:13px; margin:0 !important;}
+  .hunt-log li b{color:var(--accent-dark);}
+
+  /* ЧАТ-ДІАЛОГ */
+  .thread{display:flex; flex-direction:column; gap:8px; padding:12px; background:#F8FAFB; border:1.5px solid var(--line); border-radius:var(--radius-m); min-height:120px;}
+  .bub{max-width:82%; padding:8px 12px; border-radius:14px; font-size:13.5px; line-height:1.45; animation:pop .25s ease;}
+  @keyframes pop{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+  .bub.in{background:#fff; border:1.5px solid var(--line); align-self:flex-start; border-bottom-left-radius:4px;}
+  .bub.in .who{display:block; font-size:11.5px; font-weight:800; color:var(--accent-dark);}
+  .bub.out{background:var(--pri); color:#fff; align-self:flex-end; border-bottom-right-radius:4px;}
+  .bub .file{display:inline-block; margin-top:4px; font-weight:800; font-size:12.5px; background:#F3F5F4; border:1px solid var(--line); border-radius:6px; padding:2px 8px; color:var(--ink);}
+  .replies{display:flex; flex-direction:column; gap:7px; margin-top:10px;}
+  .rep{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:13.5px; font-weight:600; padding:9px 13px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:#fff; cursor:pointer;}
+  .rep:hover{border-color:var(--pri);}
+  .rep.wrong{background:#FBE6E9; border-color:#D14B5E;}
+
+  /* СКРИНЬКА: СПАМ */
+  .mbox{display:grid; grid-template-columns:140px 1fr; min-height:290px;}
+  @media (max-width:560px){ .mbox{grid-template-columns:1fr;} }
+  .mbox-side{background:#F8FAFB; border-right:1px solid var(--line); padding:8px;}
+  @media (max-width:560px){ .mbox-side{border-right:none; border-bottom:1px solid var(--line); display:flex; gap:4px;} }
+  .fold{display:flex; justify-content:space-between; align-items:center; width:100%; text-align:left; font-family:'Nunito Sans',sans-serif; font-size:13px; font-weight:700; padding:7px 10px; border-radius:999px; border:none; background:transparent; color:var(--ink); cursor:pointer; margin-bottom:2px;}
+  @media (max-width:560px){ .fold{width:auto; margin:0;} }
+  .fold:hover{background:#EEF3F1;}
+  .fold.on{background:#D3E3FD; color:#041E49;}
+  .fold .cnt{font-size:11.5px;}
+  .tbar{display:flex; gap:8px; align-items:center; padding:7px 12px; border-bottom:1px solid var(--line); min-height:44px; flex-wrap:wrap;}
+  .t-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12.5px; padding:6px 12px; border-radius:999px; border:1.5px solid var(--line); background:#fff; cursor:pointer;}
+  .t-btn:hover{border-color:var(--pri);}
+  .t-btn:disabled{opacity:.4; cursor:default;}
+  .mrow{display:flex; gap:10px; align-items:center; padding:8px 12px; border-bottom:1px solid #EEF3F1; cursor:pointer;}
+  .mrow:hover{background:#F6FAF8;}
+  .mrow.sel{background:#C2E7FF33; box-shadow:inset 3px 0 0 var(--pri);}
+  .mrow .box{width:16px; height:16px; border:2px solid #A9BDB6; border-radius:4px; flex-shrink:0;}
+  .mrow.sel .box{background:var(--pri); border-color:var(--pri);}
+  .mrow .from{width:118px; flex-shrink:0; font-weight:800; font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .mrow .sub{flex:1; font-size:13px; color:var(--ink-soft); min-width:0;}
+  @media (max-width:480px){ .mrow .from{width:84px;} }
+  .list-empty{padding:26px 10px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
+
+  /* ПРЕВ'Ю ЛИСТА (фішинг) */
+  .prev, .prev > span{display:block;}
+  #phishList p.q{max-width:none; margin:0 0 10px;}
+  #phishList .prev{margin:0;}
+  #phishList .choice-feedback:empty{display:none;}
+  .prev{font-weight:400; background:#F8FAFB; border:1.5px solid var(--line); border-radius:var(--radius-s); padding:9px 12px; margin-bottom:9px; font-size:13px;}
+  .prev .pf{font-weight:800;}
+  .prev .pa{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px; color:var(--ink-soft); word-break:break-all;}
+  .prev .ps{font-weight:700; margin-top:3px;}
+  .prev .pt{color:var(--ink-soft);}
+
+  /* ПОСЛІДОВНІСТЬ */
+  .seq-done{list-style:none; padding:0 !important; margin:0 0 10px !important;}
+  .seq-done li{display:flex; gap:10px; align-items:center; background:var(--pri-light); border:1.5px solid #B7DDD1; border-radius:var(--radius-s); padding:8px 12px; margin-bottom:6px !important; font-size:14px;}
+  .seq-done .n{width:24px; height:24px; border-radius:50%; background:var(--pri); color:#fff; font-family:'Baloo 2',sans-serif; font-size:13px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .seq-ask{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; margin:6px 0 8px;}
+  .seq-ask b{color:var(--accent-dark);}
+  .seq-opts{display:flex; flex-direction:column; gap:7px;}
+  .seq-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:14px; font-weight:600; padding:10px 13px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer;}
+  .seq-opt:hover{border-color:var(--pri);}
+  .seq-opt.wrong{background:#FBE6E9; border-color:#D14B5E;}
+
+  /* QUIZ */
+  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:24px 22px; margin-top:16px;}
+  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:12.5px; color:var(--ink-soft); margin-bottom:9px;}
+  .quiz-q{font-size:16px; font-weight:700; margin-bottom:14px;}
+  .quiz-options{display:flex; flex-direction:column; gap:9px;}
+  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:14px; font-weight:600; padding:11px 14px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .quiz-opt:hover{border-color:var(--pri);}
+  .quiz-opt.correct{background:#E4F5E9; border-color:#3FAE58;}
+  .quiz-opt.wrong{background:#FBE6E9; border-color:#D14B5E;}
+  .quiz-nav{display:flex; justify-content:flex-end; margin-top:16px;}
+  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:10px 20px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
+  .btn-next.active{opacity:1; pointer-events:auto;}
+
+  .completion{display:none; text-align:center; padding:18px 10px 10px;}
+  .completion.show{display:block;}
+  .badge{width:80px; height:80px; margin:0 auto 14px;}
+  .completion h3{font-size:20px; margin-bottom:8px;}
+  .completion p{color:var(--ink-soft); max-width:50ch; margin:0 auto 16px; font-size:14px;}
+  .completion .total{font-family:'Baloo 2',sans-serif; font-size:28px; color:var(--pri-dark);}
+
+
+  footer{padding:32px 24px 56px; text-align:center; color:var(--ink-soft); font-size:13px;}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
+  <div class="hud-row">
+    <span class="hud-title">7 клас · Етика й безпека</span>
+    <div class="neuron-counter">
+      <svg viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
+        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#B57A1F" opacity="0.6"/>
+      </svg>
+      <span id="neuronCount">0</span>
+    </div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Комунікація та взаємодія · Урок 6</div>
+      <h1>Етика спілкування й небезпеки цифрових технологій</h1>
+      <p>Як писати так, щоб тебе поважали, як не потрапити на гачок шахраїв і що робити, якщо все ж потрапив. Збираємо власний «рецепт» безпечного спілкування.</p>
+      <button class="btn-primary" onclick="document.getElementById('rev').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <!-- щит -->
+      <path d="M70 10 L120 26 V64 C120 98 96 118 70 130 C44 118 20 98 20 64 V26 Z" fill="#0E7C66"/>
+      <path d="M70 20 L110 33 V64 C110 92 91 108 70 119 C49 108 30 92 30 64 V33 Z" fill="#DFF2EC"/>
+      <!-- конверт з обличчям -->
+      <rect x="40" y="50" width="60" height="44" rx="7" fill="#fff" stroke="#0E7C66" stroke-width="3.5"/>
+      <path d="M42 53 L70 74 L98 53" stroke="#0E7C66" stroke-width="3.5" stroke-linejoin="round" fill="none"/>
+      <circle cx="58" cy="82" r="3.5" fill="#14302A"/><circle cx="82" cy="82" r="3.5" fill="#14302A"/>
+      <path d="M64 88 C67 91 73 91 76 88" stroke="#14302A" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- гачок, що не впіймав -->
+      <path d="M126 4 V30" stroke="#4D655F" stroke-width="2" stroke-dasharray="3 3"/>
+      <path d="M126 30 V44 C126 52 116 52 116 44" stroke="#E4572E" stroke-width="4" stroke-linecap="round" fill="none"/>
+      <line x1="108" y1="36" x2="134" y2="58" stroke="#E4572E" stroke-width="4" stroke-linecap="round"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="rev" style="border-top:none; padding-top:0;">
+    <div class="step-label">Повторення · Адресна книга та розсилки</div>
+    <h2>Пригадаймо, як працювати з листами в Gmail</h2>
+    <p>Минулого уроку ми відповідали й пересилали листи, вели Google Контакти та розсилали листи групам.</p>
+    <p class="soft">Клацни поняття, а потім — пояснення, яке йому підходить.</p>
+    <div class="exercise">
+      <div class="tool-pool" id="revPool"></div>
+      <div id="revList"></div>
+      <div class="status-line" id="revStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s1">
+    <div class="step-label">Крок 1 · Етикет листування</div>
+    <h2>Шість правил гарного листа</h2>
+    <p>В інтернеті є неписаний кодекс поведінки — <b>мережевий етикет</b>. Для листування його можна стиснути до шести слів.</p>
+    <p class="soft">Переверни кожну картку й дізнайся, що стоїть за правилом.</p>
+    <div class="flip-grid" id="flipGrid"></div>
+    <div class="status-line" id="flipStatus"></div>
+  </section>
+
+  <section class="block" id="s2">
+    <div class="step-label">Крок 2 · Що не так із листом?</div>
+    <h2>Знайди порушення етикету</h2>
+    <p>Андрій поспіхом написав однокласникові. Деякі частини листа порушують правила, а деякі — цілком нормальні.</p>
+    <p class="soft">Клацай підкреслені фрагменти. Знайди 6 порушень — по одному на кожне правило.</p>
+    <div class="exercise">
+      <div class="mail">
+        <div class="mail-top"><span class="gm"><svg viewBox="0 0 22 17"><path d="M1.5 16V3.5L11 10.5L20.5 3.5V16" fill="none" stroke="#EA4335" stroke-width="2.6" stroke-linejoin="round"/><path d="M1.5 3.5V16H5V6" fill="#4285F4"/><path d="M20.5 3.5V16H17V6" fill="#34A853"/><path d="M1.5 3.5L4 1.5L11 6.5L18 1.5L20.5 3.5" fill="none" stroke="#FBBC04" stroke-width="1.6"/></svg>Gmail</span><span class="gm-path">Нове повідомлення</span></div>
+        <div class="c-row"><span class="k">Кому</span><span><span class="hunt" data-i="0">bohdan.lysenko@gmail.com</span></span></div>
+        <div class="c-row"><span class="k">Тема</span><span><span class="hunt" data-i="1">(без теми)</span></span></div>
+        <div class="c-body">
+          <span class="hunt" data-i="2">ПРИВІТ!!! ТИ ДЕ???</span>
+          <span class="hunt" data-i="3">Не знаєш, що задали з алгебри?</span>
+          <span class="hunt" data-i="4">бо я нічо не встиг і ваще капець</span>
+          <span class="hunt" data-i="9">А ще вчора ми з Максом ходили в кіно, потім у піцерію, а потім довго чекали автобус і змерзли.</span>
+          <span class="hunt" data-i="5">Відпиши за 5 хв!!!</span>
+          <span class="hunt" data-i="6">Можеш сам глянути в Classroom, мій пароль: Andrii2012</span>
+          <span class="hunt" data-i="7">Дякую!</span><br>
+          <span class="hunt" data-i="8">Андрій, 7-Б</span>
+        </div>
+      </div>
+      <ul class="hunt-log" id="huntLog"></ul>
+      <div class="status-line" id="huntStatus">Знайдено порушень: 0 з 6</div>
+    </div>
+  </section>
+
+  <section class="block" id="s3">
+    <div class="step-label">Крок 3 · Безпечне листування</div>
+    <h2>Коли пише незнайомець</h2>
+    <p>Людина з листування може виявитися зовсім не тим, за кого себе видає. Тому:</p>
+    <ul>
+      <li>не розповідай незнайомим особисте — адресу, школу, телефон, дані родини;</li>
+      <li>не погоджуйся зустрітися з тим, кого знаєш лише з листування;</li>
+      <li>нікому не кажи свій пароль;</li>
+      <li>не вір усьому, що написано в листах;</li>
+      <li>не відкривай файли від незнайомців — у них можуть бути шкідливі програми.</li>
+    </ul>
+    <p class="soft">Тобі пише незнайомець. Обирай відповіді — так, щоб залишитися в безпеці.</p>
+    <div class="exercise">
+      <div class="thread" id="thread"></div>
+      <div class="replies" id="replies"></div>
+      <div class="status-line" id="chatStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s4">
+    <div class="step-label">Крок 4 · Спам</div>
+    <h2>Непрохані гості у Вхідних</h2>
+    <p><b>Спам</b> — небажані масові повідомлення, найчастіше рекламні, які надходять без твоєї згоди. Тих, хто їх розсилає, називають <b>спамерами</b>.</p>
+    <ul>
+      <li>Не залишай свою адресу на сумнівних сайтах.</li>
+      <li>Не відповідай на спам і не переходь за посиланнями з нього.</li>
+    </ul>
+    <div class="note">Як у Gmail: познач лист <b>☐</b>, не відкриваючи його, і натисни <span class="menu">Повідомити про спам</span>. Наступні листи від цього відправника підуть у розділ <span class="menu">Спам</span>. Якщо туди помилково потрапив потрібний лист — відкрий його й натисни <span class="menu">Не спам</span>.</div>
+    <p class="soft">Прибери весь спам із Вхідних. А ще зазирни в розділ «Спам»: там загубився потрібний лист — поверни його.</p>
+    <div class="exercise">
+      <div class="mail">
+        <div class="mail-top"><span class="gm"><svg viewBox="0 0 22 17"><path d="M1.5 16V3.5L11 10.5L20.5 3.5V16" fill="none" stroke="#EA4335" stroke-width="2.6" stroke-linejoin="round"/><path d="M1.5 3.5V16H5V6" fill="#4285F4"/><path d="M20.5 3.5V16H17V6" fill="#34A853"/><path d="M1.5 3.5L4 1.5L11 6.5L18 1.5L20.5 3.5" fill="none" stroke="#FBBC04" stroke-width="1.6"/></svg>Gmail</span><span class="gm-path">uchen.7b@gmail.com</span></div>
+        <div class="mbox">
+          <div class="mbox-side" id="spamSide"></div>
+          <div>
+            <div class="tbar" id="spamBar"></div>
+            <div id="spamList"></div>
+          </div>
+        </div>
+      </div>
+      <div class="status-line" id="spamStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s5">
+    <div class="step-label">Крок 5 · Фішинг</div>
+    <h2>Шахраї з вудкою</h2>
+    <p><b>Фішинг</b> (від англ. fishing — риболовля) — шахрайство, коли в людини виманюють пароль, номер картки чи інші дані.</p>
+    <p>Шахраї створюють сайт-копію банку, магазину чи пошти й розсилають листи: «стався збій», «акаунт заблокують» — тож «терміново введіть дані за посиланням».</p>
+    <div class="problem-note"><b>Цільовий фішинг</b> — лист, підлаштований саме під тебе: зі справжнім ім'ям, назвою школи, іменем учителя. Такий лист дуже переконливий, тому перевіряй навіть «знайомі» листи.</div>
+    <p>Перш ніж довіряти листу чи сайту, запитай себе:</p>
+    <ul>
+      <li>Чи збігається адреса відправника чи сайту з назвою сервісу?</li>
+      <li>Чи вимагають від мене діяти негайно, ще й погрожують?</li>
+      <li>Чи є помилки, дивні символи, спливаючі вікна?</li>
+      <li>Чи просять пароль, PIN-код чи дані картки?</li>
+      <li>Що написано дрібним шрифтом?</li>
+    </ul>
+    <div class="trivia">Значок замка і <span class="mono">https://</span> в адресі означають лише, що з'єднання зашифроване. Шахрайський сайт теж може мати замок — тому дивись насамперед на саму адресу.</div>
+    <p class="soft">Справжній це лист чи фішинг?</p>
+    <div id="phishList"></div>
+  </section>
+
+  <section class="block" id="s6">
+    <div class="step-label">Крок 6 · Якщо потрапив на гачок</div>
+    <h2>Діяти швидко й по черзі</h2>
+    <p>Буває, що людина все ж перейшла за посиланням і ввела пароль. Головне — не соромитися й не зволікати: що довше чекаєш, то гірші наслідки.</p>
+    <p class="soft">Ти ввів пароль від пошти на підозрілому сайті. Що робиш? Обирай дії по одній.</p>
+    <div class="exercise">
+      <ul class="seq-done" id="seqDone"></ul>
+      <div class="seq-ask" id="seqAsk"></div>
+      <div class="seq-opts" id="seqOpts"></div>
+      <div class="status-line" id="seqStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s7">
+    <div class="step-label">Крок 7 · Різні співрозмовники</div>
+    <h2>Кому і як писати</h2>
+    <p>В інтернеті ми спілкуємося з людьми різного віку, з різних країн і культур. Кілька порад:</p>
+    <ul>
+      <li><b>Знай свого адресата</b> — його вік, інтереси, звички.</li>
+      <li><b>Обирай мову</b> — офіційну для вчителя, дружню для друга.</li>
+      <li><b>Обережно з гумором і смайликами</b> — у різних культурах і поколіннях їх розуміють по-різному.</li>
+      <li><b>Поводься, як у житті</b> — пиши так, як сказав би людині в очі.</li>
+    </ul>
+    <div class="note">Усе, що ти пишеш і публікуєш, складається в твою <b>цифрову репутацію</b> — враження, яке про тебе отримують люди в мережі. Її легко зіпсувати й важко відновити.</div>
+    <p class="soft">Зістав адресата з повідомленням, яке йому найкраще підходить.</p>
+    <div class="exercise">
+      <div class="tool-pool" id="audPool"></div>
+      <div id="audList"></div>
+      <div class="status-line" id="audStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div class="quiz-box" id="quizBox">
+      <div class="quiz-progress" id="quizProgress">Запитання 1 з 8</div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
+    </div>
+    <div class="completion" id="completion">
+      <svg class="badge" viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#6C5CE7"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#6C5CE7"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#6C5CE7"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#6C5CE7"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#6C5CE7"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#6C5CE7"/>
+        <circle cx="12" cy="12" r="4.4" fill="#6C5CE7"/><circle cx="12" cy="12" r="1.6" fill="#5340c9" opacity="0.6"/>
+      </svg>
+      <h3>Урок пройдено!</h3>
+      <p>Ти знаєш шість правил етикету листування, вмієш розпізнати спам і фішинг, знаєш, як поводитися з незнайомцями й що робити, якщо потрапив на гачок, і пишеш кожному адресатові його мовою.</p>
+      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Урок · «Етика спілкування і взаємодії. Небезпеки цифрових технологій» · 7 клас (за підручником Морзе)</footer>
+
+<script>
+const STORAGE_KEY = "lesson7m-online-safety-neurons";
+let neurons = 0;
+const neuronEl = document.getElementById('neuronCount');
+const hudFill = document.getElementById('hudFill');
+
+function addNeurons(n){
+  neurons += n;
+  neuronEl.textContent = neurons;
+  neuronEl.classList.add('pop');
+  setTimeout(()=>neuronEl.classList.remove('pop'), 250);
+  saveProgress();
+}
+async function saveProgress(){
+  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
+}
+async function loadProgress(){
+  try{
+    const res = await window.storage?.get(STORAGE_KEY, false);
+    if(res && res.value){
+      const d = JSON.parse(res.value);
+      if(typeof d.neurons === 'number'){ neurons = d.neurons; neuronEl.textContent = neurons; }
+    }
+  }catch(e){}
+}
+loadProgress();
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
+});
+
+/* ---------- HELPERS ---------- */
+function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
+function flash(el, cls){ el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), 380); }
+
+function makeClassify(containerId, items, opts){
+  const list = document.getElementById(containerId);
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">${(item.opts||opts).map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i===item.correct){ btn.classList.add('correct'); fb.textContent = item.why ? `Правильно ✓ ${item.why}` : 'Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+}
+
+function makeMatching(poolId, listId, items, statusId, doneMsg){
+  const pool = document.getElementById(poolId);
+  const list = document.getElementById(listId);
+  const status = statusId ? document.getElementById(statusId) : null;
+  let selected = null;
+  let matched = 0;
+  shuffle(items).forEach(t=>{
+    const chip = document.createElement('div');
+    chip.className = 'tool-chip';
+    chip.textContent = t.name;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = t.name;
+    });
+    pool.appendChild(chip);
+  });
+  shuffle(items).forEach(t=>{
+    const card = document.createElement('div');
+    card.className = 'func-card';
+    card.innerHTML = `<div class="func-text">${t.func}</div><div class="func-slot">?</div>`;
+    card.addEventListener('click', ()=>{
+      if(card.classList.contains('matched') || !selected) return;
+      const slot = card.querySelector('.func-slot');
+      if(selected === t.name){
+        slot.textContent = selected;
+        slot.classList.add('filled');
+        card.classList.add('matched');
+        const chip = [...pool.children].find(c=>c.textContent===selected);
+        if(chip) chip.classList.add('placed');
+        addNeurons(1);
+        matched++;
+        selected = null;
+        pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+        if(matched === items.length){ addNeurons(2); if(status) status.textContent = doneMsg; }
+      } else {
+        flash(card, 'shake');
+      }
+    });
+    list.appendChild(card);
+  });
+}
+
+
+/* ---------- REVIEW ---------- */
+makeMatching('revPool', 'revList', [
+  { name:'Re:', func:'З\'являється перед темою, коли відповідаєш на лист' },
+  { name:'Fwd:', func:'З\'являється перед темою, коли лист іде новій людині разом із файлами' },
+  { name:'Відповісти всім', func:'Лист отримає автор і всі, кому він писав разом із тобою' },
+  { name:'Мітка', func:'Кольорова «наліпка» в Gmail, за якою збирають листи однієї теми' },
+  { name:'Google Контакти', func:'Адресна книга Gmail: імена, адреси, телефони людей' },
+  { name:'Список розсилки', func:'Кілька адрес під однією назвою — лист отримує кожен' },
+  { name:'Копія', func:'Адресат «для відома», якого бачать усі отримувачі' },
+  { name:'Прихована копія', func:'Отримувачі не бачать цих адрес одне в одного' }
+], 'revStatus', 'Повторення завершено ✓ Переходимо до нового!');
+
+/* ---------- 1. FLIP RULES ---------- */
+(function(){
+  const RULES = [
+    { ic:'🤝', nm:'Ввічливість', back:'Вітайся, звертайся з повагою, дякуй. Не пиши ВЕЛИКИМИ ЛІТЕРАМИ — це сприймається як крик.' },
+    { ic:'✍️', nm:'Грамотність', back:'Пиши без помилок, розставляй розділові знаки, обходься без сленгу й незрозумілих скорочень.' },
+    { ic:'🎯', nm:'Коректність', back:'Заповнюй тему: вона коротко пояснює, про що лист. Наприкінці підписуйся.' },
+    { ic:'💬', nm:'Стислість', back:'Пиши коротко: один лист — одна тема. Великі файли краще надіслати посиланням на Google Диск.' },
+    { ic:'⏰', nm:'Вчасність', back:'Відповідай протягом доби-двох. І не вимагай миттєвої відповіді — у людини свої справи.' },
+    { ic:'🔒', nm:'Безпека', back:'Не надсилай паролі й особисті дані, не відкривай підозрілі файли й посилання.' }
+  ];
+  const grid = document.getElementById('flipGrid');
+  const status = document.getElementById('flipStatus');
+  const seen = new Set();
+  RULES.forEach((r,i)=>{
+    const c = document.createElement('button');
+    c.className = 'flip-card';
+    c.innerHTML = `<div class="flip-inner">
+      <div class="flip-face flip-front"><div class="ic">${r.ic}</div><div class="nm">${r.nm}</div><div class="tap">клацни, щоб перевернути</div></div>
+      <div class="flip-face flip-back">${r.back}</div></div>`;
+    c.addEventListener('click', ()=>{
+      c.classList.toggle('flipped');
+      if(!seen.has(i)){
+        seen.add(i); c.classList.add('seen'); addNeurons(1);
+        if(seen.size === RULES.length){ addNeurons(2); status.textContent = 'Усі шість правил прочитано ✓ Тепер перевіримо їх на практиці.'; }
+      }
+    });
+    grid.appendChild(c);
+  });
+})();
+
+/* ---------- 2. FIND MISTAKES ---------- */
+(function(){
+  const PARTS = {
+    0:{ ok:true, why:'Адреса записана правильно — тут усе гаразд.' },
+    1:{ rule:'Коректність', txt:'тему не заповнено — незрозуміло, про що лист. Краще: «Домашнє з алгебри».' },
+    2:{ rule:'Ввічливість', txt:'великі літери й купа знаків оклику сприймаються як крик.' },
+    3:{ ok:true, why:'Звичайне чемне запитання — тут усе гаразд.' },
+    4:{ rule:'Грамотність', txt:'сленг і помилки («нічо», «ваще») — так листи не пишуть.' },
+    5:{ rule:'Вчасність', txt:'не можна вимагати миттєвої відповіді — у людини свої справи.' },
+    6:{ rule:'Безпека', txt:'пароль не можна надсилати навіть другові: лист можуть переслати чи прочитати інші.' },
+    7:{ ok:true, why:'Подякувати — чемно. Тут усе гаразд.' },
+    8:{ ok:true, why:'Підпис з ім\'ям і класом — саме так і треба.' },
+    9:{ rule:'Стислість', txt:'історія про кіно не стосується домашнього — один лист має бути про одне.' }
+  };
+  const TOTAL = Object.values(PARTS).filter(p=>!p.ok).length;
+  const log = document.getElementById('huntLog');
+  const status = document.getElementById('huntStatus');
+  let found = 0;
+  document.querySelectorAll('#s2 .hunt').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const p = PARTS[el.dataset.i];
+      if(el.classList.contains('found') || found >= TOTAL) return;
+      if(p.ok){ flash(el, 'nope'); status.textContent = p.why; return; }
+      el.classList.add('found'); found++; addNeurons(1);
+      const li = document.createElement('li');
+      li.innerHTML = `<b>${p.rule}:</b> ${p.txt}`;
+      log.appendChild(li);
+      status.textContent = `Знайдено порушень: ${found} з ${TOTAL}`;
+      if(found === TOTAL){ addNeurons(2); status.textContent = 'Усі 6 порушень знайдено ✓ Тепер лист можна переписати правильно.'; }
+    });
+  });
+})();
+
+/* ---------- 3. STRANGER CHAT ---------- */
+(function(){
+  const ROUNDS = [
+    { msg:'Привіт! Бачив тебе в грі — ти круто граєш 🔥 Скільки тобі років і з якої ти школи?',
+      opts:[
+        { t:'Дякую! Мені 12, я вчуся в гімназії біля метро «Лук\'янівська».', why:'Вік і школа — достатньо, щоб тебе знайти в реальному житті.' },
+        { t:'Дякую 🙂 Особисте я незнайомим не розповідаю.', ok:true },
+        { t:'Скажу, якщо ти перший розкажеш про себе.', why:'Незнайомець легко вигадає будь-що про себе — а ти розкажеш правду.' }
+      ] },
+    { msg:'Ок 😅 Слухай, давай я прокачаю твого персонажа! Скинь логін і пароль від акаунта.',
+      opts:[
+        { t:'Ні, пароль я нікому не даю.', ok:true },
+        { t:'Тримай, тільки нічого не видаляй.', why:'З паролем чужа людина зможе робити від твого імені що завгодно — і навіть змінити пароль.' },
+        { t:'Дам лише пароль від пошти, від гри не дам.', why:'Пошта ще важливіша: через неї відновлюють паролі від усіх інших акаунтів.' }
+      ] },
+    { msg:'Ну як хочеш. А давай зустрінемось у суботу в торговому центрі? Тільки батькам не кажи 😉',
+      opts:[
+        { t:'Добре, тільки я прийду з другом.', why:'Людина з листування може виявитися дорослим із поганими намірами — навіть удвох це небезпечно.' },
+        { t:'Ок, о котрій?', why:'Зустрічатися з тим, кого знаєш лише з листування, не можна. А прохання «не кажи батькам» — тривожний сигнал.' },
+        { t:'Ні. І про цю розмову я розповім батькам.', ok:true }
+      ] },
+    { msg:'Ну і нудний ти 😒 Ось, глянь фото з турніру, там і ти є!', file:'📎 turnir_foto.exe',
+      opts:[
+        { t:'Відкрити файл — цікаво ж, що там за фото.', why:'Фото не бувають з розширенням .exe — це програма, найімовірніше шкідлива.' },
+        { t:'Не відкривати файл, видалити лист і заблокувати відправника.', ok:true },
+        { t:'Попросити надіслати фото ще раз, іншим файлом.', why:'Краще взагалі припинити розмову: від незнайомців файлів не відкриваємо.' }
+      ] }
+  ];
+  const thread = document.getElementById('thread');
+  const replies = document.getElementById('replies');
+  const status = document.getElementById('chatStatus');
+  let r = 0;
+  function bubble(cls, html){
+    const b = document.createElement('div');
+    b.className = 'bub ' + cls; b.innerHTML = html;
+    thread.appendChild(b);
+  }
+  function next(){
+    replies.innerHTML = '';
+    if(r >= ROUNDS.length){
+      bubble('in', '<span class="who">Система</span>Відправника заблоковано. Розмову завершено.');
+      addNeurons(2);
+      status.textContent = 'Ти не дав себе обдурити жодного разу ✓';
+      return;
+    }
+    const R = ROUNDS[r];
+    bubble('in', `<span class="who">gamer_max2009@gmail.com</span>${R.msg}${R.file ? `<br><span class="file">${R.file}</span>` : ''}`);
+    shuffle(R.opts).forEach(o=>{
+      const b = document.createElement('button');
+      b.className = 'rep'; b.textContent = o.t;
+      b.addEventListener('click', ()=>{
+        if(o.ok){
+          bubble('out', o.t);
+          addNeurons(1); status.textContent = '✓ Безпечна відповідь.';
+          r++; setTimeout(next, 600);
+          replies.innerHTML = '';
+        } else {
+          b.classList.add('wrong'); flash(b, 'shake');
+          status.textContent = o.why;
+        }
+      });
+      replies.appendChild(b);
+    });
+  }
+  next();
+})();
+
+/* ---------- 4. SPAM ---------- */
+(function(){
+  const box = {
+    inbox:[
+      { from:'Олена Петрівна', sub:'Розклад консультацій перед контрольною', spam:false },
+      { from:'Super Prize UA', sub:'🎁 Вітаємо! Ви виграли iPhone — заберіть до вечора', spam:true },
+      { from:'Тато', sub:'Заберу тебе о 17:00 біля школи', spam:false },
+      { from:'Знижки-ШОК', sub:'−90% ТІЛЬКИ СЬОГОДНІ!!! Купуй, поки не розібрали', spam:true },
+      { from:'Google Classroom', sub:'Нове оголошення: екскурсія в планетарій', spam:false },
+      { from:'crypto.bonus', sub:'Заробляй 5000 ₴ на день, не виходячи з дому', spam:true }
+    ],
+    spam:[
+      { from:'Марія Коваль', sub:'Фото з нашої екскурсії 📸', spam:false },
+      { from:'Lottery Win', sub:'Ваш виграш чекає. Відкрийте вкладення', spam:true }
+    ]
+  };
+  const side = document.getElementById('spamSide');
+  const bar = document.getElementById('spamBar');
+  const list = document.getElementById('spamList');
+  const status = document.getElementById('spamStatus');
+  let cur = 'inbox', sel = null, done = false;
+  const left = ()=> box.inbox.filter(m=>m.spam).length + box.spam.filter(m=>!m.spam).length;
+  function render(){
+    side.innerHTML = [['inbox','📥 Вхідні'],['spam','⚠️ Спам']].map(([k,t])=>
+      `<button class="fold${cur===k?' on':''}" data-k="${k}">${t}<span class="cnt">${box[k].length}</span></button>`).join('');
+    side.querySelectorAll('.fold').forEach(b=>b.addEventListener('click', ()=>{ cur = b.dataset.k; sel = null; render(); }));
+    bar.innerHTML = cur==='inbox'
+      ? `<button class="t-btn" id="actBtn" ${sel===null?'disabled':''}>⚠️ Повідомити про спам</button>`
+      : `<button class="t-btn" id="actBtn" ${sel===null?'disabled':''}>Не спам</button>`;
+    document.getElementById('actBtn').addEventListener('click', act);
+    list.innerHTML = box[cur].length ? '' : `<div class="list-empty">${cur==='inbox'?'Тут порожньо':'Спаму немає 🎉'}</div>`;
+    box[cur].forEach((m,i)=>{
+      const row = document.createElement('div');
+      row.className = 'mrow' + (sel===i ? ' sel' : '');
+      row.innerHTML = `<span class="box"></span><span class="from">${m.from}</span><span class="sub">${m.sub}</span>`;
+      row.addEventListener('click', ()=>{ sel = (sel===i ? null : i); render(); });
+      list.appendChild(row);
+    });
+  }
+  function act(){
+    if(sel===null || done) return;
+    const m = box[cur][sel];
+    if(cur==='inbox'){
+      if(!m.spam){ status.textContent = `«${m.from}» — це потрібний лист, а не спам. Не ховай його!`; return; }
+      box.inbox.splice(sel,1); box.spam.push(m);
+      status.textContent = '✓ Лист переміщено в Спам.';
+    } else {
+      if(m.spam){ status.textContent = 'Цей лист справді схожий на спам — хай лишається тут.'; return; }
+      box.spam.splice(sel,1); box.inbox.unshift(m);
+      status.textContent = '✓ Лист повернуто у Вхідні.';
+    }
+    addNeurons(1); sel = null;
+    if(left()===0){ done = true; addNeurons(2); status.textContent = 'Скринька в порядку: спам у Спамі, потрібні листи — у Вхідних ✓'; }
+    render();
+  }
+  render();
+})();
+
+/* ---------- 5. PHISHING ---------- */
+(function(){
+  const prev = (f,a,s,t)=>`<span class="prev"><span class="pf">${f}</span><span class="pa">&lt;${a}&gt;</span><span class="ps">${s}</span><span class="pt">${t}</span></span>`;
+  makeClassify('phishList', [
+    { text: prev('Google','no-reply@accounts.google.com','Новий вхід в обліковий запис','Ми помітили вхід з нового пристрою. Якщо це були ви, нічого робити не потрібно.'), correct:0,
+      why:'Адреса належить Google, лист нічого не вимагає. А перевірити вхід можна й самому — у налаштуваннях акаунта, без посилань.' },
+    { text: prev('Служба підтримки Gmail','support@gmai1-security.com','ТЕРМІНОВО: ваш акаунт видалять через 24 години','Підтвердіть пароль за посиланням, інакше всі листи буде втрачено.'), correct:1,
+      why:'«gmai1» з одиницею замість «l», погрози й вимога ввести пароль — класичний фішинг.' },
+    { text: prev('Олена Петрівна','olena.petrivna@gmail.com','Матеріали до завтрашнього уроку','Добрий день! Додаю презентацію, перегляньте її перед уроком.'), correct:0,
+      why:'Знайома адреса з твоїх контактів, звичайний лист без вимог і поспіху.' },
+    { text: prev('Олена Петрівна','olena-petrivna@classroom-login.net','Андрію, твоя оцінка під загрозою!','Терміново увійди за посиланням і введи пароль від Classroom, щоб оцінку не анулювали.'), correct:1,
+      why:'Це цільовий фішинг: знають твоє ім\'я й учительку, але адреса чужа, а ще — погрози й пароль.' },
+    { text: prev('Посилка-Експрес','bonus@posylka-ekspres.top','Вам нараховано 1000 ₴ 🎉','Щоб отримати гроші, введіть номер картки, термін дії та три цифри зі звороту.'), correct:1,
+      why:'Ніхто не роздає гроші за лист. Три цифри зі звороту картки не можна повідомляти нікому.' }
+  ], ['Справжній', 'Фішинг']);
+})();
+
+/* ---------- 6. SEQUENCE ---------- */
+(function(){
+  const STEPS = [
+    'Одразу розповісти батькам, учителю чи іншому дорослому, якому довіряєш',
+    'Змінити паролі своїх облікових записів',
+    'Попередити друзів, яким міг переслати цей лист',
+    'Позначити шахрайський лист як спам'
+  ];
+  const HINT = [
+    'Перший крок — не сидіти з бідою наодинці: дорослий допоможе нічого не пропустити.',
+    'Шахраї вже знають старий пароль — що треба зробити з ним, поки вони не встигли?',
+    'Подумай про тих, хто міг отримати цей лист від тебе.',
+    ''
+  ];
+  const ORD = ['ПЕРШИМ', 'ДРУГИМ', 'ТРЕТІМ', 'ЧЕТВЕРТИМ'];
+  const DISTRACT = 'Нікому нічого не казати й сподіватися, що минеться';
+  const done = document.getElementById('seqDone');
+  const ask = document.getElementById('seqAsk');
+  const opts = document.getElementById('seqOpts');
+  const status = document.getElementById('seqStatus');
+  let k = 0;
+  function render(){
+    opts.innerHTML = '';
+    if(k >= STEPS.length){ ask.textContent = ''; status.textContent = 'Усе зроблено правильно й вчасно ✓'; return; }
+    ask.innerHTML = `Що робиш <b>${ORD[k]}</b>?`;
+    const pool = STEPS.slice(k);
+    if(k < 2) pool.push(DISTRACT);
+    shuffle(pool).forEach(s=>{
+      const b = document.createElement('button');
+      b.className = 'seq-opt'; b.textContent = s;
+      b.addEventListener('click', ()=>{
+        if(s === STEPS[k]){
+          const li = document.createElement('li');
+          li.innerHTML = `<span class="n">${k+1}</span>${s}`;
+          done.appendChild(li);
+          k++; addNeurons(1); status.textContent = '';
+          if(k === STEPS.length) addNeurons(2);
+          render();
+        } else {
+          b.classList.add('wrong'); flash(b, 'shake');
+          status.textContent = s === DISTRACT ? 'Що довше мовчиш, то більше встигнуть шахраї. Так не можна!' : HINT[k];
+        }
+      });
+      opts.appendChild(b);
+    });
+  }
+  render();
+})();
+
+/* ---------- 7. AUDIENCE ---------- */
+makeMatching('audPool', 'audList', [
+  { name:'Учителька інформатики', func:'«Добрий день, Ірино Василівно! Надсилаю практичну роботу №3. З повагою, Андрій Мельник, 7-Б»' },
+  { name:'Бабуся', func:'«Бабусю, привіт! Дуже сумую 💐 У неділю приїдемо з мамою — спечеш свої пиріжки?»' },
+  { name:'Найкращий друг', func:'«го в суботу на каток? 😎 о 12 біля входу»' },
+  { name:'Учасниця проєкту з Польщі', func:'«Hi Zofia! Thank you for the photos of your town. Here is our part of the project about Kyiv.»' }
+], 'audStatus', 'Кожному — своєю мовою ✓');
+
+/* ---------- FINAL QUIZ ---------- */
+const questions = [
+  { q: "Чому не варто писати лист ВЕЛИКИМИ ЛІТЕРАМИ?", opts: ["Так текст сприймається як крик", "Такий лист не дійде", "Великі літери займають більше місця"], correct: 0 },
+  { q: "Що таке спам?", opts: ["Небажані масові повідомлення, що надходять без твоєї згоди", "Будь-який лист від незнайомої людини", "Лист із прикріпленим файлом"], correct: 0 },
+  { q: "Як у Gmail позбутися листів від спамера?", opts: ["Позначити лист і натиснути «Повідомити про спам»", "Відповісти й попросити більше не писати", "Перейти за посиланням «Відписатися» в листі від незнайомця"], correct: 0 },
+  { q: "Що таке фішинг?", opts: ["Шахрайство, коли через підроблені листи й сайти виманюють паролі та дані", "Пошук інформації в інтернеті", "Масова розсилка новин гуртка"], correct: 0 },
+  { q: "Що означає значок замка й https:// в адресі сайту?", opts: ["З'єднання зашифроване, але сайт усе одно може бути шахрайським", "Сайт перевірений і точно безпечний", "Сайт належить державі"], correct: 0 },
+  { q: "Ти ввів пароль на підозрілому сайті. Що зробити першим?", opts: ["Розповісти дорослому, якому довіряєш", "Нікому не казати", "Видалити пошту назавжди"], correct: 0 },
+  { q: "Знайомий із листування кличе зустрітися й просить не казати батькам. Як вчинити?", opts: ["Відмовитися й розповісти батькам", "Піти, але з другом", "Погодитися, якщо він здається добрим"], correct: 0 },
+  { q: "Чому в листі до іноземного учасника проєкту краще уникати сленгу й жартів?", opts: ["Їх можуть не зрозуміти або сприйняти образливо", "Сленг заборонено в Gmail", "Жарти роблять лист довшим"], correct: 0 }
+].map(q=>{ // перемішуємо варіанти, щоб правильний не завжди був першим
+  const order = shuffle(q.opts.map((_,i)=>i));
+  return { q:q.q, opts:order.map(i=>q.opts[i]), correct:order.indexOf(q.correct) };
+});
+let qi=0, currentAnswered=false;
+const quizQ = document.getElementById('quizQ');
+const quizOptions = document.getElementById('quizOptions');
+const quizProgress = document.getElementById('quizProgress');
+const btnNext = document.getElementById('btnNext');
+const quizBox = document.getElementById('quizBox');
+const completion = document.getElementById('completion');
+const totalNeuronsEl = document.getElementById('totalNeurons');
+
+function renderQuestion(){
+  currentAnswered=false; btnNext.classList.remove('active');
+  const item = questions[qi];
+  quizProgress.textContent = `Запитання ${qi+1} з ${questions.length}`;
+  quizQ.textContent = item.q;
+  quizOptions.innerHTML='';
+  item.opts.forEach((opt,i)=>{
+    const b=document.createElement('button'); b.className='quiz-opt'; b.textContent=opt;
+    b.addEventListener('click', ()=>{
+      if(currentAnswered) return; currentAnswered=true;
+      const all = quizOptions.querySelectorAll('.quiz-opt');
+      all.forEach((ob,oi)=>{ if(oi===item.correct) ob.classList.add('correct'); else if(oi===i) ob.classList.add('wrong'); });
+      if(i===item.correct) addNeurons(2);
+      btnNext.classList.add('active');
+      btnNext.textContent = (qi===questions.length-1) ? 'Завершити' : 'Далі';
+    });
+    quizOptions.appendChild(b);
+  });
+}
+btnNext.addEventListener('click', ()=>{
+  if(!btnNext.classList.contains('active')) return;
+  qi++;
+  if(qi<questions.length){ renderQuestion(); }
+  else {
+    quizBox.style.display='none';
+    completion.classList.add('show');
+    addNeurons(3);
+    totalNeuronsEl.textContent = neurons;
+  }
+});
+renderQuestion();
+</script>
+
+</body>
+</html>
