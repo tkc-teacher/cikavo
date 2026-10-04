@@ -94,8 +94,8 @@
   /* SPREADSHEET MOCK */
   .sheet{background:var(--surface); border:1.5px solid var(--cell-line); border-radius:var(--radius-s); overflow:hidden; font-size:12px; user-select:none;}
   .sheet-title{display:flex; align-items:center; gap:8px; background:#FCFAF8; border-bottom:1px solid var(--cell-line); padding:6px 10px; font-weight:700; font-size:12.5px;}
-  .sheet-title .doc{width:16px; height:20px; border-radius:3px; background:#1D7A45; position:relative; flex-shrink:0;}
-  .sheet-title .doc::after{content:'X'; position:absolute; inset:0; color:#fff; font-size:10px; font-weight:800; display:flex; align-items:center; justify-content:center; font-family:Arial,sans-serif;}
+  .sheet-title .doc{width:16px; height:20px; border-radius:3px; background:#0F9D58; position:relative; flex-shrink:0;}
+  .sheet-title .doc::after{content:''; position:absolute; left:3px; right:3px; top:7px; bottom:4px; border:1.5px solid #fff; background:linear-gradient(90deg,transparent 42%,#fff 42%,#fff 58%,transparent 58%), linear-gradient(transparent 42%,#fff 42%,#fff 58%,transparent 58%);}
   .sheet-scroll{overflow-x:auto;}
   .sheet-grid{border-collapse:collapse; width:100%; table-layout:fixed;}
   .sheet-grid th, .sheet-grid td{border:1px solid var(--cell-line); height:28px; padding:0 6px; overflow:hidden; white-space:nowrap; text-overflow:clip;}
@@ -263,6 +263,32 @@
   .paper{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0 0;}
   .paper .ill svg{width:120px; height:66px;}
 
+  /* GOOGLE TOOLBAR (вирівнювання) */
+  .gtb{display:flex; flex-wrap:wrap; gap:10px; background:#F8F5F2; border:1.5px solid var(--cell-line); border-radius:10px; padding:10px; margin-top:12px;}
+  .gtb-group{display:flex; flex-direction:column; gap:4px;}
+  .gtb-cap{font-size:11px; font-weight:700; color:var(--ink-soft);}
+  .gtb-seg{display:flex; flex-wrap:wrap; border:1.5px solid var(--cell-line); border-radius:8px; overflow:hidden; background:#fff;}
+  .gtb-seg button{font-family:'Nunito Sans',sans-serif; font-size:12px; font-weight:700; padding:6px 9px; border:none; border-right:1px solid var(--cell-line); background:#fff; cursor:pointer; color:var(--ink);}
+  .gtb-seg button:last-child{border-right:none;}
+  .gtb-seg button:hover{background:#FCEDE5;}
+  .gtb-seg button.on{background:#FBE3D6; color:var(--pri-dark); box-shadow:inset 0 -3px 0 var(--pri);}
+  .al-sheet .sheet-grid td.clip{text-overflow:clip;}
+
+  /* GOOGLE SIDE PANEL (перевірка даних) */
+  .gpanel{border:1.5px solid #C9BFB6; border-radius:10px; background:#fff; box-shadow:0 6px 18px rgba(42,28,20,.08); font-size:13px; margin-top:12px; overflow:hidden; max-width:420px; margin-left:auto; margin-right:auto;}
+  .gp-title{display:flex; justify-content:space-between; padding:9px 14px; font-weight:800; font-size:14px; border-bottom:1px solid #E5DDD6;}
+  .gp-body{padding:10px 14px;}
+  .gp-label{font-size:11.5px; font-weight:800; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.03em; margin:10px 0 4px;}
+  .gp-label:first-child{margin-top:0;}
+  .gp-range{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px; border:1.5px solid var(--cell-line); border-radius:6px; padding:5px 8px; background:#FAF7F5; color:var(--ink-soft);}
+  .gpanel select{font:inherit; font-size:13px; padding:5px 6px; border:1.5px solid var(--cell-line); border-radius:6px; background:#fff; width:100%;}
+  .gp-row{display:flex; gap:8px; align-items:center; margin-top:6px;}
+  .gp-row select{width:auto; flex:1;}
+  .gp-row.hide{display:none;}
+  .gpanel input[type=checkbox], .gpanel input[type=radio]{width:16px; height:16px; accent-color:var(--pri); flex-shrink:0;}
+  .mcell.warn{position:relative;}
+  .mcell.warn::after{content:''; position:absolute; top:0; right:0; border-style:solid; border-width:0 9px 9px 0; border-color:transparent #D93025 transparent transparent;}
+
   footer{padding:32px 24px 56px; text-align:center; color:var(--ink-soft); font-size:13px;}
 </style>
 </head>
@@ -292,7 +318,7 @@
     <div class="hero-text">
       <div class="hero-eyebrow">Інформатика · Працюємо з числами · Тема 2</div>
       <h1>Додаткові параметри форматування. Перевірка даних</h1>
-      <p>Гроші, відсотки, дати, рамки й кольори роблять таблицю зрозумілою. Перевірка даних не дає ввести в неї дурниці. Розберемося з обома інструментами.</p>
+      <p>Гроші, відсотки, дати, рамки й кольори роблять таблицю зрозумілою. Перевірка даних не дає ввести в неї дурниці. Розберемося з обома інструментами в Google Таблицях.</p>
       <button class="btn-primary" onclick="document.getElementById('rev').scrollIntoView()">Почати</button>
     </div>
     <svg class="mascot" viewBox="0 0 140 140" fill="none">
@@ -333,13 +359,21 @@
     <h2>Одне число — різний вигляд</h2>
     <p>У комірці записано число <b>38,5</b>. Формат змінює лише те, <b>як воно виглядає</b>:</p>
     <div class="ill-grid">
-      <div class="ill"><div class="vis"><span class="mcell">38,5</span></div><div class="t">Загальний</div><div class="c">як ввели</div></div>
-      <div class="ill"><div class="vis"><span class="mcell">38,50</span></div><div class="t">Числовий</div><div class="c">2 знаки після коми</div></div>
-      <div class="ill"><div class="vis"><span class="mcell">38,50 ₴</span></div><div class="t">Грошовий</div><div class="c">із символом валюти</div></div>
-      <div class="ill"><div class="vis"><span class="mcell"><span class="acc"><span>38,50</span><span>₴</span></span></span><span class="mcell"><span class="acc"><span>–</span><span>₴</span></span></span></div><div class="t">Фінансовий</div><div class="c">₴ у стовпчик, нуль — риска</div></div>
-      <div class="ill"><div class="vis"><span class="mcell">0,1</span><span class="arr">↓</span><span class="mcell">10%</span></div><div class="t">Відсотковий</div><div class="c">× 100 і знак %</div></div>
+      <div class="ill"><div class="vis"><span class="mcell">38,5</span></div><div class="t">Автоматично</div><div class="c">як ввели</div></div>
+      <div class="ill"><div class="vis"><span class="mcell">38,50</span></div><div class="t">Число</div><div class="c">2 знаки після коми</div></div>
+      <div class="ill"><div class="vis"><span class="mcell">38,50 ₴</span></div><div class="t">Валюта</div><div class="c">із символом валюти</div></div>
+      <div class="ill"><div class="vis"><span class="mcell"><span class="acc"><span>38,50</span><span>₴</span></span></span><span class="mcell"><span class="acc"><span>–</span><span>₴</span></span></span></div><div class="t">Бухгалтерський облік</div><div class="c">₴ у стовпчик, нуль — риска</div></div>
+      <div class="ill"><div class="vis"><span class="mcell">0,1</span><span class="arr">↓</span><span class="mcell">10,00%</span></div><div class="t">Відсоток</div><div class="c">× 100 і знак %</div></div>
     </div>
-    <div class="note">Де шукати: вкладка <span class="menu">Основне</span> → розділ <span class="menu">Число</span>. Спершу виділи комірки, потім обери формат.</div>
+    <div class="note">Де шукати: меню <span class="menu">Формат → Число</span>. Спершу виділи комірки, потім обери формат.</div>
+    <p>На панелі інструментів є й швидкі кнопки:</p>
+    <ul>
+      <li><span class="mono">₴</span> — формат «Валюта»;</li>
+      <li><span class="mono">%</span> — формат «Відсоток»;</li>
+      <li><span class="mono">.0</span> і <span class="mono">.00</span> — менше чи більше знаків після коми;</li>
+      <li><span class="mono">123</span> — список усіх форматів.</li>
+    </ul>
+    <div class="trivia">Бачиш <b>$</b> замість <b>₴</b>? Символ валюти залежить від регіону таблиці. Зміни його в <span class="menu">Файл → Налаштування → Регіон: Україна</span>.</div>
     <p class="soft">Зроби стовпчик таким, як на зразку: обирай формат кнопками внизу. Поглядай у рядок формул — число там не змінюється!</p>
     <div class="exercise">
       <div class="hot-prompt" id="nfPrompt"></div>
@@ -364,10 +398,10 @@
   <section class="block" id="s2">
     <div class="step-label">Крок 2 · Дата й час</div>
     <h2>Чому дата — це число</h2>
-    <p>Таблиця нумерує всі дні по порядку, починаючи з 1 січня 1900 року. Дата — це просто <b>номер дня</b>, який ми бачимо в зручному вигляді:</p>
+    <p>Google Таблиці нумерують усі дні по порядку, починаючи з 30 грудня 1899 року. Дата — це просто <b>номер дня</b>, який ми бачимо в зручному вигляді:</p>
     <div class="numline">
-      <div class="nl-item"><b>1</b>01.01.1900</div>
-      <div class="nl-item"><b>2</b>02.01.1900</div>
+      <div class="nl-item"><b>0</b>30.12.1899</div>
+      <div class="nl-item"><b>1</b>31.12.1899</div>
       <div class="nl-item dots">…</div>
       <div class="nl-item"><b>45901</b>01.09.2025</div>
       <div class="nl-item"><b>45902</b>02.09.2025</div>
@@ -375,10 +409,11 @@
     <p>Тому з датами можна рахувати: <b>+1</b> — це наступний день.</p>
     <div class="ill-grid">
       <div class="ill"><div class="vis"><span class="mcell">10.09.2025</span></div><div class="t">📅 Дата</div><div class="c">через крапку</div></div>
-      <div class="ill"><div class="vis"><span class="mcell" style="font-size:11.5px">10 вересня 2025 р.</span></div><div class="t">📅 Довга дата</div><div class="c">та сама дата, інший формат</div></div>
+      <div class="ill"><div class="vis"><span class="mcell" style="font-size:11.5px">10 вересня 2025 р.</span></div><div class="t">📅 Інший формат дати</div><div class="c">та сама дата, інший вигляд</div></div>
       <div class="ill"><div class="vis"><span class="mcell">8:30</span></div><div class="t">⏰ Час</div><div class="c">через двокрапку</div></div>
     </div>
-    <div class="trivia">У різних країнах дату записують по-різному. У США спершу йде місяць: 09/10/2025 там означає 10 вересня, а не 9 жовтня.</div>
+    <div class="note">Де шукати: <span class="menu">Формат → Число → Дата</span> або <span class="menu">Час</span>. Інший вигляд дати — у <span class="menu">Спеціальна дата й час</span>.</div>
+    <div class="trivia">У різних країнах дату записують по-різному. У США спершу йде місяць: 09/10/2025 там означає 10 вересня, а не 9 жовтня. Тому регіон «Україна» в налаштуваннях таблиці важливий і для дат.</div>
     <p class="soft">У комірці A1 записано дату <span class="mono">01.09.2025</span>. Що побачимо?</p>
     <div id="dateList"></div>
   </section>
@@ -390,32 +425,30 @@
     <div class="ill-grid">
       <div class="ill"><div class="vis"><span class="mcell txt" style="min-width:64px">Ціна</span><span class="arr">↓</span><span class="mcell" style="min-width:64px;text-align:center">Ціна</span></div><div class="t">По горизонталі</div><div class="c">ліворуч, по центру, праворуч</div></div>
       <div class="ill"><div class="vis"><span class="tall" style="align-items:flex-end; width:56px">Ціна</span><span class="arr">↓</span><span class="tall" style="align-items:center; width:56px">Ціна</span></div><div class="t">По вертикалі</div><div class="c">зверху, по центру, знизу</div></div>
-      <div class="ill"><div class="vis"><span class="mcell txt" style="min-width:60px;width:60px">Кількість товару</span><span class="arr">↓</span><span class="tall" style="align-items:center; width:70px">Кількість товару</span></div><div class="t">Переносити по словах</div><div class="c">довгий текст — у кілька рядків</div></div>
-      <div class="ill"><div class="vis"><span><span class="mcell txt" style="min-width:40px;width:40px;overflow:visible;position:relative;z-index:1">Список</span><span class="mcell" style="min-width:40px;width:40px"></span><span class="mcell" style="min-width:40px;width:40px"></span></span><span class="arr">↓</span><span class="mcell" style="min-width:124px;text-align:center">Список</span></div><div class="t">Об'єднання клітинок</div><div class="c">кілька комірок → одна</div></div>
+      <div class="ill"><div class="vis"><span class="mcell txt" style="min-width:60px;width:60px">Кількість товару</span><span class="arr">↓</span><span class="tall" style="align-items:center; width:70px">Кількість товару</span></div><div class="t">Перенесення тексту</div><div class="c">довгий текст — у кілька рядків</div></div>
+      <div class="ill"><div class="vis"><span><span class="mcell txt" style="min-width:40px;width:40px;overflow:visible;position:relative;z-index:1">Список</span><span class="mcell" style="min-width:40px;width:40px"></span><span class="mcell" style="min-width:40px;width:40px"></span></span><span class="arr">↓</span><span class="mcell" style="min-width:124px;text-align:center">Список</span></div><div class="t">Об'єднати клітинки</div><div class="c">кілька комірок → одна</div></div>
     </div>
-    <div class="note">Усе це — у вікні <span class="menu">Формат клітинок</span> на вкладці <span class="menu">Вирівнювання</span>. Відкривається кнопкою-стрілочкою в кутку розділу <span class="menu">Число</span>.</div>
-    <p class="soft">Налаштуй вирівнювання так, щоб таблиця стала як на зразку, і натисни «OK».</p>
+    <div class="note">Усе це — кнопки на панелі інструментів над таблицею. Ті самі команди є в меню <span class="menu">Формат</span>: <span class="menu">Вирівнювання</span>, <span class="menu">Перенесення тексту</span>, <span class="menu">Об'єднати клітинки</span>.</div>
+    <p>У перенесення тексту три режими:</p>
+    <ul>
+      <li><b>Переповнення</b> (так стоїть одразу) — довгий текст «залазить» на сусідню комірку, якщо вона порожня;</li>
+      <li><b>Переносити</b> — текст розбивається на рядки всередині комірки;</li>
+      <li><b>Обрізати</b> — зайве просто ховається за межею комірки.</li>
+    </ul>
+    <p class="soft">Натискай кнопки на панелі, щоб таблиця стала як на зразку, і натисни «Перевірити».</p>
     <div class="exercise">
       <div class="hot-prompt" id="alPrompt"></div>
       <div class="al-wrap">
         <div><div class="mini-cap">Зразок</div><div class="sheet al-sheet target"><table class="sheet-grid" id="alTarget"></table></div></div>
         <div><div class="mini-cap">Твоя таблиця</div><div class="sheet al-sheet"><table class="sheet-grid" id="alGrid"></table></div></div>
       </div>
-      <div class="dialog">
-        <div class="dlg-title"><span>Формат клітинок</span><span>✕</span></div>
-        <div class="dlg-tabs">
-          <span class="dlg-tab">Число</span><span class="dlg-tab active">Вирівнювання</span><span class="dlg-tab">Шрифт</span><span class="dlg-tab">Межі</span><span class="dlg-tab">Заливка</span>
-        </div>
-        <div class="dlg-body">
-          <div class="dlg-row"><label class="lbl" for="alH">По горизонталі:</label>
-            <select id="alH"><option value="general">звичайне</option><option value="left">за лівим краєм</option><option value="center">по центру</option><option value="right">за правим краєм</option></select></div>
-          <div class="dlg-row"><label class="lbl" for="alV">По вертикалі:</label>
-            <select id="alV"><option value="top">зверху</option><option value="middle">по центру</option><option value="bottom">знизу</option></select></div>
-          <label class="dlg-check"><input type="checkbox" id="alWrap">переносити по словах</label>
-          <label class="dlg-check"><input type="checkbox" id="alMerge">об'єднання клітинок</label>
-        </div>
-        <div class="dlg-foot"><button class="dlg-btn prim" id="alOk">OK</button></div>
+      <div class="gtb" id="alBar">
+        <div class="gtb-group"><div class="gtb-cap">Об'єднати клітинки</div><div class="gtb-seg"><button data-k="merge" data-v="1">Об'єднати все</button><button data-k="merge" data-v="0">Скасувати об'єднання</button></div></div>
+        <div class="gtb-group"><div class="gtb-cap">По горизонталі</div><div class="gtb-seg"><button data-k="h" data-v="left">Ліворуч</button><button data-k="h" data-v="center">По центру</button><button data-k="h" data-v="right">Праворуч</button></div></div>
+        <div class="gtb-group"><div class="gtb-cap">По вертикалі</div><div class="gtb-seg"><button data-k="v" data-v="top">Угорі</button><button data-k="v" data-v="middle">Посередині</button><button data-k="v" data-v="bottom">Унизу</button></div></div>
+        <div class="gtb-group"><div class="gtb-cap">Перенесення тексту</div><div class="gtb-seg"><button data-k="wrap" data-v="overflow">Переповнення</button><button data-k="wrap" data-v="wrap">Переносити</button><button data-k="wrap" data-v="clip">Обрізати</button></div></div>
       </div>
+      <div class="toolbar"><button class="dlg-btn prim" id="alOk">Перевірити</button></div>
       <div class="status-line" id="alStatus"></div>
     </div>
   </section>
@@ -427,11 +460,13 @@
       <li><b>Межі</b> — лінії-рамки навколо комірок.</li>
       <li><b>Заливка</b> — колір фону комірок.</li>
     </ul>
-    <p>Обидві вкладки — у тому самому вікні <span class="menu">Формат клітинок</span>. Навіщо межі, якщо сітку й так видно? Порівняй:</p>
+    <p>Обидві кнопки — на панелі інструментів: <span class="menu">Межі</span> (там же колір і товщина ліній) та <span class="menu">Колір заливки</span> (відерце з фарбою). Навіщо межі, якщо сітку й так видно? Порівняй:</p>
     <div class="paper">
-      <div class="ill"><div class="vis"><svg viewBox="0 0 120 66"><g stroke="#D9CEC6" stroke-dasharray="2 2" fill="none"><rect x="6" y="6" width="108" height="54"/><line x1="42" y1="6" x2="42" y2="60"/><line x1="78" y1="6" x2="78" y2="60"/><line x1="6" y1="24" x2="114" y2="24"/><line x1="6" y1="42" x2="114" y2="42"/></g><g font-size="8" fill="#2A1C14" font-family="Arial"><text x="10" y="18">Товар</text><text x="46" y="18">Ціна</text><text x="10" y="36">Сир</text><text x="46" y="36">127,90</text></g></svg></div><div class="t">🖥 На екрані</div><div class="c">видно бліду сітку</div></div>
-      <div class="ill"><div class="vis"><svg viewBox="0 0 120 66"><g font-size="8" fill="#2A1C14" font-family="Arial"><text x="10" y="18">Товар</text><text x="46" y="18">Ціна</text><text x="10" y="36">Сир</text><text x="46" y="36">127,90</text></g></svg></div><div class="t">🖨 На папері</div><div class="c">сітки немає — без меж таблиця «розсипається»</div></div>
+      <div class="ill"><div class="vis"><svg viewBox="0 0 120 66"><g stroke="#D9CEC6" stroke-dasharray="2 2" fill="none"><rect x="6" y="6" width="108" height="54"/><line x1="42" y1="6" x2="42" y2="60"/><line x1="78" y1="6" x2="78" y2="60"/><line x1="6" y1="24" x2="114" y2="24"/><line x1="6" y1="42" x2="114" y2="42"/></g><g font-size="8" fill="#2A1C14" font-family="Arial"><text x="10" y="18">Товар</text><text x="46" y="18">Ціна</text><text x="10" y="36">Сир</text><text x="46" y="36">127,90</text></g></svg></div><div class="t">🖥 Із сіткою</div><div class="c">бліда сітка лише допомагає працювати</div></div>
+      <div class="ill"><div class="vis"><svg viewBox="0 0 120 66"><g font-size="8" fill="#2A1C14" font-family="Arial"><text x="10" y="18">Товар</text><text x="46" y="18">Ціна</text><text x="10" y="36">Сир</text><text x="46" y="36">127,90</text></g></svg></div><div class="t">🖨 Без сітки</div><div class="c">на папері чи в PDF сітки може не бути — без меж таблиця «розсипається»</div></div>
     </div>
+    <div class="note">Сітку можна сховати самому: <span class="menu">Переглянути → Показати → Лінії сітки</span>. Межі ж видно завжди.</div>
+    <div class="trivia">Швидкий спосіб зробити довгу таблицю охайною — <span class="menu">Формат → Чергування кольорів</span>. Рядки зафарбуються через один, і їх легше читати.</div>
     <p class="soft">Зістав назву з тим, як виглядає таблиця. Пунктир — сітка, яка не друкується.</p>
     <div class="exercise">
       <div class="tool-pool" id="bdPool"></div>
@@ -442,16 +477,21 @@
   <section class="block" id="s5">
     <div class="step-label">Крок 5 · Зображення</div>
     <h2>Картинка в таблиці</h2>
-    <p>У таблицю можна вставити зображення, наприклад фото товару в списку покупок. Ось де шукати кнопку:</p>
+    <p>У таблицю можна вставити зображення, наприклад фото товару в списку покупок. Ось де шукати команду:</p>
     <div class="ribbon">
-      <div class="rb-tabs"><span>Файл</span><span>Основне</span><span class="on">Вставлення</span><span>Розмітка</span><span>Формули</span><span>Дані</span></div>
+      <div class="rb-tabs"><span>Файл</span><span>Змінити</span><span>Переглянути</span><span class="on">Вставити</span><span>Формат</span><span>Дані</span></div>
       <div class="rb-body">
-        <div class="rb-group"><span class="rb-btn"><span class="ic">🖼</span>Зображення ▾</span><div class="gl">Ілюстрації</div></div>
-        <div class="rb-menu"><div>Цей пристрій…</div><div class="on">Зображення з Інтернету…</div></div>
+        <div class="rb-menu"><div>Клітинки</div><div>Рядки</div><div>Діаграма</div><div class="on">🖼 Зображення ▸</div><div>Прапорець</div><div>Спадне меню</div></div>
+        <div class="rb-menu"><div class="on">Зображення в клітинці</div><div>Зображення поверх клітинок</div></div>
       </div>
     </div>
-    <div class="note">Розмір картинки змінюють на панелі <span class="menu">Формат зображення</span> — вона відкривається через праву кнопку миші.</div>
-    <p class="soft">Як вставити зображення з інтернету й підігнати його розмір? Обирай дії по одній.</p>
+    <p>Картинка може бути двох видів:</p>
+    <ul>
+      <li><b>В клітинці</b> — стає вмістом комірки: її розмір залежить від розміру комірки, а при сортуванні вона «їде» разом із рядком;</li>
+      <li><b>Поверх клітинок</b> — «плаває» над аркушем: її можна перетягнути куди завгодно й змінити розмір, тягнучи за кути.</li>
+    </ul>
+    <div class="note">Картинку можна завантажити з комп'ютера, з Google Диска, за адресою в інтернеті або знайти через <span class="menu">Пошук картинок Google</span> — це вкладки у вікні вставлення.</div>
+    <p class="soft">Як вставити картинку з інтернету в комірку зі списком покупок? Обирай дії по одній.</p>
     <div class="exercise">
       <ul class="seq-done" id="seqDone"></ul>
       <div class="seq-ask" id="seqAsk"></div>
@@ -464,58 +504,55 @@
     <div class="step-label">Крок 6 · Перевірка даних</div>
     <h2>Охоронець для комірок</h2>
     <p><b>Перевірка (валідація) даних</b> — правило для комірки: що в неї можна вписати, а що ні. Як охоронець на вході: пропускає лише «своїх».</p>
-    <p>Де шукати: <span class="menu">Дані → Знаряддя даних → Перевірка даних</span>. Ось які бувають правила:</p>
+    <p>Де шукати: <span class="menu">Дані → Перевірка даних</span>. Праворуч відкриється панель — натисни <span class="menu">Додати правило</span> й обери критерій. Ось найпотрібніші:</p>
     <div class="ill-grid three">
-      <div class="ill"><div class="vis"><span class="mcell ok">14</span><span class="mcell no">13,5</span></div><div class="t">Ціле число</div><div class="c">тільки цілі, напр. від 12 до 15</div></div>
-      <div class="ill"><div class="vis"><span class="mcell ok">1,68</span></div><div class="t">Дійсне</div><div class="c">числа з комою</div></div>
-      <div class="ill"><div class="vis"><span class="dd"><span class="mcell txt">8-Б ▾</span><span class="lst" style="display:block"><div>8-А</div><div class="on">8-Б</div><div>8-В</div></span></span></div><div class="t">Список</div><div class="c">вибір із готового переліку</div></div>
-      <div class="ill"><div class="vis"><span class="mcell ok">15.03.2012</span></div><div class="t">Дата</div><div class="c">лише дата з проміжку</div></div>
-      <div class="ill"><div class="vis"><span class="mcell ok">8:30</span></div><div class="t">Час</div><div class="c">лише час із проміжку</div></div>
-      <div class="ill"><div class="vis"><span class="mcell ok txt">Kotyk_12</span><span class="mcell no txt" style="font-size:11px">SuperMegaKotyk2012</span></div><div class="t">Довжина тексту</div><div class="c">не більше N символів</div></div>
+      <div class="ill"><div class="vis"><span class="dd"><span class="mcell txt">8-Б ▾</span><span class="lst" style="display:block"><div>8-А</div><div class="on">8-Б</div><div>8-В</div></span></span></div><div class="t">Спадне меню</div><div class="c">вибір із готового переліку</div></div>
+      <div class="ill"><div class="vis"><span class="mcell ok">14</span><span class="mcell no">40</span></div><div class="t">Між</div><div class="c">число в проміжку, напр. від 12 до 15</div></div>
+      <div class="ill"><div class="vis"><span class="mcell ok">15.03.2012</span><span class="mcell no">15.03.2020</span></div><div class="t">Дата між</div><div class="c">лише дата з проміжку</div></div>
+      <div class="ill"><div class="vis"><span class="mcell ok txt" style="font-size:11.5px">olena@gmail.com</span><span class="mcell no txt" style="font-size:11.5px">olena.gmail</span></div><div class="t">Дійсна електронна адреса</div><div class="c">має бути @ і домен</div></div>
+      <div class="ill"><div class="vis"><span style="font-size:22px; line-height:1">☑ ☐</span></div><div class="t">Прапорець</div><div class="c">галочка «так / ні» одним клацанням</div></div>
+      <div class="ill"><div class="vis"><span class="mcell ok txt">Kotyk_12</span><span class="mcell no txt" style="font-size:11px">SuperMegaKotyk2012</span></div><div class="t">Спеціальна формула</div><div class="c">для всього іншого, напр. довжина тексту</div></div>
     </div>
+    <div class="note">Спадне меню й прапорець додаються ще швидше: <span class="menu">Вставити → Спадне меню</span> або <span class="menu">Вставити → Прапорець</span>.</div>
     <p class="soft">Яке правило перевірки підійде?</p>
     <div id="valList"></div>
   </section>
 
   <section class="block" id="s7">
     <div class="step-label">Крок 7 · Налаштування перевірки</div>
-    <h2>Три вкладки вікна «Перевірка даних»</h2>
-    <p>У вікна перевірки три вкладки. Ось що кожна з них робить:</p>
+    <h2>Налаштовуємо правило</h2>
+    <p>Правило на панелі «Перевірка даних» складається з кількох частин:</p>
     <div class="ill-grid">
-      <div class="ill"><div class="vis"><span class="mcell txt" style="font-size:11.5px">Ціле число: 12…15</span></div><div class="t">① Параметри</div><div class="c">яке правило діє</div></div>
-      <div class="ill"><div class="vis ba"><span class="mcell" style="min-width:40px; box-shadow:inset 0 0 0 2px var(--accent)"></span><span class="tipbox"><b>Вік</b><br>Введіть ціле число від 12 до 15</span></div><div class="t">② Підказка про вміст</div><div class="c">з'являється, коли клацнеш комірку</div></div>
-      <div class="ill"><div class="vis"><span class="errbox"><span class="h" style="display:block">Помилка введення</span><span class="b"><span class="x">✕</span>Вік має бути від 12 до 15</span></span></div><div class="t">③ Повідомлення про помилку</div><div class="c">вискакує, якщо ввели не те</div></div>
+      <div class="ill"><div class="vis"><span class="mcell txt" style="font-size:11.5px">Між 12 і 15</span></div><div class="t">① Критерії</div><div class="c">яке правило діє</div></div>
+      <div class="ill"><div class="vis ba"><span class="mcell" style="min-width:40px; box-shadow:inset 0 0 0 2px var(--accent)"></span><span class="tipbox">Введіть вік від 12 до 15</span></div><div class="t">② Текст довідки</div><div class="c">з'являється, коли клацнеш комірку</div></div>
+      <div class="ill"><div class="vis"><span class="mcell warn">16</span></div><div class="t">③ Попередження</div><div class="c">значення лишається, але в куті — червоний трикутник</div></div>
+      <div class="ill"><div class="vis"><span class="errbox"><span class="h" style="display:block">Помилка</span><span class="b"><span class="x">✕</span>Недійсні дані</span></span></div><div class="t">④ Відхилення</div><div class="c">неправильне значення не потрапить у комірку</div></div>
     </div>
+    <p>Пункти ③ і ④ — це два варіанти налаштування «Якщо дані недійсні». Обирають один із них.</p>
     <div class="exercise">
-      <div class="hot-prompt">Завдання: у комірки «Вік» учнів 8 класу можна вводити лише <span>цілі числа від 12 до 15</span>. Додай зрозумілу підказку й повідомлення про помилку.</div>
-      <div class="dialog">
-        <div class="dlg-title"><span>Перевірка даних</span><span>✕</span></div>
-        <div class="dlg-tabs">
-          <button class="dlg-tab live active" data-pane="vp1">Параметри</button>
-          <button class="dlg-tab live" data-pane="vp2">Підказка про вміст</button>
-          <button class="dlg-tab live" data-pane="vp3">Повідомлення про помилку</button>
-        </div>
-        <div class="dlg-body">
-          <div class="dlg-pane show" id="vp1">
-            <div class="dlg-row"><label class="lbl" for="vType">Тип даних:</label>
-              <select id="vType"><option value="any">Будь-яке значення</option><option value="int">Ціле число</option><option value="dec">Дійсне</option><option value="list">Список</option><option value="date">Дата</option><option value="time">Час</option><option value="len">Довжина тексту</option><option value="custom">Інший</option></select></div>
-            <div class="dlg-row"><label class="lbl" for="vOp">Значення:</label>
-              <select id="vOp"><option value="between">між</option><option value="notbetween">не між</option><option value="eq">дорівнює</option><option value="gt">більше ніж</option><option value="lt">менше ніж</option></select></div>
-            <div class="dlg-row"><label class="lbl" for="vMin">Мінімум:</label>
-              <select id="vMin"><option>0</option><option>10</option><option>12</option><option>13</option><option>15</option></select></div>
-            <div class="dlg-row"><label class="lbl" for="vMax">Максимум:</label>
-              <select id="vMax"><option>12</option><option>14</option><option>15</option><option>18</option><option>100</option></select></div>
+      <div class="hot-prompt">Завдання: у комірки «Вік» учнів 8 класу можна вводити лише <span>числа від 12 до 15</span>. Додай зрозумілу довідку, а неправильні значення — не пускай у таблицю взагалі.</div>
+      <div class="gpanel">
+        <div class="gp-title"><span>Правила перевірки даних</span><span>✕</span></div>
+        <div class="gp-body">
+          <div class="gp-label">Застосувати до діапазону</div>
+          <div class="gp-range">Аркуш1!B2:B30</div>
+          <div class="gp-label"><label for="vType">Критерії</label></div>
+          <select id="vType"><option value="list">Спадне меню</option><option value="contains">Текст містить</option><option value="date">Дата між</option><option value="gt">Більше</option><option value="lt">Менше</option><option value="between">Між</option><option value="notbetween">Не між</option><option value="check">Прапорець</option><option value="custom">Спеціальна формула</option></select>
+          <div class="gp-row hide" id="vRange">
+            <select id="vMin" aria-label="Мінімум"><option>0</option><option>10</option><option>12</option><option>13</option><option>15</option></select>
+            <span>і</span>
+            <select id="vMax" aria-label="Максимум"><option>12</option><option>14</option><option>15</option><option>18</option><option>100</option></select>
           </div>
-          <div class="dlg-pane" id="vp2">
-            <label class="dlg-check"><input type="checkbox" id="vShow">Відображати підказку, коли клітинку виділено</label>
-            <div class="radio-list" id="vHints"></div>
-          </div>
-          <div class="dlg-pane" id="vp3">
-            <p style="font-size:13px; margin:0 0 4px; color:var(--ink-soft);">Текст повідомлення:</p>
-            <div class="radio-list" id="vErrs"></div>
+          <div class="gp-label">Додаткові параметри</div>
+          <label class="dlg-check"><input type="checkbox" id="vShow">Показувати текст довідки для вибраної клітинки</label>
+          <div class="radio-list" id="vHints" style="padding-left:24px"></div>
+          <div class="gp-label">Якщо дані недійсні</div>
+          <div class="radio-list">
+            <label><input type="radio" name="vm" value="warn" checked>Показувати попередження</label>
+            <label><input type="radio" name="vm" value="reject">Відхиляти введення</label>
           </div>
         </div>
-        <div class="dlg-foot"><button class="dlg-btn prim" id="vOk">OK</button></div>
+        <div class="dlg-foot"><button class="dlg-btn prim" id="vOk">Готово</button></div>
       </div>
       <div class="status-line" id="vStatus"></div>
 
@@ -531,9 +568,9 @@
         </div>
         <div class="vt-pool" id="vPool"></div>
         <div class="vt-popup" id="vPopup">
-          <div class="pt">Помилка введення</div>
+          <div class="pt">Помилка</div>
           <div class="pb"><span class="x">✕</span><span id="vPopMsg"></span></div>
-          <div class="pf"><button class="dlg-btn" id="vRetry">Повторити</button><button class="dlg-btn" id="vCancel">Скасувати</button></div>
+          <div class="pf"><button class="dlg-btn prim" id="vRetry">OK</button></div>
         </div>
         <div class="status-line" id="vtStatus"></div>
       </div>
@@ -543,13 +580,15 @@
   <section class="block" id="s8">
     <div class="step-label">Крок 8 · Видалення повторів</div>
     <h2>Прибираємо дублікати</h2>
-    <p>Коли таблицю складають із кількох списків, у ній з'являються однакові рядки. Їх прибирає команда <span class="menu">Дані → Знаряддя даних → Видалити повтори</span>.</p>
+    <p>Коли таблицю складають із кількох списків, у ній з'являються однакові рядки. Їх прибирає команда <span class="menu">Дані → Очищення даних → Видалити дублікати</span>.</p>
     <div class="ill-grid">
       <div class="ill"><div class="vis"><span class="mcell txt">Олена · Київ</span><span class="mcell txt no">Олена · Київ</span></div><div class="t">Повтор ✂</div><div class="c">усе збігається — друга копія зникне, перша лишиться</div></div>
       <div class="ill"><div class="vis"><span class="mcell txt">Олена · Київ</span><span class="mcell txt ok">Олена · Львів</span></div><div class="t">Не повтор ✓</div><div class="c">хоч одне значення інше — обидва рядки лишаються</div></div>
     </div>
-    <div class="problem-note">Видалені повтори не можна автоматично повернути. Перед видаленням збережи копію даних на іншому аркуші чи в іншому файлі.</div>
-    <p class="soft">Перевіряються всі три стовпці. Клацни рядки, які буде видалено.</p>
+    <div class="note">У вікні видалення постав позначку <span class="menu">Дані мають рядок заголовка</span> — тоді назви стовпців не сприймуться як звичайний рядок.</div>
+    <div class="trivia">«Олена Коваль» і «Олена Коваль » з пробілом у кінці для таблиці — різні значення. Тому спершу варто виконати <span class="menu">Дані → Очищення даних → Обрізати пробіли</span>.</div>
+    <div class="problem-note">Помилився? <span class="mono">Ctrl+Z</span> скасує дію, а <span class="menu">Файл → Історія версій</span> поверне попередній стан таблиці. Але найспокійніше — перед очищенням зробити копію аркуша.</div>
+    <p class="soft">Порівнюються всі три стовпці. Клацни рядки, які буде видалено.</p>
     <div class="exercise">
       <div class="sheet">
         <div class="sheet-title"><span class="doc"></span>Контакти гуртка</div>
@@ -563,7 +602,7 @@
     <div class="step-label">Підсумок</div>
     <h2>Коротка перевірка</h2>
     <div class="quiz-box" id="quizBox">
-      <div class="quiz-progress" id="quizProgress">Запитання 1 з 8</div>
+      <div class="quiz-progress" id="quizProgress">Запитання 1 з 9</div>
       <div class="quiz-q" id="quizQ"></div>
       <div class="quiz-options" id="quizOptions"></div>
       <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
@@ -579,7 +618,7 @@
         <circle cx="12" cy="12" r="4.4" fill="#6C5CE7"/><circle cx="12" cy="12" r="1.6" fill="#5340c9" opacity="0.6"/>
       </svg>
       <h3>Урок пройдено!</h3>
-      <p>Ти вмієш застосовувати числові формати, працювати з датами й часом, вирівнювати текст, додавати межі, заливку й зображення, налаштовувати перевірку даних і прибирати повтори.</p>
+      <p>Ти вмієш у Google Таблицях застосовувати числові формати, працювати з датами й часом, вирівнювати текст, додавати межі, заливку й зображення, налаштовувати перевірку даних і прибирати дублікати.</p>
       <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
     </div>
   </section>
@@ -725,15 +764,15 @@ const ba = (a, b) => `<span class="ba">${a}<span class="arr">→</span>${b}</spa
     { pic: miniGrid({ hl:['C3'] }), q:'Яка адреса виділеної комірки?', opts:['3C','C3','CC33'], correct:1, why:'Спершу літера стовпця, потім номер рядка.' },
     { pic: miniGrid({ hl: rangeCells('B2','D3') }), q:'Як записати виділений діапазон?', opts:['B2;D3','B2:D3','B-D 2-3'], correct:1, why:'Діапазон — дві протилежні кутові комірки через двокрапку.' },
     { pic: miniGrid({ hl:['A1','C2','D4'] }), q:'Як записати виділені окремі комірки?', opts:['A1:D4','A1;C2;D4','A1-C2-D4'], correct:1, why:'Окремі комірки перелічують через крапку з комою.' },
-    { pic: miniWin('name'), q:'Як називається підсвічена частина вікна?', opts:['Рядок формул','Поле Ім\'я','Вкладка аркуша'], correct:1, why:'Поле Ім\'я показує адресу вибраної комірки.' },
-    { pic: miniWin('formula'), q:'А як називається ця частина?', opts:['Рядок формул','Поле Ім\'я','Рядок стану'], correct:0, why:'Рядок формул показує справжній вміст комірки.' },
+    { pic: miniWin('name'), q:'Що показує підсвічена частина вікна?', opts:['Вміст комірки','Адресу вибраної комірки','Назву аркуша'], correct:1, why:'Ліворуч від fx завжди видно адресу вибраної комірки.' },
+    { pic: miniWin('formula'), q:'А що показує ця частина — рядок формул?', opts:['Справжній вміст комірки','Адресу комірки','Назву файлу'], correct:0, why:'Рядок формул показує, що насправді записано в комірці.' },
     { pic: miniGrid({ cols:1, rows:3, hl:['A2'], vals:{ A1:['45','text-align:right'], A2:['12 шт.','text-align:left'], A3:['3,5','text-align:right'] } }),
       q:'Чому «12 шт.» притиснуте до лівого краю, а інші значення — до правого?', opts:['Таблиця сприйняла його як текст','Це найбільше число','Так завжди з цілими числами'], correct:0, why:'Літери поруч із цифрами роблять значення текстом — рахувати з ним не можна.' },
-    { pic: ba(cell('0,25'), cell('25%')), q:'Яке форматування застосували?', opts:['Грошовий формат','Відсотковий формат','Переносити текст'], correct:1, why:'0,25 — це чверть, тобто 25%.' },
+    { pic: ba(cell('0,25'), cell('25%')), q:'Яке форматування застосували?', opts:['Формат «Валюта»','Формат «Відсоток»','Перенесення тексту'], correct:1, why:'0,25 — це чверть, тобто 25%.' },
     { pic: `<span style="display:flex;flex-direction:column;align-items:center;gap:2px"><span style="display:flex">${cell('Список покупок','min-width:42px;width:42px;text-align:left;overflow:visible;position:relative;z-index:1')}${cell('','min-width:42px;width:42px')}${cell('','min-width:42px;width:42px')}</span><span class="arr" style="color:var(--pri);font-weight:800">↓</span>${cell('Список покупок','min-width:126px;text-align:center')}</span>`,
-      q:'Яку кнопку натиснули для заголовка над кількома стовпцями?', opts:['Переносити текст','Об\'єднати та розташувати в центрі','Відсотковий формат'], correct:1, why:'Кілька комірок стали однією, а текст — посередині.' },
+      q:'Яку кнопку натиснули для заголовка над кількома стовпцями?', opts:['Перенесення тексту','Об\'єднати клітинки','Формат «Відсоток»'], correct:1, why:'Кілька комірок стали однією, а текст — посередині.' },
     { pic: ba(cell('Назва продукту','min-width:56px;width:56px;text-align:left'), '<span class="tall" style="width:62px">Назва продукту</span>'),
-      q:'А тут що зробили?', opts:['Об\'єднали комірки','Увімкнули «Переносити текст»','Змінили шрифт'], correct:1, why:'Текст розбився на два рядки всередині тієї самої комірки.' },
+      q:'А тут що зробили?', opts:['Об\'єднали клітинки','Увімкнули перенесення тексту','Змінили шрифт'], correct:1, why:'Текст розбився на два рядки всередині тієї самої комірки.' },
     { pic: '<span style="font-size:30px">🌡</span>' + cell('18 · 21 · 24 · 19','min-width:120px;text-align:center'), q:'Ряд чисел без підписів і пояснень — це…', opts:['Дані','Інформація'], correct:0, why:'Це сирі факти: незрозуміло, що вони означають.' },
     { pic: '<span style="font-size:30px">📊</span><span class="tipbox" style="max-width:130px">Найтепліше було в середу — 24 °C</span>', q:'А висновок, зроблений із цих чисел, — це…', opts:['Дані','Інформація'], correct:1, why:'Дані опрацювали — і з\'явився висновок.' }
   ];
@@ -767,7 +806,7 @@ const ba = (a, b) => `<span class="ba">${a}<span class="arr">→</span>${b}</spa
 /* ---------- 1. NUMBER FORMATS ---------- */
 (function(){
   const rows = [['Молоко', 38.5, 0.1], ['Сир', 127.9, 0.05], ['Пакет', 0, 0], ['Яблука', 64, 0.25]];
-  const FORMATS = { general:'Загальний', number:'Числовий', currency:'Грошовий', accounting:'Фінансовий', percent:'Відсотковий' };
+  const FORMATS = { general:'Автоматично', number:'Число', currency:'Валюта', accounting:'Бухгалтерський облік', percent:'Відсоток' };
   const fmt = { 1:'general', 2:'general' };
   const TASKS = [
     { col:1, target:'number' },
@@ -775,10 +814,10 @@ const ba = (a, b) => `<span class="ba">${a}<span class="arr">→</span>${b}</spa
     { col:2, target:'percent' }
   ];
   const HINT = {
-    general:'Загальний формат показує число як є — без зайвих нулів і символів.',
+    general:'«Автоматично» показує число як є — без зайвих нулів і символів.',
     number:'Знаки після коми є, але чого ще бракує порівняно зі зразком?',
     currency:'З\'явився символ ₴ одразу після числа. Чи так на зразку?',
-    accounting:'Це фінансовий: ₴ стоїть по краю, а нуль став рискою. Чи так на зразку?',
+    accounting:'Це «Бухгалтерський облік»: ₴ стоїть по краю, а нуль став рискою. Чи так на зразку?',
     percent:'Число помножилось на 100 і отримало знак %. Чи так на зразку?'
   };
   function show(v, f){
@@ -788,7 +827,7 @@ const ba = (a, b) => `<span class="ba">${a}<span class="arr">→</span>${b}</spa
       case 'number': return n2;
       case 'currency': return n2 + ' ₴';
       case 'accounting': return `<span class="acc"><span>${v===0 ? '–' : n2}</span><span>₴</span></span>`;
-      case 'percent': return Math.round(v*100) + '%';
+      case 'percent': return (v*100).toFixed(2).replace('.', ',') + '%';
     }
   }
   const grid = document.getElementById('nfGrid');
@@ -842,7 +881,7 @@ const ba = (a, b) => `<span class="ba">${a}<span class="arr">→</span>${b}</spa
       if(ti >= TASKS.length) return;
       if(key === TASKS[ti].target){
         busy = true;
-        status.textContent = `✓ Це ${name.toLowerCase()} формат. А в рядку формул — те саме число ${String(rows[0][c]).replace('.', ',')}!`;
+        status.textContent = `✓ Це формат «${name}». А в рядку формул — те саме число ${String(rows[0][c]).replace('.', ',')}!`;
         addNeurons(1);
         ti++;
         if(ti === TASKS.length) addNeurons(2);
@@ -861,28 +900,27 @@ const ba = (a, b) => `<span class="ba">${a}<span class="arr">→</span>${b}</spa
 makeClassify('dateList', [
   { text:'Формула <span class="mono">=A1+1</span>', opts:['02.09.2025','01.09.2026','01.10.2025'], correct:0, why:'Додаємо одиницю — це один день.' },
   { text:'Формула <span class="mono">=A1+30</span>', opts:['01.09.2055','01.10.2025','31.09.2025'], correct:1, why:'У вересні 30 днів, тож через 30 днів настане 1 жовтня.' },
-  { text:'Комірці A1 задали формат «Загальний»', opts:['01.09.2025','Помилку','Число 45901'], correct:2, why:'Стільки днів минуло від 1 січня 1900 року — так дата зберігається насправді.' },
+  { text:'Комірці A1 задали формат «Число»', opts:['01.09.2025','Помилку','45 901,00'], correct:2, why:'Стільки днів минуло від 30 грудня 1899 року — так дата зберігається насправді.' },
   { text:'Як правильно ввести в комірку час «сім годин сорок п\'ять хвилин»?', opts:['7.45','7:45','7,45'], correct:1, why:'Години, хвилини й секунди розділяють двокрапкою.' }
 ]);
 
 /* ---------- 3. ALIGNMENT ---------- */
 (function(){
-  const DEF = { h:'general', v:'bottom', wrap:false, merge:false };
+  const DEF = { h:'auto', v:'bottom', wrap:'overflow', merge:false };
   const st = { title:{...DEF}, head:{...DEF} };
   const TASKS = [
-    { key:'title', range:'A1:D1', text:'Виділено <span>A1:D1</span>. Зроби заголовок таблиці, як на зразку', target:{ merge:true, h:'center' },
+    { key:'title', text:'Виділено <span>A1:D1</span>. Зроби заголовок таблиці, як на зразку', target:{ merge:true, h:'center' },
       hints:{ merge:'Заголовок на зразку займає одну велику комірку на всю ширину.', h:'Подивись, де стоїть заголовок по горизонталі.' } },
-    { key:'head', range:'B2', text:'Виділено <span>B2</span>. Зроби, щоб назва стовпчика була видна повністю, як на зразку', target:{ wrap:true, v:'middle', merge:false },
-      hints:{ merge:'Одну комірку нема з чим об\'єднувати — зніми цю позначку.', wrap:'Текст має розбитися на рядки всередині комірки.', v:'Подивись, де текст по вертикалі: зверху, посередині чи знизу?' } }
+    { key:'head', text:'Виділено <span>B2</span>. Зроби, щоб назва стовпчика була видна повністю, як на зразку', target:{ wrap:'wrap', v:'middle' },
+      hints:{ wrap:'Текст має розбитися на рядки всередині комірки. «Переповнення» тут не допоможе — сусідня комірка C2 зайнята.', v:'Подивись, де текст по вертикалі: угорі, посередині чи внизу?' } }
   ];
   let ti = 0;
   const grid = document.getElementById('alGrid'), tgt = document.getElementById('alTarget');
-  const selH = document.getElementById('alH'), selV = document.getElementById('alV');
-  const cbWrap = document.getElementById('alWrap'), cbMerge = document.getElementById('alMerge');
+  const bar = document.getElementById('alBar');
   const prompt = document.getElementById('alPrompt'), status = document.getElementById('alStatus');
 
-  function cellStyle(s, isText){
-    const h = s.h==='general' ? (isText ? 'left' : 'right') : s.h;
+  function cellStyle(s){
+    const h = s.h==='auto' ? 'left' : s.h;
     return `text-align:${h}; vertical-align:${s.v};`;
   }
   function tableHTML(state, selKey){
@@ -891,11 +929,11 @@ makeClassify('dateList', [
     let html = '<colgroup><col style="width:26px"><col><col><col><col></colgroup>';
     html += '<tr><th class="corner"></th><th>A</th><th>B</th><th>C</th><th>D</th></tr>';
     html += '<tr style="height:30px"><th>1</th>';
-    if(t.merge) html += `<td colspan="4" class="fname${sel('title')}" style="${cellStyle(t,true)}">Список покупок</td>`;
-    else html += `<td class="fname spill${sel('title')}" style="${cellStyle(t,true)}">Список покупок</td><td class="${sel('title')}"></td><td class="${sel('title')}"></td><td class="${sel('title')}"></td>`;
+    if(t.merge) html += `<td colspan="4" class="fname${sel('title')}" style="${cellStyle(t)}">Список покупок</td>`;
+    else html += `<td class="fname${t.wrap==='overflow'?' spill':''}${t.wrap==='wrap'?' wrapc':''}${sel('title')}" style="${cellStyle(t)}">Список покупок</td><td class="${sel('title')}"></td><td class="${sel('title')}"></td><td class="${sel('title')}"></td>`;
     html += '</tr>';
     html += `<tr style="height:58px"><th>2</th><td class="fname">Товар</td>
-      <td class="fname${hd.wrap?' wrapc':''}${sel('head')}" style="${cellStyle(hd,true)}">Кількість одиниць товару</td>
+      <td class="fname${hd.wrap==='wrap'?' wrapc':' clip'}${sel('head')}" style="${cellStyle(hd)}">Кількість одиниць товару</td>
       <td class="fname">Ціна</td><td class="fname">Разом</td></tr>`;
     html += '<tr><th>3</th><td>Молоко</td><td class="num">2</td><td class="num">38,50 ₴</td><td class="num">77,00 ₴</td></tr>';
     return html;
@@ -905,26 +943,28 @@ makeClassify('dateList', [
     grid.innerHTML = tableHTML(st, key);
     if(ti < TASKS.length){
       const goal = { title:{...st.title}, head:{...st.head} };
-      Object.assign(goal[key], TASKS[ti].target);
-      if(key==='head'){ goal.head = { ...DEF, ...TASKS[ti].target }; }
+      goal[key] = { ...DEF, ...TASKS[ti].target };
       tgt.innerHTML = tableHTML(goal, null);
-    }
-  }
-  function loadControls(){
-    if(ti >= TASKS.length) return;
-    const s = st[TASKS[ti].key];
-    selH.value = s.h; selV.value = s.v; cbWrap.checked = s.wrap; cbMerge.checked = s.merge;
+      const s = st[key];
+      bar.querySelectorAll('button').forEach(b=>{
+        const v = b.dataset.k==='merge' ? b.dataset.v==='1' : b.dataset.v;
+        b.classList.toggle('on', s[b.dataset.k] === v);
+      });
+    } else bar.querySelectorAll('button').forEach(b=>b.classList.remove('on'));
   }
   function showTask(){
     prompt.innerHTML = ti < TASKS.length ? `${ti+1}/${TASKS.length}. ${TASKS[ti].text}` : 'Таблиця як на зразку ✓';
   }
-  function onChange(){
-    if(ti >= TASKS.length) return;
-    const s = st[TASKS[ti].key];
-    s.h = selH.value; s.v = selV.value; s.wrap = cbWrap.checked; s.merge = cbMerge.checked;
-    render();
-  }
-  [selH, selV, cbWrap, cbMerge].forEach(el=>el.addEventListener('change', onChange));
+  bar.querySelectorAll('button').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      if(ti >= TASKS.length) return;
+      const key = TASKS[ti].key, k = b.dataset.k;
+      if(k==='merge' && key==='head'){ status.textContent = 'Виділено лише одну комірку — її нема з чим об\'єднувати, тож кнопка не діє.'; return; }
+      st[key][k] = k==='merge' ? b.dataset.v==='1' : b.dataset.v;
+      status.textContent = '';
+      render();
+    });
+  });
   document.getElementById('alOk').addEventListener('click', ()=>{
     if(ti >= TASKS.length) return;
     const t = TASKS[ti], s = st[t.key];
@@ -934,9 +974,9 @@ makeClassify('dateList', [
     status.textContent = t.key==='title' ? '✓ Чотири комірки стали однією, заголовок — посередині.' : '✓ Текст переноситься й стоїть посередині по висоті.';
     ti++;
     if(ti === TASKS.length) addNeurons(2);
-    showTask(); loadControls(); render();
+    showTask(); render();
   });
-  render(); loadControls(); showTask();
+  render(); showTask();
 })();
 
 /* ---------- 4. BORDERS ---------- */
@@ -964,9 +1004,9 @@ makeClassify('dateList', [
   makeMatching('bdPool', 'bdList', [
     { name:'Усі межі', func:pic({ outer:1.2, inner:true }) },
     { name:'Зовнішні межі', func:pic({ outer:1.2 }) },
-    { name:'Товста зовнішня межа', func:pic({ outer:3.5 }) },
+    { name:'Внутрішні межі', func:pic({ inner:true }) },
     { name:'Нижня межа', func:pic({ bottom:true }) },
-    { name:'Без меж', func:pic({}) },
+    { name:'Очистити межі', func:pic({}) },
     { name:'Заливка + усі межі', func:pic({ outer:1.2, inner:true, fill:true }) }
   ]);
 })();
@@ -974,11 +1014,11 @@ makeClassify('dateList', [
 /* ---------- 5. IMAGE SEQUENCE ---------- */
 (function(){
   const STEPS = [
-    'Відкрити вкладку «Вставлення»',
-    'Натиснути «Зображення» → «Зображення з Інтернету»',
-    'Ввести в пошуку ключове слово, наприклад «яблуко»',
-    'Вибрати картинку й натиснути «Вставити»',
-    'Клацнути картинку правою кнопкою → «Формат зображення» і задати розмір'
+    'Виділити комірку, у якій має бути картинка',
+    'Відкрити меню «Вставити» → «Зображення» → «Зображення в клітинці»',
+    'У вікні перейти на вкладку «Пошук картинок Google»',
+    'Ввести слово «яблуко», вибрати картинку й натиснути «Вставити»',
+    'Збільшити висоту рядка й ширину стовпця, щоб картинку було краще видно'
   ];
   const ORD = ['ПЕРШИМ', 'ДРУГИМ', 'ТРЕТІМ', 'ЧЕТВЕРТИМ', 'П\'ЯТИМ'];
   const done = document.getElementById('seqDone');
@@ -990,7 +1030,7 @@ makeClassify('dateList', [
     opts.innerHTML = '';
     if(k >= STEPS.length){
       ask.textContent = '';
-      status.textContent = 'Готово ✓ Картинка на аркуші й потрібного розміру.';
+      status.textContent = 'Готово ✓ Картинка в комірці й добре видна.';
       return;
     }
     ask.innerHTML = `Що робимо <b>${ORD[k]}</b>?`;
@@ -1022,53 +1062,49 @@ makeClassify('dateList', [
 
 /* ---------- 6. VALIDATION TYPES ---------- */
 makeClassify('valList', [
-  { text:'Скільки учнів прийшло на гурток: від 0 до 30', correct:0, why:'Людей рахують поштучно — дробів тут не буває.' },
-  { text:'Зріст спортсмена в метрах, наприклад 1,68', correct:1, why:'Потрібні числа з дробовою частиною.' },
-  { text:'Клас учня: лише 8-А, 8-Б або 8-В', correct:2, why:'Учень обирає готове значення зі спадного переліку — і не помилиться в написанні.' },
-  { text:'Коли учень народився: у проміжку з 2010 по 2013 рік', correct:3, why:'Обмежуємо календарний проміжок.' },
-  { text:'Нікнейм у грі — не більше 12 символів', correct:5, why:'Обмежуємо кількість символів.' },
-  { text:'Початок тренування — не раніше 8:00 і не пізніше 18:00', correct:4, why:'Обмежуємо проміжок протягом доби.' }
-], ['Ціле число', 'Дійсне', 'Список', 'Дата', 'Час', 'Довжина тексту']);
+  { text:'Скільки учнів прийшло на гурток: від 0 до 30', correct:1, why:'Число має потрапити в проміжок.' },
+  { text:'Клас учня: лише 8-А, 8-Б або 8-В', correct:0, why:'Учень обирає готове значення з переліку — і не помилиться в написанні.' },
+  { text:'Коли учень народився: у проміжку з 2010 по 2013 рік', correct:2, why:'Обмежуємо календарний проміжок.' },
+  { text:'Куди надсилати новини гуртка: учень вписує свою пошту, напр. olena@gmail.com', correct:3, why:'Таблиця перевірить, чи є @ і домен — «olena.gmail» не пройде.' },
+  { text:'Відмітка біля прізвища: прийшов на заняття чи ні — одним клацанням', correct:4, why:'Галочка має лише два стани: є або немає.' },
+  { text:'Нікнейм у грі — не більше 12 символів', correct:5, why:'Готового правила для довжини тексту немає — його задають формулою, наприклад =LEN(B2)<=12.' }
+], ['Спадне меню', 'Між', 'Дата між', 'Дійсна електронна адреса', 'Прапорець', 'Спеціальна формула']);
 
-/* ---------- 7. VALIDATION DIALOG ---------- */
+/* ---------- 7. VALIDATION PANEL ---------- */
 (function(){
-  const HINTS = ['Заповніть комірку', 'Введіть вік — ціле число від 12 до 15', 'Увага!'];
-  const ERRS = ['Щось пішло не так', 'Вік має бути цілим числом від 12 до 15. Спробуйте ще раз.', 'Помилка!!!'];
-  const H_OK = 1, E_OK = 1;
-  const hBox = document.getElementById('vHints'), eBox = document.getElementById('vErrs');
+  const HINTS = ['Заповніть комірку', 'Введіть вік — число від 12 до 15', 'Увага!'];
+  const H_OK = 1;
+  const hBox = document.getElementById('vHints');
   hBox.innerHTML = HINTS.map((h,i)=>`<label><input type="radio" name="vh" value="${i}">${h}</label>`).join('');
-  eBox.innerHTML = ERRS.map((h,i)=>`<label><input type="radio" name="ve" value="${i}">${h}</label>`).join('');
-  document.querySelectorAll('#s7 .dlg-tab.live').forEach(tab=>{
-    tab.addEventListener('click', ()=>{
-      document.querySelectorAll('#s7 .dlg-tab.live').forEach(t=>t.classList.toggle('active', t===tab));
-      document.querySelectorAll('#s7 .dlg-pane').forEach(p=>p.classList.toggle('show', p.id===tab.dataset.pane));
-    });
-  });
+  const typeSel = document.getElementById('vType');
+  const rangeRow = document.getElementById('vRange');
+  const syncRange = ()=> rangeRow.classList.toggle('hide', !['between','notbetween'].includes(typeSel.value));
+  typeSel.addEventListener('change', syncRange);
+  syncRange();
   const status = document.getElementById('vStatus');
   let configured = false;
   document.getElementById('vOk').addEventListener('click', ()=>{
     if(configured) return;
-    const type = document.getElementById('vType').value;
-    const op = document.getElementById('vOp').value;
+    const type = typeSel.value;
     const mn = document.getElementById('vMin').value, mx = document.getElementById('vMax').value;
     const show = document.getElementById('vShow').checked;
     const h = document.querySelector('input[name="vh"]:checked');
-    const e = document.querySelector('input[name="ve"]:checked');
+    const mode = document.querySelector('input[name="vm"]:checked').value;
     let msg = '';
-    if(type !== 'int') msg = 'Параметри: тип даних не підходить. Вік не буває дробовим, це не дата й не текст.';
-    else if(op !== 'between') msg = 'Параметри: «від 12 до 15» — яка умова описує проміжок?';
-    else if(mn !== '12' || mx !== '15') msg = 'Параметри: перевір мінімум і максимум.';
-    else if(!show) msg = 'Вкладка «Підказка про вміст»: підказка вимкнена — увімкни її.';
-    else if(!h || +h.value !== H_OK) msg = 'Вкладка «Підказка про вміст»: обери підказку, яка пояснює, що саме вводити.';
-    else if(!e || +e.value !== E_OK) msg = 'Вкладка «Повідомлення про помилку»: обери текст, з якого зрозуміло, що не так і як виправити.';
+    if(type === 'notbetween') msg = 'Критерії: «Не між» пропустить усе, КРІМ чисел від 12 до 15, — навпаки.';
+    else if(type !== 'between') msg = 'Критерії: вік має бути числом у проміжку від 12 до 15. Яке правило описує проміжок?';
+    else if(mn !== '12' || mx !== '15') msg = 'Критерії: перевір межі проміжку.';
+    else if(!show) msg = 'Довідку вимкнено — постав позначку, щоб учень бачив підказку.';
+    else if(!h || +h.value !== H_OK) msg = 'Обери текст довідки, з якого зрозуміло, що саме вводити.';
+    else if(mode !== 'reject') msg = '«Попередження» лише позначить комірку червоним трикутником, а неправильне значення залишиться. Нам треба, щоб воно взагалі не потрапило в таблицю.';
     if(msg){ status.textContent = msg; return; }
     configured = true;
     addNeurons(3);
-    status.textContent = '✓ Перевірку налаштовано.';
-    startTest(HINTS[H_OK], ERRS[E_OK]);
+    status.textContent = '✓ Правило збережено.';
+    startTest(HINTS[H_OK]);
   });
 
-  function startTest(hint, err){
+  function startTest(hint){
     const box = document.getElementById('vTest');
     const cell = document.getElementById('vCell');
     const tip = document.getElementById('vTip');
@@ -1076,15 +1112,15 @@ makeClassify('valList', [
     const popup = document.getElementById('vPopup');
     const tstatus = document.getElementById('vtStatus');
     box.classList.add('show');
-    tip.innerHTML = `<b>Вік</b>${hint}`;
-    const VALUES = ['14', '16', '13,5', 'чотирнадцять', '12', '15'];
+    tip.textContent = hint;
+    const VALUES = ['14', '16', '12', 'чотирнадцять', '15', '13,5'];
     const WHY = {
-      '14': 'Ціле число в межах — прийнято.',
+      '14': 'Число в межах — прийнято.',
       '12': 'Межі входять у проміжок «між» — 12 прийнято.',
       '15': 'Межі входять у проміжок «між» — 15 прийнято.',
-      '16': 'Більше за максимум 15.',
-      '13,5': 'Не ціле число.',
-      'чотирнадцять': 'Це текст, а не число.'
+      '16': 'Більше за 15 — відхилено.',
+      'чотирнадцять': 'Це текст, а не число — відхилено.',
+      '13,5': 'Прийнято! «Між» перевіряє лише межі, а 13,5 лежить між 12 і 15. Щоб пускати тільки цілі числа, знадобилася б спеціальна формула.'
     };
     const tested = new Set();
     VALUES.forEach(v=>{
@@ -1094,12 +1130,12 @@ makeClassify('valList', [
       chip.addEventListener('click', ()=>{
         if(popup.classList.contains('show')) return;
         const num = Number(v.replace(',', '.'));
-        const ok = Number.isInteger(num) && num >= 12 && num <= 15;
+        const ok = !Number.isNaN(num) && num >= 12 && num <= 15;
         if(ok){
           cell.textContent = v;
           chip.classList.add('tested-ok');
         } else {
-          document.getElementById('vPopMsg').textContent = err;
+          document.getElementById('vPopMsg').textContent = `Ви ввели недійсні дані в клітинку B2. ${hint}`;
           popup.classList.add('show');
           chip.classList.add('tested-bad');
         }
@@ -1114,9 +1150,7 @@ makeClassify('valList', [
       });
       pool.appendChild(chip);
     });
-    const close = ()=> popup.classList.remove('show');
-    document.getElementById('vRetry').addEventListener('click', close);
-    document.getElementById('vCancel').addEventListener('click', close);
+    document.getElementById('vRetry').addEventListener('click', ()=> popup.classList.remove('show'));
   }
 })();
 
@@ -1174,13 +1208,14 @@ makeClassify('valList', [
 /* ---------- FINAL QUIZ ---------- */
 const questions = [
   { q: "Що змінює числовий формат комірки?", opts: ["Лише вигляд числа, а значення лишається тим самим", "Саме число в комірці", "Розмір комірки"], correct: 0 },
-  { q: "У комірці записано 0,25. Що покаже відсотковий формат?", opts: ["0,25%", "25%", "250%"], correct: 1 },
-  { q: "Чим фінансовий формат відрізняється від грошового?", opts: ["Він не показує символ валюти", "Він вирівнює валюту й коми в стовпчик, а нуль показує рискою", "Він округлює до цілих гривень"], correct: 1 },
-  { q: "Як електронна таблиця зберігає дату?", opts: ["Як текст", "Як номер дня, відлічений від 1 січня 1900 року", "Як малюнок календаря"], correct: 1 },
-  { q: "Що зробить параметр «переносити по словах»?", opts: ["Розіб'є довгий текст на рядки всередині комірки", "Перенесе текст у сусідню комірку", "Перекладе текст іншою мовою"], correct: 0 },
-  { q: "Навіщо задавати межі, якщо на екрані вже видно сітку?", opts: ["Сітка не друкується, а межі — так", "Межі прискорюють обчислення", "Без меж не можна вводити дані"], correct: 0 },
-  { q: "Який тип перевірки даних дозволяє обирати значення зі спадного переліку?", opts: ["Довжина тексту", "Ціле число", "Список"], correct: 2 },
-  { q: "Що варто зробити перед видаленням повторів?", opts: ["Зберегти копію даних", "Видалити заголовки стовпців", "Об'єднати всі комірки"], correct: 0 }
+  { q: "Де в Google Таблицях обрати формат «Валюта» чи «Відсоток»?", opts: ["Формат → Число", "Дані → Перевірка даних", "Вставити → Зображення"], correct: 0 },
+  { q: "У комірці записано 0,25. Що покаже формат «Відсоток»?", opts: ["0,25%", "25,00%", "250,00%"], correct: 1 },
+  { q: "Як Google Таблиці зберігають дату?", opts: ["Як текст", "Як номер дня, відлічений від 30 грудня 1899 року", "Як малюнок календаря"], correct: 1 },
+  { q: "Що робить режим «Переносити» в перенесенні тексту?", opts: ["Розбиває довгий текст на рядки всередині комірки", "Переносить текст у сусідню комірку", "Перекладає текст іншою мовою"], correct: 0 },
+  { q: "Навіщо задавати межі, якщо на екрані вже видно сітку?", opts: ["Сітка лише допоміжна: її можна сховати, а на папері чи в PDF її може не бути", "Межі прискорюють обчислення", "Без меж не можна вводити дані"], correct: 0 },
+  { q: "Яке правило перевірки дає обрати значення з готового переліку?", opts: ["Текст містить", "Між", "Спадне меню"], correct: 2 },
+  { q: "Чим «Відхиляти введення» відрізняється від «Показувати попередження»?", opts: ["Неправильне значення не потрапить у комірку, а не лише позначиться червоним трикутником", "Нічим, це одне й те саме", "Таблиця сама виправить помилку"], correct: 0 },
+  { q: "Де знайти команду, що прибирає однакові рядки?", opts: ["Дані → Очищення даних → Видалити дублікати", "Формат → Число", "Вставити → Рядки"], correct: 0 }
 ];
 let qi=0, currentAnswered=false;
 const quizQ = document.getElementById('quizQ');
