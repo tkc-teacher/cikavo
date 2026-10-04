@@ -44,6 +44,11 @@
   .btn-open:hover{background:var(--purple-dark);}
   .tag-soon{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; color:var(--ink-soft); background:var(--bg); border:1px solid var(--line); padding:6px 12px; border-radius:999px; white-space:nowrap;}
 
+  .course-switch{display:inline-flex; flex-wrap:wrap; gap:4px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:4px; margin-top:16px;}
+  .course-switch a, .course-switch span{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; padding:6px 14px; border-radius:999px; text-decoration:none; color:var(--ink-soft);}
+  .course-switch a:hover{background:var(--bg); color:var(--ink);}
+  .course-switch .on{background:var(--purple); color:#fff;}
+
   footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
 </style>
 </head>
@@ -55,6 +60,10 @@
   <div class="hero-eyebrow">7 клас · Інформатика</div>
   <h1>Теми уроків</h1>
   <p>Урок із кнопкою «Відкрити» вже має готову інтерактивну версію.</p>
+  <nav class="course-switch" aria-label="Курс за підручником">
+    <span class="on">Тріщук, Лазарець</span>
+    <a href="../7-morze/index.html">Морзе</a>
+  </nav>
 </section>
 
 <div class="container" id="plan"></div>

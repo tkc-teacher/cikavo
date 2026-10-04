@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>7 клас · Інформатика — Теми уроків</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
+    --purple:#6C5CE7; --purple-dark:#5340c9; --teal:#16A3A0; --coral:#FF6B4A; --yellow:#FFC93C; --blue:#2D9CDB;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  a{color:inherit;}
+  .container{max-width:820px; margin:0 auto; padding:0 24px;}
+
+  .topbar{padding:18px 24px; border-bottom:1px solid var(--line); background:rgba(246,245,251,.9); position:sticky; top:0; backdrop-filter:blur(6px);}
+  .topbar-inner{max-width:820px; margin:0 auto;}
+  .back-link{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--purple-dark); text-decoration:none;}
+  .back-link:hover{text-decoration:underline;}
+
+  .hero{padding:40px 24px 28px;}
+  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--purple-dark); margin-bottom:8px;}
+  .hero h1{font-size:30px; line-height:1.2; margin-bottom:10px;}
+  .hero p{color:var(--ink-soft); font-size:15.5px; max-width:60ch;}
+
+  .theme-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:20px 22px; margin-bottom:18px;}
+  .theme-head{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:6px; flex-wrap:wrap;}
+  .theme-head h2{font-size:17px;}
+  .theme-hours{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; color:var(--ink-soft); background:var(--bg); border-radius:999px; padding:3px 10px; white-space:nowrap;}
+
+  .lesson-row{display:flex; align-items:center; gap:12px; padding:11px 0; border-top:1px solid var(--line);}
+  .lesson-row:first-of-type{border-top:none;}
+  .lesson-num{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--ink-soft); width:22px; flex-shrink:0;}
+  .lesson-body{flex:1; min-width:0;}
+  .lesson-title{font-size:14.5px;}
+  .lesson-action{flex-shrink:0;}
+  .btn-open{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; background:var(--purple); color:#fff; text-decoration:none; padding:8px 14px; border-radius:999px; white-space:nowrap; transition:background .15s ease;}
+  .btn-open:hover{background:var(--purple-dark);}
+  .tag-soon{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; color:var(--ink-soft); background:var(--bg); border:1px solid var(--line); padding:6px 12px; border-radius:999px; white-space:nowrap;}
+
+  .course-switch{display:inline-flex; flex-wrap:wrap; gap:4px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:4px; margin-top:16px;}
+  .course-switch a, .course-switch span{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; padding:6px 14px; border-radius:999px; text-decoration:none; color:var(--ink-soft);}
+  .course-switch a:hover{background:var(--bg); color:var(--ink);}
+  .course-switch .on{background:var(--purple); color:#fff;}
+
+  footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="topbar-inner"><a class="back-link" href="../index.html">← Усі класи</a></div></div>
+
+<section class="hero container">
+  <div class="hero-eyebrow">7 клас · Інформатика · за підручником Морзе</div>
+  <h1>Теми уроків</h1>
+  <p>Урок із кнопкою «Відкрити» вже має готову інтерактивну версію.</p>
+  <nav class="course-switch" aria-label="Курс за підручником">
+    <a href="../7/index.html">Тріщук, Лазарець</a>
+    <span class="on">Морзе</span>
+  </nav>
+</section>
+
+<div class="container" id="plan"></div>
+
+<footer>7 клас · Інформатика (Морзе) · Інтерактивні уроки</footer>
+
+<script>
+const PLAN = [
+  { title: "1. Комунікація та взаємодія", hours: "8 год", lessons: [
+    { title: "Комп'ютерні мережі. Поняття про штучний інтелект" },
+    { title: "Пошук інформації в інтернеті. Технології штучного інтелекту. ChatGPT" },
+    { title: "Авторське право" },
+    { title: "Поштові служби інтернету. Обліковий запис онлайн-сервісу та його налаштування. Надсилання, отримання, перенаправлення повідомлень. Пересилання файлів" },
+    { title: "Використання адресної книги та списків розсилки", link: "lesson-address-book/index.html" },
+    { title: "Етика спілкування і взаємодії в реальному та віртуальному просторі. Небезпеки використання цифрових пристроїв і технологій для людини та суспільства" },
+    { title: "Електронні послуги (е-урядування). Використання інтернету для навчання" },
+    { title: "Хмарні сервіси. Рівні та способи доступу до ресурсів" }
+  ]},
+  { title: "2. Інформаційна грамотність. Цифрова безпека", hours: "7 год", lessons: [
+    { title: "Переваги і небезпеки цифрових технологій. Засоби діагностики апаратних і програмних проблем" },
+    { title: "Інформаційне «сміття» цифрового і нецифрового формату" },
+    { title: "Цифрові пристрої і проблеми" },
+    { title: "Інформаційні процеси і системи. Інформація, повідомлення, дані, знання" },
+    { title: "Типи даних. Опрацювання даних: впорядкування, сортування" },
+    { title: "Кодування та декодування. Двійкове кодування. Одиниці вимірювання довжини двійкового коду. Кодування даних різних типів" },
+    { title: "Об'єкти та їх властивості" }
+  ]},
+  { title: "3. Цифрова творчість", hours: "11 год", lessons: [
+    { title: "Етапи розв'язування задач за допомогою комп'ютера. Моделі та їх види. Інформаційна модель" },
+    { title: "Табличні процесори, їх призначення" },
+    { title: "Абсолютні та мішані посилання в електронних таблицях" },
+    { title: "Функції в електронних таблицях. Форматування даних" },
+    { title: "Текстовий процесор. Шаблони документів. Стилі. Додавання символів і формул" },
+    { title: "Структура сайту. Правила ергономічного розміщення відомостей на вебсторінці" },
+    { title: "Етапи створення вебсайту. Автоматизовані засоби створення та публікації вебресурсів" },
+    { title: "Векторний графічний редактор" },
+    { title: "Особливості побудови й опрацювання векторних зображень" },
+    { title: "Додавання тексту до графічних зображень та його форматування. Анімація. Редактори анімації" },
+    { title: "Створення та зберігання анімацій у різних форматах" }
+  ]},
+  { title: "4. Вирішення проблем. Програмування", hours: "8 год", lessons: [
+    { title: "Мова програмування. Середовище програмування. Величини. Змінні" },
+    { title: "Вказівка присвоювання. Поняття про модуль" },
+    { title: "Створення графічних примітивів. Текстові величини та операції над ними" },
+    { title: "Налагодження алгоритмів у середовищі програмування. Порівняння значень величин" },
+    { title: "Реалізація та налагодження розгалужених алгоритмів" },
+    { title: "Реалізація та налагодження циклічних алгоритмів" },
+    { title: "Реалізація та налагодження циклічних алгоритмів" },
+    { title: "Систематизація та повторення вивченого матеріалу" }
+  ]}
+];
+
+const root = document.getElementById('plan');
+if(!PLAN.length){
+  root.innerHTML = `<div class="theme-card"><div class="theme-head"><h2>Курс готується</h2></div><p style="margin:0; color:var(--ink-soft);">Теми уроків з'являться тут найближчим часом.</p></div>`;
+}
+PLAN.forEach(theme=>{
+  const card = document.createElement('div');
+  card.className = 'theme-card';
+  const head = document.createElement('div');
+  head.className = 'theme-head';
+  head.innerHTML = `<h2>${theme.title}</h2><span class="theme-hours">${theme.hours}</span>`;
+  card.appendChild(head);
+
+  theme.lessons.forEach((lesson, i)=>{
+    const row = document.createElement('div');
+    row.className = 'lesson-row';
+    const action = lesson.link
+      ? `<a class="btn-open" href="${lesson.link}">Відкрити →</a>`
+      : `<span class="tag-soon">Скоро</span>`;
+    row.innerHTML = `
+      <span class="lesson-num">${i+1}</span>
+      <div class="lesson-body"><div class="lesson-title">${lesson.title}</div></div>
+      <div class="lesson-action">${action}</div>`;
+    card.appendChild(row);
+  });
+  root.appendChild(card);
+});
+</script>
+
+</body>
+</html>
