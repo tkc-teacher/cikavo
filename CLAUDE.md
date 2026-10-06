@@ -270,6 +270,7 @@ async function loadProgress(){
 | 5 | Як працювати в Google Classroom (вступний, поза календарним планом) | `5/lesson-classroom-intro/` |
 | 5 | З чого складається комп'ютер | `5/lesson-computer-systems/` |
 | 5 | Як пристрої передають повідомлення | `5/lesson-data-transfer/` |
+| 5 | Види комп'ютерних мереж. Мережа Інтернет | `5/lesson-networks-internet/` |
 | 6 | Як працює електронна пошта | `6/lesson-email-basics/` |
 | 6 | Етикет та безпека листування | `6/lesson-email-safety/` |
 | 6 | Етикет електронного листування (підсумок розділу «Електронна пошта») | `6/lesson-email-etiquette/` |
@@ -288,7 +289,7 @@ async function loadProgress(){
 | 9 | Поняття бази даних | `9/lesson-database-basics/` |
 | 9 | Поняття реляційної бази даних. Зв'язані аркуші в Google Таблицях | `9/lesson-relational-db/` |
 
-Класи, активовані на головній: 5, 6, 7, 8, 9. Курс 7 класу за Морзе (`7-morze/`) — список тем заповнено з календарного плану (34 уроки), підручник розпізнано (OCR); готові уроки 5–6. Приклади пошти — лише в інтерфейсі Gmail. Параграфи там — «Квести», сторінка PDF = друкована + 2, повний покажчик квестів — у `_materials/README.md`. Розділ «Лабораторія» (`labs/`) створено, поки без вправ. Фото-заготовки є в `5/lesson-computer-systems/images/`, `7/lesson-os-software/images/`, `7/lesson-browser/images/` (логотипи браузерів) та `8/lesson-tech-problems/images/`.
+Класи, активовані на головній: 5, 6, 7, 8, 9. Курс 7 класу за Морзе (`7-morze/`) — список тем заповнено з календарного плану (34 уроки), підручник розпізнано (OCR); готові уроки 5–6. Приклади пошти — лише в інтерфейсі Gmail. Параграфи там — «Квести», сторінка PDF = друкована + 2, повний покажчик квестів — у `_materials/README.md`. Розділ «Лабораторія» (`labs/`) створено, поки без вправ. Фото-заготовки є в `5/lesson-computer-systems/images/`, `7/lesson-os-software/images/`, `7/lesson-browser/images/` (логотипи браузерів), `5/lesson-networks-internet/images/` (вільні фото з Wikimedia Commons, джерела й ліцензії — у `images/README.md`) та `8/lesson-tech-problems/images/`.
 
 Ще не додані фото (урок показує емодзі-заглушки):
 - `7/lesson-os-software/images/`: `server.png`, `embedded.png` (деталі й вимоги — у `images/README.md` цієї теки);
