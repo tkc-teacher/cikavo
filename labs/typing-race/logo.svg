@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 112 96">
+  <rect x="4" y="22" width="104" height="58" rx="12" fill="#4B4B66"/>
+  <line x1="12" y1="51" x2="96" y2="51" stroke="#fff" stroke-width="2.5" stroke-dasharray="8 6" opacity=".6"/>
+  <rect x="94" y="22" width="10" height="58" fill="#fff"/>
+  <path d="M94 22h5v5h-5zM99 27h5v5h-5zM94 32h5v5h-5zM99 37h5v5h-5zM94 42h5v5h-5zM99 47h5v5h-5zM94 52h5v5h-5zM99 57h5v5h-5zM94 62h5v5h-5zM99 67h5v5h-5zM94 72h5v5h-5zM99 77h5v3h-5z" fill="#1B1B3A"/>
+  <g transform="translate(46 26) scale(.4)">
+    <path d="M6 44 V35 Q6 31 12 30 L30 28 Q42 16 54 15 H63 Q71 15 80 25 L85 27.5 Q108 29 114 33.5 Q117.5 36.5 116.5 42 V44 Q116.5 48 112.5 48 H10 Q6 48 6 44 Z" fill="#FF6B4A"/>
+    <path d="M37 28 Q45 19.5 54 18.5 H58 V28 Z M61 18.5 H63 Q69.5 18.5 77 27 H61 Z" fill="#CFEFFF"/>
+    <path d="M3 22 H21 V26 H3 Z M10 25 h3 v7 h-3 Z" fill="#1B1B3A"/>
+    <circle cx="28" cy="48" r="10" fill="#1B1B3A"/><circle cx="96" cy="48" r="10" fill="#1B1B3A"/>
+  </g>
+  <g transform="translate(22 54) scale(.4)">
+    <path d="M6 44 V35 Q6 31 12 30 L30 28 Q42 16 54 15 H63 Q71 15 80 25 L85 27.5 Q108 29 114 33.5 Q117.5 36.5 116.5 42 V44 Q116.5 48 112.5 48 H10 Q6 48 6 44 Z" fill="#6C5CE7"/>
+    <path d="M37 28 Q45 19.5 54 18.5 H58 V28 Z M61 18.5 H63 Q69.5 18.5 77 27 H61 Z" fill="#CFEFFF"/>
+    <path d="M3 22 H21 V26 H3 Z M10 25 h3 v7 h-3 Z" fill="#1B1B3A"/>
+    <circle cx="28" cy="48" r="10" fill="#1B1B3A"/><circle cx="96" cy="48" r="10" fill="#1B1B3A"/>
+  </g>
+  <rect x="10" y="4" width="22" height="16" rx="4" fill="#fff" stroke="#16A3A0" stroke-width="2.5"/>
+  <text x="21" y="16" text-anchor="middle" font-family="Arial Rounded MT Bold, Arial, sans-serif" font-weight="700" font-size="11" fill="#16A3A0">А</text>
+  <rect x="36" y="4" width="22" height="16" rx="4" fill="#16A3A0"/>
+  <text x="47" y="16" text-anchor="middle" font-family="Arial Rounded MT Bold, Arial, sans-serif" font-weight="700" font-size="11" fill="#fff">О</text>
+  <circle cx="70" cy="10" r="3" fill="#FFC93C"/><circle cx="8" cy="88" r="3" fill="#FF5D9E"/>
+</svg>
