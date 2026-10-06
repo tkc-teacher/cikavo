@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Інтерфейс бази даних — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FBF6F1; --ink:#2B1B12; --ink-soft:#6E584B; --surface:#FFFFFF; --line:#EFE0D3;
+    --pri:#C2410C; --pri-dark:#9A3412; --accent:#0E7490; --accent-dark:#155E75; --warm:#F59E0B; --coral:#E0604A;
+    --cell-line:#E6D8CC; --head-bg:#FBF0E7;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  .container{max-width:780px; margin:0 auto; padding:0 24px;}
+  @media (max-width:480px){ .container{padding:0 16px;} }
+
+  .hud{position:sticky; top:0; z-index:50; background:rgba(251,246,241,.9); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
+  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--warm),var(--pri)); transition:width .3s ease;}
+  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:780px; margin:0 auto;}
+  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
+  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
+  .neuron-counter svg{width:24px;height:24px;}
+  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
+  #neuronCount.pop{transform:scale(1.35);}
+
+  .hero{padding:48px 24px 36px;}
+  .hero-inner{max-width:780px; margin:0 auto; display:flex; align-items:center; gap:26px;}
+  .hero-text{flex:1;}
+  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--pri); margin-bottom:10px;}
+  .hero h1{font-size:29px; line-height:1.2; margin-bottom:12px;}
+  .hero p{color:var(--ink-soft); font-size:16px; max-width:54ch; margin-bottom:20px;}
+  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--pri); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
+  .btn-primary:hover{background:var(--pri-dark);}
+  .btn-primary:active{transform:scale(.97);}
+  .mascot{width:130px; height:130px; flex-shrink:0;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:100px; height:100px;} }
+
+  section.block{padding:30px 0; border-top:1px solid var(--line);}
+  .step-label{font-family:'Baloo 2',sans-serif; font-size:12.5px; font-weight:700; color:var(--pri); margin-bottom:6px; text-transform:uppercase; letter-spacing:.03em;}
+  .block h2{font-size:19px; margin-bottom:8px; max-width:40ch;}
+  .block p{max-width:64ch; font-size:15px; margin:0 0 8px; color:var(--ink);}
+  .block p.soft{color:var(--ink-soft); font-size:13.5px;}
+  .block ul, .block ol{max-width:64ch; margin:0 0 8px; padding-left:20px; font-size:15px;}
+  .block li{margin-bottom:4px;}
+  .note{background:#E6F4F7; border-left:4px solid var(--accent); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:var(--accent-dark); margin:12px 0;}
+  .trivia{background:#FDF0E4; border-left:4px solid var(--pri); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:var(--pri-dark); margin:12px 0;}
+  .problem-note{background:#FDEDEA; border-left:4px solid var(--coral); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:#8C3424; margin:12px 0;}
+  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:16px 18px; margin-top:10px;}
+  @media (max-width:480px){ .exercise{padding:14px 10px;} }
+  @keyframes itemShake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
+  .shake{animation:itemShake .35s ease;}
+  .status-line{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--pri-dark); margin-top:12px; min-height:1.4em;}
+  .hot-prompt{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; text-align:center; margin-bottom:10px;}
+  .hot-prompt span{color:var(--accent-dark);}
+
+  /* CLASSIFY */
+  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:13px 15px; margin:8px 0;}
+  .classify-card p.q{font-weight:700; margin:0 0 8px; font-size:13.5px;}
+  .choice-row{display:flex; gap:6px; flex-wrap:wrap;}
+  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12px; padding:7px 11px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease, color .15s ease;}
+  .choice-btn:hover{border-color:var(--pri);}
+  .choice-btn.correct{background:#E4F5E9; border-color:#3FAE58; color:#256B36;}
+  .choice-btn.wrong{background:#FBE6E9; border-color:#D14B5E; color:#8C2D3A;}
+  .choice-feedback{margin-top:6px; font-size:12px; color:var(--ink-soft); min-height:1.2em;}
+
+  /* MATCHING */
+  .tool-pool{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; padding:11px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:12px;}
+  .tool-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:7px 12px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .tool-chip:hover{transform:translateY(-2px);}
+  .tool-chip.selected{border-color:var(--pri); box-shadow:0 0 0 3px rgba(194,65,12,0.2);}
+  .tool-chip.placed{display:none;}
+  .func-card{display:flex; align-items:center; gap:10px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:9px 11px; margin-bottom:7px; cursor:pointer; transition:border-color .2s ease, background .2s ease;}
+  .func-card.matched{border-color:var(--pri); background:#FDF3EA; cursor:default;}
+  .func-text{flex:1; font-size:13px; color:var(--ink-soft);}
+  .func-slot{min-width:80px; max-width:40%; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:11.5px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:6px 6px;}
+  .func-slot.filled{border-style:solid; border-color:var(--pri); background:#FBE3D0; color:var(--ink);}
+
+  /* SORT BOARD */
+  .sort-buckets{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:8px;}
+  .bucket{border:2px dashed var(--line); border-radius:var(--radius-m); padding:9px; min-height:110px; cursor:pointer; background:var(--surface);}
+  .bucket-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--ink-soft); text-align:center;}
+  .bucket-sub{font-size:11px; color:var(--ink-soft); text-align:center; margin-bottom:6px;}
+  .bucket-items{display:flex; flex-wrap:wrap; gap:5px; min-height:28px; justify-content:center;}
+  .bucket.hint{border-color:var(--coral);}
+  .sort-pool{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-top:12px;}
+  .sort-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:7px 11px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .sort-chip:hover{transform:translateY(-2px);}
+  .sort-chip.selected{border-color:var(--pri); box-shadow:0 0 0 3px rgba(194,65,12,0.2);}
+  .sort-chip.placed{background:#E4F5E9; border-color:#3FAE58; cursor:default; font-size:11px;}
+  .sort-chip.placed:hover{transform:none;}
+
+  /* KITCHEN vs SHOWCASE */
+  .two-views{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:12px 0;}
+  @media (max-width:640px){ .two-views{grid-template-columns:1fr;} }
+  .view{border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; background:var(--surface);}
+  .view h3{font-size:14px; margin-bottom:6px;}
+  .view .raw{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:11px; line-height:1.5; background:#2B1B12; color:#F7D9C0; border-radius:8px; padding:8px 10px; overflow-x:auto; white-space:pre;}
+  .mini-form{display:flex; flex-direction:column; gap:6px; font-size:12.5px;}
+  .mini-form .fld{border:1.5px solid var(--cell-line); border-radius:8px; padding:5px 9px; background:#FFFCF9;}
+  .mini-form .fld b{color:var(--ink-soft); font-weight:700; font-size:11px; display:block;}
+  .mini-form .go{align-self:flex-start; background:var(--pri); color:#fff; font-family:'Baloo 2',sans-serif; font-weight:600; border-radius:8px; padding:4px 14px;}
+
+  /* FEATURE CARDS */
+  .feat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:8px; margin:10px 0 14px;}
+  .feat{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 12px; font-size:13px; color:var(--ink-soft);}
+  .feat b{display:block; font-family:'Baloo 2',sans-serif; font-size:14px; color:var(--ink); margin-bottom:2px;}
+  .feat .em{font-size:18px; margin-right:4px;}
+  .feat.lim b{color:#8C3424;}
+
+  /* APP WINDOW (emulators) */
+  .app{border:1.5px solid var(--cell-line); border-radius:var(--radius-m); overflow:hidden; background:#fff; font-size:13px;}
+  .app-bar{display:flex; align-items:center; gap:8px; background:var(--accent-dark); color:#fff; padding:7px 12px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px;}
+  .app-bar .dots{display:flex; gap:4px;}
+  .app-bar .dots i{width:8px; height:8px; border-radius:50%; background:rgba(255,255,255,.45); display:block;}
+  .app-bar .spacer{flex:1;}
+  .app-tools{display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:9px 12px; background:#F4FAFB; border-bottom:1px solid var(--cell-line);}
+  .app-tools label{font-size:12px; font-weight:700; color:var(--ink-soft); display:flex; align-items:center; gap:5px;}
+  .app-tools select, .app-form select{font:inherit; font-size:12.5px; font-weight:600; border:1.5px solid var(--cell-line); border-radius:7px; padding:4px 6px; background:#fff; cursor:pointer;}
+  .abtn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12px; border:1.5px solid var(--cell-line); background:#fff; border-radius:7px; padding:5px 10px; cursor:pointer; transition:border-color .15s ease, background .15s ease;}
+  .abtn:hover{border-color:var(--accent);}
+  .abtn.main{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .abtn.main:hover{background:var(--accent-dark);}
+  .app-scroll{overflow-x:auto;}
+  .app-table{width:100%; border-collapse:collapse; min-width:470px;}
+  .app-table th, .app-table td{padding:7px 9px; border-bottom:1px solid var(--line); text-align:left; white-space:nowrap;}
+  .app-table th{font-size:11.5px; color:var(--ink-soft); background:var(--head-bg); font-weight:800;}
+  .app-table th.sortable{cursor:pointer; color:var(--accent-dark); text-decoration:underline dotted;}
+  .app-table td.act{text-align:right;}
+  .icon-btn{border:none; background:transparent; cursor:pointer; font-size:15px; padding:2px 4px; border-radius:6px;}
+  .icon-btn:hover{background:var(--head-bg);}
+  .pill{display:inline-block; font-size:11px; font-weight:800; padding:2px 8px; border-radius:999px;}
+  .pill.on{background:#E4F5E9; color:#256B36;}
+  .pill.out{background:#FDEBD8; color:#9A3412;}
+  .app-table tr.new td{animation:rowIn 1.4s ease;}
+  @keyframes rowIn{0%{background:#FFE9C7;} 100%{background:#fff;}}
+  .app-table tr.bad td{animation:rowBad .5s ease;}
+  @keyframes rowBad{0%,100%{background:#fff;} 40%{background:#FCE6E2;}}
+  .app-form{display:none; flex-wrap:wrap; gap:8px; align-items:flex-end; padding:10px 12px; background:#FFF8F0; border-bottom:1px solid var(--cell-line);}
+  .app-form.show{display:flex;}
+  .app-form label{display:flex; flex-direction:column; font-size:11px; font-weight:700; color:var(--ink-soft); gap:2px;}
+  .app-report{display:none; padding:10px 12px; background:#F4FAFB; border-top:1px solid var(--cell-line); font-size:13px;}
+  .app-report.show{display:block;}
+  .app-empty{padding:14px; text-align:center; color:var(--ink-soft); font-size:13px;}
+  .task-box{background:#FFF8F0; border:1.5px solid #F4D2B5; border-radius:var(--radius-m); padding:10px 14px; margin-bottom:10px;}
+  .task-box .tnum{font-family:'Baloo 2',sans-serif; font-size:12px; font-weight:700; color:var(--pri);}
+  .task-box .ttext{font-weight:700; font-size:14.5px;}
+  .task-box .thint{font-size:12.5px; color:var(--ink-soft); margin-top:2px;}
+  .task-choices{display:flex; flex-direction:column; gap:6px; margin-top:8px;}
+  .task-done{list-style:none; padding:0 !important; margin:10px 0 0 !important;}
+  .task-done li{font-size:13px !important; color:#256B36; margin-bottom:2px !important;}
+
+  /* SHOP */
+  .role-switch{display:flex; background:rgba(255,255,255,.18); border-radius:999px; padding:2px;}
+  .role-switch button{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:11.5px; border:none; background:transparent; color:#fff; padding:4px 10px; border-radius:999px; cursor:pointer;}
+  .role-switch button.active{background:#fff; color:var(--accent-dark);}
+  .shop-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:8px; padding:12px;}
+  .prod{border:1.5px solid var(--line); border-radius:12px; padding:9px 10px; background:#fff; position:relative;}
+  .prod .pic{font-size:26px; line-height:1;}
+  .prod .nm{font-weight:700; font-size:12.5px; margin:4px 0 2px;}
+  .prod .pr{font-family:'Baloo 2',sans-serif; font-weight:700; color:var(--pri-dark); font-size:15px;}
+  .prod select{font:inherit; font-size:12px; margin-top:4px; border:1.5px solid var(--accent); border-radius:6px; padding:2px 4px; width:100%;}
+  .prod.flash{animation:rowIn 1.4s ease;}
+  .db-peek{display:none; margin-top:12px; border:1.5px dashed var(--accent); border-radius:var(--radius-m); padding:10px 12px; background:#F4FAFB;}
+  .db-peek.show{display:block;}
+  .db-peek h3{font-size:13.5px; margin-bottom:6px; color:var(--accent-dark);}
+  .db-peek .app-table{min-width:420px; font-size:12px;}
+  .db-peek td.hl, .db-peek th.hl{background:#FFE9C7;}
+
+  /* FIND THE PROBLEMS */
+  .bad-form{max-width:420px; margin:0 auto; border:1.5px solid var(--cell-line); border-radius:var(--radius-m); padding:14px 16px; background:#fff; font-size:13px;}
+  .bad-form .row{margin-bottom:10px;}
+  .bad-form .inp{border:1.5px solid #D9D2CB; border-radius:6px; height:30px; background:#FDFCFB; margin-top:3px; display:flex; align-items:center; padding:0 8px; color:var(--ink-soft); font-size:12px;}
+  .bad-form .btns{display:flex; align-items:center; gap:10px; margin-top:6px;}
+  .bad-form .b-cancel{background:#D64545; color:#fff; font-weight:800; padding:9px 26px; border-radius:8px; font-size:14px;}
+  .bad-form .b-ok{background:#E8E2DC; color:#B4A99F; font-size:9px; padding:3px 6px; border-radius:4px;}
+  .bad-form .pale{color:#D6CEC7; font-size:11px; line-height:1.4;}
+  .bad-form .err{background:#FBE6E6; color:#A33; border-radius:6px; padding:6px 9px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px;}
+  .spot{cursor:pointer; outline:2px dashed rgba(14,116,144,.45); outline-offset:3px; border-radius:6px; display:inline-block; transition:outline-color .15s ease, background .15s ease;}
+  .spot.block-spot{display:block;}
+  .spot:hover{outline-color:var(--accent);}
+  .spot.found{outline:2px solid #3FAE58; background:#E4F8E6;}
+  .spot.ok-seen{outline:2px solid #C9C2BB;}
+  .spot.wrong-try{animation:itemShake .3s ease;}
+  .spot-fb{max-width:520px; margin:12px auto 0; font-size:13px; color:var(--ink-soft); text-align:center; min-height:2.6em;}
+  .spot-fb b{color:var(--ink);}
+
+  /* QUIZ */
+  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:24px 22px; margin-top:16px;}
+  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:12.5px; color:var(--ink-soft); margin-bottom:9px;}
+  .quiz-q{font-size:16px; font-weight:700; margin-bottom:14px;}
+  .quiz-options{display:flex; flex-direction:column; gap:9px;}
+  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:14px; font-weight:600; padding:11px 14px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .quiz-opt:hover{border-color:var(--pri);}
+  .quiz-opt.correct{background:#E4F5E9; border-color:#3FAE58;}
+  .quiz-opt.wrong{background:#FBE6E9; border-color:#D14B5E;}
+  .quiz-nav{display:flex; justify-content:flex-end; margin-top:16px;}
+  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:10px 20px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
+  .btn-next.active{opacity:1; pointer-events:auto;}
+
+  .completion{display:none; text-align:center; padding:18px 10px 10px;}
+  .completion.show{display:block;}
+  .badge{width:80px; height:80px; margin:0 auto 14px;}
+  .completion h3{font-size:20px; margin-bottom:8px;}
+  .completion p{color:var(--ink-soft); max-width:50ch; margin:0 auto 16px; font-size:14px;}
+  .completion .total{font-family:'Baloo 2',sans-serif; font-size:28px; color:var(--pri-dark);}
+
+  footer{padding:32px 24px 56px; text-align:center; color:var(--ink-soft); font-size:13px;}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
+  <div class="hud-row">
+    <span class="hud-title">9 клас · Інтерфейс бази даних</span>
+    <div class="neuron-counter">
+      <svg viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
+        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#B57A1F" opacity="0.6"/>
+      </svg>
+      <span id="neuronCount">0</span>
+    </div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Впорядкування даних · Тема 13</div>
+      <h1>Інтерфейс бази даних: вітрина, за якою ховаються таблиці</h1>
+      <p>Щодня ти шукаєш товари, дивишся оцінки й замовляєш квитки — і працюєш із базами даних, навіть не бачачи жодної таблиці. Розберімося, що вміє інтерфейс бази даних і де його межі.</p>
+      <button class="btn-primary" onclick="document.getElementById('rev').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <!-- база даних позаду -->
+      <ellipse cx="104" cy="30" rx="26" ry="9" fill="#155E75"/>
+      <rect x="78" y="30" width="52" height="52" fill="#0E7490"/>
+      <ellipse cx="104" cy="82" rx="26" ry="9" fill="#0E7490"/>
+      <path d="M78 47 C78 52 130 52 130 47" stroke="#155E75" stroke-width="2.5"/>
+      <path d="M78 64 C78 69 130 69 130 64" stroke="#155E75" stroke-width="2.5"/>
+      <ellipse cx="104" cy="30" rx="26" ry="9" fill="#2A93AD"/>
+      <!-- вікно-вітрина -->
+      <rect x="8" y="38" width="96" height="84" rx="12" fill="#C2410C"/>
+      <rect x="8" y="38" width="96" height="18" rx="12" fill="#9A3412"/>
+      <rect x="8" y="48" width="96" height="8" fill="#9A3412"/>
+      <circle cx="20" cy="47" r="3" fill="#FBD5B5"/><circle cx="30" cy="47" r="3" fill="#FBD5B5"/><circle cx="40" cy="47" r="3" fill="#FBD5B5"/>
+      <rect x="16" y="62" width="80" height="52" rx="7" fill="#FFF8F0"/>
+      <!-- обличчя -->
+      <circle cx="42" cy="78" r="5" fill="#2B1B12"/><circle cx="70" cy="78" r="5" fill="#2B1B12"/>
+      <circle cx="43.6" cy="76.4" r="1.6" fill="#fff"/><circle cx="71.6" cy="76.4" r="1.6" fill="#fff"/>
+      <path d="M48 89 C52 94 60 94 64 89" stroke="#2B1B12" stroke-width="3" stroke-linecap="round"/>
+      <!-- кнопка -->
+      <rect x="40" y="99" width="32" height="9" rx="4.5" fill="#F59E0B"/>
+      <!-- лупа -->
+      <circle cx="112" cy="104" r="12" fill="#FFF8F0" stroke="#F59E0B" stroke-width="5"/>
+      <line x1="121" y1="113" x2="131" y2="123" stroke="#F59E0B" stroke-width="6" stroke-linecap="round"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="rev" style="border-top:none; padding-top:0;">
+    <div class="step-label">Повторення · Реляційна база даних</div>
+    <h2>Що ми вже знаємо</h2>
+    <p>Минулого уроку ми розкладали дані по кількох таблицях і зв'язували їх ключами. Пригадаймо головні поняття.</p>
+    <p class="soft">Клацни термін, потім — пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="tool-pool" id="revPool"></div>
+      <div id="revList"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s1">
+    <div class="step-label">Крок 1 · Вітрина бази даних</div>
+    <h2>Що таке інтерфейс бази даних</h2>
+    <p><b>Інтерфейс бази даних</b> — спосіб, яким людина працює з базою: знаходить, переглядає, додає, змінює чи видаляє дані.</p>
+    <p>Це ніби вітрина магазину: покупець бачить зручно розкладені товари, а склад із полицями ховається позаду. Щоб користуватися інтерфейсом, не треба вміти програмувати чи знати, як база влаштована всередині.</p>
+    <div class="two-views">
+      <div class="view">
+        <h3>🗄 Так дані лежать у базі</h3>
+        <div class="raw">id | dish_id | student_id | date
+41 | 3       | 1027       | 2026-10-06
+42 | 7       | 1027       | 2026-10-06
+43 | 3       | 1131       | 2026-10-06</div>
+      </div>
+      <div class="view">
+        <h3>🪟 Так їх бачить працівниця їдальні</h3>
+        <div class="mini-form">
+          <div class="fld"><b>Учень</b>Олена Шевчук, 9-Б</div>
+          <div class="fld"><b>Замовлення на сьогодні</b>Борщ, вареники</div>
+          <span class="go">Видати</span>
+        </div>
+      </div>
+    </div>
+    <p class="soft">Чи працює людина в кожній ситуації з базою даних через її інтерфейс?</p>
+    <div id="isUiList"></div>
+  </section>
+
+  <section class="block" id="s2">
+    <div class="step-label">Крок 2 · Види інтерфейсів</div>
+    <h2>Комп'ютер, браузер чи телефон</h2>
+    <p>До однієї й тієї самої бази можна дістатися різними шляхами:</p>
+    <ul>
+      <li><b>Програма на комп'ютері</b> — встановлюється на ПК; дані показує в таблицях, формах і звітах (Microsoft Access, LibreOffice Base).</li>
+      <li><b>Вебінтерфейс</b> — працюєш із базою через браузер, нічого не встановлюючи (інтернет-магазин, електронний щоденник).</li>
+      <li><b>Мобільний інтерфейс</b> — окремий застосунок на смартфоні (доставка їжі, банк).</li>
+    </ul>
+    <div class="note">Часто в одного сервісу є всі три «вітрини» одразу — і всі показують ту саму базу. Тому замовлення, зроблене на сайті, видно й у застосунку.</div>
+    <p class="soft">Розклади приклади: клацни картку, потім — кошик.</p>
+    <div class="exercise">
+      <div class="sort-buckets">
+        <div class="bucket" id="bPc"><div class="bucket-title">💻 Програма на ПК</div><div class="bucket-sub">встановлена на комп'ютер</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bWeb"><div class="bucket-title">🌐 Вебінтерфейс</div><div class="bucket-sub">відкривається в браузері</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bMob"><div class="bucket-title">📱 Мобільний</div><div class="bucket-sub">окремий застосунок</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="kindPool"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s3">
+    <div class="step-label">Крок 3 · Можливості інтерфейсу</div>
+    <h2>Що можна робити через інтерфейс</h2>
+    <p>Добрий інтерфейс дає змогу виконувати з даними всі основні дії:</p>
+    <div class="feat-grid">
+      <div class="feat"><b><span class="em">🧭</span>Навігація</b>Зрозуміле меню й розділи; зручно всім, зокрема людям із порушеннями зору чи слуху.</div>
+      <div class="feat"><b><span class="em">🔍</span>Пошук</b>Знайти потрібний запис за запитом: прізвищем, назвою, номером.</div>
+      <div class="feat"><b><span class="em">➕</span>Додавання</b>Внести новий запис через форму.</div>
+      <div class="feat"><b><span class="em">✏️</span>Редагування</b>Виправити чи оновити наявні дані.</div>
+      <div class="feat"><b><span class="em">🗑</span>Видалення</b>Прибрати запис, який більше не потрібен.</div>
+      <div class="feat"><b><span class="em">🧹</span>Фільтрація</b>Показати лише записи, що відповідають умові.</div>
+      <div class="feat"><b><span class="em">↕️</span>Сортування</b>Впорядкувати записи: за алфавітом, ціною, датою.</div>
+      <div class="feat"><b><span class="em">📊</span>Звіти</b>Отримати узагальнені підсумки: скільки, що найпопулярніше, які зміни.</div>
+    </div>
+    <p class="soft">Яка можливість інтерфейсу потрібна в кожній ситуації? Клацни назву, потім — ситуацію.</p>
+    <div class="exercise">
+      <div class="tool-pool" id="featPool"></div>
+      <div id="featList"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s4">
+    <div class="step-label">Крок 4 · Спробуй сам</div>
+    <h2>Інтерфейс шкільної бібліотеки</h2>
+    <p>Перед тобою інтерфейс бази даних бібліотеки. Виконуй завдання бібліотекарки по черзі — кожне потребує іншої можливості інтерфейсу.</p>
+    <div class="exercise">
+      <div class="task-box" id="libTask"></div>
+      <div class="app">
+        <div class="app-bar"><span class="dots"><i></i><i></i><i></i></span>📚 Бібліотека · Каталог</div>
+        <div class="app-tools">
+          <label>🔍 Автор <select id="libAuthor"></select></label>
+          <label>Стан <select id="libStatus"><option value="">усі</option><option>На полиці</option><option>Видана</option></select></label>
+          <button class="abtn" id="libReset">↺ Скинути</button>
+          <button class="abtn main" id="libAddBtn">➕ Додати</button>
+          <button class="abtn" id="libReportBtn">📊 Звіт</button>
+        </div>
+        <div class="app-form" id="libForm">
+          <label>Назва <select id="fTitle"></select></label>
+          <label>Автор <select id="fAuthor"></select></label>
+          <label>Рік <select id="fYear"></select></label>
+          <button class="abtn main" id="fSave">Зберегти</button>
+          <button class="abtn" id="fCancel">Скасувати</button>
+        </div>
+        <div class="app-scroll"><table class="app-table" id="libTable"></table></div>
+        <div class="app-report" id="libReport"></div>
+      </div>
+      <div class="status-line" id="libStatusLine"></div>
+      <ul class="task-done" id="libDone"></ul>
+    </div>
+  </section>
+
+  <section class="block" id="s5">
+    <div class="step-label">Крок 5 · Обмеження інтерфейсу</div>
+    <h2>Чого інтерфейс не вміє</h2>
+    <p>Інтерфейс зручний, але має межі. Головні з них:</p>
+    <div class="feat-grid">
+      <div class="feat lim"><b><span class="em">🎨</span>Залежність від дизайну</b>Незрозумілі кнопки, заплутане меню чи складні форми — і з даними працювати важко, хоч вони й є в базі.</div>
+      <div class="feat lim"><b><span class="em">🚧</span>Обмежений доступ до даних</b>Інтерфейс уміє лише те, що в нього заклали розробники. Немає потрібного фільтра — не знайдеш.</div>
+      <div class="feat lim"><b><span class="em">✍️</span>Помилки користувача</b>Інтерфейс не завжди перевіряє, чи правильно введено дані, тож помилка потрапляє в базу.</div>
+      <div class="feat lim"><b><span class="em">🔒</span>Права доступу</b>Різні користувачі бачать і можуть змінювати різне — залежно від ролі.</div>
+      <div class="feat lim"><b><span class="em">🖥</span>Технічні обмеження</b>Інтерфейс залежить від програми й пристрою: застаріле ПЗ чи слабкий комп'ютер — і доступу немає.</div>
+    </div>
+    <div class="trivia">Права доступу — обмеження, яке захищає дані. Добре, що змінювати оцінки в щоденнику може лише вчитель, а не кожен учень.</div>
+    <p class="soft">Яке обмеження заважає в кожній історії?</p>
+    <div id="limList"></div>
+  </section>
+
+  <section class="block" id="s6">
+    <div class="step-label">Крок 6 · Межі вітрини</div>
+    <h2>Інтернет-магазин спортивних товарів</h2>
+    <p>Тепер побудь покупцем в інтернет-магазині. Виконуй завдання й зверни увагу, що інтерфейс дозволяє, а що — ні.</p>
+    <div class="exercise">
+      <div class="task-box" id="shopTask"></div>
+      <div class="app">
+        <div class="app-bar"><span class="dots"><i></i><i></i><i></i></span>🏀 СпортМаркет<span class="spacer"></span>
+          <div class="role-switch" id="roleSwitch">
+            <button class="active" data-role="buyer">🛒 Покупець</button>
+            <button data-role="admin">🔑 Адміністратор</button>
+          </div>
+        </div>
+        <div class="app-tools">
+          <label>Тип <select id="shopType"><option value="">усі</option><option>Рюкзак</option><option>М'яч</option><option>Пляшка</option></select></label>
+          <label>Ціна до <select id="shopPrice"><option value="">будь-яка</option><option value="500">500 грн</option><option value="1000">1000 грн</option></select></label>
+        </div>
+        <div class="shop-grid" id="shopGrid"></div>
+      </div>
+      <div class="db-peek" id="dbPeek">
+        <h3>👀 Зазирнімо всередину бази даних магазину</h3>
+        <div class="app-scroll"><table class="app-table" id="peekTable"></table></div>
+        <p class="soft" style="margin-top:8px;">Поле «Колір» у базі є! Просто розробники не додали такого фільтра у вітрину, тож покупець до цих даних не дістанеться.</p>
+      </div>
+      <div class="status-line" id="shopStatusLine"></div>
+      <ul class="task-done" id="shopDone"></ul>
+    </div>
+  </section>
+
+  <section class="block" id="s7">
+    <div class="step-label">Крок 7 · Поганий дизайн</div>
+    <h2>Знайди проблеми форми</h2>
+    <p>Розробник поспішав, і форма запису на гурток вийшла незручною. Через такий інтерфейс у базу потраплятимуть помилки, а частина учнів узагалі не допише заявку.</p>
+    <p class="soft">Клацай на позначені частини форми. Знайди 5 проблем — але обережно: деякі частини зроблено добре.</p>
+    <div class="exercise">
+      <div class="bad-form">
+        <div class="row"><span class="spot" data-ok="Зрозумілий заголовок одразу каже, що це за форма." style="font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px;">Запис на гурток</span></div>
+        <div class="row"><div class="spot block-spot" data-real="1" data-why="Повідомлення про помилку з самим лише кодом нічого не пояснює. Добре: «Вкажіть дату народження».">
+          <div class="err">⚠ ERR_VAL_0x3F</div></div></div>
+        <div class="row"><div class="spot block-spot" data-ok="Зрозуміла назва поля, і видно, що його обов'язково заповнити.">Ім'я та прізвище *<div class="inp"></div></div></div>
+        <div class="row"><div class="spot block-spot" data-ok="Спадний список — добре: неможливо вписати клас, якого не існує.">Клас *<div class="inp">9-Б ▾</div></div></div>
+        <div class="row"><div class="spot block-spot" data-real="1" data-why="«Поле 7» — незрозуміло, що туди писати. Кожне поле повинно мати зрозумілу назву.">Поле 7<div class="inp"></div></div></div>
+        <div class="row"><div class="spot block-spot" data-real="1" data-why="Не сказано, у якому вигляді вводити дату: 05.03.2011, 2011-03-05 чи «5 березня»? Так і виникають помилки в базі.">Дата<div class="inp"></div></div></div>
+        <div class="row"><div class="spot block-spot" data-ok="Спадний список гуртків: не треба вигадувати назву, і не буде одруківок.">Гурток *<div class="inp">Робототехніка ▾</div></div></div>
+        <div class="row"><div class="spot block-spot" data-real="1" data-why="Блідий дрібний текст майже неможливо прочитати — особливо людям зі слабким зором.">
+          <div class="pale">Після надсилання заявку не можна змінити. Перевірте дані. Запис триває до 15 жовтня.</div></div></div>
+        <div class="btns">
+          <span class="spot" data-real="1" data-why="Велику яскраву кнопку «Скасувати» легко натиснути випадково, а головну — «ОК» — ледве видно. Головна дія має бути найпомітнішою."><span class="btns"><span class="b-cancel">Скасувати</span><span class="b-ok">ОК</span></span></span>
+          <span class="spot" data-ok="Позначка про обов'язкові поля підказує, що треба заповнити." style="font-size:11.5px; color:var(--ink-soft);">* — обов'язкові поля</span>
+        </div>
+      </div>
+      <div class="spot-fb" id="spotFb"></div>
+      <div class="status-line" id="spotStatus">Знайдено: 0 з 5</div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div class="quiz-box" id="quizBox">
+      <div class="quiz-progress" id="quizProgress">Запитання 1 з 8</div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
+    </div>
+    <div class="completion" id="completion">
+      <svg class="badge" viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#6C5CE7"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#6C5CE7"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#6C5CE7"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#6C5CE7"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#6C5CE7"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#6C5CE7"/>
+        <circle cx="12" cy="12" r="4.4" fill="#6C5CE7"/><circle cx="12" cy="12" r="1.6" fill="#5340c9" opacity="0.6"/>
+      </svg>
+      <h3>Урок пройдено!</h3>
+      <p>Ти знаєш, що таке інтерфейс бази даних, які бувають його види, що через нього можна робити — і де його межі: дизайн, відсутні функції, помилки введення, права доступу й техніка.</p>
+      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Урок · «Інтерфейс бази даних: можливості та обмеження» · 9 клас</footer>
+
+<script>
+const STORAGE_KEY = "lesson9-db-interface-neurons";
+let neurons = 0;
+const neuronEl = document.getElementById('neuronCount');
+const hudFill = document.getElementById('hudFill');
+
+function addNeurons(n){
+  neurons += n;
+  neuronEl.textContent = neurons;
+  neuronEl.classList.add('pop');
+  setTimeout(()=>neuronEl.classList.remove('pop'), 250);
+  saveProgress();
+}
+async function saveProgress(){
+  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
+}
+async function loadProgress(){
+  try{
+    const res = await window.storage?.get(STORAGE_KEY, false);
+    if(res && res.value){
+      const d = JSON.parse(res.value);
+      if(typeof d.neurons === 'number'){ neurons = d.neurons; neuronEl.textContent = neurons; }
+    }
+  }catch(e){}
+}
+loadProgress();
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
+});
+
+/* ---------- HELPERS ---------- */
+function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
+function flash(el, cls){ el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), 380); }
+
+function makeClassify(containerId, items, opts){
+  const list = document.getElementById(containerId);
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">${(item.opts||opts).map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i===item.correct){ btn.classList.add('correct'); fb.textContent = item.why ? `Правильно ✓ ${item.why}` : 'Правильно ✓'; answered=true; addNeurons(1); }
+        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
+      });
+    });
+  });
+}
+
+function makeSortBoard(poolId, buckets, items){
+  const pool = document.getElementById(poolId);
+  let selected = null;
+  let placedCount = 0;
+  shuffle(items).forEach(item=>{
+    const chip = document.createElement('div');
+    chip.className = 'sort-chip';
+    chip.textContent = item.text;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.sort-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = item;
+    });
+    pool.appendChild(chip);
+  });
+  Object.entries(buckets).forEach(([key, el])=>{
+    el.addEventListener('click', ()=>{
+      if(!selected) return;
+      if(selected.zone === key){
+        const chip = [...pool.children].find(c=>c.textContent===selected.text && !c.classList.contains('placed'));
+        if(chip){ chip.classList.add('placed'); chip.classList.remove('selected'); el.querySelector('.bucket-items').appendChild(chip); }
+        addNeurons(1);
+        placedCount++;
+        selected = null;
+        if(placedCount === items.length) addNeurons(2);
+      } else {
+        el.classList.add('hint');
+        setTimeout(()=>el.classList.remove('hint'), 350);
+      }
+    });
+  });
+}
+
+function makeMatching(poolId, listId, items){
+  const pool = document.getElementById(poolId);
+  const list = document.getElementById(listId);
+  let selected = null;
+  let matched = 0;
+  shuffle(items).forEach(t=>{
+    const chip = document.createElement('div');
+    chip.className = 'tool-chip';
+    chip.textContent = t.name;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = t.name;
+    });
+    pool.appendChild(chip);
+  });
+  shuffle(items).forEach(t=>{
+    const card = document.createElement('div');
+    card.className = 'func-card';
+    card.innerHTML = `<div class="func-text">${t.func}</div><div class="func-slot">?</div>`;
+    card.addEventListener('click', ()=>{
+      if(card.classList.contains('matched') || !selected) return;
+      const slot = card.querySelector('.func-slot');
+      if(selected === t.name){
+        slot.textContent = selected;
+        slot.classList.add('filled');
+        card.classList.add('matched');
+        const chip = [...pool.children].find(c=>c.textContent===selected);
+        if(chip) chip.classList.add('placed');
+        addNeurons(1);
+        matched++;
+        selected = null;
+        pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+        if(matched === items.length) addNeurons(2);
+      } else {
+        card.classList.add('shake');
+        setTimeout(()=>card.classList.remove('shake'), 350);
+      }
+    });
+    list.appendChild(card);
+  });
+}
+
+/* Покрокові завдання в емуляторі: показує поточне завдання, веде список виконаних */
+function makeTaskRunner(boxId, doneId, statusId, tasks, finalText){
+  const box = document.getElementById(boxId);
+  const done = document.getElementById(doneId);
+  const status = document.getElementById(statusId);
+  const runner = { k:0, onChange:null };
+  runner.current = ()=>tasks[runner.k];
+  runner.render = ()=>{
+    const t = tasks[runner.k];
+    if(!t){
+      box.innerHTML = `<div class="ttext">Усі завдання виконано ✓</div><div class="thint">${finalText}</div>`;
+      return;
+    }
+    box.innerHTML = `<div class="tnum">Завдання ${runner.k+1} з ${tasks.length}</div><div class="ttext">${t.text}</div>${t.hint?`<div class="thint">${t.hint}</div>`:''}`;
+    if(t.choices){
+      const wrap = document.createElement('div');
+      wrap.className = 'task-choices';
+      shuffle(t.choices).forEach(c=>{
+        const b = document.createElement('button');
+        b.className = 'abtn';
+        b.style.textAlign = 'left';
+        b.textContent = c.text;
+        b.addEventListener('click', ()=>{
+          if(c.ok){ runner.complete(c.msg); }
+          else { flash(b, 'shake'); status.textContent = c.msg; }
+        });
+        wrap.appendChild(b);
+      });
+      box.appendChild(wrap);
+    }
+  };
+  runner.complete = (msg)=>{
+    const t = tasks[runner.k];
+    const li = document.createElement('li');
+    li.textContent = `✓ ${t.label}`;
+    done.appendChild(li);
+    addNeurons(1);
+    status.textContent = msg || 'Виконано ✓';
+    runner.k++;
+    if(runner.k === tasks.length){ addNeurons(2); }
+    if(runner.onChange) runner.onChange();
+    runner.render();
+  };
+  runner.say = (msg)=>{ status.textContent = msg; };
+  return runner;
+}
+
+/* ---------- REVIEW ---------- */
+makeMatching('revPool', 'revList', [
+  { name:'Реляційна БД', func:'Дані розкладено по кількох таблицях, пов\'язаних між собою' },
+  { name:'Предметна область', func:'Частина реального світу, про яку збирають дані: бібліотека, кафе, спортклуб' },
+  { name:'Первинний ключ', func:'Поле, значення якого не повторюється в жодному записі цієї таблиці' },
+  { name:'Зовнішній ключ', func:'Поле, що зберігає ID запису з іншої таблиці й так на нього «вказує»' },
+  { name:'Один до багатьох', func:'В одному класі багато учнів, але кожен учень — лише в одному класі' }
+]);
+
+/* ---------- 1. IS IT A DB INTERFACE ---------- */
+makeClassify('isUiList', [
+  { text:'Шукаєш у застосунку квиток на потяг Київ — Львів на суботу', correct:0, why:'Розклад і вільні місця зберігаються в базі, а ти бачиш їх через застосунок.' },
+  { text:'Записуєш домашнє завдання в паперовий щоденник', correct:1, why:'Тут немає ні бази даних, ні програми.' },
+  { text:'Бібліотекарка відмічає в програмі, хто взяв «Лісову пісню»', correct:0, why:'Вона змінює запис у базі, не бачачи самої таблиці.' },
+  { text:'Рахуєш на калькуляторі 25 × 4', correct:1, why:'Калькулятор нічого не зберігає й не шукає — бази даних тут немає.' },
+  { text:'Переглядаєш в електронному щоденнику оцінки за тиждень', correct:0, why:'Оцінки лежать у базі школи, щоденник — її «вітрина».' },
+  { text:'Малюєш листівку в графічному редакторі', correct:1, why:'Малюнок — це окремий файл, а не записи в базі.' }
+], ['Так, через інтерфейс БД', 'Ні']);
+
+/* ---------- 2. KINDS ---------- */
+makeSortBoard('kindPool', {
+  pc: document.getElementById('bPc'),
+  web: document.getElementById('bWeb'),
+  mob: document.getElementById('bMob')
+}, [
+  { text:'Microsoft Access', zone:'pc' },
+  { text:'LibreOffice Base', zone:'pc' },
+  { text:'Програма обліку на касі супермаркету', zone:'pc' },
+  { text:'Сайт інтернет-магазину', zone:'web' },
+  { text:'Запис до лікаря на сайті клініки', zone:'web' },
+  { text:'Онлайн-кінотеатр у Chrome', zone:'web' },
+  { text:'Доставка їжі зі смартфона', zone:'mob' },
+  { text:'Банк у телефоні', zone:'mob' },
+  { text:'«Дія» на смартфоні', zone:'mob' }
+]);
+
+/* ---------- 3. FEATURES ---------- */
+makeMatching('featPool', 'featList', [
+  { name:'Навігація', func:'Учениця зі слабким зором вмикає великий шрифт і за два клацання потрапляє в розділ «Розклад»' },
+  { name:'Пошук', func:'Вчителька вводить прізвище учня й одразу бачить його картку' },
+  { name:'Додавання', func:'У зоомагазин привезли цуценя — продавчиня вносить кличку, породу й ціну' },
+  { name:'Редагування', func:'Родина учня переїхала — в його записі оновлюють адресу' },
+  { name:'Видалення', func:'Диск розбився, тож його прибирають із каталогу фонотеки' },
+  { name:'Фільтрація', func:'У музичному застосунку на екрані лишаються тільки рок-пісні' },
+  { name:'Сортування', func:'Список кросівок шикується від найдешевших до найдорожчих' },
+  { name:'Звіти', func:'Кухарка дізнається, яку страву за місяць замовляли найчастіше' }
+]);
+
+/* ---------- 4. LIBRARY EMULATOR ---------- */
+(function(){
+  let books = [
+    { id:1, title:'Захар Беркут', author:'Іван Франко', year:1883, status:'Видана' },
+    { id:2, title:'Лис Микита', author:'Іван Франко', year:1890, status:'На полиці' },
+    { id:3, title:'Кайдашева сім\'я', author:'Іван Нечуй-Левицький', year:1879, status:'Видана' },
+    { id:4, title:'Тіні забутих предків', author:'Михайло Коцюбинський', year:1911, status:'На полиці' },
+    { id:5, title:'Intermezzo', author:'Михайло Коцюбинський', year:1908, status:'Видана' },
+    { id:6, title:'Лісова пісня', author:'Леся Українка', year:1911, status:'На полиці' },
+    { id:7, title:'Енеїда', author:'Іван Котляревський', year:1798, status:'На полиці' }
+  ];
+  let nextId = 8;
+  const state = { author:'', status:'', sort:'' };
+  const table = document.getElementById('libTable');
+  const selAuthor = document.getElementById('libAuthor');
+  const selStatus = document.getElementById('libStatus');
+  const form = document.getElementById('libForm');
+  const report = document.getElementById('libReport');
+
+  const runner = makeTaskRunner('libTask', 'libDone', 'libStatusLine', [
+    { label:'Пошук', text:'Учень питає, які книжки Івана Франка є в бібліотеці. Покажи лише їх.' },
+    { label:'Сортування', text:'Упорядкуй каталог від найстарішої книжки до найновішої.' },
+    { label:'Фільтрація', text:'Покажи лише ті книжки, які зараз можна взяти з полиці.' },
+    { label:'Додавання', text:'Надійшла нова книжка: «Тигролови», Іван Багряний, 1944 рік. Внеси її в каталог.' },
+    { label:'Редагування', text:'«Захар Беркут» повернули до бібліотеки. Онови його стан.', hint:'Шукай кнопку ✏️ у рядку книжки.' },
+    { label:'Видалення', text:'«Кайдашеву сім\'ю» загубили, і знайти її не вдалося. Прибери її з каталогу.' },
+    { label:'Звіт', text:'Директорка просить підсумок: скільки книжок на полиці, а скільки — у читачів?' }
+  ], 'Пошук, сортування, фільтрація, додавання, редагування, видалення й звіт — усе це можливості одного інтерфейсу.');
+
+  function fillAuthors(){
+    const authors = [...new Set(books.map(b=>b.author))].sort((a,b)=>a.localeCompare(b,'uk'));
+    const cur = state.author;
+    selAuthor.innerHTML = '<option value="">усі</option>' + authors.map(a=>`<option${a===cur?' selected':''}>${a}</option>`).join('');
+  }
+  function visible(){
+    let list = books.filter(b=>(!state.author || b.author===state.author) && (!state.status || b.status===state.status));
+    if(state.sort==='asc') list = [...list].sort((a,b)=>a.year-b.year);
+    if(state.sort==='desc') list = [...list].sort((a,b)=>b.year-a.year);
+    return list;
+  }
+  function render(flashId){
+    const arrow = state.sort==='asc' ? ' ▲' : state.sort==='desc' ? ' ▼' : ' ↕';
+    const list = visible();
+    table.innerHTML = `<tr><th>Назва</th><th>Автор</th><th class="sortable" id="sortYear">Рік${arrow}</th><th>Стан</th><th></th></tr>` +
+      (list.length ? list.map(b=>`<tr data-id="${b.id}"${b.id===flashId?' class="new"':''}><td><b>${b.title}</b></td><td>${b.author}</td><td>${b.year}</td>
+        <td><span class="pill ${b.status==='Видана'?'out':'on'}">${b.status}</span></td>
+        <td class="act"><button class="icon-btn" data-act="edit" title="Змінити стан">✏️</button><button class="icon-btn" data-act="del" title="Видалити">🗑</button></td></tr>`).join('')
+      : `<tr><td colspan="5" class="app-empty">Нічого не знайдено</td></tr>`);
+    document.getElementById('sortYear').addEventListener('click', ()=>{
+      state.sort = state.sort==='asc' ? 'desc' : 'asc';
+      render(); check('sort');
+    });
+    table.querySelectorAll('button[data-act]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        const tr = btn.closest('tr');
+        const book = books.find(b=>b.id===+tr.dataset.id);
+        rowAction(btn.dataset.act, book, tr);
+      });
+    });
+  }
+  function rowAction(act, book, tr){
+    const t = runner.current();
+    if(act==='edit'){
+      if(t && t.label==='Редагування' && book.title==='Захар Беркут'){
+        book.status = 'На полиці'; render(book.id);
+        runner.complete('Готово ✓ Стан змінено — тепер усі бачать, що книжка на полиці.');
+      } else {
+        flash(tr, 'bad');
+        runner.say(t && t.label==='Редагування' ? 'Це не та книжка.' : 'Змінювати цей запис зараз не потрібно.');
+      }
+    } else {
+      if(t && t.label==='Видалення' && book.title==='Кайдашева сім\'я'){
+        books = books.filter(b=>b.id!==book.id); fillAuthors(); render();
+        runner.complete('Готово ✓ Запис видалено. Видаляй лише те, що справді вже не потрібне — повернути буде складно.');
+      } else {
+        flash(tr, 'bad');
+        runner.say('Обережно! Ця книжка ще потрібна — видаляти її не можна.');
+      }
+    }
+  }
+  function resetFilters(){
+    state.author=''; state.status='';
+    selStatus.value=''; fillAuthors();
+  }
+  function check(kind){
+    const t = runner.current();
+    if(!t) return;
+    if(t.label==='Пошук' && state.author==='Іван Франко' && !state.status){ runner.complete('Готово ✓ Пошук відібрав книжки одного автора.'); return; }
+    if(t.label==='Сортування' && state.sort==='asc'){ runner.complete('Готово ✓ Першою стоїть «Енеїда» 1798 року.'); return; }
+    if(t.label==='Фільтрація' && state.status==='На полиці'){ runner.complete('Готово ✓ Фільтр сховав видані книжки, але з бази їх не видалив.'); return; }
+    if(t.label==='Звіт' && kind==='report'){ runner.complete('Готово ✓ Звіт підрахував підсумки за всією базою.'); return; }
+    if(kind==='sort' && t.label!=='Сортування') runner.say('Сортування зараз не потрібне, але воно нічого не зіпсує.');
+    if(kind==='author' && t.label==='Пошук' && state.author && state.author!=='Іван Франко') runner.say('Це інший автор.');
+    if(kind==='author' && t.label==='Пошук' && state.author==='Іван Франко' && state.status) runner.say('Майже! Прибери фільтр «Стан», щоб побачити всі книжки Франка.');
+  }
+  runner.onChange = ()=>{
+    const t = runner.current();
+    if(t && (t.label==='Фільтрація' || t.label==='Додавання' || t.label==='Редагування' || t.label==='Видалення')){
+      if(state.author || state.status){ resetFilters(); render(); }
+    }
+  };
+
+  selAuthor.addEventListener('change', ()=>{ state.author = selAuthor.value; render(); check('author'); });
+  selStatus.addEventListener('change', ()=>{ state.status = selStatus.value; render(); check('status'); });
+  document.getElementById('libReset').addEventListener('click', ()=>{ resetFilters(); state.sort=''; render(); });
+
+  /* форма додавання */
+  const fTitle = document.getElementById('fTitle'), fAuthor = document.getElementById('fAuthor'), fYear = document.getElementById('fYear');
+  const opt = (arr)=>'<option value="">—</option>' + arr.map(v=>`<option>${v}</option>`).join('');
+  fTitle.innerHTML = opt(['Тигролови', 'Сад Гетсиманський', 'Тигри']);
+  fAuthor.innerHTML = opt(['Іван Багряний', 'Іван Франко', 'Леся Українка']);
+  fYear.innerHTML = opt([1944, 1950, 1994]);
+  document.getElementById('libAddBtn').addEventListener('click', ()=>{
+    form.classList.add('show'); report.classList.remove('show');
+    fTitle.value=''; fAuthor.value=''; fYear.value='';
+  });
+  document.getElementById('fCancel').addEventListener('click', ()=>form.classList.remove('show'));
+  document.getElementById('fSave').addEventListener('click', ()=>{
+    const t = runner.current();
+    if(!fTitle.value || !fAuthor.value || !fYear.value){ runner.say('Заповни всі поля форми.'); return; }
+    if(!t || t.label!=='Додавання'){ runner.say('Нових книжок зараз не надходило.'); return; }
+    if(fTitle.value!=='Тигролови' || fAuthor.value!=='Іван Багряний' || fYear.value!=='1944'){
+      runner.say('Звір дані з завданням — в одному з полів помилка.'); flash(form, 'shake'); return;
+    }
+    const b = { id:nextId++, title:'Тигролови', author:'Іван Багряний', year:1944, status:'На полиці' };
+    books.push(b);
+    form.classList.remove('show');
+    fillAuthors(); render(b.id);
+    runner.complete('Готово ✓ Новий запис з\'явився в базі.');
+  });
+  document.getElementById('libReportBtn').addEventListener('click', ()=>{
+    const on = books.filter(b=>b.status==='На полиці').length;
+    const out = books.length - on;
+    report.innerHTML = `<b>📊 Звіт на ${new Date().toLocaleDateString('uk-UA')}</b><br>На полиці: <b>${on}</b> · У читачів: <b>${out}</b> · Усього в каталозі: <b>${books.length}</b>`;
+    report.classList.add('show'); form.classList.remove('show');
+    check('report');
+  });
+
+  fillAuthors(); render(); runner.render();
+})();
+
+/* ---------- 5. LIMITATIONS ---------- */
+makeClassify('limList', [
+  { text:'Кнопку «Надіслати» на сайті запису до лікаря зробили сірою на сірому тлі в самому низу сторінки — багато пацієнтів так і не відправляють заявку.', correct:0 },
+  { text:'У базі кінотеатру записано тривалість кожного фільму, але на сайті ніде не можна вибрати «фільми до 90 хвилин».', correct:1 },
+  { text:'Бібліотекарка помилково вписала рік видання 2091 — і програма спокійно зберегла книжку «з майбутнього».', correct:2 },
+  { text:'Учень бачить у щоденнику свої оцінки, але виправити жодну не може.', correct:3 },
+  { text:'Програма каси працює лише на старій версії Windows. Після оновлення комп\'ютера магазин не може продавати товари.', correct:4 },
+  { text:'Щоб знайти розклад дзвінків у шкільному застосунку, треба пройти шість вкладених меню.', correct:0 },
+  { text:'Батьки бачать у щоденнику оцінки тільки своєї дитини, а не всього класу.', correct:3 }
+], ['🎨 Дизайн', '🚧 Немає функції', '✍️ Помилка введення', '🔒 Права доступу', '🖥 Техніка']);
+
+/* ---------- 6. SHOP EMULATOR ---------- */
+(function(){
+  const products = [
+    { id:1, emoji:'🎒', name:'Рюкзак «Трек»', type:'Рюкзак', price:850, color:'червоний', stock:4 },
+    { id:2, emoji:'🎒', name:'Рюкзак «Місто»', type:'Рюкзак', price:1200, color:'чорний', stock:7 },
+    { id:3, emoji:'🎒', name:'Рюкзак «Шкільний»', type:'Рюкзак', price:690, color:'червоний', stock:12 },
+    { id:4, emoji:'🎒', name:'Рюкзак «Спорт»', type:'Рюкзак', price:950, color:'синій', stock:3 },
+    { id:5, emoji:'⚽', name:'М\'яч футбольний', type:'М\'яч', price:600, color:'білий', stock:10 },
+    { id:6, emoji:'🏀', name:'М\'яч баскетбольний', type:'М\'яч', price:780, color:'помаранчевий', stock:6 },
+    { id:7, emoji:'🧴', name:'Пляшка для води', type:'Пляшка', price:250, color:'червоний', stock:20 }
+  ];
+  const state = { type:'', max:'', role:'buyer' };
+  const grid = document.getElementById('shopGrid');
+  const selType = document.getElementById('shopType');
+  const selPrice = document.getElementById('shopPrice');
+  const peek = document.getElementById('dbPeek');
+
+  const runner = makeTaskRunner('shopTask', 'shopDone', 'shopStatusLine', [
+    { label:'Пошук за типом і ціною', text:'Знайди всі рюкзаки, дешевші за 1000 грн.' },
+    { label:'Межа інтерфейсу: немає фільтра', text:'Тобі потрібен саме червоний рюкзак. Які рюкзаки червоні?', hint:'Скористайся вітриною нижче, а тоді обери відповідь.',
+      choices:[
+        { text:'«Трек» і «Спорт»', ok:false, msg:'Звідки це відомо? Подивись уважно — чи показує вітрина колір?' },
+        { text:'Усі рюкзаки дешевші за 1000 грн', ok:false, msg:'Ціна нічого не каже про колір.' },
+        { text:'Через цей інтерфейс дізнатися неможливо', ok:true, msg:'Саме так ✓ Фільтра за кольором немає, хоча в базі колір записано.' }
+      ] },
+    { label:'Права доступу', text:'Футбольний м\'яч подешевшав до 550 грн. Зміни його ціну в магазині.', hint:'Кнопки зміни ціни не видно? Подумай, хто в магазині має право змінювати ціни.' }
+  ], 'Інтерфейс показує тільки те, що в нього заклали, і кожному — лише те, що дозволяє його роль.');
+
+  function render(flashId){
+    let list = products.filter(p=>(!state.type || p.type===state.type) && (!state.max || p.price <= +state.max));
+    grid.innerHTML = list.length ? list.map(p=>`<div class="prod${p.id===flashId?' flash':''}" data-id="${p.id}">
+        <div class="pic">${p.emoji}</div><div class="nm">${p.name}</div><div class="pr">${p.price} грн</div>
+        ${state.role==='admin' ? `<select data-id="${p.id}"><option value="">✏️ Змінити ціну…</option>${[p.price-100,p.price-50,p.price+50].map(v=>`<option value="${v}">${v} грн</option>`).join('')}</select>` : ''}
+      </div>`).join('') : '<div class="app-empty">Нічого не знайдено</div>';
+    grid.querySelectorAll('select').forEach(sel=>{
+      sel.addEventListener('change', ()=>{
+        const p = products.find(x=>x.id===+sel.dataset.id);
+        const v = +sel.value;
+        if(!v) return;
+        const t = runner.current();
+        if(t && t.label==='Права доступу' && p.id===5){
+          if(v===550){ p.price = 550; render(p.id); runner.complete('Готово ✓ Змінювати ціни може лише адміністратор — покупцеві ця кнопка недоступна.'); }
+          else { sel.value=''; runner.say('Нова ціна має бути 550 грн.'); }
+        } else {
+          sel.value=''; runner.say(t && t.label==='Права доступу' ? 'Це не той товар.' : 'Ціни зараз змінювати не потрібно.');
+        }
+      });
+    });
+    renderPeek();
+  }
+  function renderPeek(){
+    document.getElementById('peekTable').innerHTML = `<tr><th>ID</th><th>Назва</th><th>Тип</th><th>Ціна</th><th class="hl">Колір</th><th>На складі</th></tr>` +
+      products.map(p=>`<tr><td>${p.id}</td><td>${p.name}</td><td>${p.type}</td><td>${p.price}</td><td class="hl">${p.color}</td><td>${p.stock}</td></tr>`).join('');
+  }
+  function check(){
+    const t = runner.current();
+    if(t && t.label==='Пошук за типом і ціною'){
+      if(state.type==='Рюкзак' && state.max==='1000') runner.complete('Готово ✓ Знайшлося три рюкзаки — фільтри за типом і ціною в цьому інтерфейсі є.');
+      else if(state.type==='Рюкзак' && state.max==='500') runner.say('Дешевше за 500 грн рюкзаків немає — а потрібна межа 1000 грн.');
+    }
+  }
+  selType.addEventListener('change', ()=>{ state.type = selType.value; render(); check(); });
+  selPrice.addEventListener('change', ()=>{ state.max = selPrice.value; render(); check(); });
+  document.querySelectorAll('#roleSwitch button').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      state.role = btn.dataset.role;
+      document.querySelectorAll('#roleSwitch button').forEach(b=>b.classList.toggle('active', b===btn));
+      render();
+      const t = runner.current();
+      if(state.role==='admin' && t && t.label!=='Права доступу') runner.say('Адміністратор бачить кнопки зміни цін — але для цього завдання вони не потрібні.');
+      if(state.role==='admin' && t && t.label==='Права доступу') runner.say('Тепер біля кожного товару є кнопка зміни ціни.');
+    });
+  });
+  runner.onChange = ()=>{
+    const t = runner.current();
+    if(t && t.label==='Права доступу') peek.classList.add('show');
+  };
+  render(); runner.render();
+})();
+
+/* ---------- 7. FIND THE PROBLEMS ---------- */
+(function(){
+  const spots = document.querySelectorAll('.spot');
+  const total = document.querySelectorAll('.spot[data-real]').length;
+  const fb = document.getElementById('spotFb');
+  const status = document.getElementById('spotStatus');
+  let found = 0;
+  spots.forEach(s=>{
+    s.addEventListener('click', ()=>{
+      if(s.dataset.real){
+        if(s.classList.contains('found')) return;
+        s.classList.add('found');
+        found++;
+        addNeurons(1);
+        fb.innerHTML = `<b>Проблема ✓</b> ${s.dataset.why}`;
+        status.textContent = `Знайдено: ${found} з ${total}`;
+        if(found === total){
+          addNeurons(2);
+          status.textContent = 'Усі проблеми знайдено ✓ Зрозумілі назви, підказки й помітна головна кнопка — половина успіху бази даних.';
+        }
+      } else {
+        flash(s, 'wrong-try');
+        s.classList.add('ok-seen');
+        fb.innerHTML = `<b>Тут усе гаразд.</b> ${s.dataset.ok}`;
+      }
+    });
+  });
+})();
+
+/* ---------- FINAL QUIZ ---------- */
+const questions = [
+  { q: "Що таке інтерфейс бази даних?", opts: ["Спосіб, яким людина працює з даними бази, не знаючи її внутрішньої будови", "Найбільша таблиця в базі даних", "Мова програмування для створення баз"], correct: 0 },
+  { q: "Ти замовляєш таксі в застосунку на смартфоні. Який це вид інтерфейсу бази даних?", opts: ["Програма на комп'ютері", "Вебінтерфейс", "Мобільний інтерфейс"], correct: 2 },
+  { q: "У каталозі лишити на екрані лише книжки, які зараз на полиці, — це…", opts: ["Сортування", "Фільтрація", "Видалення"], correct: 1 },
+  { q: "Директор хоче побачити, скільки учнів кожного класу відвідують гуртки. Яка можливість інтерфейсу допоможе?", opts: ["Звіт", "Редагування", "Додавання"], correct: 0 },
+  { q: "У базі магазину є поле «Колір», але на сайті немає такого фільтра. Чому покупець не може знайти всі червоні рюкзаки?", opts: ["У базі немає даних про колір", "Інтерфейс уміє лише те, що в нього заклали розробники", "Покупцеві треба оновити браузер"], correct: 1 },
+  { q: "Учень не може змінити свою оцінку в електронному щоденнику. Яке це обмеження?", opts: ["Технічне обмеження", "Права доступу", "Поганий дизайн"], correct: 1 },
+  { q: "Що допоможе уникнути помилок під час введення даних у форму?", opts: ["Спадні списки й підказки, у якому вигляді вводити дані", "Дрібний блідий текст інструкції", "Поля з назвами «Поле 1», «Поле 2»"], correct: 0 },
+  { q: "Що НЕ може зробити бібліотекарка через звичайний інтерфейс бібліотеки?", opts: ["Знайти книжку за автором", "Відмітити, що книжку видано", "Додати в базу нове поле «Жанр»"], correct: 2 }
+];
+let qi=0, currentAnswered=false;
+const quizQ = document.getElementById('quizQ');
+const quizOptions = document.getElementById('quizOptions');
+const quizProgress = document.getElementById('quizProgress');
+const btnNext = document.getElementById('btnNext');
+const quizBox = document.getElementById('quizBox');
+const completion = document.getElementById('completion');
+const totalNeuronsEl = document.getElementById('totalNeurons');
+
+function renderQuestion(){
+  currentAnswered=false; btnNext.classList.remove('active');
+  const item = questions[qi];
+  quizProgress.textContent = `Запитання ${qi+1} з ${questions.length}`;
+  quizQ.textContent = item.q;
+  quizOptions.innerHTML='';
+  item.opts.forEach((opt,i)=>{
+    const b=document.createElement('button'); b.className='quiz-opt'; b.textContent=opt;
+    b.addEventListener('click', ()=>{
+      if(currentAnswered) return; currentAnswered=true;
+      const all = quizOptions.querySelectorAll('.quiz-opt');
+      all.forEach((ob,oi)=>{ if(oi===item.correct) ob.classList.add('correct'); else if(oi===i) ob.classList.add('wrong'); });
+      if(i===item.correct) addNeurons(2);
+      btnNext.classList.add('active');
+      btnNext.textContent = (qi===questions.length-1) ? 'Завершити' : 'Далі';
+    });
+    quizOptions.appendChild(b);
+  });
+}
+btnNext.addEventListener('click', ()=>{
+  if(!btnNext.classList.contains('active')) return;
+  qi++;
+  if(qi<questions.length){ renderQuestion(); }
+  else {
+    quizBox.style.display='none';
+    completion.classList.add('show');
+    addNeurons(3);
+    totalNeuronsEl.textContent = neurons;
+  }
+});
+renderQuestion();
+</script>
+
+</body>
+</html>
