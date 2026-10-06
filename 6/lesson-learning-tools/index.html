@@ -72,6 +72,8 @@
   /* SORT BOARD */
   .baskets{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px;}
   .baskets.two{grid-template-columns:repeat(2,1fr);}
+  .baskets.three{grid-template-columns:repeat(3,1fr);}
+  @media (max-width:600px){ .baskets.three{grid-template-columns:repeat(2,1fr);} }
   @media (max-width:520px){ .baskets.two{grid-template-columns:1fr;} }
   .basket{background:var(--bg); border:2px dashed var(--line); border-radius:var(--radius-m); padding:12px; min-height:120px; cursor:pointer; transition:border-color .15s ease, background .15s ease;}
   .basket:hover{border-color:var(--accent);}
@@ -233,12 +235,13 @@
       <li>зберігати файли й фото;</li>
       <li>спілкуватися з учителями та однокласниками;</li>
       <li>планувати свій час;</li>
-      <li>створювати власні роботи.</li>
+      <li>навчатися;</li>
+      <li>працювати над проєктами.</li>
     </ul>
     <p class="soft">Обери інструмент, потім клацни на мету, для якої він найкраще підходить.</p>
     <div class="exercise">
       <div class="tool-pool" id="pnsPool"></div>
-      <div class="baskets" id="pnsBaskets"></div>
+      <div class="baskets three" id="pnsBaskets"></div>
       <div class="progress-line" id="pnsProgress"></div>
     </div>
     <div class="note">Не лише сервіси Google: словник, онлайн-тренажер з англійської, Вікіпедія чи шкільний розклад у телефоні — теж частина твого середовища.</div>
@@ -482,7 +485,8 @@ makeSortBoard('pnsPool', 'pnsBaskets', 'pnsProgress', [
   { id:'keep', ico:'🗂️', name:'Зберігаю файли' },
   { id:'talk', ico:'💬', name:'Спілкуюся' },
   { id:'plan', ico:'🗓️', name:'Планую час' },
-  { id:'make', ico:'🎨', name:'Створюю роботи' }
+  { id:'train', ico:'🏋️', name:'Навчаюся' },
+  { id:'make', ico:'🎨', name:'Працюю над проєктами' }
 ], [
   { name:'🌐 Пошуковик Google', basket:'find' },
   { name:'📚 Вікіпедія', basket:'find' },
@@ -492,6 +496,8 @@ makeSortBoard('pnsPool', 'pnsBaskets', 'pnsProgress', [
   { name:'🎥 Google Meet', basket:'talk' },
   { name:'📅 Google Календар', basket:'plan' },
   { name:'✅ Список справ Google Tasks', basket:'plan' },
+  { name:'🦉 Duolingo', basket:'train' },
+  { name:'⌨️ Клавіатурний тренажер', basket:'train' },
   { name:'📝 Google Документи', basket:'make' },
   { name:'📊 Google Презентації', basket:'make' }
 ], 'Портфель зібрано ✓ Саме з таких інструментів і складається персональне навчальне середовище.');
