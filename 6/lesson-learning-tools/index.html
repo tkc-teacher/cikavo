@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Мої інструменти для навчання — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
+    --purple:#6C5CE7; --purple-dark:#5340c9; --teal:#16A3A0; --coral:#FF6B4A; --yellow:#FFC93C; --pink:#FF5D9E; --blue:#2D9CDB;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+    /* акцентна гама уроку: небесно-сонячна */
+    --accent:#2B7BD6; --accent-dark:#1C5AA6; --accent-light:#E5F0FC; --sun:#EE9330; --sun-light:#FFF2E0;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  .container{max-width:800px; margin:0 auto; padding:0 24px;}
+
+  .hud{position:sticky; top:0; z-index:50; background:rgba(246,245,251,.9); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
+  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--sun),var(--accent)); transition:width .3s ease;}
+  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:800px; margin:0 auto;}
+  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
+  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
+  .neuron-counter svg{width:24px;height:24px;}
+  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
+  #neuronCount.pop{transform:scale(1.35);}
+
+  .hero{padding:52px 24px 40px;}
+  .hero-inner{max-width:800px; margin:0 auto; display:flex; align-items:center; gap:30px;}
+  .hero-text{flex:1;}
+  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--sun); margin-bottom:10px;}
+  .hero h1{font-size:32px; line-height:1.18; margin-bottom:12px;}
+  .hero p{color:var(--ink-soft); font-size:16.5px; max-width:52ch; margin-bottom:22px;}
+  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--accent); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
+  .btn-primary:hover{background:var(--accent-dark);}
+  .btn-primary:active{transform:scale(.97);}
+  .btn-primary:disabled{opacity:.4; cursor:default;}
+  .mascot{width:140px; height:140px; flex-shrink:0;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:100px; height:100px;} }
+
+  .part-title{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:14px; letter-spacing:.06em; text-transform:uppercase; color:var(--accent-dark); background:var(--accent-light); display:inline-block; padding:6px 14px; border-radius:999px; margin:30px 0 4px;}
+
+  section.block{padding:38px 0; border-top:1px solid var(--line);}
+  .step-label{font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:600; color:var(--sun); margin-bottom:8px;}
+  .block h2{font-size:21px; margin-bottom:10px; max-width:38ch;}
+  .block p{max-width:66ch; font-size:16px; margin:0 0 14px; color:var(--ink);}
+  .block p.soft{color:var(--ink-soft); font-size:15px;}
+  .block ul{margin:0 0 14px; padding-left:22px; max-width:66ch;}
+  .block li{margin-bottom:4px;}
+  .note{background:#EAF5FC; border-left:4px solid var(--blue); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; color:#2A6B8C; margin:16px 0;}
+  .trivia{background:var(--sun-light); border-left:4px solid var(--sun); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; color:#8A4F12; margin:16px 0;}
+
+  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:22px; margin-top:18px;}
+  .progress-line{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--accent-dark); margin-top:14px; min-height:1.4em;}
+  @keyframes shake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
+  .shake{animation:shake .35s ease;}
+
+  /* CHIPS (спільні для сортування й підписування) */
+  .tool-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:14px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:16px; min-height:58px;}
+  .tool-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:8px 14px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .tool-chip:hover{transform:translateY(-2px);}
+  .tool-chip.selected{border-color:var(--accent); box-shadow:0 0 0 3px rgba(43,123,214,.2);}
+  .tool-chip.placed{display:none;}
+
+  /* SORT BOARD */
+  .baskets{display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:10px;}
+  .baskets.two{grid-template-columns:repeat(2,1fr);}
+  @media (max-width:520px){ .baskets.two{grid-template-columns:1fr;} }
+  .basket{background:var(--bg); border:2px dashed var(--line); border-radius:var(--radius-m); padding:12px; min-height:120px; cursor:pointer; transition:border-color .15s ease, background .15s ease;}
+  .basket:hover{border-color:var(--accent);}
+  .basket-head{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14.5px; text-align:center; margin-bottom:8px;}
+  .basket-head .ico{display:block; font-size:24px; line-height:1.2;}
+  .basket-items{display:flex; flex-direction:column; gap:6px;}
+  .basket-item{font-size:13px; font-weight:700; background:var(--surface); border:1.5px solid var(--accent); border-radius:var(--radius-s); padding:5px 9px; text-align:center;}
+  .basket.pros .basket-item{border-color:#3FAE58;}
+  .basket.cons .basket-item{border-color:var(--sun);}
+
+  /* CLASSIFY */
+  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:16px 18px; margin:12px 0;}
+  .classify-card p.q{font-weight:700; margin:0 0 10px; font-size:15px;}
+  .choice-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; padding:8px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; text-align:left; transition:background .15s ease, border-color .15s ease, color .15s ease;}
+  .choice-btn:hover{border-color:var(--accent);}
+  .choice-btn.correct{background:#E4F8E6; border-color:#3FAE58; color:#256B36;}
+  .choice-btn.wrong{background:#FDE6E1; border-color:var(--coral); color:#B8412A;}
+  .choice-feedback{margin-top:8px; font-size:13.5px; color:var(--ink-soft); min-height:1.2em;}
+
+  /* CLOUD FLOW */
+  .flow{position:relative; height:150px; margin:6px 0 4px;}
+  .flow-line{position:absolute; left:10%; right:10%; top:46px; border-top:3px dashed var(--line);}
+  .flow-node{position:absolute; top:0; width:92px; margin-left:-46px; text-align:center;}
+  .flow-node .ico{width:92px; height:92px; border-radius:50%; background:var(--bg); border:2.5px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:38px; transition:border-color .3s ease, background .3s ease;}
+  .flow-node.lit .ico{border-color:var(--accent); background:var(--accent-light);}
+  .flow-node .lbl{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; line-height:1.25; margin-top:6px; color:var(--ink-soft);}
+  .flow-marker{position:absolute; top:32px; left:10%; width:30px; height:30px; margin-left:-15px; border-radius:8px; background:var(--sun); color:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; box-shadow:0 3px 10px rgba(238,147,48,.45); opacity:0; transition:left 1.4s ease-in-out, opacity .3s ease;}
+  .flow-marker.show{opacity:1;}
+  .flow-state{background:var(--bg); border-radius:var(--radius-m); padding:12px 16px; font-size:14.5px; min-height:3.4em; margin:6px 0 14px;}
+  .flow-actions{text-align:center;}
+
+  /* CLASSROOM EMULATOR */
+  .mission{display:flex; gap:12px; align-items:flex-start; background:var(--sun-light); border-radius:var(--radius-m); padding:12px 16px; margin-bottom:14px;}
+  .mission .num{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:13px; color:#fff; background:var(--sun); border-radius:999px; padding:2px 10px; white-space:nowrap; margin-top:2px;}
+  .mission .txt{font-weight:700; font-size:15px;}
+  .cr{border:1.5px solid var(--line); border-radius:var(--radius-m); overflow:hidden; background:var(--surface);}
+  .cr-top{display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:1px solid var(--line); font-size:14px; color:var(--ink-soft);}
+  .cr-top b{color:var(--ink); font-family:'Baloo 2',sans-serif; font-size:15px;}
+  .cr-logo{width:26px; height:26px; border-radius:6px; background:#1E8E3E; display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px;}
+  .cr-tabs{display:flex; justify-content:center; gap:4px; border-bottom:1px solid var(--line);}
+  .cr-tab{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:14px; background:none; border:none; border-bottom:3px solid transparent; padding:10px 16px; cursor:pointer; color:var(--ink-soft);}
+  .cr-tab:hover{background:var(--bg);}
+  .cr-tab.on{color:#1E8E3E; border-bottom-color:#1E8E3E;}
+  .cr-body{padding:16px; min-height:190px; background:#FAFAFD;}
+  .cr-banner{background:linear-gradient(120deg,#1E8E3E,#34A853); color:#fff; border-radius:var(--radius-s); padding:16px; margin-bottom:12px;}
+  .cr-banner b{font-family:'Baloo 2',sans-serif; font-size:20px; display:block;}
+  .cr-post{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-s); padding:10px 14px; margin-bottom:8px; font-size:14px;}
+  .cr-post .who{font-size:12.5px; color:var(--ink-soft);}
+  .cr-row{display:flex; justify-content:space-between; gap:10px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-s); padding:10px 14px; margin-bottom:8px; font-size:14px;}
+  .cr-row .due{color:var(--ink-soft); font-size:13px; white-space:nowrap;}
+  .cr-h{font-family:'Baloo 2',sans-serif; font-weight:700; color:#1E8E3E; border-bottom:1px solid #1E8E3E; padding-bottom:4px; margin:4px 0 8px; font-size:15px;}
+  .cr-person{padding:6px 2px; font-size:14px; display:flex; align-items:center; gap:10px;}
+  .cr-ava{width:26px; height:26px; border-radius:50%; color:#fff; font-size:12px; font-weight:800; display:flex; align-items:center; justify-content:center;}
+  .cr-hint{color:var(--ink-soft); font-size:14px; text-align:center; padding-top:50px;}
+
+  /* LABEL THE TASK */
+  .task-card{background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:16px 18px; font-size:14.5px; line-height:1.9;}
+  .task-card .ttl{font-family:'Baloo 2',sans-serif; font-size:19px; font-weight:700;}
+  .task-card .meta{display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; border-bottom:1px solid var(--line); padding-bottom:8px; margin-bottom:8px; font-size:13.5px;}
+  .task-card .your{margin-top:10px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-s); padding:10px 14px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px;}
+  .zone{display:inline; cursor:pointer; border-bottom:2px dotted var(--sun); padding:1px 2px; border-radius:4px; transition:background .15s ease;}
+  .zone:hover{background:var(--sun-light);}
+  .zone.done{border-bottom:2px solid var(--accent); background:var(--accent-light); cursor:default;}
+  .zone .ztag{display:inline-block; font-family:'Baloo 2',sans-serif; font-size:11px; font-weight:700; color:#fff; background:var(--accent); border-radius:999px; padding:0 8px; margin-left:6px; vertical-align:1px; line-height:1.6;}
+  .zone.wrong-try{background:#FDE6E1;}
+
+  /* SEQUENCE */
+  .seq-done{list-style:none; padding:0; margin:0 0 12px; counter-reset:seq;}
+  .seq-done li{counter-increment:seq; display:flex; align-items:center; gap:10px; background:var(--accent-light); border:1.5px solid var(--accent); border-radius:var(--radius-s); padding:9px 12px; margin-bottom:8px; font-weight:700; font-size:14.5px;}
+  .seq-done li::before{content:counter(seq); flex-shrink:0; width:26px; height:26px; border-radius:50%; background:var(--accent); color:#fff; font-family:'Baloo 2',sans-serif; display:flex; align-items:center; justify-content:center; font-size:14px;}
+  .seq-q{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; margin-bottom:10px;}
+  .seq-q b{color:var(--sun);}
+  .seq-opts{display:flex; flex-direction:column; gap:8px;}
+  .seq-opts .choice-btn{border-radius:var(--radius-s);}
+
+  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:26px 24px; margin-top:18px;}
+  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:13px; color:var(--ink-soft); margin-bottom:10px;}
+  .quiz-q{font-size:17px; font-weight:700; margin-bottom:16px;}
+  .quiz-options{display:flex; flex-direction:column; gap:10px;}
+  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:15px; font-weight:600; padding:12px 15px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .quiz-opt:hover{border-color:var(--accent);}
+  .quiz-opt.correct{background:#E4F8E6; border-color:#3FAE58;}
+  .quiz-opt.wrong{background:#FDE6E1; border-color:var(--coral);}
+  .quiz-nav{display:flex; justify-content:flex-end; margin-top:18px;}
+  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:11px 22px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
+  .btn-next.active{opacity:1; pointer-events:auto;}
+
+  .completion{display:none; text-align:center; padding:20px 10px 10px;}
+  .completion.show{display:block;}
+  .badge{width:90px; height:90px; margin:0 auto 16px;}
+  .completion h3{font-size:22px; margin-bottom:10px;}
+  .completion p{color:var(--ink-soft); max-width:50ch; margin:0 auto 18px; font-size:15px;}
+  .completion .total{font-family:'Baloo 2',sans-serif; font-size:30px; color:var(--purple-dark);}
+
+  footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
+  <div class="hud-row">
+    <span class="hud-title">6 клас · Інструменти для навчання</span>
+    <div class="neuron-counter">
+      <svg viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
+        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#E0A800" opacity="0.6"/>
+      </svg>
+      <span id="neuronCount">0</span>
+    </div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Спільна робота з документами</div>
+      <h1>Мої інструменти для навчання</h1>
+      <p>Підручник, зошит і ручка — уже не всі твої шкільні інструменти. Розберемося, з чого складається твій цифровий «портфель», що таке «хмара» і як упевнено вчитися в Google Classroom.</p>
+      <button class="btn-primary" onclick="document.getElementById('step1').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 160 160" fill="none">
+      <circle cx="80" cy="80" r="64" fill="#E5F0FC"/>
+      <circle cx="122" cy="36" r="13" fill="#EE9330"/>
+      <g stroke="#EE9330" stroke-width="3" stroke-linecap="round">
+        <line x1="122" y1="14" x2="122" y2="18"/><line x1="144" y1="36" x2="140" y2="36"/><line x1="138" y1="20" x2="135" y2="23"/>
+      </g>
+      <path d="M44 96 Q28 96 28 80 Q28 64 46 64 Q50 44 72 44 Q92 44 98 60 Q118 58 120 78 Q122 96 104 96 Z" fill="#fff" stroke="#2B7BD6" stroke-width="4" stroke-linejoin="round"/>
+      <circle cx="62" cy="76" r="4.5" fill="#1B1B3A"/><circle cx="90" cy="76" r="4.5" fill="#1B1B3A"/>
+      <circle cx="54" cy="85" r="4" fill="#FFB3A1" opacity=".8"/><circle cx="98" cy="85" r="4" fill="#FFB3A1" opacity=".8"/>
+      <path d="M68 86 Q76 93 84 86" stroke="#1B1B3A" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <rect x="52" y="104" width="56" height="34" rx="5" fill="#2B7BD6"/>
+      <rect x="57" y="109" width="46" height="24" rx="2" fill="#E5F0FC"/>
+      <rect x="62" y="114" width="22" height="3" rx="1.5" fill="#2B7BD6"/>
+      <rect x="62" y="120" width="34" height="3" rx="1.5" fill="#9CC3EE"/>
+      <rect x="62" y="126" width="28" height="3" rx="1.5" fill="#9CC3EE"/>
+      <line x1="80" y1="96" x2="80" y2="104" stroke="#2B7BD6" stroke-width="3" stroke-dasharray="2 3"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <div class="part-title">Частина 1 · Мій навчальний портфель</div>
+
+  <section class="block" id="step1" style="border-top:none;">
+    <div class="step-label">Крок 1 · Персональне навчальне середовище</div>
+    <h2>Для чого мені кожен інструмент?</h2>
+    <p><b>Персональне навчальне середовище</b> — це набір сервісів, програм і ресурсів, які ти сам обираєш і використовуєш для навчання. У кожного воно своє.</p>
+    <p>Інструменти в ньому допомагають:</p>
+    <ul>
+      <li>шукати нову інформацію;</li>
+      <li>зберігати файли й фото;</li>
+      <li>спілкуватися з учителями та однокласниками;</li>
+      <li>планувати свій час;</li>
+      <li>створювати власні роботи.</li>
+    </ul>
+    <p class="soft">Обери інструмент, потім клацни на мету, для якої він найкраще підходить.</p>
+    <div class="exercise">
+      <div class="tool-pool" id="pnsPool"></div>
+      <div class="baskets" id="pnsBaskets"></div>
+      <div class="progress-line" id="pnsProgress"></div>
+    </div>
+    <div class="note">Не лише сервіси Google: словник, онлайн-тренажер з англійської, Вікіпедія чи шкільний розклад у телефоні — теж частина твого середовища.</div>
+  </section>
+
+  <div class="part-title">Частина 2 · Що таке «хмара»</div>
+
+  <section class="block" style="border-top:none;">
+    <div class="step-label">Крок 2 · Хмарні сервіси</div>
+    <h2>Де насправді живе твій файл?</h2>
+    <p><b>Хмарний сервіс</b> — це програма чи сховище, що працює на потужних комп'ютерах-<b>серверах</b> десь далеко, а ти користуєшся ним через інтернет.</p>
+    <ul>
+      <li>Нічого не треба встановлювати — вистачить браузера або застосунку.</li>
+      <li>Файли лежать на сервері, тож відкрити їх можна з будь-якого пристрою.</li>
+      <li>Щоб дістатися саме своїх файлів, потрібен обліковий запис (акаунт).</li>
+    </ul>
+    <p class="soft">Запусти анімацію й подивись, як конспект «подорожує» зі школи додому.</p>
+    <div class="exercise">
+      <div class="flow" id="flow">
+        <div class="flow-line"></div>
+        <div class="flow-node" style="left:10%;"><div class="ico">📱</div><div class="lbl">Телефон<br>у школі</div></div>
+        <div class="flow-node" style="left:50%;"><div class="ico">☁️</div><div class="lbl">Сервер<br>Google</div></div>
+        <div class="flow-node" style="left:90%;"><div class="ico">💻</div><div class="lbl">Ноутбук<br>удома</div></div>
+        <div class="flow-marker" id="flowMarker">📄</div>
+      </div>
+      <div class="flow-state" id="flowState">Ти на перерві записуєш конспект у Google Документах на телефоні…</div>
+      <div class="flow-actions"><button class="btn-primary" id="flowBtn">Запустити ▶</button></div>
+    </div>
+
+    <p style="margin-top:26px;"><b>А тепер перевір себе.</b> У якій ситуації файл чи програма працює через сервер в інтернеті, а в якій — лише на самому пристрої?</p>
+    <div id="cloudList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Плюси й мінуси</div>
+    <h2>Хмара: зручно, але з умовами</h2>
+    <p>Хмарні сервіси дуже полегшують навчання, але мають і свої обмеження. Знати їх треба, щоб не опинитися без доступу до роботи в найважливіший момент.</p>
+    <p class="soft">Розклади твердження на дві групи.</p>
+    <div class="exercise">
+      <div class="tool-pool" id="prosPool"></div>
+      <div class="baskets two" id="prosBaskets"></div>
+      <div class="progress-line" id="prosProgress"></div>
+    </div>
+  </section>
+
+  <div class="part-title">Частина 3 · Google Classroom</div>
+
+  <section class="block" style="border-top:none;">
+    <div class="step-label">Крок 4 · Будова курсу</div>
+    <h2>Мандрівка вкладками курсу</h2>
+    <p><b>Google Classroom</b> (Google Клас) — безкоштовний хмарний сервіс для навчання. У ньому вчитель:</p>
+    <ul>
+      <li>створює класи й курси;</li>
+      <li>публікує завдання та навчальні матеріали;</li>
+      <li>перевіряє, оцінює й коментує роботи;</li>
+      <li>спілкується з учнями.</li>
+    </ul>
+    <p>Щоб приєднатися до курсу, введи код від учителя або прийми запрошення. У кожному курсі є три вкладки:</p>
+    <ul>
+      <li><b>Стрічка</b> — свіжі оголошення, матеріали й коментарі;</li>
+      <li><b>Завдання</b> — усі роботи курсу з термінами виконання;</li>
+      <li><b>Люди</b> — учитель і всі учні, що приєдналися.</li>
+    </ul>
+    <p class="soft">Виконай місії: клацни ту вкладку, де шукатимеш відповідь.</p>
+    <div class="exercise">
+      <div class="mission"><span class="num" id="missionNum">Місія 1 з 4</span><span class="txt" id="missionTxt"></span></div>
+      <div class="cr" id="cr">
+        <div class="cr-top"><span class="cr-logo">🎓</span><b>Інформатика · 6 клас</b></div>
+        <div class="cr-tabs">
+          <button class="cr-tab" data-tab="feed">Стрічка</button>
+          <button class="cr-tab" data-tab="work">Завдання</button>
+          <button class="cr-tab" data-tab="people">Люди</button>
+        </div>
+        <div class="cr-body" id="crBody"><div class="cr-hint">Обери вкладку ↑</div></div>
+      </div>
+      <div class="progress-line" id="missionProgress"></div>
+    </div>
+    <div class="trivia">Входь тільки у <b>свій</b> акаунт. Якщо на шкільному комп'ютері вже відкрито чужий — вийди з нього. Інакше твою роботу «здасть» інша людина, а вчитель її не побачить.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Коментарі</div>
+    <h2>Кому адресоване повідомлення?</h2>
+    <p>Під кожним завданням можна написати два види коментарів:</p>
+    <ul>
+      <li><b>Приватний коментар</b> — бачать лише ти й учитель;</li>
+      <li><b>Коментар до курсу</b> — бачать усі учасники курсу.</li>
+    </ul>
+    <p class="soft">Обери, куди краще написати в кожній ситуації.</p>
+    <div id="commentList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Читаємо завдання</div>
+    <h2>Що є на сторінці завдання?</h2>
+    <p>Перш ніж братися до роботи, уважно прочитай сторінку завдання: там є все, щоб не помилитися з умовою й не запізнитися.</p>
+    <p class="soft">Обери підпис, потім клацни на відповідну частину сторінки.</p>
+    <div class="exercise">
+      <div class="tool-pool" id="taskPool"></div>
+      <div class="task-card" id="taskCard">
+        <div class="ttl">Мої хмарні помічники</div>
+        <div class="meta">
+          <span><span class="zone" data-part="Автор завдання">Ткачук Ігор Антонович</span> · 7 жовт.</span>
+          <span><span class="zone" data-part="Найвища оцінка">12 балів</span> &nbsp; <span class="zone" data-part="До коли виконати">Дата здачі: 14 жовт.</span></span>
+        </div>
+        <div><span class="zone" data-part="Умова">Склади список із 5 онлайн-сервісів, якими ти користуєшся для навчання, і напиши, для чого кожен.</span></div>
+        <div class="your">
+          <span>Ваша робота · <span class="zone" data-part="Стан роботи">Призначено</span></span>
+          <span class="zone" data-part="Прикріпити свою роботу">＋ Додати або створити</span>
+        </div>
+        <div style="margin-top:8px;">👤 <span class="zone" data-part="Написати лише вчителю">Приватні коментарі</span></div>
+      </div>
+      <div class="progress-line" id="taskProgress">Підписано: 0 з 7</div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 7 · Здаємо роботу</div>
+    <h2>Від входу до «Здати»</h2>
+    <p>Відповідь можна прикріпити по-різному: файл з комп'ютера, файл з Google Диска, посилання або новий Google Документ, створений просто в завданні.</p>
+    <p class="soft">Збери правильний порядок дій — по одному кроку.</p>
+    <div class="exercise">
+      <ol class="seq-done" id="seqDone"></ol>
+      <div class="seq-q" id="seqQ"></div>
+      <div class="seq-opts" id="seqOpts"></div>
+      <div class="choice-feedback" id="seqFb"></div>
+    </div>
+    <div class="note">Якщо завдання не потребує файлу (наприклад, переглянути відео), натисни <b>«Позначити як виконане»</b>. Так учитель знатиме, що ти опрацював матеріал.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 8 · Самоорганізація</div>
+    <h2>Корисна звичка чи пастка?</h2>
+    <p>Кажуть, що дистанційне навчання вчить дисципліни й планування. Ніхто не нагадуватиме двічі — тож стежити за термінами доведеться самому.</p>
+    <p class="soft">Оціни кожну звичку.</p>
+    <div id="habitList"></div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div class="quiz-box" id="quizBox">
+      <div class="quiz-progress" id="quizProgress">Запитання 1 з 8</div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
+    </div>
+    <div class="completion" id="completion">
+      <svg class="badge" viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#6C5CE7"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#6C5CE7"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#6C5CE7"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#6C5CE7"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#6C5CE7"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#6C5CE7"/>
+        <circle cx="12" cy="12" r="4.4" fill="#6C5CE7"/><circle cx="12" cy="12" r="1.6" fill="#3F2FB0" opacity="0.6"/>
+      </svg>
+      <h3>Твій навчальний портфель зібрано!</h3>
+      <p>Ти знаєш, з чого складається персональне навчальне середовище, як працюють хмарні сервіси та їхні обмеження, і вмієш знайти, прочитати й здати завдання в Google Classroom.</p>
+      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Урок · «Мої інструменти для навчання. Персональне навчальне середовище та хмарні сервіси» · 6 клас</footer>
+
+<script>
+const STORAGE_KEY = "lesson6-learning-tools-neurons";
+let neurons = 0;
+const neuronEl = document.getElementById('neuronCount');
+const hudFill = document.getElementById('hudFill');
+
+function addNeurons(n){
+  neurons += n;
+  neuronEl.textContent = neurons;
+  neuronEl.classList.add('pop');
+  setTimeout(()=>neuronEl.classList.remove('pop'), 250);
+  saveProgress();
+}
+async function saveProgress(){
+  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
+}
+async function loadProgress(){
+  try{
+    const res = await window.storage?.get(STORAGE_KEY, false);
+    if(res?.value){ const d = JSON.parse(res.value); if(typeof d.neurons==='number'){ neurons=d.neurons; neuronEl.textContent=neurons; } }
+  }catch(e){}
+}
+loadProgress();
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
+});
+
+const shuffle = arr => [...arr].sort(()=>Math.random()-0.5);
+function shakeEl(el){ el.classList.add('shake'); setTimeout(()=>el.classList.remove('shake'), 350); }
+
+/* ---------- SORT BOARD ---------- */
+function makeSortBoard(poolId, boardId, progressId, baskets, items, doneText){
+  const pool = document.getElementById(poolId);
+  const board = document.getElementById(boardId);
+  const progress = document.getElementById(progressId);
+  let selected = null, placed = 0;
+  const update = ()=>{ progress.textContent = placed === items.length ? doneText : `Розкладено: ${placed} з ${items.length}`; };
+  shuffle(items).forEach(it=>{
+    const chip = document.createElement('div');
+    chip.className = 'tool-chip';
+    chip.textContent = it.name;
+    chip.addEventListener('click', ()=>{
+      pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = { it, chip };
+    });
+    pool.appendChild(chip);
+  });
+  baskets.forEach(b=>{
+    const el = document.createElement('div');
+    el.className = 'basket' + (b.cls ? ' ' + b.cls : '');
+    el.innerHTML = `<div class="basket-head">${b.ico ? `<span class="ico">${b.ico}</span>` : ''}${b.name}</div><div class="basket-items"></div>`;
+    el.addEventListener('click', ()=>{
+      if(!selected) return;
+      if(selected.it.basket === b.id){
+        selected.chip.classList.add('placed');
+        el.querySelector('.basket-items').insertAdjacentHTML('beforeend', `<div class="basket-item">${selected.it.name}</div>`);
+        selected = null;
+        placed++; addNeurons(1);
+        if(placed === items.length){ pool.style.display = 'none'; addNeurons(3); }
+        update();
+      } else shakeEl(el);
+    });
+    board.appendChild(el);
+  });
+  update();
+}
+
+makeSortBoard('pnsPool', 'pnsBaskets', 'pnsProgress', [
+  { id:'find', ico:'🔎', name:'Шукаю інформацію' },
+  { id:'keep', ico:'🗂️', name:'Зберігаю файли' },
+  { id:'talk', ico:'💬', name:'Спілкуюся' },
+  { id:'plan', ico:'🗓️', name:'Планую час' },
+  { id:'make', ico:'🎨', name:'Створюю роботи' }
+], [
+  { name:'🌐 Пошуковик Google', basket:'find' },
+  { name:'📚 Вікіпедія', basket:'find' },
+  { name:'💾 Google Диск', basket:'keep' },
+  { name:'🖼️ Google Фото', basket:'keep' },
+  { name:'✉️ Gmail', basket:'talk' },
+  { name:'🎥 Google Meet', basket:'talk' },
+  { name:'📅 Google Календар', basket:'plan' },
+  { name:'✅ Список справ Google Tasks', basket:'plan' },
+  { name:'📝 Google Документи', basket:'make' },
+  { name:'📊 Google Презентації', basket:'make' }
+], 'Портфель зібрано ✓ Саме з таких інструментів і складається персональне навчальне середовище.');
+
+/* ---------- CLOUD FLOW ---------- */
+(function(){
+  const btn = document.getElementById('flowBtn');
+  const marker = document.getElementById('flowMarker');
+  const state = document.getElementById('flowState');
+  const nodes = document.querySelectorAll('#flow .flow-node');
+  let rewarded = false;
+  const stages = [
+    { at:10, lit:0, text:'Ти на перерві записуєш конспект у Google Документах на телефоні…' },
+    { at:50, lit:1, text:'Кожна зміна автоматично летить через інтернет на сервер Google. Там і зберігається файл — не в пам\'яті телефона.' },
+    { at:90, lit:2, text:'Удома ти входиш у свій акаунт на ноутбуці й відкриваєш той самий конспект. Усі записи на місці — нічого не треба пересилати!' }
+  ];
+  function show(i){
+    marker.style.left = stages[i].at + '%';
+    nodes.forEach((n,ni)=>n.classList.toggle('lit', ni <= stages[i].lit));
+    state.textContent = stages[i].text;
+  }
+  btn.addEventListener('click', ()=>{
+    btn.disabled = true;
+    marker.style.transition = 'none';
+    show(0);
+    marker.offsetWidth;
+    marker.style.transition = '';
+    marker.classList.add('show');
+    setTimeout(()=>show(1), 1600);
+    setTimeout(()=>show(2), 4400);
+    setTimeout(()=>{
+      btn.disabled = false; btn.textContent = 'Ще раз ↻';
+      if(!rewarded){ rewarded = true; addNeurons(1); }
+    }, 6000);
+  });
+})();
+
+/* ---------- CLASSIFY (multi-option) ---------- */
+function makeChoice(containerId, items){
+  const list = document.getElementById(containerId);
+  items.forEach(item=>{
+    const card = document.createElement('div');
+    card.className = 'classify-card';
+    card.innerHTML = `<p class="q">${item.text}</p>
+      <div class="choice-row">${item.opts.map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
+      <div class="choice-feedback"></div>`;
+    list.appendChild(card);
+    const fb = card.querySelector('.choice-feedback');
+    let answered = false;
+    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+      btn.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i === item.correct){
+          btn.classList.add('correct');
+          fb.textContent = 'Правильно ✓' + (item.why ? ' ' + item.why : '');
+          answered = true; addNeurons(1);
+        } else { btn.classList.add('wrong'); fb.textContent = item.hint || 'Спробуй ще раз'; }
+      });
+    });
+  });
+}
+
+const CLOUD = ['☁️ Через сервер в інтернеті', '💽 Лише на пристрої'];
+makeChoice('cloudList', [
+  { text:'Реферат з історії записано на флешку, а флешку ти забув удома.', opts:CLOUD, correct:1,
+    why:'Файл є лише на флешці: немає флешки — немає реферату.' },
+  { text:'Презентацію почали робити на шкільному комп\'ютері в Google Презентаціях, а закінчили вдома.', opts:CLOUD, correct:0,
+    why:'Презентація збережена в акаунті, а не на шкільному комп\'ютері.' },
+  { text:'Гра встановлена на ноутбук і чудово працює, навіть коли вимкнено Wi-Fi.', opts:CLOUD, correct:1,
+    why:'Їй не потрібен сервер — усе потрібне вже є на ноутбуці.' },
+  { text:'У гостях ти відкриваєш свою пошту Gmail з телефона друга, увійшовши у свій акаунт.', opts:CLOUD, correct:0,
+    why:'Листи зберігаються на сервері пошти. Тільки не забудь потім вийти з акаунта!' }
+]);
+
+/* ---------- PROS / CONS ---------- */
+makeSortBoard('prosPool', 'prosBaskets', 'prosProgress', [
+  { id:'pro', ico:'👍', name:'Перевага', cls:'pros' },
+  { id:'con', ico:'⚠️', name:'Обмеження', cls:'cons' }
+], [
+  { name:'Файл відкривається з будь-якого пристрою', basket:'pro' },
+  { name:'Телефон розбився — а файли вціліли', basket:'pro' },
+  { name:'Зміни зберігаються самі, без кнопки «Зберегти»', basket:'pro' },
+  { name:'Над одним документом можна працювати разом', basket:'pro' },
+  { name:'Без інтернету більшість функцій не працює', basket:'con' },
+  { name:'Хто дізнався пароль — бачить усі твої файли', basket:'con' },
+  { name:'Безкоштовне місце має межу', basket:'con' }
+], 'Розкладено ✓ Хмара зручна, але потребує інтернету й надійного пароля.');
+
+/* ---------- CLASSROOM EMULATOR ---------- */
+(function(){
+  const tabs = document.querySelectorAll('#cr .cr-tab');
+  const body = document.getElementById('crBody');
+  const numEl = document.getElementById('missionNum');
+  const txtEl = document.getElementById('missionTxt');
+  const progress = document.getElementById('missionProgress');
+  const views = {
+    feed: `<div class="cr-banner"><b>Інформатика · 6 клас</b>Код курсу: 7kq2fm</div>
+      <div class="cr-post"><div class="who">📢 Ткачук Ігор Антонович · сьогодні</div>Увага! У четвер урок буде не третім, а п'ятим.</div>
+      <div class="cr-post"><div class="who">📘 Новий матеріал · вчора</div>Відео «Що таке хмарні сервіси»</div>`,
+    work: `<div class="cr-h">Тема: Спільна робота з документами</div>
+      <div class="cr-row"><span>📝 Мої хмарні помічники</span><span class="due">до 14 жовт.</span></div>
+      <div class="cr-row"><span>📊 Презентація «Сервіси Google»</span><span class="due">до 21 жовт.</span></div>
+      <div class="cr-row"><span>❓ Тест «Електронна пошта»</span><span class="due">до 9 жовт.</span></div>`,
+    people: `<div class="cr-h">Викладачі</div>
+      <div class="cr-person"><span class="cr-ava" style="background:#1E8E3E">ІТ</span>Ткачук Ігор Антонович</div>
+      <div class="cr-h" style="margin-top:12px;">Однокласники · 4 учні</div>
+      <div class="cr-person"><span class="cr-ava" style="background:#2B7BD6">ОК</span>Оля Коваленко</div>
+      <div class="cr-person"><span class="cr-ava" style="background:#EE9330">МШ</span>Марко Шевчук</div>
+      <div class="cr-person"><span class="cr-ava" style="background:#FF5D9E">ІБ</span>Ірина Бондар</div>
+      <div class="cr-person"><span class="cr-ava" style="background:#6C5CE7">ДЛ</span>Дмитро Лисенко</div>`
+  };
+  const missions = [
+    { tab:'feed', txt:'Друг сказав, що в четвер урок інформатики переносять. Де перевірити, що саме повідомив учитель?', ok:'Так! Оголошення вчителя з\'являються у Стрічці.' },
+    { tab:'people', txt:'Чи вже доєдналася до курсу Оля Коваленко, з якою ви робите спільний проєкт?', ok:'Саме тут — список усіх, хто вже в курсі.' },
+    { tab:'work', txt:'Не пам\'ятаєш, до якого числа треба здати «Мої хмарні помічники».', ok:'Усі роботи й терміни — в одному списку.' },
+    { tab:'people', txt:'Новенька учениця хоче знати, як звати вчителя, що веде цей курс.', ok:'Учитель завжди вгорі списку людей.' }
+  ];
+  let mi = 0, locked = false;
+  function renderMission(){
+    numEl.textContent = `Місія ${mi+1} з ${missions.length}`;
+    txtEl.textContent = missions[mi].txt;
+  }
+  tabs.forEach(t=>{
+    t.addEventListener('click', ()=>{
+      tabs.forEach(x=>x.classList.toggle('on', x===t));
+      body.innerHTML = views[t.dataset.tab];
+      if(locked || mi >= missions.length) return;
+      if(t.dataset.tab === missions[mi].tab){
+        locked = true;
+        progress.textContent = missions[mi].ok;
+        addNeurons(1);
+        setTimeout(()=>{
+          mi++; locked = false;
+          if(mi < missions.length) renderMission();
+          else { numEl.textContent = 'Готово'; txtEl.textContent = 'Усі місії виконано!'; progress.textContent = 'Ти вільно орієнтуєшся в курсі ✓'; addNeurons(2); }
+        }, 1300);
+      } else {
+        shakeEl(document.getElementById('cr'));
+        progress.textContent = 'Тут відповіді немає — спробуй іншу вкладку.';
+      }
+    });
+  });
+  renderMission();
+})();
+
+/* ---------- COMMENTS ---------- */
+const COMM = ['👤 Приватний коментар', '👥 Коментар до курсу'];
+makeChoice('commentList', [
+  { text:'Ти тиждень хворів і хочеш попросити дозволу здати роботу на два дні пізніше.', opts:COMM, correct:0,
+    why:'Це стосується лише тебе й учителя — однокласникам ця інформація ні до чого.' },
+  { text:'У завданні не відкривається посилання на відео. Можливо, проблема не лише в тебе.', opts:COMM, correct:1,
+    why:'Відповідь учителя тут побачать усі, і йому не доведеться пояснювати кожному окремо.' },
+  { text:'Тобі поставили 9 балів, і ти хочеш спитати, що варто було зробити краще.', opts:COMM, correct:0,
+    why:'Оцінки й поради щодо твоєї роботи — розмова сам на сам.' },
+  { text:'Ти не впевнений, чи всі однаково зрозуміли умову: скільки сервісів має бути в списку?', opts:COMM, correct:1,
+    why:'Уточнення умови корисне всьому класу.' }
+]);
+
+/* ---------- LABEL THE TASK ---------- */
+(function(){
+  const pool = document.getElementById('taskPool');
+  const zones = document.querySelectorAll('#taskCard .zone');
+  const progress = document.getElementById('taskProgress');
+  const names = [...zones].map(z=>z.dataset.part);
+  let selected = null, done = 0;
+  shuffle(names).forEach(n=>{
+    const chip = document.createElement('div');
+    chip.className = 'tool-chip';
+    chip.textContent = n;
+    chip.addEventListener('click', ()=>{
+      pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = n;
+    });
+    pool.appendChild(chip);
+  });
+  zones.forEach(z=>{
+    z.addEventListener('click', ()=>{
+      if(z.classList.contains('done') || !selected) return;
+      if(selected === z.dataset.part){
+        z.classList.add('done');
+        z.insertAdjacentHTML('beforeend', `<span class="ztag">${selected}</span>`);
+        [...pool.children].find(c=>c.textContent===selected)?.classList.add('placed');
+        selected = null;
+        addNeurons(1);
+        done++;
+        progress.textContent = `Підписано: ${done} з ${zones.length}`;
+        if(done === zones.length){ pool.style.display = 'none'; progress.textContent = 'Усе підписано ✓ Тепер ти знаєш, що робити, до коли й куди прикріпити відповідь.'; addNeurons(2); }
+      } else {
+        z.classList.add('wrong-try');
+        setTimeout(()=>z.classList.remove('wrong-try'), 400);
+      }
+    });
+  });
+})();
+
+/* ---------- SEQUENCE ---------- */
+function makeSequence(doneId, qId, optsId, fbId, steps, finalText){
+  const doneEl = document.getElementById(doneId);
+  const qEl = document.getElementById(qId);
+  const optsEl = document.getElementById(optsId);
+  const fb = document.getElementById(fbId);
+  const ordinals = ['ПЕРШИМ','ДРУГИМ','ТРЕТІМ','ЧЕТВЕРТИМ','П\'ЯТИМ','ШОСТИМ','СЬОМИМ'];
+  let pos = 0;
+  function render(){
+    optsEl.innerHTML = '';
+    if(pos === steps.length){ qEl.textContent = ''; fb.textContent = finalText; addNeurons(3); return; }
+    qEl.innerHTML = `Що робиш <b>${ordinals[pos]}</b>?`;
+    shuffle(steps.slice(pos)).forEach(s=>{
+      const b = document.createElement('button');
+      b.className = 'choice-btn';
+      b.textContent = s;
+      b.addEventListener('click', ()=>{
+        if(s === steps[pos]){
+          doneEl.insertAdjacentHTML('beforeend', `<li>${s}</li>`);
+          fb.textContent = '';
+          pos++; addNeurons(1);
+          render();
+        } else { b.classList.add('wrong'); fb.textContent = 'Не зараз — спершу потрібно інше.'; }
+      });
+      optsEl.appendChild(b);
+    });
+  }
+  render();
+}
+makeSequence('seqDone', 'seqQ', 'seqOpts', 'seqFb', [
+  'Увійти у свій акаунт Google і відкрити курс',
+  'Відкрити вкладку «Завдання» і клацнути потрібну роботу',
+  'Прочитати умову й перевірити дату здачі',
+  'Виконати роботу й прикріпити її через «Додати або створити»',
+  'Натиснути «Здати»'
+], 'Готово ✓ Статус зміниться на «Здано», і вчитель побачить твою роботу.');
+
+/* ---------- HABITS ---------- */
+const HAB = ['👍 Корисна звичка', '🪤 Пастка'];
+makeChoice('habitList', [
+  { text:'Щойно з\'явилося нове завдання, дивлюся дату здачі й ставлю нагадування в календарі.', opts:HAB, correct:0,
+    why:'Так терміни не стануть несподіванкою.' },
+  { text:'Усі завдання тижня роблю в неділю ввечері, за годину до дедлайну.', opts:HAB, correct:1,
+    why:'Часу на питання до вчителя чи на виправлення помилок уже не лишиться.' },
+  { text:'Даю другові свій пароль, щоб він здав роботу замість мене, поки я на тренуванні.', opts:HAB, correct:1,
+    why:'Пароль — лише для тебе. З ним друг отримає доступ до пошти, Диска й усіх файлів.' },
+  { text:'Не зрозумів умову — одразу пишу вчителю, а не вгадую.', opts:HAB, correct:0,
+    why:'Краще спитати на початку, ніж переробляти роботу.' }
+]);
+
+/* ---------- FINAL QUIZ ---------- */
+const questions = [
+  { q: "Що таке персональне навчальне середовище?", opts: ["Комп'ютерний клас у школі", "Набір сервісів і ресурсів, які ти сам обираєш для навчання", "Одна програма, яку встановлює вчитель"], correct: 1 },
+  { q: "Що таке хмарний сервіс?", opts: ["Програма чи сховище на віддалених серверах, з якими працюють через інтернет", "Сайт із прогнозом погоди", "Програма, яку встановлюють лише з флешки"], correct: 0 },
+  { q: "Що з переліченого — обмеження хмарних сервісів?", opts: ["Доступ з будь-якого пристрою", "Автоматичне збереження змін", "Без інтернету більшість функцій недоступна"], correct: 2 },
+  { q: "Як учень може приєднатися до курсу в Google Classroom?", opts: ["Ввести код курсу від учителя або прийняти запрошення", "Увійти в акаунт однокласника", "Надіслати вчителю свій пароль"], correct: 0 },
+  { q: "У якій вкладці курсу видно оголошення вчителя?", opts: ["Люди", "Стрічка", "Завдання"], correct: 1 },
+  { q: "Хто побачить твій приватний коментар до завдання?", opts: ["Усі учні курсу", "Лише ти й учитель", "Усі, хто має посилання"], correct: 1 },
+  { q: "Завдання — переглянути відео, файл здавати не треба. Що натиснути?", opts: ["«Позначити як виконане»", "«Додати або створити»", "Нічого не натискати"], correct: 0 },
+  { q: "Чому в Classroom треба входити саме у власний акаунт?", opts: ["Так сторінки завантажуються швидше", "Інакше роботу отримає чужий акаунт, і вчитель не побачить твоєї", "Бо чужий акаунт не відкриває вкладку «Люди»"], correct: 1 }
+];
+let qi = 0, currentAnswered = false;
+const quizQ = document.getElementById('quizQ');
+const quizOptions = document.getElementById('quizOptions');
+const quizProgress = document.getElementById('quizProgress');
+const btnNext = document.getElementById('btnNext');
+const quizBox = document.getElementById('quizBox');
+const completion = document.getElementById('completion');
+const totalNeuronsEl = document.getElementById('totalNeurons');
+
+function renderQuestion(){
+  currentAnswered = false; btnNext.classList.remove('active');
+  const item = questions[qi];
+  quizProgress.textContent = `Запитання ${qi+1} з ${questions.length}`;
+  quizQ.textContent = item.q;
+  quizOptions.innerHTML = '';
+  item.opts.forEach((opt,i)=>{
+    const b = document.createElement('button'); b.className = 'quiz-opt'; b.textContent = opt;
+    b.addEventListener('click', ()=>{
+      if(currentAnswered) return; currentAnswered = true;
+      quizOptions.querySelectorAll('.quiz-opt').forEach((ob,oi)=>{ if(oi===item.correct) ob.classList.add('correct'); else if(oi===i) ob.classList.add('wrong'); });
+      if(i === item.correct) addNeurons(2);
+      btnNext.classList.add('active');
+      btnNext.textContent = (qi === questions.length-1) ? 'Завершити' : 'Далі';
+    });
+    quizOptions.appendChild(b);
+  });
+}
+btnNext.addEventListener('click', ()=>{
+  if(!btnNext.classList.contains('active')) return;
+  qi++;
+  if(qi < questions.length){ renderQuestion(); }
+  else {
+    quizBox.style.display = 'none';
+    completion.classList.add('show');
+    addNeurons(3);
+    totalNeuronsEl.textContent = neurons;
+  }
+});
+renderQuestion();
+</script>
+
+</body>
+</html>
