@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Як грати · Клавіатурні перегони</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
+    --purple:#6C5CE7; --purple-dark:#5340c9; --teal:#16A3A0; --teal-dark:#0E7C7A; --coral:#FF6B4A;
+    --yellow:#FFC93C; --pink:#FF5D9E; --blue:#2D9CDB;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink); line-height:1.25;}
+  .container{max-width:860px; margin:0 auto; padding:0 16px;}
+
+  /* ---------- Top bar ---------- */
+  .topbar{position:sticky; top:0; z-index:10; background:rgba(246,245,251,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .topbar-inner{max-width:860px; margin:0 auto; padding:12px 16px; display:flex; align-items:center; gap:12px;}
+  .back-link{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--teal-dark); text-decoration:none; white-space:nowrap;}
+  .back-link:hover{text-decoration:underline;}
+  .play-link{margin-left:auto; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; text-decoration:none; background:var(--teal); color:#fff; border-radius:999px; padding:4px 16px; white-space:nowrap;}
+  .play-link:hover{background:var(--teal-dark);}
+
+  /* ---------- Hero ---------- */
+  .hero{padding:28px 0 6px;}
+  .eyebrow{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:var(--teal-dark);}
+  .hero h1{font-size:32px; margin:2px 0 4px;}
+  .hero p{margin:0; color:var(--ink-soft); font-size:17px;}
+  @media (max-width:600px){ .hero h1{font-size:26px;} }
+
+  /* ---------- Кроки ---------- */
+  .steps{list-style:none; margin:20px 0 0; padding:0; display:grid; gap:14px;}
+  .step{display:grid; grid-template-columns:44px 1fr 300px; gap:16px; align-items:center; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:18px 20px;}
+  .step.no-pic{grid-template-columns:auto 1fr;}
+  .step.key{border:2px solid var(--teal); box-shadow:0 5px 0 #D2F0EF;}
+  .num{width:44px; height:44px; border-radius:50%; background:var(--teal); color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:22px; align-self:start;}
+  .step h2{font-size:20px; margin-bottom:2px;}
+  .step p{margin:0; color:var(--ink-soft); font-size:15px;}
+  .step p + p{margin-top:4px;}
+  @media (max-width:720px){
+    .step{grid-template-columns:36px 1fr; gap:10px 12px; padding:14px;}
+    .num{width:36px; height:36px; font-size:18px;}
+    .pic{grid-column:1 / -1;}
+  }
+
+  /* Елементи інтерфейсу гри */
+  .ui{display:inline-flex; align-items:center; gap:4px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; line-height:1.3; white-space:nowrap; vertical-align:1px;
+    border:1.5px solid var(--line); background:var(--surface); color:var(--ink); border-radius:999px; padding:1px 10px;}
+  .ui.primary{background:var(--teal); border-color:var(--teal); color:#fff;}
+  .kbd{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:14px; background:var(--surface); border:1.5px solid var(--line); border-bottom-width:3px; border-radius:7px; padding:0 7px;}
+  .ico{display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; border-radius:8px; border:1.5px solid var(--line); background:var(--surface); color:var(--teal-dark); vertical-align:-9px;}
+  .ico svg{width:21px; height:21px;}
+  .ico.hl{border-color:var(--teal); box-shadow:0 0 0 3px #9FE0DE;}
+
+  /* ---------- Ілюстрації ---------- */
+  .pic{background:var(--bg); border-radius:var(--radius-m); padding:14px; font-size:14px; position:relative; overflow:hidden;}
+  .pic .cap{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; text-align:center; line-height:1.2;}
+  .pic .sub{text-align:center; color:var(--ink-soft); font-size:12.5px;}
+
+
+  /* 2 · ім'я */
+  .dlg{background:var(--surface); border-radius:var(--radius-m); padding:12px; box-shadow:0 6px 18px rgba(27,27,58,.12);}
+  .dlg .wave{font-size:28px; text-align:center; line-height:1;}
+  .chips{display:flex; gap:6px; justify-content:center; margin:8px 0;}
+  .chips span{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; border:1.5px solid var(--teal); color:var(--teal-dark); border-radius:999px; padding:0 10px;}
+  .field{display:flex; gap:6px;}
+  .field .in{flex:1; border:1.5px solid var(--teal); border-radius:999px; padding:3px 12px; font-weight:700; font-size:13.5px; white-space:nowrap; overflow:hidden;}
+  .field .in::after{content:"|"; color:var(--teal); animation:blink 1s steps(1) infinite; margin-left:1px;}
+  @keyframes blink{50%{opacity:0;}}
+
+  /* 3 · траса */
+  .mini-track{border-radius:12px; overflow:hidden; background:#fff; position:relative;}
+  .mini-track .sky{height:22px; background:linear-gradient(#CFEFFF, #E9F7FF);}
+  .mini-track .road{background:#4B4B66; border-top:3px solid #fff; border-bottom:3px solid #fff;}
+  .mini-track .lane{height:38px; position:relative;}
+  .mini-track .lane + .lane{border-top:2px dashed rgba(255,255,255,.55);}
+  .mini-track .finish{position:absolute; top:0; bottom:0; right:10px; width:10px; background:repeating-conic-gradient(#1B1B3A 0 25%, #fff 0 50%) 0 0/10px 10px;}
+  .mini-track .car{position:absolute; top:50%; transform:translateY(-50%); font-size:24px; line-height:1;}
+  .mini-track .go{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;}
+  .mini-track .go span{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; background:var(--teal); color:#fff; border-radius:999px; padding:5px 16px; box-shadow:0 3px 0 var(--teal-dark), 0 8px 18px rgba(27,27,58,.3);}
+  .ride{animation:ride 3.2s ease-in-out infinite;}
+  .ride.bot{animation-duration:3.2s; animation-name:ride-bot;}
+  @keyframes ride{0%,10%{left:6px;} 80%,100%{left:calc(100% - 46px);}}
+  @keyframes ride-bot{0%,10%{left:6px;} 80%,100%{left:calc(100% - 90px);}}
+
+  /* 4 · друк */
+  .typing{background:#FBFAFE; border:1.5px solid var(--line); border-radius:12px; padding:8px 10px; font-size:19px; font-weight:700; letter-spacing:.5px;}
+  .typing .ok{color:var(--teal-dark); opacity:.55;}
+  .typing .cur{background:var(--yellow); border-radius:4px; padding:0 2px; box-shadow:0 0 0 2px var(--yellow);}
+  .rules{display:flex; gap:6px; justify-content:center; margin-top:8px; flex-wrap:wrap;}
+  .rules span{background:var(--surface); border-radius:999px; padding:1px 10px; font-weight:700; font-size:12.5px;}
+
+  /* 5 · етапи */
+  .stages{display:grid; gap:5px;}
+  .stages div{display:flex; justify-content:space-between; align-items:center; background:var(--surface); border-radius:9px; padding:4px 10px; font-weight:700; font-size:13px;}
+  .stages .done{color:#16803C;}
+  .stages b{font-family:'Baloo 2',sans-serif;}
+  .medal{text-align:center; font-size:34px; line-height:1; margin-top:8px;}
+
+  /* 6 · копіювання */
+  .final{position:relative; border:2px dashed var(--yellow); background:#FFFBEF; border-radius:12px; padding:10px 54px 10px 12px; font-size:13px; text-align:left;}
+  .final b{font-family:'Baloo 2',sans-serif; font-size:14.5px;}
+  .final .ico{position:absolute; top:50%; right:10px; transform:translateY(-50%);}
+  .tap{position:absolute; right:-2px; top:calc(50% + 8px); width:22px; animation:tap 1.4s ease infinite;}
+  @keyframes tap{0%,100%{transform:translate(0,0);} 50%{transform:translate(-3px,-4px);}}
+  .toast{margin:10px auto 0; width:max-content; max-width:100%; background:var(--ink); color:#fff; border-radius:999px; padding:3px 14px; font-weight:700; font-size:12.5px;}
+  .toast::before{content:"✓ "; color:#7BE3A8;}
+
+  footer{margin:36px 0 30px; text-align:center; font-size:13.5px; color:var(--ink-soft);}
+
+  @media (prefers-reduced-motion:reduce){ .ride, .tap, .field .in::after{animation:none;} }
+  @media print{
+    body{background:#fff;}
+    .topbar{display:none;}
+    .step{break-inside:avoid; box-shadow:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="back-link" href="../index.html">← До перегонів</a>
+  <a class="play-link" href="../index.html">🏁 Грати</a>
+</div></div>
+
+<main class="container">
+
+  <header class="hero">
+    <div class="eyebrow">Клавіатурні перегони · Інструкція</div>
+    <h1>Як пройти змагання й надіслати результат</h1>
+    <p>Сім кроків — від посилання на змагання до твоєї медалі.</p>
+  </header>
+
+  <ol class="steps">
+
+    <!-- 1 -->
+    <li class="step no-pic">
+      <span class="num">1</span>
+      <div>
+        <h2>Перейди за посиланням</h2>
+        <p>Клацни посилання на змагання, яке ти отримав.</p>
+      </div>
+    </li>
+
+    <!-- 2 -->
+    <li class="step">
+      <span class="num">2</span>
+      <div>
+        <h2>Введи ім'я, якщо гра попросить</h2>
+        <p>Придумай ім'я гравця й натисни <span class="ui primary">Почати</span>. Уже грав? Просто обери себе у списку.</p>
+      </div>
+      <div class="pic" aria-hidden="true">
+        <div class="dlg">
+          <div class="wave">👋</div>
+          <div class="cap">Привіт! Як тебе звати?</div>
+          <div class="chips"><span>Блискавка</span><span>Турбо</span></div>
+          <div class="field"><span class="in">Супер Гонщик</span><span class="ui primary">Почати</span></div>
+        </div>
+      </div>
+    </li>
+
+    <!-- 3 -->
+    <li class="step">
+      <span class="num">3</span>
+      <div>
+        <h2>Натисни «На старт!»</h2>
+        <p>Гра одразу відкриє змагання з посилання. Тисни <span class="ui primary">🚦 На старт!</span> над трасою.</p>
+      </div>
+      <div class="pic" aria-hidden="true">
+        <div class="mini-track">
+          <div class="sky"></div>
+          <div class="road">
+            <div class="finish"></div>
+            <div class="lane"><span class="car" style="left:6px">🚙</span></div>
+            <div class="lane"><span class="car" style="left:6px">🤖</span></div>
+            <div class="go"><span>🚦 На старт!</span></div>
+          </div>
+          <div class="sky" style="height:12px; background:#E4F3D8"></div>
+        </div>
+      </div>
+    </li>
+
+    <!-- 4 -->
+    <li class="step">
+      <span class="num">4</span>
+      <div>
+        <h2>Друкуй і обжени робота</h2>
+        <p>Натискай жовту літеру. Етап зараховано, якщо ти фінішуєш першим і робиш мало помилок.</p>
+        <p>Не вийшло — тисни <span class="ui">↻ Ще раз</span>.</p>
+      </div>
+      <div class="pic" aria-hidden="true">
+        <div class="mini-track" style="margin-bottom:8px">
+          <div class="road">
+            <div class="finish"></div>
+            <div class="lane"><span class="car ride">🚙</span></div>
+            <div class="lane"><span class="car ride bot">🤖</span></div>
+          </div>
+        </div>
+        <div class="typing"><span class="ok">мама мила </span><span class="cur">р</span>аму</div>
+        <div class="rules"><span>🏁 першим</span><span>🎯 мало помилок</span></div>
+      </div>
+    </li>
+
+    <!-- 5 -->
+    <li class="step">
+      <span class="num">5</span>
+      <div>
+        <h2>Пройди всі етапи</h2>
+        <p>Після кожного етапу тисни <span class="ui">▶ Далі</span>. Коли пройдеш останній, отримаєш медаль.</p>
+      </div>
+      <div class="pic" aria-hidden="true">
+        <div class="stages">
+          <div class="done"><span>1 · 🏙️ Місто</span><b>✓ Перемога</b></div>
+          <div class="done"><span>2 · 🏙️ Місто</span><b>✓ Перемога</b></div>
+          <div class="done"><span>3 · 🏙️ Місто</span><b>✓ Перемога</b></div>
+        </div>
+        <div class="medal">🥇🥈🥉</div>
+      </div>
+    </li>
+
+    <!-- 6 -->
+    <li class="step key">
+      <span class="num">6</span>
+      <div>
+        <h2>Скопіюй посилання на результати</h2>
+        <p>У вікні перемоги або в правому верхньому куті картки змагання натисни ланцюжок <span class="ico hl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M10 7.5H7a4.5 4.5 0 0 0 0 9h3"/><path d="M14 7.5h3a4.5 4.5 0 0 1 0 9h-3"/><path d="M8.5 12h7"/></svg></span>.</p>
+      </div>
+      <div class="pic" aria-hidden="true">
+        <div class="final">
+          <b>🏆 «Кубок Києва» завершено: 🥇 Золото!</b><br>Середня точність: 98%
+          <span class="ico hl"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M10 7.5H7a4.5 4.5 0 0 0 0 9h3"/><path d="M14 7.5h3a4.5 4.5 0 0 1 0 9h-3"/><path d="M8.5 12h7"/></svg></span>
+          <svg class="tap" viewBox="0 0 24 24"><path d="M5 2 L5 19 L9.5 15 L12.5 22 L15.5 20.6 L12.6 14 L18.5 14 Z" fill="#fff" stroke="#1B1B3A" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="toast">Посилання скопійоване</div>
+      </div>
+    </li>
+
+    <!-- 7 -->
+    <li class="step key no-pic">
+      <span class="num">7</span>
+      <div>
+        <h2>Встав посилання й поділися</h2>
+        <p>Натисни <span class="kbd">Ctrl</span> + <span class="kbd">V</span> у повідомленні й надішли.</p>
+      </div>
+    </li>
+
+  </ol>
+
+  <footer>Клавіатурні перегони · Інструкція · Лабораторія</footer>
+</main>
+
+</body>
+</html>

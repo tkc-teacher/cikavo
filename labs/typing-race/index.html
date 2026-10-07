@@ -32,6 +32,7 @@
   .game-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
   .top-btn{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; border:1.5px solid var(--teal); background:var(--surface); color:var(--teal-dark); border-radius:999px; padding:4px 14px; cursor:pointer; white-space:nowrap;}
   .top-btn:hover{background:#E3F7F6;}
+  a.top-btn{text-decoration:none;}
   @media (max-width:560px){ .game-title{display:none;} .top-btn .long{display:none;} .top-btn{padding:4px 11px;} .topbar-inner{gap:8px;} }
 
   main{padding:16px 0 40px;}
@@ -406,6 +407,7 @@
     </svg>
     <span id="neuronCount">0</span>
   </div>
+  <a class="top-btn" href="guide/index.html" title="Інструкція: змагання й посилання на результати">❓<span class="long"> Як грати</span></a>
   <button class="top-btn player-btn" id="playerBtn" title="Профіль гравця"><span class="pb-car" id="playerCar"></span><span class="long" id="playerName">Гравець</span></button>
 </div></div>
 
