@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Хмара і Google Диск — Урок (індивідуальна форма)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F8FAFD; --ink:#1F1F1F; --ink-soft:#5F6368; --surface:#FFFFFF; --line:#DADCE0;
+    --accent:#1A73E8; --accent-dark:#1557B0; --accent-soft:#E8F0FE;
+    --sun:#E37400; --sun-soft:#FEF7E0; --violet:#188038; --violet-soft:#E6F4EA;
+    --g-blue:#4285F4; --g-red:#EA4335; --g-yellow:#FBBC04; --g-green:#34A853;
+    --coral:#FF6B4A; --yellow:#FFC93C; --ok:#3FAE58; --ok-soft:#E4F8E6;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  .container{max-width:800px; margin:0 auto; padding:0 24px;}
+  @media (max-width:520px){ .container{padding:0 16px;} }
+
+  .hud{position:sticky; top:0; z-index:50; background:rgba(248,250,253,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
+  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--g-blue) 0 25%,var(--g-red) 25% 50%,var(--g-yellow) 50% 75%,var(--g-green) 75%); transition:width .3s ease;}
+  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:800px; margin:0 auto;}
+  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
+  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
+  .neuron-counter svg{width:24px;height:24px;}
+  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
+  #neuronCount.pop{transform:scale(1.35);}
+
+  .hero{padding:52px 24px 40px;}
+  .hero-inner{max-width:800px; margin:0 auto; display:flex; align-items:center; gap:30px;}
+  .hero-text{flex:1;}
+  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--accent); margin-bottom:10px;}
+  .hero h1{font-size:32px; line-height:1.18; margin-bottom:12px;}
+  .hero p{color:var(--ink-soft); font-size:16.5px; max-width:54ch; margin-bottom:22px;}
+  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--accent); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
+  .btn-primary:hover{background:var(--accent-dark);}
+  .btn-primary:active{transform:scale(.97);}
+  .mascot{width:140px; height:140px; flex-shrink:0;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:104px; height:104px;} }
+
+  section.block{padding:38px 0; border-top:1px solid var(--line);}
+  .step-label{font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:600; color:var(--accent); margin-bottom:8px;}
+  .step-label.recap{color:var(--sun);}
+  .block h2{font-size:21px; margin-bottom:10px; max-width:38ch;}
+  .block h3{font-size:16px; margin:20px 0 8px;}
+  .block p{max-width:66ch; font-size:16px; margin:0 0 14px; color:var(--ink);}
+  .block p.soft{color:var(--ink-soft); font-size:15px;}
+  .block ul{max-width:66ch; margin:0 0 14px; padding-left:20px; font-size:15px;}
+  .block ul li{margin-bottom:4px;}
+  .note{background:var(--violet-soft); border-left:4px solid var(--violet); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; color:#0D652D; margin:16px 0;}
+  .trivia{background:var(--sun-soft); border-left:4px solid var(--sun); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14px; color:#8A4E0F; margin:16px 0;}
+
+  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:22px; margin-top:18px;}
+  @media (max-width:520px){ .exercise{padding:16px;} }
+  .progress-line{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--accent-dark); margin-top:14px; min-height:1.4em;}
+
+  /* ЛОГОТИПИ */
+  .lg{width:18px; height:18px; object-fit:contain; vertical-align:-4px; margin-right:3px;}
+  .q-logo{width:30px; height:30px; object-fit:contain; flex-shrink:0;}
+  .q-emoji{width:30px; text-align:center; font-size:24px; line-height:30px; flex-shrink:0;}
+  .q-head{display:flex; align-items:center; gap:12px;}
+  .q-head p.q{margin:0 !important;}
+  .classify-card .q-head + .choice-row{margin-top:10px;}
+  .eco{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:18px 20px; margin:16px 0;}
+  .eco-head{display:flex; align-items:center; gap:14px; margin-bottom:12px;}
+  .eco-head img{width:52px; height:52px; object-fit:contain;}
+  .eco-head b{font-family:'Baloo 2',sans-serif; font-size:19px; display:block; line-height:1.2;}
+  .eco-head span{font-size:14px; color:var(--ink-soft);}
+  .eco-apps{display:grid; grid-template-columns:repeat(7,1fr); gap:6px;}
+  @media (max-width:640px){ .eco-apps{grid-template-columns:repeat(4,1fr);} }
+  .eco-app{text-align:center; font-size:12px; font-weight:700; color:var(--ink-soft); line-height:1.25;}
+  .eco-app img{width:34px; height:34px; object-fit:contain; display:block; margin:0 auto 4px;}
+
+  /* ПЕРЕВАГИ ХМАРИ */
+  .pros, .cons{border-radius:var(--radius-l); padding:16px; margin:12px 0 16px;}
+  .pros{background:linear-gradient(135deg,#E8F0FE 0%,#E6F4EA 100%);}
+  .cons{background:linear-gradient(135deg,#FCE8E6 0%,#FEF7E0 100%);}
+  @media (max-width:520px){ .pros, .cons{padding:10px;} }
+  .ill .s{fill:none; stroke:var(--c); stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round;}
+  .ill .t{fill:var(--t);}
+  .ill .w{fill:#fff;}
+  .ill .f{fill:var(--c);}
+  .perks{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+  @media (max-width:680px){ .perks{grid-template-columns:repeat(2,1fr);} }
+  .perk{background:var(--surface); border-radius:var(--radius-m); padding:16px 12px 14px; text-align:center; box-shadow:0 1px 2px rgba(60,64,67,.12), 0 2px 8px rgba(60,64,67,.08);}
+  .ic-tile{width:64px; height:64px; border-radius:20px; display:flex; align-items:center; justify-content:center; margin:0 auto 10px; background:linear-gradient(145deg,var(--t) 0%,#fff 130%);}
+  .ic-tile svg{width:46px; height:46px;}
+  .perk b{display:block; font-family:'Baloo 2',sans-serif; font-size:16px; margin:0 0 3px; color:var(--c);}
+  .perk span{font-size:13px; color:var(--ink-soft); line-height:1.4; display:block;}
+  .risks{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  @media (max-width:600px){ .risks{grid-template-columns:1fr;} }
+  .risk{background:var(--surface); border-radius:var(--radius-m); padding:14px; box-shadow:0 1px 2px rgba(60,64,67,.12), 0 2px 8px rgba(60,64,67,.08); display:grid; grid-template-columns:52px 1fr; gap:4px 12px; align-items:start;}
+  .risk .ic-tile{width:52px; height:52px; border-radius:16px; margin:0; grid-row:span 2;}
+  .risk .ic-tile svg{width:38px; height:38px;}
+  .risk-head{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; line-height:1.25; color:var(--c);}
+  .risk-what{font-size:14px; color:var(--ink-soft); line-height:1.45;}
+  .risk-fix{grid-column:1 / -1; font-size:13.5px; background:#E6F4EA; color:#0D652D; border-radius:10px; padding:7px 10px; line-height:1.4; margin-top:6px;}
+
+  /* FLIP GALLERY */
+  .gallery{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:16px;}
+  @media (max-width:640px){ .gallery{grid-template-columns:1fr;} }
+  .flip-card{perspective:1200px; height:210px; cursor:pointer;}
+  .flip-inner{position:relative; width:100%; height:100%; transition:transform .6s cubic-bezier(.4,0,.2,1); transform-style:preserve-3d;}
+  .flip-card.flipped .flip-inner{transform:rotateY(180deg);}
+  .flip-face{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:var(--radius-m); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:14px; text-align:center; border:2px solid var(--card-c, var(--line));}
+  .flip-front{background:var(--surface);}
+  .flip-front .logo{width:72px; height:72px; margin-bottom:10px; border-radius:18px; background:var(--card-c-light); display:flex; align-items:center; justify-content:center;}
+  .flip-front .logo img{width:46px; height:46px; object-fit:contain;}
+  .flip-card.main .flip-front{box-shadow:0 0 0 4px var(--card-c-light);}
+  .flip-front .tag{font-family:'Baloo 2',sans-serif; font-size:11.5px; font-weight:600; background:var(--card-c); color:#fff; border-radius:999px; padding:1px 9px; margin-bottom:4px;}
+  .flip-front .name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px;}
+  .flip-front .free{font-size:13px; font-weight:700; color:var(--card-c);}
+  .flip-front .tap{font-size:12px; color:var(--ink-soft); margin-top:2px;}
+  .flip-back{background:var(--card-c-light, var(--accent-soft)); transform:rotateY(180deg); color:var(--ink-soft); line-height:1.45; align-items:flex-start; text-align:left;}
+  .flip-back ul{margin:0; padding-left:16px; font-size:13.5px;}
+  .flip-back li{margin-bottom:3px;}
+
+  /* CHOICE CARDS */
+  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:16px 18px; margin:12px 0;}
+  .classify-card p.q{font-weight:700; margin:0 0 10px; font-size:15px;}
+  .choice-row{display:flex; gap:8px; flex-wrap:wrap;}
+  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; padding:8px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; color:var(--ink); text-align:left; transition:background .15s ease, border-color .15s ease, color .15s ease;}
+  .choice-btn:hover{border-color:var(--accent);}
+  .choice-btn .gdi{width:17px; height:17px; vertical-align:-4px; margin-right:5px;}
+  .choice-btn .gdi svg{fill:currentColor;}
+  .choice-btn.correct{background:var(--ok-soft); border-color:var(--ok); color:#256B36;}
+  .choice-btn.wrong{background:#FDE6E1; border-color:var(--coral); color:#B8412A;}
+  .choice-feedback{margin-top:8px; font-size:13.5px; color:var(--ink-soft); min-height:1.2em;}
+  .yn-grid{display:grid; grid-template-columns:1fr 1fr; gap:0 12px; align-items:start;}
+  @media (max-width:560px){ .yn-grid{grid-template-columns:1fr;} }
+  .yn-grid .classify-card{margin:6px 0;}
+
+  .models{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:12px 0;}
+  @media (max-width:640px){ .models{grid-template-columns:1fr;} }
+  .model{background:var(--surface); border:2px solid var(--line); border-top:6px solid var(--mc); border-radius:var(--radius-m); padding:12px 14px;}
+  .model .abbr{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:24px; color:var(--mc); line-height:1.1; margin-bottom:6px;}
+  .model-pic{display:block; width:100%; height:auto; max-height:110px; background:#F8FAFD; border-radius:12px; margin-bottom:10px;}
+  .model .pz{background:var(--sun-soft); border-radius:8px; padding:7px 10px; font-size:13.5px; font-weight:700; margin-bottom:8px; line-height:1.4;}
+  .model .who{font-size:13px; font-weight:700; color:var(--mc); margin-bottom:2px;}
+  .pizza-scale{display:flex; justify-content:space-between; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; color:var(--ink-soft); margin:14px 0 0; position:relative; padding-bottom:10px;}
+  .pizza-scale::after{content:''; position:absolute; left:0; right:8px; bottom:0; height:4px; border-radius:2px; background:linear-gradient(90deg,#EA4335,#E37400,#1A73E8);}
+  .pizza-scale::before{content:''; position:absolute; right:0; bottom:-5px; border-left:12px solid #1A73E8; border-top:7px solid transparent; border-bottom:7px solid transparent;}
+  @media (max-width:640px){ .pizza-scale{display:none;} }
+  .model p{font-size:14px !important; margin:0 0 6px !important;}
+  .model .ex{font-size:13px; color:var(--ink-soft);}
+
+
+  /* МАКЕТ GOOGLE ДИСКА */
+  .gd{border:1.5px solid var(--line); border-radius:var(--radius-m); background:#F8FAFD; overflow:hidden; font-size:13.5px;}
+  .gd-top{display:flex; align-items:center; gap:10px; padding:10px 14px; background:#F8FAFD;}
+  .gd-top img{width:30px; height:27px; object-fit:contain;}
+  .gd-top .ttl{font-size:18px; color:#444746; font-weight:600;}
+  .gd-search{flex:1; background:#E9EEF6; border-radius:999px; padding:8px 16px; color:#5F6368; font-size:13.5px; margin-left:12px;}
+  @media (max-width:560px){ .gd-search{display:none;} }
+  .gd-body{display:grid; grid-template-columns:190px 1fr; gap:8px; padding:0 10px 10px;}
+  @media (max-width:560px){ .gd-body{grid-template-columns:1fr;} }
+  .gd-side{display:flex; flex-direction:column; gap:2px;}
+  @media (max-width:560px){ .gd-side{flex-direction:row; flex-wrap:wrap;} }
+  .gd-new{align-self:flex-start; display:flex; align-items:center; gap:8px; background:#fff; border:none; box-shadow:0 1px 3px rgba(60,64,67,.3); border-radius:16px; padding:12px 18px; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:14px; cursor:pointer; margin:4px 0 10px; color:var(--ink);}
+  .gd-item{display:flex; align-items:center; gap:10px; border:none; background:none; border-radius:999px; padding:7px 14px; font-family:'Nunito Sans',sans-serif; font-weight:600; font-size:13.5px; color:#1F1F1F; cursor:pointer; text-align:left;}
+  .gd-item:hover{background:#E9EEF6;}
+  .gd-item.on{background:#C2E7FF; font-weight:800;}
+  .gd-item.on .gdi svg{fill:#001D35;}
+  .gd-row .gdi{width:18px; height:18px;}
+  .gd-new.ok, .gd-item.ok{box-shadow:0 0 0 3px var(--ok);}
+  .gd-new.shake, .gd-item.shake{animation:shakeX .35s ease; box-shadow:0 0 0 3px var(--coral);}
+  .gd-main{background:#fff; border-radius:var(--radius-m); padding:12px 16px; min-height:190px;}
+  .gd-main h4{font-family:'Nunito Sans',sans-serif; font-size:19px; font-weight:600; margin:2px 0 10px; color:#1F1F1F;}
+  .gd-row{display:flex; align-items:center; gap:10px; padding:7px 4px; border-bottom:1px solid #EEF0F2; font-size:13.5px;}
+  .gd-row img{width:18px; height:18px; object-fit:contain;}
+  .gd-row .who{margin-left:auto; color:#5F6368; font-size:12.5px; white-space:nowrap;}
+  .gd-bar{height:6px; background:#E9EEF6; border-radius:3px; overflow:hidden; margin:10px 0 6px;}
+  .gd-bar i{display:block; height:100%; width:38%; background:var(--accent);}
+  .gdi{display:inline-flex; width:20px; height:20px; flex-shrink:0;}
+  .gdi svg{width:100%; height:100%; fill:#444746;}
+  .gd-new .gdi svg{fill:#1F1F1F;}
+  .gd-folder svg{fill:#5F6368;}
+  .gd-legend{list-style:none; padding:0 !important;}
+  .gd-legend li{display:flex; align-items:flex-start; gap:10px; margin-bottom:7px !important;}
+  .gd-legend .gdi{margin-top:2px;}
+  .tour-task{background:var(--sun-soft); border:2px solid var(--g-yellow); border-radius:var(--radius-m); padding:10px 14px; margin-bottom:12px; font-weight:700; font-size:15px;}
+  .tour-task .num{display:block; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:#B06000;}
+
+  /* ЕМУЛЯТОР «НАДАТИ ДОСТУП» */
+  .share-task{background:var(--sun-soft); border:2px solid var(--g-yellow); border-radius:var(--radius-m); padding:12px 16px; margin-bottom:14px;}
+  .share-task .num{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:#B06000;}
+  .share-task .txt{font-weight:700; font-size:15px;}
+  .share-dlg{border:none; border-radius:var(--radius-l); padding:20px 22px; box-shadow:0 1px 3px rgba(60,64,67,.3), 0 4px 8px 3px rgba(60,64,67,.15); background:#fff; max-width:560px; margin:0 auto;}
+  @media (max-width:520px){ .share-dlg{padding:16px;} }
+  .share-title{font-family:'Nunito Sans',sans-serif; font-weight:600; font-size:20px; margin-bottom:14px; color:#1F1F1F;}
+  .share-add{border:1px solid #747775; border-radius:6px; padding:12px 14px; color:#5F6368; font-size:14px; margin-bottom:6px;}
+  .share-file{font-size:13px; color:var(--ink-soft); margin-bottom:12px;}
+  .share-lbl{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:15px; color:#1F1F1F; margin:14px 0 8px;}
+  .seg{display:flex; flex-wrap:wrap; gap:6px;}
+  .seg button{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; padding:8px 14px; border-radius:8px; border:1px solid #747775; background:#fff; color:#1F1F1F; cursor:pointer;}
+  .seg button.on{background:#C2E7FF; border-color:#C2E7FF; color:#001D35;}
+  .seg button.on::before{content:'✓ ';}
+  .seg.off{opacity:.35; pointer-events:none;}
+  .share-preview{margin-top:14px; background:#F0F4F9; border-radius:12px; padding:10px 14px; font-size:14px; color:#1F1F1F; min-height:2.6em;}
+  .share-foot{display:flex; justify-content:space-between; align-items:center; margin-top:16px;}
+  .share-link{border:1px solid #747775; border-radius:999px; padding:8px 16px; font-weight:700; font-size:13.5px; color:var(--accent);}
+  .share-nav{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:14px; flex-wrap:wrap;}
+  .share-fb{font-size:14px; color:var(--ink-soft); flex:1; min-width:200px;}
+  .share-fb.good{color:#256B36; font-weight:700;}
+  .share-fb.bad{color:#B8412A; font-weight:700;}
+  .btn-check{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:14.5px; background:var(--accent); color:#fff; border:none; padding:10px 24px; border-radius:999px; cursor:pointer;}
+  .btn-check:hover{background:var(--accent-dark);}
+  .btn-check:disabled{opacity:.35; cursor:default;}
+  .acc-list{list-style:none; padding:0 !important;}
+  .acc-list li{display:flex; align-items:flex-start; gap:12px; margin-bottom:10px !important;}
+  .acc-ic{width:36px; height:36px; border-radius:50%; background:#E9EEF6; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .acc-ic.on{background:#C4EED0;}
+  .acc-ic .gdi{width:20px; height:20px;}
+  .acc-ic.on .gdi svg{fill:#0D652D;}
+  .role-head{display:flex; align-items:center; gap:10px; margin-bottom:4px;}
+  .seg button{display:inline-flex; align-items:center; gap:6px;}
+  .seg button .gdi{width:18px; height:18px;}
+  .seg button.on .gdi svg{fill:#001D35;}
+  .share-add{display:flex; align-items:center; gap:10px;}
+  .share-add .gdi svg{fill:#5F6368;}
+  .share-link{display:inline-flex; align-items:center; gap:6px;}
+  .share-link .gdi{width:18px; height:18px;}
+  .share-link .gdi svg{fill:var(--accent);}
+  .seg button.on::before{content:none;}
+  .acc-card{border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin:0 0 10px; background:#F8FAFD;}
+  .acc-card .ttl{font-size:12px; font-weight:800; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.03em; margin-bottom:6px;}
+  .acc-line{display:flex; align-items:center; gap:10px; font-size:14px; padding:3px 0;}
+  .acc-line b{font-weight:700;}
+  .acc-line span.sub{color:var(--ink-soft); font-size:13px;}
+  .acc-line .acc-ic{width:30px; height:30px;}
+  .acc-line .acc-ic .gdi{width:17px; height:17px;}
+  .acc-av{width:30px; height:30px; border-radius:50%; color:#fff; font-weight:800; font-size:14px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .acc-role{margin-left:auto; display:inline-flex; align-items:center; gap:5px; border:1px solid #747775; border-radius:8px; padding:3px 9px; font-size:13px; font-weight:700; white-space:nowrap;}
+  .acc-role .gdi{width:16px; height:16px;}
+  .roles{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:12px 0;}
+  @media (max-width:600px){ .roles{grid-template-columns:1fr;} }
+  .role{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px;}
+  .role b{font-family:'Baloo 2',sans-serif; font-size:16px; display:block;}
+  .role span{font-size:13.5px; color:var(--ink-soft);}
+
+  /* MATCHING */
+  .match-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:14px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:16px;}
+  .match-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:8px 14px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+  .match-chip:hover{transform:translateY(-2px);}
+  .match-chip.selected{border-color:var(--accent); box-shadow:0 0 0 3px rgba(26,115,232,.2);}
+  .match-chip.placed{display:none;}
+  .cr-ico{width:18px; height:18px; vertical-align:-4px; margin-right:6px; fill:#5F6368;}
+  .desc-slot.filled .cr-ico{fill:var(--accent-dark);}
+  .desc-card{display:flex; align-items:center; gap:12px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; margin-bottom:10px; cursor:pointer; transition:border-color .2s ease, background .2s ease;}
+  .desc-card.matched{border-color:var(--accent); background:var(--accent-soft); cursor:default;}
+  .desc-card.shake{animation:shakeX .35s ease;}
+  .desc-text{flex:1; font-size:14px; color:var(--ink-soft);}
+  .desc-slot{min-width:110px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13.5px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:8px 10px;}
+  .desc-slot.filled{border-style:solid; border-color:var(--accent); background:#fff; color:var(--accent-dark);}
+  @keyframes shakeX{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
+  @media (max-width:480px){ .desc-card{flex-direction:column; align-items:stretch;} }
+
+  /* ЕМУЛЯТОР СИНХРОНІЗАЦІЇ */
+  .defs{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0;}
+  @media (max-width:600px){ .defs{grid-template-columns:1fr;} }
+  .def{background:var(--surface); border:2px solid var(--line); border-left:6px solid var(--dc); border-radius:var(--radius-m); padding:12px 14px; font-size:14.5px;}
+  .def b{font-family:'Baloo 2',sans-serif; font-size:16px; display:flex; align-items:center; gap:8px; color:var(--dc); margin-bottom:4px;}
+  .def-ic{width:34px; height:34px; border-radius:50%; background:var(--dt); display:inline-flex; align-items:center; justify-content:center;}
+  .def-ic .gdi svg{fill:var(--dc);}
+  .sync-task{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; margin-bottom:12px;}
+  .sync-task span{color:var(--sun);}
+  .devices{display:grid; grid-template-columns:1fr 34px 1fr 34px 1fr; align-items:center; gap:4px;}
+  @media (max-width:560px){ .devices{grid-template-columns:1fr; gap:6px;} .wire{height:18px !important; width:4px !important; margin:0 auto;} }
+  .dev{background:var(--bg); border:2px solid var(--line); border-radius:var(--radius-m); padding:10px; min-height:118px; transition:border-color .2s ease, box-shadow .2s ease;}
+  .dev.pulse{border-color:var(--accent); box-shadow:0 0 0 4px rgba(26,115,232,.18);}
+  .dev.pulse-bad{border-color:var(--coral); box-shadow:0 0 0 4px rgba(255,107,74,.2);}
+  .dev-head{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14.5px; text-align:center;}
+  .dev-ic{width:42px; height:42px; border-radius:50%; background:#E8F0FE; display:flex; align-items:center; justify-content:center; margin:0 auto 4px;}
+  .dev-ic .gdi{width:24px; height:24px;}
+  .dev-ic .gdi svg{fill:#1A73E8;}
+  .dev-ic img{width:26px; height:24px; object-fit:contain;}
+  .dev-ic.cloud{background:#fff; box-shadow:0 1px 3px rgba(60,64,67,.25);}
+  .dev-ic.ext{background:#FEF7E0;}
+  .dev-ic.ext .gdi svg{fill:#B06000;}
+  .dev-files{display:flex; flex-direction:column; align-items:center; gap:4px; margin-top:6px; min-height:30px;}
+  .file{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; background:#fff; border:1px solid var(--line); border-radius:8px; padding:4px 9px;}
+  .file img{width:15px; height:15px;}
+  .file .gdi{width:14px; height:14px;}
+  .file .gdi svg{fill:#188038;}
+  .file.edited{border-color:var(--g-green); color:#0D652D;}
+  .file.empty{border:none; background:none; color:var(--ink-soft); font-weight:600; opacity:.7;}
+  .wire{height:4px; background:var(--line); border-radius:2px; position:relative; overflow:hidden;}
+  .wire.flow::after{content:''; position:absolute; top:0; left:-40%; width:40%; height:100%; background:var(--accent); animation:flow .45s linear;}
+  .wire.flow-rev::after{content:''; position:absolute; top:0; left:100%; width:40%; height:100%; background:var(--accent); animation:flowRev .45s linear;}
+  @keyframes flow{from{left:-40%;} to{left:100%;}}
+  @keyframes flowRev{from{left:100%;} to{left:-40%;}}
+  /* на вузькому екрані пристрої стоять стовпчиком — потік іде вертикально */
+  @media (max-width:560px){
+    .wire.flow::after, .wire.flow-rev::after{left:0; width:100%; height:40%;}
+    .wire.flow::after{top:-40%; animation-name:flowDown;}
+    .wire.flow-rev::after{top:100%; animation-name:flowUp;}
+  }
+  @keyframes flowDown{from{top:-40%;} to{top:100%;}}
+  @keyframes flowUp{from{top:100%;} to{top:-40%;}}
+  .backup-row{display:flex; align-items:center; gap:10px; margin-top:12px;}
+  .backup-row .dev{flex:0 0 220px; min-height:auto;}
+  @media (max-width:560px){ .backup-row .dev{flex:1;} }
+  .backup-row .hint-txt{font-size:13px; color:var(--ink-soft);}
+  .sync-btns{display:flex; flex-wrap:wrap; gap:8px; margin-top:16px;}
+  .sync-btns button{display:inline-flex; align-items:center; gap:7px; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; padding:8px 16px 8px 12px; border-radius:999px; border:1px solid #747775; background:#fff; color:#1F1F1F; cursor:pointer;}
+  .sync-btns button .gdi{width:18px; height:18px;}
+  .sync-btns button.now{border-color:#1A73E8; background:#E8F0FE; color:#0B57D0; box-shadow:0 0 0 3px rgba(26,115,232,.18);}
+  .sync-btns button.now .gdi svg{fill:#0B57D0;}
+  .sync-btns button:disabled{opacity:.4; cursor:default;}
+  .sync-status{margin-top:12px; font-size:14px; color:var(--ink-soft); min-height:2.6em;}
+
+  /* ПОСЛІДОВНІСТЬ */
+  .seq-done{list-style:none; padding:0 !important; margin:0 0 12px !important; counter-reset:seq;}
+  .seq-done li{counter-increment:seq; display:flex; align-items:center; gap:10px; background:var(--accent-soft); border:1.5px solid var(--accent); border-radius:var(--radius-s); padding:9px 12px; margin-bottom:8px; font-weight:700; font-size:14.5px;}
+  .seq-done li::before{content:counter(seq); flex-shrink:0; width:26px; height:26px; border-radius:50%; background:var(--accent); color:#fff; font-family:'Baloo 2',sans-serif; display:flex; align-items:center; justify-content:center; font-size:14px;}
+  .seq-q{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; margin-bottom:10px;}
+  .seq-q b{color:var(--sun);}
+  .seq-opts{display:flex; flex-direction:column; gap:8px;}
+  .seq-opts .choice-btn{border-radius:var(--radius-s);}
+
+  .ways{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:12px 0;}
+  @media (max-width:640px){ .ways{grid-template-columns:1fr;} }
+  .way{background:var(--surface); border:2px solid var(--line); border-top:5px solid var(--wc); border-radius:var(--radius-m); padding:12px 14px;}
+  .way .t{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px;}
+  .way ul{margin:4px 0 0 !important; padding-left:18px !important; font-size:13.5px !important; color:var(--ink-soft);}
+
+  /* QUIZ */
+  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:26px 24px; margin-top:18px;}
+  @media (max-width:520px){ .quiz-box{padding:20px 16px;} }
+  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:13px; color:var(--ink-soft); margin-bottom:10px;}
+  .quiz-q{font-size:17px; font-weight:700; margin-bottom:16px;}
+  .quiz-options{display:flex; flex-direction:column; gap:10px;}
+  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:15px; font-weight:600; padding:12px 15px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .quiz-opt:hover{border-color:var(--accent);}
+  .quiz-opt.correct{background:var(--ok-soft); border-color:var(--ok);}
+  .quiz-opt.wrong{background:#FDE6E1; border-color:var(--coral);}
+  .quiz-why{margin-top:12px; font-size:14px; color:var(--ink-soft); min-height:1.3em;}
+  .quiz-nav{display:flex; justify-content:flex-end; margin-top:14px;}
+  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:11px 22px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
+  .btn-next.active{opacity:1; pointer-events:auto;}
+
+  .completion{display:none; text-align:center; padding:20px 10px 10px;}
+  .completion.show{display:block;}
+  .badge{width:90px; height:90px; margin:0 auto 16px;}
+  .completion h3{font-size:22px; margin-bottom:10px;}
+  .completion p{color:var(--ink-soft); max-width:52ch; margin:0 auto 18px; font-size:15px;}
+  .completion .total{font-family:'Baloo 2',sans-serif; font-size:30px; color:var(--accent-dark);}
+
+  footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
+  footer .credits{display:block; max-width:62ch; margin:12px auto 0; font-size:11.5px; line-height:1.55; opacity:.8;}
+
+  /* ===== ІНДИВІДУАЛЬНА ФОРМА: ІГРОВІ ЕЛЕМЕНТИ ===== */
+  .block p.lead{font-size:17px;}
+  .lv{width:22px; height:22px; border-radius:50%; border:2px solid var(--line); background:#fff; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:11.5px; color:var(--ink-soft); display:flex; align-items:center; justify-content:center; transition:background .3s ease, border-color .3s ease, transform .3s ease;}
+  .lv.done{background:var(--g-green); border-color:var(--g-green); color:#fff; transform:scale(1.12);}
+  .step-label .lvl-tag{display:inline-block; background:var(--accent); color:#fff; border-radius:999px; padding:0 9px; margin-right:6px;}
+
+  .toast{position:fixed; left:50%; bottom:24px; transform:translate(-50%,calc(100% + 40px)); background:#1F1F1F; color:#fff; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; padding:10px 20px; border-radius:999px; box-shadow:0 6px 20px rgba(0,0,0,.25); transition:transform .35s cubic-bezier(.2,1.4,.4,1); z-index:100; white-space:nowrap;}
+  .toast.show{transform:translate(-50%,0);}
+
+  .mini-tiles{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+  @media (max-width:600px){ .mini-tiles{grid-template-columns:repeat(2,1fr);} }
+  .mini-tiles .perk{padding:12px 8px;}
+  .mini-tiles .perk b{font-size:14.5px; margin:0;}
+  .pros h3, .cons h3{margin:0 0 10px !important; font-size:16px;}
+
+  /* «Швидка гра»: одна картка за раз */
+  .qf{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:22px; margin-top:16px; text-align:center;}
+  .qf-top{display:flex; justify-content:space-between; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--ink-soft); margin-bottom:10px;}
+  .qf-streak{color:#E37400;}
+  .qf-pic{font-size:52px; line-height:1.1; margin:4px 0 8px; min-height:58px; display:flex; align-items:center; justify-content:center;}
+  .qf-pic img{width:56px; height:56px; object-fit:contain;}
+  .qf-pic svg{width:180px; max-width:100%; height:auto;}
+  .qf-text{font-size:18px; font-weight:700; max-width:34ch; margin:0 auto 16px; line-height:1.4;}
+  .qf-opts{display:flex; gap:10px; justify-content:center; flex-wrap:wrap;}
+  .qf-opt{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; padding:12px 22px; border-radius:16px; border:2px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; min-width:140px; display:inline-flex; align-items:center; justify-content:center; gap:8px; transition:transform .1s ease, border-color .15s ease;}
+  .qf-opt:hover{border-color:var(--accent); transform:translateY(-2px);}
+  .qf-opt img{width:22px; height:22px;}
+  .qf-opt.right{background:var(--ok-soft); border-color:var(--ok);}
+  .qf-opt.wrong{background:#FDE6E1; border-color:var(--coral); animation:shakeX .35s ease;}
+  .qf-fb{min-height:1.5em; margin-top:12px; font-size:15px; color:var(--ink-soft);}
+  .qf-fb.good{color:#256B36; font-weight:700;}
+  .qf-done{font-family:'Baloo 2',sans-serif; font-size:22px; font-weight:700; color:#188038; padding:20px 0 6px;}
+
+  /* MEMO: ЗНАЙДИ ПАРУ */
+  .memo-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+  @media (max-width:560px){ .memo-grid{grid-template-columns:repeat(3,1fr);} .memo-card .memo-feat{font-size:12px;} }
+  .memo-card{height:112px;}
+  .memo-card .flip-face{padding:9px;}
+  .memo-card .flip-front{background:linear-gradient(145deg,var(--accent),var(--accent-dark)); border-color:var(--accent-dark);}
+  .memo-card .memo-cover{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:28px; color:#fff; opacity:.9;}
+  .memo-card .flip-back{border:2px solid var(--line); background:#F0F4F9; transform:rotateY(180deg); align-items:center; text-align:center;}
+  .memo-card .memo-name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; color:var(--ink); display:flex; align-items:center; gap:4px;}
+  .memo-card .memo-name .cr-ico{width:22px; height:22px; fill:var(--accent);}
+  .memo-card .memo-feat{font-size:13.5px; color:var(--ink-soft); line-height:1.35;}
+  .memo-card.matched .flip-back{border-color:var(--ok); background:var(--ok-soft);}
+  .memo-card.miss .flip-back{border-color:var(--coral); background:#FDE6E1;}
+
+  .legend-chips{display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 4px;}
+  .gloss{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:12px 0 6px;}
+  @media (max-width:640px){ .gloss{grid-template-columns:repeat(2,1fr);} }
+  .gl{background:#fff; border-radius:var(--radius-m); padding:14px 10px; text-align:center; box-shadow:0 1px 2px rgba(60,64,67,.12), 0 2px 8px rgba(60,64,67,.08);}
+  .gl-ic{width:52px; height:52px; border-radius:50%; background:#E8F0FE; display:flex; align-items:center; justify-content:center; margin:0 auto 8px;}
+  .gl-ic .gdi{width:28px; height:28px;}
+  .gl-ic .gdi svg{fill:#1A73E8;}
+  .gl-ic img{width:30px; height:27px;}
+  .gl b{display:block; font-family:'Baloo 2',sans-serif; font-size:16px;}
+  .gl span{font-size:13.5px; color:var(--ink-soft); line-height:1.35; display:block;}
+  .memo-card .memo-name .gdi{width:22px; height:22px;}
+  .memo-card .memo-name .gdi svg{fill:var(--accent);}
+  .sync-ill{margin:6px 0 16px; background:linear-gradient(180deg,#E8F0FE 0%,#F8FAFD 100%); border-radius:var(--radius-l); padding:16px 12px 14px;}
+  .sync-ill svg{display:block; width:100%; max-width:600px; height:auto; margin:0 auto;}
+  .sync-ill text{font-family:'Nunito Sans',sans-serif; font-size:15px; font-weight:700; fill:#5F6368;}
+  .sync-ill text.b{font-family:'Baloo 2',sans-serif; font-size:17px; fill:#1A73E8;}
+  .sync-ill figcaption{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:8px;}
+  .sync-ill figcaption span{background:#fff; border-radius:999px; padding:4px 12px; font-size:13.5px; font-weight:700; box-shadow:0 1px 2px rgba(60,64,67,.15);}
+  .sync-ill text.w{font-size:8.5px; fill:#fff; font-weight:800;}
+  .sync-ill text.s{font-size:8.5px; fill:#1F1F1F; font-weight:700;}
+  /* «Друкую — бачу на телефоні» */
+  .td{display:flex; align-items:center; justify-content:center; gap:14px; padding:10px 4px 2px;}
+  .td-laptop{flex:0 1 330px; min-width:0;}
+  .td-screen{background:#1F1F1F; border-radius:10px 10px 4px 4px; padding:7px;}
+  .td-base{height:10px; background:#5F6368; border-radius:0 0 10px 10px; margin:0 -14px;}
+  .td-bar{display:flex; align-items:center; gap:6px; background:#fff; border-radius:4px 4px 0 0; padding:5px 8px; font-size:12px; font-weight:800; border-bottom:1px solid #EEF0F2;}
+  .td-bar img{width:13px; height:16px;}
+  .td-status{margin-left:auto; font-weight:600; color:#5F6368; font-size:11px; white-space:nowrap;}
+  .td-page{background:#fff; min-height:110px; padding:10px 12px; font-size:14px; line-height:1.45; border-radius:0 0 4px 4px; word-wrap:break-word;}
+  .td-caret{display:inline-block; width:2px; height:1.05em; background:#1A73E8; vertical-align:-2px; animation:blink 1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  .td-mid{display:flex; flex-direction:column; align-items:center; gap:6px; flex-shrink:0;}
+  .td-cloud{width:64px; height:64px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(26,115,232,.2);}
+  .td-cloud img{width:34px; height:31px;}
+  .td-sync{width:28px; height:28px; border-radius:50%; background:#E8F0FE; display:flex; align-items:center; justify-content:center;}
+  .td-sync .gdi{width:18px; height:18px;}
+  .td-sync .gdi svg{fill:#1A73E8;}
+  .td-sync.spin .gdi{animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(-360deg);}}
+  .td-phone{flex:0 0 120px;}
+  .td-pscreen{background:#1F1F1F; border-radius:16px; padding:10px 5px;}
+  .td-pscreen .td-page{min-height:150px; font-size:11px; padding:7px;}
+  .td-pscreen .td-bar{font-size:10.5px; padding:4px 6px;}
+  .td-lbl{text-align:center; font-weight:700; font-size:13.5px; color:#5F6368; margin-top:6px;}
+  @media (max-width:520px){ .td{gap:6px;} .td-phone{flex-basis:92px;} .td-cloud{width:46px; height:46px;} .td-cloud img{width:26px; height:24px;} .td-page{font-size:12px; min-height:90px;} .td-status{display:none;} }
+  .fm{border:1.5px solid var(--line); border-radius:var(--radius-m); background:#fff; padding:12px 14px 6px; min-height:400px;}
+  .fm-top{display:flex; align-items:center; gap:14px; margin-bottom:6px;}
+  .fm-top .gd-new{margin:0;}
+  .fm-title{font-size:19px; font-weight:600;}
+  .fm-wrap{position:relative;}
+  .fm-row{display:flex; align-items:center; gap:10px; padding:9px 4px; border-top:1px solid #EEF0F2; font-size:14.5px;}
+  .fm-row img{width:20px; height:20px; object-fit:contain;}
+  .fm-row .gd-folder svg{fill:#5F6368;}
+  .fm-row .fm-name{flex:1; min-width:0;}
+  .fm-row .fm-cnt{color:var(--ink-soft); font-size:12.5px; margin-left:6px;}
+  .fm-row .fm-star{color:#E37400;}
+  .fm-row.new{animation:fmIn .5s ease;}
+  @keyframes fmIn{from{background:#E8F0FE;} to{background:#fff;}}
+  .fm-more{width:34px; height:34px; border-radius:50%; border:none; background:none; cursor:pointer; display:flex; align-items:center; justify-content:center;}
+  .fm-more:hover, .fm-more.open{background:#E9EEF6;}
+  .fm-menu{position:absolute; top:calc(100% + 4px); right:0; z-index:20; background:#fff; border-radius:10px; box-shadow:0 2px 6px rgba(60,64,67,.3), 0 6px 18px rgba(60,64,67,.18); padding:6px 0; min-width:220px;}
+  #fmNewMenu{left:0; right:auto;}
+  .fm-item{display:flex; align-items:center; gap:12px; width:100%; border:none; background:none; padding:9px 16px; font-family:'Nunito Sans',sans-serif; font-size:14px; font-weight:600; color:#1F1F1F; cursor:pointer; text-align:left;}
+  .fm-item:hover{background:#F1F3F4;}
+  .fm-item img{width:18px; height:18px;}
+  .fm-item.shake{animation:shakeX .35s ease; background:#FDE6E1;}
+  .legend-chips > span{display:inline-flex; align-items:center; gap:6px; background:#fff; border:1px solid var(--line); border-radius:999px; padding:5px 12px 5px 8px; font-size:13.5px; font-weight:700;}
+  .model .pz{font-size:14.5px;}
+  .lv-sum{display:flex; gap:6px; justify-content:center; margin:0 0 16px;}
+  .lv-sum .lv{width:28px; height:28px; font-size:13px;}
+</style>
+</head>
+<body>
+
+<div class="hud">
+  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
+  <div class="hud-row">
+    <span class="hud-title">Хмара і Google Диск</span>
+    <div class="neuron-counter">
+      <svg viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
+        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#E0A800" opacity="0.6"/>
+      </svg>
+      <span id="neuronCount">0</span>
+    </div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · 7 клас</div>
+      <h1>Хмара і Google Диск</h1>
+      <button class="btn-primary" onclick="document.getElementById('start').scrollIntoView()">Грати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 160 160" fill="none">
+      <circle cx="58" cy="70" r="28" fill="#4285F4"/>
+      <circle cx="92" cy="58" r="34" fill="#4285F4"/>
+      <circle cx="122" cy="78" r="22" fill="#4285F4"/>
+      <rect x="36" y="74" width="104" height="26" rx="13" fill="#4285F4"/>
+      <circle cx="78" cy="74" r="5" fill="#fff"/><circle cx="104" cy="74" r="5" fill="#fff"/>
+      <circle cx="79.5" cy="75" r="2.3" fill="#1F1F1F"/><circle cx="105.5" cy="75" r="2.3" fill="#1F1F1F"/>
+      <path d="M84 86 Q91 92 98 86" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+      <g transform="translate(57 108) scale(0.53)">
+        <path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
+        <path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/>
+        <path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/>
+        <path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/>
+        <path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/>
+        <path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/>
+      </g>
+      <path d="M14 122 L14 144 L38 144 L38 128 L32 122 Z" fill="#fff" stroke="#1F1F1F" stroke-width="2.5" stroke-linejoin="round"/>
+      <line x1="19" y1="132" x2="33" y2="132" stroke="#34A853" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="19" y1="138" x2="29" y2="138" stroke="#34A853" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="128" y="114" width="22" height="34" rx="4" fill="#1F1F1F"/>
+      <rect x="131" y="118" width="16" height="24" rx="2" fill="#E8F0FE"/>
+      <path d="M30 116 Q40 104 52 110" stroke="#FBBC04" stroke-width="3" stroke-linecap="round" fill="none"/>
+      <path d="M46 104 L52 110 L45 114" stroke="#FBBC04" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <path d="M108 110 Q122 104 132 110" stroke="#EA4335" stroke-width="3" stroke-linecap="round" fill="none"/>
+      <path d="M125 105 L132 110 L126 116" stroke="#EA4335" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="start">
+    <div class="step-label"><span class="lvl-tag">Крок 1</span>Що таке хмара</div>
+    <h2>Хмара — це сховище для файлів в інтернеті</h2>
+    <p class="lead">Файли лежать не в тебе, а на серверах в інтернеті. Відкрити їх можна з будь-якого пристрою.</p>
+    <figure class="sync-ill ill-panel">
+      <svg viewBox="0 0 600 270" role="img" aria-label="Файл зі зміною піднімається з ноутбука в хмару Google Диска й опускається на телефон і планшет">
+        <defs>
+          <filter id="cloudShadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#1A73E8" flood-opacity=".18"/></filter>
+        </defs>
+        <!-- лінії зв’язку -->
+        <path id="pUp" d="M130 168 L262 112" stroke="#AECBFA" stroke-width="3" stroke-dasharray="6 7" fill="none"/>
+        <path id="pDn1" d="M300 122 L300 166" stroke="#AECBFA" stroke-width="3" stroke-dasharray="6 7" fill="none"/>
+        <path id="pDn2" d="M338 112 L470 168" stroke="#AECBFA" stroke-width="3" stroke-dasharray="6 7" fill="none"/>
+        <!-- хмара з логотипом Диска -->
+        <g filter="url(#cloudShadow)">
+          <circle cx="262" cy="78" r="34" fill="#fff"/><circle cx="306" cy="60" r="44" fill="#fff"/><circle cx="348" cy="84" r="30" fill="#fff"/>
+          <rect x="230" y="78" width="148" height="40" rx="20" fill="#fff"/>
+        </g>
+        <image href="images/drive.svg" x="282" y="64" width="46" height="41"/>
+        <!-- ноутбук -->
+        <rect x="70" y="170" width="94" height="58" rx="6" fill="#1F1F1F"/><rect x="76" y="176" width="82" height="46" rx="3" fill="#E8F0FE"/>
+        <path d="M58 232 H176 L170 240 H64 Z" fill="#5F6368"/>
+        <!-- телефон -->
+        <rect x="282" y="168" width="36" height="66" rx="7" fill="#1F1F1F"/><rect x="286" y="176" width="28" height="50" rx="3" fill="#E8F0FE"/>
+        <!-- планшет -->
+        <rect x="438" y="168" width="78" height="66" rx="8" fill="#1F1F1F"/><rect x="444" y="174" width="66" height="54" rx="4" fill="#E8F0FE"/>
+        <!-- документи в пристроях -->
+        <g transform="translate(117 199)"><rect x="-9" y="-11" width="18" height="22" rx="3" fill="#4285F4"/><rect x="-5" y="-4" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="0" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="4" width="6" height="2" rx="1" fill="#fff"/></g>
+        <g opacity="0"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.74;0.78;1" dur="4s" repeatCount="indefinite"/><g transform="translate(300 201)"><rect x="-9" y="-11" width="18" height="22" rx="3" fill="#4285F4"/><rect x="-5" y="-4" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="0" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="4" width="6" height="2" rx="1" fill="#fff"/></g></g>
+        <g opacity="0"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.74;0.78;1" dur="4s" repeatCount="indefinite"/><g transform="translate(477 201)"><rect x="-9" y="-11" width="18" height="22" rx="3" fill="#4285F4"/><rect x="-5" y="-4" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="0" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="4" width="6" height="2" rx="1" fill="#fff"/></g></g>
+        <!-- олівець: зміна на ноутбуці -->
+        <g><animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.12;0.16;1" dur="4s" repeatCount="indefinite"/>
+          <path d="M134 186 l10 -10 l4 4 l-10 10 h-4 z" fill="#FBBC04" stroke="#1F1F1F" stroke-width="1.5" stroke-linejoin="round"/></g>
+        <!-- документ летить угору в хмару -->
+        <g opacity="0">
+          <animateMotion dur="4s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.15;0.45;1" calcMode="linear"><mpath href="#pUp"/></animateMotion>
+          <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.14;0.17;0.44;0.48;1" dur="4s" repeatCount="indefinite"/>
+          <rect x="-9" y="-11" width="18" height="22" rx="3" fill="#4285F4"/><rect x="-5" y="-4" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="0" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="4" width="6" height="2" rx="1" fill="#fff"/>
+        </g>
+        <!-- і вниз на телефон та планшет -->
+        <g opacity="0">
+          <animateMotion dur="4s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.48;0.74;1" calcMode="linear"><mpath href="#pDn1"/></animateMotion>
+          <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.47;0.5;0.73;0.76;1" dur="4s" repeatCount="indefinite"/>
+          <rect x="-9" y="-11" width="18" height="22" rx="3" fill="#4285F4"/><rect x="-5" y="-4" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="0" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="4" width="6" height="2" rx="1" fill="#fff"/>
+        </g>
+        <g opacity="0">
+          <animateMotion dur="4s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.48;0.74;1" calcMode="linear"><mpath href="#pDn2"/></animateMotion>
+          <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.47;0.5;0.73;0.76;1" dur="4s" repeatCount="indefinite"/>
+          <rect x="-9" y="-11" width="18" height="22" rx="3" fill="#4285F4"/><rect x="-5" y="-4" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="0" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="4" width="6" height="2" rx="1" fill="#fff"/>
+        </g>
+        <!-- підписи -->
+        <text x="117" y="262" text-anchor="middle">Ноутбук</text>
+        <text x="300" y="262" text-anchor="middle">Телефон</text>
+        <text x="477" y="262" text-anchor="middle">Планшет</text>
+        <text x="306" y="22" text-anchor="middle" class="b">Google Диск</text>
+      </svg>
+    </figure>
+
+    <figure class="sync-ill ill-panel">
+      <div class="td">
+        <div class="td-laptop">
+          <div class="td-screen">
+            <div class="td-bar"><img src="images/docs.svg" alt="">Реферат<span class="td-status" id="tdStatus">Збережено на Диску</span></div>
+            <div class="td-page"><span id="tdLap"></span><i class="td-caret"></i></div>
+          </div>
+          <div class="td-base"></div>
+          <div class="td-lbl">Ноутбук</div>
+        </div>
+        <div class="td-mid">
+          <div class="td-cloud"><img src="images/drive.svg" alt=""></div>
+          <div class="td-sync" id="tdSync"><span class="gdi" data-i="sync"></span></div>
+        </div>
+        <div class="td-phone">
+          <div class="td-pscreen">
+            <div class="td-bar"><img src="images/docs.svg" alt="">Реферат</div>
+            <div class="td-page" id="tdPhone"></div>
+          </div>
+          <div class="td-lbl">Телефон</div>
+        </div>
+      </div>
+    </figure>
+
+    <figure class="sync-ill ill-panel">
+      <svg viewBox="0 0 600 270" role="img" aria-label="Лист вилітає з ноутбука, проходить через сервер Gmail у хмарі й приходить на телефон друга">
+        <path id="pMail" d="M140 166 L300 104 L470 150" stroke="#F6AEA9" stroke-width="3" stroke-dasharray="6 7" fill="none"/>
+        <g filter="url(#cloudShadow)">
+          <circle cx="262" cy="78" r="34" fill="#fff"/><circle cx="306" cy="60" r="44" fill="#fff"/><circle cx="348" cy="84" r="30" fill="#fff"/>
+          <rect x="230" y="78" width="148" height="40" rx="20" fill="#fff"/>
+        </g>
+        <image href="images/gmail.svg" x="281" y="66" width="48" height="36"/>
+        <!-- ноутбук з кнопкою «Надіслати» -->
+        <rect x="70" y="170" width="116" height="66" rx="6" fill="#1F1F1F"/><rect x="76" y="176" width="104" height="54" rx="3" fill="#fff"/>
+        <path d="M58 240 H198 L192 248 H64 Z" fill="#5F6368"/>
+        <image href="images/gmail.svg" x="84" y="183" width="20" height="15"/>
+        <rect x="110" y="186" width="60" height="4" rx="2" fill="#DADCE0"/><rect x="84" y="203" width="86" height="4" rx="2" fill="#DADCE0"/>
+        <rect x="84" y="212" width="58" height="14" rx="7" fill="#0B57D0">
+          <animate attributeName="fill" values="#0B57D0;#0B57D0;#4285F4;#0B57D0;#0B57D0" keyTimes="0;0.08;0.12;0.16;1" dur="4.5s" repeatCount="indefinite"/>
+        </rect>
+        <text x="113" y="222" text-anchor="middle" class="w">Надіслати</text>
+        <!-- телефон друга -->
+        <rect x="448" y="132" width="70" height="120" rx="10" fill="#1F1F1F"/><rect x="454" y="142" width="58" height="100" rx="4" fill="#F8FAFD"/>
+        <g opacity="0">
+          <animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.72;0.76;0.95;1" dur="4.5s" repeatCount="indefinite"/>
+          <rect x="457" y="148" width="52" height="30" rx="6" fill="#fff" stroke="#DADCE0"/>
+          <image href="images/gmail.svg" x="461" y="153" width="14" height="10"/>
+          <text x="477" y="162" class="s">Новий</text><text x="483" y="173" text-anchor="middle" class="s">від Олі</text>
+          <circle cx="512" cy="136" r="8" fill="#EA4335"/><text x="512" y="140" text-anchor="middle" class="w">1</text>
+        </g>
+        <!-- конверт летить -->
+        <g opacity="0">
+          <animateMotion dur="4.5s" repeatCount="indefinite" keyPoints="0;0;0.5;0.5;1;1" keyTimes="0;0.14;0.42;0.5;0.72;1" calcMode="linear"><mpath href="#pMail"/></animateMotion>
+          <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.13;0.16;0.7;0.73;1" dur="4.5s" repeatCount="indefinite"/>
+          <rect x="-15" y="-10" width="30" height="20" rx="3" fill="#fff" stroke="#EA4335" stroke-width="2.5"/><path d="M-13 -8 L0 2 L13 -8" fill="none" stroke="#EA4335" stroke-width="2.5" stroke-linejoin="round"/>
+        </g>
+        <text x="128" y="266" text-anchor="middle">Ти</text>
+        <text x="306" y="22" text-anchor="middle" class="b">Сервер Gmail</text>
+        <text x="483" y="266" text-anchor="middle">Друг</text>
+      </svg>
+    </figure>
+    <div class="pros"><h3>👍 Плюси</h3><div class="mini-tiles">
+      <div class="perk" style="--c:#1A73E8; --t:#D2E3FC;"><div class="ic-tile"><svg class="ill" viewBox="0 0 48 48" aria-hidden="true"><path class="s t" d="M14 21a6.5 6.5 0 0 1 12.6-2.3A5.5 5.5 0 1 1 30 29H15a4 4 0 0 1-1-8z"/><rect class="s w" x="4" y="33" width="20" height="10" rx="2"/><path class="s" d="M2 46h24"/><rect class="s w" x="33" y="31" width="11" height="15" rx="2.5"/><path class="s" d="M14 31v-1M38 29v-2" stroke-dasharray="1 3"/></svg></div><b>Будь-де</b></div>
+      <div class="perk" style="--c:#188038; --t:#CEEAD6;"><div class="ic-tile"><svg class="ill" viewBox="0 0 48 48" aria-hidden="true"><rect class="s w" x="7" y="5" width="25" height="33" rx="3"/><path class="s" d="M13 13h13M13 19h13M13 25h7"/><circle class="s t" cx="31" cy="35" r="7"/><circle class="f" cx="40" cy="38" r="6"/><path class="s" d="M26 27l4 2"/></svg></div><b>Разом з друзями</b></div>
+      <div class="perk" style="--c:#007B83; --t:#CBF0F8;"><div class="ic-tile"><svg class="ill" viewBox="0 0 48 48" aria-hidden="true"><path class="s t" d="M24 5l15 5v10c0 10-6.5 17-15 21C15.5 37 9 30 9 20V10z"/><path class="s" d="M17 22l5 5 9-10"/></svg></div><b>Не загубиться</b></div>
+      <div class="perk" style="--c:#8430CE; --t:#E9D2FD;"><div class="ic-tile"><svg class="ill" viewBox="0 0 48 48" aria-hidden="true"><rect class="s w" x="13" y="4" width="22" height="40" rx="4"/><path class="s" d="M24 23V12M19.5 16.5 24 12l4.5 4.5"/><rect class="t" x="17" y="31" width="14" height="5" rx="2.5"/><rect class="f" x="17" y="31" width="4" height="5" rx="2.5"/></svg></div><b>Вільна пам’ять</b></div>
+    </div></div>
+    <div class="cons"><h3>⚠️ Ризики</h3><div class="mini-tiles">
+      <div class="perk" style="--c:#C5221F; --t:#FAD2CF;"><div class="ic-tile"><svg class="ill" viewBox="0 0 48 48" aria-hidden="true"><path class="s" d="M7 19a24 24 0 0 1 34 0M13 25.5a15 15 0 0 1 22 0M19 32a7 7 0 0 1 10 0"/><circle class="f" cx="24" cy="38" r="2.4"/><path class="s" d="M9 8l30 32" style="stroke-width:3"/></svg></div><b>Без інтернету не відкриєш</b></div>
+      <div class="perk" style="--c:#B06000; --t:#FEEFC3;"><div class="ic-tile"><svg class="ill" viewBox="0 0 48 48" aria-hidden="true"><path class="s" d="M17 21v-6a7 7 0 0 1 13.4-2.8"/><rect class="s t" x="11" y="21" width="26" height="21" rx="4"/><circle class="f" cx="24" cy="30" r="2.6"/><path class="s" d="M24 32v4"/></svg></div><b>Пароль можуть вкрасти</b></div>
+      <div class="perk" style="--c:#B80672; --t:#FDCFE8;"><div class="ic-tile"><svg class="ill" viewBox="0 0 48 48" aria-hidden="true"><path class="s w" d="M5 24s7-12 19-12 19 12 19 12-7 12-19 12S5 24 5 24z"/><circle class="t" cx="24" cy="24" r="7"/><circle class="f" cx="24" cy="24" r="3.4"/><path class="s" d="M37 5l6 6M43 5l-6 6" style="stroke-width:2"/></svg></div><b>Побачать чужі</b></div>
+      <div class="perk" style="--c:#C26401; --t:#FEDFC8;"><div class="ic-tile"><svg class="ill" viewBox="0 0 48 48" aria-hidden="true"><path class="s t" d="M24 4l10 17H14z"/><path class="s" d="M24 10v5"/><circle class="f" cx="24" cy="18" r="1.4"/><rect class="s w" x="6" y="28" width="36" height="12" rx="6"/><rect class="f" x="9" y="31" width="30" height="6" rx="3"/></svg></div><b>Місце скінчиться</b></div>
+    </div></div>
+    <div class="qf" id="qfWhere"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label"><span class="lvl-tag">Крок 2</span>Сховища</div>
+    <h2>Де тримати файли</h2>
+    <p class="lead">Клацни на картку, щоб її перевернути.</p>
+    <div class="gallery" id="driveGallery"></div>
+    <div class="qf" id="qfDrive"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label"><span class="lvl-tag">Крок 3</span>Google Диск</div>
+    <h2>Що де лежить на Диску</h2>
+    <div class="legend-chips">
+      <span><span class="gdi" data-i="add"></span>Створити</span>
+      <span><span class="gdi" data-i="my"></span>Мій диск — твої файли</span>
+      <span><span class="gdi" data-i="shared"></span>Доступні мені — від інших</span>
+      <span><span class="gdi" data-i="trash"></span>Кошик — видалене</span>
+    </div>
+    <div class="exercise">
+      <div class="tour-task"><span class="num" id="tourNum"></span><span id="tourTask"></span></div>
+      <div class="gd">
+        <div class="gd-top"><img src="images/drive.svg" alt=""><span class="ttl">Диск</span><div class="gd-search"><span class="gdi" data-i="search" style="width:18px;height:18px;vertical-align:-4px;margin-right:6px;"></span>Пошук на Диску</div></div>
+        <div class="gd-body">
+          <div class="gd-side" id="gdSide"></div>
+          <div class="gd-main" id="gdMain"></div>
+        </div>
+      </div>
+      <div class="progress-line" id="tourProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label"><span class="lvl-tag">Крок 4</span>Працюємо з файлами</div>
+    <h2>Що можна робити з файлом на Диску</h2>
+    <p class="lead">Натисни <b>⋮</b> біля файлу — з’явиться меню дій.</p>
+    <div class="legend-chips">
+      <span><span class="gdi" data-i="upload"></span>Завантажити файл — з комп’ютера на Диск</span>
+      <span><span class="gdi" data-i="edit"></span>Перейменувати</span>
+      <span><span class="gdi" data-i="move"></span>Перемістити в папку</span>
+      <span><span class="gdi" data-i="star"></span>Додати зірочку</span>
+      <span><span class="gdi" data-i="trash"></span>Видалити — у Кошик</span>
+    </div>
+    <div class="exercise">
+      <div class="tour-task"><span class="num" id="fmNum"></span><span id="fmTask"></span></div>
+      <div class="fm">
+        <div class="fm-top">
+          <div class="fm-wrap"><button class="gd-new" id="fmNew"><span class="gdi" data-i="add"></span>Створити</button><div class="fm-menu" id="fmNewMenu" hidden></div></div>
+          <div class="fm-title">Мій диск</div>
+        </div>
+        <div id="fmList"></div>
+      </div>
+      <div class="qf-fb" id="fmFb"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label"><span class="lvl-tag">Крок 5</span>Доступ</div>
+    <h2>Хто бачить твій файл</h2>
+    <div class="legend-chips">
+      <span><span class="gdi" data-i="lock"></span>Лише я або додані люди</span>
+      <span><span class="gdi" data-i="globe"></span>Усі з посиланням</span>
+    </div>
+    <div class="legend-chips">
+      <span><span class="gdi" data-i="view"></span>Читач — дивиться</span>
+      <span><span class="gdi" data-i="comment"></span>Коментатор — пише примітки</span>
+      <span><span class="gdi" data-i="edit"></span>Редактор — змінює</span>
+    </div>
+    <div class="exercise">
+      <div class="share-task"><div class="num" id="shareNum"></div><div class="txt" id="shareTask"></div></div>
+      <div class="share-dlg">
+        <div class="share-title">Поділитися «<span id="shareFile"></span>»</div>
+        <div class="share-add"><span class="gdi" data-i="personadd"></span>Додати людей</div>
+        <div class="share-lbl">Загальний доступ</div>
+        <div class="seg" id="segAccess"></div>
+        <div class="share-lbl">Роль</div>
+        <div class="seg" id="segRole"></div>
+        <div class="share-preview" id="sharePreview"></div>
+        <div class="share-foot"><span class="share-link"><span class="gdi" data-i="link"></span>Копіювати посилання</span><button class="btn-check" id="shareCheck">Перевірити</button></div>
+      </div>
+      <div class="share-nav"><div class="share-fb" id="shareFb"></div></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label"><span class="lvl-tag">Крок 6</span>Обмін файлами</div>
+    <h2>Поділись папкою з фото</h2>
+    <p class="lead">Обирай дії по черзі.</p>
+    <div class="exercise">
+      <ol class="seq-done" id="seqDone"></ol>
+      <div class="seq-q" id="seqQ"></div>
+      <div class="seq-opts" id="seqOpts"></div>
+      <div class="choice-feedback" id="seqFb"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label"><span class="lvl-tag">Крок 7</span>IaaS, PaaS, SaaS</div>
+    <h2>Хмара — як піцерія</h2>
+    <div class="models">
+      <div class="model" style="--mc:#EA4335;"><svg class="model-pic" viewBox="0 0 160 100" aria-hidden="true">
+          <rect x="8" y="16" width="78" height="74" rx="9" fill="#5F6368"/>
+          <rect x="18" y="40" width="58" height="38" rx="5" fill="#3C4043"/>
+          <path d="M26 72 Q34 62 40 72 Q47 60 54 72 Q60 63 68 72 Z" fill="#FBBC04"/>
+          <circle cx="24" cy="28" r="4.5" fill="#fff"/><circle cx="38" cy="28" r="4.5" fill="#fff"/>
+          <rect x="98" y="50" width="26" height="40" rx="5" fill="#F1E3C6" stroke="#C9B48A" stroke-width="2"/>
+          <rect x="102" y="62" width="18" height="8" rx="2" fill="#fff"/>
+          <circle cx="139" cy="80" r="10" fill="#EA4335"/><path d="M136 70 l3 4 l3 -4" stroke="#34A853" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <ellipse cx="139" cy="58" rx="8" ry="10" fill="#FFF8E7" stroke="#E0D3B0" stroke-width="2"/>
+        </svg><div class="abbr">IaaS</div><div class="pz">Кухня в оренду. Готуєш сам.</div></div>
+      <div class="model" style="--mc:#E37400;"><svg class="model-pic" viewBox="0 0 160 100" aria-hidden="true">
+          <rect x="8" y="16" width="78" height="74" rx="9" fill="#5F6368"/>
+          <rect x="18" y="40" width="58" height="38" rx="5" fill="#3C4043"/>
+          <path d="M26 72 Q34 62 40 72 Q47 60 54 72 Q60 63 68 72 Z" fill="#FBBC04"/>
+          <circle cx="24" cy="28" r="4.5" fill="#fff"/><circle cx="38" cy="28" r="4.5" fill="#fff"/>
+          <ellipse cx="126" cy="70" rx="30" ry="18" fill="#F1D9A6"/>
+          <ellipse cx="126" cy="68" rx="24" ry="13" fill="#E8553D"/>
+          <circle cx="104" cy="36" r="5" fill="#34A853"/><circle cx="118" cy="30" r="5" fill="#EA4335"/><circle cx="132" cy="36" r="5" fill="#FBBC04"/>
+          <path d="M104 44 L114 58 M118 38 L120 54 M132 44 L126 56" stroke="#9AA0A6" stroke-width="2" stroke-dasharray="3 3"/>
+        </svg><div class="abbr">PaaS</div><div class="pz">Основа й піч. Додаєш начинку.</div></div>
+      <div class="model" style="--mc:#1A73E8;"><svg class="model-pic" viewBox="0 0 160 100" aria-hidden="true">
+          <path d="M22 40 L32 8 H128 L138 40 Z" fill="#C58B4E"/><path d="M36 14 H124" stroke="#B07A40" stroke-width="2"/>
+          <rect x="22" y="40" width="116" height="52" rx="6" fill="#D9A066"/>
+          <circle cx="80" cy="66" r="24" fill="#F1D9A6"/>
+          <circle cx="80" cy="66" r="20" fill="#FBBC04"/>
+          <path d="M80 46 V86 M60 66 H100 M66 52 L94 80 M94 52 L66 80" stroke="#E8A800" stroke-width="1.5"/>
+          <circle cx="72" cy="58" r="3.5" fill="#EA4335"/><circle cx="89" cy="61" r="3.5" fill="#EA4335"/><circle cx="76" cy="75" r="3.5" fill="#EA4335"/><circle cx="90" cy="76" r="3.5" fill="#EA4335"/>
+          <circle cx="66" cy="68" r="2.5" fill="#34A853"/><circle cx="84" cy="52" r="2.5" fill="#34A853"/>
+        </svg><div class="abbr">SaaS</div><div class="pz">Готова піца. Просто їж!</div></div>
+    </div>
+    <div class="qf" id="qfPizza"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label recap">Повторення · Словничок</div>
+    <h2>Запам’ятай 6 слів</h2>
+    <div class="gloss">
+      <div class="gl"><div class="gl-ic"><span class="gdi" data-i="storage"></span></div><b>Хмара</b><span>файли на серверах в інтернеті</span></div>
+      <div class="gl"><div class="gl-ic"><img src="images/drive.svg" alt=""></div><b>Google Диск</b><span>сховище файлів від Google</span></div>
+      <div class="gl"><div class="gl-ic"><span class="gdi" data-i="sync"></span></div><b>Синхронізація</b><span>зміна з’являється всюди</span></div>
+      <div class="gl"><div class="gl-ic"><span class="gdi" data-i="edit"></span></div><b>Редактор</b><span>може змінювати файл</span></div>
+      <div class="gl"><div class="gl-ic"><span class="gdi" data-i="view"></span></div><b>Читач</b><span>може лише дивитися</span></div>
+      <div class="gl"><div class="gl-ic"><span class="gdi" data-i="trash"></span></div><b>Кошик</b><span>тут видалені файли ще 30 днів</span></div>
+    </div>
+    <h3>А тепер знайди пари</h3>
+    <p class="lead">Перевертай по дві картки: слово і його значення.</p>
+    <div class="exercise">
+      <div class="memo-grid" id="memoGrid"></div>
+      <div class="progress-line" id="memoProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">🏁 Фініш</div>
+    <h2>Фінальна перевірка</h2>
+    <div class="quiz-box" id="quizBox">
+      <div class="quiz-progress" id="quizProgress"></div>
+      <div class="quiz-q" id="quizQ"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-why" id="quizWhy"></div>
+      <div class="quiz-nav"><button class="btn-next" id="quizNext">Далі</button></div>
+    </div>
+    <div class="completion" id="completion">
+      <svg class="badge" viewBox="0 0 24 24" fill="none">
+        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#6C5CE7"/>
+        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#6C5CE7"/>
+        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#6C5CE7"/>
+        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#6C5CE7"/>
+        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#6C5CE7"/>
+        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#6C5CE7"/>
+        <circle cx="12" cy="12" r="4.4" fill="#6C5CE7"/><circle cx="12" cy="12" r="1.6" fill="#5340c9" opacity="0.6"/>
+      </svg>
+      <h3>Урок пройдено!</h3>
+      <div class="lv-sum" id="lvSum"></div>
+      <p id="doneText"></p>
+      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
+    </div>
+  </section>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<footer>Урок · «Хмарні сервіси й Google Диск» · 7 клас · індивідуальна форма навчання
+  <span class="credits">Логотипи Google Диска, Gmail, Документів, Таблиць, Презентацій, Форм, Фото й Classroom (Google), OneDrive (Microsoft) та Dropbox є торговельними марками їхніх власників і використані тут із навчальною метою. Джерело — Вікісховище, суспільне надбання.</span>
+</footer>
+
+<script>
+const STORAGE_KEY = "lesson7i-cloud-services-neurons";
+let neurons = 0;
+const neuronEl = document.getElementById('neuronCount');
+const hudFill = document.getElementById('hudFill');
+
+function addNeurons(n){
+  neurons += n;
+  neuronEl.textContent = neurons;
+  neuronEl.classList.add('pop');
+  setTimeout(()=>neuronEl.classList.remove('pop'), 250);
+  saveProgress();
+}
+async function saveProgress(){
+  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
+}
+async function loadProgress(){
+  try{
+    const res = await window.storage?.get(STORAGE_KEY, false);
+    if(res && res.value){
+      const d = JSON.parse(res.value);
+      if(typeof d.neurons === 'number'){ neurons = d.neurons; neuronEl.textContent = neurons; }
+    }
+  }catch(e){}
+}
+loadProgress();
+
+window.addEventListener('scroll', ()=>{
+  const h = document.documentElement;
+  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
+});
+
+function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
+
+/* ---------- КРОКИ Й ПІДКАЗКИ-ТОСТИ ---------- */
+const LEVELS = 7;
+const doneLevels = new Set();
+
+let toastTimer = null;
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 1800);
+}
+function levelUp(n){
+  if(doneLevels.has(n)) return;
+  doneLevels.add(n);
+  toast(`🎉 Крок ${n} пройдено!`);
+}
+
+/* ---------- ЗНАЧКИ ---------- */
+const GDI = {
+  add:'<path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>',
+  home:'<path d="M12 5.69l5 4.5V18h-2v-6H9v6H7v-7.81l5-4.5M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z"/>',
+  my:'<path d="M19 15H5c-1.1 0-2 .9-2 2v2c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-2c0-1.1-.9-2-2-2zm0 4H5v-2h14v2zM7 18.5c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45 1 1 1zM8.6 3h6.8l5.2 9h-2.3l-4.05-7h-4.5L5.7 12H3.4z"/>',
+  shared:'<path d="M16.67 13.13C18.04 14.06 19 15.32 19 17v3h4v-3c0-2.18-3.57-3.47-6.33-3.87zM15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4c-.47 0-.91.1-1.33.24C14.5 5.27 15 6.58 15 8s-.5 2.73-1.33 3.76c.42.14.86.24 1.33.24zm-6 0c2.21 0 4-1.79 4-4S11.21 4 9 4 5 5.79 5 8s1.79 4 4 4zm0-6c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm0 7c-2.67 0-8 1.34-8 4v3h16v-3c0-2.66-5.33-4-8-4zm6 5H3v-.99C3.2 16.29 6.3 15 9 15s5.8 1.29 6 2v1z"/>',
+  recent:'<path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>',
+  star:'<path d="M22 9.24l-7.19-.62L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21 12 17.27 18.18 21l-1.63-7.03L22 9.24zM12 15.4l-3.76 2.27 1-4.28-3.32-2.88 4.38-.38L12 6.1l1.71 4.04 4.38.38-3.32 2.88 1 4.28L12 15.4z"/>',
+  trash:'<path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5l-1-1h-5l-1 1H5v2h14V4z"/>',
+  storage:'<path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4s1.79-4 4-4h.71C7.37 7.69 9.48 6 12 6c3.04 0 5.5 2.46 5.5 5.5v.5H19c1.66 0 3 1.34 3 3s-1.34 3-3 3z"/>',
+  search:'<path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>',
+  folder:'<path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>',
+  newfolder:'<path d="M20 6h-8l-2-2H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm0 12H4V6h5.17l2 2H20v10zm-8-4h2v2h2v-2h2v-2h-2v-2h-2v2h-2z"/>',
+  upload:'<path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5z"/>',
+  lock:'<path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"/>',
+  globe:'<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>',
+  link:'<path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/>',
+  personadd:'<path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0-6c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2zm0 8c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4zm-6 4c.22-.72 3.31-2 6-2 2.7 0 5.8 1.29 6 2H9zm-3-3v-3h3v-2H6V7H4v3H1v2h3v3z"/>',
+  view:'<path d="M12 6c3.79 0 7.17 2.13 8.82 5.5C19.17 14.87 15.79 17 12 17s-7.17-2.13-8.82-5.5C4.83 8.13 8.21 6 12 6m0-2C7 4 2.73 7.11 1 11.5 2.73 15.89 7 19 12 19s9.27-3.11 11-7.5C21.27 7.11 17 4 12 4zm0 5c1.38 0 2.5 1.12 2.5 2.5S13.38 14 12 14s-2.5-1.12-2.5-2.5S10.62 9 12 9m0-2c-2.48 0-4.5 2.02-4.5 4.5S9.52 16 12 16s4.5-2.02 4.5-4.5S14.48 7 12 7z"/>',
+  comment:'<path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12zM6 12h12v2H6zm0-3h12v2H6zm0-3h12v2H6z"/>',
+  laptop:'<path d="M20 18c1.1 0 1.99-.9 1.99-2L22 6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2H0v2h24v-2h-4zM4 6h16v10H4V6z"/>',
+  phone:'<path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 21H7v-1h10v1zm0-3H7V6h10v12zM7 4V3h10v1H7z"/>',
+  hdd:'<path d="M6 3h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm0 2v14h12V5H6zm9 10.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zM8 6.5h8v2H8z"/>',
+  sync:'<path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>',
+  backup:'<path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3zM8 13h2.55v3h2.9v-3H16l-4-4z"/>',
+  noteadd:'<path d="M13 11h-2v3H8v2h3v3h2v-3h3v-2h-3zm1-9H6c-1.1 0-2 .9-2 2v16c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm4 18H6V4h7v5h5v11z"/>',
+  copy:'<path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>',
+  restore:'<path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>',
+  edit:'<path d="M14.06 9.02l.92.92L5.92 19H5v-.92l9.06-9.06M17.66 3c-.25 0-.51.1-.7.29l-1.83 1.83 3.75 3.75 1.83-1.83c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.2-.2-.45-.29-.71-.29zm-3.6 3.19L3 17.25V21h3.75L17.81 9.94l-3.75-3.75z"/>'
+};
+const gdi = (n, extra) => `<span class="gdi ${extra||''}"><svg viewBox="0 0 24 24" aria-hidden="true">${GDI[n]}</svg></span>`;
+document.querySelectorAll('.gdi[data-i]').forEach(el=>{ el.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${GDI[el.dataset.i]}</svg>`; });
+const lg = n => `<img class="lg" src="images/${n}.svg" alt="">`;
+
+/* ---------- УНІВЕРСАЛЬНІ МЕХАНІКИ ---------- */
+
+/* Швидка гра: одна картка за раз, серії правильних відповідей дають бонус */
+function makeQuickFire(boxId, items, onDone){
+  const box = document.getElementById(boxId);
+  let qi = 0, streak = 0;
+  function render(){
+    if(qi === items.length){
+      box.innerHTML = `<div class="qf-done">✅ Готово!</div>`;
+      onDone && onDone();
+      return;
+    }
+    const it = items[qi];
+    box.innerHTML = `<div class="qf-top"><span>${qi+1} з ${items.length}</span><span class="qf-streak">${streak >= 2 ? '🔥 серія ' + streak : ''}</span></div>
+      ${it.pic ? `<div class="qf-pic">${it.pic}</div>` : ''}
+      <div class="qf-text">${it.text}</div>
+      <div class="qf-opts"></div><div class="qf-fb"></div>`;
+    const opts = box.querySelector('.qf-opts');
+    const fb = box.querySelector('.qf-fb');
+    let locked = false;
+    it.opts.forEach((o, i)=>{
+      const b = document.createElement('button');
+      b.className = 'qf-opt';
+      b.innerHTML = o;
+      b.addEventListener('click', ()=>{
+        if(locked) return;
+        if(i === it.correct){
+          locked = true;
+          b.classList.add('right');
+          streak++;
+          addNeurons(1);
+          if(streak > 0 && streak % 3 === 0){ addNeurons(1); toast(`🔥 Серія ${streak}! +1 бонус`); }
+          fb.className = 'qf-fb good';
+          fb.textContent = '✓ ' + (it.why || 'Правильно!');
+          setTimeout(()=>{ qi++; render(); }, 1300);
+        } else {
+          b.classList.add('wrong');
+          streak = 0;
+          box.querySelector('.qf-streak').textContent = '';
+          fb.className = 'qf-fb';
+          fb.textContent = 'Спробуй ще раз 🙂';
+        }
+      });
+      opts.appendChild(b);
+    });
+  }
+  render();
+}
+
+function makeMemo(gridId, pairs, progressId, onDone){
+  const grid = document.getElementById(gridId);
+  const progress = document.getElementById(progressId);
+  const cards = [];
+  pairs.forEach((p,i)=>{
+    cards.push({ pid:i, html:`<div class="memo-name">${p.icon}${p.name}</div>` });
+    cards.push({ pid:i, html:`<div class="memo-feat">${p.feat}</div>` });
+  });
+  let opened = [], busy = false, matched = 0;
+  function updateProgress(){
+    progress.textContent = (matched === pairs.length) ? 'Усі пари знайдено ✓' : `Знайдено пар: ${matched} з ${pairs.length}`;
+  }
+  shuffle(cards).forEach(c=>{
+    const card = document.createElement('div');
+    card.className = 'flip-card memo-card';
+    card.dataset.pid = c.pid;
+    card.innerHTML = `<div class="flip-inner">
+      <div class="flip-face flip-front"><div class="memo-cover">?</div></div>
+      <div class="flip-face flip-back">${c.html}</div>
+    </div>`;
+    card.addEventListener('click', ()=>{
+      if(busy || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+      card.classList.add('flipped');
+      opened.push(card);
+      if(opened.length < 2) return;
+      busy = true;
+      const [a, b] = opened;
+      if(a.dataset.pid === b.dataset.pid){
+        setTimeout(()=>{
+          a.classList.add('matched'); b.classList.add('matched');
+          opened = []; busy = false;
+          matched++; addNeurons(1); updateProgress();
+          if(matched === pairs.length){ addNeurons(2); onDone && onDone(); }
+        }, 400);
+      } else {
+        a.classList.add('miss'); b.classList.add('miss');
+        setTimeout(()=>{
+          a.classList.remove('flipped','miss'); b.classList.remove('flipped','miss');
+          opened = []; busy = false;
+        }, 950);
+      }
+    });
+    grid.appendChild(card);
+  });
+  updateProgress();
+}
+
+function makeGallery(gridId, items){
+  const grid = document.getElementById(gridId);
+  items.forEach(it=>{
+    const card = document.createElement('div');
+    card.className = 'flip-card' + (it.main ? ' main' : '');
+    card.style.setProperty('--card-c', it.color);
+    card.style.setProperty('--card-c-light', it.colorLight);
+    card.innerHTML = `<div class="flip-inner">
+      <div class="flip-face flip-front">${it.tag ? `<div class="tag">${it.tag}</div>` : ''}<div class="logo"><img src="images/${it.logo}" alt=""></div><div class="name">${it.name}</div><div class="free">${it.free}</div><div class="tap">клацни ↻</div></div>
+      <div class="flip-face flip-back"><ul>${it.facts.map(f=>`<li>${f}</li>`).join('')}</ul></div>
+    </div>`;
+    card.addEventListener('click', ()=>{ card.classList.toggle('flipped'); });
+    grid.appendChild(card);
+  });
+}
+
+function makeSequence(doneId, qId, optsId, fbId, steps, finalText, onDone){
+  const doneEl = document.getElementById(doneId);
+  const qEl = document.getElementById(qId);
+  const optsEl = document.getElementById(optsId);
+  const fb = document.getElementById(fbId);
+  const ordinals = ['ПЕРШИМ','ДРУГИМ','ТРЕТІМ','ЧЕТВЕРТИМ','П’ЯТИМ'];
+  let pos = 0;
+  function render(){
+    optsEl.innerHTML = '';
+    if(pos === steps.length){ qEl.textContent = ''; fb.textContent = finalText; addNeurons(2); onDone && onDone(); return; }
+    qEl.innerHTML = `Що робиш <b>${ordinals[pos]}</b>?`;
+    shuffle(steps.slice(pos)).forEach(s=>{
+      const b = document.createElement('button');
+      b.className = 'choice-btn';
+      b.textContent = s;
+      b.addEventListener('click', ()=>{
+        if(s === steps[pos]){
+          doneEl.insertAdjacentHTML('beforeend', `<li>${s}</li>`);
+          fb.textContent = '';
+          pos++; addNeurons(1);
+          render();
+        } else { b.classList.add('wrong'); fb.textContent = 'Не зараз — спершу інше.'; }
+      });
+      optsEl.appendChild(b);
+    });
+  }
+  render();
+}
+
+function makeMatching(poolId, listId, pairs, progressId, onDone){
+  const pool = document.getElementById(poolId);
+  const list = document.getElementById(listId);
+  const progress = document.getElementById(progressId);
+  let selected = null, matched = 0;
+  function updateProgress(){
+    progress.textContent = (matched === pairs.length) ? 'Усі пари знайдено ✓' : `Зіставлено: ${matched} з ${pairs.length}`;
+  }
+  shuffle(pairs).forEach(p=>{
+    const chip = document.createElement('div');
+    chip.className = 'match-chip';
+    chip.innerHTML = (p.icon || '') + p.name;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.match-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = p.name;
+    });
+    pool.appendChild(chip);
+  });
+  shuffle(pairs).forEach(p=>{
+    const card = document.createElement('div');
+    card.className = 'desc-card';
+    card.innerHTML = `<div class="desc-text">${p.desc}</div><div class="desc-slot">?</div>`;
+    card.addEventListener('click', ()=>{
+      if(card.classList.contains('matched') || !selected) return;
+      const slot = card.querySelector('.desc-slot');
+      if(selected === p.name){
+        slot.innerHTML = (p.icon || '') + p.name;
+        slot.classList.add('filled');
+        card.classList.add('matched');
+        const chip = [...pool.children].find(c=>c.textContent.trim() === p.name);
+        if(chip) chip.classList.add('placed');
+        selected = null;
+        matched++; addNeurons(1); updateProgress();
+        if(matched === pairs.length){ addNeurons(2); onDone && onDone(); }
+      } else {
+        card.classList.add('shake');
+        setTimeout(()=>card.classList.remove('shake'), 350);
+      }
+    });
+    list.appendChild(card);
+  });
+  updateProgress();
+}
+
+function makeQuiz(prefix, questions, perCorrect, onDone){
+  const qEl = document.getElementById(prefix + 'Q');
+  const optsEl = document.getElementById(prefix + 'Options');
+  const progEl = document.getElementById(prefix + 'Progress');
+  const whyEl = document.getElementById(prefix + 'Why');
+  const nextBtn = document.getElementById(prefix + 'Next');
+  let qi = 0, answered = false, score = 0;
+  function render(){
+    answered = false;
+    nextBtn.classList.remove('active');
+    const item = questions[qi];
+    progEl.textContent = `Запитання ${qi+1} з ${questions.length}`;
+    qEl.textContent = item.q;
+    whyEl.textContent = '';
+    optsEl.innerHTML = '';
+    item.opts.forEach((opt,i)=>{
+      const b = document.createElement('button');
+      b.className = 'quiz-opt';
+      b.textContent = opt;
+      b.addEventListener('click', ()=>{
+        if(answered) return;
+        answered = true;
+        optsEl.querySelectorAll('.quiz-opt').forEach((ob,oi)=>{
+          if(oi === item.correct) ob.classList.add('correct');
+          else if(oi === i) ob.classList.add('wrong');
+        });
+        if(i === item.correct){ score++; addNeurons(perCorrect); }
+        whyEl.textContent = (i === item.correct) ? '✓ Правильно!' : 'Правильну відповідь підсвічено.';
+        nextBtn.classList.add('active');
+        nextBtn.textContent = (qi === questions.length-1) ? 'Завершити' : 'Далі';
+      });
+      optsEl.appendChild(b);
+    });
+  }
+  nextBtn.addEventListener('click', ()=>{
+    if(!nextBtn.classList.contains('active')) return;
+    qi++;
+    if(qi < questions.length) render();
+    else onDone(score, questions.length);
+  });
+  render();
+}
+
+/* ---------- РІВЕНЬ 1: ІЛЮСТРАЦІЇ ---------- */
+/* Друкуємо на ноутбуці — текст через хмару з’являється на телефоні */
+(function(){
+  const PHRASES = ['Хмара зберігає мої файли', 'Пишу на ноутбуці — читаю на телефоні', 'Google Диск синхронізує все сам'];
+  const lap = document.getElementById('tdLap');
+  const phone = document.getElementById('tdPhone');
+  const sync = document.getElementById('tdSync');
+  const status = document.getElementById('tdStatus');
+  let pi = 0, ci = 0, idle = null;
+  function pushToPhone(text){
+    sync.classList.add('spin');
+    status.textContent = 'Зберігається…';
+    clearTimeout(idle);
+    idle = setTimeout(()=>{
+      phone.textContent = text;
+      sync.classList.remove('spin');
+      status.textContent = 'Збережено на Диску ✓';
+    }, 650);
+  }
+  function tick(){
+    const phrase = PHRASES[pi];
+    const chars = [...phrase];
+    if(ci < chars.length){
+      ci++;
+      lap.textContent = chars.slice(0, ci).join('');
+      if(ci % 4 === 0 || ci === chars.length) pushToPhone(lap.textContent);
+      setTimeout(tick, 110);
+    } else {
+      setTimeout(()=>{ pi = (pi + 1) % PHRASES.length; ci = 0; lap.textContent = ''; pushToPhone(''); setTimeout(tick, 900); }, 2600);
+    }
+  }
+  tick();
+})();
+
+/* ---------- РІВЕНЬ 1: ХМАРА ЧИ ПРИСТРІЙ ---------- */
+const WHERE = ['☁️ Хмара', '💻 Пристрій'];
+makeQuickFire('qfWhere', [
+  { text:'Ноутбук зламався, а реферат відкрився на маминому комп’ютері.', opts:WHERE, correct:0, why:'Реферат був у хмарі.' },
+  { text:'Загубив флешку — і проєкт зник назавжди.', opts:WHERE, correct:1, why:'Файл був лише на флешці.' },
+  { text:'У літаку без інтернету дивишся завантажений серіал.', opts:WHERE, correct:1, why:'Без інтернету працює лише те, що на пристрої.' },
+  { text:'Новий телефон — а всі старі фото вже в галереї.', opts:WHERE, correct:0, why:'Фото були в Google Фото.' },
+  { text:'Друг бачить слайд, який ти щойно додав у спільну презентацію.', opts:WHERE, correct:0, why:'Ви працюєте з одним файлом у хмарі.' }
+], ()=>levelUp(1));
+
+/* ---------- РІВЕНЬ 2: СХОВИЩА ---------- */
+makeGallery('driveGallery', [
+  { name:'Google Диск', logo:'drive.svg', free:'15 ГБ безкоштовно', tag:'працюємо з ним', main:true, color:'#1A73E8', colorLight:'#E8F0FE',
+    facts:['Від Google','Уже є у шкільному акаунті','Тут живуть Документи й Таблиці'] },
+  { name:'OneDrive', logo:'onedrive.svg', free:'5 ГБ безкоштовно', color:'#0364B8', colorLight:'#E3EEF9',
+    facts:['Від Microsoft','Вбудований у Windows','Дружить з Word та Excel'] },
+  { name:'Dropbox', logo:'dropbox.svg', free:'2 ГБ безкоштовно', color:'#0061FE', colorLight:'#E5EFFF',
+    facts:['Один із перших','Швидко синхронізує папки'] }
+]);
+makeQuickFire('qfDrive', [
+  { text:'Де найбільше безкоштовного місця?', opts:[lg('drive')+'Google Диск', lg('onedrive')+'OneDrive', lg('dropbox')+'Dropbox'], correct:0, why:'15 ГБ!' },
+  { text:'Яке сховище вже є у твоєму шкільному акаунті Google?', opts:[lg('dropbox')+'Dropbox', lg('drive')+'Google Диск', lg('onedrive')+'OneDrive'], correct:1, why:'Google Диск входить в акаунт Google.' }
+], ()=>levelUp(2));
+
+/* ---------- РІВЕНЬ 3: GOOGLE ДИСК ---------- */
+(function(){
+  const F = n => `images/${n}.svg`;
+  const row = (logo, name, who) => `<div class="gd-row"><img src="${F(logo)}" alt="">${name}<span class="who">${who||''}</span></div>`;
+  const folder = (name, who) => `<div class="gd-row">${gdi('folder','gd-folder')}${name}<span class="who">${who||''}</span></div>`;
+  const SECTIONS = [
+    { id:'new', label:'Створити', icon:'add', isNew:true,
+      html:'<h4>Створити</h4><div class="gd-row">'+gdi('newfolder')+'Нова папка</div><div class="gd-row">'+gdi('upload')+'Завантажити файл</div><div class="gd-row">'+gdi('upload')+'Завантажити папку</div>'+row('docs','Google Документи')+row('sheets','Google Таблиці')+row('slides','Google Презентації')+row('forms','Google Форми') },
+    { id:'home', label:'Головна', icon:'home',
+      html:'<h4>Вітаємо на Диску</h4>'+row('slides','Проєкт «Космос»','учора')+row('docs','Есе «Моє місто»','понеділок')+folder('Classroom') },
+    { id:'my', label:'Мій диск', icon:'my',
+      html:'<h4>Мій диск</h4>'+folder('Classroom','я')+folder('Практична робота №2','я')+row('docs','Есе «Моє місто»','я')+row('sheets','Витрати на екскурсію','я') },
+    { id:'shared', label:'Доступні мені', icon:'shared',
+      html:'<h4>Доступні мені</h4>'+row('slides','Правила роботи в кабінеті','Ігор Антонович')+row('docs','Сценарій свята','Оля К.')+row('sheets','Розклад консультацій','Ігор Антонович') },
+    { id:'recent', label:'Нещодавні', icon:'recent',
+      html:'<h4>Нещодавні</h4>'+row('slides','Проєкт «Космос»','учора')+row('docs','Есе «Моє місто»','понеділок')+row('forms','Анкета класу','тиждень тому') },
+    { id:'starred', label:'Із зірочкою', icon:'star',
+      html:'<h4>Із зірочкою</h4>'+row('sheets','Розклад уроків ⭐','я')+row('docs','Список літератури ⭐','я') },
+    { id:'trash', label:'Кошик', icon:'trash',
+      html:'<h4>Кошик</h4><p class="soft" style="font-size:13px;margin:0 0 6px;">Файли в кошику видаляються назавжди через 30 днів</p>'+row('docs','Чернетка реферату','видалено вчора')+row('slides','Стара презентація','видалено 12 днів тому') },
+    { id:'storage', label:'Пам’ять', icon:'storage',
+      html:'<h4>Пам’ять</h4><div class="gd-bar"><i></i></div><div style="font-size:13.5px;">Використано 5,7 ГБ із 15 ГБ</div><div class="gd-row"><img src="images/drive.svg" alt="">Google Диск — 3,1 ГБ</div>'+row('gmail','Gmail — 0,4 ГБ')+row('photos','Google Фото — 2,2 ГБ') }
+  ];
+  const TASKS = [
+    { id:'shared', text:'Учитель надіслав тобі файл. Де він?' },
+    { id:'new', text:'Треба нова папка. Що натиснеш?' },
+    { id:'trash', text:'Ой, видалив файл! Де його врятувати?' },
+    { id:'my', text:'Де всі файли, які ти створив сам?' }
+  ];
+  const side = document.getElementById('gdSide');
+  const main = document.getElementById('gdMain');
+  const numEl = document.getElementById('tourNum');
+  const taskEl = document.getElementById('tourTask');
+  const progress = document.getElementById('tourProgress');
+  let ti = 0;
+  const btns = {};
+  SECTIONS.forEach(sec=>{
+    const b = document.createElement('button');
+    b.className = sec.isNew ? 'gd-new' : 'gd-item';
+    b.innerHTML = gdi(sec.icon) + sec.label;
+    b.addEventListener('click', ()=>pick(sec, b));
+    side.appendChild(b);
+    btns[sec.id] = b;
+  });
+  function show(sec){
+    Object.values(btns).forEach(x=>x.classList.remove('on'));
+    if(!sec.isNew) btns[sec.id].classList.add('on');
+    main.innerHTML = sec.html;
+  }
+  function renderTask(){
+    if(ti < TASKS.length){
+      numEl.textContent = `Завдання ${ti+1} з ${TASKS.length}`;
+      taskEl.textContent = TASKS[ti].text;
+      progress.textContent = `Виконано: ${ti} з ${TASKS.length}`;
+    } else {
+      numEl.textContent = 'Готово ✓';
+      taskEl.textContent = 'Ти знаєш Google Диск! Можеш ще поклацати меню.';
+      progress.textContent = 'Усі завдання виконано ✓';
+    }
+  }
+  function pick(sec, b){
+    show(sec);
+    if(ti >= TASKS.length) return;
+    if(sec.id === TASKS[ti].id){
+      b.classList.add('ok'); setTimeout(()=>b.classList.remove('ok'), 600);
+      ti++; addNeurons(1);
+      if(ti === TASKS.length){ addNeurons(2); levelUp(3); }
+      renderTask();
+    } else {
+      b.classList.add('shake'); setTimeout(()=>b.classList.remove('shake'), 400);
+    }
+  }
+  show(SECTIONS[1]);
+  renderTask();
+})();
+
+
+/* ---------- КРОК 7: ПІЦЕРІЯ ---------- */
+const PZ = [...document.querySelectorAll('.model-pic')].map(el=>el.outerHTML);
+const MODELS = ['IaaS','PaaS','SaaS'];
+makeQuickFire('qfPizza', [
+  { pic:PZ[2], text:'Готова піца. Яка це модель?', opts:MODELS, correct:2, why:'SaaS — усе готове.' },
+  { pic:PZ[0], text:'Тільки кухня. Яка це модель?', opts:MODELS, correct:0, why:'IaaS — решту робиш сам.' },
+  { pic:PZ[1], text:'Основа й піч. Яка це модель?', opts:MODELS, correct:1, why:'PaaS — додаєш лише начинку.' },
+  { pic:'<img src="images/drive.svg" alt="">', text:'Google Диск — це…', opts:MODELS, correct:2, why:'Відкриваєш і користуєшся — як готова піца.' }
+], ()=>levelUp(7));
+
+/* ---------- РІВЕНЬ 5: ДОСТУП ---------- */
+(function(){
+  const ACCESS = [
+    { id:'private', label:gdi('lock')+'Лише я' },
+    { id:'people',  label:gdi('shared')+'Додані люди' },
+    { id:'link',    label:gdi('globe')+'Усі, хто має посилання' }
+  ];
+  const ROLES = [
+    { id:'viewer',    label:gdi('view')+'Читач',         verb:'лише переглядати' },
+    { id:'commenter', label:gdi('comment')+'Коментатор', verb:'переглядати й лишати коментарі' },
+    { id:'editor',    label:gdi('edit')+'Редактор',      verb:'змінювати вміст' }
+  ];
+  const TASKS = [
+    { file:'📄 Мій щоденник', access:'private',
+      text:'Це твій щоденник. Ніхто, крім тебе, не має його бачити.',
+      why:'Бачиш тільки ти.' },
+    { file:'📊 Розклад гуртків', access:'link', role:'viewer',
+      text:'Розклад потрібен усьому класу. Але змінювати його не можна.',
+      why:'Усі з посиланням дивляться, але не змінюють.' },
+    { file:'🖼️ Проєкт «Космос»', access:'people', role:'editor',
+      text:'Ви з двома друзями робите один проєкт. Кожен дописує свої слайди.',
+      why:'Лише друзі, і кожен може змінювати.' }
+  ];
+  const segA = document.getElementById('segAccess');
+  const segR = document.getElementById('segRole');
+  const fileEl = document.getElementById('shareFile');
+  const numEl = document.getElementById('shareNum');
+  const taskEl = document.getElementById('shareTask');
+  const prev = document.getElementById('sharePreview');
+  const fb = document.getElementById('shareFb');
+  const btn = document.getElementById('shareCheck');
+  let ti = 0, access = 'private', role = 'viewer', solved = false;
+
+  function buildSeg(el, list, onPick){
+    list.forEach(o=>{
+      const b = document.createElement('button');
+      b.innerHTML = o.label;
+      b.dataset.id = o.id;
+      b.addEventListener('click', ()=>{ onPick(o.id); paint(); });
+      el.appendChild(b);
+    });
+  }
+  buildSeg(segA, ACCESS, id=>{ access = id; });
+  buildSeg(segR, ROLES, id=>{ role = id; });
+
+  function paint(){
+    segA.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.id === access));
+    segR.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.id === role));
+    segR.classList.toggle('off', access === 'private');
+    const r = ROLES.find(x=>x.id === role);
+    if(access === 'private') prev.textContent = 'Файл бачиш лише ти. Для інших він не існує.';
+    else if(access === 'people') prev.textContent = `Лише люди, чию адресу ти вписав, можуть ${r.verb}. Решта побачить «Немає доступу».`;
+    else prev.textContent = `Будь-хто, у кого є посилання, може ${r.verb} — навіть незнайомі люди, яким його переслали.`;
+    if(!solved){ fb.textContent = ''; fb.className = 'share-fb'; }
+  }
+
+  function load(){
+    const t = TASKS[ti];
+    solved = false;
+    numEl.textContent = `Завдання ${ti+1} з ${TASKS.length}`;
+    taskEl.textContent = t.text;
+    fileEl.textContent = t.file.replace(/^\S+\s/, '');
+    access = 'private'; role = 'viewer';
+    btn.textContent = 'Перевірити';
+    btn.disabled = false;
+    paint();
+  }
+
+  btn.addEventListener('click', ()=>{
+    if(solved){
+      ti++;
+      if(ti < TASKS.length) load();
+      else {
+        taskEl.textContent = 'Усі файли налаштовано ✓';
+        numEl.textContent = 'Готово';
+        btn.disabled = true;
+        fb.className = 'share-fb good';
+        fb.textContent = 'Супер! Ти вмієш ділитися файлами.';
+        addNeurons(2); levelUp(5);
+      }
+      return;
+    }
+    const t = TASKS[ti];
+    const ok = access === t.access && (t.access === 'private' || role === t.role);
+    if(ok){
+      solved = true;
+      fb.className = 'share-fb good';
+      fb.textContent = 'Правильно ✓ ' + t.why;
+      addNeurons(1);
+      btn.textContent = (ti === TASKS.length-1) ? 'Завершити' : 'Наступний файл →';
+    } else {
+      fb.className = 'share-fb bad';
+      fb.textContent = (access !== t.access) ? 'Подумай ще раз, хто має отримати доступ.' : 'Доступ правильний, а от роль — ні.';
+    }
+  });
+  load();
+})();
+
+
+/* ---------- РІВЕНЬ 6: ПОДІЛИТИСЯ ПАПКОЮ ---------- */
+makeSequence('seqDone', 'seqQ', 'seqOpts', 'seqFb', [
+  'Створити папку на Google Диску',
+  'Завантажити в неї фото',
+  'Натиснути «Поділитися»',
+  'Вписати адреси друзів і надіслати'
+], 'Готово ✓ Друзі отримають посилання на папку.', ()=>levelUp(6));
+
+/* ---------- КРОК 4: ПРАЦЮЄМО З ФАЙЛАМИ ---------- */
+GDI.more = '<path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/>';
+GDI.move = '<path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V6h5.17l2 2H20v10zm-7.84-6H8v2h4.16l-1.59 1.59L11.99 17 16 13.01 11.99 9l-1.41 1.41L12.16 12z"/>';
+document.querySelectorAll('.gdi[data-i="move"]').forEach(el=>{ el.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${GDI.move}</svg>`; });
+(function(){
+  const files = [
+    { id:'folder', kind:'folder', name:'Екскурсія 7-А', inside:0 },
+    { id:'sched', kind:'sheets', name:'Розклад гуртків' },
+    { id:'draft', kind:'docs', name:'Чернетка' }
+  ];
+  const FILE_MENU = [
+    { act:'rename', icon:'edit', label:'Перейменувати' },
+    { act:'move', icon:'move', label:'Перемістити' },
+    { act:'star', icon:'star', label:'Додати зірочку' },
+    { act:'share', icon:'personadd', label:'Поділитися' },
+    { act:'delete', icon:'trash', label:'Видалити' }
+  ];
+  const NEW_MENU = [
+    { act:'folder', icon:'newfolder', label:'Нова папка' },
+    { act:'upload', icon:'upload', label:'Завантажити файл' },
+    { act:'doc', img:'docs', label:'Google Документи' }
+  ];
+  const TASKS = [
+    { target:'new', act:'upload', text:'Завантаж фото з комп’ютера на Диск.', done:'Фото на Диску!' },
+    { target:'photo', act:'rename', text:'Фото називається «IMG_2034». Дай йому зрозумілу назву.', done:'Тепер це «Екскурсія.jpg».' },
+    { target:'photo', act:'move', text:'Поклади фото в папку «Екскурсія 7-А».', done:'Фото в папці.' },
+    { target:'sched', act:'star', text:'«Розклад гуртків» потрібен щодня. Познач його як важливий.', done:'Зірочка є — файл легко знайти.' },
+    { target:'draft', act:'delete', text:'«Чернетка» більше не потрібна. Прибери її.', done:'Чернетка в Кошику — ще 30 днів можна повернути.' }
+  ];
+  const list = document.getElementById('fmList');
+  const newBtn = document.getElementById('fmNew');
+  const newMenu = document.getElementById('fmNewMenu');
+  const fb = document.getElementById('fmFb');
+  let ti = 0;
+
+  const icon = f => f.kind === 'folder' ? gdi('folder','gd-folder') : `<img src="images/${f.kind === 'photo' ? 'photos' : f.kind}.svg" alt="">`;
+  function closeMenus(){
+    document.querySelectorAll('#fmList .fm-menu').forEach(m=>m.remove());
+    document.querySelectorAll('.fm-more').forEach(b=>b.classList.remove('open'));
+    newMenu.hidden = true;
+  }
+  function menu(items, onPick){
+    const m = document.createElement('div');
+    m.className = 'fm-menu';
+    items.forEach(it=>{
+      const b = document.createElement('button');
+      b.className = 'fm-item';
+      b.innerHTML = (it.img ? `<img src="images/${it.img}.svg" alt="">` : gdi(it.icon)) + it.label;
+      b.addEventListener('click', e=>{ e.stopPropagation(); onPick(it.act, b); });
+      m.appendChild(b);
+    });
+    return m;
+  }
+  function render(newId){
+    list.innerHTML = '';
+    files.forEach(f=>{
+      const row = document.createElement('div');
+      row.className = 'fm-row' + (f.id === newId ? ' new' : '');
+      row.innerHTML = `${icon(f)}<span class="fm-name">${f.name}${f.kind === 'folder' ? `<span class="fm-cnt">${f.inside ? '· фото: ' + f.inside : ''}</span>` : ''}${f.star ? ' <span class="fm-star">★</span>' : ''}</span><div class="fm-wrap"></div>`;
+      if(f.kind !== 'folder'){
+        const wrap = row.querySelector('.fm-wrap');
+        const more = document.createElement('button');
+        more.className = 'fm-more';
+        more.setAttribute('aria-label', 'Дії з файлом');
+        more.innerHTML = gdi('more');
+        more.addEventListener('click', e=>{
+          e.stopPropagation();
+          const wasOpen = more.classList.contains('open');
+          closeMenus();
+          if(wasOpen) return;
+          more.classList.add('open');
+          wrap.appendChild(menu(FILE_MENU, (act, b)=>pick(f.id, act, b)));
+        });
+        wrap.appendChild(more);
+      }
+      list.appendChild(row);
+    });
+  }
+  function apply(t){
+    if(t.act === 'upload') files.push({ id:'photo', kind:'photo', name:'IMG_2034.jpg' });
+    if(t.act === 'rename') files.find(f=>f.id === 'photo').name = 'Екскурсія.jpg';
+    if(t.act === 'move'){ files.splice(files.findIndex(f=>f.id === 'photo'), 1); files[0].inside = 1; }
+    if(t.act === 'star') files.find(f=>f.id === 'sched').star = true;
+    if(t.act === 'delete') files.splice(files.findIndex(f=>f.id === 'draft'), 1);
+    return t.act === 'upload' ? 'photo' : (t.act === 'move' ? 'folder' : t.target);
+  }
+  function pick(target, act, btn){
+    if(ti >= TASKS.length) return;
+    const t = TASKS[ti];
+    if(target === t.target && act === t.act){
+      closeMenus();
+      const changed = apply(t);
+      render(changed);
+      fb.className = 'qf-fb good';
+      fb.textContent = '✓ ' + t.done;
+      ti++; addNeurons(1);
+      if(ti === TASKS.length){ addNeurons(2); levelUp(4); }
+      showTask();
+    } else {
+      btn.classList.add('shake');
+      setTimeout(()=>btn.classList.remove('shake'), 400);
+      fb.className = 'qf-fb';
+      fb.textContent = target !== t.target ? 'Це інший файл 🙂' : 'Спробуй іншу дію 🙂';
+    }
+  }
+  function showTask(){
+    document.getElementById('fmNum').textContent = ti < TASKS.length ? `Завдання ${ti+1} з ${TASKS.length}` : 'Готово ✓';
+    document.getElementById('fmTask').textContent = ti < TASKS.length ? TASKS[ti].text : 'Ти вмієш працювати з файлами на Диску!';
+  }
+  newBtn.addEventListener('click', e=>{
+    e.stopPropagation();
+    const wasOpen = !newMenu.hidden;
+    closeMenus();
+    if(wasOpen) return;
+    newMenu.replaceChildren(...menu(NEW_MENU, (act, b)=>pick('new', act, b)).childNodes);
+    newMenu.hidden = false;
+  });
+  document.addEventListener('click', closeMenus);
+  render();
+  showTask();
+})();
+
+/* ---------- ПОВТОРЕННЯ: ЗНАЙДИ ПАРИ ---------- */
+makeMemo('memoGrid', [
+  { icon:gdi('storage'), name:'Хмара', feat:'файли на серверах в інтернеті' },
+  { icon:'<img src="images/drive.svg" alt="" style="width:20px;height:18px;">', name:'Google Диск', feat:'сховище файлів від Google' },
+  { icon:gdi('sync'), name:'Синхронізація', feat:'зміна з’являється всюди' },
+  { icon:gdi('edit'), name:'Редактор', feat:'може змінювати файл' },
+  { icon:gdi('view'), name:'Читач', feat:'може лише дивитися' },
+  { icon:gdi('trash'), name:'Кошик', feat:'тут видалені файли ще 30 днів' }
+], 'memoProgress', ()=>toast('👍 Усі слова знайдено!'));
+
+/* ---------- ФІНІШ ---------- */
+makeQuiz('quiz', [
+  { q:'Де лежать файли з хмари?', opts:['На серверах в інтернеті','Лише на моєму телефоні','У небі'], correct:0 },
+  { q:'Скільки місця безкоштовно дає Google Диск?', opts:['2 ГБ','15 ГБ','1000 ГБ'], correct:1 },
+  { q:'Де знайти файл, яким з тобою поділився вчитель?', opts:['Кошик','Доступні мені','Пам’ять'], correct:1 },
+  { q:'Хто може змінювати файл?', opts:['Читач','Коментатор','Редактор'], correct:2 },
+  { q:'Ти друкуєш реферат на ноутбуці. Де ще з’явиться текст?', opts:['Ніде','На телефоні з тим самим акаунтом Google','Лише на флешці'], correct:1 }
+], 2, (score, total)=>{
+  document.getElementById('quizBox').style.display = 'none';
+  addNeurons(3);
+  document.getElementById('lvSum').innerHTML = [...Array(LEVELS)].map((_,i)=>`<span class="lv ${doneLevels.has(i+1) ? 'done' : ''}">${i+1}</span>`).join('');
+  document.getElementById('doneText').textContent = `Правильних відповідей у фіналі: ${score} з ${total}. Кроків пройдено: ${doneLevels.size} з ${LEVELS}.` + (doneLevels.size < LEVELS ? ' Повернись до сірих кроків, щоб пройти всі!' : ' Ти пройшов усі кроки!');
+  document.getElementById('totalNeurons').textContent = neurons;
+  document.getElementById('completion').classList.add('show');
+});
+</script>
+
+</body>
+</html>
