@@ -294,7 +294,17 @@
   .file.empty{border:none; background:none; color:var(--ink-soft); font-weight:600; opacity:.7;}
   .wire{height:4px; background:var(--line); border-radius:2px; position:relative; overflow:hidden;}
   .wire.flow::after{content:''; position:absolute; top:0; left:-40%; width:40%; height:100%; background:var(--accent); animation:flow .45s linear;}
-  @keyframes flow{to{left:100%;}}
+  .wire.flow-rev::after{content:''; position:absolute; top:0; left:100%; width:40%; height:100%; background:var(--accent); animation:flowRev .45s linear;}
+  @keyframes flow{from{left:-40%;} to{left:100%;}}
+  @keyframes flowRev{from{left:100%;} to{left:-40%;}}
+  /* на вузькому екрані пристрої стоять стовпчиком — потік іде вертикально */
+  @media (max-width:560px){
+    .wire.flow::after, .wire.flow-rev::after{left:0; width:100%; height:40%;}
+    .wire.flow::after{top:-40%; animation-name:flowDown;}
+    .wire.flow-rev::after{top:100%; animation-name:flowUp;}
+  }
+  @keyframes flowDown{from{top:-40%;} to{top:100%;}}
+  @keyframes flowUp{from{top:100%;} to{top:-40%;}}
   .backup-row{display:flex; align-items:center; gap:10px; margin-top:12px;}
   .backup-row .dev{flex:0 0 220px; min-height:auto;}
   @media (max-width:560px){ .backup-row .dev{flex:1;} }
@@ -1276,7 +1286,8 @@ makeMatching('integPool', 'integList', [
       setTimeout(()=>dev[k].classList.remove(c), 600);
     });
   }
-  function flow(w){ w.classList.remove('flow'); void w.offsetWidth; w.classList.add('flow'); }
+  /* rev — потік справа наліво (від телефона до ноутбука) */
+  function flow(w, rev){ w.classList.remove('flow','flow-rev'); void w.offsetWidth; w.classList.add(rev ? 'flow-rev' : 'flow'); }
   const wait = ms => new Promise(r=>setTimeout(r, ms));
 
   async function syncFrom(src, value, msg, bad){
@@ -1286,7 +1297,7 @@ makeMatching('integPool', 'integList', [
     statusEl.textContent = 'Синхронізація…';
     for(let i = 1; i < 3; i++){
       await wait(450);
-      flow(wires[i-1]);
+      flow(wires[i-1], src === 'phone');
       await wait(450);
       state[order[i]] = value;
       render(); pulse([order[i]], bad);
