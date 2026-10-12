@@ -758,7 +758,7 @@ function moveDot(dot, points, onArrive, done, speed=260){
       } else {
         upd();
         lock = true;
-        setTimeout(()=>{ a.inner.classList.remove('flipped'); b.inner.classList.remove('flipped'); lock = false; }, 1000);
+        setTimeout(()=>{ a.inner.classList.remove('flipped'); b.inner.classList.remove('flipped'); lock = false; }, 2500);
       }
     });
     grid.appendChild(el);
