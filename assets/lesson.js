@@ -3,15 +3,16 @@
    фінальний тест з екраном завершення (купка нейрончиків, діаграми), посилання з результатами
    на спільну сторінку result/ і самоперевірку для _tools/check-lessons.py.
 
-   Підключення (урок лежить на два рівні нижче кореня сайту: {клас}/{урок}/index.html):
+   Новий урок — з шаблону _tools/lesson-template/index.html; правила — CLAUDE.md, розділ 3.
+   Урок лежить на два рівні нижче кореня сайту ({клас}/{урок}/index.html):
      <link rel="stylesheet" href="../../assets/lesson.css">
      <body data-lesson="lesson7-cloud-services" data-hud="7 клас · Хмарні сервіси">
        ... hero, <div class="container"> секції-кроки з .step-label ... </div>, <footer> ...
        <script src="../../assets/lesson.js"></script>
        <script> makeMatching(...); ...; makeFinalQuiz('finalQuiz', [...], {summary:'…'}); </script>
 
-   Для уроку доступні: addNeurons, stepTask, shuffle, makeChoices, makeMatching, makeSortBoard,
-   makeSequence, makeFinalQuiz. Особлива вправа уроку реєструється через stepTask (див. нижче). */
+   Для уроку доступні: addNeurons, stepTask, trackTask, shuffle, loadPic, makeChoices, makeClassify, makeYesNo,
+   makeMatching, makeSortBoard, makeSequence, makeFinalQuiz. Власна вправа уроку підключається через trackTask. */
 (()=>{
 'use strict';
 
@@ -35,7 +36,8 @@ const LINK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" st
 const CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
 
 const pct = (a, b)=>b ? Math.min(100, Math.round(a / b * 100)) : 0;
-const label = el=>el ? el.textContent.replace(/\s+/g, ' ').trim() : '';
+// текст підпису з пробілами між частинами (<span>Крок 1</span>Назва → «Крок 1 Назва»)
+const label = el=>el ? [...el.childNodes].map(n=>n.textContent).join(' ').replace(/\s+/g, ' ').trim() : '';
 const shuffle = arr=>[...arr].sort(()=>Math.random() - 0.5);
 
 
@@ -86,8 +88,9 @@ addEventListener('scroll', ()=>{
    Вправа реєструється через stepTask(елемент, скільки нейрончиків можна отримати, скільки в ній елементів
    [, true — для підсумкового тесту]) і викликає повернуту функцію done(), коли завершена;
    про кожен правильно виконаний елемент (картку, пару, крок) повідомляє через done.item().
-   Блок — секція з .step-label; він пройдений, коли завершено всі його вправи (хоча б одна має бути). */
-const blocks = [...document.querySelectorAll('section')].filter(s=>s.querySelector('.step-label'));
+   Блок — секція з .step-label; він пройдений, коли завершено всі його вправи (хоча б одна має бути).
+   Секція без вправ («Гід», «Цікаво знати») позначається <section data-guide> — вона не рахується як блок. */
+const blocks = [...document.querySelectorAll('section')].filter(s=>s.querySelector('.step-label') && !s.hasAttribute('data-guide'));
 const tasks = blocks.map(()=>({ total:0, done:0, max:0, items:0, ok:0, quiz:false, finished:false }));
 
 // Смужка ліворуч: висота екрана ділиться на блоки; сірий — не пройдено, зелений — пройдено
@@ -143,6 +146,15 @@ function stepTask(el, max, items, quiz){
   return done;
 }
 
+// Скорочення для власної вправи уроку: const hit = trackTask(елемент, скільки елементів, максимум нейрончиків);
+// hit() — на кожен правильно виконаний елемент; після останнього вправа сама завершується.
+// Нейрончики вправа нараховує сама, як і раніше (addNeurons).
+function trackTask(el, items, maxNeurons = items){
+  const done = stepTask(el, maxNeurons, items);
+  let n = 0;
+  return ()=>{ if(n >= items) return; done.item(); if(++n === items) done(); };
+}
+
 
 /* ---------- ТОЧНІСТЬ І ЧАС ---------- */
 const WRONG = ['wrong','wrong-try','wrong-flash','miss','bad','shake'];
@@ -181,9 +193,22 @@ function accuracy(){
 
 /* ---------- УНІВЕРСАЛЬНІ МЕХАНІКИ ---------- */
 
-// Картки з варіантами відповіді: items — [{text, opts:[...], correct, why?, logo?, pre?}]
-// logo — файл .svg з images/ уроку або емодзі
-function makeChoices(containerId, items){
+// Фото з images/ уроку в контейнер .pic (id або сам елемент); якщо файлу ще немає — емодзі-заглушка
+function loadPic(container, file, fallbackEmoji){
+  const el = typeof container === 'string' ? document.getElementById(container) : container;
+  if(!el) return;
+  const img = document.createElement('img');
+  img.src = `images/${file}`;
+  img.alt = '';
+  img.addEventListener('error', ()=>{ el.innerHTML = `<div class="fallback">${fallbackEmoji}</div>`; });
+  el.innerHTML = '';
+  el.appendChild(img);
+}
+
+// Картки з варіантами відповіді: items — [{text, opts:[...], correct, why?, hint?, logo?, pre?}]
+// logo — файл .svg з images/ уроку або емодзі; pre (або snippet) — розмітка над запитанням (напр. фрагмент листа);
+// hint — підказка після хибної відповіді; {col:true} — варіанти стовпчиком (клас .choice-row.col задає урок)
+function makeChoices(containerId, items, {col = false} = {}){
   const list = document.getElementById(containerId);
   const done = stepTask(list, items.length, items.length);
   let left = items.length;
@@ -191,7 +216,7 @@ function makeChoices(containerId, items){
     const card = document.createElement('div');
     card.className = 'classify-card';
     const pic = item.logo ? (item.logo.endsWith('.svg') ? `<img class="q-logo" src="images/${item.logo}" alt="">` : `<span class="q-emoji">${item.logo}</span>`) : '';
-    card.innerHTML = (item.pre || '') + (pic ? `<div class="q-head">${pic}<p class="q">${item.text}</p></div>` : `<p class="q">${item.text}</p>`) + `<div class="choice-row"></div><div class="choice-feedback"></div>`;
+    card.innerHTML = (item.pre || item.snippet || '') + (pic ? `<div class="q-head">${pic}<p class="q">${item.text}</p></div>` : `<p class="q">${item.text}</p>`) + `<div class="choice-row${col ? ' col' : ''}"></div><div class="choice-feedback"></div>`;
     const row = card.querySelector('.choice-row');
     const fb = card.querySelector('.choice-feedback');
     let answered = false;
@@ -210,7 +235,7 @@ function makeChoices(containerId, items){
           if(--left === 0) done();
         } else {
           btn.classList.add('wrong');
-          fb.textContent = 'Ще раз подумай';
+          fb.textContent = item.hint || 'Ще раз подумай';
         }
       });
       row.appendChild(btn);
@@ -219,16 +244,30 @@ function makeChoices(containerId, items){
   });
 }
 
-// Зіставлення «термін ↔ пояснення»: pairs — [{name, desc, icon?}]
-function makeMatching(poolId, listId, pairs, progressId, bonus = 2){
+// Однакові варіанти для всіх карток: items — [{text, correct, why?}], opts — [...]
+function makeClassify(containerId, items, opts){
+  makeChoices(containerId, items.map(it=>({...it, opts: it.opts || opts})));
+}
+
+// Так / Ні: items — [{text, correct:true|false, why?}]
+function makeYesNo(containerId, items, optYes = 'Так', optNo = 'Ні'){
+  makeChoices(containerId, items.map(it=>({...it, opts:[optYes, optNo], correct: it.correct ? 0 : 1})));
+}
+
+// Зіставлення «термін ↔ пояснення»: pairs — [{name, desc, icon?}] (desc можна назвати func або def);
+// progressId — необов'язковий рядок «Зіставлено: N з M»; onDone — що зробити, коли всі пари знайдено
+// (можна передати замість bonus: makeMatching(pool, list, pairs, progress, ()=>…))
+function makeMatching(poolId, listId, pairs, progressId, bonus = 2, onDone){
+  if(typeof bonus === 'function'){ onDone = bonus; bonus = 2; }
+  pairs = pairs.map(p=>({...p, desc: p.desc ?? p.func ?? p.def}));
   const pool = document.getElementById(poolId);
   const list = document.getElementById(listId);
-  const progress = document.getElementById(progressId);
+  const progress = progressId ? document.getElementById(progressId) : null;
   const done = stepTask(list, pairs.length + bonus, pairs.length);
   let selected = null, matched = 0;
 
   function updateProgress(){
-    progress.textContent = (matched === pairs.length) ? 'Усі пари знайдено ✓' : `Зіставлено: ${matched} з ${pairs.length}`;
+    if(progress) progress.textContent = (matched === pairs.length) ? 'Усі пари знайдено ✓' : `Зіставлено: ${matched} з ${pairs.length}`;
   }
   shuffle(pairs).forEach(p=>{
     const chip = document.createElement('div');
@@ -259,7 +298,7 @@ function makeMatching(poolId, listId, pairs, progressId, bonus = 2){
         matched++; done.item();
         addNeurons(1);
         updateProgress();
-        if(matched === pairs.length){ addNeurons(bonus); done(); }
+        if(matched === pairs.length){ addNeurons(bonus); done(); onDone?.(); }
       } else {
         card.classList.add('shake');
         setTimeout(()=>card.classList.remove('shake'), 350);
@@ -270,15 +309,17 @@ function makeMatching(poolId, listId, pairs, progressId, bonus = 2){
   updateProgress();
 }
 
-// Розкласти по кошиках: bucketMap — {ключ: id кошика}, items — [{text, bucket:ключ}]
+// Розкласти по кошиках: bucketMap — {ключ: id кошика або сам елемент}, items — [{text, bucket:ключ}]
+// (ключ можна назвати zone); progressId — необов'язковий рядок «Розкладено: N з M»
 function makeSortBoard(poolId, bucketMap, items, progressId, bonus = 2){
+  items = items.map(it=>({...it, bucket: it.bucket ?? it.zone}));
   const pool = document.getElementById(poolId);
-  const progress = document.getElementById(progressId);
+  const progress = progressId ? document.getElementById(progressId) : null;
   const done = stepTask(pool, items.length + bonus, items.length);
   let selected = null, placed = 0;
 
   function updateProgress(){
-    progress.textContent = (placed === items.length) ? 'Усе розкладено ✓' : `Розкладено: ${placed} з ${items.length}`;
+    if(progress) progress.textContent = (placed === items.length) ? 'Усе розкладено ✓' : `Розкладено: ${placed} з ${items.length}`;
   }
   shuffle(items).forEach(item=>{
     const chip = document.createElement('div');
@@ -293,8 +334,8 @@ function makeSortBoard(poolId, bucketMap, items, progressId, bonus = 2){
     });
     pool.appendChild(chip);
   });
-  Object.entries(bucketMap).forEach(([key, id])=>{
-    const el = document.getElementById(id);
+  Object.entries(bucketMap).forEach(([key, target])=>{
+    const el = typeof target === 'string' ? document.getElementById(target) : target;
     el.addEventListener('click', ()=>{
       if(!selected) return;
       if(selected.dataset.bucket === key){
@@ -315,8 +356,8 @@ function makeSortBoard(poolId, bucketMap, items, progressId, bonus = 2){
   updateProgress();
 }
 
-// Покроковий вибір: «Що робиш ПЕРШИМ?» → «ДРУГИМ?»…; steps — правильний порядок
-function makeSequence(doneId, qId, optsId, fbId, steps, finalText){
+// Покроковий вибір: «Що робиш ПЕРШИМ?» → «ДРУГИМ?»…; steps — правильний порядок; onDone — після останнього кроку
+function makeSequence(doneId, qId, optsId, fbId, steps, finalText, onDone){
   const doneEl = document.getElementById(doneId);
   const qEl = document.getElementById(qId);
   const optsEl = document.getElementById(optsId);
@@ -326,7 +367,7 @@ function makeSequence(doneId, qId, optsId, fbId, steps, finalText){
   let pos = 0;
   function render(){
     optsEl.innerHTML = '';
-    if(pos === steps.length){ qEl.textContent = ''; fb.textContent = finalText; addNeurons(3); done(); return; }
+    if(pos === steps.length){ qEl.textContent = ''; fb.textContent = finalText; addNeurons(3); done(); onDone?.(); return; }
     qEl.innerHTML = `Що робиш <b>${ordinals[pos]}</b>?`;
     shuffle(steps.slice(pos)).forEach(s=>{
       const b = document.createElement('button');
@@ -350,7 +391,8 @@ function makeSequence(doneId, qId, optsId, fbId, steps, finalText){
 /* ---------- ФІНАЛЬНИЙ ТЕСТ І ЕКРАН ЗАВЕРШЕННЯ ----------
    makeFinalQuiz(id порожнього div, questions — [{q, opts:[...], correct, why?}], {summary, perCorrect = 2})
    будує тест, а після нього — екран завершення. Тест можна перездати після «Повернутися до уроку»:
-   нейрончики даються лише за відповіді понад найкращий результат, бонус +3 — лише за першу спробу. */
+   нейрончики даються лише за відповіді понад найкращий результат, бонус +3 — лише за першу спробу.
+   Урок без тесту (напр. завершується творчим проєктом): questions = [] — замість тесту кнопка «Завершити урок». */
 let fin = null;                             // елементи екрана завершення, коли тест побудовано
 
 const donutFig = (cls, title, sub)=>`
@@ -361,14 +403,16 @@ const donutFig = (cls, title, sub)=>`
 
 function makeFinalQuiz(containerId, questions, {summary:text = '', perCorrect = 2} = {}){
   const root = document.getElementById(containerId);
-  root.innerHTML = `
+  const noQuiz = !questions.length;
+  root.innerHTML = (noQuiz ? `
+    <div class="finish-box"><button class="btn-primary finish-btn">Завершити урок ✓</button></div>` : `
     <div class="quiz-box">
       <div class="quiz-progress"></div>
       <div class="quiz-q"></div>
       <div class="quiz-options"></div>
       <div class="quiz-why"></div>
       <div class="quiz-nav"><button class="btn-next">Далі</button></div>
-    </div>
+    </div>`) + `
     <div class="completion">
       <div class="done-top">
         <h3>Урок пройдено!</h3>
@@ -385,11 +429,14 @@ function makeFinalQuiz(containerId, questions, {summary:text = '', perCorrect = 
       </div>
     </div>`;
   const $ = s=>root.querySelector(s);
-  const box = $('.quiz-box'), qEl = $('.quiz-q'), optsEl = $('.quiz-options'), progEl = $('.quiz-progress'), whyEl = $('.quiz-why'), nextBtn = $('.btn-next');
+  const box = $(noQuiz ? '.finish-box' : '.quiz-box'), qEl = $('.quiz-q'), optsEl = $('.quiz-options'), progEl = $('.quiz-progress'), whyEl = $('.quiz-why'), nextBtn = $('.btn-next');
   fin = { root, box, el:$('.completion'), pile:$('.pile'), count:$('.pile-count'), word:$('.pile-word'),
           passed:$('.dn-passed'), acc:$('.dn-accuracy'), share:$('.rs-btn'), section:root.closest('section') };
 
-  const done = stepTask(qEl, questions.length * perCorrect + 3, questions.length, true);
+  if(noQuiz){
+    $('.finish-btn').addEventListener('click', ()=>{ t1 = Date.now(); showCompletion(); summary(); });
+  }
+  const done = noQuiz ? null : stepTask(qEl, questions.length * perCorrect + 3, questions.length, true);
   let qi = 0, answered = false, score = 0, best = 0, attempt = 0;
 
   function render(){
@@ -419,7 +466,7 @@ function makeFinalQuiz(containerId, questions, {summary:text = '', perCorrect = 
       optsEl.appendChild(b);
     });
   }
-  nextBtn.addEventListener('click', ()=>{
+  if(!noQuiz) nextBtn.addEventListener('click', ()=>{
     if(!nextBtn.classList.contains('active')) return;
     qi++;
     if(qi < questions.length){ render(); return; }
@@ -436,7 +483,7 @@ function makeFinalQuiz(containerId, questions, {summary:text = '', perCorrect = 
     fin.el.classList.remove('show');
     showCounter();
     box.style.display = '';
-    qi = 0; score = 0; render();
+    if(!noQuiz){ qi = 0; score = 0; render(); }
     const i = tasks.findIndex(x=>!x.finished);
     (i >= 0 ? blocks[i] : fin.section).scrollIntoView({behavior:'smooth'});
   });
@@ -447,7 +494,7 @@ function makeFinalQuiz(containerId, questions, {summary:text = '', perCorrect = 
     setTimeout(()=>{ fin.share.classList.remove('done'); fin.share.innerHTML = LINK_ICON + 'Поділитися результатами'; }, 1600);
   });
 
-  render();
+  if(!noQuiz) render();
   summary();
 }
 
@@ -690,5 +737,5 @@ if(/[?&]selftest\b/.test(location.search)){
 }
 
 
-Object.assign(window, { addNeurons, stepTask, shuffle, makeChoices, makeMatching, makeSortBoard, makeSequence, makeFinalQuiz });
+Object.assign(window, { addNeurons, stepTask, trackTask, shuffle, loadPic, makeChoices, makeClassify, makeYesNo, makeMatching, makeSortBoard, makeSequence, makeFinalQuiz });
 })();

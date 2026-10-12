@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- ШАБЛОН УРОКУ НА ЯДРІ. Скопіюй у {клас}/{lesson-slug}/index.html і заміни все позначене «ЗАМІНИ».
+     Правила — у CLAUDE.md, розділ 3 («Ядро уроку») і розділ 8 (чек-лист). -->
+<title>ЗАМІНИ: Назва теми — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  /* Гама уроку: перевизначаємо лише те, що відрізняється від ядра (фіолетово-бірюзова за замовчуванням) */
+  :root{
+    --accent:#0E7C7A; --accent-dark:#095E5C; --accent-soft:#E2F4F3;
+    --label:#E37400;
+  }
+  /* Стилі лише для власних віджетів уроку (тут — приклад «перемикачі») */
+  .lamp-row{display:flex; gap:10px; flex-wrap:wrap;}
+  .lamp{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px; border:2px solid var(--line); background:var(--surface); border-radius:var(--radius-m); padding:10px 16px; cursor:pointer;}
+  .lamp.on{border-color:var(--accent); background:var(--accent-soft);}
+</style>
+</head>
+<body data-lesson="lessonN-slug" data-hud="N клас · Коротка назва">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · ЗАМІНИ: рубрика</div>
+      <h1>ЗАМІНИ: Заголовок уроку</h1>
+      <p>ЗАМІНИ: одне-два речення, про що урок.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: простий плоский SVG із фігур (rect, circle, path), без растрових картинок -->
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="50" fill="#E2F4F3"/>
+      <rect x="44" y="50" width="52" height="36" rx="8" fill="#0E7C7A"/>
+      <circle cx="60" cy="68" r="5" fill="#fff"/><circle cx="80" cy="68" r="5" fill="#fff"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <!-- Повторення (якщо урок продовжує попередній): краще зіставлення, ніж сортування на 2 кошики -->
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · ЗАМІНИ: попередня тема</div>
+    <h2>Що ти вже знаєш</h2>
+    <p class="soft">Обери термін, а потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <!-- Крок: 1–2 речення пояснення → одразу вправа на саме це -->
+  <section class="block">
+    <div class="step-label">Крок 1 · ЗАМІНИ</div>
+    <h2>ЗАМІНИ: заголовок кроку</h2>
+    <p>ЗАМІНИ: коротке пояснення.</p>
+    <div id="step1List"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · ЗАМІНИ</div>
+    <h2>Розклади по кошиках</h2>
+    <p class="soft">Клацни картку, а потім кошик.</p>
+    <div class="exercise">
+      <div class="sort-buckets">
+        <div class="bucket" id="bkA"><div class="bucket-title">ЗАМІНИ: кошик А</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkB"><div class="bucket-title">ЗАМІНИ: кошик Б</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="sortPool"></div>
+      <div class="progress-line" id="sortProgress"></div>
+    </div>
+  </section>
+
+  <!-- Приклад власної вправи уроку: підключається до обліку через trackTask -->
+  <section class="block">
+    <div class="step-label">Крок 3 · ЗАМІНИ</div>
+    <h2>Увімкни всі лампи</h2>
+    <p class="soft">Приклад власного віджета — заміни своїм або видали цей крок.</p>
+    <div class="exercise">
+      <div class="lamp-row" id="lamps"></div>
+      <div class="progress-line" id="lampProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+  <!-- Розділ без вправ (гід до практичної, «Цікаво знати») позначай data-guide — він не рахується як блок:
+  <section class="block" data-guide>
+    <div class="step-label">Гід · Практична робота №N</div>
+    ...
+  </section> -->
+
+</div>
+
+<footer>Урок · «ЗАМІНИ: повна назва теми» · N клас</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Термін 1', desc:'Пояснення першого терміна' },
+  { name:'Термін 2', desc:'Пояснення другого терміна' },
+  { name:'Термін 3', desc:'Пояснення третього терміна' }
+], 'recapProgress');
+
+/* ---------- КРОК 1 ---------- */
+makeChoices('step1List', [
+  { text:'Ситуація, у якій учень має щось обрати', opts:['Варіант А', 'Варіант Б', 'Варіант В'], correct:1, why:'Коротке пояснення, чому так.' },
+  { text:'Ще одна ситуація', opts:['Варіант А', 'Варіант Б'], correct:0 }
+]);
+
+/* ---------- КРОК 2 ---------- */
+makeSortBoard('sortPool', { a:'bkA', b:'bkB' }, [
+  { text:'Приклад для кошика А', bucket:'a' },
+  { text:'Ще один для А', bucket:'a' },
+  { text:'Приклад для кошика Б', bucket:'b' },
+  { text:'Ще один для Б', bucket:'b' }
+], 'sortProgress');
+
+/* ---------- КРОК 3: ВЛАСНА ВПРАВА ----------
+   trackTask(елемент вправи, скільки елементів треба виконати, максимум нейрончиків) повертає hit();
+   hit() — на кожен виконаний елемент; після останнього вправа сама завершується. Нейрончики — як завжди, addNeurons. */
+(function(){
+  const NAMES = ['Кухня', 'Клас', 'Коридор'];
+  const row = document.getElementById('lamps');
+  const progress = document.getElementById('lampProgress');
+  const hit = trackTask(row, NAMES.length, NAMES.length + 2);
+  let on = 0;
+  NAMES.forEach(n=>{
+    const b = document.createElement('button');
+    b.className = 'lamp';
+    b.textContent = '💡 ' + n;
+    b.addEventListener('click', ()=>{
+      if(b.classList.contains('on')) return;
+      b.classList.add('on');
+      addNeurons(1); hit();
+      progress.textContent = `Увімкнено: ${++on} з ${NAMES.length}`;
+      if(on === NAMES.length) addNeurons(2);
+    });
+    row.appendChild(b);
+  });
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ----------
+   Урок без тесту (закінчується творчим проєктом): makeFinalQuiz('finalQuiz', [], {summary:'…'}) */
+makeFinalQuiz('finalQuiz', [
+  { q:'ЗАМІНИ: запитання 1?', opts:['Правильна відповідь', 'Хибна', 'Хибна'], correct:0, why:'Пояснення (необов\'язково).' },
+  { q:'ЗАМІНИ: запитання 2?', opts:['Хибна', 'Правильна відповідь', 'Хибна'], correct:1 }
+], {summary:'ЗАМІНИ: Тепер ти знаєш … (одне речення-підсумок).'});
+</script>
+
+</body>
+</html>

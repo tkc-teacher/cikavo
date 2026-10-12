@@ -9,6 +9,7 @@
   --note:#16A3A0; --note-soft:#E3F6F5; --note-ink:#0B5F5D;            /* нейтральний факт (.note) */
   --ok:#3FAE58; --ok-soft:#E4F8E6; --coral:#FF6B4A; --yellow:#FFC93C;
   --hud-bar:var(--accent);                                            /* заливка смужки прогресу в HUD */
+  --label:var(--accent);                                              /* підписи кроків і рубрика в hero */
   --radius-s:10px; --radius-m:16px; --radius-l:26px;
 }
 *{box-sizing:border-box;}
@@ -36,7 +37,7 @@ h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; 
 .hero{padding:52px 24px 40px;}
 .hero-inner{max-width:800px; margin:0 auto; display:flex; align-items:center; gap:30px;}
 .hero-text{flex:1;}
-.hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--accent); margin-bottom:10px;}
+.hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--label); margin-bottom:10px;}
 .hero h1{font-size:32px; line-height:1.18; margin-bottom:12px;}
 .hero p{color:var(--ink-soft); font-size:16.5px; max-width:54ch; margin-bottom:22px;}
 .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--accent); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
@@ -47,7 +48,7 @@ h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; 
 
 /* КРОКИ */
 section.block{padding:38px 0; border-top:1px solid var(--line); scroll-margin-top:60px;}
-.step-label{font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:600; color:var(--accent); margin-bottom:8px;}
+.step-label{font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:600; color:var(--label); margin-bottom:8px;}
 .step-label.recap{color:var(--sun);}
 .block h2{font-size:21px; margin-bottom:10px; max-width:38ch;}
 .block h3{font-size:16px; margin:20px 0 8px;}
@@ -60,6 +61,11 @@ section.block{padding:38px 0; border-top:1px solid var(--line); scroll-margin-to
 .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:22px; margin-top:18px;}
 @media (max-width:520px){ .exercise{padding:16px;} }
 .progress-line{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--accent-dark); margin-top:14px; min-height:1.4em;}
+
+/* ФОТО (loadPic): поки файлу немає — емодзі-заглушка; розмір і пропорції урок задає сам */
+.pic{display:block; overflow:hidden; border-radius:var(--radius-m); background:var(--accent-soft); aspect-ratio:16/10;}
+.pic img{width:100%; height:100%; object-fit:cover; display:block;}
+.pic .fallback{width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:34px;}
 
 /* FLIP-КАРТКИ (галерея «навчись», memo) */
 .flip-card{perspective:1200px; height:210px; cursor:pointer;}
@@ -119,7 +125,8 @@ section.block{padding:38px 0; border-top:1px solid var(--line); scroll-margin-to
 .sort-chip.placed:hover{transform:none;}
 
 /* ПОСЛІДОВНИЙ ВИБІР КРОКУ (makeSequence) */
-.seq-done{list-style:none; padding:0 !important; margin:0 0 12px !important; counter-reset:seq;}
+/* лише для списку виконаних кроків (у деяких уроках .seq-done — це div із повідомленням) */
+ol.seq-done, ul.seq-done{list-style:none; padding:0 !important; margin:0 0 12px !important; counter-reset:seq;}
 .seq-done li{counter-increment:seq; display:flex; align-items:center; gap:10px; background:var(--accent-soft); border:1.5px solid var(--accent); border-radius:var(--radius-s); padding:9px 12px; margin-bottom:8px; font-weight:700; font-size:14.5px;}
 .seq-done li::before{content:counter(seq); flex-shrink:0; width:26px; height:26px; border-radius:50%; background:var(--accent); color:#fff; font-family:'Baloo 2',sans-serif; display:flex; align-items:center; justify-content:center; font-size:14px;}
 .seq-q{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; margin-bottom:10px;}
@@ -141,6 +148,7 @@ section.block{padding:38px 0; border-top:1px solid var(--line); scroll-margin-to
 .quiz-nav{display:flex; justify-content:flex-end; margin-top:14px;}
 .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:11px 22px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
 .btn-next.active{opacity:1; pointer-events:auto;}
+.finish-box{text-align:center; margin-top:18px;}
 
 /* ЕКРАН ЗАВЕРШЕННЯ */
 .completion{display:none; text-align:center; margin-top:18px; border-radius:var(--radius-l); overflow:hidden; border:1.5px solid var(--line); background:linear-gradient(180deg, var(--accent-soft) 0%, var(--surface) 55%); box-shadow:0 6px 24px color-mix(in srgb, var(--accent) 8%, transparent);}
@@ -200,3 +208,6 @@ section.block{padding:38px 0; border-top:1px solid var(--line); scroll-margin-to
 
 footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
 footer .credits{display:block; max-width:62ch; margin:12px auto 0; font-size:11.5px; line-height:1.55; opacity:.8;}
+
+/* друк (напр. інструкції до практичної роботи) — без HUD і смужки блоків */
+@media print{ .hud, .lesson-rail{display:none !important;} }

@@ -7,81 +7,46 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
 <style>
   :root{
+    --accent-soft:color-mix(in srgb, var(--accent) 12%, #fff);
+    --hud-bar:linear-gradient(90deg,var(--indigo),var(--accent));
+    --label:var(--indigo);
+    --note:var(--blue); --note-soft:#EAF5FC; --note-ink:#2A6B8C;
+    --sun:var(--yellow); --sun-soft:#FFF6E0; --sun-ink:#7A5A00;
+   
     --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
     --purple:#6C5CE7; --purple-dark:#5340c9; --teal:#16A3A0; --coral:#FF6B4A; --yellow:#FFC93C; --pink:#FF5D9E; --blue:#2D9CDB;
     --radius-s:10px; --radius-m:16px; --radius-l:26px;
-    /* акцентна гама уроку: «мережа» — смарагдово-індигова */
+    
     --accent:#0F9D74; --accent-dark:#0A7556; --accent-light:#E2F6EF; --indigo:#3D4FD8; --indigo-light:#E9ECFD;
   }
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} }
-  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
-  h1,h2,h3{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
-  .container{max-width:800px; margin:0 auto; padding:0 24px;}
-
-  .hud{position:sticky; top:0; z-index:50; background:rgba(246,245,251,.9); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
-  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
-  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--indigo),var(--accent)); transition:width .3s ease;}
-  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:800px; margin:0 auto;}
-  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
-  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
-  .neuron-counter svg{width:24px;height:24px;}
-  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
-  #neuronCount.pop{transform:scale(1.35);}
-
-  .hero{padding:52px 24px 40px;}
-  .hero-inner{max-width:800px; margin:0 auto; display:flex; align-items:center; gap:30px;}
-  .hero-text{flex:1;}
-  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--indigo); margin-bottom:10px;}
-  .hero h1{font-size:32px; line-height:1.18; margin-bottom:12px;}
-  .hero p{color:var(--ink-soft); font-size:16.5px; max-width:62ch; margin-bottom:22px;}
-  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--accent); color:#fff; border:none; padding:12px 22px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
-  .btn-primary:hover{background:var(--accent-dark);}
-  .btn-primary:active{transform:scale(.97);}
+  .hero-eyebrow{color:var(--indigo);}
+  .hero p{max-width:62ch;}
+  .btn-primary{padding:12px 22px;}
   .btn-primary:disabled{opacity:.4; cursor:default;}
-  .mascot{width:140px; height:140px; flex-shrink:0;}
-  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:100px; height:100px;} }
-
-  section.block{padding:38px 0; border-top:1px solid var(--line);}
-  .step-label{font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:600; color:var(--indigo); margin-bottom:8px;}
-  .block h2{font-size:22px; margin-bottom:10px;}
-  .block p{max-width:62ch; font-size:16px; margin:0 0 12px;}
-  .block p.soft{color:var(--ink-soft); font-size:15px;}
-  .block ul{margin:0 0 14px; padding-left:22px; max-width:62ch;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;}
+  .mascot{width:100px; height:100px;} }
+  .step-label{color:var(--indigo);}
+  .block h2{font-size:22px;}
+  .block p{max-width:62ch; margin:0 0 12px;}
+  .block ul{padding-left:22px; max-width:62ch;}
   .block li{margin-bottom:5px;}
-  .note{background:#EAF5FC; border-left:4px solid var(--blue); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; color:#2A6B8C; margin:16px 0;}
-  .trivia{background:#FFF6E0; border-left:4px solid var(--yellow); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; color:#7A5A00; margin:16px 0;}
-  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:22px; margin-top:16px;}
-  .progress-line{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--accent-dark); margin-top:14px; min-height:1.4em;}
+  .note{background:#EAF5FC; border-left:4px solid var(--blue); color:#2A6B8C;}
+  .trivia{background:#FFF6E0; border-left:4px solid var(--yellow); font-size:14.5px; color:#7A5A00;}
+  .exercise{margin-top:16px;}
   @keyframes shake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
   .shake{animation:shake .35s ease;}
-
-  /* MATCHING */
-  .tool-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:14px; border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:16px;}
-  .tool-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:8px 14px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
-  .tool-chip:hover{transform:translateY(-2px);}
-  .tool-chip.selected{border-color:var(--accent); box-shadow:0 0 0 3px rgba(15,157,116,.18);}
-  .tool-chip.placed{display:none;}
-  .func-card{display:flex; align-items:center; gap:12px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; margin-bottom:10px; cursor:pointer; transition:border-color .2s ease, background .2s ease;}
-  .func-card.matched{border-color:var(--yellow); background:#FFFBEE; cursor:default;}
-  .func-text{flex:1; font-size:14.5px;}
-  .func-slot{min-width:120px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:8px 10px;}
-  .func-slot.filled{border-style:solid; border-color:var(--yellow); background:#FFF7E2; color:var(--ink);}
-
-  /* CLASSIFY / YES-NO */
-  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px; margin:10px 0;}
-  .classify-card p.q{font-weight:700; margin:0 0 10px; font-size:15px;}
-  .choice-row{display:flex; gap:8px; flex-wrap:wrap;}
-  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; padding:8px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; text-align:left; transition:background .15s ease, border-color .15s ease;}
-  .choice-btn:hover{border-color:var(--accent);}
-  .choice-btn.correct{background:#E4F8E6; border-color:#3FAE58; color:#256B36;}
-  .choice-btn.wrong{background:#FDE6E1; border-color:var(--coral); color:#B8412A;}
-  .choice-feedback{margin-top:8px; font-size:13.5px; color:var(--ink-soft); min-height:1.2em;}
-
-  /* ZONES */
+  .match-chip{font-size:14px;}
+  .match-chip.selected{box-shadow:0 0 0 3px rgba(15,157,116,.18);}
+  .desc-card.matched{border-color:var(--yellow); background:#FFFBEE;}
+  .desc-text{font-size:14.5px;}
+  .desc-slot{min-width:120px; font-size:13px;}
+  .desc-slot.filled{border-color:var(--yellow); background:#FFF7E2; color:var(--ink);}
+  .classify-card{padding:14px 16px; margin:10px 0;}
+  .choice-btn{transition:background .15s ease, border-color .15s ease;}
+  .choice-btn.correct{background:#E4F8E6; border-color:#3FAE58;}
   .zones-svg{width:100%; height:auto; display:block;}
   .zones-svg text{pointer-events:none;}
   .zcard{cursor:pointer;}
@@ -102,12 +67,9 @@
   .zoom-type{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:20px; color:var(--accent-dark); line-height:1.2; margin-bottom:4px;}
   .zoom-desc{font-size:14.5px; margin-bottom:4px;}
   .zoom-ex{font-size:13.5px; color:var(--ink-soft);}
-
-  /* SORT BOARD */
-  .sort-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:14px; border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:16px; min-height:54px;}
-  .sort-chip{font-size:13.5px; font-weight:700; background:var(--bg); border:2px solid var(--line); border-radius:var(--radius-s); padding:8px 12px; cursor:pointer; max-width:260px; line-height:1.35; transition:border-color .15s ease, transform .12s ease;}
-  .sort-chip:hover{transform:translateY(-2px);}
-  .sort-chip.selected{border-color:var(--accent); box-shadow:0 0 0 3px rgba(15,157,116,.18);}
+  .sort-pool{padding:14px; border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:16px; min-height:54px;}
+  .sort-chip{max-width:260px;}
+  .sort-chip.selected{box-shadow:0 0 0 3px rgba(15,157,116,.18);}
   .baskets{display:grid; grid-template-columns:repeat(2,1fr); gap:12px;}
   @media (max-width:640px){ .baskets{grid-template-columns:1fr;} }
   .basket{border:2px solid var(--line); border-radius:var(--radius-m); padding:12px; min-height:120px; background:var(--bg); cursor:pointer; transition:border-color .15s ease, background .15s ease;}
@@ -116,14 +78,12 @@
   .basket h3 .ic{display:block; font-size:26px; line-height:1.1;}
   .basket .in{font-size:12.5px; background:var(--surface); border:1.5px solid var(--accent); border-radius:var(--radius-s); padding:6px 8px; margin-bottom:6px; line-height:1.35;}
   .basket.bad{border-color:var(--coral); background:#FDE6E1;}
-
-  /* INTERNET MAP */
   .map-scroll{overflow-x:auto; -webkit-overflow-scrolling:touch;}
   .net-map{width:100%; min-width:560px; height:auto; display:block;}
   .region-lbl{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; fill:var(--ink-soft);}
   .mnode{cursor:pointer;}
   .mnode circle{fill:#fff; stroke:var(--accent); stroke-width:2.5; transition:fill .2s ease, stroke .2s ease;}
-  .mnode:hover circle,.mnode.sel circle{fill:#FFF7E2; stroke:var(--yellow);}
+  .mnode:hover circle, .mnode.sel circle{fill:#FFF7E2; stroke:var(--yellow);}
   .mnode.seen circle{stroke:var(--accent-dark); stroke-width:3.5;}
   .memo{font-size:24px; text-anchor:middle; dominant-baseline:central; pointer-events:none;}
   .mlabel{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; fill:var(--ink); text-anchor:middle; pointer-events:none;}
@@ -141,43 +101,38 @@
   .tab.cut{border-color:var(--coral); background:#FDE6E1; color:#B8412A;}
   .map-status{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px; color:var(--ink-soft); margin-top:10px;}
   .map-status b{color:var(--accent-dark);}
-
-  /* PHOTO QUIZ */
   .photo-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:12px;}
   @media (max-width:700px){ .photo-grid{grid-template-columns:repeat(2,1fr); gap:10px;} }
   @media (max-width:440px){ .photo-grid{grid-template-columns:1fr;} }
   .photo{margin:0; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); overflow:hidden; display:flex; flex-direction:column; transition:border-color .2s ease;}
   .photo.done{border-color:#3FAE58;}
   .pic{aspect-ratio:4/3; background:var(--accent-light); cursor:zoom-in;}
-  .pic img{width:100%; height:100%; object-fit:cover; display:block;}
-  .pic .fallback{width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:48px; cursor:default;}
+  .pic .fallback{font-size:48px; cursor:default;}
   .photo .body{padding:10px 12px 12px; font-size:13.5px; line-height:1.4; flex:1; display:flex; flex-direction:column; gap:6px;}
   .photo .q{font-weight:800;}
   .photo .opts{display:flex; flex-direction:column; gap:6px;}
   .photo .opts .choice-btn{font-size:12.5px; padding:6px 10px; border-radius:var(--radius-s);}
   .photo .cap{display:none;}
   .photo.done .cap{display:block;}
-  .photo.done .opts,.photo.done .q{display:none;}
+  .photo.done .opts, .photo.done .q{display:none;}
   .photo .credit{display:block; margin-top:auto; font-size:10.5px; color:var(--ink-soft); opacity:.8;}
   .lightbox{position:fixed; inset:0; z-index:100; background:rgba(27,27,58,.88); display:none; align-items:center; justify-content:center; flex-direction:column; padding:20px; cursor:zoom-out;}
   .lightbox.show{display:flex;}
   .lightbox img{max-width:100%; max-height:84vh; border-radius:var(--radius-m);}
-
-  /* MEMO-MATCH */
   .memo-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
   .memo-card{perspective:900px; aspect-ratio:1/1; cursor:pointer;}
   .memo-card .flip-inner{position:relative; width:100%; height:100%; transition:transform .45s ease; transform-style:preserve-3d;}
   .memo-card .flip-inner.flipped{transform:rotateY(180deg);}
-  .memo-card .flip-front,.memo-card .flip-back{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:var(--radius-m); overflow:hidden; display:flex; align-items:center; justify-content:center; text-align:center;}
+  .memo-card .flip-front, .memo-card .flip-back{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:var(--radius-m); overflow:hidden; display:flex; align-items:center; justify-content:center; text-align:center;}
   .memo-card .flip-front{background:linear-gradient(135deg,var(--accent),var(--indigo)); color:#fff; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:34px; box-shadow:inset 0 0 0 4px rgba(255,255,255,.25);}
-  .memo-card .flip-back{border:3px solid var(--card-c, var(--line)); background:var(--card-c-light, #F0EFF9); transform:rotateY(180deg); /* без цього рядка — баг */}
+  .memo-card .flip-back{border:3px solid var(--card-c, var(--line)); background:var(--card-c-light, #F0EFF9); transform:rotateY(180deg);}
   .memo-card .flip-back .pic{position:absolute; inset:0; aspect-ratio:auto; cursor:pointer;}
   .memo-card .flip-back .word{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; line-height:1.2; padding:8px; color:var(--ink);}
   .memo-card.matched{cursor:default;}
   .memo-card.matched .flip-back{--card-c:#3FAE58; --card-c-light:#E4F8E6;}
-  @media (max-width:640px){ .memo-grid{gap:6px;} .memo-card .flip-back .word{font-size:12.5px; padding:4px;} .memo-card .flip-front{font-size:24px;} }
-
-  /* CHAIN */
+  @media (max-width:640px){ .memo-grid{gap:6px;}
+  .memo-card .flip-back .word{font-size:12.5px; padding:4px;}
+  .memo-card .flip-front{font-size:24px;} }
   .chain{display:flex; flex-direction:column; align-items:center; margin-bottom:12px;}
   .chain-node{display:flex; align-items:center; gap:12px; width:100%; max-width:420px; background:var(--accent-light); border:2px solid var(--accent); border-radius:var(--radius-m); padding:10px 14px; transition:background .25s ease, box-shadow .25s ease, transform .25s ease;}
   .chain-node .ic{font-size:28px; line-height:1;}
@@ -186,49 +141,12 @@
   .chain-arrow{font-size:18px; color:var(--accent); line-height:1; padding:4px 0;}
   .chain-ask{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; text-align:center; margin:6px 0 10px;}
   .chain-opts{display:flex; flex-wrap:wrap; gap:8px; justify-content:center;}
-
-  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:26px 24px; margin-top:16px;}
-  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:13px; color:var(--ink-soft); margin-bottom:10px;}
-  .quiz-q{font-size:17px; font-weight:700; margin-bottom:16px;}
-  .quiz-options{display:flex; flex-direction:column; gap:10px;}
-  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:15px; font-weight:600; padding:12px 15px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
-  .quiz-opt:hover{border-color:var(--accent);}
+  .quiz-box{margin-top:16px;}
   .quiz-opt.correct{background:#E4F8E6; border-color:#3FAE58;}
-  .quiz-opt.wrong{background:#FDE6E1; border-color:var(--coral);}
-  .quiz-nav{display:flex; justify-content:flex-end; margin-top:18px;}
-  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:11px 22px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
-  .btn-next.active{opacity:1; pointer-events:auto;}
-
-  .completion{display:none; text-align:center; padding:20px 10px 10px;}
-  .completion.show{display:block;}
-  .badge{width:90px; height:90px; margin:0 auto 16px;}
-  .completion h3{font-size:22px; margin-bottom:10px;}
-  .completion p{color:var(--ink-soft); max-width:50ch; margin:0 auto 18px; font-size:15px;}
-  .completion .total{font-family:'Baloo 2',sans-serif; font-size:30px; color:var(--purple-dark);}
-
-  footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
+  .quiz-nav{margin-top:18px;}
 </style>
 </head>
-<body>
-
-<div class="hud">
-  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
-  <div class="hud-row">
-    <span class="hud-title">5 клас · Мережі та Інтернет</span>
-    <div class="neuron-counter">
-      <svg viewBox="0 0 24 24" fill="none">
-        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
-        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
-        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
-        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
-        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
-        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
-        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#E0A800" opacity="0.6"/>
-      </svg>
-      <span id="neuronCount">0</span>
-    </div>
-  </div>
-</div>
+<body data-lesson="lesson5-networks-internet" data-hud="5 клас · Мережі та Інтернет">
 
 <section class="hero">
   <div class="hero-inner">
@@ -265,7 +183,7 @@
     <p>Минулого уроку ти запускав сигнали різними каналами зв'язку. Пригадай головне.</p>
     <p class="soft">Обери поняття, потім клацни пояснення, яке йому відповідає.</p>
     <div class="exercise">
-      <div class="tool-pool" id="recapPool"></div>
+      <div class="match-pool" id="recapPool"></div>
       <div id="recapList"></div>
     </div>
     <p class="soft" style="margin-top:22px;">Що біжить каналом у кожному випадку?</p>
@@ -450,26 +368,7 @@
   <section class="block" id="finalQuizSection">
     <div class="step-label">Підсумок</div>
     <h2>Коротка перевірка</h2>
-    <div class="quiz-box" id="quizBox">
-      <div class="quiz-progress" id="quizProgress">Запитання 1 з 7</div>
-      <div class="quiz-q" id="quizQ"></div>
-      <div class="quiz-options" id="quizOptions"></div>
-      <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
-    </div>
-    <div class="completion" id="completion">
-      <svg class="badge" viewBox="0 0 24 24" fill="none">
-        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#6C5CE7"/>
-        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#6C5CE7"/>
-        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#6C5CE7"/>
-        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#6C5CE7"/>
-        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#6C5CE7"/>
-        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#6C5CE7"/>
-        <circle cx="12" cy="12" r="4.4" fill="#6C5CE7"/><circle cx="12" cy="12" r="1.6" fill="#3F2FB0" opacity="0.6"/>
-      </svg>
-      <h3>Урок пройдено!</h3>
-      <p>Ти знаєш, чим локальна мережа відрізняється від глобальної, хто такий провайдер, що таке дата-центр і як відео перетинає океан.</p>
-      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
-    </div>
+    <div id="finalQuiz"></div>
   </section>
 
 </div>
@@ -478,73 +377,11 @@
 
 <footer>Урок · «Види комп'ютерних мереж. Мережа Інтернет» · 5 клас</footer>
 
+<script src="../../assets/lesson.js"></script>
 <script>
-const STORAGE_KEY = "lesson5-networks-internet-neurons";
-let neurons = 0;
-const neuronEl = document.getElementById('neuronCount');
-const hudFill = document.getElementById('hudFill');
-
-function addNeurons(n){
-  neurons += n;
-  neuronEl.textContent = neurons;
-  neuronEl.classList.add('pop'); setTimeout(()=>neuronEl.classList.remove('pop'), 250);
-  saveProgress();
-}
-async function saveProgress(){
-  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
-}
-async function loadProgress(){
-  try{
-    const res = await window.storage?.get(STORAGE_KEY, false);
-    if(res?.value){ const d = JSON.parse(res.value); if(typeof d.neurons==='number'){ neurons=d.neurons; neuronEl.textContent=neurons; } }
-  }catch(e){}
-}
-loadProgress();
-
-window.addEventListener('scroll', ()=>{
-  const h = document.documentElement;
-  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
-  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
-});
-
-const shuffle = arr => [...arr].sort(()=>Math.random()-0.5);
 function shakeEl(el){ el.classList.add('shake'); setTimeout(()=>el.classList.remove('shake'), 350); }
 
 /* ---------- MATCHING ---------- */
-function makeMatching(poolId, listId, items){
-  const pool = document.getElementById(poolId);
-  const list = document.getElementById(listId);
-  let selected = null, matched = 0;
-  shuffle(items).forEach(t=>{
-    const chip = document.createElement('div');
-    chip.className = 'tool-chip';
-    chip.textContent = t.name;
-    chip.addEventListener('click', ()=>{
-      pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
-      chip.classList.add('selected');
-      selected = t.name;
-    });
-    pool.appendChild(chip);
-  });
-  shuffle(items).forEach(t=>{
-    const card = document.createElement('div');
-    card.className = 'func-card';
-    card.innerHTML = `<div class="func-text">${t.func}</div><div class="func-slot">?</div>`;
-    card.addEventListener('click', ()=>{
-      if(card.classList.contains('matched') || !selected) return;
-      if(selected === t.name){
-        const slot = card.querySelector('.func-slot');
-        slot.textContent = selected; slot.classList.add('filled');
-        card.classList.add('matched');
-        [...pool.children].find(c=>c.textContent===selected)?.classList.add('placed');
-        selected = null;
-        addNeurons(1);
-        if(++matched === items.length) addNeurons(2);
-      } else shakeEl(card);
-    });
-    list.appendChild(card);
-  });
-}
 
 makeMatching('recapPool', 'recapList', [
   { name:'Сигнал', func:'⚡ Зміна струму, світла чи радіохвилі, яка несе дані' },
@@ -555,30 +392,8 @@ makeMatching('recapPool', 'recapList', [
   { name:'Супутниковий зв\'язок', func:'🛰️ Сигнал летить через космос — працює навіть посеред океану' }
 ]);
 
-/* ---------- CLASSIFY ---------- */
-function makeChoice(containerId, items){
-  const list = document.getElementById(containerId);
-  items.forEach(item=>{
-    const card = document.createElement('div');
-    card.className = 'classify-card';
-    card.innerHTML = `<p class="q">${item.text}</p>
-      <div class="choice-row">${item.opts.map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
-      <div class="choice-feedback"></div>`;
-    list.appendChild(card);
-    const fb = card.querySelector('.choice-feedback');
-    let answered = false;
-    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
-      btn.addEventListener('click', ()=>{
-        if(answered) return;
-        if(i === item.correct){ btn.classList.add('correct'); fb.textContent = 'Правильно ✓' + (item.why ? ' ' + item.why : ''); answered = true; addNeurons(1); }
-        else { btn.classList.add('wrong'); fb.textContent = 'Спробуй ще раз'; }
-      });
-    });
-  });
-}
-
 const SIG = ['⚡ Електричні імпульси','💡 Спалахи світла','📡 Радіохвилі'];
-makeChoice('recapSignals', [
+makeChoices('recapSignals', [
   { text:'🧵 Кабель зі скляною ниткою всередині веде Інтернет у будинок', opts:SIG, correct:1 },
   { text:'📱 Смартфон дзвонить через вежу мобільного зв\'язку', opts:SIG, correct:2 },
   { text:'🔌 Мідний мережевий кабель з\'єднує комп\'ютер із роутером', opts:SIG, correct:0 },
@@ -586,14 +401,14 @@ makeChoice('recapSignals', [
 ]);
 
 const CH = ['🎧 Bluetooth','📶 Wi-Fi','🛰️ Супутник'];
-makeChoice('recapChannels', [
+makeChoices('recapChannels', [
   { text:'🚢 Корабель посеред океану надсилає на берег прогноз погоди', opts:CH, correct:2 },
   { text:'☕ Гості кав\'ярні сидять в Інтернеті з телефонів, ввівши пароль із чека', opts:CH, correct:1 },
   { text:'🚗 Телефон грає пісні через колонки автомобіля', opts:CH, correct:0 }
 ]);
 
 const YN = ['✅ Так','❌ Ні'];
-makeChoice('netYesNo', [
+makeChoices('netYesNo', [
   { text:'📱📱 Два телефони передають одне одному фото', opts:YN, correct:0, why:'Навіть два з\'єднані пристрої — це вже маленька мережа.' },
   { text:'🧮 Калькулятор рахує домашнє завдання з математики', opts:YN, correct:1, why:'Калькулятор працює сам, нічого нікуди не передає.' },
   { text:'🖨️ Усі учні класу друкують на одному принтері, не встаючи з-за парт', opts:YN, correct:0, why:'Комп\'ютери й принтер з\'єднані між собою.' },
@@ -610,6 +425,7 @@ makeChoice('netYesNo', [
   const cards = svg.querySelectorAll('.zcard');
   const progress = document.getElementById('zoomProgress');
   const seen = new Set();
+  const hit = trackTask(svg, levels.length, levels.length + 2);
   function show(lv){
     const L = levels[lv];
     document.getElementById('zoomType').textContent = L.type;
@@ -619,7 +435,7 @@ makeChoice('netYesNo', [
     cards.forEach(c=>c.classList.toggle('on', +c.dataset.lv === lv));
     if(!seen.has(lv)){
       seen.add(lv);
-      addNeurons(1);
+      addNeurons(1); hit();
       progress.textContent = `Переглянуто: ${seen.size} з ${levels.length}`;
       if(seen.size === levels.length){ progress.textContent = 'Бачиш? Твоя школа — лише одна маленька точка на планеті ✓'; addNeurons(2); }
     }
@@ -627,9 +443,10 @@ makeChoice('netYesNo', [
   cards.forEach(c=>c.addEventListener('click', ()=>show(+c.dataset.lv)));
 })();
 
-/* ---------- SORT BOARD ---------- */
-function makeSortBoard(poolId, boardId, progressId, items){
+/* ---------- SORT BOARD (кошики-схеми мереж) ---------- */
+function makeBasketBoard(poolId, boardId, progressId, items){
   const pool = document.getElementById(poolId);
+  const hit = trackTask(pool, items.length, items.length + 2);
   const baskets = document.querySelectorAll(`#${boardId} .basket`);
   const progress = document.getElementById(progressId);
   let selected = null, done = 0;
@@ -651,7 +468,7 @@ function makeSortBoard(poolId, boardId, progressId, items){
       d.className = 'in'; d.textContent = selected.it.text;
       b.appendChild(d);
       selected.chip.remove(); selected = null;
-      addNeurons(1);
+      addNeurons(1); hit();
       done++;
       progress.textContent = `Розкладено: ${done} з ${items.length}`;
       if(done === items.length){ progress.textContent = 'Усі мережі на своїх місцях ✓'; addNeurons(2); }
@@ -662,7 +479,7 @@ function makeSortBoard(poolId, boardId, progressId, items){
   }));
 }
 
-makeSortBoard('sortPool', 'baskets', 'sortProgress', [
+makeBasketBoard('sortPool', 'baskets', 'sortProgress', [
   { text:'🖥️ Комп\'ютери й принтер у кабінеті інформатики', k:'L' },
   { text:'🏠 Телефони й телевізор родини під\'єднані до одного роутера', k:'L' },
   { text:'🎮 Учні грають по мережі, сидячи в одному кабінеті', k:'L' },
@@ -709,6 +526,7 @@ function moveDot(dot, points, onArrive, done, speed=260){
   const cut = { 1:false, 2:false };
   const seen = new Set();
   let busy = false, sent = false, rerouted = false, blocked = false;
+  const hit = trackTask(go, 2, 7);   // досліди всю схему + надішли відео
 
   function explore(id){
     infoEl.innerHTML = `<div class="t">${info[id].t}</div>${info[id].d}`;
@@ -717,7 +535,7 @@ function moveDot(dot, points, onArrive, done, speed=260){
       seen.add(id);
       document.querySelector(`.mnode[data-id="${id}"]`)?.classList.add('seen');
       if(!busy) status.textContent = `Досліджено: ${seen.size} з 5`;
-      if(seen.size === 5){ if(!busy) status.textContent = 'Усю схему досліджено ✓ Тепер увімкни відео!'; addNeurons(2); }
+      if(seen.size === 5){ if(!busy) status.textContent = 'Усю схему досліджено ✓ Тепер увімкни відео!'; addNeurons(2); hit(); }
     }
   }
   document.querySelectorAll('.mnode').forEach(n=>n.addEventListener('click', ()=>explore(n.dataset.id)));
@@ -771,7 +589,7 @@ function moveDot(dot, points, onArrive, done, speed=260){
       setTimeout(()=>travel(back, '#FFC93C', ()=>{
         dot.setAttribute('opacity', 0);
         busy = false; go.disabled = false;
-        if(!sent){ sent = true; addNeurons(2); }
+        if(!sent){ sent = true; addNeurons(2); hit(); }
         if(n === 2 && !rerouted){
           rerouted = true; addNeurons(2);
           status.innerHTML = '✅ Кабель 1 пошкоджено, але відео прийшло кабелем 2! Мережа сама знайшла обхідний шлях.';
@@ -782,14 +600,6 @@ function moveDot(dot, points, onArrive, done, speed=260){
 })();
 
 /* ---------- PHOTO QUIZ ---------- */
-function loadPic(el, file, fallbackEmoji){
-  const img = document.createElement('img');
-  img.src = `images/${file}`;
-  img.alt = '';
-  img.addEventListener('error', ()=>{ el.innerHTML = `<div class="fallback">${fallbackEmoji}</div>`; });
-  el.innerHTML = '';
-  el.appendChild(img);
-}
 (function(){
   const photos = [
     { file:'cable-ship.jpg', emoji:'🚢', q:'Що робить це судно?', opts:['Прокладає кабель по дну океану','Ловить рибу','Возить туристів'], correct:0, cap:'Кабелеукладальне судно. У його трюмі — тисячі кілометрів кабелю.', credit:'Pburka, CC BY-SA 4.0' },
@@ -807,6 +617,7 @@ function loadPic(el, file, fallbackEmoji){
   const box = document.getElementById('lightbox');
   const big = box.querySelector('img');
   let solved = 0;
+  const hit = trackTask(grid, photos.length, photos.length + 3);
   photos.forEach(ph=>{
     const fig = document.createElement('figure');
     fig.className = 'photo';
@@ -828,7 +639,7 @@ function loadPic(el, file, fallbackEmoji){
       if(fig.classList.contains('done')) return;
       if(+b.dataset.i === ph.correct){
         fig.classList.add('done');
-        addNeurons(1);
+        addNeurons(1); hit();
         solved++;
         progress.textContent = `Розгадано: ${solved} з ${photos.length}`;
         if(solved === photos.length){ progress.textContent = 'Усі фото розгадано ✓'; addNeurons(3); }
@@ -862,6 +673,7 @@ function loadPic(el, file, fallbackEmoji){
   const opts = document.getElementById('chainOpts');
   const status = document.getElementById('chainStatus');
   let pos = 0;
+  const hit = trackTask(chain, steps.length, steps.length + 3);   // кожен крок шляху + запуск відео
 
   function addNode(s){
     if(chain.children.length) chain.insertAdjacentHTML('beforeend', '<div class="chain-arrow">▼</div>');
@@ -885,7 +697,7 @@ function loadPic(el, file, fallbackEmoji){
       b.className = 'choice-btn';
       b.textContent = `${s.ic} ${s.nm}`;
       b.addEventListener('click', ()=>{
-        if(s === steps[pos]){ addNode(s); pos++; addNeurons(1); render(); }
+        if(s === steps[pos]){ addNode(s); pos++; addNeurons(1); hit(); render(); }
         else { b.classList.add('wrong'); shakeEl(b); setTimeout(()=>b.classList.remove('wrong'), 450); }
       });
       opts.appendChild(b);
@@ -899,7 +711,7 @@ function loadPic(el, file, fallbackEmoji){
         nodes.forEach(x=>x.classList.remove('lit'));
         n.classList.add('lit');
         status.textContent = msgs[i];
-        if(i === nodes.length - 1){ btn.textContent = '✅ Відео доставлено'; addNeurons(2); }
+        if(i === nodes.length - 1){ btn.textContent = '✅ Відео доставлено'; addNeurons(2); hit(); }
       }, i*1000);
     });
   }
@@ -922,6 +734,7 @@ function loadPic(el, file, fallbackEmoji){
   const progress = document.getElementById('memoProgress');
   const cards = shuffle(pairs.flatMap(p=>[{ id:p.id, kind:'word', p }, { id:p.id, kind:'pic', p }]));
   let open = [], lock = false, found = 0, tries = 0;
+  const hit = trackTask(grid, pairs.length, pairs.length + 3);
   const upd = ()=>{ progress.textContent = `Знайдено пар: ${found} з ${pairs.length} · Спроб: ${tries}`; };
   cards.forEach(c=>{
     const el = document.createElement('div');
@@ -938,7 +751,7 @@ function loadPic(el, file, fallbackEmoji){
       tries++;
       if(a.id === b.id){
         a.el.classList.add('matched'); b.el.classList.add('matched');
-        addNeurons(1);
+        addNeurons(1); hit();
         found++;
         upd();
         if(found === pairs.length){ progress.textContent = `Усі пари знайдено за ${tries} спроб ✓`; addNeurons(3); }
@@ -962,45 +775,8 @@ const questions = [
   { q: "🌊 Як здебільшого передаються дані між континентами?", opts: ["Через Bluetooth", "Кабелями по дну океанів", "Поштою"], correct: 1 },
   { q: "⚓ Якір пошкодив один підводний кабель. Що буде з Інтернетом?", opts: ["Зникне в усьому світі", "Дані підуть іншим кабелем", "Працюватиме лише вночі"], correct: 1 }
 ];
-let qi = 0, currentAnswered = false;
-const quizQ = document.getElementById('quizQ');
-const quizOptions = document.getElementById('quizOptions');
-const quizProgress = document.getElementById('quizProgress');
-const btnNext = document.getElementById('btnNext');
-const quizBox = document.getElementById('quizBox');
-const completion = document.getElementById('completion');
-const totalNeuronsEl = document.getElementById('totalNeurons');
 
-function renderQuestion(){
-  currentAnswered = false; btnNext.classList.remove('active');
-  const item = questions[qi];
-  quizProgress.textContent = `Запитання ${qi+1} з ${questions.length}`;
-  quizQ.textContent = item.q;
-  quizOptions.innerHTML = '';
-  item.opts.forEach((opt,i)=>{
-    const b = document.createElement('button'); b.className = 'quiz-opt'; b.textContent = opt;
-    b.addEventListener('click', ()=>{
-      if(currentAnswered) return; currentAnswered = true;
-      quizOptions.querySelectorAll('.quiz-opt').forEach((ob,oi)=>{ if(oi===item.correct) ob.classList.add('correct'); else if(oi===i) ob.classList.add('wrong'); });
-      if(i === item.correct) addNeurons(2);
-      btnNext.classList.add('active');
-      btnNext.textContent = (qi === questions.length-1) ? 'Завершити' : 'Далі';
-    });
-    quizOptions.appendChild(b);
-  });
-}
-btnNext.addEventListener('click', ()=>{
-  if(!btnNext.classList.contains('active')) return;
-  qi++;
-  if(qi < questions.length){ renderQuestion(); }
-  else {
-    quizBox.style.display = 'none';
-    completion.classList.add('show');
-    addNeurons(3);
-    totalNeuronsEl.textContent = neurons;
-  }
-});
-renderQuestion();
+makeFinalQuiz('finalQuiz', questions, {summary:'Ти знаєш, чим локальна мережа відрізняється від глобальної, хто такий провайдер, що таке дата-центр і як відео перетинає океан.'});
 </script>
 
 </body>

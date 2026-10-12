@@ -7,74 +7,43 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
 <style>
   :root{
+    --accent-soft:color-mix(in srgb, var(--accent) 12%, #fff);
+    --hud-bar:linear-gradient(90deg,var(--amber),var(--accent));
+    --label:var(--amber);
+    --note:var(--blue); --note-soft:#EAF5FC; --note-ink:#2A6B8C;
+    --sun:var(--amber); --sun-soft:var(--amber-light); --sun-ink:#8A4F12;
+   
     --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
     --purple:#6C5CE7; --purple-dark:#5340c9; --teal:#16A3A0; --coral:#FF6B4A; --yellow:#FFC93C; --pink:#FF5D9E; --blue:#2D9CDB;
     --radius-s:10px; --radius-m:16px; --radius-l:26px;
-    /* акцентна гама уроку: м'ятно-бурштинова */
+    
     --accent:#1F8A70; --accent-dark:#146652; --accent-light:#E3F4EE; --amber:#E0892B; --amber-light:#FFF3E2;
   }
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
-  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
-  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
-  .container{max-width:800px; margin:0 auto; padding:0 24px;}
-
-  .hud{position:sticky; top:0; z-index:50; background:rgba(246,245,251,.9); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
-  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
-  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--amber),var(--accent)); transition:width .3s ease;}
-  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:800px; margin:0 auto;}
-  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
-  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
-  .neuron-counter svg{width:24px;height:24px;}
-  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
-  #neuronCount.pop{transform:scale(1.35);}
-
-  .hero{padding:52px 24px 40px;}
-  .hero-inner{max-width:800px; margin:0 auto; display:flex; align-items:center; gap:30px;}
-  .hero-text{flex:1;}
-  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--amber); margin-bottom:10px;}
-  .hero h1{font-size:32px; line-height:1.18; margin-bottom:12px;}
-  .hero p{color:var(--ink-soft); font-size:16.5px; max-width:52ch; margin-bottom:22px;}
-  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--accent); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
-  .btn-primary:hover{background:var(--accent-dark);}
-  .btn-primary:active{transform:scale(.97);}
+  .hero-eyebrow{color:var(--amber);}
+  .hero p{max-width:52ch;}
   .btn-primary:disabled{opacity:.4; cursor:default;}
-  .mascot{width:130px; height:130px; flex-shrink:0;}
-  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:100px; height:100px;} }
-
+  .mascot{width:130px; height:130px;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;}
+  .mascot{width:100px; height:100px;} }
   .part-title{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:14px; letter-spacing:.06em; text-transform:uppercase; color:var(--accent-dark); background:var(--accent-light); display:inline-block; padding:6px 14px; border-radius:999px; margin:30px 0 4px;}
-
-  section.block{padding:38px 0; border-top:1px solid var(--line);}
-  .step-label{font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:600; color:var(--amber); margin-bottom:8px;}
-  .block h2{font-size:21px; margin-bottom:10px; max-width:38ch;}
-  .block p{max-width:66ch; font-size:16px; margin:0 0 14px; color:var(--ink);}
-  .block p.soft{color:var(--ink-soft); font-size:15px;}
-  .block ul{margin:0 0 14px; padding-left:22px; max-width:66ch;}
+  .step-label{color:var(--amber);}
+  .block ul{padding-left:22px;}
   .block li{margin-bottom:4px;}
-  .note{background:#EAF5FC; border-left:4px solid var(--blue); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; color:#2A6B8C; margin:16px 0;}
-  .trivia{background:var(--amber-light); border-left:4px solid var(--amber); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; color:#8A4F12; margin:16px 0;}
-
-  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:22px; margin-top:18px;}
-  .progress-line{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--accent-dark); margin-top:14px; min-height:1.4em;}
+  .note{background:#EAF5FC; border-left:4px solid var(--blue); color:#2A6B8C;}
+  .trivia{background:var(--amber-light); border-left:4px solid var(--amber); font-size:14.5px; color:#8A4F12;}
   @keyframes shake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
   .shake{animation:shake .35s ease;}
-
-  /* MATCHING */
   .tool-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:14px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:16px;}
   .tool-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:8px 14px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
   .tool-chip:hover{transform:translateY(-2px);}
   .tool-chip.selected{border-color:var(--accent); box-shadow:0 0 0 3px rgba(31,138,112,.18);}
   .tool-chip.placed{display:none;}
-  .func-card{display:flex; align-items:center; gap:12px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; margin-bottom:10px; cursor:pointer; transition:border-color .2s ease, background .2s ease;}
-  .func-card.matched{border-color:var(--yellow); background:#FFFBEE; cursor:default;}
-  .func-text{flex:1; font-size:14px; color:var(--ink-soft);}
-  .func-slot{min-width:110px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12.5px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:8px 10px;}
-  .func-slot.filled{border-style:solid; border-color:var(--yellow); background:#FFF7E2; color:var(--ink);}
-
-  /* LABEL THE LETTER */
+  .desc-card.matched{border-color:var(--yellow); background:#FFFBEE;}
+  .desc-slot{font-size:12.5px;}
+  .desc-slot.filled{border-color:var(--yellow); background:#FFF7E2; color:var(--ink);}
   .mail{background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:16px 18px; font-size:14.5px; line-height:1.7;}
   .mail-head{border-bottom:1px solid var(--line); padding-bottom:10px; margin-bottom:10px; display:flex; flex-direction:column; gap:4px;}
   .mail-field{font-size:13px; color:var(--ink-soft);}
@@ -84,36 +53,24 @@
   .zone .ztag{display:inline-block; font-family:'Baloo 2',sans-serif; font-size:11px; font-weight:700; color:#fff; background:var(--accent); border-radius:999px; padding:0 8px; margin-left:6px; vertical-align:1px;}
   .zone.wrong-try{background:#FDE6E1;}
   .mail-body p{margin:0 0 8px;}
-
-  /* CLASSIFY */
-  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:16px 18px; margin:12px 0;}
-  .classify-card p.q{font-weight:700; margin:0 0 10px; font-size:15px;}
   .snippet{background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 16px; margin-bottom:10px; font-size:14px; color:var(--ink);}
   .snippet .mail-field{margin-bottom:4px;}
-  .choice-row{display:flex; gap:8px; flex-wrap:wrap;}
-  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; padding:8px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; text-align:left; transition:background .15s ease, border-color .15s ease, color .15s ease;}
-  .choice-btn:hover{border-color:var(--accent);}
-  .choice-btn.correct{background:#E4F8E6; border-color:#3FAE58; color:#256B36;}
-  .choice-btn.wrong{background:#FDE6E1; border-color:var(--coral); color:#B8412A;}
+  .choice-btn.correct{background:#E4F8E6; border-color:#3FAE58;}
   .choice-row.col{flex-direction:column;}
   .choice-row.col .choice-btn{border-radius:var(--radius-s);}
-  .choice-feedback{margin-top:8px; font-size:13.5px; color:var(--ink-soft); min-height:1.2em;}
   .mono{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13px;}
-
-  /* FLIP GALLERY */
   .flip-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px;}
-  .flip-card{perspective:900px; height:170px; cursor:pointer;}
-  .flip-inner{position:relative; width:100%; height:100%; transition:transform .5s ease; transform-style:preserve-3d;}
+  .flip-card{perspective:900px; height:170px;}
+  .flip-inner{transition:transform .5s ease;}
   .flip-inner.flipped{transform:rotateY(180deg);}
-  .flip-front,.flip-back{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:var(--radius-m); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:14px; text-align:center;}
-  .flip-front{background:var(--surface); border:2px solid var(--line);}
+  .flip-front{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:var(--radius-m); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:14px; text-align:center;}
+  .flip-back{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:var(--radius-m); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:14px; text-align:center;}
+  .flip-front{border:2px solid var(--line);}
   .flip-front .ico{font-size:34px; line-height:1; margin-bottom:8px;}
   .flip-front .nm{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px;}
   .flip-front .hint{font-size:11.5px; color:var(--ink-soft); margin-top:4px;}
-  .flip-back{background:var(--accent-light); border:2px solid var(--accent); font-size:13.5px; color:var(--ink); transform:rotateY(180deg); /* без цього рядка — баг */}
+  .flip-back{background:var(--accent-light); border:2px solid var(--accent); font-size:13.5px; color:var(--ink);}
   .flip-card.seen .flip-front{border-color:var(--accent);}
-
-  /* FIX THE LETTER */
   .fix{cursor:pointer; border-bottom:2px dotted var(--amber); border-radius:4px; padding:0 2px; transition:background .15s ease;}
   .fix:hover{background:var(--amber-light);}
   .fix.active{background:var(--amber-light); box-shadow:0 0 0 2px var(--amber);}
@@ -122,49 +79,11 @@
   .fix-panel{margin-top:14px; background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px; display:none;}
   .fix-panel.show{display:block;}
   .fix-panel .lbl{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; margin-bottom:8px; color:var(--ink-soft);}
-
-  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:26px 24px; margin-top:18px;}
-  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:13px; color:var(--ink-soft); margin-bottom:10px;}
-  .quiz-q{font-size:17px; font-weight:700; margin-bottom:16px;}
-  .quiz-options{display:flex; flex-direction:column; gap:10px;}
-  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:15px; font-weight:600; padding:12px 15px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
-  .quiz-opt:hover{border-color:var(--accent);}
   .quiz-opt.correct{background:#E4F8E6; border-color:#3FAE58;}
-  .quiz-opt.wrong{background:#FDE6E1; border-color:var(--coral);}
-  .quiz-nav{display:flex; justify-content:flex-end; margin-top:18px;}
-  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:11px 22px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
-  .btn-next.active{opacity:1; pointer-events:auto;}
-
-  .completion{display:none; text-align:center; padding:20px 10px 10px;}
-  .completion.show{display:block;}
-  .badge{width:90px; height:90px; margin:0 auto 16px;}
-  .completion h3{font-size:22px; margin-bottom:10px;}
-  .completion p{color:var(--ink-soft); max-width:50ch; margin:0 auto 18px; font-size:15px;}
-  .completion .total{font-family:'Baloo 2',sans-serif; font-size:30px; color:var(--purple-dark);}
-
-  footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
+  .quiz-nav{margin-top:18px;}
 </style>
 </head>
-<body>
-
-<div class="hud">
-  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
-  <div class="hud-row">
-    <span class="hud-title">6 клас · Етикет листування</span>
-    <div class="neuron-counter">
-      <svg viewBox="0 0 24 24" fill="none">
-        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
-        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
-        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
-        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
-        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
-        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
-        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#E0A800" opacity="0.6"/>
-      </svg>
-      <span id="neuronCount">0</span>
-    </div>
-  </div>
-</div>
+<body data-lesson="lesson6-email-etiquette" data-hud="6 клас · Етикет листування">
 
 <section class="hero">
   <div class="hero-inner">
@@ -199,7 +118,7 @@
     <p>За кілька уроків ми зібрали чимало нових слів. Перевір, чи пам'ятаєш їх усі.</p>
     <p class="soft">Обери поняття, потім клацни пояснення, яке йому відповідає.</p>
     <div class="exercise">
-      <div class="tool-pool" id="recapPool"></div>
+      <div class="match-pool" id="recapPool"></div>
       <div id="recapList"></div>
     </div>
     <div class="note">Щоб боти не зібрали твою адресу з сайту чи форуму, замість «@» можна написати «(at)» або «(собака)»: людина зрозуміє, а програма — ні.</div>
@@ -227,7 +146,6 @@
       <div class="progress-line" id="partsProgress">Підписано: 0 з 6</div>
     </div>
   </section>
-
 
   <section class="block">
     <div class="step-label">Повторення · Безпека</div>
@@ -301,100 +219,18 @@
   <section class="block" id="finalQuizSection">
     <div class="step-label">Підсумок</div>
     <h2>Коротка перевірка</h2>
-    <div class="quiz-box" id="quizBox">
-      <div class="quiz-progress" id="quizProgress">Запитання 1 з 9</div>
-      <div class="quiz-q" id="quizQ"></div>
-      <div class="quiz-options" id="quizOptions"></div>
-      <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
-    </div>
-    <div class="completion" id="completion">
-      <svg class="badge" viewBox="0 0 24 24" fill="none">
-        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#6C5CE7"/>
-        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#6C5CE7"/>
-        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#6C5CE7"/>
-        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#6C5CE7"/>
-        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#6C5CE7"/>
-        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#6C5CE7"/>
-        <circle cx="12" cy="12" r="4.4" fill="#6C5CE7"/><circle cx="12" cy="12" r="1.6" fill="#3F2FB0" opacity="0.6"/>
-      </svg>
-      <h3>Розділ «Електронна пошта» пройдено!</h3>
-      <p>Ти повторив будову адреси й листа, папки скриньки та ознаки фішингу, а ще навчився писати ввічливі листи: з темою, привітанням, «будь ласка» і підписом.</p>
-      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
-    </div>
+    <div id="finalQuiz"></div>
   </section>
 
 </div>
 
 <footer>Урок · «Етикет електронного листування та безпека» · 6 клас</footer>
 
+<script src="../../assets/lesson.js"></script>
 <script>
-const STORAGE_KEY = "lesson6-email-etiquette-neurons";
-let neurons = 0;
-const neuronEl = document.getElementById('neuronCount');
-const hudFill = document.getElementById('hudFill');
-
-function addNeurons(n){
-  neurons += n;
-  neuronEl.textContent = neurons;
-  neuronEl.classList.add('pop');
-  setTimeout(()=>neuronEl.classList.remove('pop'), 250);
-  saveProgress();
-}
-async function saveProgress(){
-  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
-}
-async function loadProgress(){
-  try{
-    const res = await window.storage?.get(STORAGE_KEY, false);
-    if(res?.value){ const d = JSON.parse(res.value); if(typeof d.neurons==='number'){ neurons=d.neurons; neuronEl.textContent=neurons; } }
-  }catch(e){}
-}
-loadProgress();
-
-window.addEventListener('scroll', ()=>{
-  const h = document.documentElement;
-  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
-  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
-});
-
-const shuffle = arr => [...arr].sort(()=>Math.random()-0.5);
 function shakeEl(el){ el.classList.add('shake'); setTimeout(()=>el.classList.remove('shake'), 350); }
 
 /* ---------- MATCHING ---------- */
-function makeMatching(poolId, listId, items){
-  const pool = document.getElementById(poolId);
-  const list = document.getElementById(listId);
-  let selected = null, matched = 0;
-  shuffle(items).forEach(t=>{
-    const chip = document.createElement('div');
-    chip.className = 'tool-chip';
-    chip.textContent = t.name;
-    chip.addEventListener('click', ()=>{
-      pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
-      chip.classList.add('selected');
-      selected = t.name;
-    });
-    pool.appendChild(chip);
-  });
-  shuffle(items).forEach(t=>{
-    const card = document.createElement('div');
-    card.className = 'func-card';
-    card.innerHTML = `<div class="func-text">${t.func}</div><div class="func-slot">?</div>`;
-    card.addEventListener('click', ()=>{
-      if(card.classList.contains('matched') || !selected) return;
-      if(selected === t.name){
-        const slot = card.querySelector('.func-slot');
-        slot.textContent = selected; slot.classList.add('filled');
-        card.classList.add('matched');
-        [...pool.children].find(c=>c.textContent===selected)?.classList.add('placed');
-        selected = null;
-        addNeurons(1);
-        if(++matched === items.length) addNeurons(2);
-      } else shakeEl(card);
-    });
-    list.appendChild(card);
-  });
-}
 
 makeMatching('recapPool', 'recapList', [
   { name:'Провайдер', func:'Сервіс, на якому реєструють скриньку: Gmail, Ukr.net, i.ua' },
@@ -414,6 +250,7 @@ makeMatching('recapPool', 'recapList', [
   const progress = document.getElementById('partsProgress');
   const names = [...zones].map(z=>z.dataset.part);
   let selected = null, done = 0;
+  const hit = trackTask(pool, zones.length, zones.length + 2);
   shuffle(names).forEach(n=>{
     const chip = document.createElement('div');
     chip.className = 'tool-chip';
@@ -433,7 +270,7 @@ makeMatching('recapPool', 'recapList', [
         z.insertAdjacentHTML('beforeend', `<span class="ztag">${selected}</span>`);
         [...pool.children].find(c=>c.textContent===selected)?.classList.add('placed');
         selected = null;
-        addNeurons(1);
+        addNeurons(1); hit();
         done++;
         progress.textContent = `Підписано: ${done} з ${zones.length}`;
         if(done === zones.length){ progress.textContent = 'Усі частини на місці ✓ Тема, привітання й підпис — саме те, що робить лист ввічливим.'; addNeurons(2); }
@@ -445,32 +282,7 @@ makeMatching('recapPool', 'recapList', [
   });
 })();
 
-/* ---------- CLASSIFY (multi-option) ---------- */
-function makeChoice(containerId, items, opts = {}){
-  const list = document.getElementById(containerId);
-  items.forEach(item=>{
-    const card = document.createElement('div');
-    card.className = 'classify-card';
-    card.innerHTML = `${item.snippet || ''}<p class="q">${item.text}</p>
-      <div class="choice-row ${opts.col ? 'col' : ''}">${item.opts.map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
-      <div class="choice-feedback"></div>`;
-    list.appendChild(card);
-    const fb = card.querySelector('.choice-feedback');
-    let answered = false;
-    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
-      btn.addEventListener('click', ()=>{
-        if(answered) return;
-        if(i === item.correct){
-          btn.classList.add('correct');
-          fb.textContent = 'Правильно ✓' + (item.why ? ' ' + item.why : '');
-          answered = true; addNeurons(1);
-        } else { btn.classList.add('wrong'); fb.textContent = item.hint || 'Спробуй ще раз'; }
-      });
-    });
-  });
-}
-
-makeChoice('safeList', [
+makeChoices('safeList', [
   { text:'Лист «від Google» просить терміново увійти в акаунт. Яка адреса сторінки входу справжня?',
     opts:['<span class="mono">https://accounts.google.com</span>','<span class="mono">https://acc0unts-google.com</span>','<span class="mono">http://google.com.login-check.ru</span>'], correct:0,
     why:'У підробках нуль замість літери «о», зайвий дефіс або чужий домен наприкінці.' },
@@ -497,6 +309,7 @@ makeChoice('safeList', [
   const grid = document.getElementById('flipGrid');
   const progress = document.getElementById('flipProgress');
   const seen = new Set();
+  const hit = trackTask(grid, rules.length, 2);
   rules.forEach((r,i)=>{
     const card = document.createElement('div');
     card.className = 'flip-card';
@@ -507,7 +320,7 @@ makeChoice('safeList', [
     card.addEventListener('click', ()=>{
       card.querySelector('.flip-inner').classList.toggle('flipped');
       if(!seen.has(i)){
-        seen.add(i); card.classList.add('seen');
+        seen.add(i); card.classList.add('seen'); hit();
         progress.textContent = `Прочитано: ${seen.size} з ${rules.length}`;
         if(seen.size === rules.length){ progress.textContent = 'Усі правила прочитано ✓'; addNeurons(2); }
       }
@@ -520,7 +333,7 @@ makeChoice('safeList', [
 function mailSnippet(fields, body){
   return `<div class="snippet">${fields.map(f=>`<div class="mail-field">${f}</div>`).join('')}${body}</div>`;
 }
-makeChoice('breakList', [
+makeChoices('breakList', [
   { snippet: mailSnippet(['Кому: olena.petrivna@school131.ua','Тема: —'], 'Доброго дня, Олено Петрівно! Надсилаю реферат з історії. Дякую! Ірина Коваль, 6-А'),
     text:'Яке правило порушено?', opts:['Привітання','Тема','Підпис','Без КАПСУ'], correct:1,
     why:'Без теми лист легко загубити серед інших або сприйняти за спам.' },
@@ -561,6 +374,7 @@ makeChoice('breakList', [
   const fb = document.getElementById('fixFeedback');
   const progress = document.getElementById('fixProgress');
   let fixedCount = 0, active = null;
+  const hit = trackTask(optsEl, fixes.length, fixes.length + 3);
 
   spans.forEach(span=>{
     span.addEventListener('click', ()=>{
@@ -593,7 +407,7 @@ makeChoice('breakList', [
             span.classList.add('fixed');
             panel.classList.remove('show');
             active = null;
-            addNeurons(1);
+            addNeurons(1); hit();
             fixedCount++;
             progress.textContent = `Виправлено: ${fixedCount} з ${fixes.length}`;
             if(fixedCount === fixes.length){ progress.textContent = 'Лист виправлено ✓ Тепер його приємно читати, і вчитель точно зрозуміє, чим допомогти.'; addNeurons(3); }
@@ -610,7 +424,7 @@ makeChoice('breakList', [
 })();
 
 /* ---------- SUBJECT LINE ---------- */
-makeChoice('subjList', [
+makeChoices('subjList', [
   { text:'Ти тиждень хворів на грип, і лікар видав документ для школи. Надсилаєш його фото класній керівничці.',
     opts:['Довідка','Довідка про хворобу — Марко Шевчук, 6-Б','Документ від лікаря'], correct:1,
     why:'Одразу видно, що це за документ і від кого.' },
@@ -637,45 +451,8 @@ const questions = [
   { q: "Тобі переслали «новину» без джерела й просять поширити. Що робити?", opts: ["Переслати всім контактам", "Не поширювати неперевірену інформацію", "Переслати лише найближчим друзям"], correct: 1 },
   { q: "Що варто зробити просто перед натисканням «Надіслати»?", opts: ["Перечитати лист і перевірити адресу", "Додати когось у копію", "Зберегти лист у чернетках"], correct: 0 }
 ];
-let qi = 0, currentAnswered = false;
-const quizQ = document.getElementById('quizQ');
-const quizOptions = document.getElementById('quizOptions');
-const quizProgress = document.getElementById('quizProgress');
-const btnNext = document.getElementById('btnNext');
-const quizBox = document.getElementById('quizBox');
-const completion = document.getElementById('completion');
-const totalNeuronsEl = document.getElementById('totalNeurons');
 
-function renderQuestion(){
-  currentAnswered = false; btnNext.classList.remove('active');
-  const item = questions[qi];
-  quizProgress.textContent = `Запитання ${qi+1} з ${questions.length}`;
-  quizQ.textContent = item.q;
-  quizOptions.innerHTML = '';
-  item.opts.forEach((opt,i)=>{
-    const b = document.createElement('button'); b.className = 'quiz-opt'; b.textContent = opt;
-    b.addEventListener('click', ()=>{
-      if(currentAnswered) return; currentAnswered = true;
-      quizOptions.querySelectorAll('.quiz-opt').forEach((ob,oi)=>{ if(oi===item.correct) ob.classList.add('correct'); else if(oi===i) ob.classList.add('wrong'); });
-      if(i === item.correct) addNeurons(2);
-      btnNext.classList.add('active');
-      btnNext.textContent = (qi === questions.length-1) ? 'Завершити' : 'Далі';
-    });
-    quizOptions.appendChild(b);
-  });
-}
-btnNext.addEventListener('click', ()=>{
-  if(!btnNext.classList.contains('active')) return;
-  qi++;
-  if(qi < questions.length){ renderQuestion(); }
-  else {
-    quizBox.style.display = 'none';
-    completion.classList.add('show');
-    addNeurons(3);
-    totalNeuronsEl.textContent = neurons;
-  }
-});
-renderQuestion();
+makeFinalQuiz('finalQuiz', questions, {summary:'Ти повторив будову адреси й листа, папки скриньки та ознаки фішингу, а ще навчився писати ввічливі листи: з темою, привітанням, «будь ласка» і підписом.'});
 </script>
 
 </body>

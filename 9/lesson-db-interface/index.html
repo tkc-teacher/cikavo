@@ -7,98 +7,71 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
 <style>
   :root{
+    --accent:var(--pri); --accent-dark:var(--pri-dark); --accent-soft:color-mix(in srgb, var(--pri) 12%, #fff);
+    --hud-bar:linear-gradient(90deg,var(--warm),var(--pri));
+    --note:var(--accent2); --note-soft:#E6F4F7; --note-ink:var(--accent2-dark);
+    --sun:var(--pri); --sun-soft:#FDF0E4; --sun-ink:var(--pri-dark);
+   
     --bg:#FBF6F1; --ink:#2B1B12; --ink-soft:#6E584B; --surface:#FFFFFF; --line:#EFE0D3;
-    --pri:#C2410C; --pri-dark:#9A3412; --accent:#0E7490; --accent-dark:#155E75; --warm:#F59E0B; --coral:#E0604A;
+    --pri:#C2410C; --pri-dark:#9A3412; --accent2:#0E7490; --accent2-dark:#155E75; --warm:#F59E0B; --coral:#E0604A;
     --cell-line:#E6D8CC; --head-bg:#FBF0E7;
     --radius-s:10px; --radius-m:16px; --radius-l:26px;
   }
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
-  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
-  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
-  .container{max-width:780px; margin:0 auto; padding:0 24px;}
+  .container{max-width:780px;}
   @media (max-width:480px){ .container{padding:0 16px;} }
-
-  .hud{position:sticky; top:0; z-index:50; background:rgba(251,246,241,.9); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
-  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
-  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--warm),var(--pri)); transition:width .3s ease;}
-  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:780px; margin:0 auto;}
-  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
-  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
-  .neuron-counter svg{width:24px;height:24px;}
-  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
-  #neuronCount.pop{transform:scale(1.35);}
-
   .hero{padding:48px 24px 36px;}
-  .hero-inner{max-width:780px; margin:0 auto; display:flex; align-items:center; gap:26px;}
-  .hero-text{flex:1;}
-  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--pri); margin-bottom:10px;}
-  .hero h1{font-size:29px; line-height:1.2; margin-bottom:12px;}
-  .hero p{color:var(--ink-soft); font-size:16px; max-width:54ch; margin-bottom:20px;}
-  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--pri); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
+  .hero-inner{max-width:780px; gap:26px;}
+  .hero-eyebrow{color:var(--pri);}
+  .hero h1{font-size:29px; line-height:1.2;}
+  .hero p{font-size:16px; margin-bottom:20px;}
+  .btn-primary{background:var(--pri);}
   .btn-primary:hover{background:var(--pri-dark);}
-  .btn-primary:active{transform:scale(.97);}
-  .mascot{width:130px; height:130px; flex-shrink:0;}
-  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:100px; height:100px;} }
-
-  section.block{padding:30px 0; border-top:1px solid var(--line);}
-  .step-label{font-family:'Baloo 2',sans-serif; font-size:12.5px; font-weight:700; color:var(--pri); margin-bottom:6px; text-transform:uppercase; letter-spacing:.03em;}
+  .mascot{width:130px; height:130px;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;}
+  .mascot{width:100px; height:100px;} }
+  section.block{padding:30px 0;}
+  .step-label{font-size:12.5px; font-weight:700; color:var(--pri); margin-bottom:6px; text-transform:uppercase; letter-spacing:.03em;}
   .block h2{font-size:19px; margin-bottom:8px; max-width:40ch;}
-  .block p{max-width:64ch; font-size:15px; margin:0 0 8px; color:var(--ink);}
-  .block p.soft{color:var(--ink-soft); font-size:13.5px;}
-  .block ul, .block ol{max-width:64ch; margin:0 0 8px; padding-left:20px; font-size:15px;}
+  .block p{max-width:64ch; font-size:15px; margin:0 0 8px;}
+  .block p.soft{font-size:13.5px;}
+  .block ol{max-width:64ch; margin:0 0 8px; padding-left:20px; font-size:15px;}
+  .block ul{max-width:64ch; margin:0 0 8px;}
   .block li{margin-bottom:4px;}
-  .note{background:#E6F4F7; border-left:4px solid var(--accent); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:var(--accent-dark); margin:12px 0;}
-  .trivia{background:#FDF0E4; border-left:4px solid var(--pri); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:var(--pri-dark); margin:12px 0;}
-  .problem-note{background:#FDEDEA; border-left:4px solid var(--coral); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:#8C3424; margin:12px 0;}
-  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:16px 18px; margin-top:10px;}
+  .note{background:#E6F4F7; border-left:4px solid var(--accent); padding:11px 14px; font-size:13.5px; color:var(--accent-dark); margin:12px 0;}
+  .trivia{background:#FDF0E4; border-left:4px solid var(--pri); padding:11px 14px; font-size:13.5px; color:var(--pri-dark); margin:12px 0;}
+  .exercise{padding:16px 18px; margin-top:10px;}
   @media (max-width:480px){ .exercise{padding:14px 10px;} }
-  @keyframes itemShake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
   .shake{animation:itemShake .35s ease;}
   .status-line{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--pri-dark); margin-top:12px; min-height:1.4em;}
-  .hot-prompt{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; text-align:center; margin-bottom:10px;}
-  .hot-prompt span{color:var(--accent-dark);}
-
-  /* CLASSIFY */
-  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:13px 15px; margin:8px 0;}
-  .classify-card p.q{font-weight:700; margin:0 0 8px; font-size:13.5px;}
-  .choice-row{display:flex; gap:6px; flex-wrap:wrap;}
-  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12px; padding:7px 11px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease, color .15s ease;}
+  .classify-card{padding:13px 15px; margin:8px 0;}
+  .classify-card p.q{margin:0 0 8px; font-size:13.5px;}
+  .choice-row{gap:6px;}
+  .choice-btn{font-size:12px; padding:7px 11px;}
   .choice-btn:hover{border-color:var(--pri);}
-  .choice-btn.correct{background:#E4F5E9; border-color:#3FAE58; color:#256B36;}
+  .choice-btn.correct{background:#E4F5E9; border-color:#3FAE58;}
   .choice-btn.wrong{background:#FBE6E9; border-color:#D14B5E; color:#8C2D3A;}
-  .choice-feedback{margin-top:6px; font-size:12px; color:var(--ink-soft); min-height:1.2em;}
-
-  /* MATCHING */
-  .tool-pool{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; padding:11px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:12px;}
-  .tool-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:7px 12px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
-  .tool-chip:hover{transform:translateY(-2px);}
-  .tool-chip.selected{border-color:var(--pri); box-shadow:0 0 0 3px rgba(194,65,12,0.2);}
-  .tool-chip.placed{display:none;}
-  .func-card{display:flex; align-items:center; gap:10px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:9px 11px; margin-bottom:7px; cursor:pointer; transition:border-color .2s ease, background .2s ease;}
-  .func-card.matched{border-color:var(--pri); background:#FDF3EA; cursor:default;}
-  .func-text{flex:1; font-size:13px; color:var(--ink-soft);}
-  .func-slot{min-width:80px; max-width:40%; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:11.5px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:6px 6px;}
-  .func-slot.filled{border-style:solid; border-color:var(--pri); background:#FBE3D0; color:var(--ink);}
-
-  /* SORT BOARD */
-  .sort-buckets{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:8px;}
-  .bucket{border:2px dashed var(--line); border-radius:var(--radius-m); padding:9px; min-height:110px; cursor:pointer; background:var(--surface);}
-  .bucket-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--ink-soft); text-align:center;}
+  .choice-feedback{margin-top:6px; font-size:12px;}
+  .match-pool{gap:7px; padding:11px; margin-bottom:12px;}
+  .match-chip{font-size:12.5px; padding:7px 12px;}
+  .match-chip.selected{border-color:var(--pri); box-shadow:0 0 0 3px rgba(194,65,12,0.2);}
+  .desc-card{gap:10px; padding:9px 11px; margin-bottom:7px;}
+  .desc-card.matched{border-color:var(--pri); background:#FDF3EA;}
+  .desc-text{font-size:13px;}
+  .desc-slot{min-width:80px; max-width:40%; font-size:11.5px; padding:6px 6px;}
+  .desc-slot.filled{border-color:var(--pri); background:#FBE3D0; color:var(--ink);}
+  .sort-buckets{grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:8px;}
+  .bucket{padding:9px; background:var(--surface);}
+  .bucket-title{font-size:13px; color:var(--ink-soft);}
   .bucket-sub{font-size:11px; color:var(--ink-soft); text-align:center; margin-bottom:6px;}
-  .bucket-items{display:flex; flex-wrap:wrap; gap:5px; min-height:28px; justify-content:center;}
+  .bucket-items{flex-wrap:wrap; gap:5px; min-height:28px; justify-content:center;}
   .bucket.hint{border-color:var(--coral);}
-  .sort-pool{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-top:12px;}
-  .sort-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:7px 11px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
-  .sort-chip:hover{transform:translateY(-2px);}
+  .sort-pool{gap:7px; margin-top:12px;}
+  .sort-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; border-radius:999px; padding:7px 11px;}
   .sort-chip.selected{border-color:var(--pri); box-shadow:0 0 0 3px rgba(194,65,12,0.2);}
-  .sort-chip.placed{background:#E4F5E9; border-color:#3FAE58; cursor:default; font-size:11px;}
-  .sort-chip.placed:hover{transform:none;}
-
-  /* KITCHEN vs SHOWCASE */
+  .sort-chip.placed{background:#E4F5E9; border-color:#3FAE58; font-size:11px;}
   .two-views{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:12px 0;}
   @media (max-width:640px){ .two-views{grid-template-columns:1fr;} }
   .view{border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; background:var(--surface);}
@@ -108,15 +81,11 @@
   .mini-form .fld{border:1.5px solid var(--cell-line); border-radius:8px; padding:5px 9px; background:#FFFCF9;}
   .mini-form .fld b{color:var(--ink-soft); font-weight:700; font-size:11px; display:block;}
   .mini-form .go{align-self:flex-start; background:var(--pri); color:#fff; font-family:'Baloo 2',sans-serif; font-weight:600; border-radius:8px; padding:4px 14px;}
-
-  /* FEATURE CARDS */
   .feat-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:8px; margin:10px 0 14px;}
   .feat{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 12px; font-size:13px; color:var(--ink-soft);}
   .feat b{display:block; font-family:'Baloo 2',sans-serif; font-size:14px; color:var(--ink); margin-bottom:2px;}
   .feat .em{font-size:18px; margin-right:4px;}
   .feat.lim b{color:#8C3424;}
-
-  /* APP WINDOW (emulators) */
   .app{border:1.5px solid var(--cell-line); border-radius:var(--radius-m); overflow:hidden; background:#fff; font-size:13px;}
   .app-bar{display:flex; align-items:center; gap:8px; background:var(--accent-dark); color:#fff; padding:7px 12px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px;}
   .app-bar .dots{display:flex; gap:4px;}
@@ -157,8 +126,6 @@
   .task-choices{display:flex; flex-direction:column; gap:6px; margin-top:8px;}
   .task-done{list-style:none; padding:0 !important; margin:10px 0 0 !important;}
   .task-done li{font-size:13px !important; color:#256B36; margin-bottom:2px !important;}
-
-  /* SHOP */
   .role-switch{display:flex; background:rgba(255,255,255,.18); border-radius:999px; padding:2px;}
   .role-switch button{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:11.5px; border:none; background:transparent; color:#fff; padding:4px 10px; border-radius:999px; cursor:pointer;}
   .role-switch button.active{background:#fff; color:var(--accent-dark);}
@@ -174,8 +141,6 @@
   .db-peek h3{font-size:13.5px; margin-bottom:6px; color:var(--accent-dark);}
   .db-peek .app-table{min-width:420px; font-size:12px;}
   .db-peek td.hl, .db-peek th.hl{background:#FFE9C7;}
-
-  /* FIND THE PROBLEMS */
   .bad-form{max-width:420px; margin:0 auto; border:1.5px solid var(--cell-line); border-radius:var(--radius-m); padding:14px 16px; background:#fff; font-size:13px;}
   .bad-form .row{margin-bottom:10px;}
   .bad-form .inp{border:1.5px solid #D9D2CB; border-radius:6px; height:30px; background:#FDFCFB; margin-top:3px; display:flex; align-items:center; padding:0 8px; color:var(--ink-soft); font-size:12px;}
@@ -192,50 +157,20 @@
   .spot.wrong-try{animation:itemShake .3s ease;}
   .spot-fb{max-width:520px; margin:12px auto 0; font-size:13px; color:var(--ink-soft); text-align:center; min-height:2.6em;}
   .spot-fb b{color:var(--ink);}
-
-  /* QUIZ */
-  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:24px 22px; margin-top:16px;}
-  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:12.5px; color:var(--ink-soft); margin-bottom:9px;}
-  .quiz-q{font-size:16px; font-weight:700; margin-bottom:14px;}
-  .quiz-options{display:flex; flex-direction:column; gap:9px;}
-  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:14px; font-weight:600; padding:11px 14px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .quiz-box{padding:24px 22px; margin-top:16px;}
+  .quiz-progress{font-size:12.5px; margin-bottom:9px;}
+  .quiz-q{font-size:16px; margin-bottom:14px;}
+  .quiz-options{gap:9px;}
+  .quiz-opt{font-size:14px; padding:11px 14px;}
   .quiz-opt:hover{border-color:var(--pri);}
   .quiz-opt.correct{background:#E4F5E9; border-color:#3FAE58;}
   .quiz-opt.wrong{background:#FBE6E9; border-color:#D14B5E;}
-  .quiz-nav{display:flex; justify-content:flex-end; margin-top:16px;}
-  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:10px 20px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
-  .btn-next.active{opacity:1; pointer-events:auto;}
-
-  .completion{display:none; text-align:center; padding:18px 10px 10px;}
-  .completion.show{display:block;}
-  .badge{width:80px; height:80px; margin:0 auto 14px;}
-  .completion h3{font-size:20px; margin-bottom:8px;}
-  .completion p{color:var(--ink-soft); max-width:50ch; margin:0 auto 16px; font-size:14px;}
-  .completion .total{font-family:'Baloo 2',sans-serif; font-size:28px; color:var(--pri-dark);}
-
-  footer{padding:32px 24px 56px; text-align:center; color:var(--ink-soft); font-size:13px;}
+  .quiz-nav{margin-top:16px;}
+  .btn-next{padding:10px 20px;}
+  footer{padding:32px 24px 56px; font-size:13px;}
 </style>
 </head>
-<body>
-
-<div class="hud">
-  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
-  <div class="hud-row">
-    <span class="hud-title">9 клас · Інтерфейс бази даних</span>
-    <div class="neuron-counter">
-      <svg viewBox="0 0 24 24" fill="none">
-        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
-        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
-        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
-        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
-        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
-        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
-        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#B57A1F" opacity="0.6"/>
-      </svg>
-      <span id="neuronCount">0</span>
-    </div>
-  </div>
-</div>
+<body data-lesson="lesson9-db-interface" data-hud="9 клас · Інтерфейс бази даних">
 
 <section class="hero">
   <div class="hero-inner">
@@ -280,7 +215,7 @@
     <p>Минулого уроку ми розкладали дані по кількох таблицях і зв'язували їх ключами. Пригадаймо головні поняття.</p>
     <p class="soft">Клацни термін, потім — пояснення, яке йому відповідає.</p>
     <div class="exercise">
-      <div class="tool-pool" id="revPool"></div>
+      <div class="match-pool" id="revPool"></div>
       <div id="revList"></div>
     </div>
   </section>
@@ -348,7 +283,7 @@
     </div>
     <p class="soft">Яка можливість інтерфейсу потрібна в кожній ситуації? Клацни назву, потім — ситуацію.</p>
     <div class="exercise">
-      <div class="tool-pool" id="featPool"></div>
+      <div class="match-pool" id="featPool"></div>
       <div id="featList"></div>
     </div>
   </section>
@@ -458,167 +393,16 @@
   <section class="block" id="finalQuizSection">
     <div class="step-label">Підсумок</div>
     <h2>Коротка перевірка</h2>
-    <div class="quiz-box" id="quizBox">
-      <div class="quiz-progress" id="quizProgress">Запитання 1 з 8</div>
-      <div class="quiz-q" id="quizQ"></div>
-      <div class="quiz-options" id="quizOptions"></div>
-      <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
-    </div>
-    <div class="completion" id="completion">
-      <svg class="badge" viewBox="0 0 24 24" fill="none">
-        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#6C5CE7"/>
-        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#6C5CE7"/>
-        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#6C5CE7"/>
-        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#6C5CE7"/>
-        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#6C5CE7"/>
-        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#6C5CE7"/>
-        <circle cx="12" cy="12" r="4.4" fill="#6C5CE7"/><circle cx="12" cy="12" r="1.6" fill="#5340c9" opacity="0.6"/>
-      </svg>
-      <h3>Урок пройдено!</h3>
-      <p>Ти знаєш, що таке інтерфейс бази даних, які бувають його види, що через нього можна робити — і де його межі: дизайн, відсутні функції, помилки введення, права доступу й техніка.</p>
-      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
-    </div>
+    <div id="finalQuiz"></div>
   </section>
 
 </div>
 
 <footer>Урок · «Інтерфейс бази даних: можливості та обмеження» · 9 клас</footer>
 
+<script src="../../assets/lesson.js"></script>
 <script>
-const STORAGE_KEY = "lesson9-db-interface-neurons";
-let neurons = 0;
-const neuronEl = document.getElementById('neuronCount');
-const hudFill = document.getElementById('hudFill');
-
-function addNeurons(n){
-  neurons += n;
-  neuronEl.textContent = neurons;
-  neuronEl.classList.add('pop');
-  setTimeout(()=>neuronEl.classList.remove('pop'), 250);
-  saveProgress();
-}
-async function saveProgress(){
-  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
-}
-async function loadProgress(){
-  try{
-    const res = await window.storage?.get(STORAGE_KEY, false);
-    if(res && res.value){
-      const d = JSON.parse(res.value);
-      if(typeof d.neurons === 'number'){ neurons = d.neurons; neuronEl.textContent = neurons; }
-    }
-  }catch(e){}
-}
-loadProgress();
-
-window.addEventListener('scroll', ()=>{
-  const h = document.documentElement;
-  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
-  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
-});
-
-/* ---------- HELPERS ---------- */
-function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
 function flash(el, cls){ el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), 380); }
-
-function makeClassify(containerId, items, opts){
-  const list = document.getElementById(containerId);
-  items.forEach(item=>{
-    const card = document.createElement('div');
-    card.className = 'classify-card';
-    card.innerHTML = `<p class="q">${item.text}</p>
-      <div class="choice-row">${(item.opts||opts).map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
-      <div class="choice-feedback"></div>`;
-    list.appendChild(card);
-    const fb = card.querySelector('.choice-feedback');
-    let answered = false;
-    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
-      btn.addEventListener('click', ()=>{
-        if(answered) return;
-        if(i===item.correct){ btn.classList.add('correct'); fb.textContent = item.why ? `Правильно ✓ ${item.why}` : 'Правильно ✓'; answered=true; addNeurons(1); }
-        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
-      });
-    });
-  });
-}
-
-function makeSortBoard(poolId, buckets, items){
-  const pool = document.getElementById(poolId);
-  let selected = null;
-  let placedCount = 0;
-  shuffle(items).forEach(item=>{
-    const chip = document.createElement('div');
-    chip.className = 'sort-chip';
-    chip.textContent = item.text;
-    chip.addEventListener('click', ()=>{
-      if(chip.classList.contains('placed')) return;
-      pool.querySelectorAll('.sort-chip').forEach(c=>c.classList.remove('selected'));
-      chip.classList.add('selected');
-      selected = item;
-    });
-    pool.appendChild(chip);
-  });
-  Object.entries(buckets).forEach(([key, el])=>{
-    el.addEventListener('click', ()=>{
-      if(!selected) return;
-      if(selected.zone === key){
-        const chip = [...pool.children].find(c=>c.textContent===selected.text && !c.classList.contains('placed'));
-        if(chip){ chip.classList.add('placed'); chip.classList.remove('selected'); el.querySelector('.bucket-items').appendChild(chip); }
-        addNeurons(1);
-        placedCount++;
-        selected = null;
-        if(placedCount === items.length) addNeurons(2);
-      } else {
-        el.classList.add('hint');
-        setTimeout(()=>el.classList.remove('hint'), 350);
-      }
-    });
-  });
-}
-
-function makeMatching(poolId, listId, items){
-  const pool = document.getElementById(poolId);
-  const list = document.getElementById(listId);
-  let selected = null;
-  let matched = 0;
-  shuffle(items).forEach(t=>{
-    const chip = document.createElement('div');
-    chip.className = 'tool-chip';
-    chip.textContent = t.name;
-    chip.addEventListener('click', ()=>{
-      if(chip.classList.contains('placed')) return;
-      pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
-      chip.classList.add('selected');
-      selected = t.name;
-    });
-    pool.appendChild(chip);
-  });
-  shuffle(items).forEach(t=>{
-    const card = document.createElement('div');
-    card.className = 'func-card';
-    card.innerHTML = `<div class="func-text">${t.func}</div><div class="func-slot">?</div>`;
-    card.addEventListener('click', ()=>{
-      if(card.classList.contains('matched') || !selected) return;
-      const slot = card.querySelector('.func-slot');
-      if(selected === t.name){
-        slot.textContent = selected;
-        slot.classList.add('filled');
-        card.classList.add('matched');
-        const chip = [...pool.children].find(c=>c.textContent===selected);
-        if(chip) chip.classList.add('placed');
-        addNeurons(1);
-        matched++;
-        selected = null;
-        pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
-        if(matched === items.length) addNeurons(2);
-      } else {
-        card.classList.add('shake');
-        setTimeout(()=>card.classList.remove('shake'), 350);
-      }
-    });
-    list.appendChild(card);
-  });
-}
 
 /* Покрокові завдання в емуляторі: показує поточне завдання, веде список виконаних */
 function makeTaskRunner(boxId, doneId, statusId, tasks, finalText){
@@ -626,6 +410,7 @@ function makeTaskRunner(boxId, doneId, statusId, tasks, finalText){
   const done = document.getElementById(doneId);
   const status = document.getElementById(statusId);
   const runner = { k:0, onChange:null };
+  const hit = trackTask(box, tasks.length, tasks.length + 2);
   runner.current = ()=>tasks[runner.k];
   runner.render = ()=>{
     const t = tasks[runner.k];
@@ -656,7 +441,7 @@ function makeTaskRunner(boxId, doneId, statusId, tasks, finalText){
     const li = document.createElement('li');
     li.textContent = `✓ ${t.label}`;
     done.appendChild(li);
-    addNeurons(1);
+    addNeurons(1); hit();
     status.textContent = msg || 'Виконано ✓';
     runner.k++;
     if(runner.k === tasks.length){ addNeurons(2); }
@@ -954,13 +739,14 @@ makeClassify('limList', [
   const fb = document.getElementById('spotFb');
   const status = document.getElementById('spotStatus');
   let found = 0;
+  const hit = trackTask(fb, total, total + 2);
   spots.forEach(s=>{
     s.addEventListener('click', ()=>{
       if(s.dataset.real){
         if(s.classList.contains('found')) return;
         s.classList.add('found');
         found++;
-        addNeurons(1);
+        addNeurons(1); hit();
         fb.innerHTML = `<b>Проблема ✓</b> ${s.dataset.why}`;
         status.textContent = `Знайдено: ${found} з ${total}`;
         if(found === total){
@@ -987,46 +773,8 @@ const questions = [
   { q: "Що допоможе уникнути помилок під час введення даних у форму?", opts: ["Спадні списки й підказки, у якому вигляді вводити дані", "Дрібний блідий текст інструкції", "Поля з назвами «Поле 1», «Поле 2»"], correct: 0 },
   { q: "Що НЕ може зробити бібліотекарка через звичайний інтерфейс бібліотеки?", opts: ["Знайти книжку за автором", "Відмітити, що книжку видано", "Додати в базу нове поле «Жанр»"], correct: 2 }
 ];
-let qi=0, currentAnswered=false;
-const quizQ = document.getElementById('quizQ');
-const quizOptions = document.getElementById('quizOptions');
-const quizProgress = document.getElementById('quizProgress');
-const btnNext = document.getElementById('btnNext');
-const quizBox = document.getElementById('quizBox');
-const completion = document.getElementById('completion');
-const totalNeuronsEl = document.getElementById('totalNeurons');
 
-function renderQuestion(){
-  currentAnswered=false; btnNext.classList.remove('active');
-  const item = questions[qi];
-  quizProgress.textContent = `Запитання ${qi+1} з ${questions.length}`;
-  quizQ.textContent = item.q;
-  quizOptions.innerHTML='';
-  item.opts.forEach((opt,i)=>{
-    const b=document.createElement('button'); b.className='quiz-opt'; b.textContent=opt;
-    b.addEventListener('click', ()=>{
-      if(currentAnswered) return; currentAnswered=true;
-      const all = quizOptions.querySelectorAll('.quiz-opt');
-      all.forEach((ob,oi)=>{ if(oi===item.correct) ob.classList.add('correct'); else if(oi===i) ob.classList.add('wrong'); });
-      if(i===item.correct) addNeurons(2);
-      btnNext.classList.add('active');
-      btnNext.textContent = (qi===questions.length-1) ? 'Завершити' : 'Далі';
-    });
-    quizOptions.appendChild(b);
-  });
-}
-btnNext.addEventListener('click', ()=>{
-  if(!btnNext.classList.contains('active')) return;
-  qi++;
-  if(qi<questions.length){ renderQuestion(); }
-  else {
-    quizBox.style.display='none';
-    completion.classList.add('show');
-    addNeurons(3);
-    totalNeuronsEl.textContent = neurons;
-  }
-});
-renderQuestion();
+makeFinalQuiz('finalQuiz', questions, {summary:'Ти знаєш, що таке інтерфейс бази даних, які бувають його види, що через нього можна робити — і де його межі: дизайн, відсутні функції, помилки введення, права доступу й техніка.'});
 </script>
 
 </body>

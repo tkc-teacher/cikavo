@@ -7,54 +7,28 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
 <style>
   :root{
+    --accent:var(--purple); --accent-dark:var(--purple-dark); --accent-soft:color-mix(in srgb, var(--purple) 12%, #fff);
+    --hud-bar:linear-gradient(90deg,var(--coral),var(--purple));
+    --label:var(--coral);
+    --note:var(--blue); --note-soft:#EAF5FC; --note-ink:#2A6B8C;
+   
     --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
     --purple:#6C5CE7; --purple-dark:#5340c9; --teal:#16A3A0; --coral:#FF6B4A; --yellow:#FFC93C; --pink:#FF5D9E; --blue:#2D9CDB;
     --radius-s:10px; --radius-m:16px; --radius-l:26px;
   }
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
-  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
-  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
-  .container{max-width:800px; margin:0 auto; padding:0 24px;}
-
-  .hud{position:sticky; top:0; z-index:50; background:rgba(246,245,251,.9); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
-  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
-  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--coral),var(--purple)); transition:width .3s ease;}
-  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:800px; margin:0 auto;}
-  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
-  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
-  .neuron-counter svg{width:24px;height:24px;}
-  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
-  #neuronCount.pop{transform:scale(1.35);}
-
-  .hero{padding:52px 24px 40px;}
-  .hero-inner{max-width:800px; margin:0 auto; display:flex; align-items:center; gap:30px;}
-  .hero-text{flex:1;}
-  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--coral); margin-bottom:10px;}
-  .hero h1{font-size:32px; line-height:1.18; margin-bottom:12px;}
-  .hero p{color:var(--ink-soft); font-size:16.5px; max-width:52ch; margin-bottom:22px;}
-  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--purple); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
+  .hero-eyebrow{color:var(--coral);}
+  .hero p{max-width:52ch;}
+  .btn-primary{background:var(--purple);}
   .btn-primary:hover{background:var(--purple-dark);}
-  .btn-primary:active{transform:scale(.97);}
-  .mascot{width:130px; height:130px; flex-shrink:0;}
-  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:100px; height:100px;} }
-
-  section.block{padding:38px 0; border-top:1px solid var(--line);}
-  .step-label{font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:600; color:var(--coral); margin-bottom:8px;}
-  .block h2{font-size:21px; margin-bottom:10px; max-width:38ch;}
-  .block p{max-width:66ch; font-size:16px; margin:0 0 14px; color:var(--ink);}
-  .block p.soft{color:var(--ink-soft); font-size:15px;}
-  .note{background:#EAF5FC; border-left:4px solid var(--blue); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; color:#2A6B8C; margin:16px 0;}
-
-  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:22px; margin-top:18px;}
-
-  /* EMAIL SNIPPET CARDS */
+  .mascot{width:130px; height:130px;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;}
+  .mascot{width:100px; height:100px;} }
+  .step-label{color:var(--coral);}
+  .note{background:#EAF5FC; border-left:4px solid var(--blue); color:#2A6B8C;}
   .snippet{background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px; margin-bottom:10px; font-size:14px; font-style:italic; color:var(--ink-soft);}
-
-  /* PASSWORD STRENGTH */
   .pw-input{width:100%; font-family:'Nunito Sans',sans-serif; font-size:15px; padding:12px 14px; border:1.5px solid var(--line); border-radius:var(--radius-s); outline:none; transition:border-color .15s ease;}
   .pw-input:focus{border-color:var(--purple);}
   .pw-criteria{display:flex; flex-direction:column; gap:7px; margin-top:16px;}
@@ -66,46 +40,26 @@
   .pw-meter-bar{height:8px; background:var(--line); border-radius:999px; overflow:hidden; margin-top:18px;}
   .pw-meter-fill{height:100%; width:0%; transition:width .25s ease, background .25s ease; background:var(--coral);}
   .pw-meter-label{margin-top:8px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; color:var(--ink-soft);}
-
-  /* SPAM EMAIL / RED FLAGS */
   .email-preview{background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:16px 18px; font-size:14px; line-height:1.75; color:var(--ink);}
   .email-preview .meta{font-size:12.5px; color:var(--ink-soft); margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--line);}
   .flag{cursor:pointer; border-bottom:2px dotted var(--coral); transition:background .15s ease, border-color .15s ease;}
   .flag.found{background:#E4F8E6; border-bottom:2px solid #3FAE58; border-radius:4px; padding:0 2px;}
   .flag.wrong-try{background:#FDE6E1; border-radius:4px; padding:0 2px;}
-  @keyframes flagShake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-3px);} 75%{transform:translateX(3px);}}
   .flag.wrong-try{animation:flagShake .3s ease;}
   .flags-progress{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--purple-dark); margin-top:14px; min-height:1.4em;}
-
-  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:16px 18px; margin:12px 0;}
-  .classify-card p.q{font-weight:700; margin:0 0 10px; font-size:15px;}
-  .choice-row{display:flex; gap:8px; flex-wrap:wrap;}
-  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; padding:8px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease, color .15s ease;}
   .choice-btn:hover{border-color:var(--purple);}
-  .choice-btn.correct{background:#E4F8E6; border-color:#3FAE58; color:#256B36;}
-  .choice-btn.wrong{background:#FDE6E1; border-color:var(--coral); color:#B8412A;}
-  .choice-feedback{margin-top:8px; font-size:13.5px; color:var(--ink-soft); min-height:1.2em;}
-
-  .tool-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:14px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:16px;}
-  .tool-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:8px 14px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
-  .tool-chip:hover{transform:translateY(-2px);}
-  .tool-chip.selected{border-color:var(--purple); box-shadow:0 0 0 3px rgba(108,92,231,0.18);}
-  .tool-chip.placed{display:none;}
-  .func-card{display:flex; align-items:center; gap:12px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; margin-bottom:10px; transition:border-color .2s ease, background .2s ease;}
-  .func-card.matched{border-color:var(--yellow); background:#FFFBEE;}
-  .func-card.shake{animation:matchShake .35s ease;}
+  .choice-btn.correct{background:#E4F8E6; border-color:#3FAE58;}
+  .match-chip.selected{border-color:var(--purple); box-shadow:0 0 0 3px rgba(108,92,231,0.18);}
+  .desc-card.matched{border-color:var(--yellow); background:#FFFBEE;}
+  .desc-card.shake{animation:matchShake .35s ease;}
   @keyframes matchShake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
-  .func-text{flex:1; font-size:14px; color:var(--ink-soft);}
-  .func-slot{min-width:90px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12.5px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:8px 10px;}
-  .func-slot.filled{border-style:solid; border-color:var(--yellow); background:#FFF7E2; color:var(--ink);}
-
-  /* PHISHING ORDER EXERCISE */
+  .desc-slot{min-width:90px; font-size:12.5px;}
+  .desc-slot.filled{border-color:var(--yellow); background:#FFF7E2; color:var(--ink);}
   .order-pool{display:flex; flex-direction:column; gap:8px; margin-top:14px;}
   .order-item{display:flex; align-items:center; gap:12px; background:var(--bg); border:2px solid var(--line); border-radius:var(--radius-s); padding:12px 14px; cursor:pointer; transition:border-color .15s ease, background .15s ease;}
   .order-item .num{width:26px; height:26px; border-radius:50%; background:var(--surface); border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; flex-shrink:0; color:var(--ink-soft);}
   .order-item.picked{border-color:var(--purple);}
   .order-item.picked .num{border-color:var(--purple); background:#EDE9FF; color:var(--purple-dark);}
-  .order-item.locked{cursor:default;}
   .order-item .txt{font-size:14.5px;}
   .order-controls{display:flex; justify-content:center; gap:10px; margin-top:16px;}
   .ctrl-btn{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-s); padding:9px 16px; cursor:pointer;}
@@ -113,52 +67,14 @@
   .order-feedback{text-align:center; margin-top:12px; font-family:'Baloo 2',sans-serif; font-weight:600; min-height:1.4em;}
   .order-feedback.ok{color:#256B36;}
   .order-feedback.err{color:#B8412A;}
-
   .insight{background:#FFF3E2; border-left:4px solid var(--yellow); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; margin-top:16px; display:none;}
   .insight.show{display:block;}
-
-  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:26px 24px; margin-top:18px;}
-  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:13px; color:var(--ink-soft); margin-bottom:10px;}
-  .quiz-q{font-size:17px; font-weight:700; margin-bottom:16px;}
-  .quiz-options{display:flex; flex-direction:column; gap:10px;}
-  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:15px; font-weight:600; padding:12px 15px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
   .quiz-opt:hover{border-color:var(--purple);}
   .quiz-opt.correct{background:#E4F8E6; border-color:#3FAE58;}
-  .quiz-opt.wrong{background:#FDE6E1; border-color:var(--coral);}
-  .quiz-nav{display:flex; justify-content:flex-end; margin-top:18px;}
-  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:11px 22px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
-  .btn-next.active{opacity:1; pointer-events:auto;}
-
-  .completion{display:none; text-align:center; padding:20px 10px 10px;}
-  .completion.show{display:block;}
-  .badge{width:90px; height:90px; margin:0 auto 16px;}
-  .completion h3{font-size:22px; margin-bottom:10px;}
-  .completion p{color:var(--ink-soft); max-width:50ch; margin:0 auto 18px; font-size:15px;}
-  .completion .total{font-family:'Baloo 2',sans-serif; font-size:30px; color:var(--purple-dark);}
-
-  footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
+  .quiz-nav{margin-top:18px;}
 </style>
 </head>
-<body>
-
-<div class="hud">
-  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
-  <div class="hud-row">
-    <span class="hud-title">6 клас · Безпека листування</span>
-    <div class="neuron-counter">
-      <svg viewBox="0 0 24 24" fill="none">
-        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
-        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
-        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
-        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
-        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
-        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
-        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#E0A800" opacity="0.6"/>
-      </svg>
-      <span id="neuronCount">0</span>
-    </div>
-  </div>
-</div>
+<body data-lesson="lesson6-email-safety" data-hud="6 клас · Безпека листування">
 
 <section class="hero">
   <div class="hero-inner">
@@ -186,7 +102,7 @@
     <h2>Пригадаймо минулу тему</h2>
     <p class="soft">Обери поняття, потім клацни пояснення, яке йому відповідає.</p>
     <div class="exercise">
-      <div class="tool-pool" id="recapPool"></div>
+      <div class="match-pool" id="recapPool"></div>
       <div id="recapList"></div>
     </div>
   </section>
@@ -284,137 +200,15 @@
   <section class="block" id="finalQuizSection">
     <div class="step-label">Підсумок</div>
     <h2>Коротка перевірка</h2>
-    <div class="quiz-box" id="quizBox">
-      <div class="quiz-progress" id="quizProgress">Запитання 1 з 7</div>
-      <div class="quiz-q" id="quizQ"></div>
-      <div class="quiz-options" id="quizOptions"></div>
-      <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
-    </div>
-    <div class="completion" id="completion">
-      <svg class="badge" viewBox="0 0 24 24" fill="none">
-        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FF6B4A" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FF6B4A"/>
-        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FF6B4A" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FF6B4A"/>
-        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FF6B4A" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FF6B4A"/>
-        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FF6B4A" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FF6B4A"/>
-        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FF6B4A" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FF6B4A"/>
-        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FF6B4A" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FF6B4A"/>
-        <circle cx="12" cy="12" r="4.4" fill="#FF6B4A"/><circle cx="12" cy="12" r="1.6" fill="#B8412A" opacity="0.6"/>
-      </svg>
-      <h3>Урок пройдено!</h3>
-      <p>Ти навчився розпізнавати ввічливий лист, складати надійний пароль, відрізняти спам від реклами і розбирати схему фішингу крок за кроком.</p>
-      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
-    </div>
+    <div id="finalQuiz"></div>
   </section>
 
 </div>
 
 <footer>Урок · «Етикет листування. Спам і фішинг» · 6 клас</footer>
 
+<script src="../../assets/lesson.js"></script>
 <script>
-const STORAGE_KEY = "lesson6-email-safety-neurons";
-let neurons = 0;
-const neuronEl = document.getElementById('neuronCount');
-const hudFill = document.getElementById('hudFill');
-
-function addNeurons(n){
-  neurons += n;
-  neuronEl.textContent = neurons;
-  neuronEl.classList.add('pop');
-  setTimeout(()=>neuronEl.classList.remove('pop'), 250);
-  saveProgress();
-}
-async function saveProgress(){
-  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
-}
-async function loadProgress(){
-  try{
-    const res = await window.storage?.get(STORAGE_KEY, false);
-    if(res && res.value){
-      const d = JSON.parse(res.value);
-      if(typeof d.neurons === 'number'){ neurons = d.neurons; neuronEl.textContent = neurons; }
-    }
-  }catch(e){}
-}
-loadProgress();
-
-window.addEventListener('scroll', ()=>{
-  const h = document.documentElement;
-  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
-  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
-});
-
-function makeClassify(containerId, items, optA, optB){
-  const list = document.getElementById(containerId);
-  items.forEach(item=>{
-    const card = document.createElement('div');
-    card.className = 'classify-card';
-    const snippetHtml = item.snippet ? `<div class="snippet">«${item.snippet}»</div>` : '';
-    card.innerHTML = `${snippetHtml}<p class="q">${item.text}</p>
-      <div class="choice-row">
-        <button class="choice-btn" data-v="true">${optA}</button>
-        <button class="choice-btn" data-v="false">${optB}</button>
-      </div>
-      <div class="choice-feedback"></div>`;
-    list.appendChild(card);
-    const fb = card.querySelector('.choice-feedback');
-    let answered = false;
-    card.querySelectorAll('.choice-btn').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        if(answered) return;
-        const isCorrect = (btn.dataset.v === 'true') === item.correct;
-        if(isCorrect){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
-        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
-      });
-    });
-  });
-}
-
-function makeMatching(poolId, listId, items){
-  const pool = document.getElementById(poolId);
-  const list = document.getElementById(listId);
-  let selected = null;
-  let matched = 0;
-  const shuffledNames = [...items].sort(()=>Math.random()-0.5);
-  shuffledNames.forEach(t=>{
-    const chip = document.createElement('div');
-    chip.className = 'tool-chip';
-    chip.textContent = t.name;
-    chip.addEventListener('click', ()=>{
-      if(chip.classList.contains('placed')) return;
-      pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
-      chip.classList.add('selected');
-      selected = t.name;
-    });
-    pool.appendChild(chip);
-  });
-  const shuffledFuncs = [...items].sort(()=>Math.random()-0.5);
-  shuffledFuncs.forEach(t=>{
-    const card = document.createElement('div');
-    card.className = 'func-card';
-    card.innerHTML = `<div class="func-text">${t.func}</div><div class="func-slot">?</div>`;
-    card.addEventListener('click', ()=>{
-      if(card.classList.contains('matched') || !selected) return;
-      const slot = card.querySelector('.func-slot');
-      if(selected === t.name){
-        slot.textContent = selected;
-        slot.classList.add('filled');
-        card.classList.add('matched');
-        const chip = [...pool.children].find(c=>c.textContent===selected);
-        if(chip) chip.classList.add('placed');
-        addNeurons(1);
-        matched++;
-        selected = null;
-        pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
-        if(matched === items.length) addNeurons(2);
-      } else {
-        card.classList.add('shake');
-        setTimeout(()=>card.classList.remove('shake'), 350);
-      }
-    });
-    list.appendChild(card);
-  });
-}
-
 /* ---------- RECAP: PREVIOUS LESSON ---------- */
 makeMatching('recapPool', 'recapList', [
   { name:'Провайдер', func:'Сервіс, де реєструють поштову скриньку — Gmail, Ukr.net, i.ua' },
@@ -428,38 +222,18 @@ makeMatching('recapPool', 'recapList', [
 ]);
 
 /* ---------- ETIQUETTE ---------- */
-makeClassify('etiquetteList', [
+makeYesNo('etiquetteList', [
   { snippet:'Привіт! Скинь, будь ласка, конспект з математики, коли буде час. Дякую!', text:'Це ввічливо чи ні?', correct:true },
   { snippet:'ДЕ КОНСПЕКТ??? ДАВАЙ ШВИДШЕ!!!', text:'Це ввічливо чи ні?', correct:false },
   { snippet:'Доброго дня! Нагадую про завтрашню репетицію о 15:00. З повагою, Марія', text:'Це ввічливо чи ні?', correct:true }
-], 'Ввічливо', 'Неввічливо');
+].map(it=>({...it, pre: it.snippet ? `<div class="snippet">«${it.snippet}»</div>` : ''})), 'Ввічливо', 'Неввічливо');
 
 /* ---------- SAFETY SCENARIOS ---------- */
-(function(){
-  const items = [
+makeChoices('safetyList', [
     { text:'Прийшов лист від незнайомої адреси з темою «Терміново відкрий файл!»', opts:['Відкрити файл одразу','Не відкривати, видалити'], correct:1 },
     { text:'У листі просять перейти за посиланням і ввести пароль від пошти', opts:['Перейти й ввести пароль','Не переходити за посиланням'], correct:1 },
     { text:'Ти закінчив перевіряти пошту на чужому комп\'ютері в бібліотеці', opts:['Просто закрити вкладку','Вийти з облікового запису'], correct:1 }
-  ];
-  const list = document.getElementById('safetyList');
-  items.forEach(item=>{
-    const card = document.createElement('div');
-    card.className = 'classify-card';
-    card.innerHTML = `<p class="q">${item.text}</p>
-      <div class="choice-row">${item.opts.map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
-      <div class="choice-feedback"></div>`;
-    list.appendChild(card);
-    const fb = card.querySelector('.choice-feedback');
-    let answered = false;
-    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
-      btn.addEventListener('click', ()=>{
-        if(answered) return;
-        if(i===item.correct){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
-        else{ btn.classList.add('wrong'); fb.textContent='Це небезпечний варіант — подумай ще раз'; }
-      });
-    });
-  });
-})();
+  ]);
 
 /* ---------- PASSWORD STRENGTH METER ---------- */
 function evaluatePassword(pw){
@@ -477,6 +251,7 @@ function evaluatePassword(pw){
   const fill = document.getElementById('pwMeterFill');
   const label = document.getElementById('pwMeterLabel');
   let rewarded4 = false, rewarded5 = false;
+  const hit = trackTask(input, 1, 3);   // вправа виконана, коли пароль став надійним
 
   input.addEventListener('input', ()=>{
     const pw = input.value;
@@ -496,40 +271,16 @@ function evaluatePassword(pw){
     fill.style.width = pct + '%';
     if(score <= 2){ fill.style.background = 'var(--coral)'; label.textContent = 'Слабкий пароль'; }
     else if(score <= 4){ fill.style.background = 'var(--yellow)'; label.textContent = 'Середній пароль'; if(!rewarded4){ rewarded4 = true; addNeurons(1); } }
-    else { fill.style.background = '#3FAE58'; label.textContent = 'Надійний пароль ✓'; if(!rewarded5){ rewarded5 = true; addNeurons(2); } }
+    else { fill.style.background = '#3FAE58'; label.textContent = 'Надійний пароль ✓'; if(!rewarded5){ rewarded5 = true; addNeurons(2); hit(); } }
   });
 })();
 
 /* ---------- PASSWORD QUICK CHECK ---------- */
-(function(){
-  const items = [
+makeYesNo('pwQuizList', [
     { text:'12345678', correct:false },
     { text:'password', correct:false },
     { text:'K9$mPz47', correct:true }
-  ];
-  const list = document.getElementById('pwQuizList');
-  items.forEach(item=>{
-    const card = document.createElement('div');
-    card.className = 'classify-card';
-    card.innerHTML = `<p class="q">${item.text}</p>
-      <div class="choice-row">
-        <button class="choice-btn" data-v="true">Надійний</button>
-        <button class="choice-btn" data-v="false">Слабкий</button>
-      </div>
-      <div class="choice-feedback"></div>`;
-    list.appendChild(card);
-    const fb = card.querySelector('.choice-feedback');
-    let answered = false;
-    card.querySelectorAll('.choice-btn').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        if(answered) return;
-        const isCorrect = (btn.dataset.v === 'true') === item.correct;
-        if(isCorrect){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
-        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
-      });
-    });
-  });
-})();
+  ], 'Надійний', 'Слабкий');
 
 /* ---------- FIND THE RED FLAGS ---------- */
 (function(){
@@ -537,6 +288,7 @@ function evaluatePassword(pw){
   const realFlags = document.querySelectorAll('.flag.real');
   const found = new Set();
   const progress = document.getElementById('flagsProgress');
+  const hit = trackTask(progress, realFlags.length, realFlags.length + 2);
   allSpans.forEach(f=>{
     f.addEventListener('click', ()=>{
       if(f.classList.contains('found')) return;
@@ -548,7 +300,7 @@ function evaluatePassword(pw){
       f.classList.add('found');
       found.add(f.dataset.flag);
       progress.textContent = `Знайдено: ${found.size} з ${realFlags.length}`;
-      addNeurons(1);
+      addNeurons(1); hit();
       if(found.size === realFlags.length){
         progress.textContent = 'Усі ознаки знайдено ✓ Термінові обіцянки, приз "нізвідки" й дивна адреса відправника — три типові сигнали шахрайського листа.';
         addNeurons(2);
@@ -558,33 +310,13 @@ function evaluatePassword(pw){
 })();
 
 /* ---------- SPAM vs ADS vs NORMAL ---------- */
-(function(){
-  const items = [
+makeChoices('spamTypeList', [
     { text:'«Знижка 90% на все — лише сьогодні!» від незнайомого відправника', opts:['Спам','Реклама, на яку я підписаний','Звичайний лист'], correct:0 },
     { text:'Щотижнева розсилка новин від блогу, на який ти сам підписався', opts:['Спам','Реклама, на яку я підписаний','Звичайний лист'], correct:1 },
     { text:'Нагадування від вчительки про завтрашню контрольну роботу', opts:['Спам','Реклама, на яку я підписаний','Звичайний лист'], correct:2 },
     { text:'Лист нібито від банку з проханням негайно підтвердити пароль за посиланням', opts:['Спам','Реклама, на яку я підписаний','Звичайний лист'], correct:0 },
     { text:'Підтвердження реєстрації на шкільну олімпіаду з інформатики', opts:['Спам','Реклама, на яку я підписаний','Звичайний лист'], correct:2 }
-  ];
-  const list = document.getElementById('spamTypeList');
-  items.forEach(item=>{
-    const card = document.createElement('div');
-    card.className = 'classify-card';
-    card.innerHTML = `<p class="q">${item.text}</p>
-      <div class="choice-row">${item.opts.map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
-      <div class="choice-feedback"></div>`;
-    list.appendChild(card);
-    const fb = card.querySelector('.choice-feedback');
-    let answered = false;
-    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
-      btn.addEventListener('click', ()=>{
-        if(answered) return;
-        if(i===item.correct){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
-        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
-      });
-    });
-  });
-})();
+  ]);
 
 /* ---------- PHISHING ORDER ---------- */
 const phishOrder = (function(){
@@ -600,6 +332,7 @@ const phishOrder = (function(){
   const feedback = document.getElementById('orderFeedback');
   const insight = document.getElementById('orderInsight');
   let solved = false;
+  const hit = trackTask(pool, 1, 3);
 
   const shuffled = [...steps.keys()].sort(()=>Math.random()-0.5);
   const itemEls = {};
@@ -635,7 +368,7 @@ const phishOrder = (function(){
       feedback.textContent = 'Правильний порядок ✓';
       solved = true;
       insight.classList.add('show');
-      addNeurons(3);
+      addNeurons(3); hit();
     } else {
       feedback.className = 'order-feedback err';
       feedback.textContent = 'Порядок ще не той — натисни «Скинути» й спробуй ще раз';
@@ -645,36 +378,12 @@ const phishOrder = (function(){
 })();
 
 /* ---------- RISK SUMMARY ---------- */
-(function(){
-  const items = [
+makeYesNo('riskList', [
     { text:'Повідомити пароль другу, якому довіряєш', correct:false },
     { text:'Ввести адресу відомого сайту вручну замість переходу за посиланням', correct:true },
     { text:'Відповісти на лист про виграш у лотереї, якої ти не купував', correct:false },
     { text:'Перевірити, чи адреса сайту починається з https', correct:true }
-  ];
-  const list = document.getElementById('riskList');
-  items.forEach(item=>{
-    const card = document.createElement('div');
-    card.className = 'classify-card';
-    card.innerHTML = `<p class="q">${item.text}</p>
-      <div class="choice-row">
-        <button class="choice-btn" data-v="true">Безпечно</button>
-        <button class="choice-btn" data-v="false">Ризиковано</button>
-      </div>
-      <div class="choice-feedback"></div>`;
-    list.appendChild(card);
-    const fb = card.querySelector('.choice-feedback');
-    let answered = false;
-    card.querySelectorAll('.choice-btn').forEach(btn=>{
-      btn.addEventListener('click', ()=>{
-        if(answered) return;
-        const isCorrect = (btn.dataset.v === 'true') === item.correct;
-        if(isCorrect){ btn.classList.add('correct'); fb.textContent='Правильно ✓'; answered=true; addNeurons(1); }
-        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
-      });
-    });
-  });
-})();
+  ], 'Безпечно', 'Ризиковано');
 
 /* ---------- SPAM DETECTIVE ---------- */
 (function(){
@@ -712,6 +421,7 @@ const phishOrder = (function(){
     }
   ];
   const list = document.getElementById('detectiveList');
+  const hit = trackTask(list, items.length);
   items.forEach(item=>{
     const card = document.createElement('div');
     card.className = 'classify-card';
@@ -729,7 +439,7 @@ const phishOrder = (function(){
     card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
       btn.addEventListener('click', ()=>{
         if(answered) return;
-        if(i===item.correct){ btn.classList.add('correct'); fb.textContent=`Правильно ✓ ${item.why}`; answered=true; addNeurons(1); }
+        if(i===item.correct){ btn.classList.add('correct'); fb.textContent=`Правильно ✓ ${item.why}`; answered=true; addNeurons(1); hit(); }
         else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
       });
     });
@@ -746,46 +456,8 @@ const questions = [
   { q: "Як безпечніше перейти на відомий сайт, якщо лист виглядає підозріло?", opts: ["Клацнути посилання з листа", "Ввести адресу вручну в браузері", "Переслати лист другу й запитати"], correct: 1 },
   { q: "Що варто зробити, завершивши роботу на чужому комп'ютері?", opts: ["Нічого, просто закрити вкладку", "Вийти зі свого облікового запису", "Змінити мову інтерфейсу"], correct: 1 }
 ];
-let qi=0, currentAnswered=false;
-const quizQ = document.getElementById('quizQ');
-const quizOptions = document.getElementById('quizOptions');
-const quizProgress = document.getElementById('quizProgress');
-const btnNext = document.getElementById('btnNext');
-const quizBox = document.getElementById('quizBox');
-const completion = document.getElementById('completion');
-const totalNeuronsEl = document.getElementById('totalNeurons');
 
-function renderQuestion(){
-  currentAnswered=false; btnNext.classList.remove('active');
-  const item = questions[qi];
-  quizProgress.textContent = `Запитання ${qi+1} з ${questions.length}`;
-  quizQ.textContent = item.q;
-  quizOptions.innerHTML='';
-  item.opts.forEach((opt,i)=>{
-    const b=document.createElement('button'); b.className='quiz-opt'; b.textContent=opt;
-    b.addEventListener('click', ()=>{
-      if(currentAnswered) return; currentAnswered=true;
-      const all = quizOptions.querySelectorAll('.quiz-opt');
-      all.forEach((ob,oi)=>{ if(oi===item.correct) ob.classList.add('correct'); else if(oi===i) ob.classList.add('wrong'); });
-      if(i===item.correct) addNeurons(2);
-      btnNext.classList.add('active');
-      btnNext.textContent = (qi===questions.length-1) ? 'Завершити' : 'Далі';
-    });
-    quizOptions.appendChild(b);
-  });
-}
-btnNext.addEventListener('click', ()=>{
-  if(!btnNext.classList.contains('active')) return;
-  qi++;
-  if(qi<questions.length){ renderQuestion(); }
-  else {
-    quizBox.style.display='none';
-    completion.classList.add('show');
-    addNeurons(3);
-    totalNeuronsEl.textContent = neurons;
-  }
-});
-renderQuestion();
+makeFinalQuiz('finalQuiz', questions, {summary:'Ти навчився розпізнавати ввічливий лист, складати надійний пароль, відрізняти спам від реклами і розбирати схему фішингу крок за кроком.'});
 </script>
 
 </body>

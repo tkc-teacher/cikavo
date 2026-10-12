@@ -7,56 +7,44 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
 <style>
   :root{
+    --accent:var(--pri); --accent-dark:var(--pri-dark); --accent-soft:color-mix(in srgb, var(--pri) 12%, #fff);
+    --hud-bar:linear-gradient(90deg,var(--accent2),var(--pri));
+    --note:var(--accent2); --note-soft:#EAF4FB; --note-ink:var(--accent2-dark);
+    --sun:var(--pri); --sun-soft:#FCEDE5; --sun-ink:var(--pri-dark);
+   
     --bg:#FBF6F2; --ink:#2A1C14; --ink-soft:#6B5649; --surface:#FFFFFF; --line:#EEDFD4;
-    --pri:#D0592A; --pri-dark:#A8431B; --accent:#2B8AC4; --accent-dark:#1E6A99; --green:#2E9E5B; --coral:#D14B5E;
+    --pri:#D0592A; --pri-dark:#A8431B; --accent2:#2B8AC4; --accent2-dark:#1E6A99; --green:#2E9E5B; --coral:#D14B5E;
     --cell-line:#E0D6CE; --head-bg:#F6EFE9;
     --radius-s:10px; --radius-m:16px; --radius-l:26px;
   }
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
-  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
-  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
-  .container{max-width:780px; margin:0 auto; padding:0 24px;}
+  .container{max-width:780px;}
   @media (max-width:480px){ .container{padding:0 16px;} }
-
-  .hud{position:sticky; top:0; z-index:50; background:rgba(251,246,242,.9); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
-  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
-  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--accent),var(--pri)); transition:width .3s ease;}
-  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:780px; margin:0 auto;}
-  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
-  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
-  .neuron-counter svg{width:24px;height:24px;}
-  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
-  #neuronCount.pop{transform:scale(1.35);}
-
   .hero{padding:48px 24px 36px;}
-  .hero-inner{max-width:780px; margin:0 auto; display:flex; align-items:center; gap:26px;}
-  .hero-text{flex:1;}
-  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--pri); margin-bottom:10px;}
-  .hero h1{font-size:29px; line-height:1.2; margin-bottom:12px;}
-  .hero p{color:var(--ink-soft); font-size:16px; max-width:54ch; margin-bottom:20px;}
-  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--pri); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
+  .hero-inner{max-width:780px; gap:26px;}
+  .hero-eyebrow{color:var(--pri);}
+  .hero h1{font-size:29px; line-height:1.2;}
+  .hero p{font-size:16px; margin-bottom:20px;}
+  .btn-primary{background:var(--pri);}
   .btn-primary:hover{background:var(--pri-dark);}
-  .btn-primary:active{transform:scale(.97);}
-  .mascot{width:130px; height:130px; flex-shrink:0;}
-  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:100px; height:100px;} }
-
-  section.block{padding:30px 0; border-top:1px solid var(--line);}
-  .step-label{font-family:'Baloo 2',sans-serif; font-size:12.5px; font-weight:700; color:var(--pri); margin-bottom:6px; text-transform:uppercase; letter-spacing:.03em;}
+  .mascot{width:130px; height:130px;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;}
+  .mascot{width:100px; height:100px;} }
+  section.block{padding:30px 0;}
+  .step-label{font-size:12.5px; font-weight:700; color:var(--pri); margin-bottom:6px; text-transform:uppercase; letter-spacing:.03em;}
   .block h2{font-size:19px; margin-bottom:8px; max-width:40ch;}
-  .block p{max-width:64ch; font-size:15px; margin:0 0 8px; color:var(--ink);}
-  .block p.soft{color:var(--ink-soft); font-size:13.5px;}
-  .block ul, .block ol{max-width:64ch; margin:0 0 8px; padding-left:20px; font-size:15px;}
+  .block p{max-width:64ch; font-size:15px; margin:0 0 8px;}
+  .block p.soft{font-size:13.5px;}
+  .block ol{max-width:64ch; margin:0 0 8px; padding-left:20px; font-size:15px;}
+  .block ul{max-width:64ch; margin:0 0 8px;}
   .block li{margin-bottom:4px;}
-  .note{background:#EAF4FB; border-left:4px solid var(--accent); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:var(--accent-dark); margin:12px 0;}
-  .trivia{background:#FCEDE5; border-left:4px solid var(--pri); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:var(--pri-dark); margin:12px 0;}
+  .note{background:#EAF4FB; border-left:4px solid var(--accent); padding:11px 14px; font-size:13.5px; color:var(--accent-dark); margin:12px 0;}
+  .trivia{background:#FCEDE5; border-left:4px solid var(--pri); padding:11px 14px; font-size:13.5px; color:var(--pri-dark); margin:12px 0;}
   .problem-note{background:#FBE6E9; border-left:4px solid var(--coral); padding:11px 14px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; color:#8C2D3A; margin:12px 0;}
-  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:16px 18px; margin-top:10px;}
+  .exercise{padding:16px 18px; margin-top:10px;}
   @media (max-width:480px){ .exercise{padding:14px 10px;} }
-  @keyframes itemShake{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
   .shake{animation:itemShake .35s ease;}
   .status-line{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--pri-dark); margin-top:12px; min-height:1.4em;}
   .hot-prompt{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; text-align:center; margin-bottom:10px;}
@@ -64,34 +52,26 @@
   .mono{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; background:var(--head-bg); padding:1px 6px; border-radius:5px; font-size:.92em; white-space:nowrap;}
   .menu{font-family:'Baloo 2',sans-serif; font-weight:700; color:var(--pri-dark); white-space:nowrap;}
   .mini-cap{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12px; color:var(--ink-soft); margin-bottom:4px; text-transform:uppercase; letter-spacing:.03em;}
-
-  /* CLASSIFY */
-  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:13px 15px; margin:8px 0;}
-  .classify-card p.q{font-weight:700; margin:0 0 8px; font-size:13.5px;}
-  .choice-row{display:flex; gap:6px; flex-wrap:wrap;}
-  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12px; padding:7px 11px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease, color .15s ease;}
+  .classify-card{padding:13px 15px; margin:8px 0;}
+  .classify-card p.q{margin:0 0 8px; font-size:13.5px;}
+  .choice-row{gap:6px;}
+  .choice-btn{font-size:12px; padding:7px 11px;}
   .choice-btn:hover{border-color:var(--pri);}
-  .choice-btn.correct{background:#E4F5E9; border-color:#3FAE58; color:#256B36;}
+  .choice-btn.correct{background:#E4F5E9; border-color:#3FAE58;}
   .choice-btn.wrong{background:#FBE6E9; border-color:#D14B5E; color:#8C2D3A;}
-  .choice-feedback{margin-top:6px; font-size:12px; color:var(--ink-soft); min-height:1.2em;}
-
-  /* MATCHING */
-  .tool-pool{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; padding:11px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:12px;}
-  .tool-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:7px 12px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
-  .tool-chip:hover{transform:translateY(-2px);}
-  .tool-chip.selected{border-color:var(--pri); box-shadow:0 0 0 3px rgba(208,89,42,0.2);}
-  .tool-chip.placed{display:none;}
-  .func-card{display:flex; align-items:center; gap:10px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:9px 11px; margin-bottom:7px; cursor:pointer; transition:border-color .2s ease, background .2s ease;}
-  .func-card.matched{border-color:var(--pri); background:#FDF1EA; cursor:default;}
-  .func-text{flex:1; font-size:13px; color:var(--ink-soft);}
-  .func-text svg{width:96px; height:56px; display:block;}
-  .func-slot{min-width:80px; max-width:44%; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:11.5px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:6px 6px;}
-  .func-slot.filled{border-style:solid; border-color:var(--pri); background:#FBE3D6; color:var(--ink);}
+  .choice-feedback{margin-top:6px; font-size:12px;}
+  .match-pool{gap:7px; padding:11px; margin-bottom:12px;}
+  .match-chip{font-size:12.5px; padding:7px 12px;}
+  .match-chip.selected{border-color:var(--pri); box-shadow:0 0 0 3px rgba(208,89,42,0.2);}
+  .desc-card{gap:10px; padding:9px 11px; margin-bottom:7px;}
+  .desc-card.matched{border-color:var(--pri); background:#FDF1EA;}
+  .desc-text{font-size:13px;}
+  .desc-text svg{width:96px; height:56px; display:block;}
+  .desc-slot{min-width:80px; max-width:44%; font-size:11.5px; padding:6px 6px;}
+  .desc-slot.filled{border-color:var(--pri); background:#FBE3D6; color:var(--ink);}
   .grid-match{display:grid; grid-template-columns:1fr 1fr; gap:7px;}
-  .grid-match .func-card{margin:0;}
+  .grid-match .desc-card{margin:0;}
   @media (max-width:560px){ .grid-match{grid-template-columns:1fr;} }
-
-  /* SPREADSHEET MOCK */
   .sheet{background:var(--surface); border:1.5px solid var(--cell-line); border-radius:var(--radius-s); overflow:hidden; font-size:12px; user-select:none;}
   .sheet-title{display:flex; align-items:center; gap:8px; background:#FCFAF8; border-bottom:1px solid var(--cell-line); padding:6px 10px; font-weight:700; font-size:12.5px;}
   .sheet-title .doc{width:16px; height:20px; border-radius:3px; background:#0F9D58; position:relative; flex-shrink:0;}
@@ -117,8 +97,6 @@
   .sheet-grid .bad{animation:itemShake .35s ease; background:#FCE6E2 !important;}
   .sheet-grid .found{background:#FFE3D3 !important; text-decoration:line-through; color:#A8431B;}
   .sheet-grid tr.gone td, .sheet-grid tr.gone th{display:none;}
-
-  /* NUMBER FORMATS */
   .nf-wrap{display:grid; grid-template-columns:150px 1fr; gap:12px; align-items:end;}
   @media (max-width:520px){ .nf-wrap{grid-template-columns:1fr;} }
   .nf-target .sheet-grid td{background:#FFFBEA;}
@@ -126,8 +104,6 @@
   .tb-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12.5px; padding:7px 12px; border-radius:8px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer;}
   .tb-btn:hover{border-color:var(--pri);}
   .tb-btn.on{background:var(--pri); color:#fff; border-color:var(--pri);}
-
-  /* ALIGN EMULATOR */
   .al-wrap{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
   @media (max-width:640px){ .al-wrap{grid-template-columns:1fr;} }
   .al-sheet .sheet-grid td{transition:background .2s ease;}
@@ -135,26 +111,11 @@
   .al-sheet .sheet-grid td.spill{overflow:visible;}
   .al-sheet .sheet-grid td.wrapc{white-space:normal; line-height:1.15;}
   .al-sheet.target .sheet-grid td{background:#FFFBEA;}
-  .dialog{border:1.5px solid #C9BFB6; border-radius:8px; background:#FBFAF9; box-shadow:0 6px 18px rgba(42,28,20,.08); font-size:13px; margin-top:12px; overflow:hidden;}
-  .dlg-title{background:#fff; border-bottom:1px solid #E5DDD6; padding:6px 10px; font-weight:800; font-size:12.5px; display:flex; justify-content:space-between;}
-  .dlg-tabs{display:flex; gap:2px; padding:6px 8px 0; border-bottom:1px solid #E5DDD6; flex-wrap:wrap;}
-  .dlg-tab{font-family:'Nunito Sans',sans-serif; font-size:12px; font-weight:700; padding:5px 10px; border:1px solid transparent; border-bottom:none; border-radius:6px 6px 0 0; background:transparent; color:#9C8E84; cursor:default;}
-  .dlg-tab.live{cursor:pointer; color:var(--ink-soft);}
-  .dlg-tab.active{background:#fff; border-color:#E5DDD6; color:var(--ink); margin-bottom:-1px;}
-  .dlg-body{padding:12px 14px; background:#fff;}
-  .dlg-row{display:flex; align-items:center; gap:10px; margin-bottom:8px; flex-wrap:wrap;}
-  .dlg-row label.lbl{min-width:118px; font-weight:700; color:var(--ink-soft); font-size:12.5px;}
-  .dlg-row select{font:inherit; font-size:13px; padding:4px 6px; border:1.5px solid var(--cell-line); border-radius:6px; background:#fff; min-width:150px;}
-  .dlg-row input[type=checkbox], .dlg-row input[type=radio]{width:16px; height:16px; accent-color:var(--pri);}
   .dlg-check{display:flex; align-items:center; gap:8px; margin-bottom:6px; font-size:13px; cursor:pointer;}
   .dlg-foot{display:flex; justify-content:flex-end; gap:8px; padding:8px 12px; border-top:1px solid #E5DDD6;}
   .dlg-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12.5px; padding:6px 18px; border-radius:6px; border:1.5px solid var(--cell-line); background:#fff; cursor:pointer;}
   .dlg-btn.prim{background:var(--pri); border-color:var(--pri); color:#fff;}
-  .dlg-pane{display:none;}
-  .dlg-pane.show{display:block;}
   .radio-list label{display:flex; gap:8px; align-items:center; padding:5px 0; font-size:13px; cursor:pointer;}
-
-  /* VALIDATION TEST */
   .vt{display:none; margin-top:14px;}
   .vt.show{display:block;}
   .vt-cell-wrap{position:relative; display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap;}
@@ -171,39 +132,25 @@
   .vt-popup .pb{display:flex; gap:10px; align-items:center; padding:12px; font-size:13px;}
   .vt-popup .pb .x{width:28px; height:28px; border-radius:50%; background:#D14B5E; color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
   .vt-popup .pf{display:flex; justify-content:flex-end; gap:6px; padding:0 12px 10px;}
-
-  /* SEQUENCE */
   .seq-done{list-style:none; padding:0 !important; margin:0 0 10px !important;}
-  .seq-done li{display:flex; gap:10px; align-items:center; background:#FDF1EA; border:1.5px solid #F2CDB9; border-radius:var(--radius-s); padding:8px 12px; margin-bottom:6px !important; font-size:14px;}
+  .seq-done li{background:#FDF1EA; border:1.5px solid #F2CDB9; padding:8px 12px; margin-bottom:6px !important; font-size:14px;}
   .seq-done .n{width:24px; height:24px; border-radius:50%; background:var(--pri); color:#fff; font-family:'Baloo 2',sans-serif; font-size:13px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;}
   .seq-ask{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; margin:6px 0 8px;}
   .seq-ask b{color:var(--accent-dark);}
-  .seq-opts{display:flex; flex-direction:column; gap:7px;}
+  .seq-opts{gap:7px;}
   .seq-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:14px; font-weight:600; padding:10px 13px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer;}
   .seq-opt:hover{border-color:var(--pri);}
   .seq-opt.wrong{background:#FBE6E9; border-color:#D14B5E;}
-
-  /* QUIZ */
-  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:24px 22px; margin-top:16px;}
-  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:12.5px; color:var(--ink-soft); margin-bottom:9px;}
-  .quiz-q{font-size:16px; font-weight:700; margin-bottom:14px;}
-  .quiz-options{display:flex; flex-direction:column; gap:9px;}
-  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:14px; font-weight:600; padding:11px 14px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+  .quiz-box{padding:24px 22px; margin-top:16px;}
+  .quiz-progress{font-size:12.5px; margin-bottom:9px;}
+  .quiz-q{font-size:16px; margin-bottom:14px;}
+  .quiz-options{gap:9px;}
+  .quiz-opt{font-size:14px; padding:11px 14px;}
   .quiz-opt:hover{border-color:var(--pri);}
   .quiz-opt.correct{background:#E4F5E9; border-color:#3FAE58;}
   .quiz-opt.wrong{background:#FBE6E9; border-color:#D14B5E;}
-  .quiz-nav{display:flex; justify-content:flex-end; margin-top:16px;}
-  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:10px 20px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
-  .btn-next.active{opacity:1; pointer-events:auto;}
-
-  .completion{display:none; text-align:center; padding:18px 10px 10px;}
-  .completion.show{display:block;}
-  .badge{width:80px; height:80px; margin:0 auto 14px;}
-  .completion h3{font-size:20px; margin-bottom:8px;}
-  .completion p{color:var(--ink-soft); max-width:50ch; margin:0 auto 16px; font-size:14px;}
-  .completion .total{font-family:'Baloo 2',sans-serif; font-size:28px; color:var(--pri-dark);}
-
-  /* ILLUSTRATED REVIEW */
+  .quiz-nav{margin-top:16px;}
+  .btn-next{padding:10px 20px;}
   .ill-card{display:grid; grid-template-columns:210px 1fr; gap:14px; align-items:center; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; margin:8px 0;}
   @media (max-width:560px){ .ill-card{grid-template-columns:1fr;} }
   .ill-card p.q{font-weight:700; margin:0 0 8px; font-size:14px;}
@@ -218,8 +165,6 @@
   .mbar .fxs{padding:0 6px; font-style:italic; color:var(--ink-soft); border-right:1px solid var(--cell-line);}
   .mbar .fb{padding:3px 6px; flex:1;}
   .mbar .on{background:#CFE6F5; box-shadow:inset 0 0 0 2px var(--accent);}
-
-  /* ILLUSTRATIONS */
   .ill-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(128px,1fr)); gap:10px; margin:10px 0 14px;}
   .ill{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 12px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:6px;}
   .ill .t{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; line-height:1.2;}
@@ -243,10 +188,6 @@
   .rb-tabs span{padding:4px 10px; border-radius:5px 5px 0 0; color:var(--ink-soft); font-weight:700;}
   .rb-tabs span.on{background:#fff; color:var(--pri-dark); box-shadow:inset 0 -3px 0 var(--pri);}
   .rb-body{display:flex; gap:14px; padding:10px 12px; align-items:flex-start; flex-wrap:wrap;}
-  .rb-group{border:1.5px dashed var(--pri); border-radius:8px; padding:6px 10px; text-align:center;}
-  .rb-group .gl{font-size:11px; color:var(--ink-soft); margin-top:4px;}
-  .rb-btn{display:inline-flex; flex-direction:column; align-items:center; font-weight:700; padding:2px 8px;}
-  .rb-btn .ic{font-size:22px;}
   .rb-menu{border:1.5px solid var(--cell-line); border-radius:6px; background:#fff; box-shadow:0 4px 10px rgba(0,0,0,.08); text-align:left;}
   .rb-menu div{padding:5px 12px;}
   .rb-menu div.on{background:#FCEDE5; font-weight:800;}
@@ -262,8 +203,6 @@
   .errbox .x{width:18px; height:18px; border-radius:50%; background:#D14B5E; color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:10px;}
   .paper{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:10px 0 0;}
   .paper .ill svg{width:120px; height:66px;}
-
-  /* GOOGLE TOOLBAR (вирівнювання) */
   .gtb{display:flex; flex-wrap:wrap; gap:10px; background:#F8F5F2; border:1.5px solid var(--cell-line); border-radius:10px; padding:10px; margin-top:12px;}
   .gtb-group{display:flex; flex-direction:column; gap:4px;}
   .gtb-cap{font-size:11px; font-weight:700; color:var(--ink-soft);}
@@ -273,8 +212,6 @@
   .gtb-seg button:hover{background:#FCEDE5;}
   .gtb-seg button.on{background:#FBE3D6; color:var(--pri-dark); box-shadow:inset 0 -3px 0 var(--pri);}
   .al-sheet .sheet-grid td.clip{text-overflow:clip;}
-
-  /* GOOGLE SIDE PANEL (перевірка даних) */
   .gpanel{border:1.5px solid #C9BFB6; border-radius:10px; background:#fff; box-shadow:0 6px 18px rgba(42,28,20,.08); font-size:13px; margin-top:12px; overflow:hidden; max-width:420px; margin-left:auto; margin-right:auto;}
   .gp-title{display:flex; justify-content:space-between; padding:9px 14px; font-weight:800; font-size:14px; border-bottom:1px solid #E5DDD6;}
   .gp-body{padding:10px 14px;}
@@ -288,30 +225,10 @@
   .gpanel input[type=checkbox], .gpanel input[type=radio]{width:16px; height:16px; accent-color:var(--pri); flex-shrink:0;}
   .mcell.warn{position:relative;}
   .mcell.warn::after{content:''; position:absolute; top:0; right:0; border-style:solid; border-width:0 9px 9px 0; border-color:transparent #D93025 transparent transparent;}
-
-  footer{padding:32px 24px 56px; text-align:center; color:var(--ink-soft); font-size:13px;}
+  footer{padding:32px 24px 56px; font-size:13px;}
 </style>
 </head>
-<body>
-
-<div class="hud">
-  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
-  <div class="hud-row">
-    <span class="hud-title">8 клас · Форматування й перевірка даних</span>
-    <div class="neuron-counter">
-      <svg viewBox="0 0 24 24" fill="none">
-        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
-        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
-        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
-        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
-        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
-        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
-        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#B57A1F" opacity="0.6"/>
-      </svg>
-      <span id="neuronCount">0</span>
-    </div>
-  </div>
-</div>
+<body data-lesson="lesson8-formatting-validation" data-hud="8 клас · Форматування й перевірка даних">
 
 <section class="hero">
   <div class="hero-inner">
@@ -469,7 +386,7 @@
     <div class="trivia">Швидкий спосіб зробити довгу таблицю охайною — <span class="menu">Формат → Чергування кольорів</span>. Рядки зафарбуються через один, і їх легше читати.</div>
     <p class="soft">Зістав назву з тим, як виглядає таблиця. Пунктир — сітка, яка не друкується.</p>
     <div class="exercise">
-      <div class="tool-pool" id="bdPool"></div>
+      <div class="match-pool" id="bdPool"></div>
       <div class="grid-match" id="bdList"></div>
     </div>
   </section>
@@ -524,7 +441,7 @@
     <p>Правило на панелі «Перевірка даних» складається з кількох частин:</p>
     <div class="ill-grid">
       <div class="ill"><div class="vis"><span class="mcell txt" style="font-size:11.5px">Між 12 і 15</span></div><div class="t">① Критерії</div><div class="c">яке правило діє</div></div>
-      <div class="ill"><div class="vis ba"><span class="mcell" style="min-width:40px; box-shadow:inset 0 0 0 2px var(--accent)"></span><span class="tipbox">Введіть вік від 12 до 15</span></div><div class="t">② Текст довідки</div><div class="c">з'являється, коли клацнеш комірку</div></div>
+      <div class="ill"><div class="vis ba"><span class="mcell" style="min-width:40px; box-shadow:inset 0 0 0 2px var(--accent2)"></span><span class="tipbox">Введіть вік від 12 до 15</span></div><div class="t">② Текст довідки</div><div class="c">з'являється, коли клацнеш комірку</div></div>
       <div class="ill"><div class="vis"><span class="mcell warn">16</span></div><div class="t">③ Попередження</div><div class="c">значення лишається, але в куті — червоний трикутник</div></div>
       <div class="ill"><div class="vis"><span class="errbox"><span class="h" style="display:block">Помилка</span><span class="b"><span class="x">✕</span>Недійсні дані</span></span></div><div class="t">④ Відхилення</div><div class="c">неправильне значення не потрапить у комірку</div></div>
     </div>
@@ -562,7 +479,7 @@
           <div class="sheet vt-cell"><table class="sheet-grid">
             <tr><th class="corner"></th><th>B</th></tr>
             <tr><th>1</th><td class="fname">Вік</td></tr>
-            <tr><th>2</th><td class="num" id="vCell" style="box-shadow:inset 0 0 0 2px var(--accent);"></td></tr>
+            <tr><th>2</th><td class="num" id="vCell" style="box-shadow:inset 0 0 0 2px var(--accent2);"></td></tr>
           </table></div>
           <div class="vt-tip" id="vTip"></div>
         </div>
@@ -601,134 +518,18 @@
   <section class="block" id="finalQuizSection">
     <div class="step-label">Підсумок</div>
     <h2>Коротка перевірка</h2>
-    <div class="quiz-box" id="quizBox">
-      <div class="quiz-progress" id="quizProgress">Запитання 1 з 9</div>
-      <div class="quiz-q" id="quizQ"></div>
-      <div class="quiz-options" id="quizOptions"></div>
-      <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
-    </div>
-    <div class="completion" id="completion">
-      <svg class="badge" viewBox="0 0 24 24" fill="none">
-        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#6C5CE7"/>
-        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#6C5CE7"/>
-        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#6C5CE7"/>
-        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#6C5CE7"/>
-        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#6C5CE7"/>
-        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#6C5CE7"/>
-        <circle cx="12" cy="12" r="4.4" fill="#6C5CE7"/><circle cx="12" cy="12" r="1.6" fill="#5340c9" opacity="0.6"/>
-      </svg>
-      <h3>Урок пройдено!</h3>
-      <p>Ти вмієш у Google Таблицях застосовувати числові формати, працювати з датами й часом, вирівнювати текст, додавати межі, заливку й зображення, налаштовувати перевірку даних і прибирати дублікати.</p>
-      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
-    </div>
+    <div id="finalQuiz"></div>
   </section>
 
 </div>
 
 <footer>Урок · «Додаткові параметри форматування. Перевірка даних» · 8 клас</footer>
 
+<script src="../../assets/lesson.js"></script>
 <script>
-const STORAGE_KEY = "lesson8-formatting-validation-neurons";
-let neurons = 0;
-const neuronEl = document.getElementById('neuronCount');
-const hudFill = document.getElementById('hudFill');
-
-function addNeurons(n){
-  neurons += n;
-  neuronEl.textContent = neurons;
-  neuronEl.classList.add('pop');
-  setTimeout(()=>neuronEl.classList.remove('pop'), 250);
-  saveProgress();
-}
-async function saveProgress(){
-  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
-}
-async function loadProgress(){
-  try{
-    const res = await window.storage?.get(STORAGE_KEY, false);
-    if(res && res.value){
-      const d = JSON.parse(res.value);
-      if(typeof d.neurons === 'number'){ neurons = d.neurons; neuronEl.textContent = neurons; }
-    }
-  }catch(e){}
-}
-loadProgress();
-
-window.addEventListener('scroll', ()=>{
-  const h = document.documentElement;
-  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
-  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
-});
-
-/* ---------- HELPERS ---------- */
 const COLS = 'ABCDEFGH'.split('');
-function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
+
 function flash(el, cls){ el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), 380); }
-
-function makeClassify(containerId, items, opts){
-  const list = document.getElementById(containerId);
-  items.forEach(item=>{
-    const card = document.createElement('div');
-    card.className = 'classify-card';
-    card.innerHTML = `<p class="q">${item.text}</p>
-      <div class="choice-row">${(item.opts||opts).map((o,i)=>`<button class="choice-btn" data-v="${i}">${o}</button>`).join('')}</div>
-      <div class="choice-feedback"></div>`;
-    list.appendChild(card);
-    const fb = card.querySelector('.choice-feedback');
-    let answered = false;
-    card.querySelectorAll('.choice-btn').forEach((btn,i)=>{
-      btn.addEventListener('click', ()=>{
-        if(answered) return;
-        if(i===item.correct){ btn.classList.add('correct'); fb.textContent = item.why ? `Правильно ✓ ${item.why}` : 'Правильно ✓'; answered=true; addNeurons(1); }
-        else{ btn.classList.add('wrong'); fb.textContent='Спробуй ще раз'; }
-      });
-    });
-  });
-}
-
-function makeMatching(poolId, listId, items){
-  const pool = document.getElementById(poolId);
-  const list = document.getElementById(listId);
-  let selected = null;
-  let matched = 0;
-  shuffle(items).forEach(t=>{
-    const chip = document.createElement('div');
-    chip.className = 'tool-chip';
-    chip.textContent = t.name;
-    chip.addEventListener('click', ()=>{
-      if(chip.classList.contains('placed')) return;
-      pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
-      chip.classList.add('selected');
-      selected = t.name;
-    });
-    pool.appendChild(chip);
-  });
-  shuffle(items).forEach(t=>{
-    const card = document.createElement('div');
-    card.className = 'func-card';
-    card.innerHTML = `<div class="func-text">${t.func}</div><div class="func-slot">?</div>`;
-    card.addEventListener('click', ()=>{
-      if(card.classList.contains('matched') || !selected) return;
-      const slot = card.querySelector('.func-slot');
-      if(selected === t.name){
-        slot.textContent = selected;
-        slot.classList.add('filled');
-        card.classList.add('matched');
-        const chip = [...pool.children].find(c=>c.textContent===selected);
-        if(chip) chip.classList.add('placed');
-        addNeurons(1);
-        matched++;
-        selected = null;
-        pool.querySelectorAll('.tool-chip').forEach(c=>c.classList.remove('selected'));
-        if(matched === items.length) addNeurons(2);
-      } else {
-        card.classList.add('shake');
-        setTimeout(()=>card.classList.remove('shake'), 350);
-      }
-    });
-    list.appendChild(card);
-  });
-}
 
 /* ---------- REVIEW (з малюнками) ---------- */
 // Міні-таблиця: hl — підсвічені адреси, vals — значення {адреса: [текст, стиль]}
@@ -779,6 +580,7 @@ const ba = (a, b) => `<span class="ba">${a}<span class="arr">→</span>${b}</spa
   const list = document.getElementById('revList');
   const status = document.getElementById('revStatus');
   let done = 0;
+  const hit = trackTask(list, items.length, items.length + 2);
   items.forEach(item=>{
     const card = document.createElement('div');
     card.className = 'ill-card';
@@ -793,7 +595,7 @@ const ba = (a, b) => `<span class="ba">${a}<span class="arr">→</span>${b}</spa
       btn.addEventListener('click', ()=>{
         if(answered) return;
         if(i===item.correct){
-          btn.classList.add('correct'); fb.textContent = `Правильно ✓ ${item.why}`; answered = true; addNeurons(1);
+          btn.classList.add('correct'); fb.textContent = `Правильно ✓ ${item.why}`; answered = true; addNeurons(1); hit();
           done++;
           if(done === items.length){ addNeurons(2); status.textContent = 'Повторення завершено ✓ Переходимо до нового!'; }
         }
@@ -837,6 +639,7 @@ const ba = (a, b) => `<span class="ba">${a}<span class="arr">→</span>${b}</spa
   const status = document.getElementById('nfStatus');
   const refEl = document.getElementById('nfRef'), valEl = document.getElementById('nfVal');
   let ti = 0, busy = false;
+  const hit = trackTask(bar, TASKS.length, TASKS.length + 2);
   const curCol = ()=> TASKS[Math.min(ti, TASKS.length-1)].col;
 
   function render(){
@@ -882,7 +685,7 @@ const ba = (a, b) => `<span class="ba">${a}<span class="arr">→</span>${b}</spa
       if(key === TASKS[ti].target){
         busy = true;
         status.textContent = `✓ Це формат «${name}». А в рядку формул — те саме число ${String(rows[0][c]).replace('.', ',')}!`;
-        addNeurons(1);
+        addNeurons(1); hit();
         ti++;
         if(ti === TASKS.length) addNeurons(2);
         setTimeout(()=>{ busy = false; showTask(); render(); }, 1500);
@@ -918,6 +721,8 @@ makeClassify('dateList', [
   const grid = document.getElementById('alGrid'), tgt = document.getElementById('alTarget');
   const bar = document.getElementById('alBar');
   const prompt = document.getElementById('alPrompt'), status = document.getElementById('alStatus');
+  const hitAl = ()=>alTask();
+  let alTask = null;
 
   function cellStyle(s){
     const h = s.h==='auto' ? 'left' : s.h;
@@ -970,12 +775,13 @@ makeClassify('dateList', [
     const t = TASKS[ti], s = st[t.key];
     const wrong = Object.keys(t.target).find(k=>s[k] !== t.target[k]);
     if(wrong){ status.textContent = 'Ще не як на зразку. ' + t.hints[wrong]; return; }
-    addNeurons(t.key==='title' ? 1 : 2);
+    addNeurons(t.key==='title' ? 1 : 2); hitAl();
     status.textContent = t.key==='title' ? '✓ Чотири комірки стали однією, заголовок — посередині.' : '✓ Текст переноситься й стоїть посередині по висоті.';
     ti++;
     if(ti === TASKS.length) addNeurons(2);
     showTask(); render();
   });
+  alTask = trackTask(bar, TASKS.length, 1 + 2 * (TASKS.length - 1) + 2);
   render(); showTask();
 })();
 
@@ -1026,6 +832,7 @@ makeClassify('dateList', [
   const opts = document.getElementById('seqOpts');
   const status = document.getElementById('seqStatus');
   let k = 0;
+  const hitSeq = trackTask(opts, STEPS.length, STEPS.length + 2);
   function render(){
     opts.innerHTML = '';
     if(k >= STEPS.length){
@@ -1044,7 +851,7 @@ makeClassify('dateList', [
           li.innerHTML = `<span class="n">${k+1}</span>${s}`;
           done.appendChild(li);
           k++;
-          addNeurons(1);
+          addNeurons(1); hitSeq();
           status.textContent = '';
           if(k === STEPS.length) addNeurons(2);
           render();
@@ -1083,6 +890,7 @@ makeClassify('valList', [
   syncRange();
   const status = document.getElementById('vStatus');
   let configured = false;
+  const hit = trackTask(status, 2, 5);   // налаштувати правило + перевірити всі значення
   document.getElementById('vOk').addEventListener('click', ()=>{
     if(configured) return;
     const type = typeSel.value;
@@ -1099,7 +907,7 @@ makeClassify('valList', [
     else if(mode !== 'reject') msg = '«Попередження» лише позначить комірку червоним трикутником, а неправильне значення залишиться. Нам треба, щоб воно взагалі не потрапило в таблицю.';
     if(msg){ status.textContent = msg; return; }
     configured = true;
-    addNeurons(3);
+    addNeurons(3); hit();
     status.textContent = '✓ Правило збережено.';
     startTest(HINTS[H_OK]);
   });
@@ -1143,7 +951,7 @@ makeClassify('valList', [
         if(!tested.has(v)){
           tested.add(v);
           if(tested.size === VALUES.length){
-            addNeurons(2);
+            addNeurons(2); hit();
             tstatus.textContent = `«${v}»: ${WHY[v]} Усі значення перевірено ✓ Охоронець працює!`;
           }
         }
@@ -1178,6 +986,7 @@ makeClassify('valList', [
   table.innerHTML = html;
   const TOTAL = rows.filter(r=>r.dup).length;
   let found = 0;
+  const hit = trackTask(table, TOTAL, TOTAL + 2);
   table.querySelectorAll('tr[data-i]').forEach(tr=>{
     const r = rows[+tr.dataset.i];
     tr.querySelectorAll('.clk').forEach(cell=>{
@@ -1187,7 +996,7 @@ makeClassify('valList', [
           tr.classList.add('marked');
           tr.querySelectorAll('td').forEach(td=>td.classList.add('found'));
           found++;
-          addNeurons(1);
+          addNeurons(1); hit();
           status.textContent = `Знайдено повторів: ${found} з ${TOTAL}. Цей рядок повністю збігається з рядком вище.`;
           if(found === TOTAL){
             addNeurons(2);
@@ -1217,46 +1026,8 @@ const questions = [
   { q: "Чим «Відхиляти введення» відрізняється від «Показувати попередження»?", opts: ["Неправильне значення не потрапить у комірку, а не лише позначиться червоним трикутником", "Нічим, це одне й те саме", "Таблиця сама виправить помилку"], correct: 0 },
   { q: "Де знайти команду, що прибирає однакові рядки?", opts: ["Дані → Очищення даних → Видалити дублікати", "Формат → Число", "Вставити → Рядки"], correct: 0 }
 ];
-let qi=0, currentAnswered=false;
-const quizQ = document.getElementById('quizQ');
-const quizOptions = document.getElementById('quizOptions');
-const quizProgress = document.getElementById('quizProgress');
-const btnNext = document.getElementById('btnNext');
-const quizBox = document.getElementById('quizBox');
-const completion = document.getElementById('completion');
-const totalNeuronsEl = document.getElementById('totalNeurons');
 
-function renderQuestion(){
-  currentAnswered=false; btnNext.classList.remove('active');
-  const item = questions[qi];
-  quizProgress.textContent = `Запитання ${qi+1} з ${questions.length}`;
-  quizQ.textContent = item.q;
-  quizOptions.innerHTML='';
-  item.opts.forEach((opt,i)=>{
-    const b=document.createElement('button'); b.className='quiz-opt'; b.textContent=opt;
-    b.addEventListener('click', ()=>{
-      if(currentAnswered) return; currentAnswered=true;
-      const all = quizOptions.querySelectorAll('.quiz-opt');
-      all.forEach((ob,oi)=>{ if(oi===item.correct) ob.classList.add('correct'); else if(oi===i) ob.classList.add('wrong'); });
-      if(i===item.correct) addNeurons(2);
-      btnNext.classList.add('active');
-      btnNext.textContent = (qi===questions.length-1) ? 'Завершити' : 'Далі';
-    });
-    quizOptions.appendChild(b);
-  });
-}
-btnNext.addEventListener('click', ()=>{
-  if(!btnNext.classList.contains('active')) return;
-  qi++;
-  if(qi<questions.length){ renderQuestion(); }
-  else {
-    quizBox.style.display='none';
-    completion.classList.add('show');
-    addNeurons(3);
-    totalNeuronsEl.textContent = neurons;
-  }
-});
-renderQuestion();
+makeFinalQuiz('finalQuiz', questions, {summary:'Ти вмієш у Google Таблицях застосовувати числові формати, працювати з датами й часом, вирівнювати текст, додавати межі, заливку й зображення, налаштовувати перевірку даних і прибирати дублікати.'});
 </script>
 
 </body>

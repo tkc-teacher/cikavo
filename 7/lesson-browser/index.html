@@ -7,86 +7,47 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
 <style>
   :root{
+    --hud-bar:linear-gradient(90deg,var(--amber),var(--accent));
+    --note:var(--indigo); --note-soft:var(--indigo-soft); --note-ink:#4B2F8A;
+    --sun:var(--amber); --sun-soft:var(--amber-soft); --sun-ink:#8A4E0F;
+   
     --bg:#F5F7FC; --ink:#172036; --ink-soft:#4F5B78; --surface:#FFFFFF; --line:#DFE5F2;
     --accent:#2F6FE4; --accent-dark:#1F55B8; --accent-soft:#E6EEFD;
     --amber:#F28A1E; --amber-soft:#FEF0E0; --indigo:#8C5BE8; --indigo-soft:#F1EAFD;
     --coral:#FF6B4A; --yellow:#FFC93C; --ok:#3FAE58; --ok-soft:#E4F8E6;
     --radius-s:10px; --radius-m:16px; --radius-l:26px;
   }
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
-  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
-  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
-  .container{max-width:800px; margin:0 auto; padding:0 24px;}
   @media (max-width:520px){ .container{padding:0 16px;} }
-
-  .hud{position:sticky; top:0; z-index:50; background:rgba(245,247,252,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
-  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
-  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--amber),var(--accent)); transition:width .3s ease;}
-  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:800px; margin:0 auto;}
-  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
-  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
-  .neuron-counter svg{width:24px;height:24px;}
-  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
-  #neuronCount.pop{transform:scale(1.35);}
-
-  .hero{padding:52px 24px 40px;}
-  .hero-inner{max-width:800px; margin:0 auto; display:flex; align-items:center; gap:30px;}
-  .hero-text{flex:1;}
-  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--accent); margin-bottom:10px;}
-  .hero h1{font-size:32px; line-height:1.18; margin-bottom:12px;}
-  .hero p{color:var(--ink-soft); font-size:16.5px; max-width:54ch; margin-bottom:22px;}
-  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--accent); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
-  .btn-primary:hover{background:var(--accent-dark);}
-  .btn-primary:active{transform:scale(.97);}
-  .mascot{width:130px; height:130px; flex-shrink:0;}
-  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:100px; height:100px;} }
-
-  section.block{padding:38px 0; border-top:1px solid var(--line);}
-  .step-label{font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:600; color:var(--accent); margin-bottom:8px;}
+  .hero-eyebrow{color:var(--accent);}
+  .mascot{width:130px; height:130px;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;}
+  .mascot{width:100px; height:100px;} }
+  .step-label{color:var(--accent);}
   .step-label.recap{color:var(--amber);}
-  .block h2{font-size:21px; margin-bottom:10px; max-width:38ch;}
-  .block h3{font-size:16px; margin:20px 0 8px;}
-  .block p{max-width:66ch; font-size:16px; margin:0 0 14px; color:var(--ink);}
-  .block p.soft{color:var(--ink-soft); font-size:15px;}
-  .block ul{max-width:66ch; margin:0 0 14px; padding-left:20px; font-size:15px;}
-  .block ul li{margin-bottom:4px;}
-  .note{background:var(--indigo-soft); border-left:4px solid var(--indigo); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; color:#4B2F8A; margin:16px 0;}
-  .trivia{background:var(--amber-soft); border-left:4px solid var(--amber); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14px; color:#8A4E0F; margin:16px 0;}
-
-  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:22px; margin-top:18px;}
+  .note{background:var(--indigo-soft); border-left:4px solid var(--indigo); color:#4B2F8A;}
+  .trivia{background:var(--amber-soft); border-left:4px solid var(--amber); color:#8A4E0F;}
   @media (max-width:520px){ .exercise{padding:16px;} }
-  .progress-line{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--accent-dark); margin-top:14px; min-height:1.4em;}
-
-  /* РУШІЇ БРАУЗЕРІВ */
   .engines{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:14px 0 6px;}
   @media (max-width:560px){ .engines{grid-template-columns:1fr;} }
   .engine{border:2px solid var(--line); border-top-width:6px; border-radius:var(--radius-m); background:var(--surface); padding:12px 14px;}
   .engine b{font-family:'Baloo 2',sans-serif; font-size:16px; display:block;}
   .engine span{font-size:13.5px; color:var(--ink-soft);}
-
-  /* FLIP GALLERY */
   .gallery{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:16px;}
   .gallery-3{grid-template-columns:repeat(3,1fr);}
   @media (max-width:640px){ .gallery-3{grid-template-columns:repeat(2,1fr);} }
-  @media (max-width:520px){ .gallery{grid-template-columns:1fr;} .gallery-3{grid-template-columns:1fr;} }
-  .flip-card{perspective:1200px; height:200px; cursor:pointer;}
-  .flip-inner{position:relative; width:100%; height:100%; transition:transform .6s cubic-bezier(.4,0,.2,1); transform-style:preserve-3d;}
-  .flip-card.flipped .flip-inner{transform:rotateY(180deg);}
-  .flip-face{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:var(--radius-m); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:14px; text-align:center; border:2px solid var(--card-c, var(--line));}
-  .flip-front{background:var(--surface);}
+  @media (max-width:520px){ .gallery{grid-template-columns:1fr;}
+  .gallery-3{grid-template-columns:1fr;} }
+  .flip-card{height:200px;}
   .flip-front .logo{width:64px; height:64px; margin-bottom:10px; display:flex; align-items:center; justify-content:center;}
   .flip-front .logo img{max-width:100%; max-height:100%; object-fit:contain;}
   .flip-front .name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px;}
   .flip-front .tap{font-size:12px; color:var(--ink-soft); margin-top:2px;}
-  .flip-back{background:var(--card-c-light, var(--accent-soft)); transform:rotateY(180deg); color:var(--ink-soft); line-height:1.45; align-items:flex-start; text-align:left;}
+  .flip-back{color:var(--ink-soft); line-height:1.45; align-items:flex-start; text-align:left;}
   .flip-back ul{margin:0; padding-left:16px; font-size:13.5px;}
   .flip-back li{margin-bottom:3px;}
-
-  /* MEMO: ЗНАЙДИ ПАРУ */
   .memo-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:10px;}
   @media (max-width:640px){ .memo-grid{grid-template-columns:repeat(2,1fr);} }
   .memo-card{perspective:1000px; height:128px; cursor:pointer;}
@@ -100,21 +61,7 @@
   .memo-card.matched{cursor:default;}
   .memo-card.matched .flip-back{border-color:var(--ok); background:var(--ok-soft);}
   .memo-card.miss .flip-back{border-color:var(--coral); background:#FDE6E1;}
-
-  /* CHOICE CARDS */
-  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:16px 18px; margin:12px 0;}
-  .classify-card p.q{font-weight:700; margin:0 0 10px; font-size:15px;}
-  .choice-row{display:flex; gap:8px; flex-wrap:wrap;}
-  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; padding:8px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; color:var(--ink); text-align:left; transition:background .15s ease, border-color .15s ease, color .15s ease;}
-  .choice-btn:hover{border-color:var(--accent);}
-  .choice-btn.correct{background:var(--ok-soft); border-color:var(--ok); color:#256B36;}
-  .choice-btn.wrong{background:#FDE6E1; border-color:var(--coral); color:#B8412A;}
-  .choice-feedback{margin-top:8px; font-size:13.5px; color:var(--ink-soft); min-height:1.2em;}
-  .yn-grid{display:grid; grid-template-columns:1fr 1fr; gap:0 12px;}
   @media (max-width:560px){ .yn-grid{grid-template-columns:1fr;} }
-  .yn-grid .classify-card{margin:6px 0;}
-
-  /* РОЗШИРЕННЯ: КАРТКА ДЛЯ ПЕРЕВІРКИ Й РЕКОМЕНДАЦІЇ */
   .ext-meta{display:block; font-weight:600; font-size:13.5px; color:var(--ink-soft); margin-top:6px; line-height:1.5;}
   .ext-meta i{font-style:normal; color:var(--ink);}
   .rec-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px;}
@@ -124,8 +71,6 @@
   .rec-tag{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; color:var(--rc,var(--accent)); text-transform:uppercase; letter-spacing:.03em;}
   .rec-name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; margin:2px 0 4px;}
   .rec-what{font-size:13.5px; color:var(--ink-soft); line-height:1.45;}
-
-  /* РЕЖИМИ CHROME */
   .mode-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:14px 0;}
   @media (max-width:640px){ .mode-grid{grid-template-columns:1fr;} }
   .mode{background:var(--surface); border:2px solid var(--mc); border-radius:var(--radius-m); padding:14px;}
@@ -153,49 +98,14 @@
   .shot{aspect-ratio:16/10; border-radius:var(--radius-s); overflow:hidden; background:#EDF1F9; border:1px solid var(--line);}
   .shot img, .shot svg{width:100%; height:100%; display:block; object-fit:cover;}
   kbd{font-family:'Nunito Sans',sans-serif; font-size:12px; font-weight:700; background:var(--bg); border:1px solid var(--line); border-bottom-width:2px; border-radius:5px; padding:0 5px;}
-
-  /* MATCHING */
-  .match-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:14px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:16px;}
-  .match-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:8px 14px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
-  .match-chip:hover{transform:translateY(-2px);}
-  .match-chip.selected{border-color:var(--accent); box-shadow:0 0 0 3px rgba(47,111,228,.18);}
-  .match-chip.placed{display:none;}
-  .desc-card{display:flex; align-items:center; gap:12px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; margin-bottom:10px; cursor:pointer; transition:border-color .2s ease, background .2s ease;}
-  .desc-card.matched{border-color:var(--accent); background:var(--accent-soft); cursor:default;}
-  .desc-card.shake{animation:shakeX .35s ease;}
-  .desc-text{flex:1; font-size:14px; color:var(--ink-soft);}
-  .desc-slot{min-width:100px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13.5px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:8px 10px;}
-  .desc-slot.filled{border-style:solid; border-color:var(--accent); background:#fff; color:var(--accent-dark);}
-  @keyframes shakeX{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
-
-  /* QUIZ (опитування на початку й фінальний квіз) */
-  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:26px 24px; margin-top:18px;}
+  .match-chip.selected{box-shadow:0 0 0 3px rgba(47,111,228,.18);}
+  .desc-slot{min-width:100px;}
   @media (max-width:520px){ .quiz-box{padding:20px 16px;} }
-  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:13px; color:var(--ink-soft); margin-bottom:10px;}
-  .quiz-q{font-size:17px; font-weight:700; margin-bottom:16px;}
   .quiz-img{display:block; height:96px; max-width:160px; object-fit:contain; margin:4px auto 16px;}
-  .quiz-options{display:flex; flex-direction:column; gap:10px;}
-  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:15px; font-weight:600; padding:12px 15px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
-  .quiz-opt:hover{border-color:var(--accent);}
-  .quiz-opt.correct{background:var(--ok-soft); border-color:var(--ok);}
-  .quiz-opt.wrong{background:#FDE6E1; border-color:var(--coral);}
-  .quiz-why{margin-top:12px; font-size:14px; color:var(--ink-soft); min-height:1.3em;}
-  .quiz-nav{display:flex; justify-content:flex-end; margin-top:14px;}
-  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:11px 22px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
-  .btn-next.active{opacity:1; pointer-events:auto;}
   .quiz-result{display:none; text-align:center; padding:6px 0;}
   .quiz-result.show{display:block;}
   .quiz-result .score{font-family:'Baloo 2',sans-serif; font-size:26px; color:var(--accent-dark);}
   .quiz-result p{color:var(--ink-soft); margin:6px auto 0; font-size:15px;}
-
-  .completion{display:none; text-align:center; padding:20px 10px 10px;}
-  .completion.show{display:block;}
-  .badge{width:90px; height:90px; margin:0 auto 16px;}
-  .completion h3{font-size:22px; margin-bottom:10px;}
-  .completion p{color:var(--ink-soft); max-width:52ch; margin:0 auto 18px; font-size:15px;}
-  .completion .total{font-family:'Baloo 2',sans-serif; font-size:30px; color:var(--accent-dark);}
-
-  /* GUIDE (без гейміфікації) */
   .guide{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:24px; margin-top:18px;}
   .guide-part{border:2px solid var(--line); border-left-width:6px; border-radius:var(--radius-s); padding:12px 16px; margin-bottom:12px;}
   .guide-part h4{font-family:'Baloo 2',sans-serif; font-size:15.5px; margin:0 0 6px;}
@@ -203,31 +113,9 @@
   .guide-req li{padding:6px 0 6px 26px; position:relative; border-top:1px solid var(--line); color:var(--ink-soft);}
   .guide-req li:first-child{border-top:none;}
   .guide-req li::before{content:'☐'; position:absolute; left:4px; color:var(--accent); font-size:15px;}
-
-  footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
-  footer .credits{display:block; max-width:62ch; margin:12px auto 0; font-size:11.5px; line-height:1.55; opacity:.8;}
 </style>
 </head>
-<body>
-
-<div class="hud">
-  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
-  <div class="hud-row">
-    <span class="hud-title">7 клас · Браузер</span>
-    <div class="neuron-counter">
-      <svg viewBox="0 0 24 24" fill="none">
-        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
-        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
-        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
-        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
-        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
-        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
-        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#E0A800" opacity="0.6"/>
-      </svg>
-      <span id="neuronCount">0</span>
-    </div>
-  </div>
-</div>
+<body data-lesson="lesson7-browser" data-hud="7 клас · Браузер">
 
 <section class="hero">
   <div class="hero-inner">
@@ -461,30 +349,10 @@
   <section class="block" id="finalQuizSection">
     <div class="step-label">Підсумок</div>
     <h2>Коротка перевірка</h2>
-    <div class="quiz-box" id="quizBox">
-      <div class="quiz-progress" id="quizProgress"></div>
-      <div class="quiz-q" id="quizQ"></div>
-      <div class="quiz-options" id="quizOptions"></div>
-      <div class="quiz-why" id="quizWhy"></div>
-      <div class="quiz-nav"><button class="btn-next" id="quizNext">Далі</button></div>
-    </div>
-    <div class="completion" id="completion">
-      <svg class="badge" viewBox="0 0 24 24" fill="none">
-        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#6C5CE7"/>
-        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#6C5CE7"/>
-        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#6C5CE7"/>
-        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#6C5CE7"/>
-        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#6C5CE7"/>
-        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#6C5CE7"/>
-        <circle cx="12" cy="12" r="4.4" fill="#6C5CE7"/><circle cx="12" cy="12" r="1.6" fill="#5340c9" opacity="0.6"/>
-      </svg>
-      <h3>Урок пройдено!</h3>
-      <p>Тепер ти знаєш, чим різняться популярні браузери, що означають терміни в налаштуваннях, як безпечно встановлювати розширення, навіщо обліковий запис браузера і коли обирати звичайний профіль, інкогніто чи Гість.</p>
-      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
-    </div>
+    <div id="finalQuiz"></div>
   </section>
 
-  <section class="block">
+  <section class="block" data-guide>
     <div class="step-label">Гід · Практична робота №5</div>
     <h2>Налаштуй свій справжній браузер</h2>
     <p>Цю частину виконують без нейрончиків — у Google Chrome на своєму комп’ютері. Познач для себе кожен виконаний пункт.</p>
@@ -524,124 +392,9 @@
   <span class="credits">Логотипи браузерів є торговельними марками їхніх власників і використані тут із навчальною метою. Джерело — Вікісховище: Google Chrome та Opera — суспільне надбання, Microsoft Edge — ліцензія MIT, Firefox — Mozilla, MPL 2.0. Логотип Safari — Apple Inc., англійська Вікіпедія.</span>
 </footer>
 
+<script src="../../assets/lesson.js"></script>
 <script>
-const STORAGE_KEY = "lesson7-browser-neurons";
-let neurons = 0;
-const neuronEl = document.getElementById('neuronCount');
-const hudFill = document.getElementById('hudFill');
-
-function addNeurons(n){
-  neurons += n;
-  neuronEl.textContent = neurons;
-  neuronEl.classList.add('pop');
-  setTimeout(()=>neuronEl.classList.remove('pop'), 250);
-  saveProgress();
-}
-async function saveProgress(){
-  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
-}
-async function loadProgress(){
-  try{
-    const res = await window.storage?.get(STORAGE_KEY, false);
-    if(res && res.value){
-      const d = JSON.parse(res.value);
-      if(typeof d.neurons === 'number'){ neurons = d.neurons; neuronEl.textContent = neurons; }
-    }
-  }catch(e){}
-}
-loadProgress();
-
-window.addEventListener('scroll', ()=>{
-  const h = document.documentElement;
-  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
-  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
-});
-
 /* ---------- УНІВЕРСАЛЬНІ МЕХАНІКИ ---------- */
-
-function makeChoices(containerId, items){
-  const list = document.getElementById(containerId);
-  items.forEach(item=>{
-    const card = document.createElement('div');
-    card.className = 'classify-card';
-    card.innerHTML = `<p class="q">${item.text}</p><div class="choice-row"></div><div class="choice-feedback"></div>`;
-    const row = card.querySelector('.choice-row');
-    const fb = card.querySelector('.choice-feedback');
-    let answered = false;
-    item.opts.forEach((opt,i)=>{
-      const btn = document.createElement('button');
-      btn.className = 'choice-btn';
-      btn.textContent = opt;
-      btn.addEventListener('click', ()=>{
-        if(answered) return;
-        if(i === item.correct){
-          btn.classList.add('correct');
-          answered = true;
-          fb.textContent = 'Правильно ✓ ' + (item.why || '');
-          addNeurons(1);
-        } else {
-          btn.classList.add('wrong');
-          fb.textContent = 'Ще раз подумай';
-        }
-      });
-      row.appendChild(btn);
-    });
-    list.appendChild(card);
-  });
-}
-
-function makeMatching(poolId, listId, pairs, progressId, bonus){
-  const pool = document.getElementById(poolId);
-  const list = document.getElementById(listId);
-  const progress = document.getElementById(progressId);
-  let selected = null, matched = 0;
-
-  function updateProgress(){
-    progress.textContent = (matched === pairs.length)
-      ? 'Усі пари знайдено ✓'
-      : `Зіставлено: ${matched} з ${pairs.length}`;
-  }
-
-  [...pairs].sort(()=>Math.random()-0.5).forEach(p=>{
-    const chip = document.createElement('div');
-    chip.className = 'match-chip';
-    chip.textContent = p.name;
-    chip.addEventListener('click', ()=>{
-      if(chip.classList.contains('placed')) return;
-      pool.querySelectorAll('.match-chip').forEach(c=>c.classList.remove('selected'));
-      chip.classList.add('selected');
-      selected = p.name;
-    });
-    pool.appendChild(chip);
-  });
-
-  [...pairs].sort(()=>Math.random()-0.5).forEach(p=>{
-    const card = document.createElement('div');
-    card.className = 'desc-card';
-    card.innerHTML = `<div class="desc-text">${p.desc}</div><div class="desc-slot">?</div>`;
-    card.addEventListener('click', ()=>{
-      if(card.classList.contains('matched') || !selected) return;
-      const slot = card.querySelector('.desc-slot');
-      if(selected === p.name){
-        slot.textContent = selected;
-        slot.classList.add('filled');
-        card.classList.add('matched');
-        const chip = [...pool.children].find(c=>c.textContent === selected);
-        if(chip) chip.classList.add('placed');
-        selected = null;
-        matched++;
-        addNeurons(1);
-        updateProgress();
-        if(matched === pairs.length) addNeurons(bonus || 2);
-      } else {
-        card.classList.add('shake');
-        setTimeout(()=>card.classList.remove('shake'), 350);
-      }
-    });
-    list.appendChild(card);
-  });
-  updateProgress();
-}
 
 function makeGallery(gridId, items){
   const grid = document.getElementById(gridId);
@@ -668,6 +421,7 @@ function makeMemo(gridId, pairs, progressId, bonus){
     cards.push({ pid:i, color:p.color, light:p.light, html:`<div class="memo-feat">${p.feat}</div>` });
   });
   let opened = [], busy = false, matched = 0;
+  const hit = trackTask(grid, pairs.length, pairs.length + (bonus || 3));
 
   function updateProgress(){
     progress.textContent = (matched === pairs.length)
@@ -697,7 +451,7 @@ function makeMemo(gridId, pairs, progressId, bonus){
           a.classList.add('matched'); b.classList.add('matched');
           opened = []; busy = false;
           matched++;
-          addNeurons(1);
+          addNeurons(1); hit();
           updateProgress();
           if(matched === pairs.length) addNeurons(bonus || 3);
         }, 400);
@@ -715,8 +469,8 @@ function makeMemo(gridId, pairs, progressId, bonus){
   updateProgress();
 }
 
-/* Питання по одному з кнопкою «Далі» — для опитування на початку і фінального квізу */
-function makeQuiz(prefix, questions, perCorrect, onDone){
+/* Опитування-повторення: питання по одному з кнопкою «Далі» (фінальний тест — makeFinalQuiz ядра) */
+function makeRecapQuiz(prefix, questions, perCorrect, onDone){
   const qEl = document.getElementById(prefix + 'Q');
   const optsEl = document.getElementById(prefix + 'Options');
   const progEl = document.getElementById(prefix + 'Progress');
@@ -727,6 +481,7 @@ function makeQuiz(prefix, questions, perCorrect, onDone){
   imgEl.alt = '';
   qEl.before(imgEl);
   let qi = 0, answered = false, score = 0;
+  const done = stepTask(qEl, questions.length * perCorrect + 2, questions.length);
 
   function render(){
     answered = false;
@@ -749,7 +504,7 @@ function makeQuiz(prefix, questions, perCorrect, onDone){
           if(oi === item.correct) ob.classList.add('correct');
           else if(oi === i) ob.classList.add('wrong');
         });
-        if(i === item.correct){ score++; addNeurons(perCorrect); }
+        if(i === item.correct){ score++; addNeurons(perCorrect); done.item(); }
         if(item.why) whyEl.textContent = (i === item.correct ? '✓ ' : 'Правильну відповідь підсвічено. ') + item.why;
         nextBtn.classList.add('active');
         nextBtn.textContent = (qi === questions.length-1) ? 'Завершити' : 'Далі';
@@ -761,14 +516,14 @@ function makeQuiz(prefix, questions, perCorrect, onDone){
     if(!nextBtn.classList.contains('active')) return;
     qi++;
     if(qi < questions.length) render();
-    else onDone(score, questions.length);
+    else { done(); onDone(score, questions.length); }
   });
   render();
 }
 
 /* ---------- ПОВТОРЕННЯ: ОПИТУВАННЯ ---------- */
 const OS_IMG = '../lesson-os-software/images/';
-makeQuiz('recap', [
+makeRecapQuiz('recap', [
   { q:'Ти двічі клацнув на фото, і воно відкрилося. Хто знайшов файл на диску й виділив для нього пам’ять?',
     opts:['Сам файл','Операційна система','Монітор'], correct:1,
     why:'Програми не звертаються до обладнання напряму — усе проходить через ОС.' },
@@ -902,7 +657,7 @@ makeChoices('syncList', [
 
 /* ---------- КРОК 6: РЕЖИМИ CHROME ---------- */
 /* Знімок екрана з images/. Поки файлу немає — показується спрощена схема. */
-function loadPic(containerId, file, fallback){
+function loadShot(containerId, file, fallback){
   const el = document.getElementById(containerId);
   const img = document.createElement('img');
   img.src = `images/${file}`;
@@ -932,9 +687,9 @@ function modeScheme(hl, items, pick, dark){
     ${rows}
   </svg>`;
 }
-loadPic('shotProfile', 'mode-profile.png', modeScheme('avatar', ['Ти ще не ввійшов у Chrome','Увійти','Гість'], 1, false));
-loadPic('shotIncognito', 'mode-incognito.png', modeScheme('menu', ['Нова вкладка','Нове вікно','Нове вікно в режимі анонімного…','Історія'], 2, false));
-loadPic('shotGuest', 'mode-guest.png', modeScheme('avatar', ['Твій профіль','Керувати профілями','Гість'], 2, false));
+loadShot('shotProfile', 'mode-profile.png', modeScheme('avatar', ['Ти ще не ввійшов у Chrome','Увійти','Гість'], 1, false));
+loadShot('shotIncognito', 'mode-incognito.png', modeScheme('menu', ['Нова вкладка','Нове вікно','Нове вікно в режимі анонімного…','Історія'], 2, false));
+loadShot('shotGuest', 'mode-guest.png', modeScheme('avatar', ['Твій профіль','Керувати профілями','Гість'], 2, false));
 
 const MODE_OPTS = ['Звичайний профіль','Інкогніто','Гість'];
 makeChoices('modeList', [
@@ -956,7 +711,7 @@ makeChoices('modeList', [
 ]);
 
 /* ---------- ФІНАЛЬНИЙ КВІЗ ---------- */
-makeQuiz('quiz', [
+makeFinalQuiz('finalQuiz', [
   { q:'Що таке веббраузер?', opts:['Пошукова система, наприклад Google','Програма для перегляду вебсторінок і роботи з ними','Сайт, на якому зберігаються всі інші сайти'], correct:1 },
   { q:'Що об’єднує Chrome, Edge та Opera?', opts:['Спільний рушій Chromium','Один розробник','Вони працюють лише на телефонах'], correct:0 },
   { q:'Що означає значок замка й https перед адресою сайту?', opts:['Сайт платний','Сайт заблоковано','Дані між тобою й сайтом передаються зашифрованими'], correct:2 },
@@ -964,12 +719,7 @@ makeQuiz('quiz', [
   { q:'Розширення-калькулятор просить дозвіл читати всі дані на всіх сайтах. Що це означає?', opts:['Так працюють усі розширення','Дозвіл не відповідає призначенню — розширення підозріле','Калькулятор рахуватиме точніше'], correct:1 },
   { q:'Ти за спільним комп’ютером у бібліотеці. Який режим Chrome найкраще підходить?', opts:['Звичайний профіль з твоїм обліковим записом','Будь-який, різниці немає','Гість'], correct:2 },
   { q:'Навіщо входити в обліковий запис браузера?', opts:['Щоб сайти відкривались швидше','Щоб закладки, паролі й налаштування були однакові на всіх твоїх пристроях','Щоб вимкнути рекламу'], correct:1 }
-], 2, ()=>{
-  document.getElementById('quizBox').style.display = 'none';
-  document.getElementById('completion').classList.add('show');
-  addNeurons(3);
-  document.getElementById('totalNeurons').textContent = neurons;
-});
+], {summary:'Тепер ти знаєш, чим різняться популярні браузери, що означають терміни в налаштуваннях, як безпечно встановлювати розширення, навіщо обліковий запис браузера і коли обирати звичайний профіль, інкогніто чи Гість.'});
 </script>
 
 </body>

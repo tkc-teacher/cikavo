@@ -7,76 +7,39 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
 <style>
   :root{
+    --hud-bar:linear-gradient(90deg,var(--amber),var(--accent));
+    --note:var(--indigo); --note-soft:var(--indigo-soft); --note-ink:#2F3F82;
+    --sun:var(--amber); --sun-soft:var(--amber-soft); --sun-ink:#8A5A13;
+   
     --bg:#F4F8F7; --ink:#14282B; --ink-soft:#4A6468; --surface:#FFFFFF; --line:#DCE9E7;
     --accent:#0F8B7E; --accent-dark:#0A6C61; --accent-soft:#E2F3F0;
     --amber:#E08A2E; --amber-soft:#FDF1E2; --indigo:#4A6CF7; --indigo-soft:#ECF0FE;
     --coral:#FF6B4A; --yellow:#FFC93C; --ok:#3FAE58; --ok-soft:#E4F8E6;
     --radius-s:10px; --radius-m:16px; --radius-l:26px;
   }
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
-  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
-  h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
-  .container{max-width:800px; margin:0 auto; padding:0 24px;}
-
-  .hud{position:sticky; top:0; z-index:50; background:rgba(244,248,247,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
-  .hud-bar{height:4px; background:var(--line); overflow:hidden;}
-  .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--amber),var(--accent)); transition:width .3s ease;}
-  .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:800px; margin:0 auto;}
-  .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
-  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
-  .neuron-counter svg{width:24px;height:24px;}
-  #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
-  #neuronCount.pop{transform:scale(1.35);}
-
-  .hero{padding:52px 24px 40px;}
-  .hero-inner{max-width:800px; margin:0 auto; display:flex; align-items:center; gap:30px;}
-  .hero-text{flex:1;}
-  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--accent); margin-bottom:10px;}
-  .hero h1{font-size:32px; line-height:1.18; margin-bottom:12px;}
-  .hero p{color:var(--ink-soft); font-size:16.5px; max-width:54ch; margin-bottom:22px;}
-  .btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--accent); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
-  .btn-primary:hover{background:var(--accent-dark);}
-  .btn-primary:active{transform:scale(.97);}
-  .mascot{width:130px; height:130px; flex-shrink:0;}
-  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:100px; height:100px;} }
-
-  section.block{padding:38px 0; border-top:1px solid var(--line);}
-  .step-label{font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:600; color:var(--accent); margin-bottom:8px;}
+  .hero-eyebrow{color:var(--accent);}
+  .mascot{width:130px; height:130px;}
+  @media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;}
+  .mascot{width:100px; height:100px;} }
+  .step-label{color:var(--accent);}
   .step-label.recap{color:var(--amber);}
-  .block h2{font-size:21px; margin-bottom:10px; max-width:38ch;}
-  .block h3{font-size:16px; margin:20px 0 8px;}
-  .block p{max-width:66ch; font-size:16px; margin:0 0 14px; color:var(--ink);}
-  .block p.soft{color:var(--ink-soft); font-size:15px;}
-  .block ul{max-width:66ch; margin:0 0 14px; padding-left:20px; font-size:15px;}
-  .block ul li{margin-bottom:4px;}
-  .note{background:var(--indigo-soft); border-left:4px solid var(--indigo); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; color:#2F3F82; margin:16px 0;}
-  .trivia{background:var(--amber-soft); border-left:4px solid var(--amber); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14px; color:#8A5A13; margin:16px 0;}
+  .note{background:var(--indigo-soft); border-left:4px solid var(--indigo); color:#2F3F82;}
+  .trivia{background:var(--amber-soft); border-left:4px solid var(--amber); color:#8A5A13;}
   .insight{background:var(--accent-soft); border-left:4px solid var(--accent); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; margin-top:16px; color:#0A5750;}
-
-  .exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:22px; margin-top:18px;}
-  .progress-line{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--accent-dark); margin-top:14px; min-height:1.4em;}
-
-  /* FLIP GALLERY */
   .gallery{display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:16px;}
   .gallery-3{grid-template-columns:repeat(3,1fr);}
   @media (max-width:640px){ .gallery-3{grid-template-columns:repeat(2,1fr);} }
-  @media (max-width:520px){ .gallery{grid-template-columns:1fr;} .gallery-3{grid-template-columns:1fr;} }
-  .flip-card{perspective:1200px; height:158px; cursor:pointer;}
-  .flip-inner{position:relative; width:100%; height:100%; transition:transform .6s cubic-bezier(.4,0,.2,1); transform-style:preserve-3d;}
-  .flip-card.flipped .flip-inner{transform:rotateY(180deg);}
-  .flip-face{position:absolute; inset:0; backface-visibility:hidden; border-radius:var(--radius-m); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:14px; text-align:center; border:2px solid var(--card-c, var(--line));}
-  .flip-front{background:var(--surface);}
+  @media (max-width:520px){ .gallery{grid-template-columns:1fr;}
+  .gallery-3{grid-template-columns:1fr;} }
+  .flip-card{height:158px;}
   .flip-front .logo{width:46px; height:46px; margin-bottom:8px; display:flex; align-items:center; justify-content:center;}
   .flip-front .logo img{max-width:100%; max-height:100%; object-fit:contain;}
   .flip-front .logo .fallback{font-size:28px; line-height:1;}
   .flip-front .name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14.5px;}
-  .flip-back{background:var(--card-c-light, var(--accent-soft)); transform:rotateY(180deg); font-size:14px; color:var(--ink-soft); line-height:1.4;}
-
-  /* MEMO: ЗНАЙДИ ПАРУ */
+  .flip-back{font-size:14px; color:var(--ink-soft); line-height:1.4;}
   .memo-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
   @media (max-width:640px){ .memo-grid{grid-template-columns:repeat(3,1fr);} }
   @media (max-width:420px){ .memo-grid{grid-template-columns:repeat(2,1fr);} }
@@ -90,50 +53,19 @@
   .memo-card.matched{cursor:default;}
   .memo-card.matched .flip-back{border-color:var(--ok); background:var(--ok-soft);}
   .memo-card.miss .flip-back{border-color:var(--coral); background:#FDE6E1;}
-
-  /* CHOICE CARDS */
-  .classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:16px 18px; margin:12px 0;}
-  .classify-card p.q{font-weight:700; margin:0 0 10px; font-size:15px;}
-  .choice-row{display:flex; gap:8px; flex-wrap:wrap;}
-  .choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; padding:8px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; color:var(--ink); transition:background .15s ease, border-color .15s ease, color .15s ease;}
-  .choice-btn:hover{border-color:var(--accent);}
-  .choice-btn.correct{background:var(--ok-soft); border-color:var(--ok); color:#256B36;}
-  .choice-btn.wrong{background:#FDE6E1; border-color:var(--coral); color:#B8412A;}
-  .choice-feedback{margin-top:8px; font-size:13.5px; color:var(--ink-soft); min-height:1.2em;}
-
-  /* SORT BUCKETS */
-  .sort-buckets{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
-  .sort-buckets.three{grid-template-columns:repeat(3,1fr);}
   .sort-buckets.four{grid-template-columns:repeat(4,1fr);}
-  @media (max-width:620px){ .sort-buckets.four{grid-template-columns:1fr 1fr;} .sort-buckets.three{grid-template-columns:1fr;} }
-  @media (max-width:480px){ .sort-buckets{grid-template-columns:1fr;} .sort-buckets.four{grid-template-columns:1fr;} }
-  .bucket{border:2px dashed var(--line); border-radius:var(--radius-m); padding:12px; min-height:110px; cursor:pointer; transition:border-color .15s ease, background .15s ease;}
-  .bucket:hover{border-color:var(--accent);}
-  .bucket-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--ink-soft); margin-bottom:8px; text-align:center;}
-  .bucket-items{display:flex; flex-wrap:wrap; gap:6px; min-height:36px;}
+  @media (max-width:620px){ .sort-buckets.four{grid-template-columns:1fr 1fr;}
+  .sort-buckets.three{grid-template-columns:1fr;} }
+  @media (max-width:480px){ .sort-buckets{grid-template-columns:1fr;}
+  .sort-buckets.four{grid-template-columns:1fr;} }
+  .bucket-title{font-size:13px; color:var(--ink-soft);}
+  .bucket-items{flex-wrap:wrap;}
   .bucket.hint{border-color:var(--coral); background:#FDE6E1;}
-  .sort-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:14px;}
-  .sort-chip{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:8px 14px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
-  .sort-chip:hover{transform:translateY(-2px);}
-  .sort-chip.selected{border-color:var(--accent); box-shadow:0 0 0 3px rgba(15,139,126,0.18);}
-  .sort-chip.placed{background:var(--ok-soft); border-color:var(--ok); cursor:default; font-size:13px;}
-  .sort-chip.placed:hover{transform:none;}
-
-  /* MATCHING */
-  .match-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:14px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:16px;}
-  .match-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:8px 14px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
-  .match-chip:hover{transform:translateY(-2px);}
-  .match-chip.selected{border-color:var(--accent); box-shadow:0 0 0 3px rgba(15,139,126,0.18);}
-  .match-chip.placed{display:none;}
-  .desc-card{display:flex; align-items:center; gap:12px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; margin-bottom:10px; cursor:pointer; transition:border-color .2s ease, background .2s ease;}
-  .desc-card.matched{border-color:var(--accent); background:var(--accent-soft); cursor:default;}
-  .desc-card.shake{animation:shakeX .35s ease;}
-  .desc-text{flex:1; font-size:14px; color:var(--ink-soft);}
-  .desc-slot{min-width:100px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13.5px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:8px 10px;}
-  .desc-slot.filled{border-style:solid; border-color:var(--accent); background:#fff; color:var(--accent-dark);}
-  @keyframes shakeX{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
-
-  /* FLOW ANIMATION */
+  .sort-chip{font-size:13px; border-radius:999px; padding:8px 14px;}
+  .sort-chip.selected{box-shadow:0 0 0 3px rgba(15,139,126,0.18);}
+  .sort-chip.placed{font-size:13px;}
+  .match-chip.selected{box-shadow:0 0 0 3px rgba(15,139,126,0.18);}
+  .desc-slot{min-width:100px;}
   .flow{position:relative; padding:4px 0 4px 54px;}
   .flow-rail{position:absolute; left:23px; top:24px; bottom:24px; width:4px; background:var(--line); border-radius:2px;}
   .flow-dot{position:absolute; left:15px; top:0; width:20px; height:20px; border-radius:50%; background:var(--amber); box-shadow:0 0 0 5px var(--amber-soft); transition:transform .65s cubic-bezier(.45,0,.25,1); opacity:0;}
@@ -144,8 +76,6 @@
   .flow-who{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--accent-dark); margin-bottom:2px;}
   .flow-what{font-size:13.5px; color:var(--ink-soft); line-height:1.4;}
   .flow-status{display:block; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; color:var(--ink-soft); margin-top:14px; min-height:1.4em;}
-
-  /* РОБОЧИЙ СТІЛ З ФАЙЛОМ */
   .desktop{background:linear-gradient(160deg,#DCE9E7,#C4DAD6); border-radius:var(--radius-m); padding:22px 16px 16px; text-align:center; margin-bottom:18px;}
   .file-icon{display:inline-block; width:112px; padding:8px 6px 6px; border-radius:var(--radius-s); cursor:pointer; user-select:none; -webkit-user-select:none; border:2px solid transparent; transition:background .15s ease, border-color .15s ease, transform .12s ease;}
   .file-icon:hover{background:rgba(20,40,43,.07);}
@@ -156,20 +86,18 @@
   .file-thumb img, .file-thumb svg{width:100%; height:100%; object-fit:cover; display:block;}
   .file-name{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; color:var(--ink); word-break:break-all;}
   .desktop-hint{font-size:13px; color:var(--ink-soft); margin-top:12px;}
-
-  /* ВІКНО ПЕРЕГЛЯДУ ФОТО */
   .viewer{display:none; margin-top:18px; border-radius:var(--radius-m); overflow:hidden; border:2px solid var(--line); box-shadow:0 12px 30px rgba(20,40,43,.18);}
   .viewer.show{display:block; animation:viewerIn .5s cubic-bezier(.2,.7,.3,1);}
   @keyframes viewerIn{from{opacity:0; transform:translateY(14px) scale(.97);} to{opacity:1; transform:none;}}
   .viewer-bar{display:flex; align-items:center; gap:6px; background:#E4EFED; border-bottom:1px solid var(--line); padding:9px 12px;}
   .viewer-bar .dot{width:9px; height:9px; border-radius:50%; background:rgba(20,40,43,.2);}
-  .viewer-bar .dot.r{background:#FF6B4A;} .viewer-bar .dot.y{background:#FFC93C;} .viewer-bar .dot.g{background:#3FAE58;}
+  .viewer-bar .dot.r{background:#FF6B4A;}
+  .viewer-bar .dot.y{background:#FFC93C;}
+  .viewer-bar .dot.g{background:#3FAE58;}
   .viewer-title{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; color:var(--ink-soft); margin-left:8px;}
   .viewer-body{background:#EEF4F3; line-height:0;}
   .viewer-body img, .viewer-body svg{width:100%; display:block;}
   .viewer-caption{background:var(--surface); padding:9px 14px; font-size:11.5px; line-height:1.5; color:var(--ink-soft); text-align:left;}
-
-  /* SYSTEM REQUIREMENTS WIDGET */
   .req-sliders{display:grid; gap:14px 20px; margin-bottom:18px; grid-template-columns:1fr 1fr;}
   @media (max-width:600px){ .req-sliders{grid-template-columns:1fr;} }
   .req-row label{display:flex; justify-content:space-between; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; color:var(--ink-soft); margin-bottom:6px;}
@@ -187,8 +115,6 @@
   .req-tag.miss{background:#FDE6E1; border-color:var(--coral); color:#B8412A; font-weight:700;}
   .req-mark{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; color:var(--coral);}
   .req-prog.ok .req-mark{color:#256B36;}
-
-  /* SOFTWARE TYPE EXPLORER */
   .sw-tabs{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:16px;}
   @media (max-width:620px){ .sw-tabs{grid-template-columns:1fr;} }
   .sw-tab{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:var(--ink); background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:14px 12px; cursor:pointer; transition:border-color .15s ease, background .15s ease, transform .12s ease;}
@@ -204,8 +130,6 @@
   .sw-panel .minus{color:#B8412A;}
   .sw-panel ul{margin:0; padding-left:20px; font-size:15px; color:var(--ink-soft);}
   .sw-panel ul li{margin-bottom:5px;}
-
-  /* ЕМУЛЯТОР ВСТАНОВЛЕННЯ */
   .sim-win{border:2px solid var(--line); border-radius:var(--radius-m); overflow:hidden;}
   .sim-win-bar{display:flex; align-items:center; gap:6px; background:#E4EFED; border-bottom:1px solid var(--line); padding:9px 12px;}
   .sim-win-bar .dot{width:9px; height:9px; border-radius:50%; background:rgba(20,40,43,.2);}
@@ -224,14 +148,12 @@
   .sim-bar{height:12px; background:var(--line); border-radius:999px; overflow:hidden; margin:16px 0 6px;}
   .sim-bar span{display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--amber),var(--accent)); transition:width .25s linear;}
   .sim-pct{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; color:var(--ink-soft); text-align:right;}
-
   .sim-file{display:inline-block; width:132px; padding:10px 8px; border-radius:var(--radius-s); cursor:pointer; user-select:none; -webkit-user-select:none; border:2px solid transparent; transition:background .15s ease, border-color .15s ease, transform .12s ease;}
   .sim-file:hover{background:rgba(20,40,43,.07);}
   .sim-file.selected{background:rgba(15,139,126,.16); border-color:var(--accent);}
   .sim-file.opening{transform:scale(.94);}
   .sim-file .sf-icon{font-size:40px; line-height:1; margin-bottom:6px;}
   .sim-file .sf-name{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; color:var(--ink); word-break:break-all;}
-
   .sim-desk{background:linear-gradient(160deg,#DCE9E7,#C4DAD6); border-radius:var(--radius-m); padding:22px 16px; text-align:center;}
   .sim-shortcut{display:inline-block; width:116px; vertical-align:top; margin:0 10px; animation:popIn .5s cubic-bezier(.2,.8,.3,1.25);}
   @keyframes popIn{from{opacity:0; transform:scale(.55);} to{opacity:1; transform:none;}}
@@ -239,28 +161,7 @@
   .sim-shortcut.junk .sc-icon{border-color:var(--coral); background:#FDE6E1;}
   .sim-shortcut .sc-name{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; color:var(--ink); line-height:1.3;}
   .sim-result{margin-top:16px; font-size:15px; line-height:1.55;}
-
-  /* QUIZ */
-  .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:26px 24px; margin-top:18px;}
-  .quiz-progress{font-family:'Baloo 2',sans-serif; font-size:13px; color:var(--ink-soft); margin-bottom:10px;}
-  .quiz-q{font-size:17px; font-weight:700; margin-bottom:16px;}
-  .quiz-options{display:flex; flex-direction:column; gap:10px;}
-  .quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:15px; font-weight:600; padding:12px 15px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
-  .quiz-opt:hover{border-color:var(--accent);}
-  .quiz-opt.correct{background:var(--ok-soft); border-color:var(--ok);}
-  .quiz-opt.wrong{background:#FDE6E1; border-color:var(--coral);}
-  .quiz-nav{display:flex; justify-content:flex-end; margin-top:18px;}
-  .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:11px 22px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
-  .btn-next.active{opacity:1; pointer-events:auto;}
-
-  .completion{display:none; text-align:center; padding:20px 10px 10px;}
-  .completion.show{display:block;}
-  .badge{width:90px; height:90px; margin:0 auto 16px;}
-  .completion h3{font-size:22px; margin-bottom:10px;}
-  .completion p{color:var(--ink-soft); max-width:52ch; margin:0 auto 18px; font-size:15px;}
-  .completion .total{font-family:'Baloo 2',sans-serif; font-size:30px; color:var(--accent-dark);}
-
-  /* GUIDE (без гейміфікації) */
+  .quiz-nav{margin-top:18px;}
   .guide{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:24px; margin-top:18px;}
   .guide-topics{display:grid; gap:10px; margin:14px 0 18px;}
   .guide-topic{border:2px solid var(--line); border-left-width:6px; border-radius:var(--radius-s); padding:10px 14px; font-size:14px;}
@@ -268,31 +169,9 @@
   .guide-req li{padding:7px 0 7px 26px; position:relative; border-top:1px solid var(--line); color:var(--ink-soft);}
   .guide-req li:first-child{border-top:none;}
   .guide-req li::before{content:'☐'; position:absolute; left:4px; color:var(--accent); font-size:15px;}
-
-  footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
-  footer .credits{display:block; max-width:62ch; margin:12px auto 0; font-size:11.5px; line-height:1.55; opacity:.8;}
 </style>
 </head>
-<body>
-
-<div class="hud">
-  <div class="hud-bar"><div class="hud-bar-fill" id="hudFill"></div></div>
-  <div class="hud-row">
-    <span class="hud-title">7 клас · Операційні системи та ПЗ</span>
-    <div class="neuron-counter">
-      <svg viewBox="0 0 24 24" fill="none">
-        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
-        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
-        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
-        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
-        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
-        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
-        <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#E0A800" opacity="0.6"/>
-      </svg>
-      <span id="neuronCount">0</span>
-    </div>
-  </div>
-</div>
+<body data-lesson="lesson7-os-software" data-hud="7 клас · Операційні системи та ПЗ">
 
 <section class="hero">
   <div class="hero-inner">
@@ -507,29 +386,10 @@
   <section class="block" id="finalQuizSection">
     <div class="step-label">Підсумок</div>
     <h2>Коротка перевірка</h2>
-    <div class="quiz-box" id="quizBox">
-      <div class="quiz-progress" id="quizProgress">Запитання 1 з 6</div>
-      <div class="quiz-q" id="quizQ"></div>
-      <div class="quiz-options" id="quizOptions"></div>
-      <div class="quiz-nav"><button class="btn-next" id="btnNext">Далі</button></div>
-    </div>
-    <div class="completion" id="completion">
-      <svg class="badge" viewBox="0 0 24 24" fill="none">
-        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#0F8B7E" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#0F8B7E"/>
-        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#0F8B7E" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#0F8B7E"/>
-        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#0F8B7E" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#0F8B7E"/>
-        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#0F8B7E" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#0F8B7E"/>
-        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#0F8B7E" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#0F8B7E"/>
-        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#0F8B7E" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#0F8B7E"/>
-        <circle cx="12" cy="12" r="4.4" fill="#0F8B7E"/><circle cx="12" cy="12" r="1.6" fill="#0A6C61" opacity="0.6"/>
-      </svg>
-      <h3>Урок пройдено!</h3>
-      <p>Тепер ти знаєш, що робить операційна система, які вони бувають і чим десктопні програми відрізняються від мобільних застосунків та онлайнових версій.</p>
-      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
-    </div>
+    <div id="finalQuiz"></div>
   </section>
 
-  <section class="block">
+  <section class="block" data-guide>
     <div class="step-label">Гід · Практична робота №4</div>
     <h2>Індивідуальна пошукова робота</h2>
     <p>Цю частину виконують без нейрончиків — це справжня робота, яку треба надіслати вчителю.</p>
@@ -564,172 +424,9 @@
   <span class="credits">Логотипи операційних систем є торговельними марками їхніх власників і використані тут із навчальною метою. Tux — Larry Ewing (lewing@isc.tamu.edu) та GIMP. Робот Android відтворений із роботи, створеної та поширеної компанією Google, і використаний за умовами ліцензії Creative Commons 3.0 Attribution. Фотографія «Морозний ранок над Яремчею» — Vitalii Bashkatov, Вікісховище, CC BY-SA 4.0.</span>
 </footer>
 
+<script src="../../assets/lesson.js"></script>
 <script>
-const STORAGE_KEY = "lesson7-os-software-neurons";
-let neurons = 0;
-const neuronEl = document.getElementById('neuronCount');
-const hudFill = document.getElementById('hudFill');
-
-function addNeurons(n){
-  neurons += n;
-  neuronEl.textContent = neurons;
-  neuronEl.classList.add('pop');
-  setTimeout(()=>neuronEl.classList.remove('pop'), 250);
-  saveProgress();
-}
-async function saveProgress(){
-  try{ await window.storage?.set(STORAGE_KEY, JSON.stringify({neurons}), false); }catch(e){}
-}
-async function loadProgress(){
-  try{
-    const res = await window.storage?.get(STORAGE_KEY, false);
-    if(res && res.value){
-      const d = JSON.parse(res.value);
-      if(typeof d.neurons === 'number'){ neurons = d.neurons; neuronEl.textContent = neurons; }
-    }
-  }catch(e){}
-}
-loadProgress();
-
-window.addEventListener('scroll', ()=>{
-  const h = document.documentElement;
-  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
-  hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
-});
-
 /* ---------- УНІВЕРСАЛЬНІ МЕХАНІКИ ---------- */
-
-function makeChoices(containerId, items){
-  const list = document.getElementById(containerId);
-  items.forEach(item=>{
-    const card = document.createElement('div');
-    card.className = 'classify-card';
-    card.innerHTML = `<p class="q">${item.text}</p><div class="choice-row"></div><div class="choice-feedback"></div>`;
-    const row = card.querySelector('.choice-row');
-    const fb = card.querySelector('.choice-feedback');
-    let answered = false;
-    item.opts.forEach((opt,i)=>{
-      const btn = document.createElement('button');
-      btn.className = 'choice-btn';
-      btn.textContent = opt;
-      btn.addEventListener('click', ()=>{
-        if(answered) return;
-        if(i === item.correct){
-          btn.classList.add('correct');
-          answered = true;
-          fb.textContent = 'Правильно ✓ ' + (item.why || '');
-          addNeurons(1);
-        } else {
-          btn.classList.add('wrong');
-          fb.textContent = 'Ще раз подумай';
-        }
-      });
-      row.appendChild(btn);
-    });
-    list.appendChild(card);
-  });
-}
-
-function makeSortBoard(poolId, bucketMap, items, progressId, bonus){
-  const pool = document.getElementById(poolId);
-  const progress = document.getElementById(progressId);
-  const buckets = {};
-  Object.entries(bucketMap).forEach(([key,id])=>{ buckets[key] = document.getElementById(id); });
-  let selected = null, placed = 0;
-
-  function updateProgress(){
-    progress.textContent = (placed === items.length)
-      ? 'Усе розкладено ✓'
-      : `Розкладено: ${placed} з ${items.length}`;
-  }
-
-  [...items].sort(()=>Math.random()-0.5).forEach(item=>{
-    const chip = document.createElement('div');
-    chip.className = 'sort-chip';
-    chip.textContent = item.text;
-    chip.dataset.bucket = item.bucket;
-    chip.addEventListener('click', ()=>{
-      if(chip.classList.contains('placed')) return;
-      pool.querySelectorAll('.sort-chip').forEach(c=>c.classList.remove('selected'));
-      chip.classList.add('selected');
-      selected = chip;
-    });
-    pool.appendChild(chip);
-  });
-
-  Object.entries(buckets).forEach(([key, el])=>{
-    el.addEventListener('click', ()=>{
-      if(!selected) return;
-      if(selected.dataset.bucket === key){
-        selected.classList.add('placed');
-        selected.classList.remove('selected');
-        el.querySelector('.bucket-items').appendChild(selected);
-        selected = null;
-        placed++;
-        addNeurons(1);
-        updateProgress();
-        if(placed === items.length) addNeurons(bonus || 2);
-      } else {
-        el.classList.add('hint');
-        setTimeout(()=>el.classList.remove('hint'), 350);
-      }
-    });
-  });
-  updateProgress();
-}
-
-function makeMatching(poolId, listId, pairs, progressId, bonus){
-  const pool = document.getElementById(poolId);
-  const list = document.getElementById(listId);
-  const progress = document.getElementById(progressId);
-  let selected = null, matched = 0;
-
-  function updateProgress(){
-    progress.textContent = (matched === pairs.length)
-      ? 'Усі пари знайдено ✓'
-      : `Зіставлено: ${matched} з ${pairs.length}`;
-  }
-
-  [...pairs].sort(()=>Math.random()-0.5).forEach(p=>{
-    const chip = document.createElement('div');
-    chip.className = 'match-chip';
-    chip.textContent = p.name;
-    chip.addEventListener('click', ()=>{
-      if(chip.classList.contains('placed')) return;
-      pool.querySelectorAll('.match-chip').forEach(c=>c.classList.remove('selected'));
-      chip.classList.add('selected');
-      selected = p.name;
-    });
-    pool.appendChild(chip);
-  });
-
-  [...pairs].sort(()=>Math.random()-0.5).forEach(p=>{
-    const card = document.createElement('div');
-    card.className = 'desc-card';
-    card.innerHTML = `<div class="desc-text">${p.desc}</div><div class="desc-slot">?</div>`;
-    card.addEventListener('click', ()=>{
-      if(card.classList.contains('matched') || !selected) return;
-      const slot = card.querySelector('.desc-slot');
-      if(selected === p.name){
-        slot.textContent = selected;
-        slot.classList.add('filled');
-        card.classList.add('matched');
-        const chip = [...pool.children].find(c=>c.textContent === selected);
-        if(chip) chip.classList.add('placed');
-        selected = null;
-        matched++;
-        addNeurons(1);
-        updateProgress();
-        if(matched === pairs.length) addNeurons(bonus || 2);
-      } else {
-        card.classList.add('shake');
-        setTimeout(()=>card.classList.remove('shake'), 350);
-      }
-    });
-    list.appendChild(card);
-  });
-  updateProgress();
-}
 
 /* Підвантажує логотип з images/. Якщо файлу ще немає — лишається емодзі. */
 function loadLogo(el, file, fallbackEmoji){
@@ -795,6 +492,7 @@ function makeMemo(gridId, pairs, progressId, bonus){
     cards.push({ pid:i, color:p.color, light:p.light, html:`<div class="memo-feat">${p.feat}</div>` });
   });
   let opened = [], busy = false, matched = 0;
+  const hit = trackTask(grid, pairs.length, pairs.length + (bonus || 3));
 
   function updateProgress(){
     progress.textContent = (matched === pairs.length)
@@ -824,7 +522,7 @@ function makeMemo(gridId, pairs, progressId, bonus){
           a.classList.add('matched'); b.classList.add('matched');
           opened = []; busy = false;
           matched++;
-          addNeurons(1);
+          addNeurons(1); hit();
           updateProgress();
           if(matched === pairs.length) addNeurons(bonus || 3);
         }, 400);
@@ -883,6 +581,7 @@ makeMatching('recapPool', 'recapList', [
   const viewerBody = document.getElementById('viewerBody');
   const els = [];
   let running = false, awarded = false;
+  const hit = trackTask(track, 1);
 
   stages.forEach(st=>{
     const el = document.createElement('div');
@@ -915,7 +614,7 @@ makeMatching('recapPool', 'recapList', [
       putPhoto(viewerBody);
       viewer.classList.add('show');
       hint.textContent = 'Клацни двічі ще раз, щоб повторити';
-      if(!awarded){ awarded = true; addNeurons(1); }
+      if(!awarded){ awarded = true; addNeurons(1); hit(); }
       return;
     }
     els.forEach(el=>el.classList.remove('active'));
@@ -1067,6 +766,7 @@ makeChoices('chooseList', [
   const progress = document.getElementById('reqProgress');
   const awarded = new Set();
   let allAwarded = false;
+  const hit = trackTask(wrap, progs.length, progs.length + 2);
 
   progs.forEach(p=>{
     const el = document.createElement('div');
@@ -1105,7 +805,7 @@ makeChoices('chooseList', [
       p.el.querySelector('.req-mark').textContent = fits ? '✓' : '✗';
       if(fits){
         okCount++;
-        if(!awarded.has(i)){ awarded.add(i); addNeurons(1); }
+        if(!awarded.has(i)){ awarded.add(i); addNeurons(1); hit(); }
       }
     });
 
@@ -1147,6 +847,7 @@ makeChoices('chooseList', [
   const panel = document.getElementById('swPanel');
   const seen = new Set();
   let awarded = false;
+  const hit = trackTask(tabs, types.length, 2);   // переглянути всі три види ПЗ
 
   function show(i){
     const t = types[i];
@@ -1158,6 +859,7 @@ makeChoices('chooseList', [
       <ul>${t.plus.map(x=>`<li>${x}</li>`).join('')}</ul>
       <div class="sw-head minus">Недоліки</div>
       <ul>${t.minus.map(x=>`<li>${x}</li>`).join('')}</ul>`;
+    if(!seen.has(i)) hit();
     seen.add(i);
     tabs.querySelectorAll('.sw-tab')[i].classList.add('seen');
     if(seen.size === types.length && !awarded){ awarded = true; addNeurons(2); }
@@ -1195,6 +897,7 @@ makeSortBoard('swPool', { desk:'bkDesk', app:'bkApp', online:'bkOnline' }, [
   const SITE = 'grafiti.com';
   const SETUP = 'grafiti-setup.exe';
   let gotLaunch = false, gotClean = false, gotDone = false, keepExtra = false;
+  const hit = trackTask(stage, 2, 4);   // запустити інсталятор + завершити встановлення
 
   const flow = makeFlow('instFlow', 'instDot', [
     { who:'Завантаження',  what:`Інсталятор іде з офіційного сайту ${SITE}` },
@@ -1255,7 +958,7 @@ makeSortBoard('swPool', { desk:'bkDesk', app:'bkApp', online:'bkOnline' }, [
       if(started) return;
       started = true;
       file.classList.add('opening');
-      if(!gotLaunch){ gotLaunch = true; addNeurons(1); }
+      if(!gotLaunch){ gotLaunch = true; addNeurons(1); hit(); }
       setTimeout(phaseLicense, 220);
     }
     file.addEventListener('click', ()=>{
@@ -1334,7 +1037,7 @@ makeSortBoard('swPool', { desk:'bkDesk', app:'bkApp', online:'bkOnline' }, [
       ${verdict}`;
     if(!keepExtra){
       flow.finish();
-      if(!gotDone){ gotDone = true; addNeurons(2); }
+      if(!gotDone){ gotDone = true; addNeurons(2); hit(); }
     }
     const again = document.getElementById('simAgain');
     if(again) again.addEventListener('click', ()=>{ keepExtra = false; phaseExtras(); });
@@ -1352,46 +1055,8 @@ const questions = [
   { q:'Звідки безпечно завантажувати нову програму?', opts:['З будь-якого сайту, де вона безкоштовна','З офіційного сайту розробника або магазину мобільних застосунків','З посилання, надісланого незнайомцем'], correct:1 },
   { q:'Що таке системні вимоги?', opts:['Правила користування програмою','Мінімальне обладнання, потрібне для роботи програми','Список оновлень'], correct:1 }
 ];
-let qi=0, currentAnswered=false;
-const quizQ = document.getElementById('quizQ');
-const quizOptions = document.getElementById('quizOptions');
-const quizProgress = document.getElementById('quizProgress');
-const btnNext = document.getElementById('btnNext');
-const quizBox = document.getElementById('quizBox');
-const completion = document.getElementById('completion');
-const totalNeuronsEl = document.getElementById('totalNeurons');
 
-function renderQuestion(){
-  currentAnswered=false; btnNext.classList.remove('active');
-  const item = questions[qi];
-  quizProgress.textContent = `Запитання ${qi+1} з ${questions.length}`;
-  quizQ.textContent = item.q;
-  quizOptions.innerHTML='';
-  item.opts.forEach((opt,i)=>{
-    const b=document.createElement('button'); b.className='quiz-opt'; b.textContent=opt;
-    b.addEventListener('click', ()=>{
-      if(currentAnswered) return; currentAnswered=true;
-      const all = quizOptions.querySelectorAll('.quiz-opt');
-      all.forEach((ob,oi)=>{ if(oi===item.correct) ob.classList.add('correct'); else if(oi===i) ob.classList.add('wrong'); });
-      if(i===item.correct) addNeurons(2);
-      btnNext.classList.add('active');
-      btnNext.textContent = (qi===questions.length-1) ? 'Завершити' : 'Далі';
-    });
-    quizOptions.appendChild(b);
-  });
-}
-btnNext.addEventListener('click', ()=>{
-  if(!btnNext.classList.contains('active')) return;
-  qi++;
-  if(qi<questions.length){ renderQuestion(); }
-  else {
-    quizBox.style.display='none';
-    completion.classList.add('show');
-    addNeurons(3);
-    totalNeuronsEl.textContent = neurons;
-  }
-});
-renderQuestion();
+makeFinalQuiz('finalQuiz', questions, {summary:'Тепер ти знаєш, що робить операційна система, які вони бувають і чим десктопні програми відрізняються від мобільних застосунків та онлайнових версій.'});
 </script>
 
 </body>
