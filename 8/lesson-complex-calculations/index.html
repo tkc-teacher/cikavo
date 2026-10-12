@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Складні розрахунки — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --pri:#3D4FC4; --pri-dark:#2B3A99; --amber:#E8574A; --amber-dark:#B23B30;
+    --accent:var(--pri); --accent-dark:var(--pri-dark); --accent-soft:#E8EBFB;
+    --bg:#F5F6FC; --ink:#1B1E3A; --ink-soft:#52577A; --line:#DFE2F3; --surface:#FFFFFF;
+    --note:#16897F; --note-soft:#E2F4F2; --note-ink:#0E5F58;
+    --sun:#E8574A; --sun-soft:#FDECEA; --sun-ink:#97302A;
+    --hud-bar:linear-gradient(90deg,var(--amber),var(--pri));
+    --cell-line:#D9DCEC; --head-bg:#EEF0F8; --sel:#1A73E8;
+  }
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; background:var(--head-bg); padding:1px 6px; border-radius:5px; font-size:.92em; white-space:nowrap;}
+  .hot-prompt{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15.5px; line-height:1.4; text-align:center; margin-bottom:12px; min-height:1.4em;}
+  .hot-prompt b{color:var(--pri-dark);}
+  .caret{display:inline-block; width:1.5px; height:15px; background:var(--ink); vertical-align:-2px; margin-left:1px; animation:blink 1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+
+  /* Пріоритет дій */
+  .prio{display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:6px 0 4px;}
+  .prio .p{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-s); padding:6px 10px; text-align:center; font-size:12.5px; color:var(--ink-soft);}
+  .prio .p b{display:block; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:18px; color:var(--pri);}
+  .prio .ar{color:var(--amber); font-weight:800;}
+  .seq-box{margin-top:6px;}
+  .seq-expr{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:20px; text-align:center; margin-bottom:12px; color:var(--pri-dark);}
+
+  /* Математичний дріб */
+  .frac{display:inline-flex; flex-direction:column; align-items:center; vertical-align:middle; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; line-height:1.2; margin:0 4px;}
+  .frac span:first-child{border-bottom:2px solid var(--ink); padding:0 6px;}
+  .math{display:flex; align-items:center; justify-content:center; gap:6px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; margin-bottom:8px;}
+  .math .vars{font-family:'Nunito Sans',sans-serif; font-weight:600; font-size:12.5px; color:var(--ink-soft); margin-left:10px;}
+
+  /* Міні-таблиця (власний віджет уроку, як у «Простих обчисленнях») */
+  .sheet{background:var(--surface); border:1.5px solid var(--cell-line); border-radius:var(--radius-s); overflow:hidden; font-size:12.5px; user-select:none; -webkit-user-select:none; max-width:460px; margin:0 auto;}
+  .fbar{display:flex; align-items:stretch; border-bottom:1px solid var(--cell-line); font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13px; background:#fff; min-height:30px;}
+  .fbar .ref{width:46px; display:flex; align-items:center; justify-content:center; border-right:1px solid var(--cell-line); color:var(--ink-soft); font-weight:700; flex-shrink:0;}
+  .fbar .fx{display:flex; align-items:center; padding:0 8px; color:var(--ink-soft); font-style:italic; border-right:1px solid var(--cell-line);}
+  .fbar .val{display:flex; align-items:center; padding:4px 8px; white-space:nowrap; overflow:hidden; flex:1; font-weight:600;}
+  .fbar .val b{font-weight:800;}
+  .sheet-grid{border-collapse:collapse; width:100%; table-layout:fixed;}
+  .sheet-grid th, .sheet-grid td{border:1px solid var(--cell-line); height:30px; padding:0;}
+  .sheet-grid th{background:var(--head-bg); font-weight:700; color:var(--ink-soft); font-size:11px; text-align:center;}
+  .sheet-grid td{background:#fff; position:relative; cursor:pointer;}
+  .sheet-grid td .cv{padding:0 6px; white-space:nowrap; overflow:hidden; line-height:28px;}
+  .sheet-grid td .cv.num{text-align:right;}
+  .sheet-grid td .cv.spill{overflow:visible;}
+  .sheet-grid td .cv.err{color:#C5221F; font-weight:700;}
+  .sheet-grid td.hdr{background:#F6F7FB; font-weight:800;}
+  .sheet-grid td.sel{box-shadow:inset 0 0 0 2px var(--sel) !important;}
+  .sheet-grid td.editing .ed{position:absolute; left:-1px; top:-1px; min-width:calc(100% + 2px); height:calc(100% + 2px); background:#fff; box-shadow:inset 0 0 0 2px var(--sel), 0 3px 10px rgba(0,0,0,.12); z-index:3; padding:0 7px; line-height:30px; font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:600; white-space:nowrap;}
+  .sheet-grid td.editing .ed b{font-weight:800;}
+  .sheet-grid.picking td{cursor:cell; touch-action:none;}
+  .sheet-grid td.shake{background:#FCE6E2 !important;}
+  .sheet-grid td.pop{animation:cellPop .9s ease;}
+  @keyframes cellPop{0%{background:#D5DBFA;} 100%{background:#fff;}}
+  .pad{display:flex; flex-wrap:wrap; gap:7px; justify-content:center; margin-top:14px;}
+  .key{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:17px; min-width:46px; padding:8px 12px; border-radius:9px; border:1.5px solid var(--cell-line); border-bottom-width:3px; background:#fff; color:var(--ink); cursor:pointer;}
+  .key:hover{border-color:var(--pri);}
+  .key:active{transform:translateY(1px);}
+  .key.eq{color:#fff; background:var(--amber); border-color:var(--amber-dark);}
+  .key.soft{font-family:'Nunito Sans',sans-serif; font-size:13px; color:var(--ink-soft);}
+  .key.go{font-family:'Nunito Sans',sans-serif; font-size:14px; background:var(--pri); border-color:var(--pri-dark); color:#fff;}
+  .key.big{font-family:'Nunito Sans',sans-serif; font-size:15px; padding:9px 18px;}
+  .pad[hidden]{display:none;}
+
+  /* Текстові функції */
+  .fn-grid{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:8px 0 4px;}
+  @media (max-width:560px){ .fn-grid{grid-template-columns:1fr;} }
+  .fn-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 14px;}
+  .fn-card .nm{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:16px; color:var(--pri-dark);}
+  .fn-card .ua{font-size:13.5px; color:var(--ink-soft);}
+  .src{display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin:12px 0 4px; font-size:13px;}
+  .src .mcell{display:inline-block; border:1.5px solid var(--cell-line); background:#fff; padding:2px 8px; font-weight:700;}
+  .src .mcell i{font-style:normal; font-family:ui-monospace,Menlo,Consolas,monospace; color:var(--ink-soft); margin-right:6px;}
+
+  /* Текстова машинка */
+  .strip{display:flex; justify-content:center; flex-wrap:wrap; gap:3px; margin:4px 0 14px;}
+  .ch{width:26px; text-align:center; border:1.5px solid var(--cell-line); border-radius:6px; background:#fff; transition:background .15s ease, border-color .15s ease;}
+  .ch b{display:block; font-size:15px; line-height:26px;}
+  .ch small{display:block; font-size:10px; color:var(--ink-soft); border-top:1px solid var(--cell-line); line-height:15px;}
+  .ch.on{background:#FFE7E3; border-color:var(--amber);}
+  .tm-row{display:flex; justify-content:center; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:10px;}
+  .seg{display:flex; border:1.5px solid var(--cell-line); border-radius:9px; overflow:hidden; background:#fff;}
+  .seg button{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:14px; padding:7px 14px; border:none; border-right:1px solid var(--cell-line); background:#fff; cursor:pointer; color:var(--ink);}
+  .seg button:last-child{border-right:none;}
+  .seg button.on{background:var(--pri); color:#fff;}
+  .num-step{display:flex; align-items:center; gap:6px; font-size:13px; color:var(--ink-soft); font-weight:700;}
+  .num-step[hidden]{display:none;}
+  .num-step button{width:30px; height:30px; border-radius:8px; border:1.5px solid var(--cell-line); background:#fff; font-weight:800; font-size:16px; cursor:pointer;}
+  .num-step .v{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:16px; color:var(--ink); min-width:22px; text-align:center;}
+  .tm-out{display:flex; justify-content:center; align-items:center; gap:10px; flex-wrap:wrap; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:15px; margin:4px 0 10px;}
+  .tm-out .f{color:var(--pri-dark); font-weight:800;}
+  .tm-out .r{min-width:90px; border:2px solid var(--sel); background:#fff; padding:3px 10px; font-weight:800;}
+  .tm-out .r.shake{animation:shakeX .35s ease; border-color:#D14B5E; background:#FBE6E9;}
+  .tm-check{display:flex; justify-content:center;}
+</style>
+</head>
+<body data-lesson="lesson8-complex-calculations" data-hud="8 клас · Складні розрахунки">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Працюємо з числами · Тема 4</div>
+      <h1>Складні розрахунки</h1>
+      <p>Степені, дужки, відсотки — і функції, які рахують комірки й працюють навіть із текстом.</p>
+      <button class="btn-primary" onclick="document.getElementById('rev').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <!-- таблиця з обличчям -->
+      <rect x="16" y="30" width="90" height="94" rx="12" fill="#fff" stroke="#3D4FC4" stroke-width="4"/>
+      <rect x="16" y="30" width="90" height="24" rx="12" fill="#3D4FC4"/>
+      <rect x="16" y="42" width="90" height="12" fill="#3D4FC4"/>
+      <text x="28" y="48" font-family="ui-monospace,Menlo,monospace" font-weight="800" font-size="14" fill="#fff">=(a+b)²</text>
+      <line x1="46" y1="54" x2="46" y2="124" stroke="#DFE2F3" stroke-width="2"/>
+      <line x1="76" y1="54" x2="76" y2="124" stroke="#DFE2F3" stroke-width="2"/>
+      <circle cx="46" cy="76" r="5.5" fill="#1B1E3A"/><circle cx="76" cy="76" r="5.5" fill="#1B1E3A"/>
+      <circle cx="47.8" cy="74.2" r="1.8" fill="#fff"/><circle cx="77.8" cy="74.2" r="1.8" fill="#fff"/>
+      <path d="M50 92 C55 98 67 98 72 92" stroke="#1B1E3A" stroke-width="3.5" stroke-linecap="round"/>
+      <!-- відсоток -->
+      <circle cx="112" cy="34" r="21" fill="#E8574A"/>
+      <circle cx="105" cy="27" r="4" stroke="#fff" stroke-width="3"/>
+      <circle cx="119" cy="41" r="4" stroke="#fff" stroke-width="3"/>
+      <line x1="120" y1="25" x2="104" y2="43" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>
+      <!-- літери «Аб» -->
+      <rect x="100" y="84" width="34" height="26" rx="7" fill="#E8EBFB" stroke="#3D4FC4" stroke-width="2.5"/>
+      <text x="106" y="103" font-family="Baloo 2,sans-serif" font-weight="800" font-size="16" fill="#3D4FC4">Аб</text>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="rev" style="border-top:none; padding-top:0;">
+    <div class="step-label recap">Повторення · Прості обчислення</div>
+    <h2>Що ти вже знаєш</h2>
+    <p class="soft">Обери термін, потім — його пояснення.</p>
+    <div class="exercise">
+      <div class="match-pool" id="revPool"></div>
+      <div id="revList"></div>
+      <div class="progress-line" id="revProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s1">
+    <div class="step-label">Крок 1 · Порядок дій</div>
+    <h2>Степінь і черговість</h2>
+    <p>Знак <span class="mono">^</span> — піднесення до степеня: <span class="mono">=5^2</span> → 25. Таблиця рахує в такому порядку:</p>
+    <div class="prio">
+      <div class="p"><b>( )</b>дужки</div><span class="ar">→</span>
+      <div class="p"><b>^</b>степінь</div><span class="ar">→</span>
+      <div class="p"><b>* /</b>множення, ділення</div><span class="ar">→</span>
+      <div class="p"><b>+ -</b>додавання, віднімання</div>
+    </div>
+    <div class="exercise seq-box">
+      <div class="seq-expr">=(2+3)^2*4-1</div>
+      <ol class="seq-done" id="seqDone"></ol>
+      <div class="seq-q" id="seqQ"></div>
+      <div class="seq-opts" id="seqOpts"></div>
+      <div class="choice-feedback" id="seqFb"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s2">
+    <div class="step-label">Крок 2 · Дужки</div>
+    <h2>Переклади з математики</h2>
+    <p>Дріб у таблиці записують в один рядок. Чисельник, де є дія, — <b>у дужках</b>, інакше поділиться лише остання частина.</p>
+    <p class="soft">Яка формула правильна?</p>
+    <div id="fracList"></div>
+  </section>
+
+  <section class="block" id="s3">
+    <div class="step-label">Крок 3 · Відсотки</div>
+    <h2>Яка частка від усіх?</h2>
+    <p>Частка = <b>частина / ціле</b>. Вийде дріб на кшталт 0,25, а кнопка <span class="mono">%</span> покаже його як 25%.</p>
+    <p class="soft">Опитування 8-А: як ти добираєшся до школи?</p>
+    <div class="exercise">
+      <div class="hot-prompt" id="pcPrompt"></div>
+      <div id="pcSheet"></div>
+      <div class="pad" id="pcPad"></div>
+      <div class="pad" id="pcFmt" hidden><button class="key big" id="pcBtn">% Формат відсотків</button></div>
+      <div class="progress-line" id="pcStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s4">
+    <div class="step-label">Крок 4 · COUNT і COUNTA</div>
+    <h2>Скільки комірок заповнено?</h2>
+    <ul>
+      <li><span class="mono">COUNT</span> — рахує комірки з <b>числами</b>;</li>
+      <li><span class="mono">COUNTA</span> — рахує <b>усі непорожні</b> комірки, і з текстом теж.</li>
+    </ul>
+    <p class="soft">Що таке в комірці? Розклади по кошиках.</p>
+    <div class="exercise">
+      <div class="sort-buckets three">
+        <div class="bucket" id="bkNum"><div class="bucket-title">Рахують обидві</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkTxt"><div class="bucket-title">Лише COUNTA</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkNone"><div class="bucket-title">Жодна</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="cntPool"></div>
+      <div class="progress-line" id="cntProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s5">
+    <div class="step-label">Крок 5 · Текст і дата</div>
+    <h2>Функції для тексту</h2>
+    <div class="fn-grid">
+      <div class="fn-card"><div class="nm">CONCATENATE</div><div class="ua">склеює текст з кількох комірок</div></div>
+      <div class="fn-card"><div class="nm">LEFT / RIGHT</div><div class="ua">бере кілька символів зліва / справа</div></div>
+      <div class="fn-card"><div class="nm">MID</div><div class="ua">бере символи з середини: звідки й скільки</div></div>
+      <div class="fn-card"><div class="nm">SUBSTITUTE</div><div class="ua">замінює частину тексту на іншу</div></div>
+      <div class="fn-card"><div class="nm">TODAY</div><div class="ua">сьогоднішня дата, щодня нова</div></div>
+    </div>
+    <div class="note">Аргументи функції розділяють крапкою з комою: <span class="mono">=LEFT(A2;3)</span>. Текст — у лапках: <span class="mono">" "</span>.</div>
+    <p class="soft">Зістав формулу з результатом.</p>
+    <div class="src"><span class="mcell"><i>A2</i>Шевченко</span><span class="mcell"><i>B2</i>Тарас</span><span class="mcell"><i>C2</i>8-А клас</span></div>
+    <div class="exercise">
+      <div class="match-pool" id="txtPool"></div>
+      <div id="txtList"></div>
+      <div class="progress-line" id="txtProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s6">
+    <div class="step-label">Крок 6 · Текстова машинка</div>
+    <h2>Виріж потрібне з назви файлу</h2>
+    <p class="soft">Обери функцію й числа, щоб отримати потрібний шматок, і натисни «Перевірити».</p>
+    <div class="exercise">
+      <div class="hot-prompt" id="tmPrompt"></div>
+      <div class="strip" id="tmStrip"></div>
+      <div class="tm-row">
+        <div class="seg" id="tmFn"><button data-f="LEFT">LEFT</button><button data-f="MID">MID</button><button data-f="RIGHT">RIGHT</button></div>
+        <div class="num-step" id="tmStartBox">з символу <button data-s="-1">−</button><span class="v" id="tmStart">1</span><button data-s="1">+</button></div>
+        <div class="num-step">скільки <button data-n="-1">−</button><span class="v" id="tmNum">3</span><button data-n="1">+</button></div>
+      </div>
+      <div class="tm-out"><span class="f" id="tmF"></span>→<span class="r" id="tmR"></span></div>
+      <div class="tm-check"><button class="btn-primary" id="tmGo">Перевірити</button></div>
+      <div class="progress-line" id="tmStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Складні розрахунки» · 8 клас</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+const $ = id=>document.getElementById(id);
+const esc = s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const num2 = v=>String(Math.round(v * 100) / 100).replace('.', ',');
+function flash(el, cls, ms = 450){ el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), ms); }
+
+/* ================= ОБЧИСЛЕННЯ ФОРМУЛ ================= */
+const FN = { SUM: v=>v.reduce((a, b)=>a + b, 0) };
+const RE_REF = /^[A-Z]+\d+$/, RE_RANGE = /^[A-Z]+\d+:[A-Z]+\d+$/;
+const colIdx = c=>c.charCodeAt(0) - 65;
+function expand(m){
+  const [a, b = a] = m.split(':');
+  const c1 = colIdx(a[0]), c2 = colIdx(b[0]), r1 = +a.slice(1), r2 = +b.slice(1), out = [];
+  for(let c = Math.min(c1, c2); c <= Math.max(c1, c2); c++)
+    for(let r = Math.min(r1, r2); r <= Math.max(r1, r2); r++) out.push(String.fromCharCode(65 + c) + r);
+  return out;
+}
+function evalRaw(cells, a, stack = []){
+  const raw = cells[a];
+  if(raw === undefined || raw === '') return {empty:true, v:0};
+  if(typeof raw === 'number') return {v:raw};
+  if(raw[0] !== '=') return {t:raw};
+  if(stack.includes(a)) return {err:'#REF!'};
+  try{ return {v: calc(raw.slice(1), cells, [...stack, a])}; }
+  catch(e){ return {err: e.message}; }
+}
+function calc(src, cells, stack){
+  const toks = src.match(/[A-Z]+\d+:[A-Z]+\d+|[A-Za-z]+\d+|[A-Za-z]+|\d+(?:[.,]\d+)?|[А-ЯҐЄІЇа-яґєії]+|\S/g) || [];
+  let p = 0;
+  const peek = ()=>toks[p], next = ()=>toks[p++];
+  const fail = m=>{ throw new Error(m); };
+  const val = x=>{ if(x.err) fail(x.err); if(x.t !== undefined) fail('#VALUE!'); return x.v; };
+  const expr = ()=>{ let v = term(); while(peek() === '+' || peek() === '-'){ const o = next(), r = term(); v = o === '+' ? v + r : v - r; } return v; };
+  const term = ()=>{ let v = pow(); while(peek() === '*' || peek() === '/'){ const o = next(), r = pow(); if(o === '/' && r === 0) fail('#DIV/0!'); v = o === '*' ? v * r : v / r; } return v; };
+  const pow = ()=>{ let v = unary(); while(peek() === '^'){ next(); v = Math.pow(v, unary()); } return v; };
+  const unary = ()=>{ if(peek() === '-'){ next(); return -unary(); } if(peek() === '+'){ next(); return unary(); } return prim(); };
+  function prim(){
+    const t = next();
+    if(t === undefined) fail('#ERROR!');
+    if(t === '('){ const v = expr(); if(next() !== ')') fail('#ERROR!'); return v; }
+    if(/^\d/.test(t)) return parseFloat(t.replace(',', '.'));
+    if(RE_REF.test(t)) return val(evalRaw(cells, t, stack));
+    if(RE_RANGE.test(t)) fail('#VALUE!');
+    if(/^[A-Za-zА-ЯҐЄІЇа-яґєії]+\d*$/.test(t)){
+      if(peek() !== '(') fail('#NAME?');
+      next();
+      const fn = FN[t.toUpperCase()];
+      if(!fn) fail('#NAME?');
+      const vals = [];
+      if(peek() !== ')'){
+        do{
+          if(RE_RANGE.test(peek() || '')){
+            expand(next()).forEach(a=>{ const x = evalRaw(cells, a, stack); if(x.err) fail(x.err); if(!x.empty && x.t === undefined) vals.push(x.v); });
+          } else vals.push(expr());
+        } while(peek() === ';' && next());
+      }
+      if(next() !== ')') fail('#ERROR!');
+      return fn(vals);
+    }
+    fail('#ERROR!');
+  }
+  const v = expr();
+  if(p < toks.length) fail('#ERROR!');
+  return v;
+}
+
+/* ================= МІНІ-ТАБЛИЦЯ ================= */
+const PAL = ['#1A73E8', '#E8710A', '#9334E6', '#D01884', '#188038'];
+function colorize(f){
+  const refs = [];
+  if(typeof f !== 'string' || f[0] !== '=') return {html: esc(f ?? ''), refs};
+  const html = esc(f).replace(/[A-Z]+\d+(?::[A-Z]+\d+)?/g, m=>{
+    const c = PAL[refs.length % PAL.length];
+    refs.push({list: expand(m), c});
+    return `<b style="color:${c}">${m}</b>`;
+  });
+  return {html, refs};
+}
+function makeSheet(host, {cols, rows, cells, widths}){
+  const S = {cells:{...cells}, fmt:{}, sel:null, edit:null, onDown:null};
+  host.innerHTML = `<div class="sheet"><div class="fbar"><span class="ref"></span><span class="fx">fx</span><span class="val"></span></div>
+    <table class="sheet-grid"></table></div>`;
+  const refEl = host.querySelector('.ref'), valEl = host.querySelector('.val'), table = host.querySelector('table');
+  let h = '<colgroup><col style="width:9%">' + widths.map(w=>`<col style="width:${w}">`).join('') + '</colgroup>';
+  h += '<tr><th></th>' + [...cols].map(c=>`<th>${c}</th>`).join('') + '</tr>';
+  for(let r = 1; r <= rows; r++) h += `<tr><th>${r}</th>` + [...cols].map(c=>`<td data-a="${c}${r}"><div class="cv"></div></td>`).join('') + '</tr>';
+  table.innerHTML = h;
+  S.table = table;
+  S.td = a=>table.querySelector(`td[data-a="${a}"]`);
+  const show = (a, v)=>S.fmt[a] === 'pct' ? (v * 100).toFixed(2).replace('.', ',') + '%' : num2(v);
+  S.render = ()=>{
+    const ed = S.edit;
+    const {html, refs} = colorize(ed ? ed.f : S.sel ? S.cells[S.sel] : '');
+    const paint = {};
+    refs.forEach(r=>r.list.forEach(a=>{ if(!paint[a]) paint[a] = r.c; }));
+    table.querySelectorAll('td').forEach(td=>{
+      const a = td.dataset.a, cv = td.querySelector('.cv');
+      const editing = ed && ed.cell === a;
+      td.classList.toggle('editing', !!editing);
+      td.classList.toggle('sel', !ed && S.sel === a);
+      td.classList.toggle('hdr', a.slice(1) === '1');
+      td.style.boxShadow = paint[a] ? `inset 0 0 0 2px ${paint[a]}` : '';
+      td.style.background = paint[a] ? paint[a] + '1F' : '';
+      if(editing){ cv.className = 'cv'; cv.innerHTML = `<span class="ed">${html}<i class="caret"></i></span>`; return; }
+      const x = evalRaw(S.cells, a);
+      const right = cols[cols.indexOf(a[0]) + 1];
+      const nextEmpty = !right || S.cells[right + a.slice(1)] === undefined;
+      cv.className = 'cv' + (x.err ? ' err' : x.t !== undefined ? (nextEmpty ? ' spill' : '') : ' num');
+      cv.textContent = x.err || (x.t !== undefined ? x.t : x.empty ? '' : show(a, x.v));
+    });
+    refEl.textContent = ed ? ed.cell : (S.sel || '');
+    const raw = S.sel ? S.cells[S.sel] : undefined;
+    valEl.innerHTML = ed ? html + '<i class="caret"></i>' : (typeof raw === 'string' && raw[0] === '=' ? html : esc(raw === undefined ? '' : typeof raw === 'number' ? num2(raw) : raw));
+  };
+  table.addEventListener('pointerdown', e=>{
+    const td = e.target.closest('td[data-a]');
+    if(td) S.onDown && S.onDown(td.dataset.a, e);
+  });
+  S.render();
+  return S;
+}
+
+/* Клавіатура формул + послідовні завдання «напиши формулу в комірці» */
+function makeFormulaTasks({sheet:S, pad, prompt, status, keys, tasks, onSolved, onAll}){
+  pad.innerHTML = keys.map(k=>`<button class="key ${k.cls || ''}" data-k="${k.k}" title="${k.t || ''}">${k.l || k.k}</button>`).join('');
+  const say = t=>{ status.innerHTML = t; };
+  let k = -1;
+  function next(){
+    k++;
+    if(k === tasks.length){ S.edit = null; S.table.classList.remove('picking'); S.render(); onAll && onAll(); return; }
+    prompt.innerHTML = tasks[k].prompt;
+    S.edit = {cell: tasks[k].cell, f:'', last:null};
+    S.table.classList.add('picking');
+    S.render();
+  }
+  pad.addEventListener('click', e=>{
+    const b = e.target.closest('.key'); if(!b) return;
+    const x = b.dataset.k, ed = S.edit;
+    if(!ed) return;
+    if(x === 'enter') return enter();
+    if(x === 'back'){
+      ed.f = ed.last !== null ? ed.f.slice(0, ed.last) : ed.f.replace(/(?:[A-Z]+\d+|.)$/, '');
+      ed.last = null; S.render(); return;
+    }
+    if(ed.f === ''){
+      if(x === '='){ ed.f = '='; S.render(); say(''); }
+      else say('Формула починається зі знака <b>=</b>.');
+      return;
+    }
+    if(x === '='){ say('Знак <b>=</b> — лише на початку.'); return; }
+    ed.f += x; ed.last = null; S.render(); say('');
+  });
+  S.onDown = a=>{
+    const ed = S.edit;
+    if(!ed){ S.sel = a; S.render(); return; }
+    if(a === ed.cell){ say('Сюди ми пишемо формулу. Клацни комірку з даними.'); return; }
+    if(ed.f === ''){ say('Спершу натисни <b>=</b>.'); return; }
+    if(ed.last === null && !/[=+\-*/^(]$/.test(ed.f)){ say('Перед адресою потрібен знак дії.'); return; }
+    if(ed.last !== null) ed.f = ed.f.slice(0, ed.last);
+    ed.last = ed.f.length; ed.f += a;
+    S.render(); say('');
+  };
+  function enter(){
+    const ed = S.edit, t = tasks[k];
+    if(ed.f === '' || ed.f === '='){ say('Формула ще порожня.'); return; }
+    const f = ed.f;
+    const r = evalRaw({...S.cells, [ed.cell]:f}, ed.cell);
+    const msg = t.check(f, r);
+    ed.last = null;
+    if(msg){ S.render(); flash(S.td(ed.cell), 'shake'); say('🤔 ' + msg); return; }
+    S.cells[ed.cell] = f; S.edit = null; S.sel = ed.cell; S.table.classList.remove('picking');
+    S.render(); flash(S.td(ed.cell), 'pop', 900);
+    say('✓ ' + t.ok);
+    onSolved && onSolved(k);
+    setTimeout(next, 1300);
+  }
+  next();
+}
+
+/* ================= ПОВТОРЕННЯ ================= */
+makeMatching('revPool', 'revList', [
+  { name:'=', desc:'З нього починається кожна формула' },
+  { name:'*', desc:'Знак множення' },
+  { name:'/', desc:'Знак ділення' },
+  { name:'Маркер заповнення', desc:'Копіює формулу в сусідні комірки, зсуваючи адреси' },
+  { name:'AVERAGE', desc:'Середнє арифметичне' },
+  { name:'MAX', desc:'Найбільше число в діапазоні' },
+  { name:'#NAME?', desc:'Таблиця не знає такої назви функції' }
+], 'revProgress');
+
+/* ================= КРОК 1: ПОРЯДОК ДІЙ ================= */
+makeSequence('seqDone', 'seqQ', 'seqOpts', 'seqFb', [
+  'Додавання в дужках: 2+3',
+  'Піднесення до степеня: ^2',
+  'Множення: *4',
+  'Віднімання: -1'
+], '✓ 5 → 25 → 100 → 99. Комірка покаже 99.');
+
+/* ================= КРОК 2: ДРОБИ ================= */
+const frac = (top, bot, vars)=>`<div class="math"><span class="frac"><span>${top}</span><span>${bot}</span></span>${vars ? `<span class="vars">${vars}</span>` : ''}</div>`;
+makeChoices('fracList', [
+  { pre: frac('a + b', '2', 'a — у A1, b — у B1'), text:'Середнє двох чисел', opts:['<span class="mono">=A1+B1/2</span>', '<span class="mono">=(A1+B1)/2</span>', '<span class="mono">=A1+(B1/2)</span>'], correct:1, why:'Без дужок поділилося б лише B1.' },
+  { pre: frac('10', '2 + 3'), text:'Що правильно?', opts:['<span class="mono">=10/2+3</span>', '<span class="mono">=10/(2+3)</span>'], correct:1, why:'Знаменник із дією теж бере в дужки. Вийде 2, а не 8.' },
+  { pre: frac('(a + b)²', 'c', 'a — A1, b — B1, c — C1'), text:'Яка формула?', opts:['<span class="mono">=(A1+B1)^2/C1</span>', '<span class="mono">=A1+B1^2/C1</span>', '<span class="mono">=(A1+B1)*2/C1</span>'], correct:0, why:'Квадрат — це ^2, а не *2.' }
+]);
+
+/* ================= КРОК 3: ВІДСОТКИ ================= */
+(function(){
+  const host = $('pcSheet'), status = $('pcStatus');
+  const cells = { A1:'Як добираюсь', B1:'Учнів', C1:'Частка',
+    A2:'Пішки', B2:14, A3:'Автобус', B3:7, A4:'Метро', B4:4, A5:'Авто', B5:3, A6:'Разом', B6:'=SUM(B2:B5)' };
+  const S = makeSheet(host, {cols:'ABC', rows:6, cells, widths:['40%', '25%', '26%']});
+  const hit = trackTask(host, 3, 5);
+  const check = (row, want)=>(f, r)=>{
+    if(r.err) return `Таблиця показала ${r.err}. Перевір формулу.`;
+    if(Math.abs(r.v - want) < 1e-9 && f.includes('B' + row) && f.includes('B6')) return '';
+    if(Math.abs(r.v - 1 / want) < 1e-9) return `Вийшло ${num2(r.v)} — це ціле, поділене на частину. Треба навпаки.`;
+    return `Вийшло ${num2(r.v)}. Частка = кількість / «Разом».`;
+  };
+  makeFormulaTasks({
+    sheet:S, pad:$('pcPad'), prompt:$('pcPrompt'), status,
+    keys:[ {k:'=', cls:'eq'}, {k:'+'}, {k:'-', l:'−'}, {k:'*'}, {k:'/'}, {k:'back', l:'⌫', cls:'soft'}, {k:'enter', l:'Enter ↵', cls:'go'} ],
+    tasks:[
+      { cell:'C2', prompt:'<b>C2</b>: яка частка класу ходить пішки?', check:check(2, 0.5), ok:'0,5 — це половина класу.' },
+      { cell:'C3', prompt:'<b>C3</b>: а яка частка їздить автобусом?', check:check(3, 0.25), ok:'0,25 — чверть класу.' }
+    ],
+    onSolved:()=>{ addNeurons(1); hit(); },
+    onAll:()=>{
+      $('pcPad').hidden = true; $('pcFmt').hidden = false;
+      $('pcPrompt').innerHTML = 'Тепер покажи частки у відсотках.';
+    }
+  });
+  $('pcBtn').addEventListener('click', ()=>{
+    S.fmt.C2 = S.fmt.C3 = 'pct'; S.render();
+    flash(S.td('C2'), 'pop', 900); flash(S.td('C3'), 'pop', 900);
+    $('pcFmt').hidden = true;
+    $('pcPrompt').innerHTML = 'Половина — це 50%, чверть — 25% ✓';
+    status.innerHTML = '✓ Число не змінилося — змінився лише вигляд.';
+    addNeurons(3); hit();
+  });
+})();
+
+/* ================= КРОК 4: COUNT / COUNTA ================= */
+makeSortBoard('cntPool', { num:'bkNum', txt:'bkTxt', none:'bkNone' }, [
+  { text:'12', bucket:'num' },
+  { text:'4,5', bucket:'num' },
+  { text:'0', bucket:'num' },
+  { text:'-3', bucket:'num' },
+  { text:'Іван', bucket:'txt' },
+  { text:'н/я', bucket:'txt' },
+  { text:'12 шт.', bucket:'txt' },
+  { text:'(порожня)', bucket:'none' }
+], 'cntProgress');
+
+/* ================= КРОК 5: ТЕКСТОВІ ФУНКЦІЇ ================= */
+const today = new Date().toLocaleDateString('uk-UA');
+makeMatching('txtPool', 'txtList', [
+  { name:'=CONCATENATE(B2;" ";A2)', desc:'Тарас Шевченко' },
+  { name:'=LEFT(A2;3)', desc:'Шев' },
+  { name:'=RIGHT(A2;3)', desc:'нко' },
+  { name:'=MID(A2;4;3)', desc:'чен' },
+  { name:'=SUBSTITUTE(C2;"А";"Б")', desc:'8-Б клас' },
+  { name:'=TODAY()', desc:today }
+], 'txtProgress');
+
+/* ================= КРОК 6: ТЕКСТОВА МАШИНКА ================= */
+(function(){
+  const SRC = 'Фото_2026_Карпати.jpg';
+  const TASKS = [
+    { want:'Фото', prompt:'Отримай слово <b>Фото</b>' },
+    { want:'jpg', prompt:'Отримай розширення <b>jpg</b>' },
+    { want:'2026', prompt:'Отримай рік <b>2026</b>' },
+    { want:'Карпати', prompt:'Отримай назву <b>Карпати</b>' }
+  ];
+  const strip = $('tmStrip'), status = $('tmStatus'), out = $('tmR');
+  strip.innerHTML = [...SRC].map((c, i)=>`<span class="ch"><b>${c}</b><small>${i + 1}</small></span>`).join('');
+  const chs = [...strip.children];
+  const hit = trackTask($('tmGo'), TASKS.length, TASKS.length + 2);
+  let fn = 'LEFT', start = 1, n = 3, k = 0;
+  const L = SRC.length;
+  function result(){
+    if(fn === 'LEFT') return [0, Math.min(n, L)];
+    if(fn === 'RIGHT') return [Math.max(0, L - n), L];
+    return [start - 1, Math.min(L, start - 1 + n)];
+  }
+  function render(){
+    $('tmFn').querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.f === fn));
+    $('tmStartBox').hidden = fn !== 'MID';
+    $('tmStart').textContent = start; $('tmNum').textContent = n;
+    const [a, b] = result();
+    chs.forEach((c, i)=>c.classList.toggle('on', i >= a && i < b));
+    $('tmF').textContent = fn === 'MID' ? `=MID(A2;${start};${n})` : `=${fn}(A2;${n})`;
+    out.textContent = SRC.slice(a, b) || '""';
+    $('tmPrompt').innerHTML = k < TASKS.length ? TASKS[k].prompt : 'Усе вирізано ✓';
+  }
+  $('tmFn').addEventListener('click', e=>{ const b = e.target.closest('[data-f]'); if(b){ fn = b.dataset.f; render(); } });
+  document.querySelector('#s6 .tm-row').addEventListener('click', e=>{
+    const b = e.target.closest('[data-s],[data-n]'); if(!b) return;
+    if(b.dataset.s) start = Math.max(1, Math.min(L, start + +b.dataset.s));
+    if(b.dataset.n) n = Math.max(1, Math.min(L, n + +b.dataset.n));
+    render();
+  });
+  $('tmGo').addEventListener('click', ()=>{
+    if(k >= TASKS.length) return;
+    const [a, b] = result(), got = SRC.slice(a, b);
+    if(got !== TASKS[k].want){
+      flash(out, 'shake');
+      status.textContent = `Вийшло «${got}», а треба «${TASKS[k].want}». Подивись на номери символів.`;
+      return;
+    }
+    status.textContent = `✓ ${$('tmF').textContent} → ${got}`;
+    addNeurons(1); hit();
+    if(++k === TASKS.length){ addNeurons(2); status.textContent += '. Машинку освоєно!'; }
+    render();
+  });
+  render();
+})();
+
+/* ================= ФІНАЛЬНИЙ ТЕСТ ================= */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що покаже комірка з формулою =2*3^2?', opts:['36', '18', '12', '64'], correct:1, why:'Спершу степінь: 3^2 = 9, потім 2*9.' },
+  { q:'Як записати в таблиці число 4 у кубі?', opts:['=4*3', '=4^3', '=4:3', '=4x3'], correct:1 },
+  { q:'Як правильно записати (A1 + B1) : C1?', opts:['=A1+B1/C1', '=(A1+B1)/C1', '=A1+(B1/C1)', '=(A1+B1):C1'], correct:1 },
+  { q:'У класі 30 учнів, 6 з них — відмінники. Яка формула дасть їхню частку?', opts:['=30/6', '=6/30', '=6*30', '=30-6'], correct:1, why:'Частина / ціле = 0,2, тобто 20%.' },
+  { q:'Що робить кнопка «Формат відсотків» з числом 0,2?', opts:['Показує його як 20%', 'Ділить його на 100', 'Перетворює на текст', 'Округлює до 0'], correct:0 },
+  { q:'У стовпчику: 5, «н/я», 8, порожня комірка. Що покаже COUNT?', opts:['4', '3', '2', '1'], correct:2, why:'COUNT рахує лише числа: 5 і 8.' },
+  { q:'А що покаже COUNTA для того самого стовпчика?', opts:['4', '3', '2', '1'], correct:1, why:'Три непорожні комірки.' },
+  { q:'У A2 — «Київ». Що поверне =LEFT(A2;2)?', opts:['Ки', 'їв', 'Київ', 'иї'], correct:0 },
+  { q:'Яка функція склеює ім\'я та прізвище з різних комірок?', opts:['SUBSTITUTE', 'MID', 'CONCATENATE', 'COUNTA'], correct:2 }
+], {summary:'Ти знаєш порядок дій зі степенем, записуєш дроби з дужками, рахуєш відсотки, вмієш COUNT і COUNTA та працюєш із текстом функціями.'});
+</script>
+
+</body>
+</html>
