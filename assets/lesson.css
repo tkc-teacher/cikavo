@@ -1,0 +1,202 @@
+/* Ядро інтерактивного уроку: спільні стилі.
+   Урок задає власну гаму, перевизначаючи змінні в :root (свій <style> після цього файлу),
+   і додає стилі лише для своїх особливих віджетів. */
+
+:root{
+  --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
+  --accent:#6C5CE7; --accent-dark:#5340c9; --accent-soft:#EEEBFD;
+  --sun:#E37400; --sun-soft:#FEF7E0; --sun-ink:#8A4E0F;               /* повторення, застереження */
+  --note:#16A3A0; --note-soft:#E3F6F5; --note-ink:#0B5F5D;            /* нейтральний факт (.note) */
+  --ok:#3FAE58; --ok-soft:#E4F8E6; --coral:#FF6B4A; --yellow:#FFC93C;
+  --hud-bar:var(--accent);                                            /* заливка смужки прогресу в HUD */
+  --radius-s:10px; --radius-m:16px; --radius-l:26px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
+body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+.container{max-width:800px; margin:0 auto; padding:0 24px;}
+@media (max-width:520px){ .container{padding:0 16px;} }
+@keyframes shakeX{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
+
+/* HUD */
+.hud{position:sticky; top:0; z-index:50; background:color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+.hud-bar{height:4px; background:var(--line); overflow:hidden;}
+.hud-bar-fill{height:100%; width:0%; background:var(--hud-bar); transition:width .3s ease;}
+.hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:800px; margin:0 auto;}
+.hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
+.neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px; transition:opacity .4s ease, transform .4s ease;}
+.neuron-counter svg{width:24px; height:24px;}
+.neuron-counter.gone{opacity:0; transform:scale(.6); pointer-events:none;}
+#neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
+#neuronCount.pop{transform:scale(1.35);}
+
+/* HERO */
+.hero{padding:52px 24px 40px;}
+.hero-inner{max-width:800px; margin:0 auto; display:flex; align-items:center; gap:30px;}
+.hero-text{flex:1;}
+.hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--accent); margin-bottom:10px;}
+.hero h1{font-size:32px; line-height:1.18; margin-bottom:12px;}
+.hero p{color:var(--ink-soft); font-size:16.5px; max-width:54ch; margin-bottom:22px;}
+.btn-primary{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--accent); color:#fff; border:none; padding:13px 24px; border-radius:var(--radius-s); cursor:pointer; transition:background .15s ease, transform .1s ease;}
+.btn-primary:hover{background:var(--accent-dark);}
+.btn-primary:active{transform:scale(.97);}
+.mascot{width:140px; height:140px; flex-shrink:0;}
+@media (max-width:640px){ .hero-inner{flex-direction:column; align-items:flex-start;} .mascot{width:104px; height:104px;} }
+
+/* КРОКИ */
+section.block{padding:38px 0; border-top:1px solid var(--line); scroll-margin-top:60px;}
+.step-label{font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:600; color:var(--accent); margin-bottom:8px;}
+.step-label.recap{color:var(--sun);}
+.block h2{font-size:21px; margin-bottom:10px; max-width:38ch;}
+.block h3{font-size:16px; margin:20px 0 8px;}
+.block p{max-width:66ch; font-size:16px; margin:0 0 14px; color:var(--ink);}
+.block p.soft{color:var(--ink-soft); font-size:15px;}
+.block ul{max-width:66ch; margin:0 0 14px; padding-left:20px; font-size:15px;}
+.block ul li{margin-bottom:4px;}
+.note{background:var(--note-soft); border-left:4px solid var(--note); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14.5px; color:var(--note-ink); margin:16px 0;}
+.trivia{background:var(--sun-soft); border-left:4px solid var(--sun); padding:12px 16px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:14px; color:var(--sun-ink); margin:16px 0;}
+.exercise{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:22px; margin-top:18px;}
+@media (max-width:520px){ .exercise{padding:16px;} }
+.progress-line{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--accent-dark); margin-top:14px; min-height:1.4em;}
+
+/* FLIP-КАРТКИ (галерея «навчись», memo) */
+.flip-card{perspective:1200px; height:210px; cursor:pointer;}
+.flip-inner{position:relative; width:100%; height:100%; transition:transform .6s cubic-bezier(.4,0,.2,1); transform-style:preserve-3d;}
+.flip-card.flipped .flip-inner{transform:rotateY(180deg);}
+.flip-face{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:var(--radius-m); display:flex; flex-direction:column; align-items:center; justify-content:center; padding:14px; text-align:center; border:2px solid var(--card-c, var(--line));}
+.flip-front{background:var(--surface);}
+.flip-back{background:var(--card-c-light, var(--accent-soft)); transform:rotateY(180deg); /* без цього обидві сторони «зникають» */}
+
+/* ВИБІР ВАРІАНТА (makeChoices) */
+.classify-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:16px 18px; margin:12px 0;}
+.classify-card p.q{font-weight:700; margin:0 0 10px; font-size:15px;}
+.q-logo{width:30px; height:30px; object-fit:contain; flex-shrink:0;}
+.q-emoji{width:30px; text-align:center; font-size:24px; line-height:30px; flex-shrink:0;}
+.q-head{display:flex; align-items:center; gap:12px;}
+.q-head p.q{margin:0 !important;}
+.classify-card .q-head + .choice-row{margin-top:10px;}
+.choice-row{display:flex; gap:8px; flex-wrap:wrap;}
+.choice-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; padding:8px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); cursor:pointer; color:var(--ink); text-align:left; transition:background .15s ease, border-color .15s ease, color .15s ease;}
+.choice-btn:hover{border-color:var(--accent);}
+.choice-btn.correct{background:var(--ok-soft); border-color:var(--ok); color:#256B36;}
+.choice-btn.wrong{background:#FDE6E1; border-color:var(--coral); color:#B8412A;}
+.choice-feedback{margin-top:8px; font-size:13.5px; color:var(--ink-soft); min-height:1.2em;}
+.yn-grid{display:grid; grid-template-columns:1fr 1fr; gap:0 12px; align-items:start;}
+@media (max-width:560px){ .yn-grid{grid-template-columns:1fr;} }
+.yn-grid .classify-card{margin:6px 0;}
+
+/* ЗІСТАВЛЕННЯ (makeMatching) */
+.match-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:14px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:16px;}
+.match-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:8px 14px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
+.match-chip:hover{transform:translateY(-2px);}
+.match-chip.selected{border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);}
+.match-chip.placed{display:none;}
+.desc-card{display:flex; align-items:center; gap:12px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; margin-bottom:10px; cursor:pointer; transition:border-color .2s ease, background .2s ease;}
+.desc-card.matched{border-color:var(--accent); background:var(--accent-soft); cursor:default;}
+.desc-card.shake{animation:shakeX .35s ease;}
+.desc-text{flex:1; font-size:14px; color:var(--ink-soft);}
+.desc-slot{min-width:110px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13.5px; color:var(--ink-soft); border:2px dashed var(--line); border-radius:var(--radius-s); padding:8px 10px;}
+.desc-slot.filled{border-style:solid; border-color:var(--accent); background:#fff; color:var(--accent-dark);}
+@media (max-width:480px){ .desc-card{flex-direction:column; align-items:stretch;} }
+
+/* КОШИКИ (makeSortBoard) */
+.sort-buckets{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+.sort-buckets.three{grid-template-columns:repeat(3,1fr);}
+@media (max-width:620px){ .sort-buckets.three{grid-template-columns:1fr;} }
+.bucket{border:2px dashed var(--line); border-radius:var(--radius-m); padding:12px; min-height:110px; cursor:pointer; transition:border-color .15s ease, background .15s ease;}
+.bucket:hover{border-color:var(--accent);}
+.bucket-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; color:var(--ink); margin-bottom:8px; text-align:center; line-height:1.2;}
+.bucket-title small{display:block; font-size:12.5px; font-weight:600; color:var(--ink-soft);}
+.bucket-items{display:flex; flex-direction:column; gap:6px; min-height:36px;}
+.bucket.wrong{border-color:var(--coral); background:#FDE6E1;}
+.sort-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:14px;}
+.sort-chip{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; line-height:1.35; background:var(--bg); border:2px solid var(--line); border-radius:var(--radius-s); padding:8px 12px; cursor:pointer; max-width:340px; transition:border-color .15s ease, transform .12s ease;}
+.sort-chip:hover{transform:translateY(-2px);}
+.sort-chip.selected{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft);}
+.sort-chip.placed{background:var(--ok-soft); border-color:var(--ok); cursor:default; font-size:12.5px; max-width:none;}
+.sort-chip.placed:hover{transform:none;}
+
+/* ПОСЛІДОВНИЙ ВИБІР КРОКУ (makeSequence) */
+.seq-done{list-style:none; padding:0 !important; margin:0 0 12px !important; counter-reset:seq;}
+.seq-done li{counter-increment:seq; display:flex; align-items:center; gap:10px; background:var(--accent-soft); border:1.5px solid var(--accent); border-radius:var(--radius-s); padding:9px 12px; margin-bottom:8px; font-weight:700; font-size:14.5px;}
+.seq-done li::before{content:counter(seq); flex-shrink:0; width:26px; height:26px; border-radius:50%; background:var(--accent); color:#fff; font-family:'Baloo 2',sans-serif; display:flex; align-items:center; justify-content:center; font-size:14px;}
+.seq-q{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; margin-bottom:10px;}
+.seq-q b{color:var(--sun);}
+.seq-opts{display:flex; flex-direction:column; gap:8px;}
+.seq-opts .choice-btn{border-radius:var(--radius-s);}
+
+/* ФІНАЛЬНИЙ ТЕСТ (makeFinalQuiz) */
+.quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:26px 24px; margin-top:18px;}
+@media (max-width:520px){ .quiz-box{padding:20px 16px;} }
+.quiz-progress{font-family:'Baloo 2',sans-serif; font-size:13px; color:var(--ink-soft); margin-bottom:10px;}
+.quiz-q{font-size:17px; font-weight:700; margin-bottom:16px;}
+.quiz-options{display:flex; flex-direction:column; gap:10px;}
+.quiz-opt{text-align:left; font-family:'Nunito Sans',sans-serif; font-size:15px; font-weight:600; padding:12px 15px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer; transition:background .15s ease, border-color .15s ease;}
+.quiz-opt:hover{border-color:var(--accent);}
+.quiz-opt.correct{background:var(--ok-soft); border-color:var(--ok);}
+.quiz-opt.wrong{background:#FDE6E1; border-color:var(--coral);}
+.quiz-why{margin-top:12px; font-size:14px; color:var(--ink-soft); min-height:1.3em;}
+.quiz-nav{display:flex; justify-content:flex-end; margin-top:14px;}
+.btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:11px 22px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
+.btn-next.active{opacity:1; pointer-events:auto;}
+
+/* ЕКРАН ЗАВЕРШЕННЯ */
+.completion{display:none; text-align:center; margin-top:18px; border-radius:var(--radius-l); overflow:hidden; border:1.5px solid var(--line); background:linear-gradient(180deg, var(--accent-soft) 0%, var(--surface) 55%); box-shadow:0 6px 24px color-mix(in srgb, var(--accent) 8%, transparent);}
+.completion.show{display:block;}
+.done-top{padding:34px 24px 4px;}
+.completion .done-top h3{font-size:34px; margin-bottom:6px;}
+.completion .done-top p{color:var(--ink-soft); max-width:52ch; margin:0 auto 6px; font-size:15px;}
+.done-bottom{padding:22px 24px 28px;}
+@media (max-width:520px){ .done-top{padding:26px 16px 20px;} .completion .done-top h3{font-size:28px;} .done-bottom{padding:20px 14px 24px;} }
+/* купка нейрончиків (не більша за діаграму) і нейрончики, що летять до неї з лічильника */
+.pile{position:relative; width:130px; height:40px; margin:16px auto 0; transition:height .3s ease;}
+.pile svg{position:absolute; width:18px; height:18px; transform:rotate(var(--r)); filter:drop-shadow(0 1px 1px rgba(138,78,15,.45));}
+.flyer{position:fixed; left:0; top:0; z-index:60; width:18px; height:18px; pointer-events:none; filter:drop-shadow(0 1px 1px rgba(138,78,15,.45));}
+.pile-total{margin-top:4px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:17px; color:var(--sun-ink);}
+.pile-total b{font-size:28px; margin-right:4px;}
+/* діаграми «Пройдено» й «Точність» */
+.donuts{display:flex; justify-content:center; gap:36px; flex-wrap:wrap; margin:0 0 4px;}
+.donut{margin:0; width:150px; text-align:center;}
+.donut-ring{position:relative; width:130px; height:130px; margin:0 auto;}
+.donut-ring svg{width:100%; height:100%; transform:rotate(-90deg);}
+.donut-ring circle{fill:none; stroke-width:11;}
+.donut-ring .trk{stroke:var(--line);}
+.donut-ring .val{stroke-linecap:round; transition:stroke-dashoffset .8s ease, stroke .8s ease;}
+.donut-ring b{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-size:30px; transition:color .8s ease;}
+.donut figcaption{margin-top:8px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:17px; line-height:1.2;}
+.donut figcaption small{display:block; font-family:'Nunito Sans',sans-serif; font-weight:600; font-size:13px; color:var(--ink-soft);}
+/* кнопки «Поділитися результатами» і «Повернутися до уроку» */
+.done-actions{display:flex; flex-direction:column; align-items:center; gap:12px; margin-top:22px;}
+.btn-sun{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:#FBBC04; color:#3C2A00; border:none; padding:10px 22px; border-radius:999px; cursor:pointer; box-shadow:0 3px 0 #D99A00; transition:transform .1s ease, background .15s ease;}
+.btn-sun:hover{background:#FFC72C;}
+.btn-sun:active{transform:translateY(2px); box-shadow:0 1px 0 #D99A00;}
+.rs-btn{display:inline-flex; align-items:center; gap:10px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--surface); color:var(--accent-dark); border:2px solid var(--accent); padding:10px 20px 10px 14px; border-radius:999px; cursor:pointer; transition:background .15s ease, transform .1s ease;}
+.rs-btn:hover{background:var(--accent-soft);}
+.rs-btn:active{transform:scale(.97);}
+.rs-btn:focus{outline:none;}
+.rs-btn:focus-visible{outline:3px solid var(--accent); outline-offset:2px;}
+.rs-btn svg{width:26px; height:26px;}
+.rs-btn.done{border-color:var(--ok); color:var(--ok);}
+
+/* СМУЖКА БЛОКІВ ЛІВОРУЧ */
+.lesson-rail{position:fixed; z-index:45; left:0; bottom:0; top:60px; display:flex; flex-direction:column;}
+.lesson-rail button{position:relative; flex:1; width:16px; padding:0; border:none; background:none; cursor:pointer;}
+/* стан блоку: сірий — не пройдено, зелений — пройдено */
+.lesson-rail button::before{content:''; position:absolute; left:0; top:0; bottom:0; width:5px; background:var(--line); transition:background .3s ease;}
+.lesson-rail button.done::before{background:var(--ok);}
+/* поточний блок — лінія кольору уроку поруч зі станом */
+.lesson-rail button::after{content:''; position:absolute; left:5px; top:0; bottom:0; width:3px; background:var(--accent); opacity:0; transition:opacity .2s ease;}
+.lesson-rail button.current::after{opacity:1;}
+.lesson-rail button:hover::before{filter:brightness(.88);}
+.lesson-rail button:focus{outline:none;}
+.lesson-rail button:focus-visible::after{opacity:1;}
+.rail-tip{position:absolute; left:16px; top:50%; transform:translate(-4px, -50%); white-space:nowrap; text-align:left; background:var(--surface); color:var(--ink); border:1px solid var(--line); box-shadow:0 4px 14px rgba(31,31,31,.08); font-family:'Nunito Sans',sans-serif; font-size:12.5px; font-weight:700; padding:5px 10px; border-radius:8px; pointer-events:none; opacity:0; transition:opacity .15s ease, transform .15s ease;}
+.rail-tip small{display:block; font-weight:400; font-size:11.5px; color:var(--ink-soft);}
+.lesson-rail button.done .rail-tip small{color:var(--ok);}
+.lesson-rail button:hover .rail-tip, .lesson-rail button:focus-visible .rail-tip{opacity:1; transform:translate(0, -50%);}
+@media (hover:none){ .rail-tip{display:none;} }
+
+footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
+footer .credits{display:block; max-width:62ch; margin:12px auto 0; font-size:11.5px; line-height:1.55; opacity:.8;}
