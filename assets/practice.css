@@ -28,7 +28,8 @@ h1,h2,h3{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(
 .p-hero h1{font-size:30px; line-height:1.2; margin-bottom:8px;}
 .p-hero p{color:var(--ink-soft); font-size:16px; max-width:60ch; margin:0 0 14px;}
 .meta{display:flex; flex-wrap:wrap; gap:8px;}
-.meta span{font-size:13px; font-weight:700; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:4px 12px;}
+.meta span{display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:700; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:4px 12px;}
+.meta img{height:16px; width:auto;}
 
 /* Розділи й картки-кроки */
 .p-section{margin:26px 0;}
