@@ -15,10 +15,12 @@ h1,h2,h3{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(
 .container{max-width:780px; margin:0 auto; padding:0 24px;}
 @media (max-width:520px){ .container{padding:0 16px;} }
 
-.topbar{padding:14px 24px; border-bottom:1px solid var(--line); background:color-mix(in srgb, var(--bg) 92%, transparent); position:sticky; top:0; backdrop-filter:blur(6px); z-index:10;}
-.topbar-inner{max-width:780px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; gap:10px;}
-.back-link{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--accent-dark); text-decoration:none;}
-.back-link:hover{text-decoration:underline;}
+/* HUD — як в уроці (смужка прогресу прокрутки + підпис), але без нейрончиків; будує assets/practice.js з data-hud */
+.hud{position:sticky; top:0; z-index:50; background:color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+.hud-bar{height:4px; background:var(--line); overflow:hidden;}
+.hud-bar-fill{height:100%; width:0%; background:var(--hud-bar, var(--accent)); transition:width .3s ease;}
+.hud-row{display:flex; align-items:center; padding:10px 24px; max-width:780px; margin:0 auto; min-height:44px;}
+.hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
 
 /* Шапка */
 .p-hero{padding:34px 0 10px;}
