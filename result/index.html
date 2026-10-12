@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Результати уроку</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
+    --purple:#6C5CE7; --purple-dark:#5340c9; --purple-soft:#EEEBFD; --ok:#3FAE58;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1{font-family:'Baloo 2',sans-serif; font-weight:700;}
+  a{color:var(--purple-dark);}
+
+  main{max-width:760px; margin:0 auto; padding:40px 24px 60px;}
+  @media (max-width:520px){ main{padding:24px 16px 40px;} }
+  .home{display:inline-block; margin-bottom:14px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; text-decoration:none;}
+  .rv-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:22px 24px;}
+  @media (max-width:520px){ .rv-card{padding:18px 14px;} }
+  .rv-kicker{font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:600; color:var(--purple);}
+  .rv-card h1{font-size:22px; line-height:1.2; margin:0 0 2px;}
+  .rv-lesson{color:var(--ink-soft); font-size:13.5px;}
+  .rv-check{font-size:13px; font-weight:700; margin-top:6px;}
+  .rv-check.ok{color:var(--ok);}
+  .rv-check.bad{background:#FDE6E1; color:#A3341C; padding:8px 12px; border-radius:var(--radius-s);}
+  .rv-empty{color:var(--ink-soft); margin:8px 0 0;}
+
+  /* за замовчуванням — один ряд з чотирьох; на вузькому екрані — два ряди по два */
+  .rv-sum{display:grid; grid-template-columns:repeat(4, auto); justify-content:center; align-items:center; gap:14px 32px; margin:16px 0; padding:14px; background:var(--bg); border-radius:var(--radius-m);}
+  @media (max-width:760px){ .rv-sum{grid-template-columns:repeat(2, auto); column-gap:28px;} }
+  @media (max-width:420px){ .rv-sum{column-gap:12px; padding:12px 10px;} .rv-sum .donut-ring, .rv-sum .rv-ic{width:48px; height:48px;} .rv-sum .donut-ring b{font-size:13px;} }
+  .rv-dn{display:flex; align-items:center; gap:8px;}
+  .rv-dn span{font-size:13px; line-height:1.25; color:var(--ink-soft);}
+  .rv-dn span b{display:block; font-family:'Baloo 2',sans-serif; font-size:15px; color:var(--ink);}
+  .donut-ring{position:relative; width:58px; height:58px; flex-shrink:0;}
+  .donut-ring svg{width:100%; height:100%; transform:rotate(-90deg);}
+  .donut-ring circle{fill:none; stroke-width:12;}
+  .donut-ring .trk{stroke:var(--line);}
+  .donut-ring .val{stroke-linecap:round;}
+  .donut-ring b{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-size:15px;}
+  /* іконка замість діаграми — того ж видимого розміру, щоб краї й центри збігалися з діаграмами */
+  .rv-ic{width:58px; height:58px; flex-shrink:0;}
+  .rv-ic svg{display:block; width:100%; height:100%;}
+
+  .rv-blocks{display:flex; flex-direction:column;}
+  .rv-row{display:grid; grid-template-columns:22px 1fr 110px 64px; align-items:center; gap:10px; padding:7px 4px; border-bottom:1px solid var(--line); font-size:14px;}
+  .rv-row.hdr{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; color:var(--ink-soft); padding-top:0;}
+  .rv-row.hdr span:last-child{text-align:right; white-space:nowrap;}
+  .rv-row.hdr .ab{background:none;}
+  .rv-row .st{width:18px; height:18px; border-radius:50%; border:2px solid var(--line); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#fff;}
+  .rv-row .st.ok{background:var(--ok); border-color:var(--ok);}
+  .rv-row .nm{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .rv-row.idle .nm{color:var(--ink-soft);}
+  .rv-row .ab{height:8px; border-radius:4px; background:var(--line); overflow:hidden;}
+  .rv-row .ab i{display:block; height:100%; border-radius:4px;}
+  .rv-row .av{font-family:'Baloo 2',sans-serif; font-weight:700; text-align:right;}
+  @media (max-width:520px){ .rv-row{grid-template-columns:20px 1fr 64px; gap:6px;} .rv-row .ab{display:none;} }
+</style>
+</head>
+<body>
+
+<main>
+  <a class="home" href="../index.html">← Головна</a>
+  <div class="rv-card" id="card"></div>
+</main>
+
+<script>
+/* Спільна сторінка результатів уроків.
+   Учень на екрані завершення уроку копіює посилання сюди; після «#» у ньому закодовано (base64url JSON) усе,
+   що потрібно для картки, тож сторінка нічого не знає про конкретні уроки. «#z=…» — JSON, стиснений deflate-raw,
+   «#j=…» — без стиснення (зі старих браузерів). Формат (v:1) описано в makeLink уроку:
+   c — клас і тема, t — назва уроку, d — час завершення (секунди), m — хвилин,
+   n — [нейрончики, максимум], a — загальна точність, b — [назва блоку, пройдено, точність або -1], h — контрольна сума.
+   SALT має збігатися з уроками — інакше всі посилання вважатимуться зміненими. */
+const SALT = 'cikavo·131';
+
+function sign(str){   // cyrb53
+  let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+  for(const ch of SALT + str){ const c = ch.codePointAt(0); h1 = Math.imul(h1 ^ c, 2654435761); h2 = Math.imul(h2 ^ c, 1597334677); }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+}
+function b64urlBytes(s){
+  s = s.replace(/-/g,'+').replace(/_/g,'/');
+  while(s.length % 4) s += '=';
+  return Uint8Array.from(atob(s), c=>c.charCodeAt(0));
+}
+async function unpack(kind, s){
+  let bytes = b64urlBytes(s);
+  if(kind === 'z') bytes = new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer());
+  return new TextDecoder().decode(bytes);
+}
+const esc = s=>String(s ?? '').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const num = x=>Math.max(0, Math.round(+x) || 0);
+const pctv = x=>Math.min(100, num(x));
+const pct = (a, b)=>b ? Math.min(100, Math.round(a / b * 100)) : 0;
+
+// Колір від червоного (0%) до зеленого (100%)
+const heat = v=>`hsl(${Math.round(v * 1.2)}, 68%, 42%)`;
+const donutHTML = v=>{
+  const C = 2 * Math.PI * 42;
+  return `<div class="donut-ring"><svg viewBox="0 0 100 100"><circle class="trk" cx="50" cy="50" r="42"/>`
+    + `<circle class="val" cx="50" cy="50" r="42" style="stroke-dasharray:${C}; stroke-dashoffset:${C * (1 - v / 100)}; stroke:${heat(v)}; opacity:${v ? 1 : 0}"/></svg>`
+    + `<b style="color:${heat(v)}">${v}%</b></div>`;
+};
+
+const NEURON_ICON = `<svg viewBox="2.3 2.3 19.4 19.4" fill="none">
+  <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
+  <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
+  <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/>
+  <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/>
+  <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/>
+  <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/>
+  <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#E0A800" opacity="0.6"/>
+</svg>`;
+const CLOCK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="#6C5CE7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+  <circle cx="12" cy="12" r="10.6" fill="#EEEBFD"/><path d="M12 6.5V12l3.8 2.5"/>
+</svg>`;
+
+async function readLink(){
+  const m = location.hash.match(/^#([zj])=([A-Za-z0-9_-]+)$/);
+  if(!m) return null;
+  try{
+    const d = JSON.parse(await unpack(m[1], m[2]));
+    if(!d || typeof d !== 'object' || d.v !== 1) return null;
+    const h = d.h; delete d.h;
+    d.valid = h === sign(JSON.stringify(d));
+    return d;
+  }catch(e){ return null; }
+}
+
+async function render(){
+  const card = document.getElementById('card');
+  const d = await readLink();
+  if(!d){
+    document.title = 'Результати уроку';
+    card.innerHTML = `<div class="rv-kicker">Результати уроку</div>
+      <h1>Посилання не розпізнано</h1>
+      <p class="rv-empty">Тут відкриваються результати, якими учень поділився наприкінці уроку кнопкою «Поділитися результатами». Перевір, чи посилання скопійоване повністю.</p>`;
+    return;
+  }
+  const blocks = (Array.isArray(d.b) ? d.b : []).filter(Array.isArray);
+  const passed = blocks.filter(x=>x[1]).length;
+  const n = Array.isArray(d.n) ? d.n : [];
+  const accuracy = pctv(d.a);
+  const when = d.d ? new Date(num(d.d) * 1000).toLocaleString('uk-UA', {day:'numeric', month:'long', hour:'2-digit', minute:'2-digit'}) : '—';
+  document.title = 'Результати · ' + (d.t || 'урок');
+  card.innerHTML = `
+    <div class="rv-kicker">Результати уроку</div>
+    <h1>${esc(d.t)}</h1>
+    <div class="rv-lesson">${d.c ? esc(d.c) + ' · ' : ''}завершено ${when}</div>
+    ${d.valid ? '<div class="rv-check ok">✓ Посилання справжнє</div>'
+              : '<div class="rv-check bad">⚠️ Дані в посиланні змінено вручну — цим числам не можна довіряти.</div>'}
+    <div class="rv-sum">
+      <div class="rv-dn">${donutHTML(pct(passed, blocks.length))}<span><b>Пройдено</b>${passed} з ${blocks.length} блоків</span></div>
+      <div class="rv-dn">${donutHTML(accuracy)}<span><b>Точність</b></span></div>
+      <div class="rv-dn"><div class="rv-ic">${CLOCK_ICON}</div><span><b>Час</b>${d.m ? `${num(d.m)} хв` : '—'}</span></div>
+      <div class="rv-dn"><div class="rv-ic">${NEURON_ICON}</div><span><b>Нейрончики</b>${num(n[0])} з ${num(n[1])}</span></div>
+    </div>
+    <div class="rv-blocks">
+      <div class="rv-row hdr"><span></span><span>Блок уроку</span><span class="ab"></span><span>Точність</span></div>
+      ${blocks.map(([name, ok, acc])=>{ const a = +acc >= 0 ? pctv(acc) : null;
+        return `<div class="rv-row${ok ? '' : ' idle'}">
+          <span class="st${ok ? ' ok' : ''}">${ok ? '✓' : ''}</span>
+          <span class="nm">${esc(name)}</span>
+          <span class="ab"><i style="width:${a || 0}%; background:${heat(a || 0)}"></i></span>
+          <span class="av" style="color:${heat(a || 0)}">${a === null ? '—' : a + '%'}</span>
+        </div>`; }).join('')}
+    </div>`;
+}
+window.addEventListener('hashchange', render);
+render();
+</script>
+
+</body>
+</html>

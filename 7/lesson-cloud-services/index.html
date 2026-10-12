@@ -29,8 +29,9 @@
   .hud-bar-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--g-blue) 0 25%,var(--g-red) 25% 50%,var(--g-yellow) 50% 75%,var(--g-green) 75%); transition:width .3s ease;}
   .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:800px; margin:0 auto;}
   .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
-  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px;}
+  .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px; transition:opacity .4s ease, transform .4s ease;}
   .neuron-counter svg{width:24px;height:24px;}
+  .neuron-counter.gone{opacity:0; transform:scale(.6); pointer-events:none;}
   #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
   #neuronCount.pop{transform:scale(1.35);}
 
@@ -332,6 +333,23 @@
   .way .t{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px;}
   .way ul{margin:4px 0 0 !important; padding-left:18px !important; font-size:13.5px !important; color:var(--ink-soft);}
 
+  /* SORT BUCKETS */
+  .sort-buckets{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .sort-buckets.three{grid-template-columns:repeat(3,1fr);}
+  @media (max-width:620px){ .sort-buckets.three{grid-template-columns:1fr;} }
+  .bucket{border:2px dashed var(--line); border-radius:var(--radius-m); padding:12px; min-height:110px; cursor:pointer; transition:border-color .15s ease, background .15s ease;}
+  .bucket:hover{border-color:var(--accent);}
+  .bucket-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; color:var(--ink); margin-bottom:8px; text-align:center; line-height:1.2;}
+  .bucket-title small{display:block; font-size:12.5px; font-weight:600; color:var(--ink-soft);}
+  .bucket-items{display:flex; flex-direction:column; gap:6px; min-height:36px;}
+  .bucket.wrong{border-color:var(--coral); background:#FDE6E1;}
+  .sort-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:14px;}
+  .sort-chip{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; line-height:1.35; background:var(--bg); border:2px solid var(--line); border-radius:var(--radius-s); padding:8px 12px; cursor:pointer; max-width:340px; transition:border-color .15s ease, transform .12s ease;}
+  .sort-chip:hover{transform:translateY(-2px);}
+  .sort-chip.selected{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft);}
+  .sort-chip.placed{background:var(--ok-soft); border-color:var(--ok); cursor:default; font-size:12.5px; max-width:none;}
+  .sort-chip.placed:hover{transform:none;}
+
   /* QUIZ */
   .quiz-box{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:26px 24px; margin-top:18px;}
   @media (max-width:520px){ .quiz-box{padding:20px 16px;} }
@@ -347,12 +365,69 @@
   .btn-next{font-family:'Baloo 2',sans-serif; font-weight:600; background:var(--ink); color:#fff; border:none; padding:11px 22px; border-radius:var(--radius-s); cursor:pointer; opacity:.4; pointer-events:none; transition:opacity .15s ease;}
   .btn-next.active{opacity:1; pointer-events:auto;}
 
-  .completion{display:none; text-align:center; padding:20px 10px 10px;}
+  .completion{display:none; text-align:center; margin-top:18px; border-radius:var(--radius-l); overflow:hidden; border:1.5px solid var(--line); background:linear-gradient(180deg, var(--accent-soft) 0%, var(--surface) 55%); box-shadow:0 6px 24px rgba(26,115,232,.08);}
   .completion.show{display:block;}
-  .badge{width:90px; height:90px; margin:0 auto 16px;}
-  .completion h3{font-size:22px; margin-bottom:10px;}
-  .completion p{color:var(--ink-soft); max-width:52ch; margin:0 auto 18px; font-size:15px;}
-  .completion .total{font-family:'Baloo 2',sans-serif; font-size:30px; color:var(--accent-dark);}
+  .done-top{padding:34px 24px 4px;}
+  .completion .done-top h3{font-size:34px; margin-bottom:6px;}
+  .completion .done-top p{color:var(--ink-soft); max-width:52ch; margin:0 auto 6px; font-size:15px;}
+  .done-bottom{padding:22px 24px 28px;}
+
+  /* КУПКА НЕЙРОНЧИКІВ */
+  .pile{position:relative; width:130px; height:40px; margin:16px auto 0; transition:height .3s ease;}
+  .pile svg{position:absolute; width:18px; height:18px; transform:rotate(var(--r)); filter:drop-shadow(0 1px 1px rgba(138,78,15,.45));}
+  .flyer{position:fixed; left:0; top:0; z-index:60; width:18px; height:18px; pointer-events:none; filter:drop-shadow(0 1px 1px rgba(138,78,15,.45));}
+  .pile-total{margin-top:4px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:17px; color:#8A4E0F;}
+  .pile-total b{font-size:28px; margin-right:4px;}
+
+  /* ТЕСТОВА КНОПКА (лише локально або з ?test в адресі) */
+  .test-tools{max-width:760px; margin:0 auto; padding:24px 24px 0; text-align:center;}
+  .btn-test{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; background:none; color:var(--ink-soft); border:1.5px dashed var(--ink-soft); padding:8px 16px; border-radius:var(--radius-s); cursor:pointer;}
+  .btn-test:hover{color:var(--ink); border-color:var(--ink);}
+  @media (max-width:520px){ .done-top{padding:26px 16px 20px;} .completion .done-top h3{font-size:28px;} .done-bottom{padding:20px 14px 24px;} }
+
+  /* СМУЖКА БЛОКІВ ЛІВОРУЧ */
+  section.block{scroll-margin-top:60px;}
+  .lesson-rail{position:fixed; z-index:45; left:0; bottom:0; top:60px; display:flex; flex-direction:column;}
+  .lesson-rail button{position:relative; flex:1; width:16px; padding:0; border:none; background:none; cursor:pointer;}
+  /* стан блоку: сірий — не пройдено, зелений — пройдено */
+  .lesson-rail button::before{content:''; position:absolute; left:0; top:0; bottom:0; width:5px; background:var(--line); transition:background .3s ease;}
+  .lesson-rail button.done::before{background:var(--ok);}
+  /* поточний блок — синя лінія поруч зі станом */
+  .lesson-rail button::after{content:''; position:absolute; left:5px; top:0; bottom:0; width:3px; background:var(--accent); opacity:0; transition:opacity .2s ease;}
+  .lesson-rail button.current::after{opacity:1;}
+  .lesson-rail button:hover::before{filter:brightness(.88);}
+  .lesson-rail button:focus{outline:none;}
+  .lesson-rail button:focus-visible::after{opacity:1;}
+  .rail-tip{position:absolute; left:16px; top:50%; transform:translate(-4px, -50%); white-space:nowrap; text-align:left; background:var(--surface); color:var(--ink); border:1px solid var(--line); box-shadow:0 4px 14px rgba(31,31,31,.08); font-family:'Nunito Sans',sans-serif; font-size:12.5px; font-weight:700; padding:5px 10px; border-radius:8px; pointer-events:none; opacity:0; transition:opacity .15s ease, transform .15s ease;}
+  .rail-tip small{display:block; font-weight:400; font-size:11.5px; color:var(--ink-soft);}
+  .lesson-rail button.done .rail-tip small{color:var(--ok);}
+  .lesson-rail button:hover .rail-tip, .lesson-rail button:focus-visible .rail-tip{opacity:1; transform:translate(0, -50%);}
+  @media (hover:none){ .rail-tip{display:none;} }
+
+  /* ПОКРАЩИТИ РЕЗУЛЬТАТ */
+  .donuts{display:flex; justify-content:center; gap:36px; flex-wrap:wrap; margin:0 0 4px;}
+  .donut{margin:0; width:150px; text-align:center;}
+  .donut-ring{position:relative; width:130px; height:130px; margin:0 auto;}
+  .donut-ring svg{width:100%; height:100%; transform:rotate(-90deg);}
+  .donut-ring circle{fill:none; stroke-width:11;}
+  .donut-ring .trk{stroke:var(--line);}
+  .donut-ring .val{stroke-linecap:round; transition:stroke-dashoffset .8s ease, stroke .8s ease;}
+  .donut-ring b{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-size:30px; transition:color .8s ease;}
+  .donut figcaption{margin-top:8px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:17px; line-height:1.2;}
+  .donut figcaption small{display:block; font-family:'Nunito Sans',sans-serif; font-weight:600; font-size:13px; color:var(--ink-soft);}
+  .done-actions{display:flex; flex-direction:column; align-items:center; gap:12px; margin-top:22px;}
+  .btn-sun{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--g-yellow); color:#3C2A00; border:none; padding:10px 22px; border-radius:999px; cursor:pointer; box-shadow:0 3px 0 #D99A00; transition:transform .1s ease, background .15s ease;}
+  .btn-sun:hover{background:#FFC72C;}
+  .btn-sun:active{transform:translateY(2px); box-shadow:0 1px 0 #D99A00;}
+
+  /* РЕЗУЛЬТАТ ЗА ПОСИЛАННЯМ */
+  .rs-btn{display:inline-flex; align-items:center; gap:10px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; background:var(--surface); color:var(--accent-dark); border:2px solid var(--accent); padding:10px 20px 10px 14px; border-radius:999px; cursor:pointer; transition:background .15s ease, transform .1s ease;}
+  .rs-btn:hover{background:var(--accent-soft);}
+  .rs-btn:active{transform:scale(.97);}
+  .rs-btn:focus{outline:none;}
+  .rs-btn:focus-visible{outline:3px solid var(--accent); outline-offset:2px;}
+  .rs-btn svg{width:26px; height:26px;}
+  .rs-btn.done{border-color:var(--ok); color:var(--ok);}
 
   footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
   footer .credits{display:block; max-width:62ch; margin:12px auto 0; font-size:11.5px; line-height:1.55; opacity:.8;}
@@ -470,6 +545,13 @@
     <h2>Три найвідоміші хмарні сховища</h2>
     <p><b>Хмарне сховище</b> — сервіс, де можна тримати файли й ділитися ними. Безкоштовно дають кілька гігабайтів, більше — за підписку. Ми працюватимемо з Google Диском, але корисно знати й інші. Клацни на картку, щоб дізнатися більше.</p>
     <div class="gallery" id="driveGallery"></div>
+    <h3>Перевір себе</h3>
+    <p class="soft">Обери сховище, а потім клацни його особливість.</p>
+    <div class="exercise">
+      <div class="match-pool" id="storePool"></div>
+      <div id="storeList"></div>
+      <div class="progress-line" id="storeProgress"></div>
+    </div>
   </section>
 
   <section class="block">
@@ -559,6 +641,17 @@
       </div>
     </div>
     <div class="note">💡 Google Диск, яким ти користуєшся, — це <b>SaaS</b>: ти просто відкриваєш його, а про сервери, оновлення й захист дбає Google.</div>
+    <h3>Розклади по моделях</h3>
+    <p class="soft">Клацни ситуацію, а потім модель, до якої вона належить.</p>
+    <div class="exercise">
+      <div class="sort-buckets three">
+        <div class="bucket" id="bkIaas"><div class="bucket-title">IaaS<small>🍕 кухня в оренду</small></div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkPaas"><div class="bucket-title">PaaS<small>🍕 основа + твоя начинка</small></div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkSaas"><div class="bucket-title">SaaS<small>🍕 готова піца</small></div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="modelPool"></div>
+      <div class="progress-line" id="modelProgress"></div>
+    </div>
   </section>
 
   <section class="block">
@@ -686,18 +779,27 @@
       <div class="quiz-nav"><button class="btn-next" id="quizNext">Далі</button></div>
     </div>
     <div class="completion" id="completion">
-      <svg class="badge" viewBox="0 0 24 24" fill="none">
-        <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#6C5CE7"/>
-        <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#6C5CE7"/>
-        <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#6C5CE7"/>
-        <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#6C5CE7"/>
-        <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#6C5CE7"/>
-        <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#6C5CE7" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#6C5CE7"/>
-        <circle cx="12" cy="12" r="4.4" fill="#6C5CE7"/><circle cx="12" cy="12" r="1.6" fill="#5340c9" opacity="0.6"/>
-      </svg>
+      <div class="done-top">
       <h3>Урок пройдено!</h3>
       <p>Тепер ти знаєш, що таке хмарні сервіси й моделі IaaS, PaaS, SaaS, де що лежить на Google Диску, як налаштувати доступ до документа, чим синхронізація відрізняється від резервної копії і як поділитися файлами.</p>
-      <div class="total">Разом: <span id="totalNeurons">0</span> нейрончиків</div>
+      <div class="pile" id="pile" aria-hidden="true"></div>
+      <div class="pile-total"><b id="pileCount">0</b><span id="pileWord">нейрончиків</span></div>
+      </div>
+      <div class="done-bottom">
+      <div class="donuts">
+        <figure class="donut" id="dnPassed">
+          <div class="donut-ring"><svg viewBox="0 0 100 100"><circle class="trk" cx="50" cy="50" r="42"/><circle class="val" cx="50" cy="50" r="42"/></svg><b></b></div>
+          <figcaption>Пройдено<small></small></figcaption>
+        </figure>
+        <figure class="donut" id="dnAccuracy">
+          <div class="donut-ring"><svg viewBox="0 0 100 100"><circle class="trk" cx="50" cy="50" r="42"/><circle class="val" cx="50" cy="50" r="42"/></svg><b></b></div>
+          <figcaption>Точність<small>з урахуванням помилок</small></figcaption>
+        </figure>
+      </div>
+      <div class="done-actions" id="doneActions">
+        <button class="btn-sun" id="backBtn">← Повернутися до уроку</button>
+      </div>
+      </div>
     </div>
   </section>
 
@@ -740,12 +842,83 @@ window.addEventListener('scroll', ()=>{
   hudFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
 });
 
+/* ---------- ОБЛІК БЛОКІВ ----------
+   Вправа реєструється через stepTask(елемент, скільки нейрончиків можна отримати, скільки в ній елементів
+   [, true — для підсумкового тесту]) і викликає повернуту функцію, коли завершена.
+   Кількість елементів (картки, пари, кроки...) потрібна для точності: виконані / (усі елементи + помилки);
+   про кожен правильно виконаний елемент вправа повідомляє через done.item(). Блок пройдено, коли завершено всі його вправи
+   (у кожному блоці має бути хоча б одна). Стан блоків видно на смужці ліворуч
+   і передається в посилання з результатами. */
+const stepTask = (()=>{
+  const blocks = [...document.querySelectorAll('section')].filter(s=>s.querySelector('.step-label'));
+  const tasks = blocks.map(()=>({ total:0, done:0, max:0, items:0, ok:0, quiz:false, finished:false }));
+
+  // Смужка ліворуч: висота екрана ділиться на блоки; сірий — не пройдено, зелений — пройдено
+  const rail = document.createElement('nav');
+  rail.className = 'lesson-rail';
+  rail.setAttribute('aria-label', 'Блоки уроку');
+  rail.innerHTML = blocks.map(b=>{
+    const label = b.querySelector('.step-label').textContent.trim();
+    return `<button aria-label="${label}"><span class="rail-tip">${label}<small>ще не пройдено</small></span></button>`;
+  }).join('');
+  document.body.appendChild(rail);
+  const segs = [...rail.children];
+  segs.forEach((s, i)=>s.addEventListener('click', ()=>blocks[i].scrollIntoView({behavior:'smooth'})));
+  const hud = document.querySelector('.hud');
+  const placeRail = ()=>{ rail.style.top = (hud ? hud.offsetHeight : 0) + 'px'; };
+  addEventListener('resize', placeRail);
+
+  function finish(i){
+    if(tasks[i].finished) return;
+    tasks[i].finished = true;
+    segs[i].classList.add('done');
+    segs[i].querySelector('small').textContent = 'пройдено ✓';
+    register.onChange?.();
+  }
+  function onScroll(){
+    let cur = -1;
+    blocks.forEach((b, i)=>{
+      const r = b.getBoundingClientRect();
+      if(r.top < innerHeight * 0.4) cur = i;
+    });
+    segs.forEach((s, i)=>s.classList.toggle('current', i === cur));
+  }
+  addEventListener('scroll', onScroll, {passive:true});
+  requestAnimationFrame(()=>{
+    placeRail(); onScroll();
+    tasks.forEach((x, i)=>{ if(!x.total) console.warn('Блок без завдання:', blocks[i].querySelector('.step-label').textContent); });
+  });
+
+  const register = (el, max, items, quiz)=>{
+    const i = blocks.indexOf(el.closest('section'));
+    if(i < 0){ const noop = ()=>{}; noop.item = noop; return noop; }
+    tasks[i].total++;
+    tasks[i].max += max;
+    tasks[i].items += items;
+    if(quiz) tasks[i].quiz = true;
+    let called = false;
+    const done = ()=>{
+      if(called) return;
+      called = true;
+      if(++tasks[i].done === tasks[i].total) finish(i);
+    };
+    done.item = ()=>{ tasks[i].ok++; };
+    return done;
+  };
+  register.blocks = blocks;
+  register.finish = finish;
+  register.tasks = tasks;
+  return register;
+})();
+
 /* ---------- УНІВЕРСАЛЬНІ МЕХАНІКИ ---------- */
 
 function shuffle(arr){ return [...arr].sort(()=>Math.random()-0.5); }
 
 function makeChoices(containerId, items){
   const list = document.getElementById(containerId);
+  const done = stepTask(list, items.length, items.length);
+  let left = items.length;
   items.forEach(item=>{
     const card = document.createElement('div');
     card.className = 'classify-card';
@@ -765,6 +938,8 @@ function makeChoices(containerId, items){
           answered = true;
           fb.textContent = 'Правильно ✓ ' + (item.why || '');
           addNeurons(1);
+          done.item();
+          if(--left === 0) done();
         } else {
           btn.classList.add('wrong');
           fb.textContent = 'Ще раз подумай';
@@ -780,6 +955,7 @@ function makeMatching(poolId, listId, pairs, progressId, bonus){
   const pool = document.getElementById(poolId);
   const list = document.getElementById(listId);
   const progress = document.getElementById(progressId);
+  const done = stepTask(list, pairs.length + (bonus || 2), pairs.length);
   let selected = null, matched = 0;
 
   function updateProgress(){
@@ -815,16 +991,65 @@ function makeMatching(poolId, listId, pairs, progressId, bonus){
         const chip = [...pool.children].find(c=>c.textContent.trim() === p.name);
         if(chip) chip.classList.add('placed');
         selected = null;
-        matched++;
+        matched++; done.item();
         addNeurons(1);
         updateProgress();
-        if(matched === pairs.length) addNeurons(bonus || 2);
+        if(matched === pairs.length){ addNeurons(bonus || 2); done(); }
       } else {
         card.classList.add('shake');
         setTimeout(()=>card.classList.remove('shake'), 350);
       }
     });
     list.appendChild(card);
+  });
+  updateProgress();
+}
+
+function makeSortBoard(poolId, bucketMap, items, progressId, bonus){
+  const pool = document.getElementById(poolId);
+  const progress = document.getElementById(progressId);
+  const done = stepTask(pool, items.length + (bonus || 2), items.length);
+  const buckets = {};
+  Object.entries(bucketMap).forEach(([key,id])=>{ buckets[key] = document.getElementById(id); });
+  let selected = null, placed = 0;
+
+  function updateProgress(){
+    progress.textContent = (placed === items.length)
+      ? 'Усе розкладено ✓'
+      : `Розкладено: ${placed} з ${items.length}`;
+  }
+
+  shuffle(items).forEach(item=>{
+    const chip = document.createElement('div');
+    chip.className = 'sort-chip';
+    chip.textContent = item.text;
+    chip.dataset.bucket = item.bucket;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.sort-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected');
+      selected = chip;
+    });
+    pool.appendChild(chip);
+  });
+
+  Object.entries(buckets).forEach(([key, el])=>{
+    el.addEventListener('click', ()=>{
+      if(!selected) return;
+      if(selected.dataset.bucket === key){
+        selected.classList.add('placed');
+        selected.classList.remove('selected');
+        el.querySelector('.bucket-items').appendChild(selected);
+        selected = null;
+        placed++; done.item();
+        addNeurons(1);
+        updateProgress();
+        if(placed === items.length){ addNeurons(bonus || 2); done(); }
+      } else {
+        el.classList.add('wrong');
+        setTimeout(()=>el.classList.remove('wrong'), 350);
+      }
+    });
   });
   updateProgress();
 }
@@ -850,11 +1075,12 @@ function makeSequence(doneId, qId, optsId, fbId, steps, finalText){
   const qEl = document.getElementById(qId);
   const optsEl = document.getElementById(optsId);
   const fb = document.getElementById(fbId);
+  const done = stepTask(optsEl, steps.length + 3, steps.length);
   const ordinals = ['ПЕРШИМ','ДРУГИМ','ТРЕТІМ','ЧЕТВЕРТИМ','П’ЯТИМ','ШОСТИМ','СЬОМИМ'];
   let pos = 0;
   function render(){
     optsEl.innerHTML = '';
-    if(pos === steps.length){ qEl.textContent = ''; fb.textContent = finalText; addNeurons(3); return; }
+    if(pos === steps.length){ qEl.textContent = ''; fb.textContent = finalText; addNeurons(3); done(); return; }
     qEl.innerHTML = `Що робиш <b>${ordinals[pos]}</b>?`;
     shuffle(steps.slice(pos)).forEach(s=>{
       const b = document.createElement('button');
@@ -864,7 +1090,7 @@ function makeSequence(doneId, qId, optsId, fbId, steps, finalText){
         if(s === steps[pos]){
           doneEl.insertAdjacentHTML('beforeend', `<li>${s}</li>`);
           fb.textContent = '';
-          pos++; addNeurons(1);
+          pos++; addNeurons(1); done.item();
           render();
         } else { b.classList.add('wrong'); fb.textContent = 'Не зараз — спершу потрібно інше.'; }
       });
@@ -880,7 +1106,8 @@ function makeQuiz(prefix, questions, perCorrect, onDone){
   const progEl = document.getElementById(prefix + 'Progress');
   const whyEl = document.getElementById(prefix + 'Why');
   const nextBtn = document.getElementById(prefix + 'Next');
-  let qi = 0, answered = false, score = 0;
+  const done = stepTask(qEl, questions.length * perCorrect + 3, questions.length, true);   // +3 — бонус за завершення, нараховується в onDone
+  let qi = 0, answered = false, score = 0, best = 0, attempt = 0;
 
   function render(){
     answered = false;
@@ -901,7 +1128,8 @@ function makeQuiz(prefix, questions, perCorrect, onDone){
           if(oi === item.correct) ob.classList.add('correct');
           else if(oi === i) ob.classList.add('wrong');
         });
-        if(i === item.correct){ score++; addNeurons(perCorrect); }
+        // при перездачі нейрончики даються лише за відповіді понад найкращий результат
+        if(i === item.correct){ score++; if(score > best) addNeurons(perCorrect); }
         if(item.why) whyEl.textContent = (i === item.correct ? '✓ ' : 'Правильну відповідь підсвічено. ') + item.why;
         nextBtn.classList.add('active');
         nextBtn.textContent = (qi === questions.length-1) ? 'Завершити' : 'Далі';
@@ -913,9 +1141,10 @@ function makeQuiz(prefix, questions, perCorrect, onDone){
     if(!nextBtn.classList.contains('active')) return;
     qi++;
     if(qi < questions.length) render();
-    else onDone(score, questions.length);
+    else { best = Math.max(best, score); attempt++; done(); onDone(best, questions.length, attempt); }
   });
   render();
+  return { restart(){ qi = 0; score = 0; render(); } };
 }
 
 /* ---------- ПОВТОРЕННЯ: БРАУЗЕР ---------- */
@@ -964,6 +1193,22 @@ makeGallery('driveGallery', [
   { name:'Dropbox', logo:'dropbox.svg', free:'2 ГБ безкоштовно', color:'#0061FE', colorLight:'#E5EFFF',
     facts:['Один із перших хмарних сервісів, з 2008 року','Відомий швидкою синхронізацією папки між пристроями','Спільні папки: запрошуєш людей за адресою пошти'] }
 ]);
+
+makeMatching('storePool', 'storeList', [
+  { name:'Google Диск', desc:'Вільне місце тут спільне з поштою й фотоархівом того самого облікового запису' },
+  { name:'OneDrive', desc:'Уже вбудований у Windows і працює в парі з Word та Excel' },
+  { name:'Dropbox', desc:'Один із найперших хмарних сервісів, але безкоштовно дає найменше місця' }
+], 'storeProgress', 2);
+
+/* ---------- КРОК 4: МОДЕЛІ ХМАРНИХ СЕРВІСІВ ---------- */
+makeSortBoard('modelPool', { iaas:'bkIaas', paas:'bkPaas', saas:'bkSaas' }, [
+  { text:'Компанія орендує в хмарі віртуальний сервер і сама встановлює на нього операційну систему', bucket:'iaas' },
+  { text:'Адміністратор сам налаштовує орендовані віртуальні машини й мережу між ними', bucket:'iaas' },
+  { text:'Програміст завантажує лише код свого сайту — сервер і база даних уже готові', bucket:'paas' },
+  { text:'Розробник гри пише код, а хмара сама запускає її й додає потужності, коли гравців стає більше', bucket:'paas' },
+  { text:'Пишеш твір у Google Документах просто в браузері', bucket:'saas' },
+  { text:'Перевіряєш пошту в Gmail, нічого не встановлюючи', bucket:'saas' }
+], 'modelProgress', 2);
 
 /* Значки меню Google Диска (гліфи Material, як в інтерфейсі Диска) */
 const GDI = {
@@ -1035,6 +1280,7 @@ document.querySelectorAll('.gdi[data-i]').forEach(el=>{ el.innerHTML = `<svg vie
   const numEl = document.getElementById('tourNum');
   const taskEl = document.getElementById('tourTask');
   const progress = document.getElementById('tourProgress');
+  const done = stepTask(side, TASKS.length + 2, TASKS.length);
   let ti = 0;
   const btns = {};
   SECTIONS.forEach(sec=>{
@@ -1066,8 +1312,8 @@ document.querySelectorAll('.gdi[data-i]').forEach(el=>{ el.innerHTML = `<svg vie
     if(ti >= TASKS.length) return;
     if(sec.id === TASKS[ti].id){
       b.classList.add('ok'); setTimeout(()=>b.classList.remove('ok'), 600);
-      ti++; addNeurons(1);
-      if(ti === TASKS.length) addNeurons(2);
+      ti++; addNeurons(1); done.item();
+      if(ti === TASKS.length){ addNeurons(2); done(); }
       renderTask();
     } else {
       b.classList.add('shake'); setTimeout(()=>b.classList.remove('shake'), 400);
@@ -1188,6 +1434,7 @@ document.querySelectorAll('.gdi[data-i]').forEach(el=>{ el.innerHTML = `<svg vie
     paint();
   }
 
+  const shareDone = stepTask(btn, TASKS.length + 2, TASKS.length);
   btn.addEventListener('click', ()=>{
     if(solved){
       ti++;
@@ -1199,13 +1446,14 @@ document.querySelectorAll('.gdi[data-i]').forEach(el=>{ el.innerHTML = `<svg vie
         fb.className = 'share-fb good';
         fb.textContent = 'Ти вмієш налаштовувати доступ до документів!';
         addNeurons(2);
+        shareDone();
       }
       return;
     }
     const t = TASKS[ti];
     const ok = access === t.access && (t.access === 'private' || role === t.role);
     if(ok){
-      solved = true;
+      solved = true; shareDone.item();
       fb.className = 'share-fb good';
       fb.textContent = 'Правильно ✓ ' + t.why;
       addNeurons(1);
@@ -1305,14 +1553,15 @@ makeMatching('integPool', 'integList', [
     return msg;
   }
 
+  const syncDone = stepTask(statusEl, STEPS.length + 2, STEPS.length);
   async function go(){
     if(busy || step >= STEPS.length) return;
     busy = true; render();
     const msg = await STEPS[step].run();
     statusEl.textContent = msg;
-    step++; busy = false;
+    step++; busy = false; syncDone.item();
     addNeurons(1);
-    if(step === STEPS.length) addNeurons(2);
+    if(step === STEPS.length){ addNeurons(2); syncDone(); }
     render();
   }
 
@@ -1339,7 +1588,7 @@ makeSequence('seqDone', 'seqQ', 'seqOpts', 'seqFb', [
 ], 'Готово ✓ Однокласники отримають лист із посиланням на папку, а ти будь-коли зможеш змінити їхній доступ.');
 
 /* ---------- ФІНАЛЬНИЙ КВІЗ ---------- */
-makeQuiz('quiz', [
+const finalQuiz = makeQuiz('quiz', [
   { q:'Де насправді зберігаються файли з хмарного сховища?',
     opts:['У хмарах у небі','На серверах у центрах обробки даних','Лише на твоєму телефоні'], correct:1 },
   { q:'Ти користуєшся готовим поштовим сервісом у браузері, нічого не встановлюючи. Яка це модель?',
@@ -1361,12 +1610,305 @@ makeQuiz('quiz', [
     why:'Для пошти це завеликий обсяг, а месенджер може стиснути відео.' },
   { q:'Що таке інтеграція сервісів?',
     opts:['Видалення непотрібних програм','Об’єднання сервісів, щоб вони обмінювалися даними між собою','Купівля платної підписки'], correct:1 }
-], 2, ()=>{
+], 2, (best, total, attempt)=>{
   document.getElementById('quizBox').style.display = 'none';
   document.getElementById('completion').classList.add('show');
-  addNeurons(3);
-  document.getElementById('totalNeurons').textContent = neurons;
+  if(attempt === 1) addNeurons(3);
+  lessonResult.quizDone(best, total);
 });
+// Повернення до уроку: тест знову доступний, переходимо до першого непройденого блоку (або до тесту)
+document.getElementById('backBtn').addEventListener('click', ()=>{
+  document.getElementById('completion').classList.remove('show');
+  lessonResult.showCounter();
+  document.getElementById('quizBox').style.display = '';
+  finalQuiz.restart();
+  const i = stepTask.tasks.findIndex(x=>!x.finished);
+  (i >= 0 ? stepTask.blocks[i] : document.getElementById('finalQuizSection')).scrollIntoView({behavior:'smooth'});
+});
+
+/* ---------- РЕЗУЛЬТАТ ЗА ПОСИЛАННЯМ ----------
+   Учень наприкінці копіює посилання на спільну сторінку result/, де після «#» закодовано все потрібне:
+   назва уроку, клас, блоки з точністю, нейрончики, час. Вчитель відкриває посилання й бачить картку з результатами —
+   сам урок для цього не потрібен. Контрольна сума (та сама сіль, що й у result/index.html)
+   не дає непомітно змінити числа в посиланні вручну. */
+const lessonResult = (()=>{
+  const SALT = 'cikavo·131';
+  const WRONG = ['wrong','wrong-try','wrong-flash','miss','bad','shake'];
+  const steps = stepTask.blocks;
+  const errs = steps.map(()=>0);               // помилкові спроби на кожен блок
+  const completionEl = document.getElementById('completion');
+  const showing = ()=>completionEl.classList.contains('show');
+  const label = el=>el.textContent.replace(/\s+/g, ' ').trim();
+  let quiz = null, t0 = 0, t1 = 0, action = 0, counted = -1;
+
+  // Час рахується від першої дії учня в будь-якому блоці уроку
+  const touch = e=>{
+    action++;
+    if(!t0 && steps.includes(e.target.closest?.('section'))) t0 = Date.now();
+  };
+  ['pointerdown','keydown','drop'].forEach(t=>document.addEventListener(t, touch, true));
+
+  const baseAdd = addNeurons;
+  addNeurons = n=>{ baseAdd(n); summary(); };
+
+  const pct = (a, b)=>b ? Math.min(100, Math.round(a / b * 100)) : 0;
+
+  // Точність блоку: тест — найкращий результат (не здано — 0%);
+  // вправи — виконані елементи / (усі елементи + помилкові спроби), тож невиконане рахується як помилка.
+  // Загальна точність — середнє по всіх блоках.
+  function accuracy(){
+    const per = stepTask.tasks.map((T, i)=>{
+      if(T.quiz) return quiz ? pct(quiz[0], quiz[1]) : 0;
+      return T.items ? pct(T.finished ? T.items : Math.min(T.ok, T.items), T.items + errs[i]) : null;
+    });
+    const vals = per.filter(v=>v !== null);
+    return { per, avg: vals.length ? Math.round(vals.reduce((a, b)=>a + b, 0) / vals.length) : 0 };
+  }
+
+  // Колір від червоного (0%) до зеленого (100%)
+  const heat = v=>`hsl(${Math.round(v * 1.2)}, 68%, 42%)`;
+  function setDonut(id, v, caption){
+    const fig = document.getElementById(id);
+    const c = fig.querySelector('.val'), C = 2 * Math.PI * 42;
+    c.style.strokeDasharray = C;
+    c.style.strokeDashoffset = C * (1 - v / 100);
+    c.style.stroke = heat(v);
+    c.style.opacity = v ? 1 : 0;
+    const b = fig.querySelector('b');
+    b.textContent = v + '%';
+    b.style.color = heat(v);
+    if(caption !== undefined) fig.querySelector('small').textContent = caption;
+  }
+
+  // Підсумок для учня на екрані завершення: пройдено, точність
+  function summary(){
+    const passed = stepTask.tasks.filter(x=>x.finished).length;
+    setDonut('dnPassed', pct(passed, steps.length), `${passed} з ${steps.length} блоків`);
+    setDonut('dnAccuracy', accuracy().avg);
+    if(showing()) renderPile();
+  }
+  stepTask.onChange = summary;
+
+  // Купка нейрончиків на екрані завершення. Кожен зароблений нейрончик лягає у випадкове місце,
+  // скочується вбік, поки поруч є нижче місце, і частково накладається на сусідів — так складається горбик.
+  // Нові нейрончики вилітають з лічильника в HUD і падають на купку; лічильник при цьому зменшується,
+  // а після останнього ховається. Після повернення до уроку лічильник з'являється знову, без анімації.
+  const pileEl = document.getElementById('pile');
+  const counterEl = document.querySelector('.neuron-counter');
+  // купка не більша за діаграму точності (130×130): чим більше нейрончиків, тим щільніше вони лягають
+  const PILE_W = 130, PILE_MAX = 130, ICON = 18, COL = 2, SLOPE = 10;
+  const ICON_SVG = counterEl.querySelector('svg').innerHTML;
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  let pileH = [], pileN = 0, landed = 0, flying = 0;
+  const plural = (n, one, few, many)=>{
+    const a = n % 10, b = n % 100;
+    return a === 1 && b !== 11 ? one : a >= 2 && a <= 4 && (b < 10 || b >= 20) ? few : many;
+  };
+  function setPileCount(){
+    document.getElementById('pileCount').textContent = landed;
+    document.getElementById('pileWord').textContent = plural(landed, 'нейрончик', 'нейрончики', 'нейрончиків');
+  }
+  function hideCounter(){ if(showing() && !flying) counterEl.classList.add('gone'); }
+  function showCounter(){
+    counterEl.style.transition = 'none';
+    counterEl.classList.remove('gone');
+    neuronEl.textContent = neurons;
+    counterEl.offsetWidth;                 // застосувати без анімації
+    counterEl.style.transition = '';
+  }
+  const icon = cls=>{
+    const svg = document.createElementNS(SVGNS, 'svg');
+    svg.setAttribute('viewBox', '0 0 24 24');
+    svg.innerHTML = ICON_SVG;
+    if(cls) svg.classList.add(cls);
+    return svg;
+  };
+
+  function renderPile(){
+    const n = Math.max(0, neurons);
+    if(n < pileN){ pileEl.innerHTML = ''; pileH = []; pileN = 0; landed = 0; }
+    const span = Math.ceil(ICON / COL), half = Math.ceil(span / 2), cols = Math.floor(PILE_W / COL) - span;
+    if(!pileH.length) pileH = Array(cols + span).fill(0);
+    // нейрончик лягає на середню висоту під собою — частково западає між сусідами
+    const top = c=>pileH.slice(c, c + span).reduce((t, h)=>t + h, 0) / span;
+    const layer = Math.max(2.5, Math.min(8, PILE_W * (PILE_MAX - ICON) * .55 / (Math.max(1, n) * ICON)));
+    const fresh = [];
+    for(let k = pileN; k < n; k++){
+      // ближче до центру падає частіше
+      let c = Math.round((Math.random() + Math.random()) / 2 * cols);
+      // скочується на пів нейрончика в нижчий бік, поки перепад висот більший за SLOPE
+      for(let guard = 0; guard < cols; guard++){
+        const here = top(c), l = c - half >= 0 ? top(c - half) : Infinity, r = c + half <= cols ? top(c + half) : Infinity;
+        if(here - Math.min(l, r) < SLOPE) break;
+        c += (l < r ? -1 : r < l ? 1 : (Math.random() < .5 ? -1 : 1)) * half;
+      }
+      const y = Math.min(top(c), PILE_MAX - ICON);
+      for(let j = c; j < c + span; j++) pileH[j] = Math.max(pileH[j], y + layer);
+      const svg = icon();
+      svg.style.left = (c * COL / PILE_W * 100) + '%';
+      svg.style.bottom = y + 'px';
+      svg.style.setProperty('--r', Math.round(Math.random() * 360) + 'deg');
+      svg.style.opacity = 0;               // з'явиться, коли долетить
+      pileEl.appendChild(svg);
+      fresh.push(svg);
+    }
+    pileN = n;
+    pileEl.style.height = Math.min(PILE_MAX, Math.max(40, Math.max(...pileH) + ICON)) + 'px';
+    if(!fresh.length){ setPileCount(); hideCounter(); return; }
+
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches){
+      fresh.forEach(s=>s.style.opacity = '');
+      landed += fresh.length; setPileCount(); hideCounter();
+      return;
+    }
+    flying += fresh.length;
+    // купка має бути на екрані, щоб було видно, куди летять нейрончики
+    const r = pileEl.getBoundingClientRect(), hud = document.querySelector('.hud').offsetHeight;
+    const visible = r.top >= hud && r.bottom <= innerHeight;
+    if(!visible) pileEl.scrollIntoView({behavior:'smooth', block:'center'});
+    setTimeout(()=>{
+      const step = Math.min(45, 2200 / fresh.length);
+      fresh.forEach((svg, k)=>setTimeout(()=>fly(svg), k * step));
+    }, visible ? 200 : 750);
+  }
+
+  function land(svg){
+    svg.style.opacity = '';
+    landed++; flying--;
+    setPileCount(); hideCounter();
+  }
+  function fly(svg){
+    // якщо учень уже повернувся до уроку — без польоту
+    if(!showing()) return land(svg);
+    const from = counterEl.querySelector('svg').getBoundingClientRect();
+    const to = svg.getBoundingClientRect();
+    const sx = from.left + from.width / 2 - ICON / 2, sy = from.top + from.height / 2 - ICON / 2;
+    const tx = to.left + to.width / 2 - ICON / 2, ty = to.top + to.height / 2 - ICON / 2;
+    const rot = svg.style.getPropertyValue('--r');
+    neuronEl.textContent = Math.max(0, (+neuronEl.textContent || 0) - 1);
+    const f = icon('flyer');
+    document.body.appendChild(f);
+    f.animate([
+      {transform:`translate(${sx}px, ${sy}px) scale(1.2) rotate(0deg)`},
+      {transform:`translate(${tx}px, ${ty}px) scale(1) rotate(${rot})`}
+    ], {duration:650 + Math.random() * 200, easing:'cubic-bezier(.5,0,.5,1)'}).onfinish = ()=>{ f.remove(); land(svg); };
+  }
+
+  // Помилка — елемент отримав клас на кшталт .wrong; рахуємо одну на дію, у блоці, де вона сталася
+  new MutationObserver(list=>{
+    if(counted === action) return;
+    for(const m of list){
+      const cl = m.target.classList, was = m.oldValue || '';
+      const i = steps.indexOf(m.target.closest?.('section'));
+      if(i >= 0 && WRONG.some(c=>cl?.contains(c) && !was.split(' ').includes(c))){ errs[i]++; counted = action; return; }
+    }
+  }).observe(document.body, {subtree:true, attributes:true, attributeFilter:['class'], attributeOldValue:true});
+
+  function sign(str){   // cyrb53
+    let h1 = 0xdeadbeef, h2 = 0x41c6ce57;
+    for(const ch of SALT + str){ const c = ch.codePointAt(0); h1 = Math.imul(h1 ^ c, 2654435761); h2 = Math.imul(h2 ^ c, 1597334677); }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+  }
+  function b64url(bytes){
+    let bin = '';
+    bytes.forEach(b=>bin += String.fromCharCode(b));
+    return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+  }
+  // Стискаємо вбудованим у браузер deflate (як gzip, але без заголовків — коротше): «z=…»;
+  // браузер без CompressionStream передає дані без стиснення: «j=…»
+  async function pack(str){
+    const bytes = new TextEncoder().encode(str);
+    if(typeof CompressionStream === 'undefined') return 'j=' + b64url(bytes);
+    const z = await new Response(new Blob([bytes]).stream().pipeThrough(new CompressionStream('deflate-raw'))).arrayBuffer();
+    return 'z=' + b64url(new Uint8Array(z));
+  }
+  const minutes = ms=>Math.max(1, Math.round(ms / 60000));
+  const text = sel=>{ const el = document.querySelector(sel); return el ? label(el) : ''; };
+
+  // Формат даних (v:1) — його ж читає result/index.html:
+  // c — клас і тема, t — назва уроку, d — час завершення (секунди),
+  // m — хвилин на урок, n — [нейрончики, максимум], a — загальна точність,
+  // b — блоки: [назва, пройдено (1/0), точність або -1, якщо в блоці нічого рахувати], h — контрольна сума
+  async function makeLink(){
+    const end = t1 || Date.now(), A = accuracy();
+    const d = {
+      v:1,
+      c:text('.hud-title'),
+      t:text('.hero h1') || document.title,
+      d:Math.round(end / 1000),
+      m:t0 ? minutes(end - t0) : 0,
+      n:[neurons, stepTask.tasks.reduce((t, x)=>t + x.max, 0)],
+      a:A.avg,
+      b:steps.map((sec, i)=>[label(sec.querySelector('.step-label')), stepTask.tasks[i].finished ? 1 : 0, A.per[i] ?? -1])
+    };
+    d.h = sign(JSON.stringify(d));
+    // Урок лежить на два рівні нижче кореня ({клас}/{урок}/), тож спільна сторінка — ../../result/
+    const page = new URL('../../result/' + (location.protocol === 'file:' ? 'index.html' : ''), location.href).href;
+    return page + '#' + await pack(JSON.stringify(d));
+  }
+  async function copyLink(){
+    const link = makeLink();
+    // ClipboardItem з обіцянкою — щоб Safari не відхилив копіювання через паузу на стиснення
+    try{
+      await navigator.clipboard.write([new ClipboardItem({'text/plain': link.then(s=>new Blob([s], {type:'text/plain'}))})]);
+      return true;
+    }catch(e){}
+    const str = await link;
+    let ok = false;
+    try{ await navigator.clipboard.writeText(str); ok = true; }catch(e){}
+    if(!ok){   // запасний спосіб — через тимчасове поле
+      const ta = document.createElement('textarea');
+      ta.value = str; ta.style.cssText = 'position:fixed; opacity:0;';
+      document.body.appendChild(ta); ta.select();
+      try{ ok = document.execCommand('copy'); }catch(e){}
+      ta.remove();
+    }
+    if(!ok) prompt('Скопіюй посилання:', str);
+    return ok;
+  }
+
+  // Кнопка «Поділитися результатами» на екрані завершення
+  const LINK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+    <path d="M10 7.5H7a4.5 4.5 0 0 0 0 9h3"/><path d="M14 7.5h3a4.5 4.5 0 0 1 0 9h-3"/><path d="M8.5 12h7"/></svg>`;
+  const CHECK_ICON = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>`;
+  document.getElementById('doneActions').insertAdjacentHTML('afterbegin',
+    `<button class="rs-btn" id="rsBtn">${LINK_ICON}Поділитися результатами</button>`);
+  const rsBtn = document.getElementById('rsBtn');
+  rsBtn.addEventListener('click', async ()=>{
+    const ok = await copyLink();
+    if(!ok) return;
+    rsBtn.classList.add('done'); rsBtn.innerHTML = CHECK_ICON + 'Посилання скопійоване';
+    setTimeout(()=>{ rsBtn.classList.remove('done'); rsBtn.innerHTML = LINK_ICON + 'Поділитися результатами'; }, 1600);
+  });
+
+  // Для швидкої перевірки: випадково позначає блоки пройденими, нараховує нейрончики й показує екран завершення
+  function simulate(){
+    const r = (a, b)=>a + Math.floor(Math.random() * (b - a + 1));
+    let target = 0;
+    stepTask.tasks.forEach((T, i)=>{
+      const fin = T.finished || Math.random() < .7;
+      errs[i] = r(0, 3);
+      T.ok = fin ? T.items : r(0, T.items);
+      if(T.quiz) quiz = fin ? [r(Math.ceil(T.items / 2), T.items), T.items] : null;
+      target += fin ? r(Math.round(T.max * .7), T.max) : r(0, Math.floor(T.max / 2));
+      if(fin) stepTask.finish(i);
+    });
+    t1 = Date.now(); t0 = t1 - r(8, 40) * 60000;
+    document.getElementById('quizBox').style.display = 'none';
+    completionEl.classList.add('show');
+    addNeurons(target - neurons);         // купка сама прокрутиться на екран і прийме нейрончики
+  }
+  if(location.protocol === 'file:' || /[?&]test\b/.test(location.search)){
+    document.querySelector('footer').insertAdjacentHTML('beforebegin',
+      '<div class="test-tools"><button class="btn-test" id="testBtn">🧪 Тест: випадкові результати</button></div>');
+    document.getElementById('testBtn').addEventListener('click', simulate);
+  }
+
+  summary();
+  return { showCounter, quizDone(score, total){ quiz = [score, total]; t1 = Date.now(); summary(); } };
+})();
 </script>
 
 </body>
