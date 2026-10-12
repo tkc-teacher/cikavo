@@ -50,6 +50,8 @@
   @media (max-width:480px){ .lab-card{flex-wrap:wrap; padding:20px;} .lab-card svg{width:48px; height:48px;} .lab-card .lab-go{width:100%; text-align:center;} }
 
   footer{padding:20px 24px 56px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
+  footer a{color:var(--purple-dark); font-weight:700; text-decoration:none; border-bottom:1px dashed currentColor;}
+  footer a:hover{color:var(--purple);}
 </style>
 </head>
 <body>
@@ -62,7 +64,10 @@
 
 <div class="grid" id="gradesGrid"></div>
 
-<footer>м. Київ</footer>
+<footer>
+  <div>Київ, 2026</div>
+  <div><a href="mailto:tkachuk.igor@school131.kyiv.ua">tkachuk.igor@school131.kyiv.ua</a></div>
+</footer>
 
 <script>
   const grades = [1,2,3,4,5,6,7,8,9,10,11];
