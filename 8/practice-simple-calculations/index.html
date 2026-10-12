@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Піца-вечірка — Прості обчислення</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --accent:#13805A; --accent-dark:#0C5F42; --accent-soft:#E3F3EC; --bg:#F5F8F4; --line:#DCE8E0; }
+  .sample td.title{font-weight:800; text-align:center; background:#FFF3DC;}
+  .sample td.hd{font-weight:800; background:#E3F3EC; white-space:normal;}
+  .sample td.b{font-weight:800;}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="back-link" href="../index.html">← 8 клас · Теми уроків</a>
+</div></div>
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 8 клас · Прості обчислення</div>
+    <h1>🍕 Піца-вечірка класу</h1>
+    <p>Склади в Google Таблицях кошторис свята: таблиця сама порахує, скільки все коштує і скільки здати кожному.</p>
+    <div class="meta"><span>⏱ 25–30 хв</span><span>🛠 Google Таблиці</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="sheet-wrap">
+      <table class="sample">
+        <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th></tr>
+        <tr><th>1</th><td class="title" colspan="4">Піца-вечірка 8 класу</td></tr>
+        <tr><th>2</th><td></td><td></td><td></td><td></td></tr>
+        <tr><th>3</th><td class="hd">Що купуємо</td><td class="hd">Ціна, ₴</td><td class="hd">Кількість</td><td class="hd">Вартість, ₴</td></tr>
+        <tr><th>4</th><td>Піца «Маргарита»</td><td class="r">189,00 ₴</td><td class="r">3</td><td class="r">567,00 ₴</td></tr>
+        <tr><th>5</th><td>…</td><td></td><td></td><td></td></tr>
+        <tr><th>11</th><td class="b">Разом</td><td></td><td></td><td class="r b">1 580,00 ₴</td></tr>
+        <tr><th>…</th><td>…</td><td></td><td></td><td></td></tr>
+        <tr><th>16</th><td class="b">З кожного учня</td><td></td><td></td><td class="r b">56,43 ₴</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи таблицю</h3>
+        <p>Обери один зі способів:</p>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Таблиці</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Таблиці</span>.</li>
+              <li>Назви файл: <b>Піца-вечірка — Прізвище</b>.</li>
+            </ol>
+          </div>
+        </div>
+        <p>Потім перевір <span class="menu">Файл → Налаштування → Регіон: Україна</span>.</p>
+        <div class="tip">Регіон потрібен, щоб гроші показувались у гривнях, а дроби — через кому.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Введи дані</h3>
+        <p>У <b>A1</b> — назва «Піца-вечірка 8 класу». У рядок <b>3</b> — заголовки, у рядки <b>4–9</b> — покупки:</p>
+        <div class="sheet-wrap">
+          <table class="sample">
+            <tr><th></th><th>A</th><th>B</th><th>C</th></tr>
+            <tr><th>3</th><td class="b">Що купуємо</td><td class="b">Ціна, ₴</td><td class="b">Кількість</td></tr>
+            <tr><th>4</th><td>Піца «Маргарита»</td><td class="r">189</td><td class="r">3</td></tr>
+            <tr><th>5</th><td>Піца «Пепероні»</td><td class="r">235</td><td class="r">2</td></tr>
+            <tr><th>6</th><td>Сік, 1 л</td><td class="r">62</td><td class="r">4</td></tr>
+            <tr><th>7</th><td>Вода, 0,5 л</td><td class="r">18</td><td class="r">10</td></tr>
+            <tr><th>8</th><td>Тарілки (упаковка)</td><td class="r">45</td><td class="r">2</td></tr>
+            <tr><th>9</th><td>Серветки</td><td class="r">25</td><td class="r">1</td></tr>
+          </table>
+        </div>
+        <p>У <b>D3</b> напиши «Вартість, ₴».</p>
+        <div class="tip">Числа вводь без «₴» і «шт.» — інакше таблиця вважатиме їх текстом.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Порахуй вартість</h3>
+        <ol>
+          <li>У <b>D4</b> введи <span class="mono">=</span>, клацни <b>B4</b>, введи <span class="mono">*</span>, клацни <b>C4</b>, натисни Enter.</li>
+          <li>Виділи <b>D4</b> і потягни <b>маркер заповнення</b> вниз до <b>D9</b>.</li>
+        </ol>
+        <div class="check-val">Перевір себе: у D4 — 567, у D9 — 25.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Підбий підсумки</h3>
+        <p>Підписи — у стовпчик A, формули — у стовпчик D:</p>
+        <div class="sheet-wrap">
+          <table class="sample">
+            <tr><th></th><th>A</th><th>D</th></tr>
+            <tr><th>11</th><td>Разом</td><td class="f">=SUM(D4:D9)</td></tr>
+            <tr><th>12</th><td>Найдорожча покупка</td><td class="f">=MAX(D4:D9)</td></tr>
+            <tr><th>13</th><td>Найдешевша покупка</td><td class="f">=MIN(D4:D9)</td></tr>
+            <tr><th>14</th><td>Середня ціна товару</td><td class="f">=AVERAGE(B4:B9)</td></tr>
+            <tr><th>15</th><td>Учнів у класі</td><td class="r">28</td></tr>
+            <tr><th>16</th><td>З кожного учня</td><td class="f">=D11/D15</td></tr>
+          </table>
+        </div>
+        <div class="tip">Діапазон зручно виділяти мишею: набери <span class="mono">=SUM(</span> і протягни від D4 до D9. У D14 — діапазон з <b>цінами</b> (B), а не з вартістю.</div>
+        <div class="check-val">Перевір себе: разом — 1580, найдорожча — 567, найдешевша — 25.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Гроші — у гривнях</h3>
+        <ol>
+          <li>Виділи <b>B4:B9</b>, утримуй <b>Ctrl</b> і додай <b>D4:D14</b> та <b>D16</b>.</li>
+          <li><span class="menu">Формат → Число → Валюта</span>.</li>
+        </ol>
+        <div class="tip">D15 не чіпай: 28 учнів — це не гроші.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Наведи красу</h3>
+        <ul>
+          <li><b>A1:D1</b> — <span class="menu">Об'єднати клітинки</span>, жирний шрифт, розмір 14, <span class="menu">Колір заливки</span>.</li>
+          <li><b>A3:D3</b> — жирний, заливка іншим кольором, <span class="menu">Перенесення тексту</span>.</li>
+          <li><b>A3:D9</b> — <span class="menu">Межі</span> → усі межі.</li>
+          <li>Рядки <b>11</b> і <b>16</b> — жирним: це головні відповіді.</li>
+          <li>Розшир стовпчик A, щоб назви вміщалися.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">7</div>
+      <div>
+        <h3>Перевір</h3>
+        <p>Зміни кількість «Маргарити» з 3 на 4 — «Разом» і «З кожного учня» мають змінитися самі. Поверни 3.</p>
+      </div>
+    </div>
+  </section>
+
+
+
+</div>
+
+<footer>Практична робота · «Прості обчислення» · 8 клас</footer>
+
+</body>
+</html>

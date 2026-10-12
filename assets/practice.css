@@ -1,0 +1,68 @@
+/* Практична робота: окрема сторінка-інструкція або завдання (без нейрончиків і ядра уроку).
+   Сторінка лежить у {клас}/practice-{slug}/index.html, посилання на неї — лише зі списку тем класу.
+   Гаму сторінка задає змінними --accent, --accent-dark, --accent-soft (за замовчуванням — фіолетова). */
+
+:root{
+  --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
+  --accent:#6C5CE7; --accent-dark:#5340c9; --accent-soft:#EEEBFD;
+  --tip:#E37400; --tip-soft:#FEF7E0; --tip-ink:#8A4E0F;
+  --cell-line:#D6DAE2; --head-bg:#EEF1F4;
+  --radius-s:10px; --radius-m:16px; --radius-l:22px;
+}
+*{box-sizing:border-box;}
+body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.55; -webkit-font-smoothing:antialiased;}
+h1,h2,h3{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+.container{max-width:780px; margin:0 auto; padding:0 24px;}
+@media (max-width:520px){ .container{padding:0 16px;} }
+
+.topbar{padding:14px 24px; border-bottom:1px solid var(--line); background:color-mix(in srgb, var(--bg) 92%, transparent); position:sticky; top:0; backdrop-filter:blur(6px); z-index:10;}
+.topbar-inner{max-width:780px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; gap:10px;}
+.back-link{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--accent-dark); text-decoration:none;}
+.back-link:hover{text-decoration:underline;}
+
+/* Шапка */
+.p-hero{padding:34px 0 10px;}
+.p-eyebrow{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--accent); margin-bottom:6px;}
+.p-hero h1{font-size:30px; line-height:1.2; margin-bottom:8px;}
+.p-hero p{color:var(--ink-soft); font-size:16px; max-width:60ch; margin:0 0 14px;}
+.meta{display:flex; flex-wrap:wrap; gap:8px;}
+.meta span{font-size:13px; font-weight:700; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:4px 12px;}
+
+/* Розділи й картки-кроки */
+.p-section{margin:26px 0;}
+.p-section > h2{font-size:20px; margin-bottom:10px;}
+.guide-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:18px 20px; margin:12px 0; display:grid; grid-template-columns:40px 1fr; gap:4px 14px; break-inside:avoid;}
+@media (max-width:520px){ .guide-card{grid-template-columns:1fr; padding:16px;} }
+.g-num{width:36px; height:36px; border-radius:50%; background:var(--accent); color:#fff; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; display:flex; align-items:center; justify-content:center;}
+.guide-card h3{font-size:17px; margin:4px 0 6px;}
+.guide-card ol, .guide-card ul{margin:0 0 6px; padding-left:20px; font-size:15px;}
+.guide-card li{margin-bottom:4px;}
+.guide-card p{margin:0 0 6px; font-size:15px;}
+.menu{font-family:'Baloo 2',sans-serif; font-weight:700; color:var(--accent-dark); white-space:nowrap;}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; background:var(--head-bg); padding:1px 6px; border-radius:5px; font-size:.92em; white-space:nowrap;}
+.variants{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:4px 0 10px;}
+@media (max-width:600px){ .variants{grid-template-columns:1fr;} }
+.variant{background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 12px;}
+.variant .v-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; margin-bottom:4px;}
+.variant ol{font-size:14px; margin:0;}
+.tip{background:var(--tip-soft); border-left:4px solid var(--tip); color:var(--tip-ink); padding:8px 12px; border-radius:0 var(--radius-s) var(--radius-s) 0; font-size:13.5px; margin:8px 0 2px;}
+.check-val{background:var(--accent-soft); color:var(--accent-dark); padding:8px 12px; border-radius:var(--radius-s); font-size:13.5px; font-weight:700; margin:8px 0 2px;}
+
+/* Таблиця-зразок */
+.sheet-wrap{overflow-x:auto; margin:8px 0 4px;}
+.sample{border-collapse:collapse; font-size:13px; background:#fff; min-width:100%;}
+.sample th, .sample td{border:1px solid var(--cell-line); padding:4px 8px; height:28px; white-space:nowrap;}
+.sample th{background:var(--head-bg); color:var(--ink-soft); font-size:11px; font-weight:700; text-align:center; padding:2px 6px;}
+.sample td.r{text-align:right;}
+.sample td.f{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px; color:var(--accent-dark);}
+
+/* Чекліст самоперевірки */
+.checklist{list-style:none; padding:0; margin:0;}
+.checklist li{margin:0 0 6px;}
+.checklist label{display:flex; gap:10px; align-items:flex-start; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 14px; cursor:pointer; font-size:15px;}
+.checklist input{width:18px; height:18px; margin-top:3px; accent-color:var(--accent); flex-shrink:0;}
+.checklist input:checked + span{color:var(--ink-soft); text-decoration:line-through;}
+.bonus{border-style:dashed;}
+
+footer{padding:30px 24px 50px; text-align:center; color:var(--ink-soft); font-size:13px;}
+

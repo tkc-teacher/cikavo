@@ -39,7 +39,9 @@
   .lesson-num{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--ink-soft); width:22px; flex-shrink:0;}
   .lesson-body{flex:1; min-width:0;}
   .lesson-title{font-size:14.5px;}
-  .lesson-action{flex-shrink:0;}
+  .lesson-action{display:flex; gap:6px; flex-wrap:wrap; justify-content:flex-end;}
+  .btn-practice{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; background:var(--surface); color:var(--purple-dark); border:1.5px solid var(--purple); text-decoration:none; padding:6.5px 13px; border-radius:999px; white-space:nowrap; transition:background .15s ease;}
+  .btn-practice:hover{background:#EEEBFD;}
   .btn-open{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; background:var(--purple); color:#fff; text-decoration:none; padding:8px 14px; border-radius:999px; white-space:nowrap; transition:background .15s ease;}
   .btn-open:hover{background:var(--purple-dark);}
   .tag-soon{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; color:var(--ink-soft); background:var(--bg); border:1px solid var(--line); padding:6px 12px; border-radius:999px; white-space:nowrap;}
@@ -54,7 +56,7 @@
 <section class="hero container">
   <div class="hero-eyebrow">6 клас · Інформатика</div>
   <h1>Теми уроків</h1>
-  <p>Урок із кнопкою «Відкрити» вже має готову інтерактивну версію. Дві теми вже об'єднують по кілька пунктів плану в один урок.</p>
+  <p>«Вчимося» — інтерактивний урок, «Практикуємо» — практична робота до нього. Дві теми вже об'єднують по кілька пунктів плану в один урок.</p>
 </section>
 
 <div class="container" id="plan"></div>
@@ -117,9 +119,10 @@ PLAN.forEach(theme=>{
   theme.lessons.forEach((lesson, i)=>{
     const row = document.createElement('div');
     row.className = 'lesson-row';
-    const action = lesson.link
-      ? `<a class="btn-open" href="${lesson.link}">Відкрити →</a>`
-      : `<span class="tag-soon">Скоро</span>`;
+    const action = (lesson.practice ? `<a class="btn-practice" href="${lesson.practice.link}" title="${lesson.practice.title}">Практикуємо</a>` : '')
+      + (lesson.link
+        ? `<a class="btn-open" href="${lesson.link}">Вчимося</a>`
+        : `<span class="tag-soon">Скоро</span>`);
     row.innerHTML = `
       <span class="lesson-num">${i+1}</span>
       <div class="lesson-body"><div class="lesson-title">${lesson.title}</div></div>
