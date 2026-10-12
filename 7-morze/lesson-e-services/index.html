@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Електронні послуги. Інтернет для навчання — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --accent:#2152A3; --accent-dark:#173C7A; --accent-soft:#E6EEFA;
+    --label:#B97D00;
+    --bg:#F5F7FC; --line:#DCE3F2;
+    --sun:#C98A00; --sun-soft:#FFF6DB; --sun-ink:#7A5400;
+    --note:#2152A3; --note-soft:#E6EEFA; --note-ink:#173C7A;
+    --gold:#F2C200;
+    --hud-bar:linear-gradient(90deg,#2152A3 0 50%,#F2C200 50%);
+  }
+
+  /* ВИДИ Е-ПОСЛУГ (завжди видимі картки) */
+  .kinds{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:14px 0 6px;}
+  @media (max-width:680px){ .kinds{grid-template-columns:repeat(2,1fr);} }
+  .kind{background:var(--surface); border:1.5px solid var(--line); border-top:5px solid var(--kc); border-radius:var(--radius-m); padding:12px; font-size:13.5px; line-height:1.4;}
+  .kind .ic{font-size:26px; line-height:1;}
+  .kind b{display:block; font-family:'Baloo 2',sans-serif; font-size:15px; margin:6px 0 2px; color:var(--ink);}
+  .kind span{color:var(--ink-soft);}
+
+  /* ЕМУЛЯТОР ПОРТАЛУ ДІЯ */
+  .quest{background:var(--sun-soft); border:2px solid var(--gold); border-radius:var(--radius-m); padding:10px 14px; margin-bottom:14px; font-weight:700; font-size:15px;}
+  .quest .num{display:block; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--sun-ink);}
+  .phone{max-width:360px; margin:0 auto; border:10px solid #1B1F2A; border-radius:34px; background:#fff; overflow:hidden; box-shadow:0 10px 30px rgba(23,60,122,.18);}
+  .ph-bar{display:flex; align-items:center; gap:10px; padding:12px 14px; border-bottom:1px solid #EEF0F4; min-height:52px;}
+  .ph-back{border:none; background:#F1F3F7; border-radius:50%; width:30px; height:30px; font-size:16px; cursor:pointer; flex-shrink:0;}
+  .ph-back[hidden]{display:none;}
+  .ph-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; color:#111;}
+  .ph-logo{width:30px; height:30px; border-radius:9px; background:#111; color:#fff; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:13px; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .ph-body{padding:14px; min-height:330px; font-size:14px;}
+  .ph-hello{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:20px; margin-bottom:4px;}
+  .ph-sub{color:#666; font-size:13px; margin-bottom:12px; line-height:1.4;}
+  .ph-tiles{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .ph-tile, .ph-row{border:none; text-align:left; font-family:'Nunito Sans',sans-serif; cursor:pointer; color:#111;}
+  .ph-tile{background:#F1F3F7; border-radius:14px; padding:12px; font-weight:700; font-size:13.5px; min-height:78px;}
+  .ph-tile .ic{display:block; font-size:22px; margin-bottom:4px;}
+  .ph-row{display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; background:#fff; border-bottom:1px solid #EEF0F4; padding:12px 4px; font-size:14px; font-weight:600;}
+  .ph-row::after{content:'›'; font-size:20px; color:#999;}
+  .ph-cap{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:#888; margin:14px 0 2px;}
+  .ph-tile.shake, .ph-row.shake{animation:shakeX .35s ease; box-shadow:0 0 0 2px var(--coral) inset;}
+  .ph-step{display:flex; gap:10px; margin:8px 0; line-height:1.45;}
+  .ph-step .n{flex-shrink:0; width:24px; height:24px; border-radius:50%; background:#111; color:#fff; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center;}
+  .ph-alert{background:#FFF6DB; border-radius:12px; padding:8px 10px; font-size:13px; margin:10px 0;}
+  .quest-fb{text-align:center; min-height:1.4em; margin-top:12px; font-weight:700; font-size:14px; color:var(--ink-soft);}
+  .quest-fb.good{color:#256B36;}
+
+  /* ЗНАЙДИ ПІДРОБКУ: макет сайту-«двійника» */
+  .fake{border:1.5px solid var(--line); border-radius:var(--radius-m); overflow:hidden; background:#fff; font-size:14px;}
+  .fake-bar{display:flex; align-items:center; gap:10px; background:#EEF1F6; padding:8px 12px;}
+  .fake-bar .dots{display:flex; gap:5px;}
+  .fake-bar .dots i{width:10px; height:10px; border-radius:50%; background:#C9D1DE; display:block;}
+  .fake-url{flex:1; background:#fff; border-radius:999px; padding:5px 12px; font-size:13px; color:#555;}
+  .fake-body{padding:14px;}
+  .fake-head{display:flex; flex-wrap:wrap; align-items:center; gap:10px; font-family:'Baloo 2',sans-serif; font-size:17px; margin-bottom:10px;}
+  .fake-head .flag{font-family:'Nunito Sans',sans-serif; font-size:13px;}
+  .fake-alert{background:#FFE3DD; color:#A3341C; font-weight:800; border-radius:10px; padding:8px 12px; margin-bottom:12px; text-align:center;}
+  .fake-book{display:flex; gap:14px; align-items:flex-start;}
+  .fake-book .cover{width:64px; height:84px; border-radius:8px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; font-size:34px; flex-shrink:0;}
+  .fake-book .t{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px;}
+  .fake-book .a{color:var(--ink-soft); font-size:13px; margin:2px 0;}
+  .fake-book .dl{margin-top:8px; display:inline-block; background:#3FAE58; color:#fff; font-weight:800; border-radius:8px; padding:6px 10px;}
+  .fake-foot{margin-top:14px; font-size:12.5px; color:#777;}
+  /* фрагменти однаково виглядають, доки їх не перевірили */
+  .flag{border-bottom:2px dotted var(--accent); cursor:pointer; transition:background .15s ease;}
+  .flag:hover{background:var(--accent-soft);}
+  .flag.found{border-bottom:2px solid #D14B5E; background:#FDE6E1; color:#A3341C;}
+  .flag.ok-seen{border-bottom:2px solid #3FAE58; cursor:default;}
+  .flag.wrong-try{animation:shakeX .35s ease;}
+  .fake-book .dl .flag, .fake-alert .flag{border-bottom-color:currentColor;}
+  .flag-why{margin-top:12px; min-height:2.6em; font-size:14px; color:var(--ink-soft);}
+  .flag-why.good{color:#A3341C; font-weight:700;}
+
+  /* ОНЛАЙН-КУРСИ: ГАЛЕРЕЯ І MEMO */
+  .gallery{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px;}
+  @media (max-width:640px){ .gallery{grid-template-columns:repeat(2,1fr);} }
+  .gallery .flip-card{height:190px;}
+  .gallery .flip-front .feat{font-size:13px; line-height:1.35; color:var(--accent-dark); font-weight:700; margin-top:4px;}
+  .gallery .logo{display:flex; align-items:center; justify-content:center; height:46px; padding:4px 10px; border-radius:10px; margin-bottom:8px;}
+  .gallery .logo img{height:34px; width:auto; max-width:150px; object-fit:contain;}
+  .logo.dark, .mlogo.dark{background:#1B1F2A;}
+  .memo .mlogo{display:flex; align-items:center; justify-content:center; height:26px; padding:2px 6px; border-radius:6px; margin-bottom:3px;}
+  .memo .mlogo img{height:20px; width:auto; max-width:90px; object-fit:contain;}
+  .gallery .flip-front b{font-family:'Baloo 2',sans-serif; font-size:16px; line-height:1.2;}
+  .gallery .flip-front small{font-size:12px; color:var(--ink-soft); margin-top:4px;}
+  .gallery .flip-back{font-size:13px; line-height:1.45; color:var(--ink);}
+  .memo{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin-top:6px;}
+  @media (max-width:560px){ .memo{grid-template-columns:repeat(3,1fr);} }
+  .memo .flip-card{height:96px;}
+  .memo .flip-front{background:linear-gradient(135deg,var(--accent),#3D72CC); border:none; color:#fff; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:26px;}
+  .memo .flip-back{background:var(--accent-soft); border-color:var(--accent); font-size:12.5px; line-height:1.3; padding:8px; color:var(--ink);}
+  .memo .flip-back b{font-family:'Baloo 2',sans-serif; font-size:14px;}
+  .memo .flip-card.matched .flip-back{background:#E4F8E6; border-color:#3FAE58;}
+  .memo .flip-card.miss .flip-back{background:#FDE6E1; border-color:var(--coral);}
+
+  /* ТРЕНАЖЕР ДЛЯ ПРОГРАМІСТІВ */
+  .judge{border:1.5px solid var(--line); border-radius:var(--radius-m); overflow:hidden; background:#fff;}
+  .judge-top{background:#1B1F2A; color:#fff; padding:10px 14px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; display:flex; justify-content:space-between; gap:10px;}
+  .judge-top span{opacity:.7; font-weight:600; font-size:13px;}
+  .judge-body{padding:14px;}
+  .task-card{background:var(--bg); border-radius:12px; padding:10px 12px; font-size:14px; margin-bottom:12px;}
+  .task-card b{font-family:'Baloo 2',sans-serif;}
+  .task-card .out{font-family:Menlo,Consolas,monospace; background:#fff; border:1px solid var(--line); border-radius:6px; padding:2px 8px;}
+  .j-lbl{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; margin:12px 0 6px;}
+  .j-lbl.off{opacity:.35;}
+  .j-row{display:flex; flex-wrap:wrap; gap:6px;}
+  .j-row.off{opacity:.35; pointer-events:none;}
+  .j-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; border:1.5px solid var(--line); background:#fff; border-radius:8px; padding:7px 12px; cursor:pointer;}
+  .j-btn.on{border-color:var(--accent); background:var(--accent-soft);}
+  .j-btn.wrong{border-color:var(--coral); background:#FDE6E1;}
+  .code{display:block; width:100%; text-align:left; font-family:Menlo,Consolas,monospace; font-size:13.5px; background:#1B1F2A; color:#E6EDF8; border:2px solid transparent; border-radius:8px; padding:8px 12px; cursor:pointer; margin-bottom:6px; white-space:pre;}
+  .code.on{border-color:var(--gold);}
+  .code.wrong{border-color:var(--coral);}
+  .j-send{margin-top:12px;}
+  .j-send:disabled{opacity:.35; cursor:default;}
+  .verdict{margin-top:12px; border-radius:10px; padding:10px 12px; font-weight:700; font-size:14px; display:none;}
+  .verdict.show{display:block;}
+  .verdict.wait{background:#F1F3F7; color:var(--ink-soft);}
+  .verdict.ok{background:#E4F8E6; color:#1E6B30;}
+  .verdict.bad{background:#FDE6E1; color:#A3341C;}
+</style>
+</head>
+<body data-lesson="lesson7m-e-services" data-hud="7 клас · Е-послуги й навчання">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Комунікація та взаємодія · Урок 7</div>
+      <h1>Електронні послуги та інтернет для навчання</h1>
+      <p>Довідка без черги, підручник за хвилину, курс від університету — і все зі смартфона. Розберемось, як держава й освітні сервіси працюють онлайн, і спробуємо їх на тренажерах.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 160 160" fill="none">
+      <circle cx="80" cy="84" r="62" fill="#E6EEFA"/>
+      <rect x="48" y="30" width="64" height="112" rx="12" fill="#1B1F2A"/>
+      <rect x="54" y="40" width="52" height="92" rx="6" fill="#FFFFFF"/>
+      <rect x="60" y="48" width="40" height="8" rx="4" fill="#2152A3"/>
+      <rect x="60" y="62" width="30" height="5" rx="2.5" fill="#C9D4EA"/>
+      <rect x="60" y="71" width="36" height="5" rx="2.5" fill="#C9D4EA"/>
+      <circle cx="80" cy="104" r="13" fill="#F2C200"/>
+      <path d="M73 104 L78 109 L88 99" stroke="#1B1F2A" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M96 22 L124 12 L152 22 L124 32 Z" fill="#2152A3"/>
+      <path d="M108 26 V36 C116 42 132 42 140 36 V26 L124 32 Z" fill="#173C7A"/>
+      <line x1="152" y1="22" x2="152" y2="38" stroke="#F2C200" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="152" cy="40" r="3.5" fill="#F2C200"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Етика й безпека листування</div>
+    <h2>Що ти пам'ятаєш про безпечне листування</h2>
+    <p>Минулого уроку ми вчилися писати ввічливо й розпізнавати спам та шахраїв. Пригадаймо головне.</p>
+    <p class="soft">Обери поняття, а потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Що таке е-послуги</div>
+    <h2>Послуга, яка приходить через інтернет</h2>
+    <p><b>Електронна послуга</b> — послуга, яку отримують через інтернет, здебільшого автоматично, без живого працівника по той бік. Часто — у застосунку на смартфоні.</p>
+    <ul>
+      <li>Їх надає <b>держава</b> (це й називають <b>е-урядуванням</b>), а також організації чи окремі люди.</li>
+      <li>Головна перевага — не треба нікуди йти й стояти в черзі.</li>
+    </ul>
+    <div class="kinds">
+      <div class="kind" style="--kc:#2152A3"><div class="ic">📄</div><b>Документи</b><span>довідки, заяви й паспорти без походу в установу</span></div>
+      <div class="kind" style="--kc:#F2C200"><div class="ic">🗂️</div><b>Бази даних</b><span>електронні примірники книжок, реєстри, архіви</span></div>
+      <div class="kind" style="--kc:#3FAE58"><div class="ic">🎓</div><b>Дистанційне навчання</b><span>уроки, курси й тести онлайн</span></div>
+      <div class="kind" style="--kc:#E0604A"><div class="ic">🌐</div><b>Електронні ресурси</b><span>сайти, бібліотеки, відео для всіх охочих</span></div>
+    </div>
+    <p class="soft">Це е-послуга чи звичайна, «паперова»?</p>
+    <div id="eList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Портал «Дія»</div>
+    <h2>Тобі виповнилося 14. Що тепер?</h2>
+    <p><b>«Дія»</b> — державний портал і застосунок, де зібрано сотні е-послуг. Їх можна шукати за назвою або за <b>життєвими подіями</b>: народження дитини, переїзд, вступ — і чотирнадцятиріччя.</p>
+    <p class="soft">Виконуй завдання в жовтій смужці й клацай потрібне на екрані телефона.</p>
+    <div class="exercise">
+      <div class="quest" id="dQuest"></div>
+      <div class="phone">
+        <div class="ph-bar"><button class="ph-back" id="dBack" hidden aria-label="Назад">‹</button><span class="ph-logo">Дія</span><span class="ph-title" id="dTitle">Головна</span></div>
+        <div class="ph-body" id="dBody"></div>
+      </div>
+      <div class="quest-fb" id="dFb"></div>
+    </div>
+    <div class="note">💡 Справжній портал — <b>diia.gov.ua</b>. Розділи там можуть змінюватися, тож перевір, як усе виглядає сьогодні.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Електронна бібліотека</div>
+    <h2>Підручник — за хвилину й безкоштовно</h2>
+    <p>Інститут модернізації змісту освіти веде <b>електронну бібліотеку</b>, де у вільному доступі лежать електронні версії шкільних підручників. Так велить закон «Про освіту», тож це офіційне й надійне джерело.</p>
+    <p>Але в мережі трапляються сайти-«двійники»: обіцяють ті самі підручники, а насправді хочуть грошей або підсунути шкідливу програму.</p>
+    <p class="soft">Марко шукав підручник і потрапив на цей сайт. Знайди 4 ознаки, що це підробка. Обережно: частина фрагментів — звичайні.</p>
+    <div class="exercise">
+      <div class="fake">
+        <div class="fake-bar"><span class="dots"><i></i><i></i><i></i></span><span class="fake-url">🔓 <span class="flag real" data-why="Офіційна бібліотека має адресу lib.imzo.gov.ua. Тут чужий домен і немає захищеного з'єднання (https).">free-pidruchnyky-2026.top/imzo</span></span></div>
+        <div class="fake-body">
+          <div class="fake-head">📚 <b>Бібліотека підручників</b> <span class="flag decoy" data-why="Каталог за класами є й на справжньому сайті — це звичайна річ.">Каталог: 1–11 клас</span></div>
+          <div class="fake-alert"><span class="flag real" data-why="Тиск терміновістю — улюблений прийом шахраїв. Справжня бібліотека працює завжди й для всіх.">⏰ Лише сьогодні! До кінця акції 09:59</span></div>
+          <div class="fake-book">
+            <div class="cover">📗</div>
+            <div>
+              <div class="t"><span class="flag decoy" data-why="Назва й клас — звичайна інформація про підручник.">«Інформатика», 7 клас</span></div>
+              <div class="a"><span class="flag decoy" data-why="Автори вказані правильно — це не ознака підробки.">Автори: Н. В. Морзе, О. В. Барна</span></div>
+              <div class="a"><span class="flag decoy" data-why="PDF — звичайний формат електронних підручників.">Формат: PDF, 46 МБ</span></div>
+              <div class="dl"><span class="flag real" data-why="Підручники в офіційній бібліотеці безкоштовні за законом. Плата за SMS — ознака шахраїв.">📩 Завантажити за SMS — лише 25 грн</span></div>
+            </div>
+          </div>
+          <div class="fake-foot"><span class="flag real" data-why="Підручник — це файл PDF. Програма .exe «для завантаження» може виявитися вірусом.">Для швидкого завантаження встанови FastLoader.exe</span></div>
+        </div>
+      </div>
+      <div class="flag-why" id="flagWhy">Клацни на фрагмент, який здається підозрілим.</div>
+      <div class="progress-line" id="flagProgress"></div>
+    </div>
+    <div class="note">✅ Офіційна бібліотека — <b>lib.imzo.gov.ua</b>: домен <b>gov.ua</b> (державний), захищене з'єднання, підручники безкоштовно й без реєстрації. Справжній підручник — це PDF, а не програма.</div>
+    <div class="trivia">Електронний підручник — для навчання. Викладати його в мережу як «свій» чи продавати не можна: автори мають авторське право.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Інтернет для навчання</div>
+    <h2>П'ять способів навчатися онлайн</h2>
+    <ul>
+      <li><b>Пошук навчальних матеріалів</b> — тексти, зображення, відео, електронні підручники.</li>
+      <li><b>Консультації</b> — тематичні форуми, енциклопедії, листування з учителем чи тренером.</li>
+      <li><b>Завантаження програм</b> — із дотриманням авторського права.</li>
+      <li><b>Поглиблення знань і самоосвіта</b> — дистанційні курси, онлайн-тести, підготовка до олімпіад.</li>
+      <li><b>Мережева спільнота</b> — спільні проєкти й обговорення з однодумцями.</li>
+    </ul>
+    <p class="soft">Який спосіб у кожній ситуації?</p>
+    <div class="exercise">
+      <div class="match-pool" id="usePool"></div>
+      <div id="useList"></div>
+      <div class="progress-line" id="useProgress"></div>
+    </div>
+    <h3>Що заважає — і як упоратися</h3>
+    <p class="soft">Обери найкращу пораду для кожної перешкоди.</p>
+    <div id="obstacleList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Онлайн-курси</div>
+    <h2>Де навчатися безкоштовно</h2>
+    <p>Дистанційні курси дають і українські платформи, і відомі університети світу. На кожній картці — головна особливість платформи, а клацнувши, дізнаєшся більше. Запам'ятай їх: далі на тебе чекає гра.</p>
+    <div class="gallery" id="courseGallery"></div>
+    <h3>Знайди пару</h3>
+    <p class="soft">Перевертай по дві картки: шукай платформу і те, чим вона відома.</p>
+    <div class="exercise">
+      <div class="memo" id="memoGrid"></div>
+      <div class="progress-line" id="memoProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Тренажери для програмістів</div>
+    <h2>Програму перевіряє робот</h2>
+    <p>Для навчання інформатики є кілька видів сервісів:</p>
+    <ul>
+      <li><b>Системи підтримки навчання</b> — завдання, роботи й оцінки в одному місці.</li>
+      <li><b>Електронні курси</b> — уроки, відео й тести з початку до кінця теми.</li>
+      <li><b>Тренажери</b> — багато однотипних задач із миттєвою перевіркою.</li>
+      <li><b>Симулятори</b> — безпечна «гра» в реальну ситуацію.</li>
+    </ul>
+    <p>Наприклад, на платформах на кшталт <b>e-olymp</b> ти надсилаєш програму, а робот за секунди її запускає й перевіряє. Спробуй!</p>
+    <div class="note">💡 <b>Компілятор</b> — програма, що «перекладає» текст програми мовою, зрозумілою комп'ютеру. Для кожної мови програмування — свій.</div>
+    <div class="exercise">
+      <div class="judge">
+        <div class="judge-top">Відправити розв'язок <span>тренажер</span></div>
+        <div class="judge-body">
+          <div class="task-card"><b>Задача №1.</b> Виведи на екран рівно таке привітання: <span class="out">Привіт, світ!</span></div>
+          <div class="j-lbl">1. Обери компілятор — програма написана мовою Python</div>
+          <div class="j-row" id="jLang"></div>
+          <div class="j-lbl off" id="jCodeLbl">2. Обери код, який виведе саме те, що просять</div>
+          <div class="j-row off" id="jCode" style="flex-direction:column;"></div>
+          <button class="btn-primary j-send" id="jSend" disabled>Відправити розв'язок</button>
+          <div class="verdict" id="jVerdict"></div>
+        </div>
+      </div>
+    </div>
+    <h3>Який це сервіс?</h3>
+    <div id="typeList"></div>
+    <div class="trivia">На порталі <b>Дія.Освіта</b> є освітні серіали, симулятор «Онлайн-безпека для дітей» та ІТ-студія з уроками інформатики — зазирни туди з дорослими.</div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Електронні послуги (е-урядування). Використання інтернету для навчання» · 7 клас (Морзе)
+  <span class="credits">Логотипи Всеукраїнської школи онлайн, Prometheus, EdEra, Khan Academy, Coursera та Відкритого університету Майдану є торговельними марками їхніх власників і використані тут із навчальною метою.</span>
+</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Ввічливість', desc:'Без великих літер і купи знаків оклику, з привітанням і подякою' },
+  { name:'Стислість', desc:'Один лист — одна тема, без зайвих історій' },
+  { name:'Безпека', desc:'Пароль не надсилають навіть найкращому другові' },
+  { name:'Спам', desc:'Непрохані масові листи з рекламою чи «виграшами»' },
+  { name:'Фішинг', desc:'Лист-підробка, щоб виманити пароль або дані картки' },
+  { name:'Повідомити про спам', desc:'Кнопка, що прибирає підозрілий лист із Вхідних в окрему папку' }
+], 'recapProgress');
+
+/* ---------- КРОК 1: Е-ПОСЛУГА ЧИ НІ ---------- */
+makeYesNo('eList', [
+  { text:'Мама замовляє довідку в застосунку й за кілька хвилин бачить її у смартфоні', correct:true },
+  { text:'Тато з самого ранку чекає у відділенні, щоб віддати заяву на папері', correct:false },
+  { text:'Ти завантажуєш підручник з офіційного сайту й читаєш його на планшеті', correct:true },
+  { text:'Бабуся передплачує газету на пошті й заповнює бланк ручкою', correct:false },
+  { text:'Сестра обирає вільну годину на сайті поліклініки й записується до лікаря', correct:true },
+  { text:'Ти проходиш курс з відеоуроками, а сертифікат приходить на пошту', correct:true }
+], '💻 Е-послуга', '🏢 Звичайна');
+
+/* ---------- КРОК 2: ЕМУЛЯТОР ПОРТАЛУ ДІЯ ---------- */
+(function(){
+  const body = document.getElementById('dBody');
+  const title = document.getElementById('dTitle');
+  const back = document.getElementById('dBack');
+  const quest = document.getElementById('dQuest');
+  const fb = document.getElementById('dFb');
+  const TASKS = [
+    { goal:'events',   text:'Знайди розділ, де послуги зібрано за подіями в житті людини.', ok:'Так! Тут послуги згруповано за подіями — не треба знати точну назву.' },
+    { goal:'age14',    text:'Обери подію, яка стосується саме тебе.', ok:'Точно! З 14 років у тебе більше прав — і більше відповідальності.' },
+    { goal:'passport', text:'Знайди, як оформити головний документ громадянина України.', ok:'Тепер ти знаєш, куди йти й що взяти з собою.' },
+    { goal:'abroad',   text:'Улітку ви з батьками їдете в іншу країну. Знайди, що для цього потрібно.', ok:'Так! Для подорожей за кордон потрібен окремий паспорт.' }
+  ];
+  const SCREENS = {
+    home:{ title:'Головна', html:`
+      <div class="ph-hello">Вітаємо в Дії 👋</div>
+      <div class="ph-sub">Державні послуги онлайн — без черг і паперів</div>
+      <div class="ph-tiles">
+        <button class="ph-tile" data-go="services"><span class="ic">📋</span>Усі послуги</button>
+        <button class="ph-tile" data-go="events"><span class="ic">🎈</span>Життєві події та ситуації</button>
+        <button class="ph-tile" data-go="news"><span class="ic">📰</span>Новини</button>
+        <button class="ph-tile" data-go="help"><span class="ic">💬</span>Підтримка</button>
+      </div>` },
+    services:{ title:'Усі послуги', back:'home', html:`
+      <div class="ph-sub">Сотні послуг за алфавітом. Шукати тут довго — спробуй інший розділ.</div>
+      <button class="ph-row" data-go="x">Автомобіль і транспорт</button>
+      <button class="ph-row" data-go="x">Бізнес</button>
+      <button class="ph-row" data-go="x">Довідки та витяги</button>
+      <button class="ph-row" data-go="x">Земля й нерухомість</button>` },
+    news:{ title:'Новини', back:'home', html:`<div class="ph-sub">Тут новини про запуск нових послуг. Потрібного розділу тут немає.</div>` },
+    help:{ title:'Підтримка', back:'home', html:`<div class="ph-sub">Тут можна поставити запитання службі підтримки. Але спершу пошукай сам.</div>` },
+    events:{ title:'Життєві події', back:'home', html:`
+      <div class="ph-sub">Обери, що з тобою відбувається, — і побачиш усі потрібні послуги разом.</div>
+      <button class="ph-row" data-go="birth">Народження дитини</button>
+      <button class="ph-row" data-go="age14">Мені виповнилось 14</button>
+      <button class="ph-row" data-go="move">Переїзд</button>
+      <button class="ph-row" data-go="univ">Вступ до вишу</button>` },
+    birth:{ title:'Народження дитини', back:'events', html:`<div class="ph-sub">Ці послуги — для батьків малюка. Тобі сюди поки рано 🙂</div>` },
+    move:{ title:'Переїзд', back:'events', html:`<div class="ph-sub">Послуги для тих, хто змінює місце проживання. Не зовсім те.</div>` },
+    univ:{ title:'Вступ до вишу', back:'events', html:`<div class="ph-sub">Це знадобиться пізніше, після школи.</div>` },
+    age14:{ title:'Мені виповнилось 14', back:'events', html:`
+      <div class="ph-sub">Вітаємо! З 14 років у тебе більше свободи й прав, а також обов'язків і відповідальності.</div>
+      <button class="ph-row" data-go="passport">Як отримати паспорт</button>
+      <button class="ph-row" data-go="rights">Мої права й обов'язки</button>
+      <div class="ph-cap">Дізнайтесь також</div>
+      <button class="ph-row" data-go="abroad">Як отримати паспорт для виїзду за кордон</button>
+      <button class="ph-row" data-go="sign">Як отримати електронний підпис</button>` },
+    rights:{ title:'Права й обов\'язки', back:'age14', html:`<div class="ph-sub">Тут пояснюють, що ти вже можеш робити сам і за що відповідаєш. Цікаво, але документ шукаємо не тут.</div>` },
+    sign:{ title:'Електронний підпис', back:'age14', html:`<div class="ph-sub">Електронний підпис замінює власноручний у документах онлайн. Корисно — але не те, що треба зараз.</div>` },
+    passport:{ title:'Як отримати паспорт', back:'age14', html:`
+      <div class="ph-alert">⏰ Паспорт оформлюють протягом місяця після 14-річчя</div>
+      <div class="ph-step"><span class="n">1</span><span>Підготуй свідоцтво про народження й документ одного з батьків.</span></div>
+      <div class="ph-step"><span class="n">2</span><span>Разом із мамою чи татом звернися до міграційної служби, ЦНАП або «Паспортного сервісу».</span></div>
+      <div class="ph-step"><span class="n">3</span><span>Отримай паспорт-картку (ID-картку) — одразу з номером платника податків.</span></div>` },
+    abroad:{ title:'Паспорт для виїзду за кордон', back:'age14', html:`
+      <div class="ph-sub">Для подорожей в інші країни потрібен окремий документ — <b>закордонний паспорт</b>.</div>
+      <div class="ph-step"><span class="n">1</span><span>Його теж оформлюють у міграційній службі, ЦНАП або «Паспортному сервісі».</span></div>
+      <div class="ph-step"><span class="n">2</span><span>Документи для дитини подають разом із батьками.</span></div>` }
+  };
+  // підказка, якщо учень зайшов не туди; шлях — екрани, через які йдуть до мети
+  const HINT = {
+    events:'Подумай: потрібні послуги не за алфавітом, а для конкретної події в житті.',
+    age14:'Яка з подій — про тебе самого?',
+    passport:'Головний документ громадянина — паспорт.',
+    abroad:'Подивись у блоці «Дізнайтесь також».'
+  };
+  const PATH = { events:['events'], age14:['events','age14'], passport:['age14','passport'], abroad:['age14','abroad'] };
+  const hit = trackTask(body, TASKS.length, TASKS.length + 2);
+  let ti = 0, cur = 'home';
+
+  function renderQuest(){
+    quest.innerHTML = ti < TASKS.length
+      ? `<span class="num">Завдання ${ti + 1} з ${TASKS.length}</span>${TASKS[ti].text}`
+      : '<span class="num">Готово</span>Усі завдання виконано! Можеш ще погортати портал.';
+  }
+  function show(id){
+    const sc = SCREENS[id];
+    cur = id;
+    title.textContent = sc.title;
+    body.innerHTML = sc.html;
+    back.hidden = !sc.back;
+    body.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click', ()=>go(b, b.dataset.go)));
+  }
+  function go(btn, target){
+    if(target === 'x'){
+      btn.classList.add('shake'); setTimeout(()=>btn.classList.remove('shake'), 400);
+      fb.className = 'quest-fb'; fb.textContent = 'Тут шукати довго — спробуй інший розділ.';
+      return;
+    }
+    show(target);
+    if(ti >= TASKS.length) return;
+    const goal = TASKS[ti].goal;
+    if(target === goal){
+      fb.className = 'quest-fb good';
+      fb.textContent = '✓ ' + TASKS[ti].ok;
+      addNeurons(1); hit();
+      ti++;
+      if(ti === TASKS.length) addNeurons(2);
+      renderQuest();
+    } else if(!PATH[goal].includes(target)){
+      body.classList.add('miss'); setTimeout(()=>body.classList.remove('miss'), 400);   // помилкова спроба
+      fb.className = 'quest-fb'; fb.textContent = HINT[goal];
+    } else {
+      fb.textContent = '';
+    }
+  }
+  back.addEventListener('click', ()=>{ const b = SCREENS[cur].back; if(b) show(b); });
+  show('home');
+  renderQuest();
+})();
+
+/* ---------- КРОК 3: ЗНАЙДИ ПІДРОБКУ ----------
+   Справжні ознаки (.real) і пастки (.decoy) виглядають однаково — щоб відповідь не було видно заздалегідь */
+(function(){
+  const flags = document.querySelectorAll('.fake .flag');
+  const total = document.querySelectorAll('.fake .flag.real').length;
+  const why = document.getElementById('flagWhy');
+  const progress = document.getElementById('flagProgress');
+  const hit = trackTask(why, total, total + 2);
+  let found = 0;
+  const upd = ()=>{ progress.textContent = found === total ? 'Підробку викрито ✓ Марко нічого не заплатив і не встановив' : `Знайдено ознак: ${found} з ${total}`; };
+  flags.forEach(f=>f.addEventListener('click', ()=>{
+    if(f.classList.contains('found') || f.classList.contains('ok-seen')) return;
+    if(f.classList.contains('real')){
+      f.classList.add('found'); found++;
+      why.className = 'flag-why good'; why.textContent = '🚩 ' + f.dataset.why;
+      addNeurons(1); hit(); upd();
+      if(found === total) addNeurons(2);
+    } else {
+      f.classList.add('wrong-try'); setTimeout(()=>{ f.classList.remove('wrong-try'); f.classList.add('ok-seen'); }, 400);
+      why.className = 'flag-why'; why.textContent = '👌 ' + f.dataset.why;
+    }
+  }));
+  upd();
+})();
+
+/* ---------- КРОК 4: СПОСОБИ НАВЧАННЯ ---------- */
+makeMatching('usePool', 'useList', [
+  { name:'Пошук матеріалів', desc:'Для реферату з фізики потрібне відео з дослідом і кілька фото' },
+  { name:'Консультації', desc:'Ставиш запитання на тематичному форумі — і за годину маєш відповідь' },
+  { name:'Завантаження програм', desc:'Встановлюєш безкоштовний графічний редактор з офіційного сайту розробника' },
+  { name:'Самоосвіта', desc:'Проходиш онлайн-курс і тести, щоб підготуватися до олімпіади' },
+  { name:'Мережева спільнота', desc:'Разом з однолітками з інших міст ведете спільний блог про космос' }
+], 'useProgress');
+
+makeChoices('obstacleList', [
+  { text:'🌀 На одне запитання знайшлися три різні відповіді', opts:['Взяти першу, що трапилась','Звірити з підручником чи надійним джерелом','Обрати найдовшу'], correct:1, why:'Надійне джерело допоможе відсіяти помилки.' },
+  { text:'⏳ Сів учити, а за годину зрозумів, що дивився кумедні відео', opts:['Вимкнути сповіщення й поставити таймер на навчання','Вчитися лише вночі','Відмовитися від інтернету назавжди'], correct:0, why:'Менше відволікань — більше користі.' },
+  { text:'📄 Знайшов готовий реферат на твою тему', opts:['Здати як свій','Використати як джерело й написати власний текст із посиланням','Переписати слово в слово від руки'], correct:1, why:'Чужу роботу видавати за свою не можна — це порушує авторське право.' }
+]);
+
+/* ---------- КРОК 5: ОНЛАЙН-КУРСИ ---------- */
+// логотипи — у images/ (джерела й ліцензії — images/README.md); dark — світлий логотип, потрібне темне тло
+const logoImg = (p, cls)=>`<span class="${cls}${p.dark ? ' dark' : ''}"><img src="images/${p.logo}" alt="${p.name}"></span>`;
+const PLATFORMS = [
+  { logo:'vsho.png', name:'Всеукраїнська школа онлайн', feat:'Уроки й тести зі шкільних предметів', back:'Відеоуроки й тести для 5–11 класів — повторити тему чи надолужити пропущене.' },
+  { logo:'prometheus.webp', name:'Prometheus', feat:'Курси, зокрема для підготовки до НМТ', back:'Безкоштовні курси від українських викладачів, зокрема для підготовки до НМТ.' },
+  { logo:'edera.svg', dark:true, name:'EdEra', feat:'Онлайн-курси й інтерактивні підручники', back:'Курси й підручники, де текст поєднано з відео та завданнями.' },
+  { logo:'khan-academy.svg', name:'Академія Хана', feat:'Відеолекції з математики, фізики, історії…', back:'Короткі відеолекції з багатьох наук — і вправи до них.' },
+  { logo:'coursera.svg', name:'Coursera', feat:'Курси від університетів світу', back:'Курси від відомих університетів, як-от Стенфордського.' },
+  { logo:'vum.svg', name:'Відкритий університет Майдану', feat:'Курси для активних громадян', back:'Безкоштовні курси про державу, права людини й саморозвиток.' }
+];
+(function(){
+  const grid = document.getElementById('courseGallery');
+  PLATFORMS.forEach(p=>{
+    const card = document.createElement('div');
+    card.className = 'flip-card';
+    card.innerHTML = `<div class="flip-inner">
+      <div class="flip-face flip-front">${logoImg(p, 'logo')}<b>${p.name}</b><span class="feat">${p.feat}</span><small>клацни ↻</small></div>
+      <div class="flip-face flip-back">${p.back}</div>
+    </div>`;
+    card.addEventListener('click', ()=>card.classList.toggle('flipped'));
+    grid.appendChild(card);
+  });
+})();
+
+/* «Знайди пару»: назва платформи ↔ чим відома */
+(function(){
+  const pairs = PLATFORMS.slice(0, 6);
+  const grid = document.getElementById('memoGrid');
+  const progress = document.getElementById('memoProgress');
+  const hit = trackTask(grid, pairs.length, pairs.length + 3);
+  const cards = shuffle(pairs.flatMap((p, i)=>[
+    { pid:i, html:`${logoImg(p, 'mlogo')}<b>${p.name}</b>` },
+    { pid:i, html:p.feat }
+  ]));
+  let open = [], busy = false, found = 0;
+  const upd = ()=>{ progress.textContent = found === pairs.length ? 'Усі пари знайдено ✓' : `Знайдено пар: ${found} з ${pairs.length}`; };
+  cards.forEach(c=>{
+    const card = document.createElement('div');
+    card.className = 'flip-card';
+    card.dataset.pid = c.pid;
+    card.innerHTML = `<div class="flip-inner"><div class="flip-face flip-front">?</div><div class="flip-face flip-back">${c.html}</div></div>`;
+    card.addEventListener('click', ()=>{
+      if(busy || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+      card.classList.add('flipped');
+      open.push(card);
+      if(open.length < 2) return;
+      busy = true;
+      const [a, b] = open;
+      if(a.dataset.pid === b.dataset.pid){
+        setTimeout(()=>{
+          a.classList.add('matched'); b.classList.add('matched');
+          open = []; busy = false; found++;
+          addNeurons(1); hit(); upd();
+          if(found === pairs.length) addNeurons(3);
+        }, 350);
+      } else {
+        a.classList.add('miss'); b.classList.add('miss');
+        setTimeout(()=>{
+          a.classList.remove('flipped', 'miss'); b.classList.remove('flipped', 'miss');
+          open = []; busy = false;
+        }, 950);
+      }
+    });
+    grid.appendChild(card);
+  });
+  upd();
+})();
+
+/* ---------- КРОК 6: ТРЕНАЖЕР «ВІДПРАВИТИ РОЗВ'ЯЗОК» ---------- */
+(function(){
+  const langRow = document.getElementById('jLang');
+  const codeRow = document.getElementById('jCode');
+  const codeLbl = document.getElementById('jCodeLbl');
+  const send = document.getElementById('jSend');
+  const verdict = document.getElementById('jVerdict');
+  const hit = trackTask(send, 3, 5);   // компілятор, код, зараховано
+  const LANGS = [
+    { t:'C++ 17', ok:false, why:'Це компілятор для мови C++, а програма написана мовою Python.' },
+    { t:'Python 3.10', ok:true },
+    { t:'Pascal', ok:false, why:'Pascal — інша мова. Шукай Python.' }
+  ];
+  const CODES = [
+    { t:'print("привіт світ")', ok:false, why:'Робот порівнює відповідь до символу: тут маленька літера й немає коми та знака оклику.' },
+    { t:'print(Привіт, світ!)', ok:false, why:'Без лапок Python сприйме слова як команди — і видасть помилку.' },
+    { t:'print("Привіт, світ!")', ok:true }
+  ];
+  let lang = false, code = false, sent = false;
+
+  shuffle(LANGS).forEach(l=>{
+    const b = document.createElement('button');
+    b.className = 'j-btn'; b.textContent = l.t;
+    b.addEventListener('click', ()=>{
+      if(lang) return;
+      if(l.ok){
+        lang = true; b.classList.add('on');
+        codeRow.classList.remove('off'); codeLbl.classList.remove('off');
+        verdict.className = 'verdict'; addNeurons(1); hit();
+      } else {
+        b.classList.add('wrong'); setTimeout(()=>b.classList.remove('wrong'), 600);
+        verdict.className = 'verdict show bad'; verdict.textContent = l.why;
+      }
+    });
+    langRow.appendChild(b);
+  });
+  shuffle(CODES).forEach(c=>{
+    const b = document.createElement('button');
+    b.className = 'code'; b.textContent = c.t;
+    b.addEventListener('click', ()=>{
+      if(code || !lang) return;
+      if(c.ok){
+        code = true; b.classList.add('on'); send.disabled = false;
+        verdict.className = 'verdict'; addNeurons(1); hit();
+      } else {
+        b.classList.add('wrong'); setTimeout(()=>b.classList.remove('wrong'), 600);
+        verdict.className = 'verdict show bad'; verdict.textContent = '❌ ' + c.why;
+      }
+    });
+    codeRow.appendChild(b);
+  });
+  send.addEventListener('click', ()=>{
+    if(sent) return;
+    sent = true; send.disabled = true;
+    verdict.className = 'verdict show wait'; verdict.textContent = '⏳ Тестуємо: запускаємо програму й порівнюємо відповідь…';
+    setTimeout(()=>{
+      verdict.className = 'verdict show ok';
+      verdict.textContent = '✅ Зараховано: 100% тестів пройдено за 0,02 с. Робот перевірив твою програму швидше, ніж ти моргнув!';
+      addNeurons(3); hit();
+    }, 1600);
+  });
+})();
+
+makeChoices('typeList', [
+  { text:'На екрані збираєш електричне коло з батарейки й лампочки: з\'єднуєш неправильно — бачиш, що сталося б, але нічого не згорить', opts:['Тренажер','Симулятор','Електронний курс','Система підтримки навчання'], correct:1, why:'Симулятор відтворює справжній прилад чи ситуацію, де можна помилятися без наслідків.' },
+  { text:'Ти розв\'язуєш десятки задач однакового типу й одразу бачиш, правильно чи ні', opts:['Тренажер','Симулятор','Електронний курс','Система підтримки навчання'], correct:0, why:'Головне в тренажері — багато повторень і миттєва перевірка.' },
+  { text:'Відео, конспекти й тести йдуть по черзі від першої теми до останньої, а в кінці — сертифікат', opts:['Тренажер','Симулятор','Електронний курс','Система підтримки навчання'], correct:2 },
+  { text:'Учитель видає завдання, ти здаєш роботи й бачиш свої оцінки в одному місці', opts:['Тренажер','Симулятор','Електронний курс','Система підтримки навчання'], correct:3, why:'Як Google Classroom — він підтримує все навчання класу.' }
+]);
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що таке електронна послуга?', opts:['Послуга, яку отримують через інтернет, здебільшого автоматично','Будь-яка послуга в будівлі з комп\'ютерами','Ремонт електроніки'], correct:0 },
+  { q:'Як називають надання державних послуг онлайн?', opts:['Е-комерція','Е-урядування','Е-спорт'], correct:1 },
+  { q:'Тобі виповнилося 14. Де на порталі «Дія» швидко знайти всі потрібні послуги разом?', opts:['У розділі «Життєві події» → «Мені виповнилось 14»','У новинах','Ніде — треба йти до школи'], correct:0 },
+  { q:'Який документ оформлюють після 14-річчя?', opts:['Паспорт громадянина України (ID-картку)','Водійське посвідчення','Студентський квиток'], correct:0 },
+  { q:'Чому електронній бібліотеці підручників ІМЗО можна довіряти?', opts:['Бо там гарний дизайн','Це офіційний ресурс, створений за законом «Про освіту»','Бо підручники там платні'], correct:1 },
+  { q:'Ти встановлюєш безкоштовну програму для навчання. Що найважливіше?', opts:['Завантажувати з офіційного сайту, не порушуючи авторських прав','Брати з будь-якого сайту, де швидше','Просити друга надіслати архів'], correct:0 },
+  { q:'Яка платформа відома величезною колекцією відеолекцій з різних наук?', opts:['Академія Хана','Портал «Дія»','Gmail'], correct:0 },
+  { q:'Що робить онлайн-тренажер на кшталт e-olymp із твоєю програмою?', opts:['Друкує її на папері','Запускає й автоматично перевіряє відповідь','Пересилає вчителю поштою'], correct:1, why:'Тому відповідь має збігатися з умовою до символу.' }
+], {summary:'Тепер ти знаєш, що таке електронні послуги й е-урядування, вмієш знайти послугу на порталі «Дія» й підручник в електронній бібліотеці, обрати онлайн-курс і перевірити програму на тренажері.'});
+</script>
+
+</body>
+</html>
