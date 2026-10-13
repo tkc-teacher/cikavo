@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Спільна робота з документами — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в інтерфейсі Google Документів -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --accent:#1A8754; --accent-dark:#11653E; --accent-soft:#E3F4EA;
+    --label:#C2185B;
+    --bg:#F4F8F5; --line:#DCE9E0;
+    --hud-bar:linear-gradient(90deg,#4285F4,#1A8754,#FBBC04);
+    /* кольори співавторів */
+    --katya:#E8710A; --misha:#7B3FD4; --me:#1A73E8; --teacher:#C2185B;
+    /* інтерфейс Google */
+    --g-blue:#0B57D0; --g-blue-soft:#C2E7FF; --g-ink:#1F1F1F; --g-soft:#444746; --g-line:#DADCE0; --g-bar:#EDF2FA; --g-canvas:#F9FBFD;
+  }
+
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em;}
+  .ms.fill{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;}
+
+  /* ---------- Повторення: фрагменти екранів Google ---------- */
+  .snip{font-family:'Roboto',sans-serif; color:var(--g-ink); background:#fff; border:1px solid var(--g-line); border-radius:12px; padding:12px 14px; margin-bottom:12px; max-width:460px; font-size:14px;}
+  .snip .ms{color:var(--g-soft);}
+  .sn-sync{display:flex; align-items:center; justify-content:space-around; gap:6px; text-align:center; font-size:12px; color:var(--g-soft);}
+  .sn-sync .dev .ms{font-size:40px; color:var(--g-ink);}
+  .sn-sync .dev b{display:block; font-weight:500; color:var(--g-ink); font-size:12.5px;}
+  .sn-sync .cl .ms{font-size:34px; color:#1A73E8;}
+  .sn-sync .arr{font-size:22px; color:#9AA0A6;}
+  .sn-toast{background:#1F1F1F; color:#F2F2F2; border:none; border-radius:8px; display:flex; align-items:center; gap:12px; box-shadow:0 2px 6px rgba(0,0,0,.3);}
+  .sn-toast .ms{color:#F2F2F2;}
+  .sn-toast b{color:#A8C7FA; font-weight:500; margin-left:auto; white-space:nowrap;}
+  .sn-store .top{display:flex; align-items:center; gap:8px; font-weight:500;}
+  .sn-store .bar{height:6px; border-radius:3px; background:#E3E3E3; margin:10px 0 6px; overflow:hidden;}
+  .sn-store .bar i{display:block; height:100%; width:100%; background:#B3261E;}
+  .sn-store small{color:var(--g-soft);}
+  .sn-store .ms.red{color:#B3261E;}
+  .sn-cr{padding:0; overflow:hidden;}
+  .sn-cr .hd{display:flex; align-items:center; gap:10px; padding:10px 14px; border-bottom:1px solid var(--g-line);}
+  .sn-cr .hd img{width:26px; height:26px;}
+  .sn-cr .tabs{display:flex; gap:22px; padding:0 14px; font-size:14px; font-weight:500; color:var(--g-soft);}
+  .sn-cr .tabs span{padding:10px 0;}
+  .sn-cr .banner{margin:12px 14px; height:56px; border-radius:8px; background:linear-gradient(120deg,#1E8E3E,#34A853); color:#fff; display:flex; align-items:flex-end; padding:8px 12px; font-size:16px; font-weight:500;}
+  .sn-cmts > div{display:flex; align-items:center; gap:10px; padding:8px 0; font-weight:500;}
+  .sn-cmts > div + div{border-top:1px solid var(--g-line);}
+  .sn-cmts .in{margin-left:auto; flex:0 1 170px; border:1px solid var(--g-line); border-radius:999px; padding:5px 12px; font-weight:400; font-size:12.5px; color:var(--g-soft);}
+  .sn-acc{display:flex; align-items:center; gap:12px;}
+  .sn-acc .av{margin:0; width:40px; height:40px; font-size:17px; border:none; background:#5F6368;}
+  .sn-acc b{display:block; font-weight:500;}
+  .sn-acc small{color:var(--g-soft);}
+  .sn-acc .out{margin-left:auto; border:1px solid #747775; border-radius:999px; padding:6px 14px; font-size:13px; font-weight:500; color:var(--g-blue); white-space:nowrap;}
+  .sn-drive .hd{display:flex; align-items:center; gap:10px; font-size:16px; padding-bottom:8px; border-bottom:1px solid var(--g-line);}
+  .sn-drive .hd img{width:24px; height:24px;}
+  .sn-drive .f{display:flex; align-items:center; gap:10px; padding:8px 0; font-size:13.5px;}
+  .sn-drive .f + .f{border-top:1px solid #F1F3F4;}
+  .sn-drive .f img{width:16px; height:16px;}
+  .sn-drive .f small{margin-left:auto; color:var(--g-soft); font-size:12px;}
+
+  /* ---------- Крок 1: вибір сервісу ---------- */
+  .task-card{display:flex; align-items:center; gap:14px; background:var(--accent-soft); border-radius:var(--radius-m); padding:14px 18px; margin-bottom:16px; min-height:64px;}
+  .task-card .tnum{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:13px; color:var(--accent-dark); white-space:nowrap;}
+  .task-card .ttext{font-weight:700; font-size:16px;}
+  .logo-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:10px;}
+  .logo-tile{display:flex; flex-direction:column; align-items:center; gap:6px; padding:12px 6px 10px; border:2px solid var(--line); border-radius:var(--radius-m); background:var(--surface); cursor:pointer; font-family:'Roboto',sans-serif; font-weight:500; font-size:12.5px; line-height:1.2; text-align:center; color:var(--g-ink); transition:transform .12s ease, border-color .15s ease;}
+  .logo-tile:hover{transform:translateY(-2px); border-color:var(--accent);}
+  .logo-tile img{width:38px; height:38px; object-fit:contain;}
+  .logo-tile.shake{animation:shakeX .35s ease; border-color:var(--coral); background:#FDE6E1;}
+  .logo-tile.ok{border-color:var(--ok); background:var(--ok-soft);}
+  .done-list{display:flex; flex-wrap:wrap; gap:6px; margin-top:14px;}
+  .done-pill{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:700; background:var(--ok-soft); border:1.5px solid var(--ok); border-radius:999px; padding:4px 10px 4px 6px;}
+  .done-pill img{width:18px; height:18px;}
+
+  /* ---------- Крок 2: рівні доступу ---------- */
+  .roles{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-top:14px;}
+  .role{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px;}
+  .role h3{font-family:'Baloo 2',sans-serif; font-size:17px; margin:0 0 8px; display:flex; align-items:center; gap:8px;}
+  .role-ico{width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .role-ico .ms{font-size:19px;}
+  .role ul{margin:0; padding-left:18px; font-size:13.5px; color:var(--ink-soft);}
+  .role li{margin:2px 0;}
+  .ri-owner{background:#FEEFC3; color:#B06000;} .ri-edit{background:#D3E3FD; color:#0842A0;}
+  .ri-com{background:#C4EED0; color:#0D652D;}  .ri-view{background:#E9E5F7; color:#5B3FB5;}
+
+  .eyes{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;}
+  .eye-btn{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; padding:7px 16px 7px 10px; border-radius:999px; border:2px solid var(--line); background:var(--surface); cursor:pointer; display:inline-flex; align-items:center; gap:6px;}
+  .eye-btn.on{border-color:var(--accent); background:var(--accent-soft); color:var(--accent-dark);}
+  .eye-btn.seen::after{content:'✓'; color:var(--ok); margin-left:2px;}
+
+  /* ---------- Макет вікна Google Документа ---------- */
+  .gdoc{border:1px solid var(--g-line); border-radius:var(--radius-m); overflow:hidden; background:var(--g-canvas); font-family:'Roboto',sans-serif; color:var(--g-ink); box-shadow:0 2px 10px rgba(0,0,0,.06);}
+  .gd-head{display:flex; align-items:center; gap:10px; padding:8px 12px 4px; background:var(--g-canvas);}
+  .gd-head > img{width:26px; height:36px; flex-shrink:0;}
+  .gd-name{flex:1; min-width:0;}
+  .gd-title{display:flex; align-items:center; gap:8px; font-size:17px; white-space:nowrap; overflow:hidden;}
+  .gd-title .ms{color:var(--g-soft); font-size:18px;}
+  .gd-menu{display:flex; gap:12px; font-size:13.5px; color:var(--g-ink); margin-top:3px; white-space:nowrap; overflow:hidden;}
+  .gd-right{display:flex; align-items:center; gap:10px; flex-shrink:0;}
+  .gd-right > .ms{color:var(--g-soft); font-size:22px;}
+  .share-btn{font-family:'Roboto',sans-serif; font-weight:500; font-size:14px; background:var(--g-blue-soft); color:#001D35; border:none; border-radius:999px; padding:9px 18px 9px 14px; display:inline-flex; gap:8px; align-items:center; white-space:nowrap;}
+  .share-btn .ms{font-size:18px;}
+  .share-btn[hidden]{display:none;}
+  .avatars{display:flex; padding-left:6px;}
+  .av{width:28px; height:28px; border-radius:50%; color:#fff; font-weight:500; font-size:13px; display:flex; align-items:center; justify-content:center; border:2px solid #fff; margin-left:-6px; font-family:'Roboto',sans-serif;}
+  .gd-tools{display:flex; align-items:center; gap:2px; margin:4px 10px 0; padding:4px 8px; background:var(--g-bar); border-radius:999px; overflow:hidden;}
+  .gd-tools .set{display:flex; align-items:center; gap:2px; flex:1; min-width:0; overflow:hidden; white-space:nowrap;}
+  .gd-tools .tl{width:28px; height:28px; border-radius:4px; display:inline-flex; align-items:center; justify-content:center; color:var(--g-soft); flex-shrink:0;}
+  .gd-tools .tl .ms{font-size:19px;}
+  .gd-tools .tx{font-size:13px; color:var(--g-soft); padding:0 8px; flex-shrink:0;}
+  .gd-tools .sep{width:1px; height:20px; background:#C7C7C7; margin:0 4px; flex-shrink:0;}
+  .gd-tools.ro .set .tl, .gd-tools.ro .set .tx{opacity:.3;}
+  .mode-pill{display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:500; padding:4px 10px; border-radius:999px; color:var(--g-ink); flex-shrink:0; white-space:nowrap;}
+  .mode-pill .ms{font-size:18px;}
+  .gd-ruler{height:14px;}
+  .gdoc-page{background:#fff; margin:6px auto 16px; max-width:520px; min-height:150px; padding:26px 32px; box-shadow:0 1px 3px rgba(60,64,67,.25); font-family:'Roboto',sans-serif; font-size:14.5px; line-height:1.55; position:relative;}
+  .gdoc-page h4{font-family:'Roboto',sans-serif; font-weight:400; font-size:22px; margin:0 0 10px;}
+  .gdoc-page p{margin:0 0 8px;}
+  .gdoc-page [contenteditable="true"]{outline:2px dashed color-mix(in srgb, var(--me) 45%, transparent); outline-offset:3px; border-radius:4px; cursor:text;}
+  .add-comment{position:absolute; right:-18px; top:62px; width:36px; height:36px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(60,64,67,.3),0 4px 8px rgba(60,64,67,.15); border:none; cursor:pointer; color:var(--g-soft); display:flex; align-items:center; justify-content:center;}
+  .add-comment[hidden]{display:none;}
+  .eye-msg{font-family:'Nunito Sans',sans-serif; font-size:14px; padding:10px 14px; background:#fff; border-top:1px solid var(--g-line); min-height:42px;}
+  @media (max-width:640px){ .gd-right > .ms, .gd-menu span:nth-child(n+5){display:none;} .share-btn span.t{display:none;} .share-btn{padding:9px 12px;} }
+
+  /* ---------- Крок 3: вікно «Надати доступ» ---------- */
+  .share-dlg{max-width:580px; margin:0 auto; background:#fff; border-radius:24px; box-shadow:0 4px 8px 3px rgba(60,64,67,.15),0 1px 3px rgba(60,64,67,.3); padding:22px 24px 20px; font-family:'Roboto',sans-serif; color:var(--g-ink);}
+  .dlg-top{display:flex; align-items:center; gap:10px; margin-bottom:16px;}
+  .dlg-top h3{font-family:'Roboto',sans-serif; font-size:21px; font-weight:400; margin:0; flex:1;}
+  .dlg-top .ms{color:var(--g-soft); font-size:22px;}
+  .fake-input{border:1px solid #747775; border-radius:4px; padding:14px 14px; color:var(--g-soft); font-size:15px; margin-bottom:18px;}
+  .dlg-sub{font-weight:500; font-size:15px; margin:4px 0 6px;}
+  .person{display:flex; align-items:center; gap:12px; padding:8px 0;}
+  .person .av{margin:0; width:34px; height:34px; font-size:15px; border:none; flex-shrink:0;}
+  .person .who{flex:1; min-width:0;}
+  .person .who b{display:block; font-size:14px; font-weight:500;}
+  .person .who span{font-size:12.5px; color:var(--g-soft);}
+  .person .why{display:block; font-family:'Nunito Sans',sans-serif; font-size:12.5px; color:var(--accent-dark) !important; font-weight:700; margin-top:1px;}
+  .role-sel{font-family:'Roboto',sans-serif; font-size:14px; font-weight:500; padding:7px 6px; border:1px solid var(--g-line); border-radius:8px; background:#fff; color:var(--g-ink); cursor:pointer; max-width:190px;}
+  .role-sel.wrong{border-color:var(--coral); background:#FDE6E1; animation:shakeX .35s ease;}
+  .role-sel.ok{border-color:var(--ok); background:var(--ok-soft); color:#256B36;}
+  .role-sel:disabled{opacity:1; cursor:default;}
+  .owner-tag{font-size:14px; color:var(--g-soft); padding-right:8px;}
+  .general{display:flex; align-items:center; gap:12px; padding:8px 0 4px;}
+  .general .globe{width:34px; height:34px; border-radius:50%; background:#E3E3E3; color:var(--g-soft); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .3s;}
+  .general .globe.pub{background:#C4EED0; color:#0D652D;}
+  .dlg-foot{display:flex; justify-content:space-between; align-items:center; margin-top:18px; gap:10px; flex-wrap:wrap;}
+  .copy-link{display:inline-flex; align-items:center; gap:8px; font-weight:500; font-size:14px; color:var(--g-blue); background:#fff; border:1px solid #747775; border-radius:999px; padding:9px 18px 9px 14px;}
+  .copy-link .ms{font-size:18px;}
+  .send-btn{font-weight:500; font-size:14px; color:#fff; background:var(--g-blue); border:none; border-radius:999px; padding:10px 24px; opacity:.35;}
+  .send-btn.ready{opacity:1;}
+  .dlg-fb{font-family:'Nunito Sans',sans-serif; font-size:13.5px; min-height:1.3em; margin-top:12px; color:var(--ink-soft);}
+
+  /* ---------- Крок 4: колективне редагування ---------- */
+  .live .gdoc-page{min-height:220px; max-width:none; padding-top:30px; margin:6px 0 16px;}
+  .live-line{min-height:1.5em; margin:0 0 8px; line-height:2.3; position:relative;}
+  .live-line .caret{display:inline-block; width:2px; height:1.15em; vertical-align:-3px; margin-left:1px; position:relative;}
+  .live-line .caret::before{content:attr(data-name); position:absolute; left:0; top:-17px; font-size:10.5px; font-weight:500; color:#fff; background:inherit; padding:0 5px; border-radius:3px 3px 3px 0; white-space:nowrap; font-family:'Roboto',sans-serif;}
+  .live-wrap{display:grid; grid-template-columns:1fr 230px; gap:14px; align-items:start; padding:0 14px;}
+  .side-comment{margin-top:40px; opacity:0; transform:translateX(12px); transition:opacity .4s ease, transform .4s ease;}
+  .side-comment.show{opacity:1; transform:none;}
+  .mention{color:var(--g-blue); background:#E8F0FE; border-radius:4px; padding:0 3px; font-weight:500;}
+  @media (max-width:640px){ .live-wrap{grid-template-columns:1fr;} .side-comment{margin-top:0; margin-bottom:14px;} }
+
+  /* картка коментаря, як у Google Документах */
+  .cmt{background:#fff; border-radius:12px; box-shadow:0 1px 3px rgba(60,64,67,.3),0 4px 8px 3px rgba(60,64,67,.15); padding:12px 14px; margin-bottom:12px; font-family:'Roboto',sans-serif; font-size:14px; color:var(--g-ink); max-width:420px;}
+  .cmt .ch{display:flex; align-items:center; gap:10px; margin-bottom:6px;}
+  .cmt .av{margin:0; width:32px; height:32px; font-size:14px; border:none; flex-shrink:0;}
+  .cmt .nm{flex:1; min-width:0; line-height:1.25;}
+  .cmt .nm b{font-weight:500; font-size:14px; display:block;}
+  .cmt .nm small{color:var(--g-soft); font-size:12px;}
+  .cmt .ms{color:var(--g-soft); font-size:20px;}
+  .cmt .ms.chk{color:var(--g-blue);}
+  .cmt .reply{margin-top:10px; border:1px solid var(--g-line); border-radius:999px; padding:7px 12px; font-size:12.5px; color:var(--g-soft);}
+  .cmt-quote{background:#FCE8B2; padding:0 2px;}
+
+  /* ---------- Крок 5: історія версій ---------- */
+  .hist{border:1px solid var(--g-line); border-radius:var(--radius-m); overflow:hidden; background:var(--g-canvas); font-family:'Roboto',sans-serif; color:var(--g-ink);}
+  .hist-top{display:flex; align-items:center; gap:12px; padding:10px 14px; background:#fff; border-bottom:1px solid var(--g-line);}
+  .hist-top .ms{color:var(--g-soft); font-size:22px;}
+  .hist-top .ver-title{flex:1; font-size:17px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .restore{font-family:'Roboto',sans-serif; font-weight:500; font-size:14px; color:#fff; background:var(--g-blue); border:none; border-radius:999px; padding:9px 18px; cursor:pointer; white-space:nowrap;}
+  .restore.wrong{background:var(--coral); animation:shakeX .35s ease;}
+  .restore:disabled{opacity:.35; cursor:default;}
+  .hist-body{display:grid; grid-template-columns:1fr 260px;}
+  .hist .gdoc-page{margin:16px; max-width:none; min-height:270px;}
+  .hist-panel{background:#fff; border-left:1px solid var(--g-line); padding:12px 0 8px;}
+  .hist-panel h4{font-family:'Roboto',sans-serif; font-weight:400; font-size:19px; margin:2px 16px 10px;}
+  .hist-filter{margin:0 16px 8px; font-size:13px; color:var(--g-soft); display:flex; align-items:center; gap:2px;}
+  .day{font-size:11px; font-weight:500; letter-spacing:.08em; color:var(--g-soft); margin:10px 16px 2px;}
+  .ver{display:block; width:100%; text-align:left; border:none; background:none; padding:9px 16px; cursor:pointer; font-family:'Roboto',sans-serif; color:var(--g-ink);}
+  .ver:hover{background:#F1F3F4;}
+  .ver.sel{background:#D3E3FD;}
+  .ver .when{font-weight:500; font-size:14px; display:block;}
+  .ver .tag{font-size:12px; color:var(--g-soft); font-style:italic; display:block;}
+  .ver .by{display:flex; align-items:center; gap:7px; font-size:13px; color:var(--g-soft); margin-top:3px;}
+  .ver .dot{width:10px; height:10px; border-radius:50%;}
+  .show-ch{display:flex; align-items:center; gap:8px; font-size:13px; margin:12px 16px 0; padding-top:10px; border-top:1px solid var(--g-line);}
+  .show-ch .ms{color:var(--g-blue);}
+  .sec{margin:0 0 10px; padding:4px 8px; border-radius:4px;}
+  .sec b{display:block; font-weight:500; font-size:15px;}
+  .sec small{font-size:12px; color:#B3261E;}
+  .sec.new{background:color-mix(in srgb, var(--c) 16%, #fff); border-left:3px solid var(--c);}
+  .sec.gone{background:#FCE8E6; border-left:3px solid #B3261E;}
+  .sec.gone b{text-decoration:line-through; color:#B3261E;}
+  .hist-fb{font-size:14px; min-height:1.3em; margin-top:12px;}
+  .who-q{margin-top:14px; display:none;}
+  .who-q.show{display:block;}
+  @media (max-width:640px){ .hist-body{grid-template-columns:1fr;} .hist-panel{border-left:none; border-top:1px solid var(--g-line);} .hist-top .ms:first-child{display:none;} }
+</style>
+</head>
+<body data-lesson="lesson6-collaboration" data-hud="6 клас · Спільна робота з документами">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Спільна робота з документами</div>
+      <h1>Працюємо разом у хмарі</h1>
+      <p>Як усією командою писати один документ, дати друзям доступ до файлу, залишати коментарі й повернути те, що хтось випадково стер.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: документ, у якому одночасно пишуть троє -->
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="72" r="56" fill="#E3F4EA"/>
+      <rect x="36" y="26" width="68" height="88" rx="8" fill="#fff" stroke="#1A8754" stroke-width="3"/>
+      <path d="M86 26 L104 44 L86 44 Z" fill="#A8DABC"/>
+      <rect x="46" y="54" width="40" height="5" rx="2.5" fill="#CFE3D6"/>
+      <rect x="46" y="66" width="48" height="5" rx="2.5" fill="#CFE3D6"/>
+      <rect x="46" y="78" width="30" height="5" rx="2.5" fill="#CFE3D6"/>
+      <rect x="46" y="90" width="42" height="5" rx="2.5" fill="#CFE3D6"/>
+      <rect x="87" y="51" width="3" height="11" fill="#E8710A"/><rect x="87" y="47" width="14" height="6" rx="2" fill="#E8710A"/>
+      <rect x="95" y="63" width="3" height="11" fill="#7B3FD4"/><rect x="95" y="59" width="14" height="6" rx="2" fill="#7B3FD4"/>
+      <rect x="77" y="75" width="3" height="11" fill="#1A73E8"/><rect x="77" y="71" width="14" height="6" rx="2" fill="#1A73E8"/>
+      <circle cx="40" cy="30" r="11" fill="#E8710A" stroke="#fff" stroke-width="3"/>
+      <circle cx="56" cy="22" r="11" fill="#7B3FD4" stroke="#fff" stroke-width="3"/>
+      <circle cx="72" cy="18" r="11" fill="#1A73E8" stroke="#fff" stroke-width="3"/>
+      <circle cx="37" cy="28" r="1.6" fill="#fff"/><circle cx="43" cy="28" r="1.6" fill="#fff"/>
+      <circle cx="53" cy="20" r="1.6" fill="#fff"/><circle cx="59" cy="20" r="1.6" fill="#fff"/>
+      <circle cx="69" cy="16" r="1.6" fill="#fff"/><circle cx="75" cy="16" r="1.6" fill="#fff"/>
+      <path d="M37 33 Q40 35.5 43 33 M53 25 Q56 27.5 59 25 M69 21 Q72 23.5 75 21" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Мої інструменти для навчання</div>
+    <h2>Що ти вже знаєш</h2>
+    <p>Минулого разу ти дізнався про хмарні сервіси й навчився працювати в Google Classroom.</p>
+    <p class="soft">Подивись на екран і обери правильну відповідь.</p>
+    <div id="recapList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Інструменти для команди</div>
+    <h2>Проєкт «Професії майбутнього»</h2>
+    <p>Олексій на тиждень поїхав із батьками у відпустку, а його команда тим часом робить проєкт. Усі мають обліковий запис Google — отже, можна працювати разом, навіть коли ви в різних містах.</p>
+    <p class="soft">Прочитай, що потрібно команді, і клацни сервіс, який із цим допоможе.</p>
+    <div class="exercise" id="toolsEx">
+      <div class="task-card"><span class="tnum" id="toolNum"></span><span class="ttext" id="toolTask"></span></div>
+      <div class="logo-grid" id="toolGrid"></div>
+      <div class="choice-feedback" id="toolFb"></div>
+      <div class="done-list" id="toolDone"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Рівні доступу</div>
+    <h2>Хто що може робити з файлом</h2>
+    <p>Хто створив файл — той його <b>власник</b>. Іншим людям він може дати один із трьох рівнів доступу:</p>
+    <div class="roles">
+      <div class="role"><h3><span class="role-ico ri-owner"><span class="ms fill">key</span></span>Власник</h3><ul><li>робить із файлом усе</li><li>видаляє файл</li><li>забирає доступ в інших</li></ul></div>
+      <div class="role"><h3><span class="role-ico ri-edit"><span class="ms">edit</span></span>Редактор</h3><ul><li>змінює текст</li><li>пише коментарі</li><li>може запросити інших</li></ul></div>
+      <div class="role"><h3><span class="role-ico ri-com"><span class="ms">add_comment</span></span>Коментатор</h3><ul><li>читає</li><li>пише коментарі</li><li>текст змінити не може</li></ul></div>
+      <div class="role"><h3><span class="role-ico ri-view"><span class="ms">visibility</span></span>Читач</h3><ul><li>лише переглядає</li><li>може зробити собі копію</li></ul></div>
+    </div>
+    <p class="soft" style="margin-top:18px">Подивись на той самий документ очима кожного співавтора — натисни всі три кнопки.</p>
+    <div class="exercise">
+      <div class="eyes" id="eyes"></div>
+      <div class="gdoc" id="eyeDoc">
+        <div class="gd-head">
+          <img src="images/docs.svg" alt="">
+          <div class="gd-name">
+            <div class="gd-title">Професії майбутнього <span class="ms">star</span><span class="ms">drive_file_move</span><span class="ms">cloud_done</span></div>
+            <div class="gd-menu"><span>Файл</span><span>Редагувати</span><span>Вигляд</span><span>Вставлення</span><span>Формат</span><span>Інструменти</span><span>Довідка</span></div>
+          </div>
+          <div class="gd-right">
+            <span class="ms">history</span><span class="ms">comment</span>
+            <div class="avatars"><div class="av" style="background:var(--katya)">К</div><div class="av" style="background:var(--misha)">М</div></div>
+            <button class="share-btn" id="eyeShare"><span class="ms fill">lock</span><span class="t">Надати доступ</span></button>
+          </div>
+        </div>
+        <div class="gd-tools" id="eyeTools"></div>
+        <div class="gd-ruler"></div>
+        <div class="gdoc-page">
+          <button class="add-comment" id="eyeComment" title="Додати коментар"><span class="ms">add_comment</span></button>
+          <h4>Професії майбутнього</h4>
+          <p id="eyeText">Розробник віртуальних світів створює ігри та уроки, у яких можна «прогулятися» в окулярах віртуальної реальності.</p>
+        </div>
+        <div class="eye-msg" id="eyeMsg">Обери, чиїми очима подивитися ☝️</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Надаємо доступ</div>
+    <h2>Кнопка «Надати доступ»</h2>
+    <p>Ти — власник документа. Натиснув <b>«Надати доступ»</b> — і з'явилося таке вікно. Для кожної людини обери рівень доступу, який їй справді потрібен — не більше.</p>
+    <div class="exercise">
+      <div class="share-dlg" id="shareDlg">
+        <div class="dlg-top"><h3>Надати доступ до «Професії майбутнього»</h3><span class="ms">help</span><span class="ms">settings</span></div>
+        <div class="fake-input">Додайте людей, групи й події календаря</div>
+        <div class="dlg-sub">Користувачі з доступом</div>
+        <div id="people"></div>
+        <div class="dlg-sub" style="margin-top:14px">Загальний доступ</div>
+        <div id="general"></div>
+        <div class="dlg-foot"><span class="copy-link"><span class="ms">link</span>Копіювати посилання</span><span class="send-btn" id="sendBtn">Готово</span></div>
+        <div class="dlg-fb" id="shareFb"></div>
+      </div>
+    </div>
+    <div class="note">Чим менше людей можуть редагувати файл, тим менше шансів, що хтось випадково зіпсує спільну роботу.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Колективне редагування й коментарі</div>
+    <h2>Пишемо всі одночасно</h2>
+    <p>У спільному документі кожен співавтор має свій кольоровий курсор: видно, хто де пише, а зміни з'являються в усіх одразу.</p>
+    <div class="gdoc live" id="liveDoc">
+      <div class="gd-head">
+        <img src="images/docs.svg" alt="">
+        <div class="gd-name">
+          <div class="gd-title">Професії майбутнього <span class="ms">star</span><span class="ms">drive_file_move</span><span class="ms">cloud_done</span></div>
+          <div class="gd-menu"><span>Файл</span><span>Редагувати</span><span>Вигляд</span><span>Вставлення</span><span>Формат</span><span>Інструменти</span><span>Довідка</span></div>
+        </div>
+        <div class="gd-right">
+          <span class="ms">history</span><span class="ms">comment</span>
+          <div class="avatars"><div class="av" style="background:var(--katya)">К</div><div class="av" style="background:var(--misha)">М</div><div class="av" style="background:var(--teacher)">В</div></div>
+          <span class="share-btn"><span class="ms fill">lock</span><span class="t">Надати доступ</span></span>
+        </div>
+      </div>
+      <div class="gd-tools" id="liveTools"></div>
+      <div class="gd-ruler"></div>
+      <div class="live-wrap">
+        <div class="gdoc-page" id="livePage"></div>
+        <div class="side-comment" id="liveComment"></div>
+      </div>
+    </div>
+    <p style="margin-top:18px"><b>Коментар</b> — це примітка збоку від тексту: сам документ він не змінює. Коли зауваження виправлено, коментар позначають як вирішений — кнопкою <span class="ms" style="color:var(--g-blue)">check</span>.</p>
+    <div id="commentList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Історія версій</div>
+    <h2>Хтось стер половину роботи!</h2>
+    <p>Документ сам запам'ятовує, хто й коли що змінив. Через <b>Файл → Історія версій</b> (або значок <span class="ms">history</span> угорі) можна побачити будь-яку попередню версію й відновити її.</p>
+    <p class="soft">Хтось видалив розділ «Дизайнер одягу». Переглянь версії праворуч і віднови <b>найновішу</b>, де цей розділ ще є, — щоб не втратити нічиєї роботи.</p>
+    <div class="exercise" id="histEx">
+      <div class="hist">
+        <div class="hist-top">
+          <span class="ms">arrow_back</span>
+          <span class="ver-title" id="verTitle"></span>
+          <button class="restore" id="restoreBtn">Відновити цю версію</button>
+        </div>
+        <div class="hist-body">
+          <div class="gdoc-page" id="histPage"></div>
+          <div class="hist-panel">
+            <h4>Історія версій</h4>
+            <div class="hist-filter">Усі версії <span class="ms">arrow_drop_down</span></div>
+            <div id="verList"></div>
+            <div class="show-ch"><span class="ms fill">check_box</span>Показати зміни</div>
+          </div>
+        </div>
+      </div>
+      <div class="hist-fb" id="histFb"></div>
+      <div class="who-q" id="whoQ">
+        <p class="q"><b>А хто ж видалив розділ?</b> Подивись, у якій версії він став закресленим.</p>
+        <div class="choice-row" id="whoOpts"></div>
+        <div class="choice-feedback" id="whoFb"></div>
+      </div>
+    </div>
+    <div class="note">Якщо видалили цілий файл, його можна знайти в <b>Кошику</b> Google Диска — там він лежить ще 30 днів.</div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Інтернет-ресурси для спільної роботи. Спільний доступ, колективне редагування, коментарі та історія змін» · 6 клас</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+const ms = (name, cls = '')=>`<span class="ms ${cls}">${name}</span>`;
+
+/* Панель інструментів Google Документа */
+const TOOLBAR = ['search', 'undo', 'redo', 'print', 'spellcheck', 'format_paint', '|', '100%', '|', 'Звичайний текст', '|', 'Arial', '|',
+  'format_bold', 'format_italic', 'format_underlined', 'format_color_text', 'ink_highlighter', '|', 'link', 'add_comment', 'image', '|',
+  'format_align_left', 'format_line_spacing', 'checklist', 'format_list_bulleted', 'format_list_numbered'];
+function fillToolbar(el, mode){
+  el.innerHTML = '<div class="set">' + TOOLBAR.map(t=>t === '|' ? '<span class="sep"></span>'
+    : /^[a-z_]+$/.test(t) ? `<span class="tl">${ms(t)}</span>` : `<span class="tx">${t}</span>`).join('') + '</div>'
+    + `<span class="mode-pill">${mode || ''}</span>`;
+}
+const MODE = {
+  edit:ms('edit') + 'Редагування',
+  view:ms('visibility') + 'Лише перегляд',
+  comment:ms('rate_review') + 'Лише коментування'
+};
+
+/* ---------- ПОВТОРЕННЯ ---------- */
+const RECAP_SNIP = {
+  sync:`<div class="snip sn-sync"><div class="dev">${ms('smartphone')}<b>Телефон у школі</b>Конспект записано</div><span class="arr">→</span><div class="cl">${ms('cloud')}<br>сервер Google</div><span class="arr">→</span><div class="dev">${ms('laptop')}<b>Ноутбук удома</b>Конспект уже тут!</div></div>`,
+  offline:`<div class="snip sn-toast">${ms('cloud_off')}<span>Не вдається підключитися. Перевірте з'єднання з Інтернетом.</span><b>Повторити</b></div>`,
+  store:`<div class="snip sn-store"><div class="top">${ms('cloud', 'red')}Сховище (заповнено 100%)</div><div class="bar"><i></i></div><small>Використано 15 ГБ з 15 ГБ</small></div>`,
+  classroom:`<div class="snip sn-cr"><div class="hd"><img src="images/classroom.svg" alt=""><b style="font-weight:500">Інформатика · 6-Б</b></div><div class="tabs"><span>Стрічка</span><span>Завдання</span><span>Люди</span></div><div class="banner">Інформатика · 6-Б</div></div>`,
+  comments:`<div class="snip sn-cmts"><div>${ms('group')}Коментарі до курсу<span class="in">Додати коментар…</span></div><div>${ms('person')}Приватні коментарі<span class="in">Додати коментар…</span></div></div>`,
+  account:`<div class="snip sn-acc"><div class="av">П</div><div><b>Петро Іваненко</b><small>petro.6a@gmail.com</small></div><span class="out">Вийти</span></div>`,
+  drive:`<div class="snip sn-drive"><div class="hd"><img src="images/drive.svg" alt="">Мій диск</div><div class="f"><img src="images/docs.svg" alt="">Реферат з історії<small>змінено вчора</small></div><div class="f"><img src="images/slides.svg" alt="">Презентація «Космос»<small>12 жовт.</small></div></div>`
+};
+makeChoices('recapList', [
+  { pre:RECAP_SNIP.sync, text:'Як конспект потрапив на ноутбук?',
+    opts:['Через Bluetooth', 'Через сервер Google', 'Його надіслав учитель'], correct:1,
+    why:'Файл лежить на сервері, тож відкривається з будь-якого пристрою.' },
+  { pre:RECAP_SNIP.offline, text:'Чому файл не відкривається?',
+    opts:['Його видалили', 'Немає Інтернету', 'Зламався ноутбук'], correct:1,
+    why:'Без Інтернету до сервера не дістатися.' },
+  { pre:RECAP_SNIP.store, text:'Що сталося з Диском?',
+    opts:['Закінчилося вільне місце', 'Зникли всі файли', 'Повільний Інтернет'], correct:0,
+    why:'Безкоштовне місце в хмарі має межу.' },
+  { pre:RECAP_SNIP.classroom, text:'Де побачити всіх учнів курсу?',
+    opts:['Стрічка', 'Завдання', 'Люди'], correct:2 },
+  { pre:RECAP_SNIP.comments, text:'Як написати, щоб прочитав тільки вчитель?',
+    opts:['Коментарі до курсу', 'Приватні коментарі'], correct:1 },
+  { pre:RECAP_SNIP.account, text:'На шкільному комп\'ютері відкрито акаунт Петра. Що зробиш?',
+    opts:['Здам роботу з нього', 'Вийду й увійду у свій', 'Подивлюся його оцінки'], correct:1,
+    why:'Інакше твою роботу «здасть» Петро.' },
+  { pre:RECAP_SNIP.drive, text:'Флешку з рефератом забуто вдома. Як цього уникнути?',
+    opts:['Купити другу флешку', 'Зберігати реферат на Google Диску', 'Носити ноутбук із собою'], correct:1,
+    why:'Файл на Диску відкриється з будь-якого комп\'ютера.' },
+  { text:'Що працює без Інтернету?',
+    opts:['Google Classroom', 'Гра, встановлена на ноутбук', 'Google Документи'], correct:1 }
+]);
+
+/* ---------- КРОК 1: ВИБІР СЕРВІСУ ---------- */
+(function(){
+  const TOOLS = [
+    { id:'docs', name:'Документи' }, { id:'sheets', name:'Таблиці' }, { id:'slides', name:'Презентації' },
+    { id:'forms', name:'Форми' }, { id:'meet', name:'Meet' }, { id:'calendar', name:'Календар' },
+    { id:'drive', name:'Диск' }, { id:'keep', name:'Keep' }, { id:'chat', name:'Chat' }
+  ];
+  const TASKS = [
+    { t:'Поговорити з Олексієм по відео, поки він у відпустці', a:'meet', why:'Google Meet — відеозустрічі.' },
+    { t:'Разом написати текст доповіді, кожен — свою частину', a:'docs', why:'Google Документи — спільні текстові документи.' },
+    { t:'Дізнатися, ким мріють стати 25 однокласників', a:'forms', why:'Google Форми — опитування: кожен відповідає зі свого пристрою.' },
+    { t:'Порахувати, скільки голосів отримала кожна професія', a:'sheets', why:'Google Таблиці — рахувати й будувати діаграми.' },
+    { t:'Не забути: захист проєкту — 20 листопада', a:'calendar', why:'Google Календар нагадає всім учасникам про подію.' },
+    { t:'Скласти короткий список справ із галочками', a:'keep', why:'Google Keep — нотатки та списки справ, ними теж можна ділитися.' },
+    { t:'Тримати всі фото й файли команди в одній папці', a:'drive', why:'Google Диск — хмарне сховище для файлів і папок.' },
+    { t:'Швидко написати команді: «Свою частину я доробив!»', a:'chat', why:'Google Chat — переписка в команді.' },
+    { t:'Підготувати слайди, які покажете на екрані під час виступу', a:'slides', why:'Google Презентації — слайди, які можна робити разом.' }
+  ];
+  const ex = document.getElementById('toolsEx'), grid = document.getElementById('toolGrid');
+  const num = document.getElementById('toolNum'), task = document.getElementById('toolTask');
+  const fb = document.getElementById('toolFb'), doneList = document.getElementById('toolDone');
+  const hit = trackTask(ex, TASKS.length, TASKS.length + 2);
+  let i = 0;
+  const show = ()=>{
+    if(i >= TASKS.length){
+      num.textContent = '🎉'; task.textContent = 'Команда має все, щоб працювати разом!';
+      grid.querySelectorAll('.logo-tile').forEach(b=>b.disabled = true);
+      return;
+    }
+    num.textContent = `Завдання ${i + 1} з ${TASKS.length}`;
+    task.textContent = TASKS[i].t;
+  };
+  TOOLS.forEach(tl=>{
+    const b = document.createElement('button');
+    b.className = 'logo-tile';
+    b.innerHTML = `<img src="images/${tl.id}.svg" alt="">Google ${tl.name}`;
+    b.addEventListener('click', ()=>{
+      if(i >= TASKS.length) return;
+      const cur = TASKS[i];
+      if(tl.id === cur.a){
+        b.classList.add('ok'); setTimeout(()=>b.classList.remove('ok'), 600);
+        fb.textContent = '✅ ' + cur.why;
+        doneList.insertAdjacentHTML('beforeend', `<span class="done-pill"><img src="images/${tl.id}.svg" alt="">${cur.t}</span>`);
+        addNeurons(1); hit(); i++;
+        if(i === TASKS.length) addNeurons(2);
+        show();
+      } else {
+        b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake');
+        setTimeout(()=>b.classList.remove('shake'), 400);
+        fb.textContent = '🤔 Цей сервіс для іншого. Подумай ще.';
+      }
+    });
+    grid.appendChild(b);
+  });
+  show();
+})();
+
+/* ---------- КРОК 2: ОЧИМА СПІВАВТОРА ---------- */
+(function(){
+  const ROLES = {
+    reader:{ icon:'visibility', label:'Читач', mode:MODE.view, edit:false, comment:false, share:false,
+      msg:'Ти можеш лише читати. Спробуй клацнути в текст — змінити його не вийде, а кнопки коментаря немає.' },
+    commenter:{ icon:'add_comment', label:'Коментатор', mode:MODE.comment, edit:false, comment:true, share:false,
+      msg:'Текст змінити не можна, але праворуч з\'явилася кнопка коментаря — можна залишити примітку збоку.' },
+    editor:{ icon:'edit', label:'Редактор', mode:MODE.edit, edit:true, comment:true, share:true,
+      msg:'Можна все: клацни в текст і допиши щось! Можна коментувати й навіть запросити інших кнопкою «Надати доступ».' }
+  };
+  const eyes = document.getElementById('eyes'), text = document.getElementById('eyeText');
+  const cBtn = document.getElementById('eyeComment'), share = document.getElementById('eyeShare');
+  const tools = document.getElementById('eyeTools'), msg = document.getElementById('eyeMsg');
+  const hit = trackTask(eyes, 3, 0);
+  const set = key=>{
+    const r = ROLES[key];
+    eyes.querySelectorAll('.eye-btn').forEach(b=>b.classList.toggle('on', b.dataset.k === key));
+    text.contentEditable = r.edit;
+    cBtn.hidden = !r.comment; share.hidden = !r.share;
+    fillToolbar(tools, r.mode); tools.classList.toggle('ro', !r.edit);
+    msg.textContent = r.msg;
+  };
+  Object.entries(ROLES).forEach(([k, r])=>{
+    const b = document.createElement('button');
+    b.className = 'eye-btn'; b.dataset.k = k; b.innerHTML = ms(r.icon) + r.label;
+    b.addEventListener('click', ()=>{
+      set(k);
+      if(!b.classList.contains('seen')){ b.classList.add('seen'); hit(); }
+    });
+    eyes.appendChild(b);
+  });
+  fillToolbar(tools, ''); tools.classList.add('ro');
+  cBtn.hidden = true; share.hidden = true; text.contentEditable = false;
+  cBtn.addEventListener('click', ()=>{ msg.textContent = '💬 Відкрилося поле для коментаря — він з\'явиться збоку від тексту, а сам текст не зміниться.'; });
+})();
+
+/* ---------- КРОК 3: ВІКНО «НАДАТИ ДОСТУП» ---------- */
+(function(){
+  const OPTS = ['Читач', 'Коментатор', 'Редактор'];
+  const PEOPLE = [
+    { n:'Катя', mail:'katya.p@gmail.com', c:'var(--katya)', why:'пише разом з тобою половину тексту', a:'Редактор',
+      ok:'Каті треба змінювати текст — їй потрібен редактор.' },
+    { n:'Вчителька', mail:'o.koval@school.ua', c:'var(--teacher)', why:'перевіряє й підказує, що покращити', a:'Коментатор',
+      ok:'Вчителька залишає зауваження збоку, а виправляє команда сама.' },
+    { n:'Бабуся', mail:'babusia.nina@ukr.net', c:'#5F6368', why:'хоче просто подивитися, що вийшло', a:'Читач',
+      ok:'Для перегляду досить рівня читача.' },
+    { n:'Міша', mail:'misha.2014@gmail.com', c:'var(--misha)', why:'дописує розділ про професію дизайнера', a:'Редактор',
+      ok:'Міша дописує текст — отже, редактор.' }
+  ];
+  const GEN = { why:'Учителька хоче кинути посилання в чат класу: хай усі 30 учнів побачать роботу, але нічого не зіпсують.',
+    opts:['Обмежений', 'Усі, хто має посилання · Читач', 'Усі, хто має посилання · Редактор'], a:1 };
+  const people = document.getElementById('people'), general = document.getElementById('general');
+  const fb = document.getElementById('shareFb'), send = document.getElementById('sendBtn');
+  const hit = trackTask(document.getElementById('shareDlg'), PEOPLE.length + 1, PEOPLE.length + 3);
+  let left = PEOPLE.length + 1;
+  const mkSel = (opts, onPick)=>{
+    const s = document.createElement('select');
+    s.className = 'role-sel';
+    s.innerHTML = '<option value="">Обери…</option>' + opts.map((o, k)=>`<option value="${k}">${o}</option>`).join('');
+    s.addEventListener('change', ()=>{ if(s.value !== '') onPick(+s.value, s); });
+    return s;
+  };
+  const good = (s, text)=>{
+    s.classList.remove('wrong'); s.classList.add('ok'); s.disabled = true;
+    fb.textContent = '✅ ' + text;
+    addNeurons(1); hit();
+    if(--left === 0){
+      send.classList.add('ready'); addNeurons(2);
+      fb.textContent = '🎉 Доступ налаштовано! Кожен отримає лист-запрошення з посиланням на документ.';
+    }
+  };
+  const bad = (s, text)=>{
+    s.classList.remove('wrong'); void s.offsetWidth; s.classList.add('wrong');
+    fb.textContent = '🤔 ' + text;
+    setTimeout(()=>{ s.value = ''; }, 500);
+  };
+  people.innerHTML = `<div class="person"><div class="av" style="background:var(--me)">О</div><div class="who"><b>Олексій (ви)</b><span>oleksii.6b@gmail.com</span></div><span class="owner-tag">Власник</span></div>`;
+  PEOPLE.forEach(p=>{
+    const row = document.createElement('div');
+    row.className = 'person';
+    row.innerHTML = `<div class="av" style="background:${p.c}">${p.n[0]}</div><div class="who"><b>${p.n}</b><span>${p.mail}</span><span class="why">${p.why}</span></div>`;
+    row.appendChild(mkSel(OPTS, (k, s)=>{
+      if(OPTS[k] === p.a) good(s, p.ok);
+      else if(k > OPTS.indexOf(p.a)) bad(s, `Забагато прав: ${p.n} отримає більше, ніж потрібно, і може випадково щось змінити.`);
+      else bad(s, `Замало: з таким доступом ${p.n} не зможе зробити те, що треба.`);
+    }));
+    people.appendChild(row);
+  });
+  const g = document.createElement('div');
+  g.className = 'general';
+  g.innerHTML = `<div class="globe">${ms('lock')}</div><div class="who"><span class="why" style="color:var(--g-ink) !important; font-weight:600">${GEN.why}</span></div>`;
+  g.appendChild(mkSel(GEN.opts, (k, s)=>{
+    if(k === GEN.a){
+      const gl = g.querySelector('.globe'); gl.classList.add('pub'); gl.innerHTML = ms('public');
+      good(s, 'Хто має посилання, той може переглянути документ, але не змінити.');
+    }
+    else if(k === 0) bad(s, 'З обмеженим доступом посилання відкриють лише додані люди, а не весь клас.');
+    else bad(s, '30 редакторів — і хтось точно щось випадково зітре!');
+  }));
+  general.appendChild(g);
+})();
+
+/* ---------- КРОК 4: ЖИВИЙ ДОКУМЕНТ ---------- */
+const cmt = (who, c, time, text, resolve)=>`<div class="cmt"><div class="ch"><div class="av" style="background:${c}">${who[0]}</div><div class="nm"><b>${who}</b><small>${time}</small></div>${resolve ? ms('check', 'chk') : ''}${ms('more_vert')}</div>${text}${resolve ? '<div class="reply">Відповісти або додати інших за допомогою @</div>' : ''}</div>`;
+(function(){
+  fillToolbar(document.getElementById('liveTools'), MODE.edit);
+  const page = document.getElementById('livePage'), comment = document.getElementById('liveComment');
+  comment.innerHTML = cmt('Вчителька', 'var(--teacher)', '18:32 Сьогодні', 'Цікаво! <span class="mention">@Міша</span>, додай, яку освіту треба здобути для цієї професії.', true);
+  page.innerHTML = '<h4>Професії майбутнього</h4>';
+  const LINES = [
+    { who:'Катя', c:'var(--katya)', text:'1. Розробник віртуальних світів — створює ігри й уроки для VR-окулярів.' },
+    { who:'Міша', c:'var(--misha)', text:'2. Дизайнер одягу з 3D-принтера — друкує речі під твій розмір.' },
+    { who:'Олексій', c:'var(--me)', text:'3. Лікар-оператор роботів — керує роботом під час операції.' }
+  ];
+  const els = LINES.map(l=>{
+    const p = document.createElement('p');
+    p.className = 'live-line';
+    p.innerHTML = `<span class="t"></span><span class="caret" style="background:${l.c}" data-name="${l.who}"></span>`;
+    page.appendChild(p);
+    return p.querySelector('.t');
+  });
+  let pos = 0, running = false;
+  const MAX = Math.max(...LINES.map(l=>l.text.length));
+  const tick = ()=>{
+    if(!running) return;
+    pos++;
+    LINES.forEach((l, k)=>{
+      // кожен друкує зі своєю швидкістю
+      const n = Math.min(l.text.length, Math.floor(pos * [1, .8, .9][k]));
+      els[k].textContent = l.text.slice(0, n);
+    });
+    if(pos === Math.round(MAX * .7)) comment.classList.add('show');
+    if(pos > MAX * 1.25 + 30){ pos = 0; comment.classList.remove('show'); setTimeout(tick, 600); return; }
+    setTimeout(tick, 70 + Math.random() * 60);
+  };
+  new IntersectionObserver(es=>{
+    const vis = es[0].isIntersecting;
+    if(vis && !running){ running = true; tick(); }
+    if(!vis) running = false;
+  }, {threshold:.3}).observe(page);
+})();
+
+makeChoices('commentList', [
+  { pre:cmt('Катя', 'var(--katya)', '18:20 Сьогодні', 'Може, напишемо «розробник ігор»? Так зрозуміліше 🙂', true),
+    text:'Ти погодився й уже виправив текст. Що тепер зробити з цим коментарем?',
+    opts:['Натиснути ✓ — позначити як вирішений', 'Видалити весь абзац', 'Написати ще один коментар «ок»'], correct:0,
+    why:'Вирішений коментар зникає з полів, але його можна знайти в історії коментарів.' },
+  { text:'Тобі треба, щоб саме Міша побачив коментар, навіть якщо зараз не відкрив документ. Що зробити?',
+    opts:['Написати МІША!!! великими літерами', 'Написати @ і обрати Мішу зі списку', 'Нічого, він колись сам знайде'], correct:1,
+    why:'Згадка через @ надсилає людині лист-сповіщення про коментар.' },
+  { text:'Який коментар справді допоможе команді?',
+    opts:['«Жах, усе погано»', '«😂😂😂»', '«Тут дата неправильна: захист 20 листопада, а не 12»'], correct:2,
+    why:'Корисний коментар — ввічливий і конкретний: що саме не так і як виправити.' },
+  { pre:cmt('Вчителька', 'var(--teacher)', '18:45 Сьогодні', 'Додайте, будь ласка, джерела інформації.'),
+    text:'Що станеться з текстом документа, коли вчителька додала цей коментар?',
+    opts:['Нічого — коментар висить збоку', 'Текст сам виправиться', 'Документ стане доступний лише вчительці'], correct:0,
+    why:'Коментар — це примітка, він не змінює сам документ.' }
+], {col:true});
+
+/* ---------- КРОК 5: ІСТОРІЯ ВЕРСІЙ ---------- */
+(function(){
+  const C = { me:'var(--me)', katya:'var(--katya)', misha:'var(--misha)' };
+  const S = {
+    vr:'Розробник віртуальних світів', dz:'Дизайнер одягу з 3D-принтера',
+    dr:'Лікар-оператор роботів', end:'Висновок: учитися доведеться все життя!'
+  };
+  // нові зміни версії підсвічені кольором автора, видалене — закреслене
+  const VERS = [
+    { day:'СЬОГОДНІ', when:'14 жовтня, 18:40', tag:'Поточна версія', by:'Олексій', c:C.me, secs:[['vr'], ['dr'], ['end'], ['Фото для презентації — у папці на Диску', 'new']] },
+    { when:'14 жовтня, 18:35', by:'Міша', c:C.misha, secs:[['vr'], ['dz', 'gone'], ['dr'], ['end']] },
+    { when:'14 жовтня, 17:10', by:'Катя', c:C.katya, secs:[['vr'], ['dz'], ['dr'], ['end', 'new']] },
+    { day:'ВЧОРА', when:'13 жовтня, 19:02', by:'Міша', c:C.misha, secs:[['vr'], ['dz', 'new'], ['dr', 'new']] },
+    { when:'13 жовтня, 18:15', by:'Олексій', c:C.me, secs:[['vr', 'new']] }
+  ];
+  const RIGHT = 2;
+  const ex = document.getElementById('histEx'), page = document.getElementById('histPage');
+  const list = document.getElementById('verList'), btn = document.getElementById('restoreBtn');
+  const title = document.getElementById('verTitle');
+  const fb = document.getElementById('histFb'), whoQ = document.getElementById('whoQ');
+  const hit = trackTask(ex, 2, 5);
+  let sel = 0, solved = false;
+  const render = ()=>{
+    const v = VERS[sel];
+    title.textContent = v.when;
+    page.innerHTML = '<h4>Професії майбутнього</h4>' + v.secs.map(([k, st])=>
+      `<div class="sec ${st || ''}" style="--c:${v.c}"><b>${S[k] || k}</b>${st === 'gone' ? '<small>видалено в цій версії</small>' : ''}</div>`).join('');
+    list.querySelectorAll('.ver').forEach((b, k)=>b.classList.toggle('sel', k === sel));
+    btn.disabled = sel === 0 || solved;
+  };
+  const buildList = ()=>{
+    list.innerHTML = '';
+    VERS.forEach((v, k)=>{
+      if(v.day) list.insertAdjacentHTML('beforeend', `<div class="day">${v.day}</div>`);
+      const b = document.createElement('button');
+      b.className = 'ver';
+      b.innerHTML = `<span class="when">${v.when}</span>${v.tag ? `<span class="tag">${v.tag}</span>` : ''}<span class="by"><span class="dot" style="background:${v.c}"></span>${v.by}</span>`;
+      b.addEventListener('click', ()=>{ sel = k; render(); });
+      list.appendChild(b);
+    });
+  };
+  buildList();
+  btn.addEventListener('click', ()=>{
+    if(solved || sel === 0) return;
+    const has = VERS[sel].secs.some(([k, st])=>k === 'dz' && st !== 'gone');
+    if(sel === RIGHT){
+      solved = true; addNeurons(3); hit();
+      delete VERS[0].tag; delete VERS[0].day;
+      VERS.unshift({ day:'СЬОГОДНІ', when:'14 жовтня, 18:52', tag:'Поточна версія', by:'Олексій (відновлено)', c:C.me, secs:VERS[RIGHT + 1].secs.map(([k])=>[k]) });
+      sel = 0; buildList(); render();
+      fb.innerHTML = '✅ <b>Відновлено!</b> Розділ повернувся, а висновок Каті теж на місці. Стара версія не зникла — вона лишилася в історії.';
+      whoQ.classList.add('show');
+    } else {
+      btn.classList.remove('wrong'); void btn.offsetWidth; btn.classList.add('wrong');
+      setTimeout(()=>btn.classList.remove('wrong'), 400);
+      fb.textContent = has
+        ? '🤔 Розділ тут є, але це стара версія: зникне висновок, який пізніше дописала Катя. Знайди новішу.'
+        : '🤔 У цій версії розділу «Дизайнер одягу» немає. Пошукай іншу.';
+    }
+  });
+  render();
+
+  const whoOpts = document.getElementById('whoOpts'), whoFb = document.getElementById('whoFb');
+  ['Катя', 'Міша', 'Олексій'].forEach(n=>{
+    const b = document.createElement('button');
+    b.className = 'choice-btn'; b.textContent = n;
+    b.addEventListener('click', ()=>{
+      if(whoOpts.dataset.done) return;
+      if(n === 'Міша'){
+        b.classList.add('correct'); whoOpts.dataset.done = 1;
+        whoFb.textContent = 'Так, у версії 18:35 від Міші розділ закреслено. Мабуть, випадково — головне, що історія все зберегла!';
+        addNeurons(2); hit();
+      } else {
+        b.classList.add('wrong'); setTimeout(()=>b.classList.remove('wrong'), 600);
+        whoFb.textContent = 'Подивись уважніше: у чиїй версії розділ став закресленим?';
+      }
+    });
+    whoOpts.appendChild(b);
+  });
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Хто може видалити файл і забрати доступ в інших?', opts:['Читач', 'Власник', 'Коментатор'], correct:1 },
+  { q:'Однокласник має лише переглянути твою презентацію. Який рівень доступу дати?', opts:['Читач', 'Редактор', 'Власник'], correct:0 },
+  { q:'Що може коментатор?', opts:['Змінювати текст', 'Видаляти файл', 'Читати й залишати примітки збоку'], correct:2 },
+  { q:'Як у спільному документі побачити, хто зараз пише?', opts:['За кольоровими курсорами з іменами', 'Ніяк', 'Треба зателефонувати кожному'], correct:0 },
+  { q:'Хтось зіпсував спільний документ. Що допоможе повернути попередній стан?', opts:['Кошик', 'Історія версій', 'Коментар'], correct:1 },
+  { q:'Який сервіс допоможе провести опитування серед класу?', opts:['Google Форми', 'Google Meet', 'Google Keep'], correct:0, why:'Форми збирають відповіді від багатьох людей.' },
+  { q:'Учитель має перевіряти доповідь і підказувати, але не змінювати текст. Який доступ йому дати?', opts:['Редактор', 'Коментатор', 'Читач'], correct:1 },
+  { q:'Як зробити, щоб увесь клас міг відкрити документ за посиланням, але нічого не зіпсував?', opts:['Усі, хто має посилання · Читач', 'Усі, хто має посилання · Редактор', 'Обмежений доступ'], correct:0 },
+  { q:'Зауваження з коментаря ти вже виправив. Що зробити з коментарем?', opts:['Видалити документ', 'Позначити як вирішений ✓', 'Нічого не робити'], correct:1 },
+  { q:'Навіщо в коментарі писати @ та ім\'я однокласника?', opts:['Щоб він отримав сповіщення про коментар', 'Щоб текст став жирним', 'Щоб забрати в нього доступ'], correct:0 },
+  { q:'Де шукати файл, який випадково видалили з Google Диска?', opts:['В історії версій', 'У Кошику', 'У Google Календарі'], correct:1, why:'Видалений файл лежить у Кошику ще 30 днів.' }
+], {summary:'Тепер ти знаєш, як надавати доступ до файлів, працювати разом в одному документі, коментувати й відновлювати попередні версії.'});
+</script>
+
+</body>
+</html>
