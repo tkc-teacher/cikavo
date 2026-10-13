@@ -33,7 +33,8 @@
   .top-btn{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; border:1.5px solid var(--teal); background:var(--surface); color:var(--teal-dark); border-radius:999px; padding:4px 14px; cursor:pointer; white-space:nowrap;}
   .top-btn:hover{background:#E3F7F6;}
   a.top-btn{text-decoration:none;}
-  @media (max-width:560px){ .game-title{display:none;} .top-btn .long{display:none;} .top-btn{padding:4px 11px;} .topbar-inner{gap:8px;} }
+  @media (max-width:380px){ .topbar-inner{gap:6px; padding:10px 12px;} .back-link{font-size:13px;} .top-btn{padding:3px 9px;} }
+  @media (max-width:640px){ .game-title{display:none;} .top-btn .long{display:none;} .top-btn{padding:4px 11px;} .topbar-inner{gap:8px;} }
 
   main{padding:16px 0 40px;}
 
@@ -42,6 +43,7 @@
   .scene{background-repeat:repeat-x; background-size:auto 100%; background-position:left bottom;}
   .scene-top{height:var(--scene-top);}
   .scene-bottom{height:var(--scene-bottom);}
+  .track.compact .track-name{display:none;}
   .track-name{position:absolute; top:10px; left:12px; z-index:2; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; line-height:1; padding:5px 11px 4px; border-radius:999px; background:rgba(255,255,255,.9); color:var(--ink);}
   .road{position:relative; background:var(--road); border-top:4px solid var(--edge); border-bottom:4px solid var(--edge);}
   .lane{position:relative; height:var(--lane-h);}
@@ -56,6 +58,8 @@
   .sun{position:absolute; top:8px; right:70px; width:40px; height:40px; border-radius:50%; background:#FFC93C; box-shadow:0 0 0 8px rgba(255,201,60,.3), 0 0 0 16px rgba(255,201,60,.15);}
   .flake{position:absolute; top:-8px; width:6px; height:6px; border-radius:50%; background:#fff; box-shadow:0 0 2px rgba(80,120,160,.5); animation:snow linear infinite;}
   @keyframes snow{to{transform:translate(-30px, 330px);}}
+  .drop{position:absolute; top:-14px; width:1.5px; height:11px; border-radius:1px; background:rgba(255,255,255,.75); animation:rain linear infinite;}
+  @keyframes rain{to{transform:translate(-14px, 330px);}}
   .leaf{position:absolute; top:-10px; width:9px; height:6px; border-radius:6px 0; background:#E8A33D; animation:snow linear infinite;}
 
   .car{position:absolute; top:56%; width:var(--car-w); transform:translateY(-50%); z-index:1;
@@ -99,16 +103,16 @@
   .seg button:disabled{opacity:.45; cursor:not-allowed;}
 
   .cards{display:grid; gap:10px;}
-  .cards.tracks{grid-template-columns:repeat(4, 1fr);}
+  .cards.tracks{grid-template-columns:repeat(5, 1fr);}
   .cards.cars{grid-template-columns:repeat(6, 1fr);}
-  @media (max-width:700px){ .cards.tracks{grid-template-columns:repeat(2, 1fr);} .cards.cars{grid-template-columns:repeat(3, 1fr);} }
+  @media (max-width:700px){ .cards.tracks .label{font-size:13px; padding:6px 2px 2px;} .cards.tracks{grid-template-columns:repeat(3, 1fr);} .cards.cars{grid-template-columns:repeat(3, 1fr);} }
   .pick{border:1.5px solid var(--line); background:var(--surface); border-radius:var(--radius-m); padding:0; cursor:pointer; overflow:hidden; text-align:center; transition:all .15s ease;}
   .pick:hover:not(:disabled){border-color:var(--teal); transform:translateY(-2px);}
   .pick.on{border-color:var(--teal); box-shadow:0 0 0 2px var(--teal);}
   .pick:disabled{cursor:not-allowed;}
   .pick .label{display:block; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14.5px; line-height:1.2; padding:7px 6px 2px;}
   .pick small{display:block; font-size:11.5px; font-weight:600; color:var(--ink-soft); line-height:1.25; padding:0 6px 8px;}
-  .track-prev{height:54px; background-color:var(--edge); background-repeat:repeat-x; background-size:auto 100%; border-bottom:6px solid var(--road);}
+  .track-prev{height:48px; background-color:var(--edge); background-repeat:repeat-x; background-size:auto 100%; border-bottom:6px solid var(--road);}
   .pick:disabled .track-prev{filter:grayscale(1) opacity(.45);}
   .pick .car-prev{display:block; padding:10px 8px 0;}
   .pick .car-prev svg{width:100%; height:auto; display:block; overflow:visible;}
@@ -148,7 +152,7 @@
   .tip{background:#FFF4D6; color:#8A6200; border-radius:var(--radius-s); padding:6px 12px; font-size:14px; font-weight:700; margin-bottom:10px;}
 
   /* Екранна клавіатура */
-  .kb{--k:min(50px, calc((100vw - 90px) / 13.2)); display:flex; flex-direction:column; align-items:center; gap:5px; user-select:none;}
+  .kb{--k:min(50px, calc((100vw - 150px) / 13.5));   /* найширший — нижній ряд: 10 клавіш + 2 Shift по 1.75 */ display:flex; flex-direction:column; align-items:center; gap:5px; user-select:none;}
   .kb-row{display:flex; gap:5px;}
   .key{position:relative; width:var(--k); height:calc(var(--k) * .88); border-radius:8px; display:flex; align-items:center; justify-content:center;
     font-family:'Baloo 2',sans-serif; font-weight:700; font-size:calc(var(--k) * .36); color:var(--ink); background:var(--fc, var(--f-thumb));
@@ -162,13 +166,27 @@
   .key.next.bump::after{background:rgba(255,255,255,.6);}
   .key.press{transform:translateY(2px); border-bottom-width:1.5px;}
   .kb-row.r2{padding-left:calc(var(--k) * .35);}
+  .kb-row.rn{padding-right:var(--k);}   /* ряд цифр зсунутий ліворуч, як на справжній клавіатурі */
   @media (max-width:600px){
     :root{--car-w:68px; --lane-h:66px; --scene-top:44px; --scene-bottom:26px;}
     .text-box{font-size:22px;}
     .panel{padding:16px 14px;}
-    .kb{--k:calc((100vw - 64px) / 12.6); gap:4px;} .kb-row{gap:3px;}
+    /* на телефоні Shift вужчі (1.15 клавіші), тож нижній ряд — 12.3 клавіші, і самі клавіші більші */
+    .kb{--k:calc((100vw - 105px) / 12.3); gap:4px;} .kb-row{gap:3px;}
+    .key.wide{width:calc(var(--k) * 1.15);}
+    .container{padding:0 12px;}
     .sun{width:28px; height:28px; top:6px;}
+    /* лічильники — в один ряд, число над підписом */
+    .stats{display:grid; grid-template-columns:repeat(4, 1fr); gap:6px;}
+    .stat{padding:4px 4px; text-align:center; font-size:11px; line-height:1.2;}
+    .stat b{display:block; margin:0; font-size:16px;}
+    /* вікно результату: три показники в один ряд */
+    .result{gap:6px; flex-wrap:nowrap;}
+    .result div{flex:1; min-width:0; padding:8px 6px;}
+    .result b{font-size:22px;}
+    .win{padding:22px 16px;}
   }
+  @media (max-width:420px){ .field{flex-direction:column;} .field .btn{align-self:center;} }
 
   /* ---------- Результат ---------- */
   .overlay{position:fixed; inset:0; z-index:20; background:rgba(27,27,58,.45); display:none; align-items:center; justify-content:center; padding:16px;}
@@ -564,7 +582,20 @@ const TEXTS = {
     sentences:['Practice makes perfect.','My robot can type very fast.','The mouse and the keyboard are input devices.',
            'Save your work every few minutes.','A strong password is long and secret.','The printer puts text on paper.',
            'Every file lives in a folder.','Slow and steady wins the race.','Look at the screen and not at the keys.',
-           'Computers help us learn new things.','Keep your fingers on the home row.']
+           'Computers help us learn new things.','Keep your fingers on the home row.'],
+    // Речення з розділовими знаками . , - ( ) " ! ? @ ' : — для змагання «Слалом знаків»
+    punct:['Hi, Anna! Can you send me the file?','My e-mail is robot@school.ua: write to me!',
+           "Don't forget: save your work (every few minutes)!",'"Ready?" asked the robot. "Go!"',
+           "It's a mouse, not a cat (a computer mouse)!",'Write to help@lab.org - or ask the teacher.',
+           'Is it a mouse, a keyboard, or a printer?',"Let's race: you, me, and the robot!",
+           "Tom's laptop isn't new, but it's fast.",'Is this link safe? Check it: look at the address!',
+           'Sam asked: "Where is my folder?"','Ready, steady - go!','Click "Save" (or press the keys).',
+           "We're online: kate@mail.com, max@mail.com.",'Oops! Wrong key - try again.',
+           'Wow! The robot is fast, but you are faster.',"Where's my mouse? (It's under the book!)",
+           'Note: the password is secret - never share it!','Ann wrote: "See you at school!"',
+           "My login is anna_k@mail.com - don't tell anyone!",'What is a file? It is a box for data.',
+           'Hello, world! Hello, robot!',"Is it raining? Yes, it is - take your umbrella!",
+           'Max said: "I can type with ten fingers!"',"First, open the browser; then, type the address."]
   }
 };
 
@@ -581,6 +612,9 @@ const LAYOUTS = {
        ['z','x','c','v','b','n','m',[',','<'],['.','>'],['/','?']] ]
 };
 const BUMPS = { uk:['а','о'], en:['f','j'] };
+// Ряд цифр — лише коли в тексті є його символи (! @ ( ) - тощо); пальці — для кожної клавіші окремо
+const NUM_ROW = { en:[['1','!'],['2','@'],['3','#'],['4','$'],['5','%'],['6','^'],['7','&'],['8','*'],['9','('],['0',')'],['-','_']] };
+const NUM_FINGER = [0,1,2,3,3,3,4,5,6,7,7];
 // Колонка → палець: 0–3 ліва рука (мізинець…вказівний), 4–7 права (вказівний…мізинець)
 const COL_FINGER = [0,1,2,3,3,4,4,5,6,7,7,7];
 const FINGERS = ['лівий мізинець','лівий безіменний','лівий середній','лівий вказівний',
@@ -680,22 +714,101 @@ function carSVG(model, color, kind){
 const svgURL = s => `url("data:image/svg+xml,${encodeURIComponent(s)}")`;
 const tile = (w, h, body) => svgURL(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${body}</svg>`);
 
+// Київ: Лаврська дзвіниця, Михайлівський собор, Батьківщина-Мати, телевежа, Арка Свободи, каштани
+const chestnutTree = (x, y, r) => `<rect x="${x-1.5}" y="${y}" width="3" height="${64-y}" fill="#8B5A2B"/>
+    <circle cx="${x}" cy="${y-r*.4}" r="${r}" fill="#4E9F57"/><circle cx="${x-r*.5}" cy="${y-r*.1}" r="${r*.7}" fill="#5FAF63"/>
+    ${[[-.4,-.8],[.35,-.6],[-.1,-.2],[.55,0]].map(([dx,dy])=>`<ellipse cx="${x+dx*r}" cy="${y+dy*r-r*.3}" rx="1" ry="2" fill="#FFF8E7"/>`).join('')}`;
+const goldDome = (x, y, r) => `<ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r*1.05}" fill="#F2C230"/><path d="M${x-r*.45} ${y-r*.8} L${x} ${y-r*2} L${x+r*.45} ${y-r*.8} Z" fill="#F2C230"/>
+    <path d="M${x} ${y-r*2} V${y-r*2.8} M${x-1.2} ${y-r*2.5} H${x+1.2}" stroke="#C99A1E" stroke-width=".8"/>`;
 function cityTop(){
-  const B = [[0,30,40,'#8E9AC8'],[32,22,52,'#F2A97E'],[56,38,30,'#7FC8C0'],[96,26,46,'#B79CE0'],[124,34,36,'#F5C76B'],
-             [160,24,56,'#8E9AC8'],[186,30,26,'#7FC8C0'],[218,22,44,'#F2A97E']];
-  let s = '<rect width="240" height="64" fill="#CDEBFF"/><ellipse cx="40" cy="10" rx="14" ry="4.5" fill="#fff"/><ellipse cx="150" cy="13" rx="18" ry="5" fill="#fff"/>';
+  const B = [[118,22,30,'#F2A97E'],[142,18,40,'#8E9AC8'],[222,24,34,'#7FC8C0'],[248,20,26,'#F5C76B'],[270,26,42,'#B79CE0'],[438,24,30,'#F2A97E']];
+  let s = '<rect width="480" height="64" fill="#CDEBFF"/><ellipse cx="90" cy="9" rx="16" ry="4.5" fill="#fff"/><ellipse cx="300" cy="12" rx="20" ry="5" fill="#fff"/><ellipse cx="420" cy="8" rx="12" ry="3.5" fill="#fff"/>';
+  s += '<path d="M0 52 Q60 38 130 48 T260 46 T400 44 T480 52 V64 H0 Z" fill="#A9D9A2"/>';   // київські пагорби
   for(const [x,w,h,c] of B){
     const y = 64 - h;
     s += `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
     for(let wy = y+5; wy < 60; wy += 9) for(let wx = x+4; wx < x+w-5; wx += 7) s += `<rect x="${wx}" y="${wy}" width="3.5" height="4.5" fill="#FFF6C7"/>`;
   }
-  return tile(240, 64, s);
+  // Велика Лаврська дзвіниця
+  s += `<rect x="28" y="36" width="30" height="28" fill="#F4F1E8"/><rect x="31" y="25" width="24" height="11" fill="#E3F0E7"/><rect x="34" y="16" width="18" height="9" fill="#F4F1E8"/>
+    <rect x="28" y="35" width="30" height="2" fill="#5FA77A"/><rect x="31" y="24" width="24" height="2" fill="#5FA77A"/><rect x="34" y="15" width="18" height="2" fill="#5FA77A"/>
+    ${[33,41,49].map(x=>`<path d="M${x} 50 V44 Q${x+2} 41 ${x+4} 44 V50 Z" fill="#9CC5AC"/>`).join('')}
+    ${[35,43].map(x=>`<path d="M${x} 33 V29 Q${x+2.5} 26.5 ${x+5} 29 V33 Z" fill="#9CC5AC"/>`).join('')}
+    ${goldDome(43, 11, 5)}`;
+  // Михайлівський Золотоверхий
+  s += `<rect x="68" y="42" width="40" height="22" fill="#7FB3E0"/><rect x="80" y="34" width="16" height="8" fill="#8FC0EA"/>
+    ${[73,81,95,103].map(x=>`<rect x="${x}" y="47" width="3" height="7" rx="1.5" fill="#fff"/>`).join('')}
+    ${goldDome(88, 29, 5)}${goldDome(73, 38, 3.2)}${goldDome(103, 38, 3.2)}`;
+  // Батьківщина-Мати
+  s += `<path d="M184 64 L189 42 H203 L208 64 Z" fill="#B8BFCC"/>
+    <path d="M192 42 L194.5 22 Q196 19 197.5 22 L200 42 Z" fill="#C9CFDA"/><circle cx="196" cy="18" r="2.4" fill="#C9CFDA"/>
+    <path d="M197.5 23 L203 9" stroke="#C9CFDA" stroke-width="2.2" stroke-linecap="round"/><path d="M202.5 10 L206 1" stroke="#EEF1F5" stroke-width="1.6" stroke-linecap="round"/>
+    <ellipse cx="190.5" cy="28" rx="3.6" ry="4.4" fill="#AEB6C4"/>`;
+  // Київська телевежа
+  s += `<path d="M316 64 L322.5 26 H325.5 L332 64 Z" fill="none" stroke="#8A93A6" stroke-width="1.6"/>
+    <path d="M318 56 L330 46 M330 56 L318 46 M320 44 L328 34 M328 44 L320 34" stroke="#8A93A6" stroke-width=".9"/>
+    <rect x="320" y="24" width="8" height="3" fill="#8A93A6"/><rect x="323" y="6" width="2" height="18" fill="#8A93A6"/>
+    <rect x="323.2" y="1" width="1.6" height="5" fill="#E8453C"/><rect x="323.2" y="3" width="1.6" height="1.2" fill="#fff"/>`;
+  // Арка Свободи
+  s += `<path d="M362 64 A24 24 0 0 1 410 64" fill="none" stroke="#9AA3B5" stroke-width="4"/>
+    <path d="M378 64 V54 H386 V64 M381 54 V50 H383 V54" fill="#B8BFCC"/>`;
+  // каштани й прапор
+  s += chestnutTree(16, 50, 9) + chestnutTree(214, 52, 7) + chestnutTree(300, 50, 9) + chestnutTree(424, 52, 7);
+  s += `<path d="M466 64 V30" stroke="#6E6C8A" stroke-width="1.4"/><rect x="467" y="30" width="11" height="4" fill="#2F6FD1"/><rect x="467" y="34" width="11" height="4" fill="#FFD23F"/>`;
+  return tile(480, 64, s);
 }
 function cityBottom(){
-  return tile(120, 40, `<rect width="120" height="40" fill="#CFCDDC"/>
-    <path d="M30 0 V40 M90 0 V40" stroke="#B9B6CB" stroke-width="1.5"/><path d="M0 20 H120" stroke="#B9B6CB" stroke-width="1"/>
-    <rect x="58.5" y="8" width="3" height="30" fill="#514F72"/><ellipse cx="60" cy="8" rx="5" ry="3" fill="#FFC93C"/>
-    <rect x="13" y="24" width="3" height="14" fill="#8B5A2B"/><circle cx="14.5" cy="20" r="9" fill="#6DBF71"/>`);
+  return tile(120, 40, `<rect width="120" height="40" fill="#D6D3E0"/>
+    <path d="M30 0 V40 M90 0 V40" stroke="#BDB9CE" stroke-width="1.5"/><path d="M0 20 H120" stroke="#BDB9CE" stroke-width="1"/>
+    <rect x="13" y="24" width="3" height="14" fill="#8B5A2B"/><circle cx="14.5" cy="18" r="10" fill="#4E9F57"/><circle cx="10" cy="21" r="6" fill="#5FAF63"/>
+    <ellipse cx="10" cy="13" rx="1.2" ry="2.4" fill="#FFF8E7"/><ellipse cx="19" cy="15" rx="1.2" ry="2.4" fill="#FFF8E7"/><ellipse cx="14" cy="20" rx="1.2" ry="2.4" fill="#FFF8E7"/>
+    <circle cx="44" cy="33" r="2.6" fill="#8B4A22"/><circle cx="43.2" cy="32.2" r=".8" fill="#E9C99A"/>
+    <rect x="58.5" y="10" width="3" height="28" fill="#514F72"/><path d="M54 10 H66 L64 6 H56 Z" fill="#514F72"/><ellipse cx="60" cy="11" rx="4" ry="2" fill="#FFE07A"/>
+    <rect x="96" y="18" width="2" height="20" fill="#514F72"/><rect x="90" y="8" width="14" height="11" rx="2" fill="#fff" stroke="#514F72" stroke-width="1"/>
+    <text x="97" y="17" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="9" fill="#2E8B57">М</text>`);
+}
+// Лондон: Біг-Бен і парламент, Лондонське око, Шард, Тауерський міст, цегляні будинки
+function londonTop(){
+  let s = '<rect width="480" height="64" fill="#DCE6F0"/><ellipse cx="140" cy="9" rx="22" ry="5" fill="#fff"/><ellipse cx="290" cy="7" rx="16" ry="4" fill="#fff"/><ellipse cx="450" cy="11" rx="18" ry="5" fill="#fff"/>';
+  // Біг-Бен
+  s += `<rect x="32" y="16" width="16" height="48" fill="#D9B97A"/><rect x="31" y="11" width="18" height="6" fill="#C9A563"/>
+    <path d="M32 11 L40 0 L48 11 Z" fill="#5E6B7A"/><circle cx="40" cy="22" r="5.5" fill="#FFF8E1" stroke="#8A6A30" stroke-width="1.2"/>
+    <path d="M40 22 V18.6 M40 22 L42.6 23.4" stroke="#1B1B3A" stroke-width="1"/>
+    ${[34,38,42].map(x=>`<rect x="${x}" y="32" width="2.4" height="26" fill="#C9A563"/>`).join('')}`;
+  // парламент
+  s += `<rect x="48" y="40" width="62" height="24" fill="#D9B97A"/>${Array.from({length:8}, (_, i)=>`<rect x="${50+i*7.6}" y="35" width="2.4" height="6" fill="#C9A563"/>`).join('')}
+    ${Array.from({length:7}, (_, i)=>`<rect x="${52+i*8}" y="45" width="3" height="9" fill="#9C7E45"/>`).join('')}
+    <rect x="104" y="24" width="12" height="40" fill="#D9B97A"/><rect x="103" y="22" width="14" height="3" fill="#C9A563"/>`;
+  // Лондонське око
+  s += `<path d="M160 64 L174 34 L188 64" fill="none" stroke="#8A93A6" stroke-width="2"/>
+    <circle cx="174" cy="34" r="24" fill="none" stroke="#B7C3D6" stroke-width="2"/>
+    ${Array.from({length:12}, (_, i)=>{ const a = i*Math.PI/6, x = (174+24*Math.cos(a)).toFixed(1), y = (34+24*Math.sin(a)).toFixed(1);
+      return `<path d="M174 34 L${x} ${y}" stroke="#C9D2E0" stroke-width=".7"/><ellipse cx="${x}" cy="${y}" rx="2.2" ry="1.8" fill="#7FA6D1"/>`; }).join('')}
+    <circle cx="174" cy="34" r="2.2" fill="#8A93A6"/>`;
+  // Шард
+  s += `<path d="M226 64 L240 2 L254 64 Z" fill="#A9C6E0"/><path d="M240 2 L254 64 H240 Z" fill="#8FB2D3"/>`;
+  // Тауерський міст над Темзою
+  s += `<rect x="272" y="54" width="128" height="10" fill="#7FB6D9"/>
+    <path d="M272 50 Q290 44 305 28 M369 28 Q384 44 400 50" fill="none" stroke="#5FA8D8" stroke-width="2"/>
+    <rect x="315" y="27" width="46" height="4" fill="#5FA8D8"/><rect x="272" y="48" width="128" height="4" fill="#5FA8D8"/>
+    ${[303,359].map(x=>`<rect x="${x}" y="22" width="14" height="42" fill="#C9BFA6"/><path d="M${x} 22 L${x+7} 10 L${x+14} 22 Z" fill="#5E6B7A"/>
+      <rect x="${x}" y="20" width="2.5" height="4" fill="#5E6B7A"/><rect x="${x+11.5}" y="20" width="2.5" height="4" fill="#5E6B7A"/>
+      <path d="M${x+4} 40 V34 Q${x+7} 30 ${x+10} 34 V40 Z" fill="#8A7E66"/>`).join('')}`;
+  // цегляні будинки
+  s += [[410,22,34],[432,20,28],[452,26,38]].map(([x,w,h])=>{ const y = 64-h;
+    let b = `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#B5654A"/><rect x="${x}" y="${y}" width="${w}" height="3" fill="#8F4C37"/>`;
+    for(let wy = y+7; wy < 58; wy += 10) for(let wx = x+3; wx < x+w-5; wx += 7) b += `<rect x="${wx}" y="${wy}" width="4" height="6" fill="#F4F1E8"/>`;
+    return b; }).join('');
+  return tile(480, 64, s);
+}
+function londonBottom(){
+  return tile(140, 40, `<rect width="140" height="40" fill="#CFCDD6"/><path d="M0 20 H140 M35 0 V40 M105 0 V40" stroke="#BAB7C6" stroke-width="1"/>
+    <rect x="18" y="8" width="13" height="29" rx="1.5" fill="#D7263D"/><path d="M18 9 Q24.5 4 31 9" fill="#D7263D"/><rect x="18" y="11" width="13" height="3" fill="#1B1B3A"/>
+    ${[0,1,2].map(r=>[0,1].map(c=>`<rect x="${20+c*5}" y="${16+r*5}" width="4" height="4" fill="#FFF8E1"/>`).join('')).join('')}
+    <rect x="52" y="22" width="9" height="15" rx="4" fill="#D7263D"/><rect x="53.5" y="27" width="6" height="1.5" fill="#1B1B3A"/>
+    <g transform="translate(78 10)"><rect width="52" height="26" rx="4" fill="#D7263D"/>
+      ${[0,1,2,3,4].map(i=>`<rect x="${4+i*9.4}" y="3" width="7" height="6" rx="1" fill="#CFEFFF"/><rect x="${4+i*9.4}" y="13" width="7" height="6" rx="1" fill="#CFEFFF"/>`).join('')}
+      <rect y="10.5" width="52" height="1.5" fill="#A51C2F"/><circle cx="11" cy="27" r="4" fill="#1B1B3A"/><circle cx="41" cy="27" r="4" fill="#1B1B3A"/></g>`);
 }
 function pine(x, h, c){
   let s = `<rect x="${x-2}" y="58" width="4" height="6" fill="#8B5A2B"/>`;
@@ -755,10 +868,12 @@ function arcticBottom(){
 }
 
 const TRACKS = [
-  {id:'city',   name:'Місто',   emoji:'🏙️', road:'#4B4B66', dash:'rgba(255,255,255,.55)', edge:'#FFFFFF', top:cityTop(),   bottom:cityBottom()},
-  {id:'forest', name:'Ліс',     emoji:'🌲', road:'#5A5550', dash:'rgba(255,255,255,.5)',  edge:'#E9E2C8', top:forestTop(), bottom:forestBottom(), fx:'leaves'},
-  {id:'desert', name:'Пустеля', emoji:'🏜️', road:'#7A6458', dash:'#FFC93C',              edge:'#F7E2B5', top:desertTop(), bottom:desertBottom(), fx:'sun'},
-  {id:'arctic', name:'Арктика', emoji:'🧊', road:'#8DBFDC', dash:'rgba(255,255,255,.95)', edge:'#FFFFFF', top:arcticTop(), bottom:arcticBottom(), fx:'snow'}
+  // id «city» лишається (на ньому збережені рекорди й налаштування гравців), але траса — Київ
+  {id:'city',   name:'Київ',    emoji:'🌰', base:4,  road:'#4B4B66', dash:'rgba(255,255,255,.55)', edge:'#FFFFFF', top:cityTop(),   bottom:cityBottom()},
+  {id:'london', name:'Лондон',  emoji:'🎡', base:6,  road:'#44465A', dash:'rgba(255,255,255,.7)',  edge:'#F2D04B', top:londonTop(), bottom:londonBottom(), fx:'rain'},
+  {id:'forest', name:'Ліс',     emoji:'🌲', base:7,  road:'#5A5550', dash:'rgba(255,255,255,.5)',  edge:'#E9E2C8', top:forestTop(), bottom:forestBottom(), fx:'leaves'},
+  {id:'desert', name:'Пустеля', emoji:'🏜️', base:10, road:'#7A6458', dash:'#FFC93C',              edge:'#F7E2B5', top:desertTop(), bottom:desertBottom(), fx:'sun'},
+  {id:'arctic', name:'Арктика', emoji:'🧊', base:14, road:'#8DBFDC', dash:'rgba(255,255,255,.95)', edge:'#FFFFFF', top:arcticTop(), bottom:arcticBottom(), fx:'snow'}
 ];
 const trackIdx = id => TRACKS.findIndex(t=>t.id===id);
 
@@ -766,8 +881,9 @@ const trackIdx = id => TRACKS.findIndex(t=>t.id===id);
 
 
 /* ================= Складність: траса → текст, автівка → суперник ================= */
-const TRACK_LEVEL = { city:'home', forest:'words', desert:'sentences', arctic:'long' };
-const LEVEL_NAME = { home:'основний ряд', words:'слова', sentences:'речення', long:'довгі речення' };
+const TRACK_LEVEL = { city:'home', london:'words', forest:'words', desert:'sentences', arctic:'long' };
+const LEVEL_NAME = { home:'основний ряд', words:'слова', sentences:'речення', long:'довгі речення', punct:'розділові знаки' };
+const stageLevel = ([track, , level]) => level || TRACK_LEVEL[track];
 const CAR_ORDER = ['beetle','taxi','jeep','monster','sport','f1'];
 const CAR_CPM = { beetle:35, taxi:50, jeep:65, monster:80, sport:100, f1:125 };
 const BOT_COLOR = '#6C5CE7';
@@ -777,6 +893,7 @@ const UNLOCKS = [
   { kind:'car',   id:'beetle',  at:0 },
   { kind:'track', id:'city',    at:0 },
   { kind:'car',   id:'taxi',    at:30 },
+  { kind:'track', id:'london',  at:45 },
   { kind:'track', id:'forest',  at:60 },
   { kind:'car',   id:'jeep',    at:120 },
   { kind:'track', id:'desert',  at:200 },
@@ -790,7 +907,7 @@ const isOpen = (kind, id, n = profile.neurons) => n >= unlockAt(kind, id);
 
 // Нейрончики за заїзд: складність траси + швидкість, помножені на точність, + бонус за перемогу
 function neuronsFor(r){
-  const base = [4, 7, 10, 14][trackIdx(r.track)];
+  const base = TRACKS[trackIdx(r.track)].base;
   const speedPts = Math.round(r.speed / 15);
   const mult = r.errors === 0 ? 1.5 : r.acc >= 95 ? 1.2 : r.acc >= 90 ? 1 : r.acc >= 80 ? 0.6 : 0.3;
   const win = r.won ? base : 0;
@@ -832,10 +949,12 @@ const BADGES = {
   crown:`<path d="M5 30 L4 11 L13 19 L20 7 L27 19 L36 11 L35 30 Z" fill="#FFC93C" ${OUT}/><rect x="5" y="28.5" width="30" height="5.5" rx="1.5" fill="#E8A33D" stroke="#fff" stroke-width="2.5" paint-order="stroke"/>
     <circle cx="20" cy="22" r="2.6" fill="#FF5D9E"/><circle cx="12" cy="24.5" r="1.8" fill="#16A3A0"/><circle cx="28" cy="24.5" r="1.8" fill="#6C5CE7"/>`
 };
+BADGES.bubble = `<path d="M5 9 Q5 4 10 4 H30 Q35 4 35 9 V24 Q35 29 30 29 H17 L9 36 L10.5 29 H10 Q5 29 5 24 Z" fill="#FF5D9E" ${OUT}/>
+    <text x="20" y="23.5" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="16" fill="#fff">?!</text>`;
 const badgeHTML = (id, title='') => BADGES[id] ? `<span class="badge-ico"${title ? ` title="${esc(title)}"` : ''}><svg viewBox="-2 -2 44 44" aria-hidden="true">${BADGES[id]}</svg></span>` : '';
 
 /* ================= Змагання ================= */
-// stages — [траса, мова] кожного етапу; cpm — швидкість робота-суперника; cars — дозволені автівки (null — будь-яка)
+// stages — [траса, мова, текст?] кожного етапу (текст — рівень з TEXTS, за замовчуванням — за трасою); cpm — швидкість робота-суперника; cars — дозволені автівки (null — будь-яка)
 const COMPS = [
   { id:'kyiv', name:'Кубок Києва', badge:'chestnut', cpm:35, minAcc:85, cars:null,
     desc:'Три заїзди вулицями столиці. Найкраще змагання для першого старту.',
@@ -845,7 +964,7 @@ const COMPS = [
     stages:[['city','uk'],['forest','uk'],['forest','uk']] },
   { id:'london', name:'Гран-прі Лондона', badge:'bus', cpm:45, minAcc:88, cars:null,
     desc:'Перегони англійською мовою повз червоні двоповерхові автобуси.',
-    stages:[['city','en'],['city','en'],['forest','en']] },
+    stages:[['london','en','home'],['london','en','home'],['forest','en']] },
   { id:'nyc', name:'Нічне таксі Нью-Йорка', badge:'checker', cpm:60, minAcc:90, cars:['taxi'],
     desc:'Тільки для таксі! Чотири замовлення двома мовами.',
     stages:[['city','en'],['forest','en'],['city','uk'],['forest','uk']] },
@@ -863,7 +982,10 @@ const COMPS = [
     stages:[['city','uk'],['forest','en'],['desert','uk'],['arctic','en'],['arctic','uk']] },
   { id:'f1', name:'Формула 1', badge:'crown', cpm:125, minAcc:95, cars:['f1'],
     desc:'Королівські перегони — лише для болідів і найточніших пілотів.',
-    stages:[['desert','uk'],['arctic','uk'],['arctic','en']] }
+    stages:[['desert','uk'],['arctic','uk'],['arctic','en']] },
+  { id:'punct', name:'Слалом знаків', badge:'bubble', cpm:40, minAcc:85, cars:null, lvl:4,
+    desc:'Англійські речення, повні розділових знаків: . , - ( ) " ! ? @ \' : — підійде будь-яка автівка.',
+    stages:[['city','en','punct'],['city','en','punct'],['forest','en','punct'],['forest','en','punct'],['desert','en','punct'],['arctic','en','punct']] }
 ];
 const MEDALS = { gold:['🥇','Золото'], silver:['🥈','Срібло'], bronze:['🥉','Бронза'] };
 const MEDAL_RANK = { bronze:1, silver:2, gold:3 };
@@ -875,6 +997,8 @@ function medalOf(results){
   return acc >= 97 ? 'gold' : acc >= 93 ? 'silver' : 'bronze';
 }
 const compById = id => COMPS.find(c=>c.id===id);
+// Складність: за місцем у списку або власна (lvl) — для змагань, доданих у кінець, щоб не зсувати номери в посиланнях #z=N
+const diffDots = (c, i) => { const d = c.lvl || i + 1; return '●'.repeat(d) + `<i>${'●'.repeat(COMPS.length - d)}</i>`; };
 const avg = (arr, i) => Math.round(arr.reduce((s, x)=>s + x[i], 0) / arr.length);
 // Автівка для змагання: обрана, якщо дозволена, інакше найкраща з дозволених відкритих
 function compCar(c){
@@ -957,6 +1081,14 @@ function applyTrack(id){
   document.getElementById('trackName').textContent = `${t.emoji} ${t.name}`;
   fxEl.innerHTML = '';
   if(t.fx === 'sun') fxEl.innerHTML = '<div class="sun"></div>';
+  if(t.fx === 'rain') for(let i=0;i<34;i++){
+    const d = document.createElement('div');
+    d.className = 'drop';
+    d.style.left = (Math.random()*110) + '%';
+    d.style.animationDuration = (.7 + Math.random()*.5) + 's';
+    d.style.animationDelay = (-Math.random()*2) + 's';
+    fxEl.appendChild(d);
+  }
   if(t.fx === 'snow' || t.fx === 'leaves'){
     const n = t.fx === 'snow' ? 26 : 9;
     for(let i=0;i<n;i++){
@@ -981,9 +1113,31 @@ function drawCars(model = settings.model){
 }
 function setP(car, p){ car.style.setProperty('--p', Math.min(1, p)); }
 
+// Під час заїзду траса стискається, щоб панель із текстом і клавіатурою вміщалась у вікно:
+// спершу краєвид (до 30% висоти), потім смуги з автівками (до 55%). Більше вікно — траса знову росте.
+const FIT_VARS = ['--car-w', '--lane-h', '--scene-top', '--scene-bottom'];
+function fitTrack(){
+  FIT_VARS.forEach(v=>trackEl.style.removeProperty(v));
+  trackEl.classList.remove('compact');
+  if(raceEl.hidden) return;
+  const [car, lane, top, bottom] = FIT_VARS.map(v=>parseFloat(getComputedStyle(trackEl).getPropertyValue(v)));
+  let over = raceEl.offsetTop + raceEl.offsetHeight + 12 - innerHeight;
+  if(over <= 0) return;
+  const scenes = top + bottom, lanes = 2 * lane;
+  const cut = Math.min(over, scenes * .7);
+  const ks = 1 - cut / scenes, kl = Math.max(.55, 1 - (over - cut) / lanes);
+  trackEl.style.setProperty('--scene-top', top * ks + 'px');
+  trackEl.style.setProperty('--scene-bottom', bottom * ks + 'px');
+  trackEl.style.setProperty('--lane-h', lane * kl + 'px');
+  trackEl.style.setProperty('--car-w', car * kl + 'px');
+  trackEl.classList.toggle('compact', top * ks < 36);   // низький краєвид — назва траси заважала б табличці з ім'ям
+}
+addEventListener('resize', fitTrack);
+
 /* ================= Гараж ================= */
 const setupEl = document.getElementById('setup');
 const raceEl = document.getElementById('race');
+new ResizeObserver(()=>fitTrack()).observe(raceEl);   // текст заїзду переноситься по-різному — висота панелі змінюється
 
 function seg(el, items, cur, onPick){
   el.innerHTML = items.map(it=>`<button type="button" data-id="${it.id}" class="${it.id===cur?'on':''}" ${it.disabled?'disabled':''}>${it.html}</button>`).join('');
@@ -1131,11 +1285,11 @@ function renderCompPane(){
   const i = COMPS.indexOf(c), n = c.stages.length;
   const run = runOf(c), done = run.results.length;
   const best = profile.comps[c.id];
-  const diff = '●'.repeat(i+1) + `<i>${'●'.repeat(COMPS.length-1-i)}</i>`;
+  const diff = diffDots(c, i);
   const pane = document.getElementById('paneComp');
   pane.innerHTML = `
     <div class="cp-head">${badgeHTML(c.badge)}<div>
-      <div class="comp-num">Змагання ${i+1}<span class="diff" title="Складність ${i+1} з ${COMPS.length}">${diff}</span></div>
+      <div class="comp-num">Змагання ${i+1}<span class="diff" title="Складність ${c.lvl || i+1} з ${COMPS.length}">${diff}</span></div>
       <h2>${c.name}<button type="button" class="share-mini" data-link="${i+1}" title="Поділитися змаганням">${LINK_ICON}</button></h2></div>
       <button type="button" class="share-ico" data-prog="${c.id}" title="Поділитися результатами">${LINK_ICON}</button>
     </div>
@@ -1146,11 +1300,11 @@ function renderCompPane(){
       <span class="cp-progress"><span class="bar"><i style="width:${done/n*100}%"></i></span>${done} з ${n}</span>
     </div>
     <div class="table-scroll"><table class="res-table stage-table"><tbody>
-      ${c.stages.map(([track, lang], k)=>{ const t = TRACKS[trackIdx(track)], x = run.results[k];
+      ${c.stages.map((stage, k)=>{ const [track, lang] = stage, t = TRACKS[trackIdx(track)], x = run.results[k];
         const res = x ? `${fmtTime(x[0])} · ${x[1]} зн/хв · ${x[2]}% · ${x[3] ? '<span class="won">Перемога</span>' : '2 місце'}`
                       : k === done ? `<span class="next-car" title="Наступний етап">${carSVG(compCar(c) || settings.model, carColor(compCar(c) || settings.model), 'me')}</span>` : '';
         return `<tr class="${x ? 'done' : k === done ? 'next' : 'todo'}"><td>${k+1}</td><td>${t.emoji} ${t.name}</td>
-          <td>${LANG_FLAG[lang]} ${LEVEL_NAME[TRACK_LEVEL[track]]}</td><td>${res}</td></tr>`; }).join('')}
+          <td>${LANG_FLAG[lang]} ${LEVEL_NAME[stageLevel(stage)]}</td><td>${res}</td></tr>`; }).join('')}
     </tbody></table></div>
     <div class="cp-foot">
       ${medalsHTML(c)}
@@ -1197,11 +1351,11 @@ function renderComps(){
     const best = profile.comps[c.id];
     const run = profile.runs[c.id];
     const car = compCar(c);
-    const diff = '●'.repeat(i+1) + `<i>${'●'.repeat(COMPS.length-1-i)}</i>`;
+    const diff = diffDots(c, i);
     const chips = c.stages.map((st, k)=>stageChip(st, run && k < run.stage ? 'done' : '')).join('');
     return `<div class="comp${best?' got':''}" id="comp-${i+1}">
       <div class="comp-head">${badgeHTML(c.badge)}<div>
-        <div class="comp-num">${i+1}<span class="diff" title="Складність ${i+1} з ${COMPS.length}">${diff}</span></div>
+        <div class="comp-num">${i+1}<span class="diff" title="Складність ${c.lvl || i+1} з ${COMPS.length}">${diff}</span></div>
         <h4>${c.name}<button type="button" class="share-mini" data-link="${i+1}" title="Поділитися змаганням">${LINK_ICON}</button></h4></div></div>
       <div class="stages">${chips}</div>
       <div class="comp-rules"><span title="Швидкість суперника · мінімальна точність етапу">${KEY_ICON} ${c.cpm} зн/хв · 🎯 від ${c.minAcc}%</span>
@@ -1225,6 +1379,18 @@ let keyMap = {}, shiftL = null, shiftR = null;
 function buildKeyboard(){
   keyMap = {};
   kbEl.innerHTML = '';
+  const nums = NUM_ROW[race.lang];
+  if(nums && nums.some(k=>race.text.includes(k[0]) || race.text.includes(k[1]))){
+    const rowEl = document.createElement('div');
+    rowEl.className = 'kb-row rn';
+    nums.forEach(([lo, up], col)=>{
+      const el = mkKey(lo, up, NUM_FINGER[col], '');
+      keyMap[lo] = { el, finger:NUM_FINGER[col], shift:false };
+      keyMap[up] = { el, finger:NUM_FINGER[col], shift:true };
+      rowEl.appendChild(el);
+    });
+    kbEl.appendChild(rowEl);
+  }
   LAYOUTS[race.lang].forEach((row, r)=>{
     const rowEl = document.createElement('div');
     rowEl.className = `kb-row r${r}`;
@@ -1297,7 +1463,7 @@ function shuffle(a){
 
 function makeText(lang, level){
   const src = TEXTS[lang][level === 'long' ? 'sentences' : level];
-  const n = { home:8, words:7, sentences:2, long:3 }[level];
+  const n = { home:8, words:7, sentences:2, long:3, punct:3 }[level];
   return shuffle(src.slice()).slice(0, n).join(' ');
 }
 
@@ -1316,11 +1482,11 @@ function renderText(){
 }
 
 
-// opts: { track, lang, cpm, model, comp }
+// opts: { track, lang, cpm, model, comp, level? }
 function startRace(opts){
   overlay.classList.remove('show');
   cancelAnimationFrame(rafId);
-  const level = TRACK_LEVEL[opts.track];
+  const level = opts.level || TRACK_LEVEL[opts.track];
   race = {
     text: makeText(opts.lang, level), track:opts.track, lang:opts.lang, level, model:opts.model, comp:opts.comp || null,
     pos:0, errors:0, missed:false, phase:'countdown', startT:0, lastKeyT:0,
@@ -1358,8 +1524,9 @@ function startComp(id){
   if(selComp !== id) setJoined(id);
   profile.runs[id] ||= { stage:0, results:[] };
   saveStore();
-  const [track, lang] = c.stages[profile.runs[id].stage];
-  startRace({ track, lang, cpm:c.cpm, model:car, comp:c });
+  const stage = c.stages[profile.runs[id].stage];
+  const [track, lang] = stage;
+  startRace({ track, lang, cpm:c.cpm, model:car, comp:c, level:stageLevel(stage) });
 }
 
 function runCountdown(){
@@ -1406,7 +1573,7 @@ function loop(now){
 
 function fmtTime(sec){ sec = Math.floor(sec); return `${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`; }
 function updateStats(now){
-  const sec = race.startT && now ? (now - race.startT)/1000 : 0;
+  const sec = race.startT && now ? Math.max(0, now - race.startT)/1000 : 0;   // кадр анімації буває трохи раніший за старт
   document.getElementById('sTime').textContent = fmtTime(sec);
   document.getElementById('sSpeed').textContent = sec > 2 ? Math.round(race.pos / sec * 60) : 0;
   document.getElementById('sErr').textContent = race.errors;
@@ -1427,6 +1594,8 @@ function handleChar(ch){
   if(!race || race.phase !== 'race') return;
   const need = race.text[race.pos];
   if(ch === ' ') ch = ' ';
+  if(/[’‘ʼ]/.test(ch) && need === "'") ch = "'";          // планшети ставлять «розумний» апостроф і лапки
+  if(/[“”„]/.test(ch) && need === '"') ch = '"';
   flashKey(ch);
   if(ch === need){
     spans[race.pos].classList.remove('cur', 'err');
@@ -1443,7 +1612,7 @@ function handleChar(ch){
   }
   // Неправильна розкладка чи Caps Lock — підказуємо, але помилкою не рахуємо
   if(isCyr(need) && isLat(ch)) return showTip('Схоже, увімкнена англійська розкладка. Перемкни на українську (Alt+Shift або Win+Пробіл; на Mac — Ctrl+Пробіл).');
-  if(isLat(need) && isCyr(ch)) return showTip('Схоже, увімкнена українська розкладка. Перемкни на англійську (Alt+Shift або Win+Пробіл; на Mac — Ctrl+Пробіл).');
+  if(race.lang === 'en' && !isCyr(need) && isCyr(ch)) return showTip('Схоже, увімкнена українська розкладка. Перемкни на англійську (Alt+Shift або Win+Пробіл; на Mac — Ctrl+Пробіл).');
   if(ch.toLowerCase() === need && ch !== need) return showTip('Літера вийшла великою. Може, увімкнено Caps Lock?');
   race.errors++;
   race.missed = true;
@@ -1583,6 +1752,7 @@ function toSetup(){
   overlay.classList.remove('show');
   countdownEl.hidden = true;
   raceEl.hidden = true;
+  fitTrack();
   shareView.hidden = true;
   document.body.classList.remove('ro');
   trackEl.hidden = false;

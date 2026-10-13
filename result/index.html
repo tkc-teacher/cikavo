@@ -31,7 +31,12 @@
   .rv-mark{flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:2px;}
   .rv-mark b{display:flex; align-items:center; justify-content:center; width:72px; height:72px; font-size:42px; line-height:1; font-weight:400; background:var(--bg); border:1.5px solid var(--line); border-radius:50%;}
   .rv-mark span{font-family:'Baloo 2',sans-serif; font-size:12px; font-weight:600; color:var(--ink-soft); text-align:center; max-width:90px; line-height:1.2;}
-  @media (max-width:520px){ .rv-mark b{width:56px; height:56px; font-size:32px;} }
+  @media (max-width:520px){
+    .rv-head{align-items:flex-start; gap:12px;}
+    .rv-mark b{width:50px; height:50px; font-size:28px;}
+    .rv-mark span{font-size:11px; max-width:60px;}
+    .rv-card h1{font-size:20px;}
+  }
   .rv-lesson{color:var(--ink-soft); font-size:13.5px;}
   .rv-check{font-size:13px; font-weight:700; margin-top:6px;}
   .rv-check.ok{color:var(--ok);}

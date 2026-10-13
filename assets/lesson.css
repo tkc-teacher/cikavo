@@ -25,9 +25,9 @@ h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; 
 .hud{position:sticky; top:0; z-index:50; background:color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
 .hud-bar{height:4px; background:var(--line); overflow:hidden;}
 .hud-bar-fill{height:100%; width:0%; background:var(--hud-bar); transition:width .3s ease;}
-.hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:800px; margin:0 auto;}
-.hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
-.hud-right{display:flex; align-items:center; gap:8px;}
+.hud-row{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:10px 24px; max-width:800px; margin:0 auto;}
+.hud-title{min-width:0; font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; line-height:1.3; color:var(--ink-soft);}
+.hud-right{display:flex; align-items:center; gap:8px; flex-shrink:0;}
 .session-mark{display:flex; align-items:center; justify-content:center; width:36px; height:36px; font-size:23px; line-height:1; background:var(--surface); border:1.5px solid var(--line); border-radius:50%; padding:0; font-family:inherit; cursor:pointer; user-select:none; transition:border-color .15s ease;}
 .session-mark:hover{border-color:var(--accent);}
 .session-mark:focus{outline:none;}
@@ -37,6 +37,14 @@ h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; 
 .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px; transition:opacity .4s ease, transform .4s ease;}
 .neuron-counter svg{width:24px; height:24px;}
 .neuron-counter.gone{opacity:0; transform:scale(.6); pointer-events:none;}
+@media (max-width:520px){
+  .hud-row{padding:8px 16px; gap:10px;}
+  .hud-title{font-size:13.5px;}
+  .hud-right{gap:6px;}
+  .session-mark{width:32px; height:32px; font-size:20px;}
+  .neuron-counter{gap:5px; padding:3px 10px 3px 4px; font-size:14px;}
+  .neuron-counter svg{width:22px; height:22px;}
+}
 #neuronCount{min-width:1.4em; display:inline-block; transition:transform .25s ease;}
 #neuronCount.pop{transform:scale(1.35);}
 
