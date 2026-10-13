@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Пошук інформації в Інтернеті. Пошукові системи. Ключові слова, запити — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --accent:#2F6FEB; --accent-dark:#1E4FB8; --accent-soft:#E6EEFD;
+    --label:#E8730C;
+    --bg:#F5F7FC; --line:#DEE5F5;
+    --hud-bar:linear-gradient(90deg,#2F6FEB,#E8730C);
+  }
+  .block ul{padding-left:22px; max-width:62ch;}
+  .block li{margin-bottom:5px;}
+  .choice-row.col{flex-direction:column; align-items:stretch;}
+  .choice-row.col .choice-btn{text-align:left;}
+  code.qry{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:14px; background:var(--accent-soft); color:var(--accent-dark); border-radius:6px; padding:2px 7px;}
+  .choice-btn code.qry{background:transparent; padding:0;}
+
+  /* Галерея «як працює пошукова система» */
+  .flip-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  @media (max-width:620px){ .flip-grid{grid-template-columns:1fr;} .flip-grid .flip-card{height:170px;} }
+  .flip-front .big{font-size:46px; line-height:1;}
+  .flip-front .name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; margin-top:8px; line-height:1.2;}
+  .flip-front .tap{font-size:12.5px; color:var(--ink-soft); margin-top:4px;}
+  .flip-back{font-size:14.5px; line-height:1.4;}
+  .flip-back b{font-family:'Baloo 2',sans-serif; color:var(--accent-dark); font-size:16px; display:block; margin-bottom:4px;}
+  .robodog{width:1.35em; height:1.35em; vertical-align:-.3em; display:inline-block;}
+  .flip-front .big .robodog{width:64px; height:64px;}
+
+  /* Логотипи пошукових систем */
+  .logo-row{display:flex; gap:12px; flex-wrap:wrap; margin:6px 0 14px;}
+  .logo-row figure{margin:0; display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:8px 14px;}
+  .logo-row img{height:26px; width:auto;}
+  .logo-row figcaption{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px;}
+
+  /* Ілюстрація «як знаходиться сторінка» */
+  .how-ill{display:grid; grid-template-columns:1fr 26px 1fr 26px 1fr; align-items:center; gap:6px; margin:16px 0 18px;}
+  .ill-panel{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 10px 12px;}
+  .ill-panel svg{width:100%; height:auto; display:block;}
+  .ill-cap{font-size:13.5px; line-height:1.35; margin-top:6px; color:var(--ink-soft);}
+  .ill-cap b{display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:var(--label); color:#fff; font-family:'Baloo 2',sans-serif; font-size:13px; margin-right:4px;}
+  .ill-arrow{font-size:22px; color:var(--accent); text-align:center; font-weight:700;}
+  @media (max-width:700px){ .how-ill{grid-template-columns:1fr; max-width:340px; margin-inline:auto;} .ill-arrow{transform:rotate(90deg);} }
+
+  /* Імітація сторінки результатів Google */
+  .gtask{font-size:15.5px; margin-bottom:12px;}
+  .gtask b{font-family:'Baloo 2',sans-serif;}
+  .serp{background:#fff; border:1.5px solid var(--line); border-radius:var(--radius-m); padding:16px 16px 18px; font-family:Arial,'Helvetica Neue',sans-serif; color:#202124;}
+  .serp-head{display:flex; align-items:center; gap:16px; flex-wrap:wrap;}
+  .serp-head img{height:28px;}
+  .serp-box{flex:1; min-width:200px; display:flex; align-items:center; gap:10px; border:1px solid #DFE1E5; border-radius:24px; padding:9px 16px; box-shadow:0 1px 6px rgba(32,33,36,.18); font-size:16px;}
+  .serp-box .q{flex:1;}
+  .serp-box svg{width:20px; height:20px; flex-shrink:0;}
+  .serp-tabs{display:flex; gap:4px; border-bottom:1px solid #EBEBEB; margin-top:14px; overflow-x:auto;}
+  .serp-tab{font:inherit; font-size:14px; color:#4D5156; background:none; border:none; border-bottom:3px solid transparent; padding:8px 12px 9px; cursor:pointer; white-space:nowrap; border-radius:6px 6px 0 0;}
+  .serp-tab:hover{background:#F1F3F4;}
+  .serp-tab.active{color:#1A0DAB; border-bottom-color:#1A73E8; font-weight:700;}
+  .serp-tab.wrong{background:#FDE6E1; color:#B23A1E;}
+  .serp-tab.more{cursor:default; color:#9AA0A6;}
+  .serp-tab.more:hover{background:none;}
+  .serp-stat{font-size:13px; color:#70757A; margin:10px 0 8px; min-height:16px;}
+  .serp-area{min-height:150px;}
+  .serp-empty{display:flex; flex-direction:column; gap:10px; padding-top:6px;}
+  .serp-empty i{display:block; height:12px; border-radius:6px; background:#F1F3F4;}
+  .serp-fb{font-family:'Nunito Sans',sans-serif; font-size:14.5px; color:var(--ink-soft); min-height:22px; margin-top:12px;}
+  .s-res{margin-bottom:14px;}
+  .s-res .u{font-size:12.5px; color:#202124;}
+  .s-res .t{font-size:18px; color:#1A0DAB; line-height:1.3;}
+  .s-res .d{font-size:14px; color:#4D5156; line-height:1.45;}
+  .s-imgs{display:grid; grid-template-columns:repeat(4,1fr); gap:6px;}
+  .s-imgs div{aspect-ratio:4/3; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:34px;}
+  .s-vid{display:flex; gap:12px; margin-bottom:12px; align-items:flex-start;}
+  .s-thumb{position:relative; width:130px; flex-shrink:0; aspect-ratio:16/9; border-radius:10px; background:#202124; display:flex; align-items:center; justify-content:center; font-size:28px;}
+  .s-thumb::after{content:'▶'; position:absolute; font-size:16px; color:#fff; background:rgba(0,0,0,.55); width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; padding-left:2px; box-sizing:border-box;}
+  .s-thumb span{position:absolute; right:5px; bottom:4px; background:rgba(0,0,0,.75); color:#fff; font-size:11px; padding:1px 4px; border-radius:3px;}
+  .s-news{border:1px solid #DADCE0; border-radius:10px; padding:10px 12px; margin-bottom:10px;}
+  .s-news .src{font-size:12.5px; color:#4D5156;}
+  .s-news .h{font-size:16px; color:#1A0DAB; line-height:1.3; margin:3px 0;}
+  .s-news .ago{font-size:12px; color:#70757A;}
+  .s-map{border-radius:10px; overflow:hidden; border:1px solid #DADCE0;}
+  .s-map svg{display:block; width:100%; height:auto;}
+  .s-place{padding:8px 12px; font-size:14px;}
+  .s-place b{font-size:16px;}
+  @media (max-width:520px){ .s-imgs{grid-template-columns:repeat(3,1fr);} .s-thumb{width:100px;} }
+
+  /* «Знайди ключові слова» */
+  .kw-sent{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px; margin-bottom:12px;}
+  .kw-words{font-size:18px; line-height:2.1;}
+  .kw{cursor:pointer; padding:2px 4px; border-radius:6px; border-bottom:2px dotted var(--ink-soft); transition:background .15s ease;}
+  .kw:hover{background:var(--accent-soft);}
+  .kw.picked{background:var(--accent); color:#fff; border-bottom-color:transparent;}
+  .kw.wrong-flash{background:#FDE6E1; color:#B23A1E;}
+  .kw-query{margin-top:8px; font-size:14.5px; color:var(--ink-soft); min-height:24px;}
+
+  /* Емулятор «Шукайко» */
+  .emu{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); overflow:hidden;}
+  .emu-top{background:var(--accent-soft); padding:14px 18px; border-bottom:1.5px solid var(--line);}
+  .emu-logo{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:22px; color:var(--accent-dark);}
+  .emu-logo span{color:var(--label);}
+  .emu-mission{font-size:15px; margin-top:4px;}
+  .emu-body{padding:16px 18px;}
+  .emu-bar{display:flex; gap:8px; align-items:stretch;}
+  .emu-input{flex:1; min-height:46px; display:flex; flex-wrap:wrap; gap:6px; align-items:center; border:2px solid var(--line); border-radius:24px; padding:6px 14px; background:#fff;}
+  .emu-input:empty::before{content:'Клацай слова нижче, щоб скласти запит'; color:#9AA3BD; font-size:14px;}
+  .emu-input.shake{border-color:var(--coral);}
+  .emu-go{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; border:none; border-radius:24px; padding:0 20px; background:var(--accent); color:#fff; cursor:pointer;}
+  .emu-go:disabled{opacity:.45; cursor:default;}
+  .emu-chips{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px;}
+  .emu-chip{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:14.5px; border:1.5px solid var(--line); background:var(--surface); border-radius:18px; padding:5px 13px; cursor:pointer;}
+  .emu-chip:hover{border-color:var(--accent);}
+  .emu-input .emu-chip{background:var(--accent-soft); border-color:var(--accent); color:var(--accent-dark);}
+  .emu-msg{font-size:14.5px; color:var(--ink-soft); min-height:22px; margin-top:10px;}
+  .emu-results{margin-top:6px; display:flex; flex-direction:column; gap:10px;}
+  .res{border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 14px; cursor:pointer; transition:border-color .15s ease;}
+  .res:hover{border-color:var(--accent);}
+  .res .url{font-size:12.5px; color:#2E7D32;}
+  .res .ttl{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; color:var(--accent-dark); line-height:1.25;}
+  .res .snip{font-size:14px; color:var(--ink-soft);}
+  .res.correct{border-color:var(--ok); background:var(--ok-soft);}
+  .res.wrong{border-color:var(--coral); background:#FDE6E1;}
+  .emu-next{margin-top:12px;}
+  .emu-dots{display:flex; gap:6px; margin-top:8px;}
+  .emu-dots i{width:10px; height:10px; border-radius:50%; background:var(--line);}
+  .emu-dots i.on{background:var(--accent);}
+  .emu-dots i.ok{background:var(--ok);}
+</style>
+</head>
+<body data-lesson="lesson5-web-search" data-hud="5 клас · Пошук в Інтернеті">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Пошук інформації</div>
+      <h1>Пошук інформації в Інтернеті</h1>
+      <p>В Інтернеті мільярди сторінок. Дізнайся, як пошукові системи знаходять потрібну за секунду і як скласти запит, щоб вона опинилась першою.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 160 160" fill="none">
+      <circle cx="80" cy="80" r="64" fill="#E6EEFD"/>
+      <rect x="98" y="100" width="18" height="46" rx="8" transform="rotate(-45 107 123)" fill="#E8730C"/>
+      <circle cx="70" cy="70" r="40" fill="#fff" stroke="#2F6FEB" stroke-width="10"/>
+      <circle cx="57" cy="66" r="9" fill="#fff" stroke="#1B1B3A" stroke-width="2.5"/>
+      <circle cx="83" cy="66" r="9" fill="#fff" stroke="#1B1B3A" stroke-width="2.5"/>
+      <circle cx="59" cy="67" r="4" fill="#1B1B3A"/><circle cx="85" cy="67" r="4" fill="#1B1B3A"/>
+      <path d="M60 86 Q70 94 80 86" stroke="#1B1B3A" stroke-width="3" stroke-linecap="round"/>
+      <path d="M50 46 Q58 40 66 44" stroke="#9DB8F5" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="132" cy="36" r="7" fill="#FFC93C"/><circle cx="24" cy="120" r="5" fill="#2F6FEB"/><circle cx="140" cy="80" r="4" fill="#E8730C"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Види комп'ютерних мереж. Мережа Інтернет</div>
+    <h2>Що ти вже знаєш про мережі</h2>
+    <p>Минулого уроку ти дізнався, як пристрої об'єднуються в мережі і де «живуть» сайти. Пригадай головне.</p>
+    <p class="soft">Обери поняття, а потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Пошукова система</div>
+    <h2>Як знайти потрібне серед мільярдів сторінок</h2>
+    <p>Можна блукати посиланнями від сайту до сайту — але це дуже довго. Швидше запитати пошукову систему.</p>
+    <p><b>Пошукова система</b> (пошукова служба) — сайт, який збирає інформацію з Інтернету, впорядковує її та допомагає швидко знайти потрібне.</p>
+    <p>Найвідоміші пошукові системи:</p>
+    <div class="logo-row">
+      <figure><img src="images/google-g.svg" alt=""><figcaption>Google</figcaption></figure>
+      <figure><img src="images/bing.svg" alt=""><figcaption>Bing</figcaption></figure>
+      <figure><img src="images/yahoo.svg" alt=""><figcaption>Yahoo!</figcaption></figure>
+    </div>
+    <div class="trivia">⚠️ Не плутай: <b>браузер</b> (Chrome, Firefox, Edge) — це програма, якою відкривають сайти. А пошукова система — сайт, який ти відкриваєш у браузері.</div>
+    <p class="soft">Це пошукова система?</p>
+    <div id="engineYesNo"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Як працює пошук</div>
+    <h2>Хто шукає замість тебе</h2>
+    <p>Пошукова система не шукає по всьому Інтернету в ту мить, коли ти натиснув «Пошук». Вона все підготувала заздалегідь — працюють три помічники.</p>
+    <div class="how-ill" id="howIll"></div>
+    <p class="soft">Переверни кожну картку.</p>
+    <div class="exercise">
+      <div class="flip-grid" id="howGrid"></div>
+    </div>
+    <p class="soft" style="margin-top:22px;">Хто з помічників це робить?</p>
+    <div id="howCheck"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Ключові слова</div>
+    <h2>Найголовніші слова</h2>
+    <ul>
+      <li><b>Ключове слово</b> — слово, яке найточніше описує те, що ти шукаєш.</li>
+      <li><b>Запит</b> — набір ключових слів, які вводять у поле пошуку.</li>
+    </ul>
+    <p>Пошуковій системі не потрібні «привіт» чи «будь ласка» — їй потрібна суть.</p>
+    <p class="soft">Клацни в кожному реченні всі ключові слова. Зайві слова не чіпай!</p>
+    <div class="exercise">
+      <div id="kwBox"></div>
+      <div class="progress-line" id="kwProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Алгоритм пошуку</div>
+    <h2>Шукаємо крок за кроком</h2>
+    <p>Будь-який пошук — це той самий порядок дій. Склади його.</p>
+    <div class="exercise">
+      <ol class="seq-done" id="seqDone"></ol>
+      <div class="seq-q" id="seqQ"></div>
+      <div class="seq-opts" id="seqOpts"></div>
+      <div class="choice-feedback" id="seqFb"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Вкладки пошуку</div>
+    <h2>Не лише сторінки</h2>
+    <p>Під полем пошуку є вкладки. Вони показують знайдене в різному вигляді:</p>
+    <ul>
+      <li><b>Усі</b> — сторінки з текстом;</li>
+      <li><b>Зображення</b> — фото й малюнки;</li>
+      <li><b>Відео</b> — ролики;</li>
+      <li><b>Новини</b> — статті про свіжі події;</li>
+      <li><b>Карти</b> — місця й маршрути.</li>
+    </ul>
+    <p class="soft">Прочитай завдання й клацни вкладку Google, у якій шукатимеш.</p>
+    <div class="exercise">
+      <div class="gtask" id="gTask"></div>
+      <div class="serp" id="serp"></div>
+      <div class="serp-fb" id="serpFb"></div>
+      <div class="progress-line" id="serpProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Хороший запит</div>
+    <h2>Як скласти вдалий запит</h2>
+    <ul>
+      <li>Пиши слова <b>без помилок</b>.</li>
+      <li>Бери <b>кілька</b> точних слів, а не одне.</li>
+      <li>Додавай уточнення: місто, рік, назву.</li>
+      <li>Не знайшов — <b>зміни слова</b> або спробуй іншу пошукову систему.</li>
+    </ul>
+    <p class="soft">Який запит найкращий?</p>
+    <div id="goodQuery"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 7 · Тренажер «Шукайко»</div>
+    <h2>Знайди відповідь сам</h2>
+    <p>Склади запит із потрібних слів, натисни «Знайти» і обери сторінку, яка справді відповідає на питання.</p>
+    <div class="exercise" style="padding:0; border:none; background:none;">
+      <div class="emu" id="emu">
+        <div class="emu-top">
+          <div class="emu-logo">Шукай<span>ко</span></div>
+          <div class="emu-mission" id="emuMission"></div>
+          <div class="emu-dots" id="emuDots"></div>
+        </div>
+        <div class="emu-body">
+          <div class="emu-bar">
+            <div class="emu-input" id="emuInput"></div>
+            <button class="emu-go" id="emuGo">🔍 Знайти</button>
+          </div>
+          <div class="emu-chips" id="emuChips"></div>
+          <div class="emu-msg" id="emuMsg"></div>
+          <div class="emu-results" id="emuResults"></div>
+          <div class="emu-next" id="emuNext"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 8 · Лапки й мінус</div>
+    <h2>Секретні знаки пошуку</h2>
+    <ul>
+      <li><b>Лапки</b> <code class="qry">"…"</code> — знайти фразу точно так, як написано: ті самі слова, в тому самому порядку.</li>
+      <li><b>Мінус</b> перед словом <code class="qry">-слово</code> — прибрати сторінки, де є це слово. Пробілу між мінусом і словом немає.</li>
+    </ul>
+    <div class="note">💡 У багатьох пошукових системах є ще <b>розширений пошук</b>: там можна обрати мову, країну чи дату, коли сторінку опубліковано.</div>
+    <p class="soft">Який запит допоможе?</p>
+    <div id="opsCheck"></div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Пошук інформації в Інтернеті. Пошукові системи. Ключові слова, запити» · 5 клас</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Комп\'ютерна мережа', desc:'🔗 Пристрої, з\'єднані між собою, щоб обмінюватися даними' },
+  { name:'Локальна мережа', desc:'🏫 Комп\'ютери одного класу, будинку чи школи' },
+  { name:'Глобальна мережа', desc:'🌍 Охоплює міста, країни й континенти' },
+  { name:'Інтернет', desc:'🕸️ Всесвітня «мережа мереж», де живуть сайти й відео' },
+  { name:'Провайдер', desc:'💳 Компанія, яка за плату під\'єднує твій дім до Інтернету' },
+  { name:'Дата-центр', desc:'🏢 Будівля з тисячами серверів, де зберігаються сайти' }
+], 'recapProgress');
+
+/* ---------- КРОК 1 ---------- */
+makeYesNo('engineYesNo', [
+  { text:'Google Chrome', logo:'chrome.svg', correct:false, why:'Це браузер. Він відкриває сайти, зокрема й пошукові, але сам нічого не шукає.' },
+  { text:'Bing', logo:'bing.svg', correct:true, why:'Пошукова система від Microsoft.' },
+  { text:'Microsoft Edge', logo:'edge.svg', correct:false, why:'Теж від Microsoft, але це браузер. Пошукова система Microsoft — Bing.' },
+  { text:'Yahoo!', logo:'yahoo.svg', correct:true, why:'Одна з найстаріших пошукових систем.' },
+  { text:'Mozilla Firefox', logo:'firefox.svg', correct:false, why:'Це браузер.' }
+], '✅ Так', '❌ Ні');
+
+/* ---------- КРОК 2: ГАЛЕРЕЯ ----------
+   Пошуковий робот — роботизована собачка-пошуковик (власна SVG-іконка) */
+const DOG_PARTS = `
+  <path d="M15 32 L7 21" stroke="#1E4FB8" stroke-width="3" stroke-linecap="round"/><circle cx="7" cy="20" r="3.2" fill="#E8730C"/>
+  <rect x="18" y="40" width="5" height="14" rx="2" fill="#1E4FB8"/><rect x="26" y="40" width="5" height="14" rx="2" fill="#1E4FB8"/>
+  <rect x="35" y="40" width="5" height="14" rx="2" fill="#1E4FB8"/><rect x="43" y="40" width="5" height="14" rx="2" fill="#1E4FB8"/>
+  <rect x="13" y="28" width="38" height="16" rx="7" fill="#2F6FEB"/>
+  <circle cx="24" cy="36" r="2.6" fill="#E6EEFD"/><circle cx="32" cy="36" r="2.6" fill="#E6EEFD"/>
+  <rect x="45" y="9" width="8" height="8" rx="4" fill="#17409A"/>
+  <rect x="40" y="13" width="18" height="18" rx="5" fill="#2F6FEB"/>
+  <rect x="38" y="12" width="8.5" height="18" rx="4.25" transform="rotate(14 42 14)" fill="#1E4FB8"/>
+  <rect x="40.3" y="16" width="3.6" height="10" rx="1.8" transform="rotate(14 42 14)" fill="#5D8CF0"/>
+  <circle cx="42.3" cy="14.6" r="1.9" fill="#E6EEFD"/>
+  <rect x="54" y="22" width="8" height="7" rx="3" fill="#1E4FB8"/>
+  <rect x="47" y="18" width="9" height="5" rx="2.5" fill="#1B1B3A"/><circle cx="53" cy="20.5" r="1.8" fill="#FFC93C"/>`;
+const ROBODOG = `<svg class="robodog" viewBox="0 0 64 64" fill="none" aria-hidden="true">${DOG_PARTS}</svg>`;
+
+/* Ілюстрація: робот обходить сайти → індексатор розкладає → сторінка пошуку показує */
+(function(){
+  const pts = [[30,34],[118,24],[190,62],[150,124],[50,122]];
+  const page = ([x,y])=>`<g transform="translate(${x-14},${y-18})"><rect width="28" height="36" rx="4" fill="#fff" stroke="#2F6FEB" stroke-width="2"/><rect x="5" y="7" width="18" height="4" rx="2" fill="#2F6FEB"/><rect x="5" y="15" width="18" height="3" rx="1.5" fill="#C9D6F5"/><rect x="5" y="21" width="14" height="3" rx="1.5" fill="#C9D6F5"/><rect x="5" y="27" width="16" height="3" rx="1.5" fill="#C9D6F5"/></g>`;
+  const links = [[0,1],[1,2],[2,3],[3,4],[4,0],[0,3],[1,4]].map(([a,b])=>`<line x1="${pts[a][0]}" y1="${pts[a][1]}" x2="${pts[b][0]}" y2="${pts[b][1]}" stroke="#9DB8F5" stroke-width="2" stroke-dasharray="5 5"/>`).join('');
+  const route = 'M' + pts.map(p=>p.join(' ')).join(' L') + ' Z';
+  const web = `<svg viewBox="0 0 220 160" fill="none">${links}${pts.map(page).join('')}
+    <g><g transform="translate(-28,-44) scale(.82)">${DOG_PARTS}</g><animateMotion dur="9s" repeatCount="indefinite" path="${route}"/></g></svg>`;
+
+  const drawers = ['пінгвіни','Говерла','млинці'].map((w,i)=>`<rect x="58" y="${26+i*40}" width="104" height="32" rx="6" fill="#fff" stroke="#2F6FEB" stroke-width="2"/><rect x="100" y="${49+i*40}" width="20" height="4" rx="2" fill="#9DB8F5"/><text x="110" y="${44+i*40}" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="700" font-size="14" fill="#1E4FB8">${w}</text>`).join('');
+  const store = `<svg viewBox="0 0 220 160" fill="none"><rect x="48" y="16" width="124" height="134" rx="10" fill="#E6EEFD" stroke="#1E4FB8" stroke-width="2"/>${drawers}
+    <g><g transform="translate(6,8) scale(.55)"><rect width="28" height="36" rx="4" fill="#fff" stroke="#E8730C" stroke-width="2.5"/><rect x="5" y="8" width="18" height="4" rx="2" fill="#E8730C"/><rect x="5" y="17" width="16" height="3" rx="1.5" fill="#F6C89A"/></g>
+      <animateTransform attributeName="transform" type="translate" values="0 0; 136 20; 136 20" keyTimes="0; .55; 1" dur="2.6s" repeatCount="indefinite"/>
+      <animate attributeName="opacity" values="0; 1; 1; 0; 0" keyTimes="0; .12; .55; .7; 1" dur="2.6s" repeatCount="indefinite"/></g></svg>`;
+
+  const res = [76,104,132].map((y,i)=>`<rect x="24" y="${y}" width="${[110,96,120][i]}" height="7" rx="3.5" fill="#1A0DAB" opacity=".85"/><rect x="24" y="${y+11}" width="160" height="4" rx="2" fill="#DADCE0"/><rect x="24" y="${y+18}" width="${[130,140,110][i]}" height="4" rx="2" fill="#DADCE0"/>`).join('');
+  const serp = `<svg viewBox="0 0 220 160" fill="none"><rect x="8" y="6" width="204" height="150" rx="10" fill="#fff" stroke="#DEE5F5" stroke-width="2"/><path d="M8 16 a10 10 0 0 1 10 -10 h184 a10 10 0 0 1 10 10 v8 H8 Z" fill="#F1F3F4"/>
+    <circle cx="20" cy="15" r="3" fill="#FF6B4A"/><circle cx="30" cy="15" r="3" fill="#FFC93C"/><circle cx="40" cy="15" r="3" fill="#3BB273"/>
+    <rect x="18" y="36" width="184" height="26" rx="13" fill="#fff" stroke="#DFE1E5" stroke-width="1.5"/>
+    <image href="images/google-g.svg" x="26" y="42" width="14" height="14"/>
+    <text x="48" y="54" font-family="Arial, sans-serif" font-size="13" fill="#202124">пінгвіни</text>
+    <rect x="18" y="72" width="184" height="28" rx="6" fill="#FFF1CC"><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;.25;.75;1" dur="2.6s" repeatCount="indefinite"/></rect>${res}</svg>`;
+
+  document.getElementById('howIll').innerHTML = `
+    <div class="ill-panel">${web}<div class="ill-cap"><b>1</b>Робот без зупинки обходить сайти, переходячи за посиланнями.</div></div>
+    <div class="ill-arrow">→</div>
+    <div class="ill-panel">${store}<div class="ill-cap"><b>2</b>Індексатор розкладає сторінки по «шухлядах» — за словами, які на них є.</div></div>
+    <div class="ill-arrow">→</div>
+    <div class="ill-panel">${serp}<div class="ill-cap"><b>3</b>Ти вводиш запит — і система миттю дістає готовий список із потрібної «шухляди».</div></div>`;
+})();
+(function(){
+  const cards = [
+    { big:ROBODOG, name:'Пошуковий робот', back:'<b>Пошуковий робот («павук»)</b>Програма, яка без зупинки переходить сайтами за посиланнями й читає нові сторінки.' },
+    { big:'🗂️', name:'Індексатор', back:'<b>Індексатор</b>Впорядковує зібране у величезне сховище — як каталог у бібліотеці, щоб усе знаходилось миттєво.' },
+    { big:'🔍', name:'Сторінка пошуку', back:'<b>Сторінка пошуку</b>Те, що бачиш ти: поле для запиту й список посилань, які система дістала зі сховища.' }
+  ];
+  const grid = document.getElementById('howGrid');
+  const hit = trackTask(grid, cards.length, 0);
+  cards.forEach(c=>{
+    const el = document.createElement('div');
+    el.className = 'flip-card';
+    el.innerHTML = `<div class="flip-inner"><div class="flip-face flip-front"><div class="big">${c.big}</div><div class="name">${c.name}</div><div class="tap">клацни, щоб перевернути</div></div><div class="flip-face flip-back">${c.back}</div></div>`;
+    let seen = false;
+    el.addEventListener('click', ()=>{
+      el.classList.toggle('flipped');
+      if(!seen){ seen = true; hit(); }
+    });
+    grid.appendChild(el);
+  });
+})();
+
+const HELP = [ROBODOG + ' Робот', '🗂️ Індексатор', '🔍 Сторінка пошуку'];
+makeClassify('howCheck', [
+  { text:'Учора на шкільному сайті з\'явилась новина. Хто має там побувати, перш ніж її можна буде знайти?', correct:0 },
+  { text:'Ти натиснув «Пошук», і за пів секунди готово. Завдяки кому не треба чекати, поки система перегляне весь Інтернет?', correct:1 },
+  { text:'Сайт уже видалили, а пошук ще кілька днів показує на нього посилання. Хто ще не встиг туди повернутися й помітити це?', correct:0 },
+  { text:'Що з трьох помічників ти бачиш на екрані власними очима?', correct:2 }
+], HELP);
+
+/* ---------- КРОК 3: КЛЮЧОВІ СЛОВА ----------
+   k — ключове (треба клацнути), f — зайве (помилка), n — можна лишити, але не головне */
+(function(){
+  const sentences = [
+    [['Привіт!','f'],['Розкажи,','f'],['будь','f'],['ласка,','f'],['де','n'],['живуть','k'],['пінгвіни','k']],
+    [['Мені','f'],['дуже','f'],['треба','f'],['знати,','f'],['яка','n'],['висота','k'],['гори','n'],['Говерла','k']],
+    [['Скажи,','f'],['як','n'],['приготувати','k'],['млинці','k'],['з','n'],['яблуками','k']]
+  ];
+  const box = document.getElementById('kwBox');
+  const progress = document.getElementById('kwProgress');
+  const total = sentences.flat().filter(w=>w[1] === 'k').length;
+  const hit = trackTask(box, total, total + 2);
+  let found = 0;
+  const upd = ()=>{ progress.textContent = found === total ? `Усі ключові слова знайдено ✓` : `Знайдено ключових слів: ${found} з ${total}`; };
+  sentences.forEach(words=>{
+    const card = document.createElement('div');
+    card.className = 'kw-sent';
+    card.innerHTML = '<div class="kw-words"></div><div class="kw-query"></div>';
+    const line = card.querySelector('.kw-words');
+    const query = card.querySelector('.kw-query');
+    const need = words.filter(w=>w[1] === 'k').length;
+    let got = 0;
+    words.forEach(([w, t], i)=>{
+      const s = document.createElement('span');
+      s.className = 'kw';
+      s.textContent = w;
+      s.addEventListener('click', ()=>{
+        if(s.classList.contains('picked') || got === need) return;
+        if(t === 'k'){
+          s.classList.add('picked'); got++; found++;
+          addNeurons(1); hit(); upd();
+          if(got === need){
+            const q = words.filter(x=>x[1] === 'k').map(x=>x[0].replace(/[,!?]/g, '')).join(' ');
+            query.innerHTML = `✓ Запит: <code class="qry">${q}</code>`;
+            if(found === total) addNeurons(2);
+          } else query.textContent = '';
+        } else if(t === 'f'){
+          s.classList.add('wrong-flash');
+          query.textContent = '✗ Це слово нічого не каже про те, що шукаємо.';
+          setTimeout(()=>s.classList.remove('wrong-flash'), 600);
+        } else {
+          query.textContent = 'Це слово можна й лишити, але воно не головне. Шукай важливіші.';
+        }
+      });
+      line.appendChild(s);
+      if(i < words.length - 1) line.appendChild(document.createTextNode(' '));
+    });
+    box.appendChild(card);
+  });
+  upd();
+})();
+
+/* ---------- КРОК 4: АЛГОРИТМ ---------- */
+makeSequence('seqDone', 'seqQ', 'seqOpts', 'seqFb', [
+  '💭 Придумую ключові слова',
+  '⌨️ Вводжу їх у поле пошуку',
+  '🔍 Натискаю «Пошук» або Enter',
+  '👀 Читаю описи знайдених посилань',
+  '🖱️ Відкриваю сторінку, що підходить (або уточнюю запит)'
+], 'Готово! Якщо потрібного не знайшлось — змінюю ключові слова й шукаю знову.');
+
+/* ---------- КРОК 5: ВКЛАДКИ GOOGLE ---------- */
+(function(){
+  const TABS = [['all','Усі'],['img','Зображення'],['vid','Відео'],['news','Новини'],['map','Карти']];
+  const WHAT = { all:'сторінки з текстом', img:'лише картинки', vid:'лише ролики', news:'статті про свіжі події', map:'місця на мапі' };
+  const tasks = [
+    { need:'Побачити, як виглядає жук-олень.', q:'жук-олень', tab:'img', emoji:'🪲' },
+    { need:'Дізнатися, що таке фотосинтез, і прочитати пояснення.', q:'фотосинтез', tab:'all', res:[
+      { u:'biolohiia-dlia-ditei.ua › roslyny', t:'Фотосинтез: як рослини готують собі їжу', d:'На світлі листки перетворюють вуглекислий газ і воду на поживні речовини та кисень…' },
+      { u:'shkola-pryrody.ua › urok-12', t:'Що таке фотосинтез — простими словами', d:'Зелений колір листкам дає хлорофіл. Саме він «ловить» сонячне світло…' } ] },
+    { need:'Навчитися складати паперового журавлика, повторюючи рухи за майстром.', q:'журавлик з паперу', tab:'vid', emoji:'🕊️', vids:[
+      ['Журавлик з паперу за 5 хвилин', 'Майстерня «Оригамі» · 120 тис. переглядів', '5:12'],
+      ['Оригамі для початківців: журавлик', 'Творчі руки · 48 тис. переглядів', '8:40'] ] },
+    { need:'Дізнатися, чим учора закінчився матч збірної України з футболу.', q:'збірна України футбол', tab:'news', news:[
+      ['Спортивний вісник', 'Збірна України здобула перемогу у відбірковому матчі', '9 год тому'],
+      ['Футбол сьогодні', 'Головний тренер розповів, як команда готувалась до гри', '14 год тому'] ] },
+    { need:'Знайти, як пройти від школи до зоопарку.', q:'зоопарк', tab:'map', place:'Зоопарк', meta:'⭐ 4,6 · Відчинено до 18:00' },
+    { need:'Підібрати малюнок соняшника для листівки бабусі.', q:'соняшник малюнок', tab:'img', emoji:'🌻' }
+  ];
+  const PASTEL = ['#FDE7C8','#E3F1DD','#E6EEFD','#FBE1E7','#FFF3C4','#E9E3FB','#DDF3F2','#F5E6DA'];
+  const SEARCH_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="#4285F4" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg>';
+  const box = document.getElementById('serp');
+  const taskEl = document.getElementById('gTask');
+  const fb = document.getElementById('serpFb');
+  const progress = document.getElementById('serpProgress');
+  const hit = trackTask(box, tasks.length, tasks.length + 2);
+  let n = 0;
+
+  const preview = {
+    all: T=>T.res.map(r=>`<div class="s-res"><div class="u">${r.u}</div><div class="t">${r.t}</div><div class="d">${r.d}</div></div>`).join(''),
+    img: T=>`<div class="s-imgs">${PASTEL.map((c,i)=>`<div style="background:${c}; font-size:${[34,28,40,30,36,26,32,38][i]}px">${T.emoji}</div>`).join('')}</div>`,
+    vid: T=>T.vids.map(([t,src,len])=>`<div class="s-vid"><div class="s-thumb">${T.emoji}<span>${len}</span></div><div><div class="t" style="color:#1A0DAB; font-size:16px; line-height:1.3;">${t}</div><div style="font-size:12.5px; color:#70757A; margin-top:3px;">${src}</div></div></div>`).join(''),
+    news: T=>T.news.map(([src,h,ago])=>`<div class="s-news"><div class="src">📰 ${src}</div><div class="h">${h}</div><div class="ago">${ago}</div></div>`).join(''),
+    map: T=>`<div class="s-map"><svg viewBox="0 0 400 170"><rect width="400" height="170" fill="#E8F0E3"/><path d="M0 120 C90 100 150 150 260 128 S380 90 400 100" stroke="#A9CFF5" stroke-width="16" fill="none"/>
+      <path d="M40 0 L120 170 M0 60 L400 40 M230 0 L300 170" stroke="#fff" stroke-width="9"/><rect x="250" y="56" width="70" height="44" rx="6" fill="#CDE6C0"/>
+      <path d="M70 52 C130 52 170 70 285 76" stroke="#1A73E8" stroke-width="4" stroke-dasharray="7 6" fill="none"/><circle cx="70" cy="52" r="7" fill="#fff" stroke="#1A73E8" stroke-width="3"/>
+      <path d="M285 78 c-11 -14 -16 -22 -16 -30 a16 16 0 0 1 32 0 c0 8 -5 16 -16 30z" fill="#EA4335"/><circle cx="285" cy="48" r="6" fill="#fff"/></svg>
+      <div class="s-place"><b>${T.place}</b><br><span style="color:#70757A;">${T.meta} · 🚶 18 хв від школи</span></div></div>`
+  };
+
+  function load(){
+    const T = tasks[n];
+    taskEl.innerHTML = `<b>Завдання ${n + 1} з ${tasks.length}:</b> ${T.need}`;
+    fb.textContent = '';
+    box.innerHTML = `<div class="serp-head"><img src="images/google.svg" alt="Google"><div class="serp-box"><span class="q">${T.q}</span>${SEARCH_ICON}</div></div>
+      <div class="serp-tabs">${TABS.map(([k,l])=>`<button class="serp-tab" data-k="${k}">${l}</button>`).join('')}<span class="serp-tab more">⋮ Ще</span></div>
+      <div class="serp-stat"></div><div class="serp-area"><div class="serp-empty"><i style="width:40%"></i><i style="width:85%"></i><i style="width:70%"></i><i style="width:35%"></i><i style="width:80%"></i></div></div>`;
+    const area = box.querySelector('.serp-area');
+    let solved = false;
+    box.querySelectorAll('button.serp-tab').forEach(b=>b.addEventListener('click', ()=>{
+      if(solved) return;
+      const k = b.dataset.k;
+      if(k === T.tab){
+        solved = true;
+        b.classList.add('active');
+        box.querySelector('.serp-stat').textContent = `Приблизно ${['184 000','2 310 000','95 400','1 270 000','8 650 000','3 920 000'][n]} результатів (0,3 с)`;
+        area.innerHTML = preview[k](T);
+        addNeurons(1); hit();
+        if(n < tasks.length - 1){
+          fb.innerHTML = '✓ Саме так! <button class="btn-primary" style="margin-left:10px; padding:6px 14px; font-size:14px;">Наступне завдання →</button>';
+          fb.querySelector('button').addEventListener('click', ()=>{ n++; load(); });
+        } else { fb.textContent = '✓ Усі завдання виконано — ти вмієш користуватися вкладками пошуку!'; addNeurons(2); }
+        progress.textContent = `Виконано: ${n + 1} з ${tasks.length}`;
+      } else {
+        b.classList.add('wrong');
+        fb.textContent = `✗ Тут будуть ${WHAT[k]}. А тобі потрібно інше.`;
+        setTimeout(()=>b.classList.remove('wrong'), 600);
+      }
+    }));
+  }
+  load();
+  progress.textContent = `Виконано: 0 з ${tasks.length}`;
+})();
+
+/* ---------- КРОК 6: ХОРОШИЙ ЗАПИТ ---------- */
+const Q = s=>`<code class="qry">${s}</code>`;
+makeChoices('goodQuery', [
+  { text:'🚆 Треба знайти розклад електричок з Києва до Фастова.', opts:[Q('розклад електричок'), Q('електричка Фастів'), Q('розклад електричок Київ Фастів')], correct:2, why:'Обидва міста й слово «розклад» — і нічого зайвого.' },
+  { text:'🦕 У якому запиті немає жодної помилки?', opts:[Q('динозаври травоідні'), Q('динозаври травоїдні'), Q('дінозаври травоїдні')], correct:1, why:'Через помилку система може не зрозуміти, що ти шукаєш.' },
+  { text:'🎬 Хочеш знати, які мультфільми цього тижня показують у кінотеатрах Житомира.', opts:[Q('мультфільми Житомир'), Q('розклад кінотеатрів Житомир мультфільми'), Q('кінотеатри розклад мультфільми')], correct:1, why:'Слово «розклад» і назва міста звужують пошук саме до того, що потрібно.' },
+  { text:'🦔 Що їдять їжаки взимку? Обери найточніший запит.', opts:[Q('їжак'), Q('чим харчується їжак'), Q('чим харчується їжак взимку')], correct:2, why:'Без слова «взимку» знайдеться все про їжаків цілий рік.' }
+], {col:true});
+
+/* ---------- КРОК 7: ЕМУЛЯТОР «ШУКАЙКО» ----------
+   need — слова, без яких пошук не вдасться; junk — зайві; решта — можна додати.
+   results — сторінки після вдалого запиту; ok — та, що справді відповідає */
+(function(){
+  const missions = [
+    { task:'🕷️ Дізнайся, скільки ніг у павука.',
+      chips:['привіт','павука','мені','кількість','ніг','цікаво'], need:['павука','ніг'], junk:['привіт','мені','цікаво'],
+      results:[
+        { url:'zoo-svit.ua › komakhy', ttl:'Скільки ніг у комах', snip:'У всіх комах — мурах, бджіл, метеликів — по шість ніг…' },
+        { url:'tvaryny.ua › pavuky', ttl:'Павуки: будова тіла', snip:'Павук — не комаха! У нього вісім ніг і зазвичай вісім очей…', ok:true },
+        { url:'domivka.ua › porady', ttl:'Як вигнати павука з дому', snip:'Павуки не люблять запаху м\'яти та цитрусових…' }
+      ] },
+    { task:'🗾 Дізнайся, яке місто — столиця Японії.',
+      chips:['підкажи','столиця','будь','Японії','ласка','зараз'], need:['столиця','Японії'], junk:['підкажи','будь','ласка','зараз'],
+      results:[
+        { url:'mandry.ua › kioto', ttl:'Кіото — колишня столиця Японії', snip:'Понад тисячу років Кіото був столицею, а тепер це місто храмів…' },
+        { url:'kukhnia.ua › sushi', ttl:'Японська кухня для початківців', snip:'Суші, роли й місо-суп — готуємо вдома…' },
+        { url:'krainy-svitu.ua › japan', ttl:'Японія: коротко про країну', snip:'Столиця Японії — Токіо, одне з найбільших міст світу…', ok:true }
+      ] },
+    { task:'🐆 Дізнайся, яка тварина найшвидше бігає по суші.',
+      chips:['найшвидша','слухай','тварина','а','ти','знаєш','суходіл'], need:['найшвидша','тварина'], junk:['слухай','а','ти','знаєш'],
+      results:[
+        { url:'tvaryny.ua › rekordy', ttl:'Гепард — рекордсмен суходолу', snip:'Гепард розганяється до 110 км/год — швидше за всіх наземних тварин…', ok:true },
+        { url:'ptakhy.ua › sapsan', ttl:'Сапсан — найшвидша тварина планети', snip:'Пікіруючи з висоти, сокіл сапсан летить понад 300 км/год…' },
+        { url:'sport.ua › bih', ttl:'Найшвидша людина світу', snip:'Рекорд у бігу на 100 метрів — 9,58 секунди…' }
+      ] }
+  ];
+  const emu = document.getElementById('emu');
+  const missionEl = document.getElementById('emuMission');
+  const dots = document.getElementById('emuDots');
+  const input = document.getElementById('emuInput');
+  const go = document.getElementById('emuGo');
+  const chipsEl = document.getElementById('emuChips');
+  const msg = document.getElementById('emuMsg');
+  const results = document.getElementById('emuResults');
+  const next = document.getElementById('emuNext');
+  const hit = trackTask(emu, missions.length, missions.length * 2 + 2);
+  dots.innerHTML = missions.map(()=>'<i></i>').join('');
+  let m = 0, query = [], searched = false;
+
+  function shakeEl(el){ el.classList.add('shake'); setTimeout(()=>el.classList.remove('shake'), 400); }
+
+  function renderBar(){
+    const M = missions[m];
+    input.innerHTML = '';
+    chipsEl.innerHTML = '';
+    query.forEach(w=>{
+      const c = document.createElement('button');
+      c.className = 'emu-chip'; c.textContent = w + ' ✕';
+      c.addEventListener('click', ()=>{ if(searched) return; query = query.filter(x=>x !== w); renderBar(); });
+      input.appendChild(c);
+    });
+    M.chips.filter(w=>!query.includes(w)).forEach(w=>{
+      const c = document.createElement('button');
+      c.className = 'emu-chip'; c.textContent = w;
+      c.addEventListener('click', ()=>{ if(searched) return; query.push(w); msg.textContent = ''; renderBar(); });
+      chipsEl.appendChild(c);
+    });
+    go.disabled = searched || !query.length;
+  }
+
+  function load(){
+    const M = missions[m];
+    missionEl.innerHTML = `<b>Завдання ${m + 1} з ${missions.length}:</b> ${M.task}`;
+    [...dots.children].forEach((d, i)=>{ d.className = i < m ? 'ok' : i === m ? 'on' : ''; });
+    query = []; searched = false;
+    results.innerHTML = ''; next.innerHTML = ''; msg.textContent = '';
+    renderBar();
+  }
+
+  go.addEventListener('click', ()=>{
+    const M = missions[m];
+    if(M.junk.some(w=>query.includes(w))){ shakeEl(input); msg.textContent = '✗ У запиті є зайві слова — вони лише заважають. Прибери їх.'; return; }
+    if(!M.need.every(w=>query.includes(w))){ shakeEl(input); msg.textContent = '✗ Бракує важливого слова — без нього система не зрозуміє, що шукаєш.'; return; }
+    searched = true; renderBar();
+    msg.textContent = 'Чудовий запит! Тепер прочитай описи й обери сторінку з відповіддю.';
+    let answered = false;
+    M.results.forEach(r=>{
+      const el = document.createElement('div');
+      el.className = 'res';
+      el.innerHTML = `<div class="url">${r.url}</div><div class="ttl">${r.ttl}</div><div class="snip">${r.snip}</div>`;
+      el.addEventListener('click', ()=>{
+        if(answered) return;
+        if(r.ok){
+          answered = true;
+          el.classList.add('correct');
+          msg.textContent = '✓ Саме тут відповідь!';
+          addNeurons(2); hit();
+          dots.children[m].className = 'ok';
+          if(m < missions.length - 1){
+            next.innerHTML = '<button class="btn-primary">Наступне завдання →</button>';
+            next.firstChild.addEventListener('click', ()=>{ m++; load(); });
+          } else {
+            msg.textContent = '🏆 Усі завдання виконано — ти справжній дослідник Інтернету!';
+            addNeurons(2);
+          }
+        } else {
+          el.classList.add('wrong');
+          msg.textContent = '✗ Прочитай опис уважніше — тут відповідь на інше питання.';
+          setTimeout(()=>el.classList.remove('wrong'), 700);
+        }
+      });
+      results.appendChild(el);
+    });
+  });
+
+  load();
+})();
+
+/* ---------- КРОК 8: ЛАПКИ Й МІНУС ---------- */
+makeChoices('opsCheck', [
+  { text:'📜 Знайти вірш, у якому є рядок «Садок вишневий коло хати».', opts:[Q('садок вишневий коло хати'), Q('"Садок вишневий коло хати"'), Q('садок -вишневий коло хати')], correct:1, why:'Без лапок знайдуться сторінки, де ці слова розкидані будь-де. Лапки шукають рядок слово в слово.' },
+  { text:'🍕 Знайти рецепт піци без грибів.', opts:[Q('рецепт піци без грибів'), Q('рецепт піци -гриби'), Q('"рецепт піци" гриби')], correct:1, why:'На сторінці про піцу без грибів може бути слово «грибів» — і вона знайдеться. Мінус прибирає всі сторінки з грибами.' },
+  { text:'🐆 Знайти про тварину ягуар, а не про автомобілі з такою назвою.', opts:[Q('ягуар -тварина автомобіль'), Q('"ягуар автомобіль"'), Q('ягуар тварина -автомобіль')], correct:2, why:'Мінус ставлять перед тим, чого НЕ треба.' },
+  { text:'🎵 Знайти пісню, в якій є слова «ой у лузі червона калина».', opts:[Q('"ой у лузі червона калина"'), Q('ой у лузі -червона калина'), Q('"ой" "у" "лузі" "калина"')], correct:0, why:'Усю фразу беруть в одні лапки.' }
+], {col:true});
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'🔎 Що таке пошукова система?', opts:['Програма, якою відкривають сайти', 'Сайт, що збирає інформацію з Інтернету й допомагає її знайти', 'Сервер, на якому зберігаються всі сайти Інтернету'], correct:1, why:'Програма для відкриття сайтів — це браузер.' },
+  { q:'🌐 Що з цього — пошукова система?', opts:['Microsoft Edge', 'Google Chrome', 'Bing'], correct:2, why:'Edge і Chrome — браузери.' },
+  { q:'🔑 Що таке ключове слово?', opts:['Перше слово, з якого починається запит', 'Слово, яке найточніше описує те, що шукаєш', 'Слово, яке система виділяє жирним у результатах'], correct:1 },
+  { q:'🐾 Що робить пошуковий робот?', opts:['Переходить сайтами за посиланнями й читає нові сторінки', 'Розкладає зібрані сторінки у сховищі', 'Показує тобі список посилань'], correct:0, why:'Розкладає індексатор, а список ти бачиш на сторінці пошуку.' },
+  { q:'1️⃣ Чому запит з одного слова — погана ідея?', opts:['Система не прийме такий запит', 'Знайдеться забагато сторінок на різні теми', 'Пошук триватиме дуже довго'], correct:1 },
+  { q:'❓ Пошук не дав потрібного. Що робити?', opts:['Змінити або уточнити ключові слова', 'Дописати до запиту «будь ласка»', 'Повторити той самий запит ще раз'], correct:0 },
+  { q:'💬 Навіщо брати фразу в лапки?', opts:['Щоб шукати ці слова саме в такому порядку', 'Щоб прибрати ці слова з результатів', 'Щоб пошук ішов швидше'], correct:0 },
+  { q:'➖ Що знайде запит «казки -Андерсен»?', opts:['Лише казки Андерсена', 'Казки, але без сторінок, де згадано Андерсена', 'Біографію Андерсена'], correct:1 }
+], {summary:'Тепер ти знаєш, як працюють пошукові системи, вмієш добирати ключові слова, складати точний запит і користуватися лапками та мінусом.'});
+</script>
+
+</body>
+</html>
