@@ -26,6 +26,12 @@
   @media (max-width:520px){ .rv-card{padding:18px 14px;} }
   .rv-kicker{font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:600; color:var(--purple);}
   .rv-card h1{font-size:22px; line-height:1.2; margin:0 0 2px;}
+  .rv-head{display:flex; align-items:center; gap:16px;}
+  .rv-head > div{min-width:0;}
+  .rv-mark{flex-shrink:0; display:flex; flex-direction:column; align-items:center; gap:2px;}
+  .rv-mark b{display:flex; align-items:center; justify-content:center; width:72px; height:72px; font-size:42px; line-height:1; font-weight:400; background:var(--bg); border:1.5px solid var(--line); border-radius:50%;}
+  .rv-mark span{font-family:'Baloo 2',sans-serif; font-size:12px; font-weight:600; color:var(--ink-soft); text-align:center; max-width:90px; line-height:1.2;}
+  @media (max-width:520px){ .rv-mark b{width:56px; height:56px; font-size:32px;} }
   .rv-lesson{color:var(--ink-soft); font-size:13.5px;}
   .rv-check{font-size:13px; font-weight:700; margin-top:6px;}
   .rv-check.ok{color:var(--ok);}
@@ -76,7 +82,7 @@
    Учень на екрані завершення уроку копіює посилання сюди; після «#» у ньому закодовано (base64url JSON) усе,
    що потрібно для картки, тож сторінка нічого не знає про конкретні уроки. «#z=…» — JSON, стиснений deflate-raw,
    «#j=…» — без стиснення (зі старих браузерів). Формат (v:1) описано в makeLink уроку:
-   c — клас і тема, t — назва уроку, d — час завершення (секунди), m — хвилин,
+   e — знак сесії [емодзі, назва] (у старих посиланнях немає), c — клас і тема, t — назва уроку, d — час завершення (секунди), m — хвилин,
    n — [нейрончики, максимум], a — загальна точність, b — [назва блоку, пройдено, точність або -1], h — контрольна сума.
    SALT має збігатися з уроками — інакше всі посилання вважатимуться зміненими. */
 const SALT = 'cikavo·131';
@@ -151,12 +157,18 @@ async function render(){
   const passed = blocks.filter(x=>x[1]).length;
   const n = Array.isArray(d.n) ? d.n : [];
   const accuracy = pctv(d.a);
+  const mark = Array.isArray(d.e) && d.e[0] ? d.e : null;
   const when = d.d ? new Date(num(d.d) * 1000).toLocaleString('uk-UA', {day:'numeric', month:'long', hour:'2-digit', minute:'2-digit'}) : '—';
-  document.title = 'Результати · ' + (d.t || 'урок');
+  document.title = (mark ? mark[0] + ' ' : '') + 'Результати · ' + (d.t || 'урок');
   card.innerHTML = `
-    <div class="rv-kicker">Результати уроку</div>
-    <h1>${esc(d.t)}</h1>
-    <div class="rv-lesson">${d.c ? esc(d.c) + ' · ' : ''}завершено ${when}</div>
+    <div class="rv-head">
+      ${mark ? `<div class="rv-mark" title="Знак сесії учня"><b>${esc(mark[0])}</b><span>${esc(mark[1])}</span></div>` : ''}
+      <div>
+        <div class="rv-kicker">Результати уроку</div>
+        <h1>${esc(d.t)}</h1>
+        <div class="rv-lesson">${d.c ? esc(d.c) + ' · ' : ''}завершено ${when}</div>
+      </div>
+    </div>
     ${d.valid ? '<div class="rv-check ok">✓ Посилання справжнє</div>'
               : '<div class="rv-check bad">⚠️ Дані в посиланні змінено вручну — цим числам не можна довіряти.</div>'}
     <div class="rv-sum">

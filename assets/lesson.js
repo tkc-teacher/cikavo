@@ -41,17 +41,41 @@ const label = el=>el ? [...el.childNodes].map(n=>n.textContent).join(' ').replac
 const shuffle = arr=>[...arr].sort(()=>Math.random() - 0.5);
 
 
+/* ---------- ЗНАК СЕСІЇ ----------
+   Під час кожного відкриття уроку учень отримує випадковий знак-емодзі — мордочку тваринки (лише емодзі не новіші за 2018 рік, щоб показувались і на старих системах). Він видний у HUD біля нейрончиків (клацання — інша тваринка)
+   і потрапляє в посилання з результатами: вчитель бачить знак на сторінці результатів, тож однакові знаки
+   у двох учнів одразу помітні (тоді варто звірити час завершення). Ніде не зберігається. */
+const MARKS = [
+  ['🐶','Песик'],['🐱','Котик'],['🐭','Мишка'],['🐹','Хом\'ячок'],['🐰','Зайчик'],['🦊','Лисичка'],['🐻','Ведмедик'],['🐼','Панда'],
+  ['🐨','Коала'],['🐯','Тигреня'],['🦁','Левеня'],['🐵','Мавпочка']
+];
+let MARK = MARKS[Math.floor(Math.random() * MARKS.length)];
+
+
 /* ---------- HUD І НЕЙРОНЧИКИ ---------- */
 body.insertAdjacentHTML('afterbegin', `
   <div class="hud">
     <div class="hud-bar"><div class="hud-bar-fill"></div></div>
     <div class="hud-row">
       <span class="hud-title"></span>
+      <div class="hud-right">
+      <button class="session-mark" type="button"></button>
       <div class="neuron-counter"><svg viewBox="0 0 24 24" fill="none">${NEURON_SVG}</svg><span id="neuronCount">0</span></div>
+      </div>
     </div>
   </div>`);
 const hud = body.querySelector('.hud');
 hud.querySelector('.hud-title').textContent = body.dataset.hud || '';
+const markEl = hud.querySelector('.session-mark');
+function showMark(){ markEl.textContent = MARK[0]; markEl.title = MARK[1]; markEl.setAttribute('aria-label', `Знак уроку: ${MARK[1]}. Змінити`); }
+showMark();
+// клацання — інша випадкова тваринка (не та сама)
+markEl.addEventListener('click', ()=>{
+  const rest = MARKS.filter(m=>m !== MARK);
+  MARK = rest[Math.floor(Math.random() * rest.length)];
+  showMark();
+  markEl.classList.remove('spin'); markEl.offsetWidth; markEl.classList.add('spin');
+});
 const hudFill = hud.querySelector('.hud-bar-fill');
 const counterEl = hud.querySelector('.neuron-counter');
 const neuronEl = hud.querySelector('#neuronCount');
@@ -656,13 +680,14 @@ async function pack(str){
 }
 
 // Формат даних (v:1) — його ж читає result/index.html:
-// c — клас і тема, t — назва уроку, d — час завершення (секунди), m — хвилин на урок,
+// e — знак сесії [емодзі, назва], c — клас і тема, t — назва уроку, d — час завершення (секунди), m — хвилин на урок,
 // n — [нейрончики, максимум], a — загальна точність,
 // b — блоки: [назва, пройдено (1/0), точність або -1, якщо в блоці нічого рахувати], h — контрольна сума
 async function makeLink(){
   const end = t1 || Date.now(), A = accuracy();
   const d = {
     v:1,
+    e:MARK,
     c:body.dataset.hud || '',
     t:label(document.querySelector('.hero h1')) || document.title,
     d:Math.round(end / 1000),

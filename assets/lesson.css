@@ -27,6 +27,13 @@ h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; 
 .hud-bar-fill{height:100%; width:0%; background:var(--hud-bar); transition:width .3s ease;}
 .hud-row{display:flex; align-items:center; justify-content:space-between; padding:10px 24px; max-width:800px; margin:0 auto;}
 .hud-title{font-family:'Baloo 2',sans-serif; font-size:15px; font-weight:600; color:var(--ink-soft);}
+.hud-right{display:flex; align-items:center; gap:8px;}
+.session-mark{display:flex; align-items:center; justify-content:center; width:36px; height:36px; font-size:23px; line-height:1; background:var(--surface); border:1.5px solid var(--line); border-radius:50%; padding:0; font-family:inherit; cursor:pointer; user-select:none; transition:border-color .15s ease;}
+.session-mark:hover{border-color:var(--accent);}
+.session-mark:focus{outline:none;}
+.session-mark:focus-visible{outline:3px solid var(--accent); outline-offset:2px;}
+.session-mark.spin{animation:mark-spin .35s cubic-bezier(.3,1.4,.5,1);}
+@keyframes mark-spin{from{transform:scale(.5) rotate(-90deg);}}
 .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px; transition:opacity .4s ease, transform .4s ease;}
 .neuron-counter svg{width:24px; height:24px;}
 .neuron-counter.gone{opacity:0; transform:scale(.6); pointer-events:none;}
