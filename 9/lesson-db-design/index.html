@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Проєктування бази даних — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  /* Гама «креслення»: синій папір + помаранчевий олівець */
+  :root{
+    --bp:#2B59C3; --bp-dark:#1D3F8F; --pencil:#D9662B; --pencil-dark:#A84A1A;
+    --accent:var(--bp); --accent-dark:var(--bp-dark); --accent-soft:#E6EDFB;
+    --label:var(--pencil);
+    --bg:#F4F7FC; --ink:#172340; --ink-soft:#4F5B78; --line:#DCE4F3; --surface:#FFFFFF;
+    --note:var(--bp); --note-soft:#EAF0FC; --note-ink:var(--bp-dark);
+    --sun:var(--pencil); --sun-soft:#FDF0E8; --sun-ink:var(--pencil-dark);
+    --hud-bar:linear-gradient(90deg,var(--bp),var(--pencil));
+  }
+
+  /* Етапи проєктування */
+  .stages{list-style:none; padding:0; margin:12px 0 16px; display:grid; gap:8px;}
+  .stages li{display:flex; gap:12px; align-items:flex-start; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 14px;}
+  .stages .n{flex-shrink:0; width:30px; height:30px; border-radius:50%; background:var(--bp); color:#fff; font-family:'Baloo 2',sans-serif; font-weight:700; display:flex; align-items:center; justify-content:center;}
+  .stages b{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; display:block; line-height:1.2;}
+  .stages span{font-size:14px; color:var(--ink-soft);}
+
+  /* Чернетка таблиці: знайди погані поля */
+  .draft-wrap{overflow-x:auto; margin:6px 0 10px;}
+  .draft{border-collapse:collapse; min-width:620px; font-size:14px; background:var(--surface);}
+  .draft th, .draft td{border:1.5px solid var(--line); padding:7px 10px; text-align:left; white-space:nowrap;}
+  .draft th{background:var(--accent-soft); font-family:'Baloo 2',sans-serif; font-weight:700; cursor:pointer; border-bottom:2px dashed var(--bp); transition:background .15s;}
+  .draft th:hover{background:#D6E2FA;}
+  .draft th.found{background:#FDE3D6; color:var(--pencil-dark); border-bottom-color:var(--pencil); cursor:default;}
+  .draft th.ok{background:#E3F4EA; color:#1E6B43; border-bottom-color:#2E9B61; cursor:default;}
+  .draft th.wrong-flash{animation:flash .5s;}
+  @keyframes flash{0%,100%{background:var(--accent-soft);}50%{background:#FFE08A;}}
+  .draft td{color:var(--ink-soft);}
+  .field-fb{min-height:22px; font-size:14px; margin-top:4px;}
+  .field-fb b{color:var(--pencil-dark);}
+
+  /* Схема бази ветклініки */
+  .schema{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:12px; margin:12px 0;}
+  .tcard{background:var(--surface); border:2px solid var(--bp); border-radius:var(--radius-m); overflow:hidden;}
+  .tcard h4{margin:0; background:var(--bp); color:#fff; font-family:'Baloo 2',sans-serif; font-size:15px; padding:6px 12px;}
+  .tcard.link h4{background:var(--pencil);}
+  .tcard.link{border-color:var(--pencil);}
+  .tcard ul{list-style:none; margin:0; padding:8px 12px; font-size:13.5px;}
+  .tcard li{padding:2px 0;}
+  .pk{font-weight:800; color:var(--bp-dark);}
+  .fk{font-weight:800; color:var(--pencil-dark);}
+  .legend{display:flex; flex-wrap:wrap; gap:14px; font-size:13px; color:var(--ink-soft); margin-bottom:8px;}
+  .links{list-style:none; padding:0; margin:8px 0 14px; font-size:14px;}
+  .links li{padding:4px 0;}
+  .rel{display:inline-block; min-width:52px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; background:var(--sun-soft); color:var(--pencil-dark); border-radius:8px; padding:0 6px; margin-right:6px;}
+
+  /* Повторення: імітація Google Таблиць */
+  .hot-prompt{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; text-align:center; margin-bottom:10px;}
+  .hot-prompt span{color:var(--pencil-dark);}
+  .status-line{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--bp-dark); margin-top:12px; min-height:1.4em;}
+  .sheet{background:var(--surface); border:1.5px solid #D3DCEB; border-radius:var(--radius-s); overflow:hidden; font-size:12.5px; user-select:none;}
+  .sheet-title{display:flex; align-items:center; gap:8px; background:#FAFBFE; border-bottom:1px solid #D3DCEB; padding:6px 10px; font-weight:700;}
+  .sheet-title .doc{width:16px; height:20px; border-radius:3px; background:#1FA463; position:relative;}
+  .sheet-title .doc::after{content:''; position:absolute; left:3px; right:3px; top:6px; height:8px; border:1.5px solid #fff; border-radius:1px;}
+  .sheet-scroll{overflow-x:auto;}
+  .sheet-grid{border-collapse:collapse; width:100%; min-width:480px; table-layout:fixed;}
+  .sheet-grid.narrow{min-width:220px;}
+  .sheet-grid th, .sheet-grid td{border:1px solid #D3DCEB; height:28px; padding:0 6px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;}
+  .sheet-grid th{background:#EEF2F9; font-weight:700; color:var(--ink-soft); font-size:11px; text-align:center;}
+  .sheet-grid th.corner{width:30px;}
+  .sheet-grid td{background:#fff;}
+  .sheet-grid td.fname{font-weight:800; background:#F4F6FC;}
+  .sheet-grid td.num{text-align:right;}
+  .sheet-grid td.ctr{text-align:center;}
+  .clk{cursor:pointer; transition:background .15s, box-shadow .15s;}
+  .clk:hover{box-shadow:inset 0 0 0 2px rgba(43,89,195,.35);}
+  .sheet-grid .ok{background:#DFF3E6 !important; color:#1E6B3A;}
+  .sheet-grid .bad{animation:shakeX .35s; background:#FCE6E2 !important;}
+  @keyframes shakeX{0%,100%{transform:translateX(0);}25%{transform:translateX(-3px);}75%{transform:translateX(3px);}}
+  .sheet-pair{position:relative; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; align-items:start;}
+  @media (max-width:700px){ .sheet-pair{grid-template-columns:minmax(0,1fr); row-gap:46px;} }
+  .sheet-pair .sheet{position:relative; z-index:1; min-width:0;}
+  .sheet-pair .sheet-grid.narrow{min-width:230px;}
+  .sheet-pair td.fname{white-space:normal; line-height:1.15; height:auto; padding:4px 5px; font-size:11.5px;}
+  .link-svg{position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; z-index:2;}
+  .link-svg path{fill:none; stroke:var(--pencil); stroke-width:2.5; stroke-linejoin:round; stroke-linecap:round; stroke-dasharray:var(--len); stroke-dashoffset:var(--len); animation:draw .9s ease forwards;}
+  .link-svg circle{fill:var(--pencil);}
+  .link-svg text{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12.5px; fill:var(--pencil-dark); paint-order:stroke; stroke:var(--bg); stroke-width:5px; text-anchor:middle;}
+  @keyframes draw{to{stroke-dashoffset:0;}}
+  .link-legend{font-size:13px; color:var(--ink-soft); margin-top:4px;}
+  .link-legend b{color:var(--pencil-dark);}
+
+  /* Повторення: екрани застосунку */
+  .phone{width:250px; max-width:100%; margin:0 auto 12px; background:#fff; border:3px solid var(--ink); border-radius:24px; padding:14px 12px 16px; font-size:13px; box-shadow:0 6px 18px rgba(23,35,64,.12);}
+  .phone .bar{width:60px; height:5px; border-radius:3px; background:var(--ink); opacity:.25; margin:0 auto 10px;}
+  .phone .app{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; margin-bottom:8px;}
+  .phone .search{border:1.5px solid var(--line); border-radius:20px; padding:5px 10px; margin-bottom:8px; color:var(--ink);}
+  .phone .chips{display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px;}
+  .phone .chip{border:1.5px solid var(--line); border-radius:12px; padding:1px 8px; font-size:12px; color:var(--ink-soft);}
+  .phone .chip.on{background:var(--bp); border-color:var(--bp); color:#fff;}
+  .phone .row{display:flex; justify-content:space-between; gap:8px; padding:5px 0; border-bottom:1px solid var(--line);}
+  .phone .row:last-child{border-bottom:none;}
+  .phone .row b{color:var(--bp-dark);}
+  .phone label{display:block; font-size:11px; color:var(--ink-soft); margin-top:6px;}
+  .phone .inp{border:1.5px solid var(--line); border-radius:8px; padding:4px 8px; min-height:26px;}
+  .phone .inp.edit{border-color:var(--pencil); background:var(--sun-soft);}
+  .phone .btn{margin-top:10px; text-align:center; background:var(--bp); color:#fff; border-radius:10px; padding:5px; font-weight:700;}
+  .phone .bars .row{border:none; align-items:center;}
+  .phone .bars i{display:block; height:10px; border-radius:5px; background:var(--pencil);}
+
+  /* Аркуші-кошики */
+  .sheet-buckets .bucket{border-top:6px solid var(--bp);}
+  .sheet-buckets .bucket-title::before{content:'▦ '; color:var(--bp);}
+  .sheet-buckets #shVisits{border-top-color:var(--pencil);}
+</style>
+</head>
+<body data-lesson="lesson9-db-design" data-hud="9 клас · Проєктування бази даних">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Впорядкування даних</div>
+      <h1>Проєктуємо базу даних</h1>
+      <p>Перш ніж будувати дім, архітектор креслить план. З базою даних так само: спочатку продумуємо об'єкти, поля, ключі й зв'язки — і лише потім створюємо аркуші в Google Таблицях.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: аркуш-креслення зі схемою двох таблиць і олівцем -->
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="62" fill="#E6EDFB"/>
+      <rect x="24" y="28" width="86" height="80" rx="8" fill="#2B59C3"/>
+      <path d="M24 48h86M24 68h86M24 88h86M44 28v80M64 28v80M84 28v80" stroke="#4C76D6" stroke-width="1"/>
+      <rect x="32" y="38" width="28" height="30" rx="4" fill="#fff"/>
+      <rect x="32" y="38" width="28" height="8" rx="3" fill="#FFC9A8"/>
+      <rect x="76" y="66" width="26" height="30" rx="4" fill="#fff"/>
+      <rect x="76" y="66" width="26" height="8" rx="3" fill="#FFC9A8"/>
+      <path d="M60 56h8v22h8" stroke="#fff" stroke-width="2.5" stroke-dasharray="4 3"/>
+      <circle cx="41" cy="57" r="3" fill="#172340"/><circle cx="51" cy="57" r="3" fill="#172340"/>
+      <path d="M41 63q5 4 10 0" stroke="#172340" stroke-width="2" stroke-linecap="round"/>
+      <g transform="rotate(35 104 104)">
+        <rect x="98" y="70" width="12" height="44" rx="2" fill="#D9662B"/>
+        <rect x="98" y="70" width="12" height="7" fill="#F4B184"/>
+        <path d="M98 114l6 12 6-12z" fill="#F6D3B5"/><path d="M102.5 123l1.5 3 1.5-3z" fill="#172340"/>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення 1 · Поле, запис, ключ</div>
+    <h2>Що ти вже знаєш про таблицю бази даних</h2>
+    <ul>
+      <li><b>Поле</b> — стовпець, одна характеристика об'єкта.</li>
+      <li><b>Запис</b> — рядок, усі відомості про один об'єкт.</li>
+      <li><b>Ключове поле</b> — значення в ньому не повторюються.</li>
+    </ul>
+    <p class="soft">Виконай завдання: клацай на букву стовпця, номер рядка або комірку.</p>
+    <div class="exercise">
+      <div class="hot-prompt" id="frPrompt"></div>
+      <div class="sheet">
+        <div class="sheet-title"><span class="doc"></span>Фільмотека</div>
+        <div class="sheet-scroll"><table class="sheet-grid" id="frGrid"></table></div>
+      </div>
+      <div class="status-line" id="frStatus"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label recap">Повторення 2 · Зв'язані таблиці</div>
+    <h2>Первинний і зовнішній ключ</h2>
+    <p>Зовнішній ключ зберігає ID запису з іншої таблиці.</p>
+    <p class="soft">Клацай по всіх трьох таблицях.</p>
+    <div class="exercise">
+      <div class="hot-prompt" id="keyPrompt"></div>
+      <div class="sheet-pair">
+        <div class="sheet">
+          <div class="sheet-title"><span class="doc"></span>Учні</div>
+          <div class="sheet-scroll"><table class="sheet-grid narrow" id="kU"></table></div>
+        </div>
+        <div class="sheet">
+          <div class="sheet-title"><span class="doc"></span>Класи</div>
+          <div class="sheet-scroll"><table class="sheet-grid narrow" id="kK"></table></div>
+        </div>
+        <div class="sheet">
+          <div class="sheet-title"><span class="doc"></span>Вчителі</div>
+          <div class="sheet-scroll"><table class="sheet-grid narrow" id="kV"></table></div>
+        </div>
+      </div>
+      <div class="status-line" id="keyStatus"></div>
+      <div class="link-legend">Знайдений зовнішній ключ з'явиться <b>стрілкою</b>.</div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label recap">Повторення 3 · Інтерфейс бази даних</div>
+    <h2>Що вміє «вітрина» бази</h2>
+    <p class="soft">Яку можливість інтерфейсу використали на екрані?</p>
+    <div id="uiList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · План роботи</div>
+    <h2>П'ять етапів проєктування</h2>
+    <p>Проєктування — це продумування будови бази ще до внесення даних:</p>
+    <ol class="stages">
+      <li><div class="n">1</div><div><b>Предметна область</b><span>Про що база і на які запитання вона має відповідати.</span></div></li>
+      <li><div class="n">2</div><div><b>Об'єкти</b><span>Про кого чи про що зберігаємо дані. Кожен об'єкт — окрема таблиця.</span></div></li>
+      <li><div class="n">3</div><div><b>Поля</b><span>Які властивості об'єкта записуємо і якого вони типу.</span></div></li>
+      <li><div class="n">4</div><div><b>Ключі</b><span>Яке поле однозначно вказує на кожен запис.</span></div></li>
+      <li><div class="n">5</div><div><b>Зв'язки</b><span>Як таблиці посилаються одна на одну.</span></div></li>
+    </ol>
+    <p class="soft">Проєктуємо базу ветклініки. На якому етапі ухвалюють кожне рішення?</p>
+    <div id="stageList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Об'єкти</div>
+    <h2>Що стане таблицею, а що — полем</h2>
+    <p>Об'єкт — те, про що зберігаємо <b>кілька</b> відомостей (людина, річ, подія). Окрема відомість — це поле.</p>
+    <p class="soft">Клацни картку, а потім кошик.</p>
+    <div class="exercise">
+      <div class="sort-buckets">
+        <div class="bucket" id="bkObj"><div class="bucket-title">Об'єкт → таблиця</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkField"><div class="bucket-title">Властивість → поле</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkNone"><div class="bucket-title">Базі не потрібно</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="objPool"></div>
+      <div class="progress-line" id="objProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Поля</div>
+    <h2>Правила хороших полів</h2>
+    <ul>
+      <li><b>Одне поле — одна відомість.</b> Ім'я та телефон — два різні поля.</li>
+      <li><b>Без списків у комірці.</b> Якщо значень може бути багато (усі візити, усі щеплення), це окрема таблиця.</li>
+      <li><b>Не зберігати те, що змінюється саме.</b> Вік щороку інший — краще дата народження.</li>
+    </ul>
+    <p class="soft">Знайди 3 невдалі поля в чернетці «Тварини» — клацай заголовки.</p>
+    <div class="exercise">
+      <div class="draft-wrap">
+        <table class="draft" id="draftTable">
+          <thead><tr id="draftHead"></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Мурка</td><td>кіт</td><td>4</td><td>Коваль О., 067 123 45 67</td><td>4,2</td><td>12.01, 03.05, 20.09</td></tr>
+            <tr><td>2</td><td>Рекс</td><td>пес</td><td>7</td><td>Бондар І., 050 765 43 21</td><td>31,0</td><td>08.02</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="field-fb" id="fieldFb"></div>
+      <div class="progress-line" id="fieldProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Ключі</div>
+    <h2>Первинний ключ: який він має бути</h2>
+    <p>Найнадійніший первинний ключ — окремий стовпець ID (1, 2, 3…). Хороший ключ:</p>
+    <ul>
+      <li>є в <b>кожного</b> запису;</li>
+      <li><b>ніколи не повторюється</b>;</li>
+      <li><b>не змінюється</b> з часом.</li>
+    </ul>
+    <p class="soft">Чи годиться поле на роль первинного ключа?</p>
+    <div id="keyList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Зв'язки</div>
+    <h2>Як визначити тип зв'язку</h2>
+    <p>Для двох об'єктів А і Б постав два запитання: «Скільки Б може бути в одного А?» і «Скільки А — в одного Б?»</p>
+    <ul>
+      <li><b>1 : 1</b> — обидві відповіді «один».</li>
+      <li><b>1 : N</b> — з одного боку «один», з другого «багато». Зовнішній ключ додають у таблицю з боку «багато».</li>
+      <li><b>M : N</b> — обидві відповіді «багато». Тоді створюють <b>проміжну таблицю</b> з двома зовнішніми ключами.</li>
+    </ul>
+    <p>Схема ветклініки:</p>
+    <div class="legend"><span><span class="pk">🔑 ID</span> — первинний ключ</span><span><span class="fk">🔗 ID…</span> — зовнішній ключ</span></div>
+    <div class="schema">
+      <div class="tcard"><h4>Власники</h4><ul><li class="pk">🔑 ID власника</li><li>Прізвище</li><li>Ім'я</li><li>Телефон</li></ul></div>
+      <div class="tcard"><h4>Тварини</h4><ul><li class="pk">🔑 ID тварини</li><li>Кличка</li><li>Вид</li><li>Дата народження</li><li class="fk">🔗 ID власника</li></ul></div>
+      <div class="tcard"><h4>Лікарі</h4><ul><li class="pk">🔑 ID лікаря</li><li>Прізвище</li><li>Спеціалізація</li></ul></div>
+      <div class="tcard link"><h4>Візити</h4><ul><li class="pk">🔑 ID візиту</li><li>Дата</li><li>Діагноз</li><li class="fk">🔗 ID тварини</li><li class="fk">🔗 ID лікаря</li></ul></div>
+    </div>
+    <ul class="links">
+      <li><span class="rel">1 : N</span>Власники → Тварини (в одного власника може бути кілька тварин)</li>
+      <li><span class="rel">M : N</span>Тварини ↔ Лікарі, через таблицю «Візити»</li>
+    </ul>
+    <p class="soft">Визнач тип зв'язку для кожної пари.</p>
+    <div id="relList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Аркуші Google Таблиць</div>
+    <h2>Від схеми до аркушів</h2>
+    <p class="soft">Розклади поля по аркушах файлу «Ветклініка».</p>
+    <div class="exercise">
+      <div class="sort-buckets sheet-buckets">
+        <div class="bucket" id="shOwners"><div class="bucket-title">Власники</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="shPets"><div class="bucket-title">Тварини</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="shVisits"><div class="bucket-title">Візити</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="sheetPool"></div>
+      <div class="progress-line" id="sheetProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 7 · Увесь шлях</div>
+    <h2>Проєкт бази танцювальної школи</h2>
+    <p>Школа танців хоче вести облік учнів, груп і тренерів. Що робимо далі?</p>
+    <div class="exercise">
+      <ol class="seq-done" id="seqDone"></ol>
+      <div class="seq-q" id="seqQ"></div>
+      <div class="seq-opts" id="seqOpts"></div>
+      <div class="choice-feedback" id="seqFb"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Етапи проєктування бази даних: об'єкти, поля, ключі, зв'язки. Проєктування бази даних як набору аркушів Google Таблиць» · 9 клас</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- ПОВТОРЕННЯ: СПІЛЬНЕ ДЛЯ ТАБЛИЦЬ ---------- */
+const COLS = 'ABCDEFGH'.split('');
+function flash(el, cls){ el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), 380); }
+// Таблиця у вигляді Google Таблиць: рядок 1 — назви полів, далі записи; усе клікабельне
+function sheetHTML(fields, rows, opts={}){
+  const num = opts.num || [], ctr = opts.ctr || [];
+  let html = opts.widths ? `<colgroup><col style="width:30px">${opts.widths.map(w=>`<col style="width:${w}">`).join('')}</colgroup>` : '';
+  html += '<tr><th class="corner"></th>' + fields.map((f,c)=>`<th class="clk" data-kind="col" data-c="${c}">${COLS[c]}</th>`).join('') + '</tr>';
+  html += '<tr><th class="clk" data-kind="row" data-r="0">1</th>' + fields.map((f,c)=>`<td class="fname clk" data-kind="cell" data-r="0" data-c="${c}">${f}</td>`).join('') + '</tr>';
+  rows.forEach((row,i)=>{
+    const r = i+1;
+    html += `<tr><th class="clk" data-kind="row" data-r="${r}">${r+1}</th>` +
+      row.map((v,c)=>`<td class="clk${num.includes(c)?' num':''}${ctr.includes(c)?' ctr':''}" data-kind="cell" data-r="${r}" data-c="${c}">${v}</td>`).join('') + '</tr>';
+  });
+  return html;
+}
+// Завдання «клацни потрібне в таблиці»: tables — [[елемент, мітка]], tasks — [{text, ok(t,k,r,c), hl(r) → [[таблиця,'c'|'r'|'x',n]], hint?, done}]; 'x' — комірка [r,c]
+function sheetTasks(promptId, statusId, tables, tasks){
+  const prompt = document.getElementById(promptId);
+  const status = document.getElementById(statusId);
+  let i = 0, busy = false;
+  const hit = trackTask(prompt, tasks.length, tasks.length + 2);
+  const clearHl = ()=> tables.forEach(([tbl])=>tbl.querySelectorAll('.ok').forEach(e=>e.classList.remove('ok')));
+  const show = ()=>{ prompt.innerHTML = i < tasks.length ? `${i+1}/${tasks.length}. ${tasks[i].text}` : 'Усі завдання виконано ✓'; };
+  tables.forEach(([tbl, t])=>{
+    tbl.querySelectorAll('.clk').forEach(el=>{
+      el.addEventListener('click', ()=>{
+        if(busy || i >= tasks.length) return;
+        const k = el.dataset.kind, r = +el.dataset.r, c = +el.dataset.c;
+        const task = tasks[i];
+        if(task.ok(t, k, r, c)){
+          busy = true;
+          clearHl();
+          task.hl(r).forEach(([tb, kind, n])=>tb.querySelectorAll(kind==='x' ? `td[data-r="${n[0]}"][data-c="${n[1]}"]` : kind==='c' ? `[data-c="${n}"]` : `[data-r="${n}"]`).forEach(e=>e.classList.add('ok')));
+          status.textContent = '✓ ' + task.done;
+          addNeurons(1); hit();
+          task.after?.();
+          if(++i === tasks.length) addNeurons(2);
+          setTimeout(()=>{ busy = false; clearHl(); show(); }, 1500);
+        } else {
+          flash(el, 'bad');
+          status.textContent = task.hint || (k==='row' ? 'Це цілий рядок. Спробуй ще раз.' : k==='col' ? 'Це цілий стовпець. Спробуй ще раз.' : 'Це одна комірка. Спробуй ще раз.');
+        }
+      });
+    });
+  });
+  show();
+}
+const isField = (k,r,c,col)=> (k==='col' && c===col) || (k==='cell' && r===0 && c===col);
+
+/* ---------- ПОВТОРЕННЯ 1: ПОЛЕ, ЗАПИС, КЛЮЧ ---------- */
+(function(){
+  const t = document.getElementById('frGrid');
+  t.innerHTML = sheetHTML(['ID', 'Назва фільму', 'Рік', 'Жанр', 'Переглянуто'], [
+    ['1', 'Мавка. Лісова пісня', '2023', 'мультфільм', '☑'],
+    ['2', 'Король Лев', '1994', 'мультфільм', '☑'],
+    ['3', 'Довгі часи', '2023', 'драма', '☐'],
+    ['4', 'Інтерстеллар', '2014', 'фантастика', '☐']
+  ], { num:[0,2], ctr:[4], widths:['9%','33%','13%','23%','22%'] });
+  sheetTasks('frPrompt', 'frStatus', [[t,'f']], [
+    { text:'Покажи поле <span>«Жанр»</span>', ok:(_,k,r,c)=>isField(k,r,c,3), hl:()=>[[t,'c',3]], done:'Поле — це весь стовпець D.' },
+    { text:'Покажи запис про фільм <span>«Король Лев»</span>', ok:(_,k,r)=>k==='row' && r===2, hl:()=>[[t,'r',2]], done:'Запис — увесь рядок з відомостями про один фільм.' },
+    { text:'Покажи значення поля «Рік» у записі <span>«Інтерстеллар»</span>', ok:(_,k,r,c)=>k==='cell' && r===4 && c===2, hl:()=>[[t,'x',[4,2]]], done:'Значення — на перетині поля й запису.' },
+    { text:'Покажи рядок з <span>назвами полів</span>', ok:(_,k,r)=>k==='row' && r===0, hl:()=>[[t,'r',0]], done:'Перший рядок — заголовок, а не запис.' },
+    { text:'Покажи поле, яке годиться на роль <span>ключа</span>', ok:(_,k,r,c)=>isField(k,r,c,0), hl:()=>[[t,'c',0]],
+      hint:'Шукай стовпець, у якому жодне значення не повторюється.', done:'ID — у кожного фільму свій номер. Рік і жанр повторюються.' },
+    { text:'Покажи поле <span>логічного типу</span> (так/ні)', ok:(_,k,r,c)=>isField(k,r,c,4), hl:()=>[[t,'c',4]],
+      hint:'Шукай стовпець, де можливі лише два значення.', done:'«Переглянуто» — або так, або ні.' }
+  ]);
+})();
+
+/* ---------- ПОВТОРЕННЯ 2: ЗВ'ЯЗАНІ ТАБЛИЦІ ---------- */
+// Стрілки «зовнішній ключ → первинний ключ» між таблицями в .sheet-pair.
+// links — [[таблиця FK, стовпець, таблиця PK, стовпець, підпис]]; show(n) — показати n-ту стрілку
+function drawLinks(pair, links){
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.classList.add('link-svg');
+  svg.innerHTML = '<defs><marker id="lnArrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#D9662B"/></marker></defs>';
+  pair.appendChild(svg);
+  const shown = new Set(), fresh = new Set();
+  const cell = (t, c)=> t.querySelector(`td[data-r="0"][data-c="${c}"]`);
+  function draw(){
+    svg.querySelectorAll('g').forEach(g=>g.remove());
+    const sheets = [...pair.querySelectorAll('.sheet')];
+    const stacked = sheets[1].offsetTop > sheets[0].offsetTop + 10;
+    pair.style.paddingBottom = stacked ? '' : (14 + links.length * 24) + 'px';
+    const P = pair.getBoundingClientRect();
+    const low = Math.max(...sheets.map(s=>s.getBoundingClientRect().bottom)) - P.top;
+    links.forEach(([tf, cf, tp, cp, label], i)=>{
+      if(!shown.has(i)) return;
+      const a = cell(tf, cf).getBoundingClientRect(), b = cell(tp, cp).getBoundingClientRect();
+      const sa = tf.closest('.sheet').getBoundingClientRect(), sb = tp.closest('.sheet').getBoundingClientRect();
+      const x1 = a.left + a.width/2 - P.left, x2 = b.left + b.width/2 - P.left;
+      const y1 = sa.bottom - P.top;
+      let y2, ym;
+      if(stacked){ y2 = sb.top - P.top; ym = (y1 + y2) / 2; }   // таблиці одна під одною: стрілка в проміжку між ними
+      else { y2 = sb.bottom - P.top; ym = low + 16 + i * 24; }  // поруч: стрілка під таблицями
+      const r = 8, dir = x2 > x1 ? 1 : -1;
+      const d = stacked
+        ? `M${x1} ${y1} V${ym - r} Q${x1} ${ym} ${x1 + dir*r} ${ym} H${x2 - dir*r} Q${x2} ${ym} ${x2} ${ym + r} V${y2 - 2}`
+        : `M${x1} ${y1} V${ym - r} Q${x1} ${ym} ${x1 + dir*r} ${ym} H${x2 - dir*r} Q${x2} ${ym} ${x2} ${ym - r} V${y2 + 2}`;
+      const g = document.createElementNS(NS, 'g');
+      g.innerHTML = `<circle cx="${x1}" cy="${y1}" r="4"/><path d="${d}" marker-end="url(#lnArrow)"/><text x="${(x1 + x2)/2}" y="${ym + 4}">${label}</text>`;
+      const path = g.querySelector('path');
+      svg.appendChild(g);
+      const len = path.getTotalLength();
+      path.style.setProperty('--len', len);
+      if(!fresh.has(i)){ path.style.animation = 'none'; path.style.strokeDashoffset = 0; }
+    });
+  }
+  new ResizeObserver(()=>draw()).observe(pair);
+  document.fonts?.ready.then(()=>draw());
+  return { show(i){ shown.add(i); fresh.add(i); draw(); setTimeout(()=>fresh.delete(i), 1000); } };
+}
+
+(function(){
+  const uR = [['101','Савчук','2'], ['102','Мороз','1'], ['103','Гнатюк','3'], ['104','Олійник','1'], ['105','Кравчук','2'], ['106','Литвин','3']];
+  const kR = [['1','9-А','12'], ['2','9-Б','14'], ['3','9-В','11']];
+  const vR = [['11','Петренко','алгебра'], ['12','Бондар','історія'], ['13','Кравець','фізика'], ['14','Руденко','хімія']];
+  const tU = document.getElementById('kU'), tK = document.getElementById('kK'), tV = document.getElementById('kV');
+  tU.innerHTML = sheetHTML(['ID учня', 'Прізвище', 'ID класу'], uR, { num:[0,2], widths:['30%','40%','30%'] });
+  tK.innerHTML = sheetHTML(['ID класу', 'Назва', 'ID вчителя'], kR, { num:[0,2], widths:['32%','28%','40%'] });
+  tV.innerHTML = sheetHTML(['ID вчителя', 'Прізвище', 'Предмет'], vR, { num:[0], widths:['31%','38%','31%'] });
+  const links = drawLinks(tU.closest('.sheet-pair'), [[tU, 2, tK, 0, 'ID класу'], [tK, 2, tV, 0, 'ID вчителя']]);
+  sheetTasks('keyPrompt', 'keyStatus', [[tU,'u'],[tK,'k'],[tV,'v']], [
+    { text:'Покажи <span>первинний ключ</span> таблиці «Учні»', ok:(t,k,r,c)=>t==='u' && isField(k,r,c,0), hl:()=>[[tU,'c',0]],
+      hint:'Шукай в «Учнях» поле, значення якого не повторюються.', done:'ID учня — у кожного свій.' },
+    { text:'Покажи <span>зовнішній ключ</span> у таблиці «Учні»', ok:(t,k,r,c)=>t==='u' && isField(k,r,c,2), hl:()=>[[tU,'c',2],[tK,'c',0]],
+      hint:'Шукай в «Учнях» поле, яке зберігає ID з іншої таблиці.', done:'ID класу в «Учнях» вказує на запис у «Класах».', after:()=>links.show(0) },
+    { text:'Покажи <span>зовнішній ключ</span> у таблиці «Класи»', ok:(t,k,r,c)=>t==='k' && isField(k,r,c,2), hl:()=>[[tK,'c',2],[tV,'c',0]],
+      hint:'Шукай у «Класах» поле, яке зберігає ID з іншої таблиці.', done:'ID вчителя в «Класах» вказує на класного керівника у «Вчителях».', after:()=>links.show(1) },
+    { text:'У якому класі навчається <span>Гнатюк</span>? Клацни запис у «Класах»', ok:(t,k,r)=>t==='k' && r===3, hl:()=>[[tU,'r',3],[tK,'r',3]],
+      hint:'Подивись, яке число в Гнатюка в стовпці «ID класу», і знайди цей ID у «Класах».', done:'У Гнатюка ID класу 3 — це 9-В.' },
+    { text:'Хто <span>класний керівник</span> Гнатюка? Клацни запис у «Вчителях»', ok:(t,k,r)=>t==='v' && r===1, hl:()=>[[tU,'r',3],[tK,'r',3],[tV,'r',1]],
+      hint:'Гнатюк — у 9-В. Яке значення «ID вчителя» в цього класу?', done:'9-В → ID вчителя 11 → Петренко. Два переходи за ключами!' },
+    { text:'Клацни будь-кого з учнів, у кого класний керівник — <span>Руденко</span>', ok:(t,k,r)=>t==='u' && r>0 && uR[r-1][2]==='2', hl:r=>[[tU,'r',r],[tK,'r',2],[tV,'r',4]],
+      hint:'Іди у зворотний бік: ID Руденко у «Вчителях» → клас із таким ID вчителя → учні цього класу.', done:'Руденко (14) → 9-Б (ID 2) → Савчук і Кравчук.' }
+  ]);
+})();
+
+/* ---------- ПОВТОРЕННЯ 3: ІНТЕРФЕЙС ---------- */
+const phone = (app, body)=>`<div class="phone"><div class="bar"></div><div class="app">${app}</div>${body}</div>`;
+const uiOpts = (right, ...others)=>({ opts:[right, ...others], correct:0 });
+makeChoices('uiList', [
+  { pre:phone('🎧 Техномаркет', `<div class="search">🔍 бездротові навушники</div>
+      <div class="row"><span>Навушники Air S</span><b>899 грн</b></div><div class="row"><span>Навушники Buds 2</span><b>1250 грн</b></div>`),
+    text:'Покупець увів назву товару й одразу отримав список.', ...uiOpts('Пошук', 'Звіти', 'Додавання'), why:'За введеним текстом база знайшла потрібні записи.' },
+  { pre:phone('🎵 Музика', `<div class="chips"><span class="chip">Поп</span><span class="chip on">Рок ✓</span><span class="chip">Джаз</span></div>
+      <div class="row"><span>Пісня 1</span><span>рок</span></div><div class="row"><span>Пісня 2</span><span>рок</span></div><div class="row"><span>Пісня 3</span><span>рок</span></div>`),
+    text:'Після натискання на «Рок» у списку лишилися тільки рок-пісні.', ...uiOpts('Фільтрація', 'Сортування', 'Редагування'), why:'Записи відібрано за умовою «жанр — рок», решта приховані.' },
+  { pre:phone('👟 Кросівки', `<div class="chips"><span class="chip on">Ціна ↑</span></div>
+      <div class="row"><span>Модель «Старт»</span><b>1100 грн</b></div><div class="row"><span>Модель «Біг»</span><b>1650 грн</b></div><div class="row"><span>Модель «Про»</span><b>2400 грн</b></div>`),
+    text:'Ті самі кросівки тепер стоять від найдешевших до найдорожчих.', ...uiOpts('Сортування', 'Фільтрація', 'Пошук'), why:'Нічого не зникло — змінився лише порядок записів.' },
+  { pre:phone('🐾 Зоомагазин', `<label>Кличка</label><div class="inp">Бублик</div><label>Вид</label><div class="inp">цуценя</div><label>Ціна</label><div class="inp">3500</div><div class="btn">+ Додати тварину</div>`),
+    text:'Продавчиня заповнила форму про цуценя, яке щойно привезли.', ...uiOpts('Додавання', 'Редагування', 'Пошук'), why:'У базі з\'явиться новий запис.' },
+  { pre:phone('🏫 Щоденник', `<label>Учень</label><div class="inp">Мороз Андрій</div><label>Адреса</label><div class="inp edit">вул. Нова, 5 ✏️</div><div class="btn">Зберегти зміни</div>`),
+    text:'Родина учня переїхала, і в його картці виправили адресу.', ...uiOpts('Редагування', 'Додавання', 'Звіти'), why:'Змінили значення поля в наявному записі.' },
+  { pre:phone('🍲 Їдальня · жовтень', `<div class="bars"><div class="row"><span>Борщ</span><i style="width:90px"></i></div><div class="row"><span>Вареники</span><i style="width:70px"></i></div><div class="row"><span>Каша</span><i style="width:35px"></i></div></div>`),
+    text:'Кухарка бачить, які страви за місяць замовляли найчастіше.', ...uiOpts('Звіти', 'Сортування', 'Пошук'), why:'Звіт узагальнює дані з багатьох записів.' }
+].map(it=>{ const idx = shuffle(it.opts.map((_,i)=>i)); return { ...it, opts:idx.map(i=>it.opts[i]), correct:idx.indexOf(0) }; }));
+
+/* ---------- КРОК 1: ЕТАПИ ---------- */
+makeClassify('stageList', [
+  { text:'Вирішуємо: база потрібна, щоб знати, яких тварин і коли лікували', correct:0, why:'Це опис предметної області — для чого база і на що відповідає.' },
+  { text:'Записуємо, що в базі будуть «Власники», «Тварини», «Лікарі» й «Візити»', correct:1, why:'Ми назвали, про кого і про що зберігатимемо дані, — це об\'єкти.' },
+  { text:'Для «Тварин» обираємо: кличка — текст, дата народження — дата', correct:2, why:'Властивості об\'єкта та їхні типи — це етап полів.' },
+  { text:'Кожній тварині дамо унікальний номер, якого не буде в жодної іншої', correct:3, why:'Унікальний номер запису — первинний ключ.' },
+  { text:'У таблиці «Тварини» з\'явиться стовпець з номером власника', correct:4, why:'Так таблиця «Тварини» посилатиметься на «Власників» — це зв\'язок.' }
+], ['Предметна область', 'Об\'єкти', 'Поля', 'Ключі', 'Зв\'язки']);
+
+/* ---------- КРОК 2: ОБ'ЄКТИ ---------- */
+makeSortBoard('objPool', { obj:'bkObj', field:'bkField', none:'bkNone' }, [
+  { text:'Тварина', bucket:'obj' },
+  { text:'Власник', bucket:'obj' },
+  { text:'Лікар', bucket:'obj' },
+  { text:'Візит до лікаря', bucket:'obj' },
+  { text:'Кличка', bucket:'field' },
+  { text:'Номер телефону', bucket:'field' },
+  { text:'Спеціалізація лікаря', bucket:'field' },
+  { text:'Діагноз', bucket:'field' },
+  { text:'Колір стін у приймальні', bucket:'none' },
+  { text:'Улюблена пісня лікаря', bucket:'none' }
+], 'objProgress');
+
+/* ---------- КРОК 3: ЗНАЙДИ НЕВДАЛІ ПОЛЯ ---------- */
+(function(){
+  const COLS = [
+    { name:'ID', bad:false, why:'ID — первинний ключ, з ним усе гаразд.' },
+    { name:'Кличка', bad:false, why:'Одна відомість, тип — текст. Хороше поле.' },
+    { name:'Вид', bad:false, why:'Одна відомість, тип — текст. Хороше поле.' },
+    { name:'Вік', bad:true, why:'Вік щороку змінюється — краще зберігати <b>дату народження</b>, а вік обчислювати.' },
+    { name:'Власник і телефон', bad:true, why:'Тут дві відомості в одному полі, та й власник — окремий об\'єкт. Потрібна таблиця «Власники» і поле <b>ID власника</b>.' },
+    { name:'Вага, кг', bad:false, why:'Одна відомість, тип — число. Хороше поле.' },
+    { name:'Усі візити', bad:true, why:'Список дат в одній комірці не відсортуєш і не відфільтруєш. Візити — окрема таблиця <b>«Візити»</b>.' }
+  ];
+  const head = document.getElementById('draftHead');
+  const fb = document.getElementById('fieldFb');
+  const progress = document.getElementById('fieldProgress');
+  const total = COLS.filter(c=>c.bad).length;
+  const hit = trackTask(document.getElementById('draftTable'), total, total + 2);
+  let found = 0;
+  const show = ()=>{ progress.textContent = `Знайдено: ${found} з ${total}`; };
+  COLS.forEach(c=>{
+    const th = document.createElement('th');
+    th.textContent = c.name;
+    th.addEventListener('click', ()=>{
+      if(th.classList.contains('found') || found === total) return;
+      if(c.bad){
+        th.classList.add('found');
+        fb.innerHTML = '✓ ' + c.why;
+        addNeurons(1); found++; hit(); show();
+        if(found === total){
+          addNeurons(2);
+          head.querySelectorAll('th:not(.found)').forEach(t=>t.classList.add('ok'));
+          fb.innerHTML += ' <br>Усі невдалі поля знайдено!';
+        }
+      } else {
+        th.classList.remove('wrong-flash'); void th.offsetWidth; th.classList.add('wrong-flash');
+        fb.innerHTML = c.why;
+      }
+    });
+    head.appendChild(th);
+  });
+  show();
+})();
+
+/* ---------- КРОК 4: КЛЮЧІ ---------- */
+makeYesNo('keyList', [
+  { text:'«Прізвище» в таблиці «Власники»', correct:false, why:'Однакові прізвища трапляються часто, тож запис не визначиться однозначно.' },
+  { text:'«ID тварини» з номерами 1, 2, 3…', correct:true, why:'Є в кожного запису, не повторюється й не змінюється.' },
+  { text:'«Номер телефону» в таблиці «Власники»', correct:false, why:'Людина може змінити номер, а в сім\'ї один номер буває на кількох власників.' },
+  { text:'«Кличка» в таблиці «Тварини»', correct:false, why:'Мурок і Рексів у клініці буде багато.' },
+  { text:'«ID візиту» в таблиці «Візити»', correct:true, why:'Кожен візит отримує свій номер — це надійний ключ.' },
+  { text:'«Дата» в таблиці «Візити»', correct:false, why:'За один день буває багато візитів — дата повторюється.' }
+], 'Годиться', 'Не годиться');
+
+/* ---------- КРОК 5: ТИПИ ЗВ'ЯЗКІВ ---------- */
+makeClassify('relList', [
+  { text:'Тварина — її чип-паспорт', correct:0, why:'У тварини один чип-паспорт, і кожен паспорт належить одній тварині.' },
+  { text:'Власник — тварини', correct:1, why:'В одного власника може бути кілька тварин, але кожна тварина записана на одного власника.' },
+  { text:'Фільми — актори', correct:2, why:'У фільмі грає багато акторів, а актор знімається в багатьох фільмах. Потрібна проміжна таблиця «Ролі».' },
+  { text:'Країна — її столиця', correct:0, why:'Одна країна — одна столиця, і навпаки.' },
+  { text:'Автобусний маршрут — зупинки', correct:2, why:'На маршруті багато зупинок, а через одну зупинку проходить багато маршрутів.' },
+  { text:'Лікар — візити, які він провів', correct:1, why:'Один лікар провів багато візитів, а кожен візит — один лікар.' }
+], ['1 : 1', '1 : N', 'M : N']);
+
+/* ---------- КРОК 6: АРКУШІ ---------- */
+makeSortBoard('sheetPool', { own:'shOwners', pet:'shPets', vis:'shVisits' }, [
+  { text:'🔑 ID власника', bucket:'own' },
+  { text:'Прізвище власника', bucket:'own' },
+  { text:'Телефон', bucket:'own' },
+  { text:'🔑 ID тварини', bucket:'pet' },
+  { text:'Кличка', bucket:'pet' },
+  { text:'🔗 ID власника', bucket:'pet' },
+  { text:'🔑 ID візиту', bucket:'vis' },
+  { text:'Діагноз', bucket:'vis' },
+  { text:'🔗 ID тварини', bucket:'vis' }
+], 'sheetProgress');
+
+/* ---------- КРОК 7: УВЕСЬ ШЛЯХ ---------- */
+makeSequence('seqDone', 'seqQ', 'seqOpts', 'seqFb', [
+  'Описати предметну область: облік учнів, груп і тренерів школи танців',
+  'Виділити об\'єкти: «Учні», «Групи», «Тренери»',
+  'Скласти поля кожного об\'єкта й обрати їхні типи',
+  'Додати в кожну таблицю первинний ключ ID',
+  'Визначити зв\'язки: в одній групі багато учнів → у «Учні» поле «ID групи»',
+  'Створити аркуші в Google Таблицях і підставляти дані за ID'
+], 'Готово! Від ідеї до аркушів — без жодної переробки.');
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'З чого починається проєктування бази даних?', opts:['З опису предметної області', 'Зі створення аркушів', 'З введення даних', 'З вибору кольору таблиці'], correct:0 },
+  { q:'Що стає окремою таблицею бази даних?', opts:['Кожна властивість', 'Кожен запис', 'Об\'єкт предметної області', 'Кожен тип даних'], correct:2 },
+  { q:'Яке поле краще: «Вік» чи «Дата народження»?', opts:['«Вік», бо коротше', '«Дата народження», бо не змінюється з часом', 'Обидва однаково хороші', 'Жодне'], correct:1 },
+  { q:'Що не так із полем «Ім\'я і телефон»?', opts:['Нічого', 'Воно занадто коротке', 'Воно має бути числом', 'У ньому дві відомості замість однієї'], correct:3 },
+  { q:'Яка вимога до первинного ключа?', opts:['Він ніколи не повторюється', 'Він має бути текстом', 'Він стоїть в останньому стовпці', 'Він може бути порожнім'], correct:0 },
+  { q:'Зв\'язок «один до багатьох». Куди додати зовнішній ключ?', opts:['У таблицю з боку «один»', 'У таблицю з боку «багато»', 'В обидві', 'Нікуди'], correct:1, why:'Наприклад, «ID власника» додають у таблицю «Тварини».' },
+  { q:'Як реалізувати зв\'язок «багато до багатьох»?', opts:['Записати список у комірку', 'Об\'єднати дві таблиці в одну', 'Створити проміжну таблицю з двома зовнішніми ключами', 'Ніяк'], correct:2 },
+  { q:'Як база даних виглядає в Google Таблицях?', opts:['Одна таблиця на одному аркуші', 'Кожен запис — окремий файл', 'Кожне поле — окремий аркуш', 'Кожна таблиця — окремий аркуш одного файлу'], correct:3 }
+], {summary:'Тепер ти знаєш, як спроєктувати базу даних: від предметної області до зв\'язаних аркушів Google Таблиць.'});
+</script>
+
+</body>
+</html>
