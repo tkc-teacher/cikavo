@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Особливості Google Документів — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в інтерфейсі Google Документів -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --accent:#2E5AAC; --accent-dark:#1F3F7A; --accent-soft:#E6EEFB;
+    --label:#D97706;
+    --bg:#F5F7FC; --line:#DFE5F2;
+    --hud-bar:linear-gradient(90deg,#4285F4,#2E5AAC,#F59E0B);
+    /* інтерфейс Google */
+    --g-blue:#0B57D0; --g-blue-soft:#C2E7FF; --g-ink:#1F1F1F; --g-soft:#444746; --g-line:#DADCE0; --g-bar:#EDF2FA; --g-canvas:#F9FBFD;
+  }
+
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em;}
+  .ms.fill{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;}
+  .mpath{font-family:'Roboto',sans-serif; font-weight:500; font-size:.94em; background:#E9EEF6; border-radius:6px; padding:1px 8px; white-space:nowrap;}
+
+  /* ---------- Крок 1: документ у хмарі ---------- */
+  .where{display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:16px; margin:14px 0;}
+  .where .dev{text-align:center; font-size:12.5px; font-weight:700; color:var(--ink-soft);}
+  .where .dev .ms{font-size:36px; color:var(--g-soft); display:block; margin:0 auto 2px;}
+  .where .cl{text-align:center; font-size:12.5px; font-weight:700; color:var(--accent-dark);}
+  .where .cl img{width:46px; height:46px; display:block; margin:0 auto 2px;}
+  .where .ln{flex:0 0 26px; height:3px; border-radius:2px; background:repeating-linear-gradient(90deg,var(--accent) 0 6px,transparent 6px 10px);}
+  @media (max-width:520px){ .where .ln{display:none;} }
+
+  /* ---------- Макет вікна Google Документа ---------- */
+  .gdoc{position:relative; border:1px solid var(--g-line); border-radius:var(--radius-m); background:var(--g-canvas); font-family:'Roboto',sans-serif; color:var(--g-ink); box-shadow:0 2px 10px rgba(0,0,0,.06);}
+  .gd-head{display:flex; align-items:center; gap:10px; padding:8px 12px 4px;}
+  .gd-head > img{width:26px; height:36px; flex-shrink:0;}
+  .gd-name{flex:1; min-width:0;}
+  .gd-title{display:flex; align-items:center; gap:4px; font-size:17px; white-space:nowrap; overflow:hidden;}
+  .gd-title .nm{margin-right:4px; overflow:hidden; text-overflow:ellipsis;}
+  .gd-menu{display:flex; gap:2px; font-size:13.5px; margin-top:2px; white-space:nowrap; overflow:hidden;}
+  .gd-menu > span{padding:3px 8px;}
+  .gd-right{display:flex; align-items:center; gap:4px; flex-shrink:0;}
+  .hot{border:none; background:none; font:inherit; color:var(--g-soft); cursor:pointer; border-radius:999px; padding:5px; display:inline-flex; align-items:center; justify-content:center; transition:background .15s ease, box-shadow .15s ease;}
+  .hot:hover{background:#E9EEF6;}
+  .hot .ms{font-size:20px;}
+  .gd-right .hot .ms{font-size:22px;}
+  .hot img{width:20px; height:20px; object-fit:contain;}
+  .hot.found{box-shadow:0 0 0 3px var(--ok); background:var(--ok-soft);}
+  .hot.shake{animation:shakeX .35s ease; box-shadow:0 0 0 3px var(--coral);}
+  .share-btn{font-family:'Roboto',sans-serif; font-weight:500; font-size:14px; background:var(--g-blue-soft); color:#001D35; border-radius:999px; padding:9px 18px 9px 14px; display:inline-flex; align-items:center; gap:8px; white-space:nowrap; margin-left:4px;}
+  .share-btn .ms{font-size:18px;}
+  .av{width:30px; height:30px; border-radius:50%; background:#D97706; color:#fff; font-weight:500; font-size:14px; display:flex; align-items:center; justify-content:center; margin-left:6px; flex-shrink:0;}
+  .gd-tools{display:flex; align-items:center; gap:2px; margin:4px 10px 0; padding:4px 8px; background:var(--g-bar); border-radius:999px; overflow:hidden; white-space:nowrap;}
+  .gd-tools .tl{width:28px; height:28px; display:inline-flex; align-items:center; justify-content:center; color:var(--g-soft); flex-shrink:0;}
+  .gd-tools .tl .ms{font-size:19px;}
+  .gd-tools .tx{font-size:13px; color:var(--g-soft); padding:0 8px; flex-shrink:0;}
+  .gd-tools .sep{width:1px; height:20px; background:#C7C7C7; margin:0 4px; flex-shrink:0;}
+  .gdoc-page{background:#fff; margin:14px auto 16px; max-width:500px; min-height:120px; padding:24px 30px; box-shadow:0 1px 3px rgba(60,64,67,.25); font-size:14.5px; line-height:1.55;}
+  .gdoc-page h4{font-family:'Roboto',sans-serif; font-weight:400; font-size:21px; margin:0 0 8px;}
+  .gdoc-page p{margin:0;}
+  .last-edit{font-size:12.5px; color:var(--g-soft); text-decoration:underline; cursor:pointer; border:none; background:none; padding:2px 6px; border-radius:4px; font-family:'Roboto',sans-serif;}
+  @media (max-width:640px){ .gd-tools{display:none;} .share-btn .t{display:none;} .share-btn{padding:8px 10px;} .gdoc-page{padding:18px; margin:12px;} .gd-right .hot{padding:3px;} .gd-menu .opt-s{display:none;} }
+  .tour-task{background:var(--sun-soft); border:2px solid #F59E0B; border-radius:var(--radius-m); padding:10px 14px; margin-bottom:12px; font-weight:700; font-size:15px;}
+  .tour-task .num{display:block; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:#B45309;}
+  .tour-log{list-style:none; padding:0 !important; margin:12px 0 0; font-size:14px;}
+  .tour-log li{display:flex; gap:10px; align-items:center; padding:6px 0; border-top:1px solid var(--line);}
+  .tour-log li:first-child{border-top:none;}
+  .tour-log .ms{color:var(--g-soft); font-size:20px; flex-shrink:0;}
+  .tour-log img{width:20px; height:20px; flex-shrink:0;}
+
+  /* ---------- Крок 3: смарт-чипи ---------- */
+  .plan{width:100%; border-collapse:collapse; font-size:14px; margin-top:6px;}
+  .plan td{border:1px solid #C4C7C5; padding:8px 10px; vertical-align:middle;}
+  .plan td:first-child{width:42%; color:var(--g-soft);}
+  .at{border:1.5px dashed #9AA0A6; background:#F8F9FA; border-radius:999px; padding:3px 12px; font:inherit; font-size:13.5px; color:#5F6368; cursor:pointer;}
+  .at:hover{border-color:var(--g-blue); color:var(--g-blue);}
+  .at.open{border-style:solid; border-color:var(--g-blue); color:var(--g-blue);}
+  .chip{display:inline-flex; align-items:center; gap:6px; background:#E9EEF6; border-radius:999px; padding:3px 10px 3px 4px; font-size:13.5px; font-weight:500; color:var(--g-ink); animation:pop .3s ease;}
+  .chip .ms{font-size:17px; color:var(--g-soft);}
+  .chip img{width:16px; height:16px;}
+  .chip .pa{width:20px; height:20px; border-radius:50%; background:#7B3FD4; color:#fff; font-size:11px; display:flex; align-items:center; justify-content:center;}
+  .chip.dd{background:#FDE293; color:#594300; padding:3px 6px 3px 12px;}
+  .chip.dd .ms{color:#594300;}
+  .chip.plain{padding-left:10px;}
+  @keyframes pop{0%{transform:scale(.6); opacity:0;} 100%{transform:scale(1); opacity:1;}}
+  .chip-legend{display:grid; grid-template-columns:repeat(5,1fr); gap:8px; margin:12px 0;}
+  @media (max-width:680px){ .chip-legend{grid-template-columns:repeat(2,1fr);} }
+  .chip-legend div{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px; font-size:13px; line-height:1.35; color:var(--ink-soft);}
+  .chip-legend b{display:flex; align-items:center; gap:5px; font-family:'Baloo 2',sans-serif; font-size:14.5px; color:var(--ink); margin-bottom:2px;}
+  .chip-legend .ms{color:var(--accent); font-size:19px;}
+
+  /* ---------- Випадне меню (смарт-чипи й меню Документа) ---------- */
+  .mbar{display:flex; flex-wrap:wrap; gap:2px; font-size:14px;}
+  .mbtn{border:none; background:none; font:inherit; color:var(--g-ink); padding:4px 9px; border-radius:4px; cursor:pointer;}
+  .mbtn:hover, .mbtn.open{background:#E1E5EA;}
+  .mdrop{position:absolute; z-index:5; background:#fff; border-radius:8px; box-shadow:0 2px 6px 2px rgba(60,64,67,.15), 0 1px 2px rgba(60,64,67,.3); padding:6px 0; min-width:250px; max-width:calc(100% - 16px); font-family:'Roboto',sans-serif;}
+  .mdrop .mhead{font-size:12px; color:#5F6368; padding:4px 16px 6px; font-weight:500;}
+  .mitem{display:flex; align-items:center; gap:14px; width:100%; border:none; background:none; font:inherit; font-size:14px; color:var(--g-ink); padding:7px 16px; cursor:pointer; text-align:left;}
+  .mitem:hover{background:#F1F3F4;}
+  .mitem .ms{color:var(--g-soft); font-size:20px; flex-shrink:0;}
+  .mitem .lbl{flex:1;}
+  .mitem .kb{font-size:12.5px; color:#5F6368; white-space:nowrap;}
+  .mitem .arr{color:#5F6368; font-size:18px;}
+  .mitem.shake{animation:shakeX .35s ease; background:#FDE6E1;}
+  .mitem.found{background:var(--ok-soft);}
+  .msep{height:1px; background:#E3E3E3; margin:6px 0;}
+
+  /* ---------- Кроки 6–7: анімовані ілюстрації входу (SVG) ---------- */
+  .flow{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:14px; margin:16px 0 8px; box-shadow:0 10px 30px rgba(31,63,122,.07);}
+  .flow-top{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;}
+  .play{display:inline-flex; align-items:center; gap:4px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14.5px; border:none; color:#fff; background:linear-gradient(135deg,#4285F4,#6D5BF5); border-radius:999px; padding:6px 16px 6px 10px; cursor:pointer; box-shadow:0 4px 12px rgba(66,133,244,.3); transition:transform .15s ease, opacity .2s;}
+  .play:hover{transform:translateY(-1px);}
+  .play.evil{background:linear-gradient(135deg,#E8453C,#B3261E); box-shadow:0 4px 12px rgba(217,48,37,.3);}
+  .play:disabled{opacity:.45; cursor:default; transform:none;}
+  .play .ms{font-size:20px;}
+  .flow svg{display:block; width:100%; height:auto;}
+  .flow svg text{font-family:'Roboto',sans-serif;}
+  .scr{opacity:0; transition:opacity .35s ease;}
+  .scr.on{opacity:1;}
+  .fld{fill:#fff; stroke:#A8AEB8; stroke-width:1.2; transition:stroke .2s;}
+  .fld.act{stroke:#0B57D0; stroke-width:2.2;}
+  .fv{font-size:12px; fill:#1F1F1F;}
+  .fv.code{font-size:16px; font-weight:500; letter-spacing:3px;}
+  .s-h{font-size:13px; fill:#1F1F1F;} .s-h.b{font-weight:700;}
+  .s-sub{font-size:10.5px; fill:#5F6368;}
+  .s-err{font-size:10.5px; fill:#D93025; font-weight:500;}
+  .btn-t{font-size:11px; fill:#fff; font-weight:500;}
+  .dev-l{font-size:13px; font-weight:700; fill:#5F6B84; text-anchor:middle; transition:fill .3s;}
+  .dev-l.evil{fill:#C5221F;}
+  .srv-t{font-size:15px; font-weight:700; fill:#fff;}
+  .rec{fill:#F4F7FD; stroke:#D6DEEE; stroke-width:1.5; transition:fill .3s, stroke .3s;}
+  .rec.cmp{fill:#FEF7E0; stroke:#F9AB00;} .rec.ok{fill:#E6F4EA; stroke:#34A853;} .rec.no{fill:#FCE8E6; stroke:#EA4335;}
+  .rec-l{font-size:9.5px; fill:#6B7A99; letter-spacing:.6px;}
+  .rec-v{font-size:12px; fill:#1F2430;} .rec-v.b{font-weight:700;}
+  .lock .shackle{fill:none; stroke:#8A97B4; stroke-width:3.4; stroke-linecap:round; transition:transform .45s cubic-bezier(.3,1.6,.5,1), stroke .3s;}
+  .lock .lbody{fill:#8A97B4; transition:fill .3s;}
+  .lock.chk .lbody{fill:#F9AB00;} .lock.chk .shackle{stroke:#F9AB00;}
+  .lock.open .shackle{transform:translateY(-7px); stroke:#1E8E3E;} .lock.open .lbody{fill:#1E8E3E;}
+  .lock.fail .shackle{stroke:#D93025;} .lock.fail .lbody{fill:#D93025;}
+  .lock.fail{animation:lockShake .45s ease;}
+  @keyframes lockShake{20%{transform:translateX(-4px);} 40%{transform:translateX(4px);} 60%{transform:translateX(-3px);} 80%{transform:translateX(2px);}}
+  .lk-t{font-size:11.5px; font-weight:700; fill:#5F6B84;}
+  .wire{fill:none; stroke:#C3CDE6; stroke-width:2.4; stroke-dasharray:1 7; stroke-linecap:round;}
+  .wire-hi{fill:none; stroke-width:3.5; stroke-linecap:round; opacity:0; transition:opacity .6s ease;}
+  .pkt-t{font-size:12px; font-weight:700; fill:#fff;}
+  .ph-time{font-size:26px; font-weight:300; fill:#fff;}
+  .ph-date{font-size:9px; fill:#fff; opacity:.85;}
+  .notif{opacity:0; transform:translateY(-10px); transition:opacity .35s ease, transform .35s ease;}
+  .notif.on{opacity:1; transform:none;}
+  .n-app{font-size:8.5px; fill:#5F6368;}
+  .n-t{font-size:9.5px; fill:#1F1F1F; font-weight:500;}
+  .n-code{font-size:15px; font-weight:700; fill:#1F1F1F; letter-spacing:1.5px;}
+  .n-code.red{fill:#C5221F; font-size:10px; letter-spacing:0;}
+  .badge-x{font-size:11.5px; font-weight:700; fill:#fff;}
+  .stepper{list-style:none; padding:0 !important; margin:14px 0 0; display:grid; grid-template-columns:repeat(var(--n),1fr);}
+  .stepper li{position:relative; text-align:center; font-size:12.5px; font-weight:700; color:var(--ink-soft); line-height:1.25; padding:0 4px; margin:0 !important; counter-increment:sp;}
+  .stepper li::after{content:''; position:absolute; top:13px; left:calc(-50% + 16px); right:calc(50% + 16px); height:3px; border-radius:2px; background:var(--line); transition:background .3s;}
+  .stepper li:first-child::after{display:none;}
+  .stepper .dot{width:28px; height:28px; margin:0 auto 5px; border-radius:50%; background:#fff; border:2.5px solid var(--line); display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-size:13px; color:var(--ink-soft); transition:all .3s;}
+  .stepper .dot::before{content:counter(sp);}
+  .stepper{counter-reset:sp;}
+  .stepper li.on .dot{border-color:var(--accent); color:var(--accent); box-shadow:0 0 0 5px var(--accent-soft); animation:pulse 1.2s ease infinite;}
+  .stepper li.on{color:var(--ink);}
+  .stepper li.ok .dot{background:#1E8E3E; border-color:#1E8E3E; color:#fff;} .stepper li.ok .dot::before{content:'✓';}
+  .stepper li.ok::after, .stepper li.on::after{background:linear-gradient(90deg,#1E8E3E,var(--accent));}
+  .stepper li.no .dot{background:#D93025; border-color:#D93025; color:#fff;} .stepper li.no .dot::before{content:'✕';}
+  .stepper li.ok, .stepper li.no{color:var(--ink);}
+  @keyframes pulse{50%{box-shadow:0 0 0 9px rgba(46,90,172,.08);}}
+  @media (max-width:520px){ .stepper li{font-size:11px;} }
+  .flow-cap{display:flex; gap:8px; align-items:flex-start; margin-top:12px; background:var(--accent-soft); border-radius:var(--radius-m); padding:10px 14px; font-size:14px; font-weight:700; color:var(--accent-dark); min-height:44px;}
+  .flow-cap .ms{color:var(--accent); flex-shrink:0;}
+  .flow-cap.bad{background:#FCE8E6; color:#A50E0E;} .flow-cap.bad .ms{color:#D93025;}
+  .flow-cap.good{background:#E6F4EA; color:#0D652D;} .flow-cap.good .ms{color:#1E8E3E;}
+  .twofa{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0;}
+  @media (max-width:560px){ .twofa{grid-template-columns:1fr;} }
+  .twofa div{display:flex; gap:12px; align-items:center; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; font-size:14px; line-height:1.4;}
+  .twofa .ms{font-size:30px; color:#fff; background:linear-gradient(135deg,#4285F4,#8B5CF6); border-radius:14px; padding:9px; width:auto; flex-shrink:0;}
+  .twofa b{font-family:'Baloo 2',sans-serif; font-size:16px; display:block;}
+</style>
+</head>
+<body data-lesson="lesson7-google-docs" data-hud="7 клас · Google Документи">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Прикладні програми</div>
+      <h1>Google Документи: більше, ніж текстовий редактор</h1>
+      <p>Документ, який не губиться, смарт-чипи, перекладач, голосове введення — а ще як надійно входити у свій обліковий запис.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: аркуш Google Документа зі знаком «@» -->
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="56" fill="#E6EEFB"/>
+      <path d="M38 24h44l20 20v70a6 6 0 0 1-6 6H38a6 6 0 0 1-6-6V30a6 6 0 0 1 6-6z" fill="#4285F4"/>
+      <path d="M82 24v14a6 6 0 0 0 6 6h14z" fill="#A1C2FA"/>
+      <rect x="44" y="58" width="44" height="5" rx="2.5" fill="#fff"/>
+      <rect x="44" y="70" width="44" height="5" rx="2.5" fill="#fff"/>
+      <rect x="44" y="82" width="26" height="5" rx="2.5" fill="#fff"/>
+      <circle cx="102" cy="100" r="22" fill="#F59E0B"/>
+      <circle cx="102" cy="100" r="6" stroke="#fff" stroke-width="4"/>
+      <path d="M108 94v9a4 4 0 0 0 8 0v-3a14 14 0 1 0-6 11.5" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Хмарні сервіси</div>
+    <h2>Що ти вже знаєш</h2>
+    <p class="soft">Обери термін, а потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Документ, який не губиться</div>
+    <h2>Де живе Google Документ</h2>
+    <p>Google Документ — не файл на твоєму комп’ютері, а документ на <b>Google Диску</b>. Тому:</p>
+    <ul>
+      <li>він відкривається з будь-якого пристрою — у браузері чи в застосунку «Документи»;</li>
+      <li>кожна зміна зберігається сама — кнопки «Зберегти» немає;</li>
+      <li>без інтернету він працює лише тоді, коли заздалегідь увімкнути <span class="mpath">Файл → Зробити доступним офлайн</span>.</li>
+    </ul>
+    <div class="where">
+      <div class="dev"><span class="ms">laptop_chromebook</span>шкільний ноутбук</div><div class="ln"></div>
+      <div class="cl"><img src="images/drive.svg" alt="">Google Диск</div><div class="ln"></div>
+      <div class="dev"><span class="ms">smartphone</span>телефон</div><div class="ln"></div>
+      <div class="dev"><span class="ms">desktop_windows</span>домашній комп’ютер</div>
+    </div>
+    <p class="soft">Правда чи міф?</p>
+    <div class="yn-grid" id="mythList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Вікно Документа</div>
+    <h2>Що ховається біля назви документа</h2>
+    <p>Біля назви документа і праворуч угорі — значки, через які Документ пов’язаний з Google Диском та іншими сервісами. Виконай завдання: клацни потрібний значок.</p>
+    <div class="exercise">
+      <div class="tour-task" id="tourTask"></div>
+      <div class="gdoc" id="tourDoc">
+        <div class="gd-head">
+          <img src="images/docs.svg" alt="">
+          <div class="gd-name">
+            <div class="gd-title"><span class="nm">Проєкт «Карпати»</span><button class="hot" data-k="star"><span class="ms">star</span></button><button class="hot" data-k="move"><span class="ms">drive_file_move</span></button><button class="hot" data-k="cloud"><span class="ms">cloud_done</span></button></div>
+            <div class="gd-menu"><span>Файл</span><span>Редагувати</span><span class="opt-s">Вигляд</span><span class="opt-s">Вставлення</span><span class="opt-s">Формат</span><span>Інструменти</span></div>
+          </div>
+          <div class="gd-right">
+            <button class="hot" data-k="history"><span class="ms">history</span></button>
+            <button class="hot" data-k="comments"><span class="ms">comment</span></button>
+            <button class="hot" data-k="meet"><span class="ms">videocam</span></button>
+            <span class="share-btn"><span class="ms fill">lock</span><span class="t">Надати доступ</span></span>
+            <div class="av">М</div>
+          </div>
+        </div>
+        <div class="gd-tools">
+          <span class="tl"><span class="ms">search</span></span><span class="tl"><span class="ms">undo</span></span><span class="tl"><span class="ms">redo</span></span><span class="tl"><span class="ms">print</span></span><span class="tl"><span class="ms">spellcheck</span></span>
+          <span class="sep"></span><span class="tx">100%</span><span class="sep"></span><span class="tx">Звичайний текст</span><span class="sep"></span><span class="tx">Arial</span><span class="sep"></span>
+          <span class="tl"><span class="ms">format_bold</span></span><span class="tl"><span class="ms">format_italic</span></span><span class="tl"><span class="ms">format_underlined</span></span>
+        </div>
+        <div class="gdoc-page">
+          <h4>Проєкт «Карпати»</h4>
+          <p>Наша команда розповість про найвищу гору України — Говерлу, про карпатські ліси й про те, як поводитися в горах…</p>
+        </div>
+      </div>
+      <ul class="tour-log" id="tourLog"></ul>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Смарт-чипи</div>
+    <h2>Магія символу «@»</h2>
+    <p>Набери в документі <b>@</b> — і з’явиться меню <b>смарт-чипів</b>. Смарт-чип — це «жива» вставка: наведи на неї — і побачиш картку людини, файлу чи події, не виходячи з документа.</p>
+    <div class="chip-legend">
+      <div><b><span class="ms">person</span>Люди</b>ім’я з пошти: видно контакти, можна написати</div>
+      <div><b><span class="ms">description</span>Файли</b>посилання на файл з Диска з попереднім переглядом</div>
+      <div><b><span class="ms">event</span>Події календаря</b>зустріч з Календаря: час і учасники</div>
+      <div><b><span class="ms">calendar_today</span>Дата</b>дата, яку легко змінити в календарику</div>
+      <div><b><span class="ms">arrow_drop_down_circle</span>Розкривний список</b>кольоровий статус на вибір</div>
+    </div>
+    <p class="soft">Заповни план проєкту: клацни на «@», а потім обери вид смарт-чипа, який тут потрібен.</p>
+    <div class="exercise">
+      <div class="gdoc" id="chipDoc">
+        <div class="gd-head"><img src="images/docs.svg" alt=""><div class="gd-name"><div class="gd-title"><span class="nm">План проєкту «Карпати»</span></div></div></div>
+        <div class="gdoc-page" style="max-width:560px;">
+          <h4>План проєкту «Карпати»</h4>
+          <table class="plan" id="planTable"></table>
+        </div>
+      </div>
+      <div class="progress-line" id="chipProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Інструменти в меню</div>
+    <h2>Перекладач, диктування й не тільки</h2>
+    <p>У меню Документа є інструменти, про які багато хто не здогадується. Відкривай пункти меню й шукай потрібну команду.</p>
+    <div class="exercise">
+      <div class="tour-task" id="menuTask"></div>
+      <div class="gdoc" id="mdoc">
+        <div class="gd-head"><img src="images/docs.svg" alt=""><div class="gd-name"><div class="gd-title"><span class="nm">Проєкт «Карпати»</span></div><div class="mbar" id="mbar"></div></div></div>
+        <div class="gdoc-page">
+          <h4>Проєкт «Карпати»</h4>
+          <p>Наша команда розповість про найвищу гору України — Говерлу, про карпатські ліси й про те, як поводитися в горах…</p>
+        </div>
+      </div>
+      <ul class="tour-log" id="menuLog"></ul>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Яка можливість допоможе</div>
+    <h2>Підбери можливість до ситуації</h2>
+    <p class="soft">Обери можливість Google Документів, а потім клацни ситуацію, у якій вона виручить.</p>
+    <div class="exercise">
+      <div class="match-pool" id="sitPool"></div>
+      <div id="sitList"></div>
+      <div class="progress-line" id="sitProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" data-guide>
+    <div class="step-label">Крок 6 · Обліковий запис і авторизація</div>
+    <h2>Як Google упізнає тебе</h2>
+    <p>Усі твої Документи, Диск і Gmail прив’язані до <b>облікового запису</b> Google. Щоб ним користуватися, треба пройти <b>авторизацію</b> — увійти за допомогою логіна (пошти) і пароля.</p>
+    <ul>
+      <li>ти вводиш пошту й пароль;</li>
+      <li>сервер Google порівнює їх із тими, що зберіг під час реєстрації;</li>
+      <li>збіглося — доступ відкрито, ні — відмова.</li>
+    </ul>
+    <div class="flow" id="authFlow">
+      <div class="flow-top">
+        <button class="play" data-run="ok"><span class="ms">play_arrow</span>Правильний пароль</button>
+        <button class="play evil" data-run="bad"><span class="ms">play_arrow</span>Помилка в паролі</button>
+      </div>
+      <div class="flow-svg"></div>
+      <ol class="stepper" style="--n:3"><li><span class="dot"></span>Вводить пошту й пароль</li><li><span class="dot"></span>Сервер порівнює</li><li><span class="dot"></span>Доступ або відмова</li></ol>
+      <div class="flow-cap"><span class="ms">info</span><span class="t">Натисни кнопку, щоб запустити анімацію.</span></div>
+    </div>
+    <div class="trivia">Сервер порівнює <b>кожен символ</b>: <b>Karpaty#2026</b> і <b>karpaty#2026</b> для нього — різні паролі. А от <b>хто саме</b> вводить пароль, він не бачить. Тому пароль бережуть у таємниці.</div>
+  </section>
+
+  <section class="block" data-guide>
+    <div class="step-label">Крок 7 · Двофакторна автентифікація</div>
+    <h2>Два замки замість одного</h2>
+    <p><b>Двофакторна автентифікація</b> — вхід у два кроки: після пароля сервер надсилає код на твій телефон, і без цього коду не пустить.</p>
+    <div class="twofa">
+      <div><span class="ms">password</span><span><b>Те, що ти знаєш</b>пароль</span></div>
+      <div><span class="ms">smartphone</span><span><b>Те, що ти маєш</b>свій телефон</span></div>
+    </div>
+    <div class="flow" id="tfaFlow">
+      <div class="flow-top">
+        <button class="play" data-run="olya"><span class="ms">play_arrow</span>Входить Оля</button>
+        <button class="play evil" data-run="evil"><span class="ms">play_arrow</span>Входить зловмисник з паролем Олі</button>
+      </div>
+      <div class="flow-svg"></div>
+      <ol class="stepper" style="--n:4"><li><span class="dot"></span>Пароль</li><li><span class="dot"></span>Код на телефон</li><li><span class="dot"></span>Введення коду</li><li><span class="dot"></span>Доступ</li></ol>
+      <div class="flow-cap"><span class="ms">info</span><span class="t">Натисни кнопку, щоб запустити анімацію.</span></div>
+    </div>
+    <div class="trivia">Код підтвердження — як ключ від квартири. Справжня служба Google <b>ніколи</b> не просить його продиктувати: хто просить код, той і хоче увійти у твій акаунт.</div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Особливості Google Документів. Обліковий запис: авторизація, двофакторна автентифікація» · 7 клас</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Хмарне сховище', desc:'Місце в інтернеті, де лежать твої файли, доступні з будь-якого пристрою' },
+  { name:'Синхронізація', desc:'Файл, змінений на ноутбуці, за мить оновлюється й на телефоні' },
+  { name:'Резервна копія', desc:'Запасний примірник файлів на випадок, якщо пристрій зламається' },
+  { name:'Читач', desc:'Рівень доступу: можна лише переглядати файл' },
+  { name:'Коментатор', desc:'Рівень доступу: можна залишати примітки, але не змінювати текст' },
+  { name:'Редактор', desc:'Рівень доступу: можна змінювати вміст файлу' },
+  { name:'Посилання на файл', desc:'Спосіб поділитися великим файлом, не надсилаючи сам файл' },
+  { name:'Інтеграція сервісів', desc:'Сервіси працюють разом: з листа Gmail вкладення одразу потрапляє на Диск' }
+], 'recapProgress');
+
+/* ---------- ВИПАДНЕ МЕНЮ (спільне для кроків 3 і 4) ----------
+   items: '-' — роздільник, {head} — підпис, [іконка, назва, праворуч ('▸' чи клавіші), ключ] */
+let curDrop = null;
+function closeDrop(){ curDrop?.el.remove(); curDrop?.btn.classList.remove('open'); curDrop = null; }
+document.addEventListener('click', closeDrop);
+function openDrop(host, btn, items, onPick){
+  closeDrop();
+  const el = document.createElement('div');
+  el.className = 'mdrop';
+  items.forEach(it=>{
+    if(it === '-'){ el.insertAdjacentHTML('beforeend', '<div class="msep"></div>'); return; }
+    if(it.head){ el.insertAdjacentHTML('beforeend', `<div class="mhead">${it.head}</div>`); return; }
+    const [ico, lbl, extra = '', key = ''] = it;
+    const b = document.createElement('button');
+    b.className = 'mitem';
+    b.innerHTML = `<span class="ms">${ico}</span><span class="lbl">${lbl}</span>` + (extra === '▸' ? '<span class="ms arr">arrow_right</span>' : extra ? `<span class="kb">${extra}</span>` : '');
+    b.addEventListener('click', e=>{
+      e.stopPropagation();
+      if(onPick(key, b)) setTimeout(closeDrop, 400);
+      else { b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake'); setTimeout(()=>b.classList.remove('shake'), 400); }
+    });
+    el.appendChild(b);
+  });
+  host.appendChild(el);
+  btn.classList.add('open');
+  curDrop = { el, btn };
+  const r = btn.getBoundingClientRect(), h = host.getBoundingClientRect();
+  el.style.left = Math.max(8, Math.min(r.left - h.left, h.width - el.offsetWidth - 8)) + 'px';
+  el.style.top = (r.bottom - h.top + 4) + 'px';
+}
+
+/* ---------- КРОК 1 ---------- */
+makeYesNo('mythList', [
+  { text:'Щоб нічого не загубити, треба частіше натискати «Зберегти»', correct:false, why:'Такої кнопки немає: кожна зміна зберігається сама.' },
+  { text:'Документ, створений на ноутбуці, можна дописати з телефона', correct:true },
+  { text:'Якщо раптом вимкнеться світло, весь текст пропаде', correct:false, why:'Усе, що встигло зберегтися на Диску, на місці.' },
+  { text:'Без інтернету Документи не працюють ніколи', correct:false, why:'Працюють, якщо заздалегідь увімкнути офлайн-доступ.' },
+  { text:'Google Документ можна завантажити як файл для Word', correct:true, why:'Файл → Завантажити → Microsoft Word (.docx).' },
+  { text:'Щоб відкрити Документ на чужому комп’ютері, треба встановити програму', correct:false, why:'Досить браузера й твого акаунта Google.' }
+], 'Правда', 'Міф');
+
+/* ---------- КРОК 2: ЗНАЧКИ ВІКНА ---------- */
+(function(){
+  const TASKS = [
+    { k:'cloud',    task:'Перед тим як закрити ноутбук, переконайся, що останні зміни не загубляться.', ico:'<span class="ms">cloud_done</span>', done:'Хмаринка з галочкою — усе збережено на Диску' },
+    { k:'move',     task:'Перенеси документ у папку «Географія» на Диску.', ico:'<span class="ms">drive_file_move</span>', done:'Папка зі стрілкою — розташування документа на Диску' },
+    { k:'history',  task:'Учора ввечері хтось дописав абзац. Дізнайся, хто це був.', ico:'<span class="ms">history</span>', done:'Годинник зі стрілкою — останні зміни: хто й коли редагував' },
+    { k:'star',     task:'Цей документ знадобиться ще не раз. Зроби так, щоб він завжди був під рукою серед важливих на Диску.', ico:'<span class="ms">star</span>', done:'Зірочка — документ потрапляє в розділ «Із зірочкою» на Диску' },
+    { k:'meet',     task:'Обговори план зі співавторами, бачачи одне одного, — і не виходь з документа.', ico:'<span class="ms">videocam</span>', done:'Камера — відеозустріч Google Meet просто з документа' }
+  ];
+  const doc = document.getElementById('tourDoc');
+  const taskEl = document.getElementById('tourTask');
+  const log = document.getElementById('tourLog');
+  const hit = trackTask(doc, TASKS.length, TASKS.length + 2);
+  let i = 0;
+  function show(){
+    taskEl.innerHTML = i < TASKS.length
+      ? `<span class="num">Завдання ${i+1} з ${TASKS.length}</span>${TASKS[i].task}`
+      : `<span class="num">Готово!</span>Ти знаєш, що означають значки біля назви документа 🎉`;
+  }
+  doc.querySelectorAll('.hot').forEach(b=>{
+    b.addEventListener('click', ()=>{
+      if(i >= TASKS.length) return;
+      if(b.dataset.k === TASKS[i].k){
+        b.classList.add('found');
+        log.insertAdjacentHTML('beforeend', `<li>${TASKS[i].ico}${TASKS[i].done}</li>`);
+        i++; addNeurons(1); hit();
+        if(i === TASKS.length) addNeurons(2);
+        show();
+      } else {
+        b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake');
+        setTimeout(()=>b.classList.remove('shake'), 400);
+      }
+    });
+  });
+  show();
+})();
+
+/* ---------- КРОК 3: СМАРТ-ЧИПИ ---------- */
+(function(){
+  const KINDS = [
+    { head:'Смарт-чипи' },
+    ['person', 'Люди', '', 'people'],
+    ['description', 'Файли', '', 'files'],
+    ['event', 'Події календаря', '', 'event'],
+    ['calendar_today', 'Дата', '', 'date'],
+    ['arrow_drop_down_circle', 'Розкривний список', '', 'dropdown']
+  ];
+  const ROWS = [
+    { label:'Хто шукає фото Говерли', k:'people',   chip:'<span class="chip"><span class="pa">О</span>Оля Коваль</span>' },
+    { label:'Коли здаємо вчительці',  k:'date',     chip:'<span class="chip plain">20 лист. 2026 р.</span>' },
+    { label:'Наші слайди',            k:'files',    chip:'<span class="chip"><img src="images/drive.svg" alt="">Карпати — слайди</span>' },
+    { label:'Що з текстом зараз',     k:'dropdown', chip:'<span class="chip dd">В роботі<span class="ms">arrow_drop_down</span></span>' },
+    { label:'Репетиція виступу',      k:'event',    chip:'<span class="chip"><span class="ms">event</span>Репетиція · четвер, 15:00</span>' }
+  ];
+  const host = document.getElementById('chipDoc');
+  const table = document.getElementById('planTable');
+  const progress = document.getElementById('chipProgress');
+  const hit = trackTask(host, ROWS.length, ROWS.length + 2);
+  let done = 0;
+  ROWS.forEach(r=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${r.label}</td><td><button class="at">@ …</button></td>`;
+    const at = tr.querySelector('.at');
+    at.addEventListener('click', e=>{
+      e.stopPropagation();
+      if(curDrop?.btn === at){ closeDrop(); return; }
+      openDrop(host, at, KINDS, key=>{
+        if(key !== r.k) return false;
+        at.parentNode.innerHTML = r.chip;
+        addNeurons(1); hit();
+        progress.textContent = `Вставлено смарт-чипів: ${++done} з ${ROWS.length}`;
+        if(done === ROWS.length){ addNeurons(2); progress.textContent += ' — план готовий! 🎉'; }
+        return true;
+      });
+    });
+    table.appendChild(tr);
+  });
+  progress.textContent = `Вставлено смарт-чипів: 0 з ${ROWS.length}`;
+})();
+
+/* ---------- КРОК 4: МЕНЮ ДОКУМЕНТА ---------- */
+(function(){
+  const MENUS = {
+    'Файл': [['note_add','Створити','▸'],['folder_open','Відкрити','Ctrl+O'],['file_copy','Створити копію'],'-',['person_add','Надати доступ','▸'],['mail','Електронна пошта','▸','email'],['download','Завантажити','▸','download'],'-',['drive_file_rename_outline','Перейменувати'],['drive_file_move','Перемістити'],['delete','Видалити'],'-',['history','Історія версій','▸'],['offline_pin','Зробити доступним офлайн'],'-',['print','Друк','Ctrl+P']],
+    'Редагувати': [['undo','Скасувати','Ctrl+Z'],['redo','Повторити','Ctrl+Y'],'-',['content_cut','Вирізати','Ctrl+X'],['content_copy','Копіювати','Ctrl+C'],['content_paste','Вставити','Ctrl+V'],'-',['select_all','Вибрати все','Ctrl+A'],['find_replace','Знайти й замінити','Ctrl+H','find']],
+    'Вигляд': [['edit','Режим','▸'],['straighten','Показати лінійку'],['toc','Показати контур документа'],['fullscreen','На весь екран']],
+    'Вставлення': [['image','Зображення','▸'],['table','Таблиця','▸'],['insert_chart','Діаграма','▸'],['horizontal_rule','Горизонтальна лінія'],['mood','Емодзі'],['smart_button','Смарт-чипи','▸'],'-',['link','Посилання','Ctrl+K'],['add_comment','Коментар','Ctrl+Alt+M']],
+    'Формат': [['format_size','Текст','▸'],['title','Стилі абзацу','▸'],['format_align_left','Вирівнювання й відступи','▸'],['format_line_spacing','Міжрядковий інтервал','▸'],['view_column','Колонки','▸'],['format_list_bulleted','Маркери й нумерація','▸']],
+    'Інструменти': [['spellcheck','Правопис і граматика','▸'],['123','Статистика','Ctrl+Shift+C','count'],'-',['translate','Перекласти документ','','translate'],['mic','Голосове введення','Ctrl+Shift+S','voice'],'-',['settings','Налаштування']]
+  };
+  const TASKS = [
+    { k:'translate', task:'У проєкті бере участь школа з Польщі. Зроби англійську версію всього документа.', path:'Інструменти → Перекласти документ', ico:'translate' },
+    { k:'voice',     task:'Пальці втомились друкувати. Зроби так, щоб текст писався сам, поки ти розповідаєш.', path:'Інструменти → Голосове введення', ico:'mic' },
+    { k:'count',     task:'Текст має бути не довшим за 300 слів. Скільки їх уже?', path:'Інструменти → Статистика', ico:'123' },
+    { k:'find',      task:'Де в довгому тексті згадується «Говерла»? Переглянь усі такі місця по черзі.', path:'Редагувати → Знайти й замінити', ico:'find_replace' },
+    { k:'email',     task:'Відправ документ учительці листом, не відкриваючи Gmail.', path:'Файл → Електронна пошта', ico:'mail' },
+    { k:'download',  task:'У однокласника вдома лише Word і немає інтернету. Підготуй для нього файл .docx.', path:'Файл → Завантажити → Microsoft Word', ico:'download' }
+  ];
+  const host = document.getElementById('mdoc');
+  const bar = document.getElementById('mbar');
+  const taskEl = document.getElementById('menuTask');
+  const log = document.getElementById('menuLog');
+  const hit = trackTask(host, TASKS.length, TASKS.length + 2);
+  let i = 0;
+  function show(){
+    taskEl.innerHTML = i < TASKS.length
+      ? `<span class="num">Завдання ${i+1} з ${TASKS.length}</span>${TASKS[i].task}`
+      : `<span class="num">Готово!</span>Тепер ти знаєш, де шукати приховані інструменти Документів 🎉`;
+  }
+  Object.keys(MENUS).forEach(name=>{
+    const b = document.createElement('button');
+    b.className = 'mbtn';
+    b.textContent = name;
+    b.addEventListener('click', e=>{
+      e.stopPropagation();
+      if(curDrop?.btn === b){ closeDrop(); return; }
+      openDrop(host, b, MENUS[name], key=>{
+        if(i >= TASKS.length || key !== TASKS[i].k) return false;
+        log.insertAdjacentHTML('beforeend', `<li><span class="ms">${TASKS[i].ico}</span><span class="mpath">${TASKS[i].path}</span></li>`);
+        i++; addNeurons(1); hit();
+        if(i === TASKS.length) addNeurons(2);
+        show();
+        return true;
+      });
+    });
+    bar.appendChild(b);
+  });
+  show();
+})();
+
+/* ---------- КРОК 5 ---------- */
+makeMatching('sitPool', 'sitList', [
+  { name:'Голосове введення', desc:'Зламав праву руку, а доповідь писати треба' },
+  { name:'Перекласти документ', desc:'Учасник проєкту з Німеччини не знає української' },
+  { name:'Офлайн-доступ', desc:'Їдеш на вихідні в село, де немає зв’язку' },
+  { name:'Смарт-чип «Люди»', desc:'Треба показати в плані, хто за що відповідає, і швидко їм написати' },
+  { name:'Google Meet з документа', desc:'Обговорити план разом і бачити одне одного, хоча всі вдома' },
+  { name:'Статистика', desc:'Учитель просить твір не коротший за 150 слів' },
+  { name:'Завантажити як .docx', desc:'Документ треба відкрити в Word без інтернету' }
+], 'sitProgress');
+
+/* ---------- КРОКИ 6–7: АНІМОВАНІ ІЛЮСТРАЦІЇ ВХОДУ ----------
+   Уся сцена — один SVG із viewBox, тож вона пропорційно масштабується на будь-якому екрані. */
+const wait = ms => new Promise(r=>setTimeout(r, ms));
+const SVG = {
+  defs:(p, w, h)=>`<defs>
+    <linearGradient id="${p}bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EEF3FF"/><stop offset="1" stop-color="#F5EFFF"/></linearGradient>
+    <pattern id="${p}dots" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.2" fill="#C9D3EE"/></pattern>
+    <linearGradient id="${p}brand" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4285F4"/><stop offset="1" stop-color="#8B5CF6"/></linearGradient>
+    <linearGradient id="${p}scr" x1="0" y1="0" x2="0.6" y2="1"><stop offset="0" stop-color="#5B6CF6"/><stop offset="1" stop-color="#B05CF6"/></linearGradient>
+    <filter id="${p}sh" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="8" stdDeviation="9" flood-color="#1F3F7A" flood-opacity=".18"/></filter>
+    <filter id="${p}glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="7"/></filter>
+  </defs>
+  <rect width="${w}" height="${h}" rx="22" fill="url(#${p}bg)"/><rect width="${w}" height="${h}" rx="22" fill="url(#${p}dots)" opacity=".75"/>`,
+  laptop:(p, x, y, label)=>`<text id="${p}lapL" class="dev-l" x="${x+120}" y="${y-12}">${label}</text>
+  <g transform="translate(${x} ${y})">
+    <g filter="url(#${p}sh)">
+      <rect width="240" height="172" rx="14" fill="#1E2330"/>
+      <path d="M-16 172h272l-10 13a7 7 0 0 1-5.5 2.6H-10.5A7 7 0 0 1-16 185z" fill="#CBD2DF"/>
+    </g>
+    <rect x="98" y="172" width="44" height="4" rx="2" fill="#A9B1C2"/>
+    <circle cx="120" cy="7" r="2" fill="#4B5263"/>
+    <rect x="9" y="13" width="222" height="150" rx="6" fill="#fff"/>
+    <g id="${p}sLogin" class="scr on">
+      <text x="22" y="38" font-size="16" font-weight="500"><tspan fill="#4285F4">G</tspan><tspan fill="#EA4335">o</tspan><tspan fill="#FBBC04">o</tspan><tspan fill="#4285F4">g</tspan><tspan fill="#34A853">l</tspan><tspan fill="#EA4335">e</tspan></text>
+      <text x="22" y="57" class="s-h">Вхід</text>
+      <rect id="${p}f1" class="fld" x="20" y="66" width="200" height="26" rx="6"/><text id="${p}email" class="fv" x="29" y="83"></text>
+      <rect id="${p}f2" class="fld" x="20" y="99" width="200" height="26" rx="6"/><text id="${p}pass" class="fv" x="29" y="116"></text>
+      <text id="${p}err" class="s-err" x="21" y="147"></text>
+      <rect x="164" y="134" width="56" height="22" rx="11" fill="#0B57D0"/><text x="192" y="149" text-anchor="middle" class="btn-t">Далі</text>
+    </g>
+    <g id="${p}sCode" class="scr">
+      <text x="22" y="40" class="s-h b">Підтвердьте, що це ви</text>
+      <text x="22" y="58" class="s-sub">Код надіслано на телефон ••• 47</text>
+      <rect id="${p}f3" class="fld" x="20" y="70" width="200" height="32" rx="6"/><text id="${p}code" class="fv code" x="30" y="92"></text>
+      <rect x="164" y="134" width="56" height="22" rx="11" fill="#0B57D0"/><text x="192" y="149" text-anchor="middle" class="btn-t">Далі</text>
+    </g>
+    <g id="${p}sDone" class="scr">
+      <circle cx="120" cy="62" r="24" fill="#D97706"/><text x="120" y="70" text-anchor="middle" font-size="22" font-weight="500" fill="#fff">О</text>
+      <circle cx="139" cy="44" r="10" fill="#1E8E3E" stroke="#fff" stroke-width="2.5"/><path d="M134 44l3.5 3.5 6-7" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="120" y="112" text-anchor="middle" class="s-h b">Вітаємо, Оля!</text>
+      <text x="120" y="130" text-anchor="middle" class="s-sub">Відкриваю Google Документи…</text>
+    </g>
+    <g id="${p}sBlock" class="scr">
+      <circle cx="120" cy="60" r="26" fill="#FCE8E6"/>
+      <path d="M112 60v-6a8 8 0 0 1 16 0v6" fill="none" stroke="#D93025" stroke-width="3.4" stroke-linecap="round"/><rect x="107" y="58" width="26" height="20" rx="5" fill="#D93025"/>
+      <text x="120" y="112" text-anchor="middle" class="s-h b" fill="#C5221F">Вхід заблоковано</text>
+      <text x="120" y="130" text-anchor="middle" class="s-sub">Не вдалося підтвердити, що це ви</text>
+    </g>
+  </g>`,
+  lock:(p, id, x, y, label)=>`<g transform="translate(${x} ${y})"><g id="${p}${id}" class="lock">
+    <path class="shackle" d="M9 15v-5a7.5 7.5 0 0 1 15 0v5"/>
+    <rect class="lbody" x="3" y="14" width="27" height="21" rx="6"/>
+    <circle cx="16.5" cy="23" r="2.6" fill="#fff"/><rect x="15.5" y="24" width="2" height="5" rx="1" fill="#fff"/>
+  </g><text x="37" y="30" class="lk-t">${label}</text></g>`,
+  server:(p, x, y, h, locks)=>`<g transform="translate(${x} ${y})">
+    <rect width="216" height="${h}" rx="20" fill="#fff" filter="url(#${p}sh)"/>
+    <path d="M0 20a20 20 0 0 1 20-20h176a20 20 0 0 1 20 20v34H0z" fill="url(#${p}brand)"/>
+    <path transform="translate(16 15) scale(1.05)" d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z" fill="#fff"/>
+    <text x="52" y="33" class="srv-t">Сервер Google</text>
+    <rect id="${p}rec" class="rec" x="14" y="66" width="188" height="58" rx="10"/>
+    <text x="26" y="83" class="rec-l">ЗБЕРЕЖЕНО</text>
+    <text x="26" y="100" class="rec-v">olya.koval@gmail.com</text>
+    <text x="26" y="116" class="rec-v b">🔑 Karpaty#2026</text>
+    ${locks}
+  </g>`,
+  phone:(p, x, y)=>`<text id="${p}phL" class="dev-l" x="${x+55}" y="${y+198}">телефон Олі</text>
+  <g transform="translate(${x} ${y})">
+    <rect width="110" height="176" rx="20" fill="#1E2330" filter="url(#${p}sh)"/>
+    <rect x="6" y="6" width="98" height="164" rx="15" fill="url(#${p}scr)"/>
+    <rect x="42" y="11" width="26" height="6" rx="3" fill="#1E2330"/>
+    <text x="55" y="50" text-anchor="middle" class="ph-time">15:42</text>
+    <text x="55" y="64" text-anchor="middle" class="ph-date">четвер, 14 жовтня</text>
+    <g id="${p}notif" class="notif">
+      <rect x="11" y="76" width="88" height="70" rx="11" fill="#fff" fill-opacity=".97"/>
+      <text x="19" y="91" class="n-app">Google · зараз</text>
+      <text id="${p}n1" x="19" y="106" class="n-t"></text>
+      <text id="${p}n2" x="19" y="119" class="n-t"></text>
+      <text id="${p}n3" x="19" y="137" class="n-code"></text>
+    </g>
+  </g>`,
+  wire:(p, id, d, color)=>`<path class="wire" d="${d}"/><path id="${p}${id}Hi" class="wire-hi" d="${d}" stroke="${color}"/><path id="${p}${id}" d="${d}" fill="none" stroke="none"/>`
+};
+
+function makeScene(root, p, w, h, body){
+  const box = root.querySelector('.flow-svg');
+  box.innerHTML = `<svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Анімована схема входу в обліковий запис">${SVG.defs(p, w, h)}${body}<g id="${p}fx"></g></svg>`;
+  const svg = box.firstChild;
+  const $ = id => svg.getElementById(p + id);
+  const capEl = root.querySelector('.flow-cap'), capT = capEl.querySelector('.t'), capI = capEl.querySelector('.ms');
+  const steps = [...root.querySelectorAll('.stepper li')];
+  const k = {
+    $, svg,
+    cap(text, mood = ''){ capT.textContent = text; capEl.className = 'flow-cap ' + mood; capI.textContent = mood === 'good' ? 'check_circle' : mood === 'bad' ? 'gpp_bad' : 'info'; },
+    step(i, cls = 'on'){ steps[i].className = cls; },
+    screen(name){ ['sLogin','sCode','sDone','sBlock'].forEach(n=>$(n)?.classList.toggle('on', n === name)); },
+    async type(id, text, speed = 38){ const el = $(id); el.textContent = ''; for(const ch of text){ el.textContent += ch; await wait(speed); } },
+    async field(f, id, text, speed){ $(f).classList.add('act'); await k.type(id, text, speed); await wait(150); $(f).classList.remove('act'); },
+    async fly(id, label, color, dur = 1150){
+      const path = $(id), hi = $(id + 'Hi'), len = path.getTotalLength();
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+      const wPill = 20 + [...label].length * 7.3;
+      g.innerHTML = `<circle r="20" fill="${color}" opacity=".45" filter="url(#${p}glow)"/><rect x="${-wPill/2}" y="-13" width="${wPill}" height="26" rx="13" fill="${color}"/><text class="pkt-t" text-anchor="middle" y="4.5">${label}</text>`;
+      $('fx').appendChild(g);
+      hi.style.transition = 'none'; hi.style.opacity = 1;
+      const t0 = Date.now();
+      await new Promise(res=>{
+        (function tick(){
+          const t = Math.min(1, (Date.now() - t0) / dur), e = t < .5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
+          const pt = path.getPointAtLength(len * e);
+          g.setAttribute('transform', `translate(${pt.x} ${pt.y})`);
+          hi.setAttribute('stroke-dasharray', `${len * e} ${len}`);
+          t < 1 ? setTimeout(tick, 16) : res();
+        })();
+      });
+      g.remove();
+      hi.style.transition = ''; hi.style.opacity = 0;
+    },
+    badge(id, text){
+      const path = $(id), pt = path.getPointAtLength(path.getTotalLength() / 2);
+      const wB = 22 + [...text].length * 6.6;
+      $('fx').insertAdjacentHTML('beforeend', `<g transform="translate(${pt.x} ${pt.y})"><rect x="${-wB/2}" y="-14" width="${wB}" height="28" rx="14" fill="#D93025"/><text class="badge-x" text-anchor="middle" y="4">${text}</text></g>`);
+    },
+    reset(){
+      $('fx').innerHTML = '';
+      ['email','pass','code','err','n1','n2','n3'].forEach(id=>{ if($(id)) $(id).textContent = ''; });
+      $('rec').setAttribute('class', 'rec');
+      svg.querySelectorAll('.lock').forEach(l=>l.setAttribute('class', 'lock'));
+      $('notif')?.classList.remove('on');
+      steps.forEach(x=>x.className = '');
+      k.screen('sLogin');
+    }
+  };
+  return k;
+}
+function bindFlow(root, runs, first){
+  const btns = root.querySelectorAll('.play');
+  let busy = false;
+  async function go(name){
+    if(busy) return; busy = true;
+    btns.forEach(x=>x.disabled = true);
+    try{ await runs[name](); } finally { busy = false; btns.forEach(x=>x.disabled = false); }
+  }
+  btns.forEach(b=>b.addEventListener('click', ()=>go(b.dataset.run)));
+  // перший показ — автоматично, коли схема з'являється на екрані
+  if('IntersectionObserver' in window){
+    const io = new IntersectionObserver(es=>{ if(es[0].isIntersecting){ io.disconnect(); go(first); } }, {threshold:.6});
+    io.observe(root.querySelector('.flow-svg'));
+  }
+}
+
+/* --- Крок 6: авторизація --- */
+(function(){
+  const root = document.getElementById('authFlow');
+  const k = makeScene(root, 'a', 640, 300,
+    SVG.wire('a', 'req', 'M270 112C320 50 360 50 400 112', '#4F6BED') +
+    SVG.wire('a', 'res', 'M400 196C360 256 320 256 270 196', '#1E8E3E') +
+    SVG.wire('a', 'resNo', 'M400 196C360 256 320 256 270 196', '#D93025') +
+    SVG.laptop('a', 24, 64, 'ноутбук Олі') +
+    SVG.server('a', 400, 56, 196, SVG.lock('a', 'lock', 14, 140, 'Пароль'))
+  );
+  async function run(ok){
+    k.reset();
+    k.step(0); k.cap('Оля вводить пошту й пароль…');
+    await k.field('f1', 'email', 'olya.koval@gmail.com');
+    await k.field('f2', 'pass', '•'.repeat(12), 60);
+    if(!ok){ k.cap('Оля поспішала й набрала karpaty#2026 — з малої літери.'); await wait(1200); }
+    k.step(0, 'ok'); k.step(1); k.cap('Пошта й пароль летять на сервер Google…');
+    await k.fly('req', '🔑 пароль', '#4F6BED');
+    k.$('rec').setAttribute('class', 'rec cmp'); k.$('lock').setAttribute('class', 'lock chk');
+    k.cap('Сервер порівнює кожен символ зі збереженим…');
+    await wait(1300);
+    k.$('rec').setAttribute('class', 'rec ' + (ok ? 'ok' : 'no'));
+    k.$('lock').setAttribute('class', 'lock ' + (ok ? 'open' : 'fail'));
+    k.step(1, ok ? 'ok' : 'no'); k.step(2);
+    await wait(500);
+    if(ok){
+      await k.fly('res', '✓ доступ', '#1E8E3E');
+      k.screen('sDone'); k.step(2, 'ok');
+      k.cap('Усе збіглося — Оля в акаунті.', 'good');
+    } else {
+      await k.fly('resNo', '✕ відмова', '#D93025');
+      k.$('err').textContent = 'Неправильний пароль'; k.step(2, 'no');
+      k.cap('Пароль не збігся — сервер відмовив. Велика й мала літери для нього різні.', 'bad');
+    }
+  }
+  bindFlow(root, { ok:()=>run(true), bad:()=>run(false) }, 'ok');
+})();
+
+/* --- Крок 7: двофакторна автентифікація --- */
+(function(){
+  const root = document.getElementById('tfaFlow');
+  const k = makeScene(root, 't', 640, 470,
+    SVG.wire('t', 'req', 'M270 104C320 44 360 44 400 104', '#4F6BED') +
+    SVG.wire('t', 'res', 'M400 190C360 246 320 246 270 190', '#1E8E3E') +
+    SVG.wire('t', 'resNo', 'M400 190C360 246 320 246 270 190', '#D93025') +
+    SVG.wire('t', 'sms', 'M508 272C508 316 462 346 396 350', '#D97706') +
+    SVG.wire('t', 'read', 'M276 366C206 372 150 332 144 254', '#D97706') +
+    SVG.laptop('t', 24, 56, 'ноутбук Олі') +
+    SVG.server('t', 400, 40, 230, SVG.lock('t', 'lock1', 14, 138, 'Пароль') + SVG.lock('t', 'lock2', 14, 182, 'Код з телефона')) +
+    SVG.phone('t', 282, 266)
+  );
+  async function run(evil){
+    k.reset();
+    k.$('lapL').textContent = evil ? 'комп’ютер зловмисника · Одеса' : 'ноутбук Олі';
+    k.$('lapL').classList.toggle('evil', evil);
+    k.$('phL').textContent = evil ? 'телефон Олі · Київ' : 'телефон Олі';
+    k.step(0);
+    k.cap(evil ? 'Зловмисник якось дізнався пароль Олі й вводить його…' : 'Оля вводить пошту й пароль…', evil ? 'bad' : '');
+    await k.field('f1', 'email', 'olya.koval@gmail.com');
+    await k.field('f2', 'pass', '•'.repeat(12), 60);
+    await k.fly('req', '🔑 пароль', '#4F6BED');
+    k.$('rec').setAttribute('class', 'rec cmp'); k.$('lock1').setAttribute('class', 'lock chk');
+    await wait(900);
+    k.$('rec').setAttribute('class', 'rec ok'); k.$('lock1').setAttribute('class', 'lock open');
+    k.step(0, 'ok'); k.step(1);
+    k.cap('Пароль правильний — перший замок відчинено. Але є другий: сервер надсилає код на телефон Олі.');
+    await wait(900);
+    k.$('lock2').setAttribute('class', 'lock chk');
+    await k.fly('sms', '📩 код', '#D97706');
+    k.$('n1').textContent = evil ? 'Хтось входить' : 'Код для входу:';
+    k.$('n2').textContent = evil ? 'з Одеси. Це ви?' : '';
+    k.$('n3').textContent = '482 915';
+    k.$('notif').classList.add('on');
+    k.screen('sCode');
+    k.step(1, 'ok'); k.step(2);
+    if(!evil){
+      k.cap('Оля дивиться на свій телефон і вводить код.');
+      await wait(700);
+      await k.fly('read', '👀 482 915', '#D97706');
+      await k.field('f3', 'code', '482915', 110);
+      await k.fly('req', '📩 482915', '#4F6BED');
+      await wait(500);
+      k.$('lock2').setAttribute('class', 'lock open');
+      k.step(2, 'ok'); k.step(3);
+      await wait(500);
+      await k.fly('res', '✓ доступ', '#1E8E3E');
+      k.screen('sDone'); k.step(3, 'ok');
+      k.cap('Обидва замки відчинено: пароль + телефон. Оля в акаунті.', 'good');
+    } else {
+      k.cap('Код прийшов на телефон Олі в Києві. У зловмисника його немає…', 'bad');
+      k.$('f3').classList.add('act');
+      for(let n = 0; n < 6; n++){ k.$('code').textContent = n % 2 ? '' : '_'; await wait(380); }
+      k.$('f3').classList.remove('act');
+      k.badge('read', '✕ коду немає');
+      k.$('lock2').setAttribute('class', 'lock fail'); k.$('rec').setAttribute('class', 'rec no');
+      k.step(2, 'no'); k.step(3);
+      await wait(700);
+      await k.fly('resNo', '✕ заблоковано', '#D93025');
+      k.screen('sBlock'); k.step(3, 'no');
+      k.$('n1').textContent = 'Підозрілий вхід';
+      k.$('n2').textContent = 'заблоковано.';
+      k.$('n3').textContent = 'Змініть пароль!'; k.$('n3').setAttribute('class', 'n-code red');
+      k.cap('Пароль украли — але другий замок не пустив. Олі варто змінити пароль.', 'bad');
+    }
+  }
+  const resetN3 = ()=>k.$('n3').setAttribute('class', 'n-code');
+  bindFlow(root, { olya:()=>{ resetN3(); return run(false); }, evil:()=>{ resetN3(); return run(true); } }, 'olya');
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Де зберігаються Google Документи?', opts:['На Google Диску', 'Лише на комп’ютері, де їх створили', 'На флешці'], correct:0 },
+  { q:'Що означає хмаринка з галочкою біля назви документа?', opts:['Документ видалено', 'Усі зміни збережено на Диску', 'Документ доступний усім'], correct:1 },
+  { q:'Як працювати в Документах без інтернету?', opts:['Ніяк', 'Заздалегідь увімкнути «Зробити доступним офлайн»', 'Частіше натискати «Зберегти»'], correct:1 },
+  { q:'Що відбувається, якщо в документі набрати «@»?', opts:['Відкривається Gmail', 'З’являється меню смарт-чипів', 'Текст стає посиланням'], correct:1 },
+  { q:'Який смарт-чип вставити, щоб показати статус «Готово / В роботі»?', opts:['Дата', 'Розкривний список', 'Люди'], correct:1 },
+  { q:'Де знайти перекладач усього документа?', opts:['Інструменти → Перекласти документ', 'Формат → Текст', 'Вставлення → Емодзі'], correct:0 },
+  { q:'Як дізнатися, скільки слів у документі?', opts:['Порахувати вручну', 'Інструменти → Статистика', 'Файл → Друк'], correct:1 },
+  { q:'Що відкриває значок камери вгорі праворуч у вікні Документа?', opts:['Камеру для фото', 'Відеозустріч Google Meet', 'Вставлення відео'], correct:1 },
+  { q:'Однокласник має лише Word без інтернету. Що зробити з Документом?', opts:['Надіслати посилання', 'Завантажити як файл .docx', 'Нічого не вийде'], correct:1 }
+], {summary:'Тепер ти знаєш, де живе Google Документ, як користуватися смарт-чипами, де шукати приховані інструменти і як захистити свій обліковий запис.'});
+</script>
+
+</body>
+</html>
