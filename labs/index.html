@@ -49,6 +49,7 @@
   .badge.kind-game{background:#FFE9F2; color:#C2185B;}
   .badge.kind-crossword{background:#FFF4D6; color:#8A6200;}
   .badge.kind-exercise{background:#E3F7F6; color:var(--teal-dark);}
+  .badge.kind-creative{background:#EDE9FF; color:var(--purple-dark);}
 
   .empty{text-align:center; background:var(--surface); border:2px dashed var(--line); border-radius:var(--radius-l); padding:44px 24px; color:var(--ink-soft);}
   .empty .emoji{font-size:44px; margin-bottom:6px;}
@@ -84,7 +85,7 @@
 
 <script>
 // Кожна вправа — окрема тека labs/{slug}/index.html.
-// kind: 'game' | 'crossword' | 'exercise'; grades — рядок на кшталт "5–7" або "усі класи".
+// kind: 'game' | 'crossword' | 'exercise' | 'creative'; grades — рядок на кшталт "5–7" або "усі класи".
 // logo — шлях до SVG-логотипу гри (якщо немає — показується emoji).
 // Приклад: { title:"Кросворд «Пристрої комп'ютера»", kind:"crossword", grades:"5–6", emoji:"🧩", desc:"...", link:"crossword-devices/index.html" }
 const LABS = [
@@ -93,10 +94,12 @@ const LABS = [
   { title:"Де ця літера? English Alphabet", kind:"game", grades:"усі класи", logo:"match-alphabet/logo.svg",
     desc:"Послухай назву літери й перетягни картку на правильну літеру.", link:"match-alphabet/index.html" },
   { title:"Клавіатурні перегони", kind:"game", grades:"усі класи", logo:"typing-race/logo.svg",
-    desc:"Тренажер десятипальцевого друку: перегони з роботом, нейрончики, 5 трас (зокрема Київ і Лондон), 6 автівок і 10 змагань — від Кубка Києва до Формули 1.", link:"typing-race/index.html" }
+    desc:"Тренажер десятипальцевого друку: перегони з роботом, нейрончики, 5 трас (зокрема Київ і Лондон), 6 автівок і 10 змагань — від Кубка Києва до Формули 1.", link:"typing-race/index.html" },
+  { title:"Конструктор аватарів", kind:"creative", grades:"усі класи", logo:"avatar-maker/logo.svg",
+    desc:"Збери власного персонажа: зачіска, очі, одяг, котячі вушка чи корона. Аватар кліпає, стежить за курсором і зберігається картинкою.", link:"avatar-maker/index.html" }
 ];
 
-const KINDS = { game:'Гра', crossword:'Кросворд', exercise:'Вправа' };
+const KINDS = { game:'Гра', crossword:'Кросворд', exercise:'Вправа', creative:'Творчість' };
 const filtersEl = document.getElementById('filters');
 const labsEl = document.getElementById('labs');
 let current = 'all';
