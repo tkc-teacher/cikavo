@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Кінотеатр мрії — Створення й наповнення таблиць</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#4338CA,#C27A0E); --accent:#4338CA; --accent-dark:#312A9B; --accent-soft:#E9E8FB; --bg:#F6F6FC; --line:#E0DFF2; }
+  .sample td.hd{font-weight:800; background:#E9E8FB;}
+  .sample td.c{text-align:center; font-size:16px; color:#0B57D0;}
+  .sample tr.hdr td, .sample tr.hdr th{border-bottom:3px solid #C4C7C5;}
+  .dd{display:inline-block; border-radius:999px; padding:0 8px; font-size:.92em;}
+</style>
+</head>
+<body data-hud="9 клас · Практична · Кінотеатр мрії">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 9 клас · Створення й наповнення таблиць</div>
+    <h1>🎬 Кінотеатр мрії</h1>
+    <p>Створи в Google Таблицях таблицю бази даних «Фільми»: із ключем, типами стовпців і списком жанрів.</p>
+    <div class="meta"><span>⏱ 20–25 хв</span><span><img src="../../assets/logos/sheets.svg" alt="">Google Таблиці</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="sheet-wrap">
+      <table class="sample">
+        <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th></tr>
+        <tr class="hdr"><th>1</th><td class="hd">ID</td><td class="hd">Назва</td><td class="hd">Жанр</td><td class="hd">Тривалість, хв</td><td class="hd">Прем'єра</td><td class="hd">У прокаті</td><td class="hd">Квиток</td></tr>
+        <tr><th>2</th><td class="r">1</td><td>Таємниця старого маяка</td><td><span class="dd" style="background:#FFE5A0">Пригоди ▾</span></td><td class="r">104</td><td class="r">15.08.2026</td><td class="c">☑</td><td class="r">150,00 ₴</td></tr>
+        <tr><th>3</th><td class="r">2</td><td>Робот на канікулах</td><td><span class="dd" style="background:#BFE1F6">Мультфільм ▾</span></td><td class="r">88</td><td class="r">01.06.2026</td><td class="c">☑</td><td class="r">120,00 ₴</td></tr>
+        <tr><th>…</th><td>…</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи таблицю</h3>
+        <p>Обери один зі способів:</p>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Таблиці</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Таблиці</span>.</li>
+              <li>Назви файл: <b>Кінотеатр — Прізвище</b>.</li>
+            </ol>
+          </div>
+        </div>
+        <ul>
+          <li>Перевір <span class="menu">Файл → Налаштування → Регіон: Україна</span>.</li>
+          <li>Двічі клацни вкладку аркуша внизу й назви її <b>Фільми</b>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Назви полів</h3>
+        <p>У рядок <b>1</b>, з A1 до G1: <b>ID</b>, <b>Назва</b>, <b>Жанр</b>, <b>Тривалість, хв</b>, <b>Прем'єра</b>, <b>У прокаті</b>, <b>Квиток</b>.</p>
+        <ul>
+          <li>Виділи рядок 1 і зроби його жирним.</li>
+          <li><span class="menu">Вигляд → Закріпити → 1 рядок</span>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Типи стовпців</h3>
+        <p>Клацни букву стовпця, щоб виділити його, і задай тип:</p>
+        <ul>
+          <li><b>D</b> (тривалість) — <span class="menu">Формат → Число → Число</span>;</li>
+          <li><b>E</b> (прем'єра) — <span class="menu">Формат → Число → Дата</span>;</li>
+          <li><b>G</b> (квиток) — <span class="menu">Формат → Число → Валюта</span>;</li>
+          <li><b>F2:F7</b> (у прокаті) — <span class="menu">Вставити → Прапорець</span>.</li>
+        </ul>
+        <div class="tip">Якщо в D з'явилися нулі після коми, натисни кнопку «Зменшити кількість десяткових знаків» на панелі інструментів.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Жанр — зі списку</h3>
+        <ol>
+          <li>Виділи <b>C2:C7</b>.</li>
+          <li><span class="menu">Дані → Перевірка даних → Додати правило</span>.</li>
+          <li>Критерії — <b>спадне меню</b>. Варіанти: <b>Комедія</b>, <b>Мультфільм</b>, <b>Пригоди</b>, <b>Фантастика</b>.</li>
+          <li>Натисни <b>Готово</b>.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Ключ ID</h3>
+        <ol>
+          <li>Введи <b>1</b> в A2 і <b>2</b> в A3.</li>
+          <li>Виділи обидві комірки й потягни маркер заповнення вниз до <b>A7</b>.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Внеси записи</h3>
+        <p>Почни з B2. <b>Tab</b> — до наступного поля, <b>Enter</b> — до нового запису. Жанр обирай зі списку, «У прокаті» — постав прапорець.</p>
+        <div class="sheet-wrap">
+          <table class="sample">
+            <tr><th></th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th></tr>
+            <tr><th>2</th><td>Таємниця старого маяка</td><td>Пригоди</td><td class="r">104</td><td class="r">15.08.2026</td><td>так</td><td class="r">150</td></tr>
+            <tr><th>3</th><td>Робот на канікулах</td><td>Мультфільм</td><td class="r">88</td><td class="r">01.06.2026</td><td>так</td><td class="r">120</td></tr>
+            <tr><th>4</th><td>Зоряний десант 9-А</td><td>Фантастика</td><td class="r">117</td><td class="r">20.09.2026</td><td>так</td><td class="r">170</td></tr>
+            <tr><th>5</th><td>Кіт у кросівках</td><td>Комедія</td><td class="r">92</td><td class="r">12.03.2026</td><td>ні</td><td class="r">100</td></tr>
+            <tr><th>6</th><td>Острів драконів</td><td>Пригоди</td><td class="r">110</td><td class="r">10.10.2026</td><td>так</td><td class="r">160</td></tr>
+            <tr><th>7</th><td>Шкільний детектив</td><td>Комедія</td><td class="r">95</td><td class="r">25.12.2025</td><td>ні</td><td class="r">90</td></tr>
+          </table>
+        </div>
+        <div class="tip">Числа вводь без «хв» і «грн» — одиниці вже є в назвах полів.</div>
+        <div class="check-val">Перевір себе: 6 записів, прапорці стоять у 4 фільмів, квитки показано в гривнях (150,00 ₴).</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">7</div>
+      <div>
+        <h3>Перевір захист</h3>
+        <ul>
+          <li>Клацни стрілку в C7 — у списку лише 4 жанри, зайвого не обереш. Закрий список.</li>
+          <li>Введи в E7 слово <b>скоро</b> — значення стане ліворуч, як текст, а не дата. Поверни 25.12.2025.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Практична робота · «Основні принципи створення таблиць бази даних. Наповнення таблиць даними» · 9 клас</footer>
+
+<script src="../../assets/practice.js"></script>
+</body>
+</html>
