@@ -126,6 +126,10 @@
   .sw{width:42px; height:42px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 1.5px var(--line); cursor:pointer; transition:transform .1s ease, box-shadow .15s ease;}
   .sw:hover{transform:scale(1.08);}
   .sw.on{box-shadow:0 0 0 3px var(--teal);}
+  /* Група, яка зараз не впливає на аватар (колір очей без райдужки): лишається на місці, щоб список не стрибав */
+  .group h3 .off-hint{display:none; font-family:'Nunito Sans',sans-serif; font-weight:600; font-size:13px; color:var(--ink-soft);}
+  .group.off h3 .off-hint{display:inline;}
+  .group.off .swatches{opacity:.35; pointer-events:none;}
   .opt:focus-visible, .sw:focus-visible, .tab:focus-visible, .btn:focus-visible{outline:3px solid var(--purple); outline-offset:2px;}
 
   .toast{position:fixed; left:50%; bottom:24px; transform:translate(-50%,20px); background:var(--ink); color:#fff; font-family:'Baloo 2',sans-serif; font-weight:600; padding:8px 18px; border-radius:999px; opacity:0; transition:all .25s ease; pointer-events:none; z-index:20;}
@@ -141,6 +145,8 @@
     .stage{top:49px; z-index:5; flex-direction:row; flex-wrap:wrap; justify-content:center; padding:12px; gap:10px 14px; border-radius:0 0 var(--radius-l) var(--radius-l); margin:0 -16px; border-top:none; box-shadow:0 6px 14px rgba(27,27,58,.06);}
     .stage h1{display:none;}
     .avatar-wrap{width:130px;}
+    /* Малий аватар стоїть біля лівого краю — фраза росте праворуч, над кнопками, і переноситься */
+    .bubble{right:auto; left:4px; top:-10px; z-index:2; font-size:13px; line-height:1.3; white-space:normal; width:max-content; max-width:min(230px, calc(100vw - 40px));}
     .btn .ic{display:none;}
     .actions{width:auto; flex:1; min-width:0; max-width:260px;}
     .btn{font-size:13.5px; padding:6px 6px;}
@@ -737,6 +743,8 @@ function partSVG(key, v){
   if(v===0 && OPTIONAL.includes(key)) return NONE_SVG;
   const s = {...state, [key]:v}, hw = HW[s.head], skin = SKIN[s.skin];
   const ghost = headShape(s.head, 'fill="none" stroke="#CFCBE3" stroke-width="2.5" stroke-dasharray="5 4"');
+  // Для кумедних вушок контур залитий кольором тла кнопки: він ховає основи вушок, як голова в аватарі
+  const ghostFill = headShape(s.head, 'fill="#F6F5FB" stroke="#CFCBE3" stroke-width="2.5" stroke-dasharray="5 4"');
   const ex = eyeX(hw);
   let vb, o;
   switch(key){
@@ -746,7 +754,7 @@ function partSVG(key, v){
     case 'brows':  vb = '66 66 68 30'; o = drawBrows(s); break;
     case 'mouth':  vb = '76 102 48 36'; o = drawMouth(v); break;
     case 'hair':   vb = '30 8 140 170'; { const [b,f] = drawHair(s); o = (b||'') + ghost + (f||''); } break;
-    case 'ears':   vb = '22 -6 156 130'; o = drawAnimalEars(s) + ghost; break;
+    case 'ears':   vb = '22 -6 156 130'; o = drawAnimalEars(s) + ghostFill; break;
     case 'hear':   vb = `${100-hw-21} 82 36 36`; o = drawSideEars(s, hw); break;  // крупно — одне вухо
     case 'cloth':  vb = v>=12 && v<19 ? '48 150 104 52' : '26 124 148 78'; o = neckRect(s) + drawBody(s, ++UID); break;
     case 'glasses':vb = '48 80 104 36'; o = drawGlasses(s, hw); break;
@@ -796,7 +804,7 @@ function avatarSVG(s, {cls='', size=''}={}){
 const TABS = [
   {icon:'<circle cx="12" cy="12" r="9"/><circle class="dot" cx="9" cy="10" r="1.2"/><circle class="dot" cx="15" cy="10" r="1.2"/><path d="M8.5 14.5 Q12 17.5 15.5 14.5"/>', name:'Обличчя', groups:[{key:'skin', title:'Колір шкіри', colors:SKIN}, {key:'head', title:'Форма голови'}]},
   {icon:'<circle cx="12" cy="12" r="9"/><ellipse cx="7.5" cy="13.5" rx="2" ry="1.3"/><ellipse cx="16.5" cy="13.5" rx="2" ry="1.3"/><circle class="dot" cx="9" cy="10" r="1.1"/><circle class="dot" cx="15" cy="10" r="1.1"/>', name:'Щічки', groups:[{key:'cheeks', title:'Щічки'}]},
-  {icon:'<path d="M2 12 Q12 3.5 22 12 Q12 20.5 2 12Z"/><circle cx="12" cy="12" r="3.2"/><circle class="dot" cx="12" cy="12" r="1.2"/>', name:'Очі', groups:[{key:'eyec', title:'Колір очей', colors:EYEC, when:st=>EYE_COLOR.includes(st.eyes)}, {key:'eyes', title:'Очі'}]},
+  {icon:'<path d="M2 12 Q12 3.5 22 12 Q12 20.5 2 12Z"/><circle cx="12" cy="12" r="3.2"/><circle class="dot" cx="12" cy="12" r="1.2"/>', name:'Очі', groups:[{key:'eyec', title:'Колір очей', colors:EYEC, when:st=>EYE_COLOR.includes(st.eyes), off:'— для очей «Великі», «З віями», «Блискучі», «Хитрі»'}, {key:'eyes', title:'Очі'}]},
   {icon:'<path d="M3 10 Q6.5 6 10 8.5 M14 8.5 Q17.5 6 21 10"/><circle class="dot" cx="7" cy="14.5" r="1.6"/><circle class="dot" cx="17" cy="14.5" r="1.6"/>', name:'Брови', groups:[{key:'brows', title:'Брови'}]},
   {icon:'<path d="M4 10 Q12 22 20 10 Z"/><path d="M7 11.5 H17"/>', name:'Рот', groups:[{key:'mouth', title:'Рот'}]},
   {icon:'<path d="M7.5 10 a5 5 0 0 1 10 0 c0 3.2 -2.6 4.2 -2.6 6.6 a2.9 2.9 0 0 1 -5.6 1.2"/><path d="M10.6 10.2 a2 2 0 0 1 4 0 c0 1.3 -1.1 1.7 -1.5 2.6"/>', name:'Вушка', groups:[{key:'hear', title:'Форма вух'}]},
@@ -834,16 +842,17 @@ function renderTabs(){
 }
 
 function renderGroups(){
-  $('groups').innerHTML = TABS[tab].groups.filter(g=>!g.when || g.when(state)).map(g=>{
+  $('groups').innerHTML = TABS[tab].groups.map(g=>{
+    const off = g.when && !g.when(state);
     let inner;
     if(g.colors){
-      inner = `<div class="swatches">${g.colors.map((c,i)=>`<button class="sw${state[g.key]===i?' on':''}" style="background:${c}" data-k="${g.key}" data-v="${i}" aria-label="Колір ${i+1}"></button>`).join('')}</div>`;
+      inner = `<div class="swatches">${g.colors.map((c,i)=>`<button class="sw${state[g.key]===i?' on':''}" style="background:${c}" data-k="${g.key}" data-v="${i}" aria-label="Колір ${i+1}"${off?' disabled':''}></button>`).join('')}</div>`;
     }else{
       const items = g.items || NAMES[g.key].map((_,i)=>i).filter(i=>!isGone(g.key, i));
       inner = `<div class="opts">${items.map(i=>{ const n = NAMES[g.key][i];
         return `<button class="opt${state[g.key]===i?' on':''}" data-k="${g.key}" data-v="${i}" title="${n}">${partSVG(g.key, i)}<span>${n}</span></button>`; }).join('')}</div>`;
     }
-    return `<div class="group"><h3>${g.title}</h3>${inner}</div>`;
+    return `<div class="group${off?' off':''}"><h3>${g.title}${g.off?` <span class="off-hint">${g.off}</span>`:''}</h3>${inner}</div>`;
   }).join('');
 }
 
@@ -923,8 +932,25 @@ function toast(msg){
   const t = $('toast'); t.textContent = msg; t.classList.add('show');
   clearTimeout(toast.t); toast.t = setTimeout(()=>t.classList.remove('show'), 2200);
 }
-$('saveBtn').addEventListener('click', ()=>{
-  const svg = avatarSVG(state, {size:'width="600" height="600"'});
+/* Картинка з SVG не бачить шрифтів сторінки, тож написи (футболки, кепки) вийшли б звичайним Arial.
+   Тому вбудовуємо в SVG сам шрифт Baloo 2 — лише літери, що є в написах. Без інтернету — збережемо без нього. */
+async function fontCSS(svg){
+  const chars = [...new Set((svg.match(/<text[^>]*>[^<]*/g)||[]).map(t=>t.replace(/<text[^>]*>/,'')).join(''))].join('');
+  if(!chars) return '';
+  try{
+    const ctl = new AbortController(); setTimeout(()=>ctl.abort(), 4000);
+    const css = await (await fetch('https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&text=' + encodeURIComponent(chars), {signal:ctl.signal})).text();
+    const url = (css.match(/url\((https:[^)]+)\)/)||[])[1];
+    if(!url) return '';
+    const blob = await (await fetch(url, {signal:ctl.signal})).blob();
+    const data = await new Promise((ok, fail)=>{ const r = new FileReader(); r.onload = ()=>ok(r.result); r.onerror = fail; r.readAsDataURL(blob); });
+    return `<style>@font-face{font-family:'Baloo 2';font-weight:800;src:url(${data}) format('woff2');}</style>`;
+  }catch(e){ return ''; }
+}
+$('saveBtn').addEventListener('click', async ()=>{
+  let svg = avatarSVG(state, {size:'width="600" height="600"'});
+  const font = await fontCSS(svg);
+  if(font) svg = svg.replace(/(<svg[^>]*>)/, '$1' + font);
   const img = new Image();
   img.onload = ()=>{
     const cv = document.createElement('canvas'); cv.width = cv.height = 600;
@@ -939,6 +965,7 @@ $('saveBtn').addEventListener('click', ()=>{
 function download(href, name){
   const a = document.createElement('a'); a.href = href; a.download = name;
   document.body.appendChild(a); a.click(); a.remove();
+  if(href.startsWith('blob:')) setTimeout(()=>URL.revokeObjectURL(href), 1000);
   toast('Аватар збережено 🖼️');
 }
 
