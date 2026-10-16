@@ -89,6 +89,11 @@
   @keyframes fall{0%{transform:translateY(-12px); opacity:0;} 20%,70%{opacity:1;} 100%{transform:translateY(14px); opacity:0;}}
   @keyframes balloon{0%,100%{transform:rotate(-3deg) translateY(0);} 50%{transform:rotate(3deg) translateY(-3px);}}
   @keyframes swing{0%,100%{transform:rotate(-7deg);} 50%{transform:rotate(7deg);}}
+  .live .a-rot{animation:spin 9s linear infinite; transform-box:fill-box; transform-origin:center;}
+  .live .a-rev{animation-direction:reverse;}
+  .live .a-hop{animation:hop 1.7s ease-in-out infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @keyframes hop{0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);}}
   @keyframes flash{0%,80%,100%{opacity:1;} 85%,95%{opacity:.35;} 90%{opacity:1;}}
   @media (prefers-reduced-motion:reduce){ .live *{animation:none !important;} }
 
@@ -126,10 +131,6 @@
   .sw{width:42px; height:42px; border-radius:50%; border:3px solid #fff; box-shadow:0 0 0 1.5px var(--line); cursor:pointer; transition:transform .1s ease, box-shadow .15s ease;}
   .sw:hover{transform:scale(1.08);}
   .sw.on{box-shadow:0 0 0 3px var(--teal);}
-  /* Група, яка зараз не впливає на аватар (колір очей без райдужки): лишається на місці, щоб список не стрибав */
-  .group h3 .off-hint{display:none; font-family:'Nunito Sans',sans-serif; font-weight:600; font-size:13px; color:var(--ink-soft);}
-  .group.off h3 .off-hint{display:inline;}
-  .group.off .swatches{opacity:.35; pointer-events:none;}
   .opt:focus-visible, .sw:focus-visible, .tab:focus-visible, .btn:focus-visible{outline:3px solid var(--purple); outline-offset:2px;}
 
   .toast{position:fixed; left:50%; bottom:24px; transform:translate(-50%,20px); background:var(--ink); color:#fff; font-family:'Baloo 2',sans-serif; font-weight:600; padding:8px 18px; border-radius:999px; opacity:0; transition:all .25s ease; pointer-events:none; z-index:20;}
@@ -190,12 +191,12 @@
 /* ================= Палітри ================= */
 const SKIN  = ['#FFE7D1','#FFDFC4','#F7C9A0','#E3A979','#C68642','#A86B3C','#8D5524','#5C3A21'];
 const HAIR  = ['#2B1B10','#5A3825','#8B5A2B','#D9A441','#F5D98B','#B7472A','#A0A3AD','#FF7BB0','#5B8DEF','#8E6CE8'];
-const CLOTH = ['#6C5CE7','#16A3A0','#FF6B4A','#FFC93C','#FF5D9E','#2D9CDB','#2ECC71','#1B1B3A','#F1EFFA','#C0392B'];
+const CLOTH = ['#6C5CE7','#16A3A0','#FF6B4A','#FFC93C','#FF5D9E','#2D9CDB','#2ECC71','#1B1B3A','#F1EFFA','#C0392B','#2348C4'];  // нові кольори — лише в кінець (номери в посиланнях)
 const BG    = ['#E3F7F6','#EDE9FF','#FFE9F2','#FFF4D6','#E3F0FF','#E6F8E6','#FFE4DC','#1B1B3A','#6C5CE7','#16A3A0'];
 const INK = '#1B1B3A';
 const EYEC  = ['#5A3A22','#2B1B10','#9A7130','#3E8E5E','#3B82C4','#7D8A99','#7B5CC9'];
 /* Очі, де видно райдужку — для них можна обрати колір */
-const EYE_COLOR = [1,8,9,10];
+const EYE_COLOR = [1,8,9,10,11,12];
 
 /* Половина ширини голови для кожної форми — під неї підлаштовуються вуха й зачіски */
 const HW = [46, 40, 45, 45, 50];
@@ -214,7 +215,7 @@ function onScalp(s, h, opacity){
 
 /* ================= Стан ================= */
 // Порядок ключів важливий: з нього будується код аватара в посиланні (#a=…)
-const KEYS = ['shape','bgc','pat','skin','head','cheeks','ears','eyes','brows','mouth','hair','hairc','cloth','clothc','glasses','hat','earr','neck','pet','fx','hear','eyec'];
+const KEYS = ['shape','bgc','pat','skin','head','cheeks','ears','eyes','brows','mouth','hair','hairc','cloth','clothc','glasses','hat','earr','neck','pet','fx','hear','eyec','hatc'];
 const NAMES = {
   shape:  ['Квадрат','Коло'],
   pat:    ['Без візерунка','Горошок','Смужки','Зірочки','Клітинка','Конфеті'],
@@ -222,24 +223,26 @@ const NAMES = {
   cheeks: ['Без нічого','Рум\'янець','Веснянки','Усе разом'],
   ears:   ['Без вушок','Котячі','Ведмежі','Заячі','Антенки робота'],  // доповнення (обруч); людські вуха — hear
   hear:   ['Звичайні','Маленькі','Великі','Круглі','Відстовбурчені'],
-  eyes:   ['Крапки','Великі','Радісні','Сонні','Підморгування','Зірочки','Закоханість','Здивовані','З віями','Блискучі','Хитрі'],
+  eyes:   ['Крапки','Великі','Радісні','Сонні','Підморгування','Зірочки','Закоханість','Здивовані','З віями','Блискучі','Хитрі','Аніме','Рішучі'],
   brows:  ['Без брів','Звичайні','Здивовані','Сердиті','Сумні','Густі'],
   mouth:  ['Усмішка','Регіт','Ой!','Спокій','Язичок','Хитрість','Котик','Сум'],
-  hair:   ['Без волосся','Коротка','Їжачок','Кучері','Довге','Каре','Хвостики','Гулька',null,'Афро','Під машинку','На проділ','Чубчик','Коса','Хвіст','Хвилясте','Пряме','Пряме з чубчиком','Дві коси','Довгі кучері','Під горщик','Скуйовджене'],
-  cloth:  ['Футболка','Худі','Светр','Сорочка','Програміст','Супергерой','Поло','Піджак','Комбінезон','Сукня','Блуза','Олімпійка','Я можу!','Знання — сила','Не здавайся','Мрій сміливо','Все вийде!','Київ','Гімназія №131','Футбольна'],
+  hair:   ['Без волосся','Коротка','Їжачок','Кучері','Довге','Каре','Хвостики','Гулька',null,'Афро','Під машинку','На проділ','Чубчик','Коса','Хвіст','Хвилясте','Пряме','Пряме з чубчиком','Дві коси','Довгі кучері','Під горщик','Скуйовджене','Кок','Ірокез','Дві гульки','Низькі хвостики','Пірамідка','Кучері вгору'],
+  cloth:  ['Футболка','Худі','Светр','Сорочка','Програміст','Супергерой','Поло','Піджак','Комбінезон','Сукня','Блуза','Олімпійка','Я можу!','Знання — сила','Не здавайся','Мрій сміливо','Все вийде!',null,null,'Футбольна'],
   earr:   ['Без сережок','Кульки','Кільця','Сердечка','Зірочки','Перлинки'],
   pet:    ['Без улюбленця','Котик','Песик','Папуга','Хом\'ячок','Робот-помічник','Сова','Зайчик','Пінгвін','Лисичка','Черепашка'],
-  fx:     ['Без ефектів','Іскорки','Сердечка','Повітряні кульки',null,'Бульбашки','Двійковий код','Квіточки'],  // 4 — прибране сяйво
+  fx:     ['Без ефектів','Іскорки','Сердечка','Повітряні кульки',null,'Бульбашки','Двійковий код','Квіточки',
+    'Абетка','Книжки','Привітання','Формули','Фігури','Пісочні годинники','Мандри','ДНК','Колби','Атоми','Планети',
+    'Фарби','Ноти','М\'ячі','Шестерні','Яблука','Олівці','Дзвоники'],  // 4 — прибране сяйво
   neck:   ['Без намиста','Перли','Сердечко','Бусини',null,'Чокер'],  // 4 — прибрана зірка
   glasses:['Без окулярів','Круглі','Квадратні','Сонцезахисні','Сердечка','Пікселі'],
-  hat:    ['Без шапки','Кепка','Шапка','Корона','Навушники','Бантик','Ковпачок','Чарівник','Кепка «Київ»','Кепка «Україна»','Віночок','Берет','Панамка','Капелюх','Капелюх Шерлока'],
+  hat:    ['Без шапки','Кепка','Шапка','Корона','Навушники','Бантик','Ковпачок','Чарівник',null,null,'Віночок','Берет','Панамка','Капелюх','Капелюх Шерлока'],
 };
 const COUNT = {...Object.fromEntries(Object.entries(NAMES).map(([k,v])=>[k,v.length])),
-  bgc:BG.length, eyec:EYEC.length, skin:SKIN.length, hairc:HAIR.length, clothc:CLOTH.length};
+  bgc:BG.length, eyec:EYEC.length, skin:SKIN.length, hairc:HAIR.length, clothc:CLOTH.length, hatc:CLOTH.length};
 /* Прибрані варіанти (null у NAMES) лишають свій номер, щоб старі посилання не зсувались */
 const isGone = (k, v) => NAMES[k] !== undefined && NAMES[k][v] === null;
 
-const DEFAULT = {shape:0,bgc:0,pat:1,skin:1,head:0,cheeks:1,ears:0,eyes:1,brows:1,mouth:0,hair:1,hairc:1,cloth:4,clothc:0,glasses:0,hat:0,earr:0,neck:0,pet:0,fx:0,hear:0,eyec:0};
+const DEFAULT = {shape:0,bgc:0,pat:1,skin:1,head:0,cheeks:1,ears:0,eyes:1,brows:1,mouth:0,hair:1,hairc:1,cloth:4,clothc:0,glasses:0,hat:0,earr:0,neck:0,pet:0,fx:0,hear:0,eyec:0,hatc:2};
 const STORE = 'avatar-maker-v1';
 
 function encode(s){ return KEYS.map(k=>s[k].toString(36)).join(''); }
@@ -375,6 +378,35 @@ function drawHair(s){
     case 21:
       back = `<path d="M52 98 C50 60 70 44 100 44 C130 44 150 60 148 98 Z" fill="${dk}"/>`;
       front = `<path d="M52 98 C48 70 54 56 62 50 L58 40 L70 44 L72 32 L84 40 L92 28 L100 38 L110 26 L116 40 L128 32 L130 44 L142 42 L138 52 C148 60 150 76 148 98 C142 82 132 72 122 68 L116 76 L108 68 L98 76 L90 68 L80 74 L74 66 C64 74 56 84 52 98 Z" fill="${h}"/>`; break;
+    case 22: // Кок: короткі боки, високий чуб, зачесаний угору й назад
+      back = `<path d="M52 100 C46 52 74 38 100 38 C126 38 154 52 148 100 Z" fill="${dk}"/>`;
+      front = `<path d="M52 100 C48 62 58 48 70 43 C68 26 90 12 116 16 C138 20 150 34 142 46 C150 58 152 78 148 100 C144 84 138 72 128 66 C114 72 90 74 72 68 C62 76 55 86 52 100 Z" fill="${h}"/>`
+        + `<path d="M80 40 Q94 24 120 25 M88 48 Q102 34 126 35" fill="none" stroke="${shade(h,.25)}" stroke-width="2.2" stroke-linecap="round" opacity=".7"/>`; break;
+    case 23: // Ірокез: лише гребінь шпичаків посередині, боки голені «до шкіри»
+      front = `<path d="M86 68 L82 44 L89 47 L86 26 L94 33 L94 12 L100 22 L106 12 L106 33 L114 26 L111 47 L118 44 L114 68 Q100 73 86 68 Z" fill="${h}"/>`
+        + `<path d="M100 26 V64" stroke="${shade(h,-.2)}" stroke-width="1.6" stroke-linecap="round"/>`; break;
+    case 24: { // Дві гульки на маківці
+      const bun = `<circle cx="62" cy="44" r="16" fill="${h}"/><path d="M53 42 Q56 34 64 35 Q71 37 70 45 Q68 51 61 50" fill="none" stroke="${dk}" stroke-width="2.2" stroke-linecap="round"/>`;
+      back = both(bun);
+      front = `<path d="${smooth}" fill="${h}"/>${part}`; break;
+    }
+    case 25: // Низькі хвостики з гумками, на плечах
+      back = `<path d="M48 92 C46 46 74 34 100 34 C126 34 154 46 152 92 L150 124 L50 124 Z" fill="${dk}"/>`
+        + both(`<path d="M50 124 C32 136 28 160 38 180 C48 172 58 160 62 146 C64 136 61 128 56 121 Z" fill="${h}"/><path d="M46 140 Q40 156 41 170 M54 142 Q52 154 48 164" fill="none" stroke="${dk}" stroke-width="1.6" stroke-linecap="round"/><ellipse cx="53" cy="124" rx="6.5" ry="4" fill="#FF5D9E"/>`);
+      front = `<path d="${smooth}" fill="${h}"/>${part}`; break;
+    case 26: // Пірамідка: усе волосся зібране вгору, у гострий «конус»
+      back = `<path d="M52 100 C46 52 74 38 100 38 C126 38 154 52 148 100 Z" fill="${dk}"/>`;
+      front = `<path d="M52 98 C48 62 60 48 76 42 Q93 28 100 4 Q107 28 124 42 C140 48 152 62 148 98 C142 78 126 64 100 62 C74 64 58 78 52 98 Z" fill="${h}"/>`
+        + `<path d="M68 58 Q88 40 99 10 M86 52 Q96 36 100 10 M114 52 Q104 36 101 10 M132 58 Q112 40 101 10" fill="none" stroke="${shade(h,-.2)}" stroke-width="1.8" stroke-linecap="round"/>`; break;
+    case 27: { // Кучері вгору: довгі кучері закручені на маківці пишною купкою
+      const curls = (list, fill) => list.map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}"/>`).join('');
+      const swirl = list => list.map(([x,y,r])=>`<path d="M${x-r*.5} ${y+r*.1} A${r*.5} ${r*.5} 0 1 1 ${x+r*.15} ${y+r*.45}" fill="none" stroke="${dk}" stroke-width="1.8" stroke-linecap="round"/>`).join('');
+      const top = [[80,42,12],[120,42,12],[100,38,14],[88,26,11],[112,26,11],[100,17,9]];
+      back = `<path d="M52 100 C46 52 74 38 100 38 C126 38 154 52 148 100 Z" fill="${dk}"/>`
+        + curls([[72,48,14],[128,48,14],[100,30,17],[84,24,12],[116,24,12],[100,13,10]], dk);
+      front = `<path d="${smooth}" fill="${h}"/>` + curls(top, h) + swirl(top);
+      break;
+    }
   }
   return [back && `<g ${sx}>${back}</g>`, scalp + (front && `<g ${sx}>${front}</g>`)];
 }
@@ -426,6 +458,13 @@ function drawEye(type, x, y, side, s, lid = SKIN[s.skin]){
       + `<circle cx="2.8" cy="-2.6" r="2.9" fill="#fff"/><circle cx="-3" cy="4.6" r="1.4" fill="#fff"/></g></g></g>`;
     case 10: return `<g ${t}><g class="blink"><ellipse rx="9.5" ry="8.5" fill="#fff" stroke="${INK}" stroke-width="1.5"/><g class="pupil"><circle cx="${side*2}" cy="2" r="5.6" fill="${ic}"/><circle cx="${side*2}" cy="2" r="2.8" fill="${INK}"/><circle cx="${side*2+1.8}" cy="1" r="1.4" fill="#fff"/></g>`
       + `<path d="M-11 -0.5 A11 10 0 0 1 11 -0.5 Z" fill="${lid}"/><path d="M-10 -0.5 H10" stroke="${INK}" stroke-width="2.4" stroke-linecap="round"/></g></g>`;
+    case 11: // Аніме: високі очі з великою райдужкою, двома відблисками й густими віями
+      return `<g ${t}><g class="blink"><ellipse rx="9.5" ry="12.5" fill="#fff" stroke="${INK}" stroke-width="1.5"/><g class="pupil"><ellipse cy="1.5" rx="7" ry="9.5" fill="${ic}"/><ellipse cy="3" rx="5" ry="6.5" fill="${shade(ic,-.35)}"/><ellipse cy="3" rx="3" ry="4" fill="${INK}"/>`
+        + `<ellipse cx="2.8" cy="-3" rx="2.6" ry="3.4" fill="#fff"/><circle cx="-2.6" cy="6" r="1.5" fill="#fff"/></g>`
+        + `<path d="M-10.5 -7 Q0 -16 10.5 -7" fill="none" stroke="${INK}" stroke-width="3.4" stroke-linecap="round"/><path d="M${side*9.5} -8 L${side*13.5} -11.5" stroke="${INK}" stroke-width="2.4" stroke-linecap="round"/></g></g>`;
+    case 12: // Рішучі: повіка скошена до перенісся
+      return `<g ${t}><g class="blink"><ellipse rx="9.5" ry="9" fill="#fff" stroke="${INK}" stroke-width="1.5"/><g class="pupil"><circle cy="1.5" r="5.8" fill="${ic}"/><circle cy="1.5" r="3" fill="${INK}"/><circle cx="1.8" cy="0" r="1.4" fill="#fff"/></g>`
+        + `<path d="M${side*12} -12 L${-side*12} -12 L${-side*12} -1 L${side*12} -6.5 Z" fill="${lid}"/><path d="M${side*10.5} -6 L${-side*10.5} -1.5" stroke="${INK}" stroke-width="2.6" stroke-linecap="round"/></g></g>`;
   }
 }
 
@@ -471,35 +510,37 @@ function drawBody(s, u){
   const c = CLOTH[s.clothc], d = shade(c,-.18), neck = shade(SKIN[s.skin],-.12), B = TORSO;
   const ink = lum(c)>0.6 ? INK : '#fff';
   const stripe = lum(c)>0.8 ? shade(c,-.2) : shade(c,.55);
-  const tee = `<path d="${B}" fill="${c}"/><path d="M86 150 Q100 166 114 150 Z" fill="${neck}"/>`;
+  // Смужка кольору шиї над верхом тулуба: ховає тонкий шов між шиєю й вирізом горловини
+  const seam = `<rect x="88" y="146" width="24" height="4.6" fill="${neck}"/>`, torso = `<path d="${B}" fill="${c}"/>` + seam;
+  const tee = `${torso}<path d="M86 150 Q100 166 114 150 Z" fill="${neck}"/>`;
   switch(s.cloth){
     case 0: return tee + `<path d="M52 176 Q56 186 54 200 M148 176 Q144 186 146 200" fill="none" stroke="${d}" stroke-width="2.5" stroke-linecap="round"/>`;
-    case 1: return `<path d="${B}" fill="${c}"/><path d="M66 158 C66 140 134 140 134 158 C122 170 78 170 66 158 Z" fill="${d}"/><path d="M86 152 Q100 164 114 152 Z" fill="${neck}"/>`
+    case 1: return `${torso}<path d="M66 158 C66 140 134 140 134 158 C122 170 78 170 66 158 Z" fill="${d}"/><path d="M88 138 H112 V150 L114 152 Q100 164 86 152 L88 150 Z" fill="${neck}"/>`
       + `<g class="a-str"><path d="M92 164 V184 M108 164 V184" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/><circle cx="92" cy="186" r="2.5" fill="#fff"/><circle cx="108" cy="186" r="2.5" fill="#fff"/></g><path d="M74 190 H126 L122 200 H78 Z" fill="${d}"/>`;
-    case 2: return `<clipPath id="b${u}"><path d="${B}"/></clipPath><path d="${B}" fill="${c}"/><g clip-path="url(#b${u})"><rect x="0" y="174" width="200" height="7" fill="${stripe}"/><rect x="0" y="187" width="200" height="7" fill="${stripe}"/></g>`
-      + `<path d="M86 151 Q100 165 114 151 Z" fill="${neck}"/><path d="M85 152 Q100 168 115 152" fill="none" stroke="${d}" stroke-width="5" stroke-linecap="round"/>`;
+    case 2: return `<clipPath id="b${u}"><path d="${B}"/></clipPath>${torso}<g clip-path="url(#b${u})"><rect x="0" y="174" width="200" height="7" fill="${stripe}"/><rect x="0" y="187" width="200" height="7" fill="${stripe}"/></g>`
+      + `<path d="M86 150 Q100 165 114 150 Z" fill="${neck}"/><path d="M85 152 Q100 168 115 152" fill="none" stroke="${d}" stroke-width="5" stroke-linecap="round"/>`;
     case 3: { const tie = s.clothc===9 || s.clothc===2 ? '#1B1B3A' : '#C0392B';
-      return `<path d="${B}" fill="${c}"/><path d="M88 150 L100 164 L112 150 Z" fill="${neck}"/>`
+      return `${torso}<path d="M88 150 L100 164 L112 150 Z" fill="${neck}"/>`
       + `<path d="M96 165 H104 L108 194 L100 200 L92 194 Z" fill="${tie}"/><path d="M95 160 H105 L103 167 H97 Z" fill="${shade(tie,-.2)}"/>`
       + `<path d="M86 149 L100 164 L91 172 L80 155 Z M114 149 L100 164 L109 172 L120 155 Z" fill="#fff" stroke="${shade(c,-.1)}" stroke-width="1"/>`; }
     case 4: return tee + `<text x="100" y="190" text-anchor="middle" font-family="Menlo, Consolas, 'Courier New', monospace" font-weight="700" font-size="19" fill="${ink}">&lt;/&gt;</text><rect class="a-cur" x="121" y="187" width="8" height="2.6" fill="${ink}" opacity="0"/>`;
     case 5: return tee + `<circle cx="100" cy="181" r="14" fill="#FFC93C" stroke="${d}" stroke-width="2"/><path class="a-flash" d="M103 170 L94 183 H100 L97 193 L107 179 H101 Z" fill="#E8412C"/>`;
-    case 6: return `<path d="${B}" fill="${c}"/><path d="M90 150 L100 162 L110 150 Z" fill="${neck}"/>`
+    case 6: return `${torso}<path d="M90 150 L100 162 L110 150 Z" fill="${neck}"/>`
       + `<path d="M86 148 L100 160 L93 168 L81 154 Z M114 148 L100 160 L107 168 L119 154 Z" fill="${shade(c,-.1)}" stroke="${d}" stroke-width="1"/>`
       + `<circle cx="100" cy="168" r="1.8" fill="${d}"/><circle cx="100" cy="176" r="1.8" fill="${d}"/>`;
-    case 7: return `<path d="${B}" fill="${c}"/><path d="M89 150 L100 200 L111 150 Z" fill="#F4F3FA"/><path d="M91 150 L100 161 L109 150 Z" fill="${neck}"/>`
+    case 7: return `${torso}<path d="M89 150 L100 200 L111 150 Z" fill="#F4F3FA"/><path d="M91 150 L100 161 L109 150 Z" fill="${neck}"/>`
       + `<path d="M88 150 L100 184 L93 190 L77 160 Z M112 150 L100 184 L107 190 L123 160 Z" fill="${d}"/>`
       + `<circle cx="100" cy="193" r="2.4" fill="${d}"/><path d="M128 178 H140" stroke="${shade(c,.4)}" stroke-width="3" stroke-linecap="round"/>`;
     case 8: { const shirt = lum(c)>0.75 ? '#C7E7F7' : shade(c,.78);
-      return `<path d="${B}" fill="${shirt}"/><path d="M86 150 Q100 166 114 150 Z" fill="${neck}"/>`
+      return `<path d="${B}" fill="${shirt}"/>${seam}<path d="M86 150 Q100 166 114 150 Z" fill="${neck}"/>`
       + `<path d="M76 172 H124 V200 H76 Z" fill="${c}"/><path d="M80 175 L66 154 M120 175 L134 154" stroke="${c}" stroke-width="7" stroke-linecap="round"/>`
       + `<circle cx="81" cy="177" r="2.6" fill="#FFC93C"/><circle cx="119" cy="177" r="2.6" fill="#FFC93C"/><rect x="92" y="182" width="16" height="10" rx="2" fill="${d}"/>`; }
-    case 9: return `<path d="${B}" fill="${c}"/><path d="M86 150 Q100 162 114 150 Z" fill="${neck}"/>`
+    case 9: return `${torso}<path d="M86 150 Q100 162 114 150 Z" fill="${neck}"/>`
       + [[60,180],[80,192],[120,192],[140,180],[100,184],[70,166],[130,166],[48,194],[152,194]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="2.6" fill="#fff" opacity=".55"/>`).join('')
       + `<path d="M100 159 Q88 172 78 156 Q88 150 100 159 Z M100 159 Q112 172 122 156 Q112 150 100 159 Z" fill="#fff" stroke="${shade(c,-.1)}" stroke-width="1"/>`;
     case 10: { let r = ''; for(let i=0;i<=8;i++){ const t=i/8, x=(1-t)*(1-t)*83+2*t*(1-t)*100+t*t*117, y=(1-t)*(1-t)*150+2*t*(1-t)*172+t*t*150; r += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.2" fill="${shade(c,.6)}"/>`; }
-      return `<path d="${B}" fill="${c}"/><path d="M86 150 Q100 164 114 150 Z" fill="${neck}"/>` + r; }
-    case 11: return `<path d="${B}" fill="${c}"/><path d="M91 150 L100 157 L109 150 Z" fill="${neck}"/>`
+      return `${torso}<path d="M86 150 Q100 164 114 150 Z" fill="${neck}"/>` + r; }
+    case 11: return `${torso}<path d="M91 150 L100 157 L109 150 Z" fill="${neck}"/>`
       + `<path d="M86 146 Q100 154 114 146 L115 152 Q100 162 85 152 Z" fill="${d}"/><path d="M100 158 V200" stroke="${d}" stroke-width="2"/>`
       + `<rect x="98" y="166" width="4" height="8" rx="1.5" fill="#C9CDD6"/><path d="M46 176 L40 200 M154 176 L160 200" stroke="#fff" stroke-width="4" stroke-linecap="round"/>`;
     case 12: case 13: case 14: case 15: case 16: {
@@ -510,21 +551,11 @@ function drawBody(s, u){
         ? `<text x="100" y="180" ${font} font-size="12" fill="${ink}">${l1}</text><text x="100" y="195" ${font} font-size="13" fill="${acc}">${l2}</text>`
         : `<text x="100" y="189" ${font} font-size="16" fill="${ink}">${l1}</text>`)
         + star(l2 ? 134 : 150, l2 ? 176 : 178, 4.5, acc, 'class="a-tw"'); }
-    case 17: { // Київ: напис і листок каштана — символ міста
-      let leaf = ''; for(let i=0;i<5;i++){ const a = (-150 + i*30)*Math.PI/180; leaf += `<ellipse cx="${(74+9*Math.cos(a)).toFixed(1)}" cy="${(186+9*Math.sin(a)).toFixed(1)}" rx="8" ry="3.2" fill="#3FA34D" transform="rotate(${-150+i*30} ${(74+9*Math.cos(a)).toFixed(1)} ${(186+9*Math.sin(a)).toFixed(1)})"/>`; }
-      return tee + leaf + `<path d="M74 186 V196" stroke="#2E7D3A" stroke-width="1.6" stroke-linecap="round"/>`
-        + `<text x="110" y="191" text-anchor="middle" font-family="'Baloo 2','Arial Rounded MT Bold',Arial,sans-serif" font-weight="800" font-size="17" fill="${ink}" letter-spacing="1">КИЇВ</text>`; }
-    case 18: { // Гімназія №131: дерево і напис «№131»
-      const greens = ['#3FA34D','#7CC36A','#2E8B57','#9AD17E','#56B060','#3FA34D','#7CC36A'];
-      const crown = [[-11,-6,7],[0,-12,8.5],[11,-6,7],[-6,1,6.5],[6,1,6.5],[0,-3,6.5],[-16,1,4.5]].map(([x,y,r],i)=>`<circle cx="${80+x}" cy="${178+y}" r="${r}" fill="${greens[i]}"/>`).join('');
-      return tee + `<path d="M78.3 180 L77 194 H83 L81.7 180 Z M80 184 L73 178 M80 184 L87 178" fill="#8B5A2B" stroke="#8B5A2B" stroke-width="1.8" stroke-linecap="round"/>` + crown
-        + `<text x="120" y="190" text-anchor="middle" font-family="'Baloo 2','Arial Rounded MT Bold',Arial,sans-serif" font-weight="800" font-size="16" fill="${ink}">№131</text>`; }
-    case 19: { // Футбольна: V-комір, смужки на рукавах, номер 10
+    case 19: { // Футбольна: V-комір, смужки на рукавах
       const acc = lum(c)>0.6 ? '#1F3A6E' : '#fff';
-      return `<path d="${B}" fill="${c}"/><path d="M89 150 L100 163 L111 150 Z" fill="${neck}"/>`
+      return `${torso}<path d="M89 150 L100 163 L111 150 Z" fill="${neck}"/>`
         + `<path d="M87 149 L100 164 L113 149" fill="none" stroke="${acc}" stroke-width="3.5" stroke-linejoin="round"/>`
-        + `<path d="M50 168 L44 186 M56 164 L49 186 M150 168 L156 186 M144 164 L151 186" stroke="${acc}" stroke-width="2.5" stroke-linecap="round"/>`
-        + `<text x="100" y="196" text-anchor="middle" font-family="'Baloo 2','Arial Rounded MT Bold',Arial,sans-serif" font-weight="800" font-size="24" fill="${acc}">10</text>`; }
+        + `<path d="M50 168 L44 186 M56 164 L49 186 M150 168 L156 186 M144 164 L151 186" stroke="${acc}" stroke-width="2.5" stroke-linecap="round"/>`; }
   }
 }
 
@@ -622,8 +653,16 @@ function petBody(s){
 }
 
 /* Ефекти — за персонажем, поверх тла */
+/* Точки для значків шкільних ефектів — по всьому тлу (персонаж частину з них закриває) */
+const FX_SPOTS = [[20,20,1.1],[100,12,1],[180,24,1.1],[16,92,1.1],[184,88,1],[38,138,1],[164,134,1.1],[18,176,1.1],[182,172,1]];
+const PAL = ['#FF6B4A','#2D9CDB','#FFC93C','#2ECC71','#FF5D9E','#6C5CE7','#16A3A0','#E8412C'];
+const FXFONT = `font-family="'Baloo 2','Arial Rounded MT Bold',Arial,sans-serif" font-weight="800" text-anchor="middle"`;
 function drawFx(s){
   const d = i => `style="animation-delay:${(-i*0.7).toFixed(1)}s"`;
+  // spread: значок icon(i) у кожній точці spots (i — номер значка 0…7, далі по колу); cls — клас анімації (або функція від i), rot(i) — нахил значка
+  // напівпрозорість робить значки пастельними, щоб тло не сперечалося з персонажем
+  const spread = (cls, icon, rot, spots = FX_SPOTS) => '<g opacity=".78">' + spots.map(([x,y,k],j)=>{ const i = j%8, r = rot ? rot(i) : 0;
+    return `<g class="${typeof cls==='function' ? cls(i) : cls}" ${d(j)}><g transform="translate(${x} ${y}) scale(${k})${r ? ` rotate(${r})` : ''}">${icon(i)}</g></g>`; }).join('') + '</g>';
   const spark = (x,y,r) => `M${x} ${y-r} L${x+r*.25} ${y-r*.25} L${x+r} ${y} L${x+r*.25} ${y+r*.25} L${x} ${y+r} L${x-r*.25} ${y+r*.25} L${x-r} ${y} L${x-r*.25} ${y-r*.25} Z`;
   switch(s.fx){
     case 1: return [[30,40,10],[172,34,8],[24,128,7],[178,110,9],[150,16,5],[52,16,5],[176,70,4],[22,84,4]]
@@ -650,6 +689,67 @@ function drawFx(s){
     case 7: { const cols = ['#FF8FB8','#FFC93C','#B9A6F5','#FF9F7A','#8FD3F5','#FF8FB8','#B9A6F5','#FFC93C'];
       return [[26,34,9],[170,30,8],[22,92,7],[180,84,9],[34,148,8],[168,140,7],[54,14,5],[148,12,5]]
         .map(([x,y,r],i)=>flower(x, y, r, cols[i], i%2 ? '#FF6B4A' : '#FFC93C', `class="a-fl" ${d(i)}`)).join(''); }
+    /* Шкільні ефекти: однакові значки, розкидані навколо голови (spread) */
+    case 8: { const L = ['А','Б','В','Ґ','Є','Ї','Я','Ж'];
+      return spread('a-fl', i=>`<text y="6" ${FXFONT} font-size="18" fill="${PAL[i]}">${L[i]}</text>`); }
+    case 9: return spread('a-fl', i=>`<path d="M0 -4 Q-5 -7.5 -10 -5.5 V5.5 Q-5 3.5 0 6.5 Q5 3.5 10 5.5 V-5.5 Q5 -7.5 0 -4 Z" fill="#fff" stroke="${PAL[i]}" stroke-width="1.8" stroke-linejoin="round"/>`
+      + `<path d="M0 -4 V6.5" stroke="${PAL[i]}" stroke-width="1.4"/><path d="M-7.5 -2.5 Q-4.5 -3.8 -2.5 -2 M-7.5 .5 Q-4.5 -.8 -2.5 1 M2.5 -2 Q4.5 -3.8 7.5 -2.5 M2.5 1 Q4.5 -.8 7.5 .5" fill="none" stroke="#C9C5DE" stroke-width="1" stroke-linecap="round"/>`);
+    case 10: { const W = ['Hola!','Ciao!','Привіт!','Hej!','Hallo!','Salut!','Ahoj!','Hi!'];
+      return spread('a-fl', i=>{ const w = W[i].length*5.6+8, c = PAL[i];
+        return `<rect x="${-w/2}" y="-7" width="${w}" height="13" rx="6.5" fill="${c}"/><path d="M${-w/2+5} 5 L${-w/2+3} 10 L${-w/2+10} 5.5 Z" fill="${c}"/>`
+          + `<text y="2.8" ${FXFONT} font-size="9" fill="${lum(c)>0.6 ? INK : '#fff'}">${W[i]}</text>`; }, null,
+        // хмаринки з текстом ширші за інші значки — точки трохи далі від країв, щоб слова не обрізались
+        [[30,18,1],[100,12,1],[170,24,1],[30,88,1],[172,86,1],[46,132,1],[156,130,1],[30,172,1],[172,170,1]]); }
+    case 11: { const M = ['+','−','×','÷','=','π','√','%'];
+      return spread('a-fl', i=>`<text y="7" ${FXFONT} font-size="21" fill="${PAL[i]}">${M[i]}</text>`); }
+    case 12: { const F = ['<path d="M0 -8 L7.5 6 H-7.5 Z"/>','<rect x="-6.5" y="-6.5" width="13" height="13"/>','<circle r="7"/>','<path d="M0 -8 L7.6 -2.5 L4.7 6.5 H-4.7 L-7.6 -2.5 Z"/>'];
+      return spread(i=>'a-rot' + (i%2 ? ' a-rev' : ''), i=>`<g fill="${PAL[i]}" fill-opacity=".18" stroke="${PAL[i]}" stroke-width="2.4" stroke-linejoin="round">${F[i%4]}</g>`); }
+    case 13: return spread('a-fl', ()=>`<rect x="-7" y="-10" width="14" height="2.6" rx="1.2" fill="#A0703C"/><rect x="-7" y="7.4" width="14" height="2.6" rx="1.2" fill="#A0703C"/>`
+      + `<path d="M-5.5 -7.4 H5.5 C5.5 -3 1.5 -1.5 1.2 0 C1.5 1.5 5.5 3 5.5 7.4 H-5.5 C-5.5 3 -1.5 1.5 -1.2 0 C-1.5 -1.5 -5.5 -3 -5.5 -7.4 Z" fill="#E3F4FB" stroke="#9ACBE0" stroke-width=".9"/>`
+      + `<path d="M-3.6 -4 H3.6 C2.6 -2.2 1 -1.2 0 0 C-1 -1.2 -2.6 -2.2 -3.6 -4 Z M-4.8 7.4 Q0 2.5 4.8 7.4 Z" fill="#F2B84B"/><path d="M0 0 V5" stroke="#F2B84B" stroke-width=".8"/>`, i=>i%2 ? 10 : -10);
+    case 14: return spread('a-fl', i=>i%2
+      ? `<path d="M0 9 C-2 4 -7 1 -7 -3 A7 7 0 0 1 7 -3 C7 1 2 4 0 9 Z" fill="#E8412C"/><circle cy="-3" r="2.8" fill="#fff"/>`
+      : `<circle r="8" fill="#5BB6F0"/><path d="M-5 -4 Q-2 -6 0 -3 Q-1 0 -4 1 Q-6 -1 -5 -4 Z M2 1 Q5 0 6 3 Q4 6 1 5 Q0 3 2 1 Z M1 -7 Q4 -6 4 -4 Q2 -4 1 -7 Z" fill="#3FA34D"/>`
+        + `<ellipse rx="8" ry="3" fill="none" stroke="#fff" stroke-width=".8" opacity=".6"/><path d="M0 -8 V8" stroke="#fff" stroke-width=".8" opacity=".6"/>`);
+    case 15: { let a1 = '', a2 = '', rungs = '';
+      for(let y=-15; y<=15; y+=1){ const x = 5*Math.sin(y*0.3); a1 += (a1?'L':'M') + x.toFixed(1) + ' ' + y; a2 += (a2?'L':'M') + (-x).toFixed(1) + ' ' + y; }
+      for(let y=-13.5; y<=14; y+=3.4){ const x = 5*Math.sin(y*0.3); rungs += `<path d="M${x.toFixed(1)} ${y} H${(-x).toFixed(1)}" stroke="${y%2<1 ? '#FFC93C' : '#2ECC71'}" stroke-width="1.6"/>`; }
+      const helix = rungs + `<path d="${a1}" fill="none" stroke="#6C5CE7" stroke-width="2.2" stroke-linecap="round"/><path d="${a2}" fill="none" stroke="#FF5D9E" stroke-width="2.2" stroke-linecap="round"/>`;
+      return spread('a-fl', ()=>helix, null, [[22,34,1.1],[178,30,1.1],[22,134,1.1],[178,130,1.1]]); }
+    case 16: return spread('a-fl', i=>`<rect x="-3.5" y="-10.5" width="7" height="1.8" rx=".9" fill="#7D8A99"/><path d="M-2.5 -9 H2.5 V-3 L7.5 6.5 Q8.5 9 6 9 H-6 Q-8.5 9 -7.5 6.5 L-2.5 -3 Z" fill="#fff" fill-opacity=".85" stroke="#7D8A99" stroke-width="1.5" stroke-linejoin="round"/>`
+      + `<path d="M-5.2 2 H5.2 L7.3 6.3 Q8 8 6 8 H-6 Q-8 8 -7.3 6.3 Z" fill="${PAL[i]}"/><circle cx="-1.5" cy="-1" r="1.2" fill="${PAL[i]}" opacity=".7"/><circle cx="1" cy="-5" r=".9" fill="${PAL[i]}" opacity=".6"/>`);
+    case 17: { const A = ['#2D9CDB','#6C5CE7','#16A3A0','#FF5D9E'];
+      return spread('a-rot', i=>{ const c = A[i%4]; return `<g fill="none" stroke="${c}" stroke-width="1.3"><ellipse rx="10" ry="3.6"/><ellipse rx="10" ry="3.6" transform="rotate(60)"/><ellipse rx="10" ry="3.6" transform="rotate(120)"/></g>`
+        + `<circle r="2.6" fill="${c}"/><circle cx="10" r="1.5" fill="${c}"/><circle cx="-5" cy="-8.7" r="1.5" fill="${c}"/><circle cx="-5" cy="8.7" r="1.5" fill="${c}"/>`; }); }
+    case 18: { const P = ['#F4B860','#5B8DEF','#FF8A65','#9B7BEA','#4FC3A1','#F4B860','#FFC93C','#5B8DEF'];
+      return spread('a-fl', i=> i%3===0 ? `<circle r="6.5" fill="${P[i]}"/><ellipse rx="11" ry="3.2" fill="none" stroke="${shade(P[i],-.25)}" stroke-width="1.8" transform="rotate(-18)"/>`
+        : i%3===1 ? `<circle r="6" fill="${P[i]}"/><path d="M-5.5 -2 Q0 -3.5 5.5 -2 M-5.8 1.5 Q0 0 5.8 1.5" fill="none" stroke="${shade(P[i],-.2)}" stroke-width="1.2"/><circle cx="9" cy="-6" r="1.8" fill="#C9CDD6"/>`
+        : star(0, 0, 7, '#FFC93C')); }
+    case 19: return spread('a-fl', i=>`<path d="M0 -8 C4 -8 5 -4 8 -3 C10 0 6 2 7 5 C6 8 2 6 0 8 C-3 9 -5 6 -8 5 C-10 2 -6 0 -7 -3 C-7 -7 -3 -7 0 -8 Z" fill="${PAL[i]}"/>`
+      + `<circle cx="10" cy="-7" r="1.6" fill="${PAL[i]}"/><circle cx="-9" cy="8" r="1.2" fill="${PAL[i]}"/>`, i=>i*47);
+    case 20: return spread('a-rise', i=>{ const c = PAL[i];
+      return i%2 ? `<ellipse cx="-2" cy="5" rx="3.6" ry="2.7" fill="${c}" transform="rotate(-20 -2 5)"/><path d="M1.3 4.5 V-8 Q4 -5 6.5 -4.5" fill="none" stroke="${c}" stroke-width="1.8" stroke-linecap="round"/>`
+        : `<ellipse cx="-5" cy="6" rx="3.4" ry="2.5" fill="${c}" transform="rotate(-20 -5 6)"/><ellipse cx="5" cy="4" rx="3.4" ry="2.5" fill="${c}" transform="rotate(-20 5 4)"/><path d="M-1.9 5.5 V-6 M8.1 3.5 V-8" stroke="${c}" stroke-width="1.6"/><path d="M-2.7 -6 L8.9 -8.5 V-5.5 L-2.7 -3 Z" fill="${c}"/>`; });
+    case 21: { const u = ++UID;
+      // п'ятикутник з центром (x,y): латки футбольного м'яча
+      const pent = (x, y, r, rot=0) => [0,1,2,3,4].map(k=>{ const t = (k*72-90+rot)*Math.PI/180; return (k?'L':'M') + (x+r*Math.cos(t)).toFixed(1) + ' ' + (y+r*Math.sin(t)).toFixed(1); }).join('') + 'Z';
+      const B = [
+        `<circle r="7.5" fill="#fff"/><g clip-path="url(#fb${u})" fill="${INK}"><path d="${pent(0,0,2.9)}"/>${[0,1,2,3,4].map(k=>`<path d="${pent(8.6*Math.cos((k*72+90)*Math.PI/180), 8.6*Math.sin((k*72+90)*Math.PI/180), 3.2, k*72)}"/>`).join('')}</g>`
+          + `<path d="M0 -2.9 V-7.5 M2.8 -.9 L7.1 -2.3 M1.7 2.4 L4.4 6.1 M-1.7 2.4 L-4.4 6.1 M-2.8 -.9 L-7.1 -2.3" stroke="${INK}" stroke-width=".8"/><circle r="7.5" fill="none" stroke="${INK}" stroke-width="1.2"/>`,
+        `<circle r="7.5" fill="#F08A24"/><path d="M-7.5 0 H7.5 M0 -7.5 V7.5 M-5.3 -5.3 Q-2 0 -5.3 5.3 M5.3 -5.3 Q2 0 5.3 5.3" fill="none" stroke="#7A3E0E" stroke-width="1"/>`,
+        `<circle r="7.5" fill="#fff" stroke="#2D9CDB" stroke-width="1.2"/><path d="M0 0 Q4 -4 2 -7.2 M0 0 Q-5.5 -1 -7 3 M0 0 Q2 5 6.5 3.6" fill="none" stroke="#2D9CDB" stroke-width="1.3"/>`,
+        `<circle r="5.5" fill="#D4E84A"/><path d="M-4 -3.7 Q0 0 -4 3.7 M4 -3.7 Q0 0 4 3.7" fill="none" stroke="#fff" stroke-width="1"/>`];
+      return `<clipPath id="fb${u}"><circle r="7.5"/></clipPath>` + spread('a-hop', i=>B[i%4]); }
+    case 22: { let g = ''; for(let j=0;j<40;j++){ const a = j*Math.PI/20, r = j%5<2 ? 8.5 : 6.4; g += (j?'L':'M') + (r*Math.cos(a)).toFixed(1) + ' ' + (r*Math.sin(a)).toFixed(1); }
+      const G = ['#9AA3B5','#FFC93C','#7D8A99','#FF6B4A'];
+      return spread(i=>'a-rot' + (i%2 ? ' a-rev' : ''), i=>`<path d="${g}Z" fill="${G[i%4]}"/><circle r="2.6" fill="#fff" opacity=".85"/>`); }
+    case 23: { const C = ['#E8412C','#E8412C','#7CC36A','#E8412C','#FFC93C','#E8412C','#7CC36A','#E8412C'];
+      return spread('a-fl', i=>`<path d="M0 -4 C-3 -7 -8.5 -6 -8.5 0 C-8.5 6 -4 9 0 7.5 C4 9 8.5 6 8.5 0 C8.5 -6 3 -7 0 -4 Z" fill="${C[i]}"/><path d="M0 -4 Q.5 -7 2 -8.5" stroke="#6E4520" stroke-width="1.4" fill="none" stroke-linecap="round"/>`
+        + `<path d="M1.5 -6.5 Q5 -9.5 7 -7 Q4 -5 1.5 -6.5 Z" fill="#3FA34D"/><ellipse cx="-4" cy="-1" rx="1.5" ry="2.5" fill="#fff" opacity=".45"/>`); }
+    case 24: return spread('a-fl', i=>`<rect x="-3" y="-9" width="6" height="13" fill="${PAL[i]}"/><rect x="-3" y="-11.5" width="6" height="2.8" rx="1" fill="#FF9EB8"/><rect x="-3" y="-9.2" width="6" height="1.2" fill="#C9CDD6"/>`
+      + `<path d="M-3 4 L0 10 L3 4 Z" fill="#F2C185"/><path d="M-1.1 7.8 L0 10 L1.1 7.8 Z" fill="${PAL[i]}"/>`, i=>[-35,30,-20,40,25,-30,50,-45][i]);
+    case 25: return spread('a-swing', i=>`<rect x="-1.4" y="-11" width="2.8" height="4.5" rx="1" fill="#8B5A2B"/><path d="M0 -10 L-5 -13 L-5 -7 Z M0 -10 L5 -13 L5 -7 Z" fill="${i%2 ? '#2D9CDB' : '#E8412C'}"/>`
+      + `<path d="M0 -7 C-5 -7 -6 -3 -6 1 C-6 4 -8 5 -8 6.5 H8 C8 5 6 4 6 1 C6 -3 5 -7 0 -7 Z" fill="#FFC93C" stroke="#D9A11A" stroke-width="1"/><circle cy="8" r="1.8" fill="#D9A11A"/>`);
   }
   return '';
 }
@@ -677,8 +777,9 @@ function drawHat(s, hw){
   const sx = fitT(s);
   let o = '';
   switch(s.hat){
-    case 1: o = `<path d="M52 74 C52 40 74 28 100 28 C126 28 148 40 148 74 Z" fill="#FF6B4A"/><path d="M100 30 V72" stroke="#E04E2E" stroke-width="2"/><circle cx="100" cy="29" r="4.5" fill="#E04E2E"/>`
-          + `<path d="M46 74 Q100 62 154 74 Q160 86 148 86 Q100 76 52 86 Q40 86 46 74 Z" fill="#E04E2E"/>`; break;
+    case 1: { const c = CLOTH[s.hatc], d = shade(c, lum(c)>0.8 ? -.12 : -.18);  // колір кепки обирають окремо (hatc)
+      o = `<path d="M52 74 C52 40 74 28 100 28 C126 28 148 40 148 74 Z" fill="${c}"/><path d="M100 30 V72" stroke="${d}" stroke-width="2"/><circle cx="100" cy="29" r="4.5" fill="${d}"/>`
+          + `<path d="M46 74 Q100 62 154 74 Q160 86 148 86 Q100 76 52 86 Q40 86 46 74 Z" fill="${d}"/>`; break; }
     case 2: o = `<path d="M51 78 C49 38 74 24 100 24 C126 24 151 38 149 78 Z" fill="#16A3A0"/><path d="M78 30 V66 M100 26 V66 M122 30 V66" stroke="#0E7C7A" stroke-width="2.5" opacity=".6"/>`
           + `<rect x="47" y="64" width="106" height="18" rx="9" fill="#5FD3CF"/><g class="a-pom"><circle cx="100" cy="22" r="12" fill="#fff"/><circle cx="96" cy="18" r="4" fill="#F0F0F7"/></g>`; break;
     case 3: o = `<path d="M62 60 L60 26 L80 42 L100 18 L120 42 L140 26 L138 60 Z" fill="#FFC93C" stroke="#E0A000" stroke-width="2.5" stroke-linejoin="round"/>`
@@ -693,12 +794,6 @@ function drawHat(s, hw){
     case 7: o = `<path d="M66 64 L98 6 Q104 -2 110 6 L134 64 Z" fill="#6C5CE7"/><rect x="66" y="52" width="68" height="9" fill="#5340c9"/>`
           + star(102,34,9,'#FFC93C','class="a-tw"') + `<circle class="a-tw" style="animation-delay:.7s" cx="118" cy="44" r="2.5" fill="#FFC93C"/><circle class="a-tw" style="animation-delay:1.4s" cx="86" cy="42" r="2" fill="#FFC93C"/>`
           + `<ellipse cx="100" cy="64" rx="62" ry="10" fill="#5340c9"/>`; break;
-    case 8: case 9: {
-      const [crown, brim, txt, tc, fs] = s.hat===8 ? ['#1F3A6E','#16294F','КИЇВ','#fff',14] : ['#1E5BC6','#FFD500','УКРАЇНА','#FFD500',10.5];
-      o = `<path d="M52 74 C52 40 74 28 100 28 C126 28 148 40 148 74 Z" fill="${crown}"/><circle cx="100" cy="29" r="4.5" fill="${brim}"/>`
-        + `<text x="100" y="${s.hat===8?62:60}" text-anchor="middle" font-family="'Baloo 2','Arial Rounded MT Bold',Arial,sans-serif" font-weight="800" font-size="${fs}" fill="${tc}" letter-spacing=".5">${txt}</text>`
-        + `<path d="M46 74 Q100 62 154 74 Q160 86 148 86 Q100 76 52 86 Q40 86 46 74 Z" fill="${brim}"/>`; break;
-    }
     case 10: { const fl = ['#E8412C','#FFC93C','#2D9CDB','#FF5D9E','#E8412C','#FFFFFF','#FFC93C','#2D9CDB','#FF5D9E'];
       o = `<g class="a-str"><path d="M140 62 Q150 96 146 128" fill="none" stroke="#E8412C" stroke-width="4" stroke-linecap="round"/><path d="M145 60 Q160 92 157 122" fill="none" stroke="#FFC93C" stroke-width="4" stroke-linecap="round"/><path d="M136 64 Q141 100 135 134" fill="none" stroke="#2D9CDB" stroke-width="4" stroke-linecap="round"/></g>`;
       for(let i=0;i<9;i++){ const a=(200+i*17.5)*Math.PI/180, x=100+50*Math.cos(a), y=86+42*Math.sin(a);
@@ -753,13 +848,13 @@ function partSVG(key, v){
     case 'eyes':   vb = '66 82 68 32'; o = drawEye(v, ex, 98, -1, s, '#F6F5FB') + drawEye(v, 200-ex, 98, 1, s, '#F6F5FB'); break;
     case 'brows':  vb = '66 66 68 30'; o = drawBrows(s); break;
     case 'mouth':  vb = '76 102 48 36'; o = drawMouth(v); break;
-    case 'hair':   vb = '30 8 140 170'; { const [b,f] = drawHair(s); o = (b||'') + ghost + (f||''); } break;
+    case 'hair':   vb = v===26 || v===27 ? '28 -10 144 184' : '30 8 140 170'; /* пірамідка й кучері вгору вищі за інші */ { const [b,f] = drawHair(s); o = (b||'') + ghost + (f||''); } break;
     case 'ears':   vb = '22 -6 156 130'; o = drawAnimalEars(s) + ghostFill; break;
     case 'hear':   vb = `${100-hw-21} 82 36 36`; o = drawSideEars(s, hw); break;  // крупно — одне вухо
     case 'cloth':  vb = v>=12 && v<19 ? '48 150 104 52' : '26 124 148 78'; o = neckRect(s) + drawBody(s, ++UID); break;
     case 'glasses':vb = '48 80 104 36'; o = drawGlasses(s, hw); break;
     case 'pet':    vb = {3:'122 106 56 80', 5:'140 108 64 72', 7:'134 114 68 88', 9:'118 128 84 74', 10:'122 128 84 74'}[s.pet] || '136 128 68 72'; o = drawPet(s); break;
-    case 'fx':     vb = '0 0 200 200'; o = `<rect width="200" height="200" fill="${BG[s.bgc]}"/>` + drawFx(s) + headShape(s.head, 'fill="none" stroke="#CFCBE3" stroke-width="3" stroke-dasharray="6 5"'); break;
+    case 'fx':     vb = '0 0 124 124';  /* лівий верхній кут — значки видно крупніше */ o = `<rect width="200" height="200" fill="${BG[s.bgc]}"/>` + drawFx(s); break;
     case 'earr':   vb = `${100-hw-18} 88 36 42`; o = drawSideEars(s, hw) + drawEarrings(s, hw); break;  // крупно — одна сережка
     case 'neck':   vb = '68 122 64 56'; o = `<rect x="88" y="120" width="24" height="36" fill="${shade(skin,-.12)}"/><path d="${TORSO}" fill="#E4E1F5"/><path d="M86 150 Q100 166 114 150 Z" fill="${shade(skin,-.12)}"/>` + drawNecklace(s); break;
     case 'hat':    vb = '32 -4 136 118'; o = ghost + drawHat(s, hw); break;
@@ -804,15 +899,15 @@ function avatarSVG(s, {cls='', size=''}={}){
 const TABS = [
   {icon:'<circle cx="12" cy="12" r="9"/><circle class="dot" cx="9" cy="10" r="1.2"/><circle class="dot" cx="15" cy="10" r="1.2"/><path d="M8.5 14.5 Q12 17.5 15.5 14.5"/>', name:'Обличчя', groups:[{key:'skin', title:'Колір шкіри', colors:SKIN}, {key:'head', title:'Форма голови'}]},
   {icon:'<circle cx="12" cy="12" r="9"/><ellipse cx="7.5" cy="13.5" rx="2" ry="1.3"/><ellipse cx="16.5" cy="13.5" rx="2" ry="1.3"/><circle class="dot" cx="9" cy="10" r="1.1"/><circle class="dot" cx="15" cy="10" r="1.1"/>', name:'Щічки', groups:[{key:'cheeks', title:'Щічки'}]},
-  {icon:'<path d="M2 12 Q12 3.5 22 12 Q12 20.5 2 12Z"/><circle cx="12" cy="12" r="3.2"/><circle class="dot" cx="12" cy="12" r="1.2"/>', name:'Очі', groups:[{key:'eyec', title:'Колір очей', colors:EYEC, when:st=>EYE_COLOR.includes(st.eyes), off:'— для очей «Великі», «З віями», «Блискучі», «Хитрі»'}, {key:'eyes', title:'Очі'}]},
+  {icon:'<path d="M2 12 Q12 3.5 22 12 Q12 20.5 2 12Z"/><circle cx="12" cy="12" r="3.2"/><circle class="dot" cx="12" cy="12" r="1.2"/>', name:'Очі', groups:[{key:'eyec', title:'Колір очей', colors:EYEC, when:st=>EYE_COLOR.includes(st.eyes)}, {key:'eyes', title:'Очі'}]},
   {icon:'<path d="M3 10 Q6.5 6 10 8.5 M14 8.5 Q17.5 6 21 10"/><circle class="dot" cx="7" cy="14.5" r="1.6"/><circle class="dot" cx="17" cy="14.5" r="1.6"/>', name:'Брови', groups:[{key:'brows', title:'Брови'}]},
   {icon:'<path d="M4 10 Q12 22 20 10 Z"/><path d="M7 11.5 H17"/>', name:'Рот', groups:[{key:'mouth', title:'Рот'}]},
   {icon:'<path d="M7.5 10 a5 5 0 0 1 10 0 c0 3.2 -2.6 4.2 -2.6 6.6 a2.9 2.9 0 0 1 -5.6 1.2"/><path d="M10.6 10.2 a2 2 0 0 1 4 0 c0 1.3 -1.1 1.7 -1.5 2.6"/>', name:'Вушка', groups:[{key:'hear', title:'Форма вух'}]},
-  {icon:'<path d="M5 15 C3 6 8 3 12 3 C16 3 21 6 19 15 C18 11 16 9 14 8.5 C12 10.5 9 11 7 10 C6 11.5 5.5 13 5 15Z"/><path d="M6 14 C6.5 18.5 9 21 12 21 C15 21 17.5 18.5 18 14"/>', name:'Зачіска', groups:[{key:'hairc', title:'Колір волосся', colors:HAIR}, {key:'hair', title:'Короткі зачіски', items:[0,10,1,11,12,20,21,2,3,9]}, {key:'hair', title:'Довгі зачіски', items:[5,16,17,4,15,19,6,18,7,13,14]}]},
-  {icon:'<path d="M8.5 3.5 L3 6.5 L5 10.5 L7 9.5 V20.5 H17 V9.5 L19 10.5 L21 6.5 L15.5 3.5 Q12 6.5 8.5 3.5Z"/>', name:'Одяг', groups:[{key:'clothc', title:'Колір одягу', colors:CLOTH}, {key:'cloth', title:'Одяг', items:[0,1,2,3,4,5,6,7,8,9,10,11,19]}, {key:'cloth', title:'Футболки з написами', items:[12,13,14,15,16]}, {key:'cloth', title:'Футболки з логотипом', items:[17,18]}]},
-  {icon:'<circle cx="6.5" cy="13" r="3.8"/><circle cx="17.5" cy="13" r="3.8"/><path d="M10.3 12.4 Q12 11 13.7 12.4 M2.7 12.5 L1.5 8.5 M21.3 12.5 L22.5 8.5"/>', name:'Аксесуари', groups:[{key:'glasses', title:'Окуляри'}, {key:'hat', title:'На голову'}, {key:'ears', title:'Кумедні вушка'}, {key:'earr', title:'Сережки'}, {key:'neck', title:'Намисто'}]},
+  {icon:'<path d="M5 15 C3 6 8 3 12 3 C16 3 21 6 19 15 C18 11 16 9 14 8.5 C12 10.5 9 11 7 10 C6 11.5 5.5 13 5 15Z"/><path d="M6 14 C6.5 18.5 9 21 12 21 C15 21 17.5 18.5 18 14"/>', name:'Зачіска', groups:[{key:'hairc', title:'Колір волосся', colors:HAIR}, {key:'hair', title:'Короткі зачіски', items:[0,10,1,11,12,20,21,22,2,23,3,9]}, {key:'hair', title:'Довгі зачіски', items:[5,16,17,4,15,19,6,25,18,7,24,26,27,13,14]}]},
+  {icon:'<path d="M8.5 3.5 L3 6.5 L5 10.5 L7 9.5 V20.5 H17 V9.5 L19 10.5 L21 6.5 L15.5 3.5 Q12 6.5 8.5 3.5Z"/>', name:'Одяг', groups:[{key:'clothc', title:'Колір одягу', colors:CLOTH}, {key:'cloth', title:'Одяг', items:[0,1,2,3,4,5,6,7,8,9,10,11,19]}, {key:'cloth', title:'Футболки з написами', items:[12,13,14,15,16]}]},
+  {icon:'<circle cx="6.5" cy="13" r="3.8"/><circle cx="17.5" cy="13" r="3.8"/><path d="M10.3 12.4 Q12 11 13.7 12.4 M2.7 12.5 L1.5 8.5 M21.3 12.5 L22.5 8.5"/>', name:'Аксесуари', groups:[{key:'glasses', title:'Окуляри'}, {key:'hatc', title:'Колір кепки', colors:CLOTH, when:st=>st.hat===1}, {key:'hat', title:'На голову'}, {key:'ears', title:'Кумедні вушка'}, {key:'earr', title:'Сережки'}, {key:'neck', title:'Намисто'}]},
   {icon:'<ellipse cx="12" cy="16" rx="4.6" ry="3.8"/><circle cx="5.8" cy="10.5" r="1.9"/><circle cx="9.6" cy="6.5" r="1.9"/><circle cx="14.4" cy="6.5" r="1.9"/><circle cx="18.2" cy="10.5" r="1.9"/>', name:'Улюбленець', groups:[{key:'pet', title:'Улюбленець'}]},
-  {icon:'<path d="M11 4 L12.6 10.4 L19 12 L12.6 13.6 L11 20 L9.4 13.6 L3 12 L9.4 10.4 Z"/><path d="M19 3 V7 M17 5 H21"/>', name:'Ефекти', groups:[{key:'fx', title:'Ефекти', items:[0,1,7,2,3,5,6]}]},
+  {icon:'<path d="M11 4 L12.6 10.4 L19 12 L12.6 13.6 L11 20 L9.4 13.6 L3 12 L9.4 10.4 Z"/><path d="M19 3 V7 M17 5 H21"/>', name:'Ефекти', groups:[{key:'fx', title:'Ефекти', items:[0,1,7,2,3,5,8,9,10,13,11,12,6,17,16,15,18,14,19,20,24,21,22,23,25]}]},
   {icon:'<rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="8.5" cy="9.5" r="1.8"/><path d="M3 17 L9 12 L13 15.5 L16 13 L21 17"/>', name:'Тло', groups:[{key:'bgc', title:'Колір тла', colors:BG}, {key:'pat', title:'Візерунок'}, {key:'shape', title:'Форма'}]},
 ];
 
@@ -842,17 +937,16 @@ function renderTabs(){
 }
 
 function renderGroups(){
-  $('groups').innerHTML = TABS[tab].groups.map(g=>{
-    const off = g.when && !g.when(state);
+  $('groups').innerHTML = TABS[tab].groups.filter(g=>!g.when || g.when(state)).map(g=>{
     let inner;
     if(g.colors){
-      inner = `<div class="swatches">${g.colors.map((c,i)=>`<button class="sw${state[g.key]===i?' on':''}" style="background:${c}" data-k="${g.key}" data-v="${i}" aria-label="Колір ${i+1}"${off?' disabled':''}></button>`).join('')}</div>`;
+      inner = `<div class="swatches">${g.colors.map((c,i)=>`<button class="sw${state[g.key]===i?' on':''}" style="background:${c}" data-k="${g.key}" data-v="${i}" aria-label="Колір ${i+1}"></button>`).join('')}</div>`;
     }else{
       const items = g.items || NAMES[g.key].map((_,i)=>i).filter(i=>!isGone(g.key, i));
       inner = `<div class="opts">${items.map(i=>{ const n = NAMES[g.key][i];
         return `<button class="opt${state[g.key]===i?' on':''}" data-k="${g.key}" data-v="${i}" title="${n}">${partSVG(g.key, i)}<span>${n}</span></button>`; }).join('')}</div>`;
     }
-    return `<div class="group${off?' off':''}"><h3>${g.title}${g.off?` <span class="off-hint">${g.off}</span>`:''}</h3>${inner}</div>`;
+    return `<div class="group"><h3>${g.title}</h3>${inner}</div>`;
   }).join('');
 }
 
@@ -880,7 +974,7 @@ const any = k => { const vs = [...Array(COUNT[k]).keys()].filter(v=>v && !isGone
 const maybe = (p, k) => Math.random()<p ? any(k) : 0;
 $('randomBtn').addEventListener('click', ()=>{
   const s = {};
-  KEYS.forEach(k=>s[k]=rnd(COUNT[k]));
+  KEYS.forEach(k=>{ const vs = [...Array(COUNT[k]).keys()].filter(v=>!isGone(k, v)); s[k] = vs[rnd(vs.length)]; });
   s.hat = maybe(0.35, 'hat');
   s.glasses = maybe(0.35, 'glasses');
   s.earr = maybe(0.3, 'earr');
