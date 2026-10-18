@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Табель класу — Логічні та вкладені функції</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в інтерфейсі Google -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#E8912C,#7A3E9D); --accent:#7A3E9D; --accent-dark:#5A2B78; --accent-soft:#F2E9F8; --bg:#F8F5FB; --line:#E6DEF0; }
+  .sample td.title{font-weight:800; text-align:center; background:#FDF0E0;}
+  .sample td.hd{font-weight:800; background:#F2E9F8; white-space:normal;}
+  .sample td.c{text-align:center;}
+  .sample td.b{font-weight:800;}
+  .mono.long{white-space:normal; overflow-wrap:anywhere; display:inline-block; margin-top:4px;}
+  /* Ілюстрація «Об'єднати клітинки» — як у Google Таблицях */
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em; color:#444746;}
+  .merge-ill{display:flex; flex-direction:column; align-items:center; gap:6px; margin:12px 0 6px; padding:14px 10px; background:#F8FAFD; border:1px solid #E1E3E1; border-radius:12px; font-family:Roboto,Arial,sans-serif; color:#1F1F1F; font-size:13px;}
+  .mi-step{display:flex; flex-direction:column; align-items:center; gap:8px;}
+  .mi-cap{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12.5px; color:var(--ink-soft);}
+  .mi-cap b{display:inline-flex; width:20px; height:20px; border-radius:50%; background:var(--accent); color:#fff; align-items:center; justify-content:center; font-size:12px; margin-right:4px;}
+  .mi-arrow{color:var(--accent); font-size:22px; font-weight:800; line-height:1;}
+  .gcells{border-collapse:collapse; background:#fff;}
+  .gcells th{background:#F8F9FA; color:#444746; font-weight:400; font-size:11px; border:1px solid #E1E3E1; height:20px; padding:0;}
+  .gcells th + th{min-width:32px;}
+  .gcells th:first-child{width:20px;}
+  .gcells td{border:1px solid #E1E3E1; width:32px; height:26px; padding:0 6px; white-space:nowrap;}
+  .gcells td.sel{background:#E8F0FE; border-top:2px solid #1A73E8; border-bottom:2px solid #1A73E8;}
+  .gcells td.sel.l{border-left:2px solid #1A73E8;}
+  .gcells td.sel.r{border-right:2px solid #1A73E8;}
+  .gcells td.m{text-align:center;}
+  .gbar{display:flex; align-items:center; gap:2px; background:#EDF2FA; border-radius:24px; padding:4px 10px;}
+  .gbar .ms{padding:4px; width:auto;}
+  .gbar .on{display:inline-flex; align-items:center; background:#D3E3FD; border-radius:6px; box-shadow:0 0 0 2px #1A73E8;}
+  .gbar .on .ms{color:#041E49;}
+  .gbar .on .dd{font-size:18px; padding:4px 0;}
+  .gbar .dd2{font-size:18px; padding:4px 0; margin-left:-4px;}
+  .gwrap{display:flex; flex-direction:column; align-items:flex-end;}
+  .gpop{display:flex; gap:2px; background:#fff; border-radius:8px; box-shadow:0 2px 6px rgba(60,64,67,.15), 0 1px 2px rgba(60,64,67,.3); padding:4px; margin-top:4px;}
+  .gpop .ms{padding:4px; width:auto; border-radius:4px;}
+  .gpop .hl{background:#D3E3FD; color:#041E49; box-shadow:0 0 0 2px #1A73E8;}
+  .sample td.yes{color:#188038; font-weight:700;}
+  .sample td.no{color:#C5221F; font-weight:700;}
+</style>
+</head>
+<body data-hud="8 клас · Практична · Табель класу">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 8 клас · Логічні та вкладені функції</div>
+    <h1>📒 Табель класу</h1>
+    <p>Побудуй у Google Таблицях табель: таблиця сама порахує середній бал, рівень і атестацію.</p>
+    <div class="meta"><span>⏱ 20–25 хв</span><span><img src="../../assets/logos/sheets.svg" alt="">Google Таблиці</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="sheet-wrap">
+      <table class="sample">
+        <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th><th>H</th><th>I</th></tr>
+        <tr><th>1</th><td class="title" colspan="9">Табель 8 класу</td></tr>
+        <tr><th>2</th><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><th>3</th><td class="hd c">Учень</td><td class="hd c" colspan="5">Оцінки</td><td class="hd c">Середній бал</td><td class="hd c">Рівень</td><td class="hd c">Атестація</td></tr>
+        <tr><th>4</th><td>Олена Бондар</td><td class="r">10</td><td class="r">11</td><td class="r">9</td><td class="r">12</td><td class="r">10</td><td class="r">10,4</td><td>Високий</td><td class="yes">Атестований</td></tr>
+        <tr><th>…</th><td>…</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><th>8</th><td>Марія Литвин</td><td class="r">2</td><td class="r">3</td><td class="r">4</td><td class="r">3</td><td class="r">2</td><td class="r">2,8</td><td>Початковий</td><td class="no">Неатестований</td></tr>
+        <tr><th>…</th><td>…</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><th>13</th><td class="b">Частка атестованих</td><td class="r b">60%</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи таблицю</h3>
+        <p>Обери один зі способів:</p>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Таблиці</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Таблиці</span>.</li>
+              <li>Назви файл: <b>Табель класу — Прізвище</b>.</li>
+            </ol>
+          </div>
+        </div>
+        <p>Потім перевір <span class="menu">Файл → Налаштування → Регіон: Україна</span>.</p>
+        <div class="tip">З регіоном «Україна» частини формули розділяють крапкою з комою <span class="mono">;</span>, а дроби пишуть через кому.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Зроби шапку</h3>
+        <ol>
+          <li>У <b>A1</b> — «Табель 8 класу».</li>
+          <li>У рядок <b>3</b>: <b>A3</b> — «Учень», <b>B3</b> — «Оцінки», <b>G3</b> — «Середній бал», <b>H3</b> — «Рівень», <b>I3</b> — «Атестація».</li>
+          <li>Виділи <b>B3:F3</b> → кнопка <span class="menu">Об'єднати клітинки</span> на панелі інструментів.</li>
+          <li>Не знімаючи виділення, вирівняй текст по центру.</li>
+          <li>Так само об'єднай і вирівняй по центру <b>A1:I1</b>.</li>
+        </ol>
+        <div class="merge-ill" aria-label="Як об'єднати клітинки й вирівняти текст по центру в Google Таблицях">
+          <div class="mi-step">
+            <div class="mi-cap"><b>1</b>Виділи комірки</div>
+            <table class="gcells">
+              <tr><th></th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th></tr>
+              <tr><th>3</th><td class="sel l">Оцінки</td><td class="sel"></td><td class="sel"></td><td class="sel"></td><td class="sel r"></td></tr>
+            </table>
+          </div>
+          <div class="mi-arrow">↓</div>
+          <div class="mi-step">
+            <div class="mi-cap"><b>2</b>Об'єднай клітинки</div>
+            <div class="gbar">
+              <span class="ms">format_bold</span><span class="ms">format_color_fill</span><span class="ms">border_all</span>
+              <span class="on"><span class="ms">cell_merge</span><span class="ms dd">arrow_drop_down</span></span>
+              <span class="ms">format_align_left</span><span class="ms dd2">arrow_drop_down</span>
+            </div>
+            <table class="gcells">
+              <tr><th></th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th></tr>
+              <tr><th>3</th><td class="sel l r" colspan="5">Оцінки</td></tr>
+            </table>
+          </div>
+          <div class="mi-arrow">↓</div>
+          <div class="mi-step">
+            <div class="mi-cap"><b>3</b>Вирівняй по центру</div>
+            <div class="gwrap">
+              <div class="gbar">
+                <span class="ms">format_bold</span><span class="ms">format_color_fill</span><span class="ms">border_all</span>
+                <span class="ms">cell_merge</span><span class="ms dd2">arrow_drop_down</span>
+                <span class="on"><span class="ms">format_align_left</span><span class="ms dd">arrow_drop_down</span></span>
+              </div>
+              <div class="gpop"><span class="ms">format_align_left</span><span class="ms hl">format_align_center</span><span class="ms">format_align_right</span></div>
+            </div>
+            <table class="gcells">
+              <tr><th></th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th></tr>
+              <tr><th>3</th><td class="sel l r m" colspan="5">Оцінки</td></tr>
+            </table>
+          </div>
+        </div>
+        <div class="tip">Зроби шапку жирною й залий кольором, щоб вона вирізнялася.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Введи оцінки й порахуй середній бал</h3>
+        <div class="sheet-wrap">
+          <table class="sample">
+            <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th></tr>
+            <tr><th>4</th><td>Олена Бондар</td><td class="r">10</td><td class="r">11</td><td class="r">9</td><td class="r">12</td><td class="r">10</td></tr>
+            <tr><th>5</th><td>Андрій Коваль</td><td class="r">7</td><td class="r">8</td><td class="r">6</td><td class="r">9</td><td class="r">8</td></tr>
+            <tr><th>6</th><td>Софія Мельник</td><td class="r">12</td><td class="r">9</td><td class="r">11</td><td class="r">10</td><td class="r">12</td></tr>
+            <tr><th>7</th><td>Максим Шевчук</td><td class="r">3</td><td class="r">4</td><td class="r">2</td><td class="r">5</td><td class="r">3</td></tr>
+            <tr><th>8</th><td>Марія Литвин</td><td class="r">2</td><td class="r">3</td><td class="r">4</td><td class="r">3</td><td class="r">2</td></tr>
+          </table>
+        </div>
+        <p>У <b>G4</b> введи <span class="mono">=AVERAGE(B4:F4)</span> і потягни <b>маркер заповнення</b> до <b>G8</b>.</p>
+        <div class="check-val">Перевір себе: у G4 — 10,4, у G8 — 2,8.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Визнач рівень</h3>
+        <p>Середній бал понад 9 — «Високий», понад 6 — «Достатній», понад 3 — «Середній», інакше — «Початковий».</p>
+        <ol>
+          <li>У <b>H4</b> введи:<br><span class="mono long">=IF(G4&gt;9;"Високий";IF(G4&gt;6;"Достатній";IF(G4&gt;3;"Середній";"Початковий")))</span></li>
+          <li>Потягни маркер заповнення до <b>H8</b>.</li>
+        </ol>
+        <div class="tip">Три <span class="mono">IF(</span> — три дужки в кінці. Текст — у лапках.</div>
+        <div class="check-val">Перевір себе: H5 — «Достатній», H7 — «Середній», H8 — «Початковий».</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Атестація</h3>
+        <p>Учня атестовано, якщо середній бал — 4 або більше.</p>
+        <ol>
+          <li>У <b>I4</b> введи:<br><span class="mono long">=IF(G4&gt;=4;"Атестований";"Неатестований")</span></li>
+          <li>Потягни маркер заповнення до <b>I8</b>.</li>
+        </ol>
+        <div class="check-val">Перевір себе: «Неатестований» — лише в I7 та I8.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Підбий підсумки</h3>
+        <p>Підписи — у стовпчик A, формули — у стовпчик B:</p>
+        <div class="sheet-wrap">
+          <table class="sample">
+            <tr><th></th><th>A</th><th>B</th></tr>
+            <tr><th>10</th><td>Учнів</td><td class="f">=COUNT(G4:G8)</td></tr>
+            <tr><th>11</th><td>З високим рівнем</td><td class="f">=COUNTIF(H4:H8;"Високий")</td></tr>
+            <tr><th>12</th><td>Атестовано</td><td class="f">=COUNTIF(I4:I8;"Атестований")</td></tr>
+            <tr><th>13</th><td>Частка атестованих</td><td class="f">=B12/B10</td></tr>
+          </table>
+        </div>
+        <p>Виділи <b>B13</b> → <span class="menu">Формат → Число → Відсоток</span>.</p>
+        <div class="check-val">Перевір себе: учнів — 5, з високим рівнем — 2, атестовано — 3, частка — 60%.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">7</div>
+      <div>
+        <h3>Перевір</h3>
+        <p>Зміни п’яту оцінку Максима (<b>F7</b>) з 3 на 6. Атестація в I7 і частка в B13 мають змінитися самі.</p>
+        <div class="check-val">Перевір себе: середній бал Максима — 4, частка — 80%.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Практична робота · «Логічні та вкладені функції» · 8 клас</footer>
+
+<script src="../../assets/practice.js"></script>
+</body>
+</html>

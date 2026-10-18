@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Логічні та вкладені функції — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --pri:#7A3E9D; --pri-dark:#5A2B78; --amber:#E8912C; --amber-dark:#B86A14;
+    --accent:var(--pri); --accent-dark:var(--pri-dark); --accent-soft:#F2E9F8;
+    --bg:#F8F5FB; --ink:#22183A; --ink-soft:#5B5274; --line:#E6DEF0; --surface:#FFFFFF;
+    --note:#2F7FA8; --note-soft:#E4F1F8; --note-ink:#1D5A7A;
+    --sun:#E8912C; --sun-soft:#FDF0E0; --sun-ink:#8F4F0B;
+    --hud-bar:linear-gradient(90deg,var(--amber),var(--pri));
+    --cell-line:#DCD6E6; --head-bg:#F0ECF6; --sel:#1A73E8;
+    --yes:#188038; --yes-soft:#E3F3E7; --no:#C5221F; --no-soft:#FCE8E6;
+  }
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; background:var(--head-bg); padding:1px 6px; border-radius:5px; font-size:.92em; white-space:nowrap;}
+  .hot-prompt{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15.5px; line-height:1.4; text-align:center; margin-bottom:12px; min-height:1.4em;}
+  .hot-prompt b{color:var(--pri-dark);}
+  .fline{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; font-size:14px; text-align:center; margin:10px 0 4px; overflow-wrap:anywhere; color:var(--ink);}
+  .fline .k{color:var(--pri);}
+  .fline .t{color:var(--yes);}
+  .fline .f{color:var(--no);}
+
+  /* Знаки порівняння */
+  .signs{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:8px 0 6px;}
+  @media (max-width:520px){ .signs{grid-template-columns:repeat(2,1fr);} }
+  .signs div{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-s); padding:6px 10px; display:flex; align-items:center; gap:10px; font-size:13.5px; color:var(--ink-soft);}
+  .signs b{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:18px; color:var(--pri); min-width:28px; text-align:center;}
+  .tf{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin:6px 0 4px;}
+  .tf span{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:14px; padding:3px 12px; border-radius:20px;}
+  .tf .t{background:var(--yes-soft); color:var(--yes);}
+  .tf .f{background:var(--no-soft); color:var(--no);}
+
+  /* Будова IF */
+  .anatomy{display:flex; flex-wrap:wrap; justify-content:center; align-items:stretch; gap:4px; font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:15px; margin:8px 0 6px;}
+  .anatomy .part{border-radius:9px; padding:6px 10px; text-align:center; line-height:1.25;}
+  .anatomy .part small{display:block; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:11px; margin-top:2px;}
+  .anatomy .c{background:var(--accent-soft); color:var(--pri-dark);}
+  .anatomy .y{background:var(--yes-soft); color:var(--yes);}
+  .anatomy .n{background:var(--no-soft); color:var(--no);}
+  .anatomy .sym{display:flex; align-items:center; color:var(--ink-soft);}
+
+  /* Міні-таблиця */
+  .mini{border-collapse:collapse; margin:0 auto 10px; font-size:13px; background:#fff; border:1.5px solid var(--cell-line);}
+  .mini th, .mini td{border:1px solid var(--cell-line); padding:4px 10px; height:28px; white-space:nowrap;}
+  .mini th{background:var(--head-bg); color:var(--ink-soft); font-size:11px; font-weight:700; padding:2px 8px;}
+  .mini td.hdr{background:#F7F5FA; font-weight:800;}
+  .mini td.num{text-align:right;}
+  .mini td.out{min-width:96px; font-weight:700;}
+  .mini td.pop{animation:cellPop .9s ease;}
+  @keyframes cellPop{0%{background:#E9DBF4;} 100%{background:#fff;}}
+  .mini.pick td.col{cursor:pointer;}
+  .mini.pick td.col:hover{box-shadow:inset 0 0 0 2px var(--sel);}
+  .mini td.got{background:var(--yes-soft); color:var(--yes); font-weight:800; box-shadow:inset 0 0 0 2px var(--yes);}
+  .mini td.shake{background:var(--no-soft) !important; animation:shakeX .35s ease;}
+  .mini td.range{background:#EEF4FE;}
+
+  /* Конструктор IF */
+  .if-formula{display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:4px; font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:16px; margin:4px 0 14px;}
+  .if-formula .kw{color:var(--pri);}
+  .slot{min-width:92px; padding:6px 10px; border:2px dashed var(--cell-line); border-radius:9px; text-align:center; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12.5px; color:var(--ink-soft); background:#fff;}
+  .slot.active{border-color:var(--pri); background:var(--accent-soft); color:var(--pri-dark);}
+  .slot.filled{border-style:solid; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:15px; font-weight:800;}
+  .slot.filled.s0{border-color:var(--pri); color:var(--pri-dark); background:var(--accent-soft);}
+  .slot.filled.s1{border-color:var(--yes); color:var(--yes); background:var(--yes-soft);}
+  .slot.filled.s2{border-color:var(--no); color:var(--no); background:var(--no-soft);}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:14px;}
+  .fchip{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:15px; padding:7px 14px; border-radius:20px; border:1.5px solid var(--cell-line); border-bottom-width:3px; background:#fff; cursor:pointer; color:var(--ink);}
+  .fchip:hover{border-color:var(--pri);}
+  .fchip.shake{animation:shakeX .35s ease; border-color:var(--no); background:var(--no-soft);}
+  .fchip[hidden]{display:none;}
+
+  /* Сходинки вкладених IF */
+  .ladder{max-width:460px; margin:0 auto 12px; display:flex; flex-direction:column; gap:0;}
+  .lv{display:flex; align-items:center; gap:10px;}
+  .lv .cond{flex-shrink:0; width:120px; text-align:center; font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:14px; padding:8px 6px; border-radius:10px; border:2px solid var(--cell-line); background:#fff; transition:all .25s ease;}
+  .lv .arrow{color:var(--ink-soft); font-size:12.5px; font-weight:700; white-space:nowrap;}
+  .lv .res{flex:1; padding:7px 12px; border-radius:10px; border:1.5px dashed var(--cell-line); font-weight:700; font-size:14px; color:var(--ink-soft); transition:all .25s ease;}
+  .lv.cur .cond{border-color:var(--sel); box-shadow:0 0 0 3px #1A73E833;}
+  .lv.pass .cond{border-color:var(--yes); background:var(--yes-soft); color:var(--yes);}
+  .lv.pass .res{border-style:solid; border-color:var(--yes); background:var(--yes-soft); color:var(--yes);}
+  .lv.fail .cond{border-color:var(--no); background:var(--no-soft); color:var(--no); opacity:.75;}
+  .down{width:120px; text-align:center; font-size:11.5px; font-weight:700; color:var(--ink-soft); line-height:20px;}
+  .lv.else .cond{border-style:dashed; font-family:'Nunito Sans',sans-serif; font-size:13px;}
+  .run-row{display:flex; justify-content:center; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:10px;}
+  .num-step{display:flex; align-items:center; gap:6px; font-size:13.5px; color:var(--ink-soft); font-weight:700;}
+  .num-step button{width:32px; height:32px; border-radius:8px; border:1.5px solid var(--cell-line); background:#fff; font-weight:800; font-size:16px; cursor:pointer;}
+  .num-step .v{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:18px; color:var(--ink); min-width:28px; text-align:center;}
+  .run-out{min-width:110px; text-align:center; border:2px solid var(--sel); background:#fff; border-radius:9px; padding:5px 12px; font-weight:800;}
+  .run-out.shake{animation:shakeX .35s ease; border-color:var(--no); background:var(--no-soft);}
+
+  #s5 .seq-opts .choice-btn, #s5 .seq-done li{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:14px;}
+
+  /* COUNTIF */
+  .cnt-out{display:flex; justify-content:center; align-items:center; gap:10px; font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:15px; margin-bottom:6px;}
+  .cnt-out .n{min-width:44px; text-align:center; border:2px solid var(--sel); border-radius:8px; padding:3px 10px; background:#fff;}
+</style>
+</head>
+<body data-lesson="lesson8-logical-functions" data-hud="8 клас · Логічні та вкладені функції">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Працюємо з числами · Тема 5</div>
+      <h1>Логічні та вкладені функції</h1>
+      <p>Навчимо таблицю ухвалювати рішення:<br><span style="white-space:nowrap">«якщо так — одне, якщо ні — інше».</span></p>
+      <button class="btn-primary" onclick="document.getElementById('rev').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <!-- ромб-рішення з обличчям -->
+      <path d="M70 12 L118 60 L70 108 L22 60 Z" fill="#fff" stroke="#7A3E9D" stroke-width="4.5" stroke-linejoin="round"/>
+      <text x="70" y="40" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-weight="800" font-size="13" fill="#7A3E9D">IF</text>
+      <circle cx="58" cy="58" r="5.5" fill="#22183A"/><circle cx="82" cy="58" r="5.5" fill="#22183A"/>
+      <circle cx="59.8" cy="56.2" r="1.8" fill="#fff"/><circle cx="83.8" cy="56.2" r="1.8" fill="#fff"/>
+      <path d="M61 73 C65 78 75 78 79 73" stroke="#22183A" stroke-width="3.5" stroke-linecap="round"/>
+      <!-- так -->
+      <path d="M22 60 L12 60 L12 104" stroke="#188038" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="16" cy="118" r="15" fill="#188038"/>
+      <path d="M9 118 l5 5 l9 -10" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- ні -->
+      <path d="M118 60 L128 60 L128 104" stroke="#E8912C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="124" cy="118" r="15" fill="#E8912C"/>
+      <path d="M118 112 l12 12 M130 112 l-12 12" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="rev" style="border-top:none; padding-top:0;">
+    <div class="step-label recap">Повторення · Складні розрахунки</div>
+    <h2>Що ти вже знаєш</h2>
+    <p class="soft">Обери термін, потім — його пояснення.</p>
+    <div class="exercise">
+      <div class="match-pool" id="revPool"></div>
+      <div id="revList"></div>
+      <div class="progress-line" id="revProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s1">
+    <div class="step-label">Крок 1 · Умова</div>
+    <h2>Правда чи ні?</h2>
+    <p>Умова — це порівняння. Таблиця відповідає на нього одним словом:</p>
+    <div class="tf"><span class="t">TRUE — істинно</span><span class="f">FALSE — хибно</span></div>
+    <div class="signs">
+      <div><b>&gt;</b>більше</div>
+      <div><b>&lt;</b>менше</div>
+      <div><b>=</b>дорівнює</div>
+      <div><b>&gt;=</b>більше або дорівнює</div>
+      <div><b>&lt;=</b>менше або дорівнює</div>
+      <div><b>&lt;&gt;</b>не дорівнює</div>
+    </div>
+    <p class="soft">У комірці <span class="mono">B2</span> — число <b>7</b>. Що відповість таблиця?</p>
+    <div id="cmpList"></div>
+  </section>
+
+  <section class="block" id="s2">
+    <div class="step-label">Крок 2 · Функція IF</div>
+    <h2>Якщо так — одне, якщо ні — інше</h2>
+    <p>Функція <span class="mono">IF</span> перевіряє умову й показує один із двох результатів.</p>
+    <div class="anatomy">
+      <span class="sym">=IF(</span>
+      <span class="part c">умова<small>що перевіряємо</small></span><span class="sym">;</span>
+      <span class="part y">якщо так<small>умова TRUE</small></span><span class="sym">;</span>
+      <span class="part n">якщо ні<small>умова FALSE</small></span><span class="sym">)</span>
+    </div>
+    <div class="note">Текст у формулі завжди беруть у лапки: <span class="mono">"Дорогий"</span>. Числа й адреси — без лапок.</div>
+    <div class="exercise">
+      <div class="hot-prompt" id="ifPrompt"></div>
+      <div class="if-formula" id="ifFormula">
+        <span class="kw">=IF(</span><span class="slot" data-i="0">умова</span><span class="kw">;</span><span class="slot" data-i="1">якщо так</span><span class="kw">;</span><span class="slot" data-i="2">якщо ні</span><span class="kw">)</span>
+      </div>
+      <div class="chips" id="ifChips"></div>
+      <table class="mini" id="ifTable"></table>
+      <div class="progress-line" id="ifStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s3">
+    <div class="step-label">Крок 3 · Що покаже комірка</div>
+    <h2>Прочитай формулу</h2>
+    <p>Результатом <span class="mono">IF</span> може бути текст, число і навіть обчислення.</p>
+    <div id="readList"></div>
+  </section>
+
+  <section class="block" id="s4">
+    <div class="step-label">Крок 4 · Вкладені IF</div>
+    <h2>Коли варіантів більше, ніж два</h2>
+    <p>На місце «якщо ні» можна поставити ще один <span class="mono">IF</span>. Так виходять сходинки перевірок.</p>
+    <div class="fline"><span class="k">=IF(</span>B2&gt;9;<span class="t">"Високий"</span>;<span class="k">IF(</span>B2&gt;6;<span class="t">"Достатній"</span>;<span class="k">IF(</span>B2&gt;3;<span class="t">"Середній"</span>;<span class="f">"Початковий"</span><span class="k">)))</span></div>
+    <div class="note">Перевірки йдуть згори вниз. Перша умова, що справдилася, — зупиняє формулу.</div>
+    <div class="exercise">
+      <div class="hot-prompt" id="ladPrompt"></div>
+      <div class="ladder" id="ladder"></div>
+      <div class="run-row">
+        <div class="num-step">оцінка в B2 <button data-d="-1">−</button><span class="v" id="ladVal">8</span><button data-d="1">+</button></div>
+        <button class="btn-primary" id="ladGo">Перевірити</button>
+        <span class="run-out" id="ladOut">?</span>
+      </div>
+      <div class="progress-line" id="ladStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s5">
+    <div class="step-label">Крок 5 · Порядок перевірок</div>
+    <h2>Від найвищої межі — до найнижчої</h2>
+    <p>Якщо першою поставити умову <span class="mono">B2&gt;3</span>, то й 11 балів дадуть «Середній»: формула далі не дивиться.</p>
+    <div class="trivia">Скільки разів відкрив <span class="mono">IF(</span> — стільки дужок закрий у кінці.</div>
+    <p class="soft">Збери формулу на 4 рівні по частинах.</p>
+    <div class="exercise">
+      <ol class="seq-done" id="seqDone"></ol>
+      <div class="seq-q" id="seqQ"></div>
+      <div class="seq-opts" id="seqOpts"></div>
+      <div class="choice-feedback" id="seqFb"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s6">
+    <div class="step-label">Крок 6 · AND і OR</div>
+    <h2>Кілька умов разом</h2>
+    <ul>
+      <li><span class="mono">AND</span> — TRUE, коли виконуються <b>усі</b> умови;</li>
+      <li><span class="mono">OR</span> — TRUE, коли виконується <b>хоча б одна</b>.</li>
+    </ul>
+    <p class="soft">Оцінки за самостійну (B) і контрольну (C). Перевіряємо:</p>
+    <div class="fline"><span class="k">=AND(</span>B2&gt;6;C2&gt;6<span class="k">)</span> &nbsp;і&nbsp; <span class="k">=OR(</span>B2&gt;6;C2&gt;6<span class="k">)</span></div>
+    <div class="exercise">
+      <div class="sort-buckets three">
+        <div class="bucket" id="bkBoth"><div class="bucket-title">TRUE в обох</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkOr"><div class="bucket-title">TRUE лише в OR</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkNone"><div class="bucket-title">FALSE в обох</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="aoPool"></div>
+      <div class="progress-line" id="aoProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s7">
+    <div class="step-label">Крок 7 · IF разом з AND</div>
+    <h2>Атестація</h2>
+    <p><span class="mono">AND</span> можна поставити на місце умови в <span class="mono">IF</span>. Учня атестують, якщо <b>обидві</b> оцінки не менші за 4.</p>
+    <div class="fline"><span class="k">=IF(AND(</span>B2&gt;=4;C2&gt;=4<span class="k">)</span>;<span class="t">"Атестований"</span>;<span class="f">"Неатестований"</span><span class="k">)</span></div>
+    <div id="attList"></div>
+  </section>
+
+  <section class="block" id="s8">
+    <div class="step-label">Крок 8 · COUNTIF</div>
+    <h2>Скільки комірок підходить?</h2>
+    <p><span class="mono">COUNTIF</span> рахує комірки діапазону, які відповідають умові. Умову пишуть у лапках: <span class="mono">"&gt;=8"</span>.</p>
+    <p class="soft">Клацни всі комірки, які порахує формула.</p>
+    <div class="exercise">
+      <div class="fline" id="cntF"></div>
+      <table class="mini pick" id="cntTable"></table>
+      <div class="cnt-out">результат → <span class="n" id="cntN">?</span></div>
+      <div class="progress-line" id="cntStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Логічні та вкладені функції» · 8 клас</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+const $ = id=>document.getElementById(id);
+function flash(el, cls, ms = 450){ el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), ms); }
+const m = s=>`<span class="mono">${s}</span>`;
+// Міні-таблиця: rows — масив рядків (перший — заголовки), cls(r, c) — додаткові класи комірки
+function miniTable(rows, cls = ()=>''){
+  const cols = 'ABCDEFG';
+  let h = '<tr><th></th>' + rows[0].map((_, c)=>`<th>${cols[c]}</th>`).join('') + '</tr>';
+  rows.forEach((row, r)=>{
+    h += `<tr><th>${r + 1}</th>` + row.map((v, c)=>{
+      const k = [r === 0 ? 'hdr' : typeof v === 'number' ? 'num' : '', cls(r, c)].filter(Boolean).join(' ');
+      return `<td data-r="${r}" data-c="${c}"${k ? ` class="${k}"` : ''}>${v}</td>`;
+    }).join('') + '</tr>';
+  });
+  return h;
+}
+
+/* ================= ПОВТОРЕННЯ ================= */
+makeMatching('revPool', 'revList', [
+  { name:'^', desc:'Піднесення до степеня' },
+  { name:'( )', desc:'Дія в них виконується першою' },
+  { name:';', desc:'Розділяє аргументи функції' },
+  { name:'COUNT', desc:'Рахує комірки з числами' },
+  { name:'COUNTA', desc:'Рахує всі непорожні комірки' },
+  { name:'LEFT', desc:'Бере кілька символів зліва' },
+  { name:'CONCATENATE', desc:'Склеює текст з кількох комірок' }
+], 'revProgress');
+
+/* ================= КРОК 1: УМОВИ ================= */
+makeYesNo('cmpList', [
+  { text:m('B2&gt;6'), correct:true },
+  { text:m('B2&lt;7'), correct:false, why:'7 не менше за 7.' },
+  { text:m('B2&gt;=7'), correct:true, why:'«Або дорівнює» — 7 підходить.' },
+  { text:m('B2&lt;&gt;7'), correct:false, why:'B2 якраз дорівнює 7.' },
+  { text:m('B2=7'), correct:true },
+  { text:m('B2&lt;=6'), correct:false }
+], 'TRUE', 'FALSE');
+
+/* ================= КРОК 2: КОНСТРУКТОР IF ================= */
+(function(){
+  const GOODS = [['Молоко', 32], ['Сир', 85], ['Хліб', 24], ['Кава', 120], ['Яблука', 45]];
+  const rows = [['Товар', 'Ціна, грн', 'Оцінка'], ...GOODS.map(g=>[g[0], g[1], ''])];
+  const table = $('ifTable'), status = $('ifStatus');
+  table.innerHTML = miniTable(rows, (r, c)=>c === 2 && r ? 'out' : '');
+  $('ifPrompt').innerHTML = 'Познач дорогі товари: ціна <b>понад 50 грн</b>.';
+  const CHIPS = [
+    { t:'B2>50', slot:0 },
+    { t:'"Дорогий"', slot:1 },
+    { t:'"Дешевий"', slot:2 },
+    { t:'B2+50', msg:'Це обчислення, а не порівняння. Умова має відповідати «так» чи «ні».' },
+    { t:'Дорогий', msg:'Текст без лапок таблиця не зрозуміє — покаже помилку.' },
+    { t:'B2<50', msg:'Ця умова шукає дешеві товари, а нам потрібні дорогі.' }
+  ];
+  const WHY = [
+    'Спершу — умова: що саме перевіряємо?',
+    'Друге місце — що показати, коли ціна понад 50.',
+    'Третє місце — що показати, коли умова не виконалась.'
+  ];
+  const slots = [...$('ifFormula').querySelectorAll('.slot')];
+  const chipsEl = $('ifChips');
+  const hit = trackTask(chipsEl, 3, 5);
+  let cur = 0;
+  const mark = ()=>slots.forEach((s, i)=>s.classList.toggle('active', i === cur));
+  shuffle(CHIPS).forEach(ch=>{
+    const b = document.createElement('button');
+    b.className = 'fchip'; b.textContent = ch.t;
+    b.addEventListener('click', ()=>{
+      if(cur > 2) return;
+      if(ch.slot !== cur){
+        flash(b, 'shake');
+        status.textContent = '🤔 ' + (ch.msg || WHY[cur]);
+        return;
+      }
+      const s = slots[cur];
+      s.textContent = ch.t; s.classList.add('filled', 's' + cur);
+      b.hidden = true; status.textContent = '';
+      addNeurons(1); hit();
+      cur++; mark();
+      if(cur === 3) fill();
+    });
+    chipsEl.appendChild(b);
+  });
+  function fill(){
+    chipsEl.querySelectorAll('.fchip').forEach(b=>b.hidden = true);
+    status.textContent = 'Копіюємо формулу вниз маркером заповнення…';
+    GOODS.forEach((g, i)=>setTimeout(()=>{
+      const td = table.querySelector(`td[data-r="${i + 1}"][data-c="2"]`);
+      const yes = g[1] > 50;
+      td.textContent = yes ? 'Дорогий' : 'Дешевий';
+      td.style.color = yes ? 'var(--yes)' : 'var(--no)';
+      flash(td, 'pop', 900);
+      if(i === GOODS.length - 1){ status.textContent = '✓ Одна формула — і таблиця сама оцінила всі товари.'; addNeurons(2); }
+    }, 400 * (i + 1)));
+  }
+  mark();
+})();
+
+/* ================= КРОК 3: ЧИТАЄМО ФОРМУЛИ ================= */
+const pre = (rows, f)=>`<table class="mini">${miniTable(rows)}</table><div class="fline">${f}</div>`;
+makeChoices('readList', [
+  { pre: pre([['Товар', 'Ціна'], ['Батон', 50]], '=IF(B2&gt;50;"Дорогий";"Дешевий")'),
+    text:'Що покаже комірка?', opts:['Дорогий', 'Дешевий', 'FALSE'], correct:1,
+    why:'50 не більше за 50. Щоб 50 теж було «дорогим», пишуть >=.' },
+  { pre: pre([['СР', 'КР'], [9, 11]], '=IF((A2+B2)/2&gt;9;"Високий";"Достатній")'),
+    text:'Що покаже комірка?', opts:['Високий', 'Достатній', '10'], correct:0,
+    why:'Середнє (9 + 11) / 2 = 10, а 10 > 9.' },
+  { pre: pre([['СР', 'КР', 'Рівень'], [8, 12, 'Високий']], '=IF(C2="Високий";(A2+B2)/2;"Достатній")'),
+    text:'Що покаже комірка?', opts:['Високий', '10', 'Достатній', '20'], correct:1,
+    why:'Умова виконана, тож комірка обчислить середнє: (8 + 12) / 2.' },
+  { pre: pre([['Сума', 'Людей'], [600, 0]], '=IF(B2&lt;&gt;0;A2/B2;"—")'),
+    text:'Що покаже комірка?', opts:['600', '0', '—', '#DIV/0!'], correct:2,
+    why:'B2 дорівнює 0, тому ділення не відбудеться. Так IF захищає від помилки.' }
+]);
+
+/* ================= КРОК 4: СХОДИНКИ ================= */
+(function(){
+  const LV = [['B2 > 9', 'Високий', v=>v > 9], ['B2 > 6', 'Достатній', v=>v > 6], ['B2 > 3', 'Середній', v=>v > 3]];
+  const TASKS = ['Середній', 'Початковий', 'Достатній'];
+  const lad = $('ladder'), out = $('ladOut'), status = $('ladStatus'), go = $('ladGo');
+  lad.innerHTML = LV.map(l=>`<div class="lv"><span class="cond">${l[0]} ?</span><span class="arrow">так →</span><span class="res">${l[1]}</span></div><div class="down">ні ↓</div>`).join('')
+    + '<div class="lv else"><span class="cond">інакше</span><span class="arrow">→</span><span class="res">Початковий</span></div>';
+  const rows = [...lad.querySelectorAll('.lv')];
+  const hit = trackTask(go, TASKS.length, TASKS.length + 2);
+  let v = 8, k = 0, busy = false;
+  const prompt = ()=>{ $('ladPrompt').innerHTML = k < TASKS.length ? `Яку оцінку поставити, щоб вийшло <b>«${TASKS[k]}»</b>?` : 'Сходинки пройдено ✓'; };
+  lad.parentElement.querySelector('.num-step').addEventListener('click', e=>{
+    const b = e.target.closest('[data-d]'); if(!b || busy) return;
+    v = Math.max(1, Math.min(12, v + +b.dataset.d)); $('ladVal').textContent = v;
+  });
+  go.addEventListener('click', ()=>{
+    if(busy || k >= TASKS.length) return;
+    busy = true; status.textContent = ''; out.textContent = '…';
+    rows.forEach(r=>r.classList.remove('cur', 'pass', 'fail'));
+    let i = 0;
+    (function step(){
+      const r = rows[i];
+      r.classList.add('cur');
+      setTimeout(()=>{
+        r.classList.remove('cur');
+        const ok = i === LV.length || LV[i][2](v);
+        r.classList.add(ok ? 'pass' : 'fail');
+        if(!ok){ i++; return setTimeout(step, 250); }
+        const got = i === LV.length ? 'Початковий' : LV[i][1];
+        out.textContent = got;
+        busy = false;
+        if(got !== TASKS[k]){ flash(out, 'shake'); status.textContent = `Вийшло «${got}». Спробуй інше число.`; return; }
+        status.textContent = `✓ ${v} → «${got}»`;
+        addNeurons(1); hit();
+        if(++k === TASKS.length){ addNeurons(2); status.textContent += '. Ти розумієш, як працюють вкладені IF!'; }
+        prompt();
+      }, 550);
+    })();
+  });
+  prompt();
+})();
+
+/* ================= КРОК 5: ПОРЯДОК ================= */
+makeSequence('seqDone', 'seqQ', 'seqOpts', 'seqFb', [
+  'IF(B2>9;"Високий"; …',
+  'IF(B2>6;"Достатній"; …',
+  'IF(B2>3;"Середній"; …',
+  '"Початковий"',
+  ')))'
+], '✓ =IF(B2>9;"Високий";IF(B2>6;"Достатній";IF(B2>3;"Середній";"Початковий"))) — три IF, три дужки.');
+
+/* ================= КРОК 6: AND / OR ================= */
+makeSortBoard('aoPool', { both:'bkBoth', or:'bkOr', none:'bkNone' }, [
+  { text:'8 і 9', bucket:'both' },
+  { text:'10 і 7', bucket:'both' },
+  { text:'7 і 5', bucket:'or' },
+  { text:'3 і 11', bucket:'or' },
+  { text:'12 і 6', bucket:'or' },
+  { text:'4 і 6', bucket:'none' },
+  { text:'6 і 6', bucket:'none' }
+], 'aoProgress');
+
+/* ================= КРОК 7: IF + AND ================= */
+makeClassify('attList', [
+  { text:'Самостійна — 5, контрольна — 4', correct:0, why:'Обидві не менші за 4.' },
+  { text:'Самостійна — 3, контрольна — 10', correct:1, why:'Для AND досить однієї невиконаної умови.' },
+  { text:'Самостійна — 4, контрольна — 4', correct:0, why:'«>=» пропускає й саму четвірку.' },
+  { text:'Самостійна — 12, контрольна — 2', correct:1, why:'Висока самостійна не рятує: AND вимагає обидві.' }
+], ['Атестований', 'Неатестований']);
+
+/* ================= КРОК 8: COUNTIF ================= */
+(function(){
+  const PEOPLE = [['Остап', 7], ['Ліна', 10], ['Марко', 5], ['Соня', 8], ['Тарас', 12], ['Віра', 6], ['Ігор', 9], ['Ната', 3]];
+  const lvl = v=>v > 9 ? 'Високий' : v > 6 ? 'Достатній' : v > 3 ? 'Середній' : 'Початковий';
+  const rows = [['Учень', 'Оцінка', 'Рівень'], ...PEOPLE.map(p=>[p[0], p[1], lvl(p[1])])];
+  const ROUNDS = [
+    { col:1, f:'=COUNTIF(B2:B9;"&gt;=8")', test:x=>x >= 8 },
+    { col:2, f:'=COUNTIF(C2:C9;"Достатній")', test:x=>x === 'Достатній' }
+  ];
+  const table = $('cntTable'), status = $('cntStatus'), nEl = $('cntN');
+  table.innerHTML = miniTable(rows);
+  const need = ROUNDS.map(R=>rows.slice(1).filter(r=>R.test(r[R.col])).length);
+  const hit = trackTask(table, need[0] + need[1], need[0] + need[1] + 2);
+  let k = 0, got = 0;
+  function start(){
+    const R = ROUNDS[k];
+    $('cntF').innerHTML = `<span class="k">${R.f.split('(')[0]}(</span>${R.f.slice(R.f.indexOf('(') + 1)}`;
+    got = 0; nEl.textContent = '?';
+    table.querySelectorAll('td').forEach(td=>{
+      td.classList.remove('got', 'col', 'range');
+      if(+td.dataset.r > 0 && +td.dataset.c === R.col) td.classList.add('col', 'range');
+    });
+  }
+  table.addEventListener('click', e=>{
+    const td = e.target.closest('td'); if(!td || k >= ROUNDS.length) return;
+    const R = ROUNDS[k];
+    if(!td.classList.contains('col')){ status.textContent = `Формула дивиться лише на стовпчик ${'ABC'[R.col]} — він підсвічений.`; return; }
+    if(td.classList.contains('got')) return;
+    const v = rows[+td.dataset.r][R.col];
+    if(!R.test(v)){ flash(td, 'shake'); status.textContent = `«${v}» не підходить під умову.`; return; }
+    td.classList.add('got'); got++;
+    addNeurons(1); hit();
+    status.textContent = `Знайдено: ${got} з ${need[k]}`;
+    if(got < need[k]) return;
+    nEl.textContent = got;
+    status.textContent = `✓ Формула поверне ${got}.`;
+    if(++k < ROUNDS.length) setTimeout(()=>{ start(); status.textContent = 'Тепер — інша умова.'; }, 1600);
+    else { addNeurons(2); status.textContent += ' COUNTIF рахує і числа, і текст.'; }
+  });
+  start();
+})();
+
+/* ================= ФІНАЛЬНИЙ ТЕСТ ================= */
+makeFinalQuiz('finalQuiz', [
+  { q:'У A1 — число 10. Що покаже =IF(A1>10;"Так";"Ні")?', opts:['Так', 'Ні', 'TRUE', '10'], correct:1, why:'10 не більше за 10.' },
+  { q:'Який знак у таблиці означає «не дорівнює»?', opts:['!=', '<>', '=/', '><'], correct:1 },
+  { q:'Скільки частин (аргументів) має функція IF?', opts:['Одну', 'Дві', 'Три', 'Скільки завгодно'], correct:2, why:'Умова; що показати, якщо так; що показати, якщо ні.' },
+  { q:'Чому формула =IF(B2>50;Дорогий;Дешевий) не спрацює?', opts:['Немає знака =', 'Текст не взято в лапки', 'Треба кому замість ;', 'Не можна порівнювати з 50'], correct:1 },
+  { q:'Що поверне =AND(5>3;2>4)?', opts:['TRUE', 'FALSE', '5', '2'], correct:1, why:'Друга умова хибна, а AND потребує всіх.' },
+  { q:'Що поверне =OR(5>3;2>4)?', opts:['TRUE', 'FALSE', '5', '2'], correct:0, why:'Досить однієї істинної умови.' },
+  { q:'B2 = 15. Що покаже =IF(B2>=18;"Золото";IF(B2>=15;"Срібло";IF(B2>=10;"Бронза";"Без медалі")))?', opts:['Золото', 'Срібло', 'Бронза', 'Без медалі'], correct:1 },
+  { q:'B2 = 11. Що покаже =IF(B2>3;"Середній";IF(B2>9;"Високий";"Початковий"))?', opts:['Високий', 'Середній', 'Початковий', 'Помилку'], correct:1, why:'Перша ж умова 11 > 3 справдилась — далі формула не дивиться.' },
+  { q:'Скільки дужок закрити в кінці формули з трьома вкладеними IF?', opts:['1', '2', '3', '4'], correct:2 },
+  { q:'У B2:B6 — 9, 7, 8, 10, 5. Що поверне =COUNTIF(B2:B6;">=8")?', opts:['2', '3', '4', '5'], correct:1, why:'9, 8 і 10.' }
+], {summary:'Ти знаєш знаки порівняння, пишеш функцію IF і вкладені IF у правильному порядку, поєднуєш умови через AND і OR та рахуєш комірки з COUNTIF.'});
+</script>
+
+</body>
+</html>
