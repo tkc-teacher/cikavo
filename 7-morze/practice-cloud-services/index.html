@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Опитування класу — Хмарні сервіси</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в інтерфейсі Google -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#E8590C,#0277BD); --accent:#0277BD; --accent-dark:#01579B; --accent-soft:#E1F2FB; --bg:#F4F8FC; --line:#D8E6F2; --gf:#673AB7; --gf-bg:#F0EBF8; }
+
+  /* Макет Google Форми */
+  .gf{background:var(--gf-bg); border-radius:var(--radius-m); padding:12px; font-family:Roboto,Arial,sans-serif; color:#202124; max-width:640px;}
+  .gf-card{background:#fff; border:1px solid #DADCE0; border-radius:8px; padding:14px 18px; margin-bottom:10px;}
+  .gf-card:last-child{margin-bottom:0;}
+  .gf-head{border-top:10px solid var(--gf);}
+  .gf-head .t{font-size:24px; line-height:1.25; margin-bottom:6px;}
+  .gf-head .d{font-size:13.5px; margin-bottom:10px;}
+  .gf-head .req{font-size:13px; color:#D93025; border-top:1px solid #DADCE0; padding-top:8px;}
+  .gf-q{font-size:15px; margin-bottom:10px;}
+  .gf-q .star{color:#D93025;}
+  .gf-opt{display:flex; align-items:center; gap:10px; font-size:14px; margin:6px 0;}
+  .gf-box, .gf-dot{width:16px; height:16px; border:2px solid #5F6368; flex-shrink:0;}
+  .gf-box{border-radius:2px;}
+  .gf-dot{border-radius:50%;}
+  .gf-scale{display:flex; align-items:flex-end; gap:14px; font-size:13px; flex-wrap:wrap;}
+  .gf-scale .n{display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .gf-scale .lbl{padding-bottom:2px; color:#5F6368;}
+  .gf-line{border-bottom:1px dotted #9AA0A6; width:70%; height:22px; font-size:13.5px; color:#70757A;}
+
+  /* Ілюстрації до кроків — макети інтерфейсу Google */
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em; color:#5F6368;}
+  .shot{margin:10px 0 6px; background:var(--gf-bg); border-radius:12px; padding:14px; font-family:Roboto,Arial,sans-serif; color:#202124; font-size:14px; overflow-x:auto;}
+  .shot .gf-card{margin:0;}
+  .hl{outline:2.5px solid #E8590C; outline-offset:2px; border-radius:6px;}
+  .focus{border-left:6px solid #4285F4 !important;}
+  .uline{border-bottom:1px solid #DADCE0; padding:4px 0 6px; margin-bottom:10px;}
+  .uline.on{border-bottom:2px solid var(--gf);}
+
+  /* Google Диск: меню «Створити» */
+  .sh-drive{background:#F8FAFD; display:flex; gap:6px; align-items:flex-start;}
+  .d-col{display:flex; flex-direction:column; gap:10px; flex-shrink:0;}
+  .d-new{align-self:flex-start; display:inline-flex; align-items:center; gap:10px; background:#fff; border-radius:16px; padding:12px 18px 12px 14px; font-weight:500; box-shadow:0 1px 3px rgba(60,64,67,.3),0 4px 8px 3px rgba(60,64,67,.15);}
+  .d-new .ms{color:#202124; font-size:22px;}
+  .d-menu{background:#fff; border-radius:6px; padding:6px 0; box-shadow:0 2px 6px 2px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.3); min-width:220px;}
+  .d-row{display:flex; align-items:center; gap:14px; padding:6px 16px; font-size:13.5px; white-space:nowrap;}
+  .d-row img{width:20px; height:20px;}
+  .d-row .chev{margin-left:auto; font-size:18px;}
+  .d-row.act{background:#E8EAED;}
+  .d-sep{height:1px; background:#E0E0E0; margin:6px 0;}
+  .d-menu.sub{min-width:170px; margin-top:212px;}
+  @media (max-width:600px){ .sh-drive{flex-direction:column;} .d-menu.sub{margin:0 0 0 40px;} }
+
+  /* Редактор запитання */
+  .q-top{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:12px;}
+  .q-field{flex:1 1 220px; background:#F1F3F4; border-bottom:2px solid var(--gf); padding:10px 12px; font-size:15px;}
+  .q-type{display:inline-flex; align-items:center; gap:8px; border:1px solid #DADCE0; border-radius:4px; padding:8px 8px 8px 12px; font-size:14px; white-space:nowrap;}
+  .q-add{color:#70757A; font-size:13.5px;}
+  .q-add b{color:#1A73E8; font-weight:500;}
+  .q-foot{display:flex; align-items:center; justify-content:flex-end; gap:14px; border-top:1px solid #DADCE0; margin-top:12px; padding-top:10px; font-size:14px;}
+  .q-foot .vr{width:1px; height:26px; background:#DADCE0;}
+  .q-req{display:inline-flex; align-items:center; gap:10px; padding:2px 4px;}
+  .toggle{width:34px; height:14px; border-radius:7px; background:#C5B3E6; position:relative;}
+  .toggle::after{content:""; position:absolute; right:-2px; top:-3px; width:20px; height:20px; border-radius:50%; background:var(--gf); box-shadow:0 1px 3px rgba(0,0,0,.3);}
+
+  /* Шкала + панель праворуч */
+  .sh-tools{display:flex; gap:10px; align-items:flex-start;}
+  .sh-tools .gf-card{flex:1 1 auto; min-width:0;}
+  .f-tools{background:#fff; border:1px solid #DADCE0; border-radius:8px; padding:6px; display:flex; flex-direction:column; gap:4px; flex-shrink:0;}
+  .f-tools .ms{font-size:22px; padding:5px; width:auto;}
+  @media (max-width:760px){ .sh-tools{flex-direction:column;} .sh-tools .gf-card{width:100%;} .f-tools{flex-direction:row; align-self:flex-end;} }
+  .sc-row{display:flex; align-items:center; gap:12px; margin:6px 0; font-size:14px;}
+  .sc-sel{display:inline-flex; align-items:center; gap:2px; border-bottom:1px solid #DADCE0; padding:2px 0 2px 4px;}
+  .sc-lbl{display:inline-block; min-width:130px; border-bottom:1px solid #DADCE0; padding:2px 0;}
+  .sc-labels{display:inline-block; padding:2px 6px;}
+
+  /* Меню типів запитань */
+  .t-menu{background:#fff; border-radius:6px; padding:6px 0; box-shadow:0 2px 6px 2px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.3); max-width:290px;}
+  .t-menu .d-row{padding:7px 16px; margin:0 6px;}
+
+  /* Верхня панель редактора форми */
+  .f-bar{display:flex; align-items:center; gap:12px; background:#fff; border-radius:8px; padding:8px 12px; flex-wrap:wrap;}
+  .f-bar img{width:26px; height:26px;}
+  .f-bar .ttl{font-size:16px; margin-right:auto; white-space:nowrap;}
+  .f-bar .ms{font-size:22px; padding:4px;}
+  .f-pub{background:var(--gf); color:#fff; border-radius:4px; padding:7px 16px; font-weight:500; font-size:14px;}
+  .f-theme{background:#fff; border-radius:8px; padding:12px 16px; margin:10px 0 0 auto; max-width:260px; box-shadow:0 1px 3px rgba(60,64,67,.3);}
+  .f-theme .h{font-size:16px; margin-bottom:10px; display:flex; align-items:center; gap:8px;}
+  .f-theme .k{font-size:12px; color:#5F6368; text-transform:uppercase; letter-spacing:.4px; margin:8px 0 6px;}
+  .dots{display:flex; gap:8px;}
+  .dots i{width:24px; height:24px; border-radius:50%; display:inline-block;}
+  .dots i.sel{box-shadow:0 0 0 2px #fff,0 0 0 4px #5F6368;}
+
+  /* Попередній перегляд з помилкою */
+  .gf-card.err{border-color:#D93025;}
+  .err-line{display:flex; align-items:center; gap:8px; color:#D93025; font-size:12.5px; margin-top:10px;}
+  .err-line .ms{color:#D93025; font-size:18px;}
+  .f-send{display:flex; align-items:center; justify-content:space-between; margin-top:10px;}
+  .f-send .b{background:var(--gf); color:#fff; border-radius:4px; padding:8px 24px; font-weight:500;}
+  .f-send .c{color:var(--gf); font-weight:500; font-size:14px;}
+
+  /* Вікно «Опублікувати форму» */
+  .pub-dlg{background:#fff; border-radius:24px; padding:20px 22px; max-width:440px; margin-top:10px; box-shadow:0 2px 6px 2px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.3);}
+  .pub-dlg .h{font-size:20px; margin-bottom:14px;}
+  .pub-dlg .k{font-size:14px; font-weight:500; margin-bottom:8px;}
+  .acc{display:flex; gap:12px; align-items:flex-start;}
+  .acc .ic{width:36px; height:36px; border-radius:50%; background:#C4EED0; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .acc .ic .ms{color:#0D652D;}
+  .acc .sel{display:inline-flex; align-items:center; gap:4px; font-size:14px; font-weight:500; padding:4px 4px 4px 8px; border-radius:4px; background:#F1F3F4;}
+  .acc .sub{font-size:12.5px; color:#5F6368; margin-top:4px;}
+  .pub-btns{display:flex; justify-content:flex-end; gap:8px; margin-top:18px;}
+  .pub-btns span{border-radius:4px; padding:8px 16px; font-weight:500; font-size:14px; color:var(--gf);}
+  .pub-btns .main{background:var(--gf); color:#fff;}
+
+  .types{display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 8px;}
+  .types span{font-size:13px; font-weight:700; background:var(--bg); border:1.5px solid var(--line); border-radius:999px; padding:3px 10px;}
+  .sample td{white-space:normal;}
+  .sample td.b{font-weight:800; background:var(--accent-soft);}
+</style>
+</head>
+<body data-hud="7 клас · Практична · Опитування класу">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 7 клас · Хмарні сервіси</div>
+    <h1>📋 Опитування класу</h1>
+    <p>Створи в Google Формах коротке опитування про те, як твої однокласники користуються хмарою.</p>
+    <div class="meta"><span>⏱ 20–25 хв</span><span><img src="../../assets/logos/forms.svg" alt="">Google Форми</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="gf">
+      <div class="gf-card gf-head">
+        <div class="t">Як ми користуємося хмарою</div>
+        <div class="d">Опитування 7 класу. Відповіді анонімні, займе 2 хвилини.</div>
+        <div class="req">* Позначає обов'язкове запитання</div>
+      </div>
+      <div class="gf-card">
+        <div class="gf-q">Якими сервісами Google ти користуєшся? <span class="star">*</span></div>
+        <div class="gf-opt"><span class="gf-box"></span>Gmail</div>
+        <div class="gf-opt"><span class="gf-box"></span>Google Диск</div>
+        <div class="gf-opt"><span class="gf-box"></span>Google Документи</div>
+        <div class="gf-opt"><span class="gf-box"></span>…</div>
+      </div>
+      <div class="gf-card">
+        <div class="gf-q">Де ти найчастіше зберігаєш свої файли? <span class="star">*</span></div>
+        <div class="gf-opt"><span class="gf-dot"></span>На комп'ютері</div>
+        <div class="gf-opt"><span class="gf-dot"></span>У хмарі</div>
+        <div class="gf-opt"><span class="gf-dot"></span>…</div>
+      </div>
+      <div class="gf-card">
+        <div class="gf-q">Наскільки зручно редагувати документ разом з однокласниками? <span class="star">*</span></div>
+        <div class="gf-scale">
+          <span class="lbl">Незручно</span>
+          <span class="n">1<span class="gf-dot"></span></span><span class="n">2<span class="gf-dot"></span></span><span class="n">3<span class="gf-dot"></span></span><span class="n">4<span class="gf-dot"></span></span><span class="n">5<span class="gf-dot"></span></span>
+          <span class="lbl">Дуже зручно</span>
+        </div>
+      </div>
+      <div class="gf-card">
+        <div class="gf-q">Чого б ти хотів чи хотіла навчитися в хмарних сервісах?</div>
+        <div class="gf-line">Ваша відповідь</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи форму</h3>
+        <ol>
+          <li>На Google Диску: <span class="menu">Створити → Google Форми → Порожня форма</span>.</li>
+          <li>Назви файл: <b>Опитування — Прізвище</b>.</li>
+        </ol>
+        <div class="shot sh-drive">
+          <div class="d-col">
+            <span class="d-new"><span class="ms">add</span>Створити</span>
+            <div class="d-menu">
+              <div class="d-row"><span class="ms">create_new_folder</span>Нова папка</div>
+              <div class="d-sep"></div>
+              <div class="d-row"><span class="ms">upload_file</span>Завантажити файл</div>
+              <div class="d-row"><span class="ms">drive_folder_upload</span>Завантажити папку</div>
+              <div class="d-sep"></div>
+              <div class="d-row"><img src="../../assets/logos/docs.svg" alt="">Google Документи<span class="ms chev">chevron_right</span></div>
+              <div class="d-row"><img src="../../assets/logos/sheets.svg" alt="">Google Таблиці<span class="ms chev">chevron_right</span></div>
+              <div class="d-row"><img src="../../assets/logos/slides.svg" alt="">Google Презентації<span class="ms chev">chevron_right</span></div>
+              <div class="d-row act hl"><img src="../../assets/logos/forms.svg" alt="">Google Форми<span class="ms chev">chevron_right</span></div>
+              <div class="d-row" style="padding-left:50px">Більше<span class="ms chev">chevron_right</span></div>
+            </div>
+          </div>
+          <div class="d-menu sub">
+            <div class="d-row hl">Порожня форма</div>
+            <div class="d-row">Порожній тест</div>
+            <div class="d-row">З шаблону</div>
+          </div>
+        </div>
+        <div class="tip">Форма, як і документ, зберігається на Google Диску сама — кнопки «Зберегти» немає.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Напиши назву й опис</h3>
+        <ol>
+          <li>Клацни «Форма без назви» і введи: <b>Як ми користуємося хмарою</b>.</li>
+          <li>В «Опис форми» введи: <b>Опитування 7 класу. Відповіді анонімні, займе 2 хвилини.</b></li>
+        </ol>
+        <div class="shot">
+          <div class="gf-card gf-head focus">
+            <div class="t uline">Як ми користуємося хмарою</div>
+            <div class="uline on" style="font-size:13.5px; margin:0;">Опитування 7 класу. Відповіді анонімні, займе 2 хвилини.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Створи перше запитання</h3>
+        <ol>
+          <li>Клацни «Запитання без назви» і введи: <b>Якими сервісами Google ти користуєшся?</b></li>
+          <li>Праворуч від запитання обери тип <span class="menu">Прапорці</span>.</li>
+          <li>Введи варіанти: <b>Gmail</b>, <b>Google Диск</b>, <b>Google Документи</b>, <b>Classroom</b>, <b>Meet</b>.</li>
+          <li>Унизу картки увімкни <span class="menu">Обов'язкове</span>.</li>
+        </ol>
+        <div class="shot">
+          <div class="gf-card focus">
+            <div class="q-top">
+              <div class="q-field">Якими сервісами Google ти користуєшся?</div>
+              <span class="ms">image</span>
+              <span class="q-type hl"><span class="ms">check_box</span>Прапорці<span class="ms">arrow_drop_down</span></span>
+            </div>
+            <div class="gf-opt"><span class="gf-box"></span>Gmail</div>
+            <div class="gf-opt"><span class="gf-box"></span>Google Диск</div>
+            <div class="gf-opt"><span class="gf-box"></span>Google Документи</div>
+            <div class="gf-opt"><span class="gf-box"></span><span class="q-add">Додати варіант або <b>додати «Інше»</b></span></div>
+            <div class="q-foot">
+              <span class="ms">content_copy</span><span class="ms">delete</span><span class="vr"></span>
+              <span class="q-req hl">Обов'язкове<span class="toggle"></span></span>
+              <span class="ms">more_vert</span>
+            </div>
+          </div>
+        </div>
+        <div class="tip">Прапорці дозволяють обрати кілька варіантів, а кружечки («Кілька варіантів») — лише один.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Додай ще три запитання</h3>
+        <p>Кожне нове запитання — кнопкою <span class="menu"><span class="ms" style="color:inherit">add_circle</span> Додати запитання</span> на панелі праворуч:</p>
+        <div class="sheet-wrap">
+          <table class="sample">
+            <tr><td class="b">Запитання</td><td class="b">Тип</td><td class="b">Варіанти</td></tr>
+            <tr><td>Де ти найчастіше зберігаєш свої файли?</td><td>Кілька варіантів</td><td>На комп'ютері · На телефоні · На флешці · У хмарі</td></tr>
+            <tr><td>Наскільки зручно редагувати документ разом з однокласниками?</td><td>Лінійна шкала</td><td>від 1 «Незручно» до 5 «Дуже зручно»</td></tr>
+            <tr><td>Чого б ти хотів чи хотіла навчитися в хмарних сервісах?</td><td>Абзац</td><td>—</td></tr>
+          </table>
+        </div>
+        <p>Перші два зроби обов'язковими, останнє — ні.</p>
+        <div class="shot sh-tools">
+          <div class="gf-card focus">
+            <div class="q-top">
+              <div class="q-field">Наскільки зручно редагувати документ разом з однокласниками?</div>
+              <span class="q-type"><span class="ms">linear_scale</span>Лінійна шкала<span class="ms">arrow_drop_down</span></span>
+            </div>
+            <div class="sc-row"><span class="sc-sel">1<span class="ms">arrow_drop_down</span></span>до<span class="sc-sel">5<span class="ms">arrow_drop_down</span></span></div>
+            <div class="sc-labels hl">
+              <div class="sc-row">1 <span class="sc-lbl">Незручно</span></div>
+              <div class="sc-row">5 <span class="sc-lbl">Дуже зручно</span></div>
+            </div>
+          </div>
+          <div class="f-tools">
+            <span class="ms hl">add_circle</span><span class="ms">upload_file</span><span class="ms">title</span><span class="ms">image</span><span class="ms">smart_display</span><span class="ms">view_agenda</span>
+          </div>
+        </div>
+        <div class="tip">Підписи «Незручно» і «Дуже зручно» вводять у рядки під числами шкали.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Додай своє запитання</h3>
+        <p>Придумай ще одне запитання про хмару й обери для нього тип, якого ще немає у формі:</p>
+        <div class="types"><span>Коротка відповідь</span><span>Спадний список</span><span>Дата</span></div>
+        <div class="shot">
+          <div class="t-menu">
+            <div class="d-row hl"><span class="ms">short_text</span>Коротка відповідь</div>
+            <div class="d-row"><span class="ms">subject</span>Абзац</div>
+            <div class="d-sep"></div>
+            <div class="d-row"><span class="ms">radio_button_checked</span>Кілька варіантів</div>
+            <div class="d-row"><span class="ms">check_box</span>Прапорці</div>
+            <div class="d-row hl"><span class="ms">arrow_drop_down_circle</span>Спадний список</div>
+            <div class="d-sep"></div>
+            <div class="d-row"><span class="ms">linear_scale</span>Лінійна шкала</div>
+            <div class="d-sep"></div>
+            <div class="d-row hl"><span class="ms">event</span>Дата</div>
+            <div class="d-row"><span class="ms">schedule</span>Час</div>
+          </div>
+        </div>
+        <div class="tip">Спадний список зручний, коли варіантів багато: наприклад, «У якому класі ти навчаєшся?».</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Наведи красу</h3>
+        <ol>
+          <li>Угорі клацни <span class="menu"><span class="ms" style="color:inherit">palette</span> Налаштувати тему</span>.</li>
+          <li>Обери колір і шрифт, за бажанням — зображення для заголовка.</li>
+        </ol>
+        <div class="shot">
+          <div class="f-bar">
+            <img src="../../assets/logos/forms.svg" alt=""><span class="ttl">Як ми користуємося хмарою</span>
+            <span class="ms hl">palette</span><span class="ms">visibility</span><span class="ms">undo</span><span class="ms">redo</span>
+            <span class="f-pub">Опублікувати</span><span class="ms">more_vert</span>
+          </div>
+          <div class="f-theme">
+            <div class="h"><span class="ms">palette</span>Тема</div>
+            <div class="k">Колір</div>
+            <div class="dots"><i class="sel" style="background:#673AB7"></i><i style="background:#DB4437"></i><i style="background:#4285F4"></i><i style="background:#0F9D58"></i><i style="background:#F4B400"></i><i style="background:#FF6D00"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">7</div>
+      <div>
+        <h3>Перевір</h3>
+        <ol>
+          <li>Угорі клацни <span class="menu"><span class="ms" style="color:inherit">visibility</span> Попередній перегляд</span> — форма відкриється так, як її бачитимуть однокласники.</li>
+          <li>Нічого не обираючи, натисни <span class="menu">Надіслати</span>.</li>
+        </ol>
+        <div class="shot">
+          <div class="gf-card err">
+            <div class="gf-q">Якими сервісами Google ти користуєшся? <span class="star">*</span></div>
+            <div class="gf-opt"><span class="gf-box"></span>Gmail</div>
+            <div class="gf-opt"><span class="gf-box"></span>Google Диск</div>
+            <div class="gf-opt"><span class="gf-box"></span>…</div>
+            <div class="err-line"><span class="ms">error</span>Це обов'язкове запитання</div>
+          </div>
+          <div class="f-send"><span class="b">Надіслати</span><span class="c">Очистити форму</span></div>
+        </div>
+        <div class="check-val">Перевір себе: у формі 5 запитань, і біля трьох з них з'явилось «Це обов'язкове запитання».</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">8</div>
+      <div>
+        <h3>Опублікуй форму</h3>
+        <ol>
+          <li>Угорі клацни <span class="menu">Опублікувати</span>.</li>
+          <li>У вікні в «Загальний доступ» обери <span class="menu">Усі, хто має посилання</span>.</li>
+          <li>Натисни <span class="menu">Опублікувати</span> ще раз.</li>
+          <li>Клацни <span class="menu"><span class="ms" style="color:inherit">link</span> Копіювати посилання</span> — тепер форму можна надіслати однокласникам.</li>
+        </ol>
+        <div class="shot">
+          <div class="f-bar">
+            <img src="../../assets/logos/forms.svg" alt=""><span class="ttl">Як ми користуємося хмарою</span>
+            <span class="ms">palette</span><span class="ms">visibility</span><span class="ms">link</span>
+            <span class="f-pub hl">Опублікувати</span><span class="ms">more_vert</span>
+          </div>
+          <div class="pub-dlg">
+            <div class="h">Опублікувати форму</div>
+            <div class="k">Загальний доступ</div>
+            <div class="acc">
+              <span class="ic"><span class="ms">public</span></span>
+              <div>
+                <span class="sel hl">Усі, хто має посилання<span class="ms">arrow_drop_down</span></span>
+                <div class="sub">Відповідати може будь-хто в Інтернеті, хто має посилання</div>
+              </div>
+            </div>
+            <div class="pub-btns"><span>Скасувати</span><span class="main hl">Опублікувати</span></div>
+          </div>
+        </div>
+        <div class="tip">Без публікації форма — лише чернетка: відповідати на неї не може ніхто, крім тебе.</div>
+        <div class="check-val">Перевір себе: замість кнопки «Опублікувати» тепер напис «Опубліковано».</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Практична робота · «Хмарні сервіси. Рівні та способи доступу до ресурсів» · 7 клас</footer>
+
+<script src="../../assets/practice.js"></script>
+</body>
+</html>
