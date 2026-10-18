@@ -17,6 +17,9 @@ html{scroll-behavior:smooth;}
 @media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto;} *{animation-duration:.001ms !important; transition-duration:.001ms !important;} }
 body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
 h1,h2,h3,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+/* Красиві переноси: заголовки — рівними рядками, у тексті — без одного-двох слів в останньому рядку */
+body{text-wrap:pretty;}
+h1,h2,h3,h4,.headline,.step-label,.q,.bucket-title{text-wrap:balance;}
 .container{max-width:800px; margin:0 auto; padding:0 24px;}
 @media (max-width:520px){ .container{padding:0 16px;} }
 @keyframes shakeX{0%,100%{transform:translateX(0);} 25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}

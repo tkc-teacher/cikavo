@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Хмарні сервіси. Рівні та способи доступу — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в інтерфейсі Google Диска -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --accent:#0277BD; --accent-dark:#01579B; --accent-soft:#E1F2FB;
+    --label:#E8590C;
+    --bg:#F4F8FC; --line:#D8E6F2;
+    --note:#0277BD; --note-soft:#E1F2FB; --note-ink:#01579B;
+    --hud-bar:linear-gradient(90deg,#4FC3F7,#0277BD,#E8590C);
+    /* кольори співавторів */
+    --olya:#E8710A; --denys:#7B3FD4; --taras:#0B8043; --me:#1A73E8;
+    /* інтерфейс Google */
+    --g-blue:#0B57D0; --g-blue-soft:#C2E7FF; --g-ink:#1F1F1F; --g-soft:#444746; --g-line:#DADCE0; --g-canvas:#F8FAFD;
+  }
+
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em;}
+  .ms.fill{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;}
+
+  /* ---------- Крок 1: синхронізація й спільне редагування (як у 7-ind/lesson-cloud-services) ---------- */
+  .sync-ill{margin:6px 0 16px; background:linear-gradient(180deg,#E1F2FB 0%,#F8FAFD 100%); border-radius:var(--radius-l); padding:16px 12px 14px;}
+  .sync-ill svg{display:block; width:100%; max-width:600px; height:auto; margin:0 auto;}
+  .sync-ill text{font-family:'Nunito Sans',sans-serif; font-size:15px; font-weight:700; fill:#5F6368;}
+  .sync-ill text.b{font-family:'Baloo 2',sans-serif; font-size:17px; fill:#1A73E8;}
+  .td{display:flex; align-items:center; justify-content:center; gap:14px; padding:10px 4px 2px;}
+  .td-laptop{flex:0 1 330px; min-width:0;}
+  .td-screen{background:#1F1F1F; border-radius:10px 10px 4px 4px; padding:7px;}
+  .td-base{height:10px; background:#5F6368; border-radius:0 0 10px 10px; margin:0 -14px;}
+  .td-bar{display:flex; align-items:center; gap:6px; background:#fff; border-radius:4px 4px 0 0; padding:5px 8px; font-family:'Roboto',sans-serif; font-size:12px; font-weight:500; border-bottom:1px solid #EEF0F2;}
+  .td-bar img{width:13px; height:16px;}
+  .td-av{width:16px; height:16px; border-radius:50%; color:#fff; font-size:9.5px; display:inline-flex; align-items:center; justify-content:center; margin-left:auto; flex-shrink:0;}
+  .td-status{font-weight:400; color:#5F6368; font-size:11px; white-space:nowrap;}
+  .td-page{background:#fff; height:116px; overflow:hidden; display:flex; flex-direction:column; justify-content:flex-start; padding:10px 12px; font-family:'Roboto',sans-serif; font-size:14px; line-height:1.45; border-radius:0 0 4px 4px; word-wrap:break-word;}
+  .td-page p{margin:0 0 4px; font-size:inherit; line-height:inherit; flex-shrink:0;}
+  .td-caret{display:inline-block; width:2px; height:1.05em; background:var(--olya); vertical-align:-2px; animation:blink 1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  .td-mid{display:flex; flex-direction:column; align-items:center; gap:6px; flex-shrink:0;}
+  .td-cloud{width:64px; height:64px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(26,115,232,.2);}
+  .td-cloud img{width:34px; height:31px;}
+  .td-sync{width:28px; height:28px; border-radius:50%; background:#E8F0FE; color:#1A73E8; display:flex; align-items:center; justify-content:center;}
+  .td-sync .ms{font-size:18px;}
+  .td-sync.spin .ms{animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(-360deg);}}
+  .td-phone{flex:0 0 130px;}
+  .td-pscreen{background:#1F1F1F; border-radius:16px; padding:10px 5px;}
+  .td-pscreen .td-page{height:170px; font-size:10.5px; line-height:1.35; padding:7px;}
+  .td-pscreen .td-bar{font-size:10.5px; padding:4px 6px;}
+  .td-lbl{text-align:center; font-weight:700; font-size:13.5px; color:#5F6368; margin-top:6px;}
+  @media (max-width:520px){ .td{gap:6px;} .td-phone{flex-basis:96px;} .td-cloud{width:46px; height:46px;} .td-cloud img{width:26px; height:24px;} .td-page{font-size:12px; height:116px;} .td-pscreen .td-page{height:170px; font-size:9.5px;} .td-status{display:none;} }
+  /* ---------- Крок 2: сервіси Google і гра «Знайди пару» ---------- */
+  .svc{display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:14px 0 20px;}
+  @media (max-width:640px){ .svc{grid-template-columns:repeat(2,1fr);} }
+  .svc-it{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 10px 12px; text-align:center;}
+  .svc-it img{width:36px; height:36px; object-fit:contain;}
+  .svc-it b{display:block; font-family:'Roboto',sans-serif; font-weight:500; font-size:14.5px; margin:6px 0 2px; color:var(--g-ink);}
+  .svc-it span{display:block; font-size:13px; line-height:1.35; color:var(--ink-soft);}
+  .memo-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+  .memo-card{perspective:1200px; height:104px; cursor:pointer;}
+  .memo-card .flip-inner{transition:transform .5s cubic-bezier(.4,0,.2,1);}
+  .memo-card.flipped .flip-inner{transform:rotateY(180deg);}
+  .memo-card .flip-face{padding:8px; border:none;}
+  .memo-card .flip-front{background:linear-gradient(135deg,var(--accent),var(--accent-dark)); color:#fff;}
+  .memo-card .flip-front .ms{font-size:34px; width:auto; opacity:.9;}
+  .memo-card .flip-back{background:#fff; border:2px solid var(--line); transform:rotateY(180deg); /* без цього рядка картка «зникає» */}
+  .memo-card .flip-back img{width:30px; height:30px; object-fit:contain; margin-bottom:5px;}
+  .memo-card .flip-back b{font-family:'Roboto',sans-serif; font-weight:500; font-size:13px; line-height:1.2; color:var(--g-ink);}
+  .memo-card .flip-back span{font-size:12.5px; font-weight:700; line-height:1.3; color:var(--ink);}
+  .memo-card.matched{pointer-events:none;}
+  .memo-card.matched .flip-back{border-color:var(--ok); background:var(--ok-soft);}
+  /* трусимо саму картку: анімація transform на .flip-back затерла б її rotateY(180deg), і картка «зникла» б */
+  .memo-card.wrong{animation:shakeX .35s ease;}
+  .memo-card.wrong .flip-back{border-color:var(--coral);}
+  @media (max-width:480px){ .memo-grid{gap:6px;} .memo-card{height:96px;} .memo-card .flip-back span{font-size:11px;} .memo-card .flip-back b{font-size:11.5px;} }
+
+  /* ---------- Крок 3: Google Диск ---------- */
+  .task-card{display:flex; align-items:center; gap:14px; background:var(--accent-soft); border-radius:var(--radius-m); padding:14px 18px; margin-bottom:14px; min-height:64px;}
+  .task-card .tnum{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:13px; color:var(--accent-dark); white-space:nowrap;}
+  .task-card .ttext{font-weight:700; font-size:16px;}
+  .gdrive{display:grid; grid-template-columns:220px 1fr; border:1px solid var(--g-line); border-radius:var(--radius-m); overflow:hidden; background:var(--g-canvas); font-family:'Roboto',sans-serif; color:var(--g-ink); box-shadow:0 2px 10px rgba(0,0,0,.06);}
+  .gdr-side{padding:12px 10px 12px 8px;}
+  .gdr-logo{display:flex; align-items:center; gap:8px; font-size:20px; padding:2px 8px 12px;}
+  .gdr-logo img{width:30px; height:30px;}
+  .new-btn{display:inline-flex; align-items:center; gap:10px; background:#fff; border-radius:16px; padding:14px 20px 14px 16px; font-weight:500; font-size:14px; box-shadow:0 1px 2px rgba(60,64,67,.3),0 1px 3px 1px rgba(60,64,67,.15); margin:0 0 12px 4px;}
+  .new-btn .ms{font-size:22px;}
+  .nav-it{display:flex; align-items:center; gap:14px; width:100%; border:none; background:none; border-radius:999px; padding:7px 14px; font-family:'Roboto',sans-serif; font-size:14px; color:var(--g-ink); cursor:pointer; text-align:left;}
+  .nav-it .ms{color:var(--g-soft);}
+  .nav-it:hover{background:#E9EEF6;}
+  .nav-it.sel{background:var(--g-blue-soft); font-weight:500;}
+  .nav-it.sel .ms{color:#001D35;}
+  .nav-it.shake{animation:shakeX .35s ease; background:#FDE6E1;}
+  .nav-gap{height:8px;}
+  .gdr-main{background:#fff; border-radius:16px; margin:10px 10px 10px 0; padding:14px 18px; min-height:300px;}
+  .gdr-main h4{font-family:'Roboto',sans-serif; font-weight:400; font-size:21px; margin:2px 0 12px; display:flex; align-items:center; gap:8px;}
+  .gdr-row{display:flex; align-items:center; gap:12px; padding:9px 4px; border-bottom:1px solid #F1F3F4; font-size:14px;}
+  .gdr-row img{width:20px; height:20px;}
+  .gdr-row .ms{color:var(--g-soft);}
+  .gdr-row small{margin-left:auto; color:var(--g-soft); font-size:12.5px; white-space:nowrap;}
+  .gdr-hint{font-size:13px; color:var(--g-soft); background:#F1F4F9; border-radius:8px; padding:8px 12px; margin-bottom:8px;}
+  .gdr-bar{height:6px; border-radius:3px; background:#E3E3E3; margin:14px 0 8px; overflow:hidden;}
+  .gdr-bar i{display:block; height:100%; width:41%; background:var(--g-blue);}
+  @media (max-width:640px){
+    .gdrive{grid-template-columns:1fr;}
+    .gdr-side{display:grid; grid-template-columns:1fr 1fr; gap:2px;}
+    .gdr-logo, .new-btn, .nav-gap{display:none;}
+    .gdr-main{margin:0 10px 10px; min-height:0;}
+  }
+  .fb-line{font-size:14.5px; min-height:1.4em; margin-top:12px;}
+
+  /* ---------- Крок 4: рівні доступу ---------- */
+  .roles{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin:14px 0 18px;}
+  .role{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px;}
+  .role h3{font-family:'Baloo 2',sans-serif; font-size:17px; margin:0 0 8px; display:flex; align-items:center; gap:8px;}
+  .role-ico{width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .role-ico .ms{font-size:19px;}
+  .role ul{margin:0; padding-left:18px; font-size:13.5px; color:var(--ink-soft);}
+  .role li{margin:2px 0;}
+  .ri-owner{background:#FEEFC3; color:#B06000;} .ri-edit{background:#D3E3FD; color:#0842A0;}
+  .ri-com{background:#C4EED0; color:#0D652D;}  .ri-view{background:#E9E5F7; color:#5B3FB5;}
+
+  /* ---------- Крок 4–5: вікно «Надати доступ» ---------- */
+  .share-dlg{max-width:580px; margin:0 auto; background:#fff; border-radius:24px; box-shadow:0 4px 8px 3px rgba(60,64,67,.15),0 1px 3px rgba(60,64,67,.3); padding:22px 24px 20px; font-family:'Roboto',sans-serif; color:var(--g-ink);}
+  .share-dlg.shake{animation:shakeX .35s ease; box-shadow:0 0 0 3px var(--coral);}
+  .dlg-top{display:flex; align-items:center; gap:10px; margin-bottom:16px;}
+  .dlg-top h3{font-family:'Roboto',sans-serif; font-size:21px; font-weight:400; margin:0; flex:1;}
+  .dlg-top .ms{color:var(--g-soft); font-size:22px;}
+  .fake-input{border:1px solid #747775; border-radius:4px; padding:14px; color:var(--g-soft); font-size:15px; margin-bottom:18px;}
+  .dlg-sub{font-weight:500; font-size:15px; margin:4px 0 6px;}
+  .person{display:flex; align-items:center; gap:12px; padding:8px 0;}
+  .person .av{width:34px; height:34px; border-radius:50%; color:#fff; font-size:15px; font-weight:500; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .person .who{flex:1; min-width:0;}
+  .person .who b{display:block; font-size:14px; font-weight:500;}
+  .person .who span{font-size:12.5px; color:var(--g-soft);}
+  .person .why{display:block; font-family:'Nunito Sans',sans-serif; font-size:12.5px; color:var(--accent-dark); font-weight:700; margin-top:1px;}
+  .role-sel{font-family:'Roboto',sans-serif; font-size:14px; font-weight:500; padding:7px 6px; border:1px solid var(--g-line); border-radius:8px; background:#fff; color:var(--g-ink); cursor:pointer; max-width:150px; flex-shrink:0;}
+  .role-sel.wrong{border-color:var(--coral); background:#FDE6E1; animation:shakeX .35s ease;}
+  .role-sel.ok{border-color:var(--ok); background:var(--ok-soft); color:#256B36;}
+  .role-sel:disabled{opacity:1; cursor:default;}
+  .owner-tag{font-size:14px; color:var(--g-soft); padding-right:8px;}
+  .globe{width:34px; height:34px; border-radius:50%; background:#E3E3E3; color:var(--g-soft); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .3s;}
+  .globe.pub{background:#C4EED0; color:#0D652D;}
+  .g-sel{font-family:'Roboto',sans-serif; font-size:14px; font-weight:500; padding:6px 4px; border:1px solid transparent; border-radius:8px; background:#fff; color:var(--g-ink); cursor:pointer; max-width:100%;}
+  .g-sel:hover{background:#F1F3F4;}
+  .g-sel[hidden]{display:none;}
+  .dlg-foot{display:flex; justify-content:space-between; align-items:center; margin-top:18px; gap:10px; flex-wrap:wrap;}
+  .copy-link{display:inline-flex; align-items:center; gap:8px; font-weight:500; font-size:14px; color:var(--g-blue); background:#fff; border:1px solid #747775; border-radius:999px; padding:9px 18px 9px 14px;}
+  .copy-link .ms{font-size:18px;}
+  .done-btn{font-family:'Roboto',sans-serif; font-weight:500; font-size:14px; color:#fff; background:var(--g-blue); border:none; border-radius:999px; padding:10px 24px; cursor:pointer;}
+  .done-btn:disabled{opacity:.35; cursor:default;}
+
+</style>
+</head>
+<body data-lesson="lesson7m-cloud-services" data-hud="7 клас · Хмарні сервіси й доступ">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Комунікація та взаємодія · Урок 8</div>
+      <h1>Хмарні сервіси. Хто і як бачить твої файли</h1>
+      <p>Твої файли можуть жити не на флешці, а в «хмарі» — і відкриватися з будь-якого пристрою. Розберемось, як упорядкувати Google Диск і як дати однокласникам доступ рівно такий, як потрібно.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: усміхнена хмаринка з ключем доступу -->
+    <svg class="mascot" viewBox="0 0 160 160" fill="none">
+      <circle cx="80" cy="84" r="62" fill="#E1F2FB"/>
+      <circle cx="58" cy="80" r="22" fill="#fff"/>
+      <circle cx="84" cy="66" r="28" fill="#fff"/>
+      <circle cx="110" cy="84" r="19" fill="#fff"/>
+      <rect x="40" y="80" width="88" height="24" rx="12" fill="#fff"/>
+      <path d="M40 92 a22 22 0 0 1 18 -34 a28 28 0 0 1 52 8 a19 19 0 0 1 18 26 V104 H52 a12 12 0 0 1 -12 -12 Z" stroke="#0277BD" stroke-width="4" stroke-linejoin="round"/>
+      <circle cx="72" cy="82" r="4.5" fill="#01579B"/><circle cx="96" cy="82" r="4.5" fill="#01579B"/>
+      <path d="M76 92 Q84 99 92 92" stroke="#01579B" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="64" cy="90" r="4" fill="#FFB199"/><circle cx="104" cy="90" r="4" fill="#FFB199"/>
+      <circle cx="116" cy="124" r="10" stroke="#E8590C" stroke-width="5"/>
+      <path d="M108 131 L88 151 M93 146 L98 151 M98 141 L103 146" stroke="#E8590C" stroke-width="5" stroke-linecap="round"/>
+      <path d="M80 104 V118" stroke="#0277BD" stroke-width="3" stroke-dasharray="3 4" stroke-linecap="round"/>
+      <rect x="66" y="118" width="28" height="20" rx="4" fill="#0277BD"/>
+      <rect x="66" y="114" width="12" height="7" rx="2" fill="#0277BD"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Електронні послуги</div>
+    <h2>Що ти пам'ятаєш про е-послуги</h2>
+    <p>Минулого уроку ми розбиралися, які послуги держава й освітні сервіси надають онлайн.</p>
+    <p class="soft">Обери поняття, а потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Хмара й Google Диск</div>
+    <h2>Один файл — на всіх пристроях</h2>
+    <p><b>Хмарні технології</b> — дані зберігаються й опрацьовуються не на твоєму пристрої, а на серверах в інтернеті.</p>
+    <p>Твоя хмара від Google — <b>Google Диск</b>: 15 ГБ безкоштовно, а Документи, Таблиці й Презентації працюють просто в браузері.</p>
+    <figure class="sync-ill">
+      <svg viewBox="0 0 600 270" role="img" aria-label="Файл зі зміною піднімається з ноутбука в хмару Google Диска й опускається на телефон і планшет">
+      <defs>
+      <filter id="cloudShadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#1A73E8" flood-opacity=".18"/></filter>
+      </defs>
+      <!-- лінії зв’язку -->
+      <path id="pUp" d="M130 168 L262 112" stroke="#AECBFA" stroke-width="3" stroke-dasharray="6 7" fill="none"/>
+      <path id="pDn1" d="M300 122 L300 166" stroke="#AECBFA" stroke-width="3" stroke-dasharray="6 7" fill="none"/>
+      <path id="pDn2" d="M338 112 L470 168" stroke="#AECBFA" stroke-width="3" stroke-dasharray="6 7" fill="none"/>
+      <!-- хмара з логотипом Диска -->
+      <g filter="url(#cloudShadow)">
+      <circle cx="262" cy="78" r="34" fill="#fff"/><circle cx="306" cy="60" r="44" fill="#fff"/><circle cx="348" cy="84" r="30" fill="#fff"/>
+      <rect x="230" y="78" width="148" height="40" rx="20" fill="#fff"/>
+      </g>
+      <image href="images/drive.svg" x="282" y="64" width="46" height="41"/>
+      <!-- ноутбук -->
+      <rect x="70" y="170" width="94" height="58" rx="6" fill="#1F1F1F"/><rect x="76" y="176" width="82" height="46" rx="3" fill="#E8F0FE"/>
+      <path d="M58 232 H176 L170 240 H64 Z" fill="#5F6368"/>
+      <!-- телефон -->
+      <rect x="282" y="168" width="36" height="66" rx="7" fill="#1F1F1F"/><rect x="286" y="176" width="28" height="50" rx="3" fill="#E8F0FE"/>
+      <!-- планшет -->
+      <rect x="438" y="168" width="78" height="66" rx="8" fill="#1F1F1F"/><rect x="444" y="174" width="66" height="54" rx="4" fill="#E8F0FE"/>
+      <!-- документи в пристроях -->
+      <g transform="translate(117 199)"><rect x="-9" y="-11" width="18" height="22" rx="3" fill="#4285F4"/><rect x="-5" y="-4" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="0" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="4" width="6" height="2" rx="1" fill="#fff"/></g>
+      <g opacity="0"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.74;0.78;1" dur="4s" repeatCount="indefinite"/><g transform="translate(300 201)"><rect x="-9" y="-11" width="18" height="22" rx="3" fill="#4285F4"/><rect x="-5" y="-4" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="0" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="4" width="6" height="2" rx="1" fill="#fff"/></g></g>
+      <g opacity="0"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.74;0.78;1" dur="4s" repeatCount="indefinite"/><g transform="translate(477 201)"><rect x="-9" y="-11" width="18" height="22" rx="3" fill="#4285F4"/><rect x="-5" y="-4" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="0" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="4" width="6" height="2" rx="1" fill="#fff"/></g></g>
+      <!-- олівець: зміна на ноутбуці -->
+      <g><animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.12;0.16;1" dur="4s" repeatCount="indefinite"/>
+      <path d="M134 186 l10 -10 l4 4 l-10 10 h-4 z" fill="#FBBC04" stroke="#1F1F1F" stroke-width="1.5" stroke-linejoin="round"/></g>
+      <!-- документ летить угору в хмару -->
+      <g opacity="0">
+      <animateMotion dur="4s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.15;0.45;1" calcMode="linear"><mpath href="#pUp"/></animateMotion>
+      <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.14;0.17;0.44;0.48;1" dur="4s" repeatCount="indefinite"/>
+      <rect x="-9" y="-11" width="18" height="22" rx="3" fill="#4285F4"/><rect x="-5" y="-4" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="0" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="4" width="6" height="2" rx="1" fill="#fff"/>
+      </g>
+      <!-- і вниз на телефон та планшет -->
+      <g opacity="0">
+      <animateMotion dur="4s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.48;0.74;1" calcMode="linear"><mpath href="#pDn1"/></animateMotion>
+      <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.47;0.5;0.73;0.76;1" dur="4s" repeatCount="indefinite"/>
+      <rect x="-9" y="-11" width="18" height="22" rx="3" fill="#4285F4"/><rect x="-5" y="-4" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="0" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="4" width="6" height="2" rx="1" fill="#fff"/>
+      </g>
+      <g opacity="0">
+      <animateMotion dur="4s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.48;0.74;1" calcMode="linear"><mpath href="#pDn2"/></animateMotion>
+      <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.47;0.5;0.73;0.76;1" dur="4s" repeatCount="indefinite"/>
+      <rect x="-9" y="-11" width="18" height="22" rx="3" fill="#4285F4"/><rect x="-5" y="-4" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="0" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="4" width="6" height="2" rx="1" fill="#fff"/>
+      </g>
+      <!-- підписи -->
+      <text x="117" y="262" text-anchor="middle">Ноутбук</text>
+      <text x="300" y="262" text-anchor="middle">Телефон</text>
+      <text x="477" y="262" text-anchor="middle">Планшет</text>
+      <text x="306" y="22" text-anchor="middle" class="b">Google Диск</text>
+      </svg>
+    </figure>
+    <p>З файлом у хмарі можна працювати <b>разом</b>: Оля пише на ноутбуці — Тарас за мить бачить зміни на телефоні.</p>
+    <figure class="sync-ill">
+      <div class="td">
+        <div class="td-laptop">
+          <div class="td-screen">
+            <div class="td-bar"><img src="images/docs.svg" alt="">Ідеї до проєкту<span class="td-av" style="background:var(--olya)">О</span><span class="td-status" id="tdStatus">Збережено на Диску</span></div>
+            <div class="td-page" id="tdLap"></div>
+          </div>
+          <div class="td-base"></div>
+          <div class="td-lbl">Оля · ноутбук</div>
+        </div>
+        <div class="td-mid">
+          <div class="td-cloud"><img src="images/drive.svg" alt=""></div>
+          <div class="td-sync" id="tdSync"><span class="ms">sync</span></div>
+        </div>
+        <div class="td-phone">
+          <div class="td-pscreen">
+            <div class="td-bar"><img src="images/docs.svg" alt="">Ідеї до проєкту</div>
+            <div class="td-page" id="tdPhone"></div>
+          </div>
+          <div class="td-lbl">Тарас · телефон</div>
+        </div>
+      </div>
+    </figure>
+    <p class="soft">Що з цього — справжня перевага хмари?</p>
+    <div id="plusList"></div>
+    <div class="trivia">Головне правило хмари: пам'ятай пароль від облікового запису.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Сервіси Google</div>
+    <h2>Один обліковий запис — багато сервісів</h2>
+    <p>Увійшовши в Google, ти отримуєш цілий набір сервісів. Усе, що в них створюєш, зберігається на твоєму Google Диску.</p>
+    <div class="svc" id="svcList"></div>
+    <p class="soft">Гра «Знайди пару»: перевертай по дві картки й знайди для кожного сервісу його опис.</p>
+    <div class="exercise">
+      <div class="memo-grid" id="memoGrid"></div>
+      <div class="fb-line" id="memoFb"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Розділи Google Диска</div>
+    <h2>Де що лежить на Диску</h2>
+    <p>Ліворуч на Google Диску — меню розділів. Кожен показує файли по-своєму: твої, чужі, нещодавні, важливі чи видалені.</p>
+    <p class="soft">Прочитай завдання й клацни розділ, де шукатимеш.</p>
+    <div class="exercise" id="driveEx">
+      <div class="task-card"><span class="tnum" id="drvNum"></span><span class="ttext" id="drvTask"></span></div>
+      <div class="gdrive">
+        <div class="gdr-side" id="drvSide">
+          <div class="gdr-logo"><img src="images/drive.svg" alt="">Диск</div>
+          <div class="new-btn"><span class="ms">add</span>Створити</div>
+        </div>
+        <div class="gdr-main" id="drvMain"></div>
+      </div>
+      <div class="fb-line" id="drvFb"></div>
+    </div>
+    <div class="note">Файл із Кошика зникає назавжди через 30 днів. До того його ще можна відновити.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Рівні доступу</div>
+    <h2>Хто що може робити з файлом</h2>
+    <p>Хто створив файл, той його <b>власник</b>. Іншим людям він дає один із трьох рівнів доступу:</p>
+    <div class="roles">
+      <div class="role"><h3><span class="role-ico ri-owner"><span class="ms fill">key</span></span>Власник</h3><ul><li>робить із файлом усе</li><li>запрошує інших</li><li>видаляє файл — і доступ зникає в усіх</li></ul></div>
+      <div class="role"><h3><span class="role-ico ri-edit"><span class="ms">edit</span></span>Редактор</h3><ul><li>змінює текст</li><li>запрошує інших, якщо власник дозволив</li><li>зберігає копію собі</li></ul></div>
+      <div class="role"><h3><span class="role-ico ri-com"><span class="ms">add_comment</span></span>Коментатор</h3><ul><li>читає</li><li>пише коментарі</li><li>текст напряму не змінює</li></ul></div>
+      <div class="role"><h3><span class="role-ico ri-view"><span class="ms">visibility</span></span>Читач</h3><ul><li>лише переглядає</li><li>зберігає копію собі</li></ul></div>
+    </div>
+    <p class="soft">Ти створив документ «Ідеї до проєкту» й натиснув <b>«Надати доступ»</b>. Обери кожному рівень, який йому справді потрібен, — не більше.</p>
+    <div class="exercise">
+      <div class="share-dlg" id="roleDlg">
+        <div class="dlg-top"><h3>Надати доступ до «Ідеї до проєкту»</h3><span class="ms">help</span><span class="ms">settings</span></div>
+        <div class="fake-input">Додайте людей, групи й події календаря</div>
+        <div class="dlg-sub">Користувачі з доступом</div>
+        <div id="rolePeople"></div>
+        <div class="dlg-foot"><span class="copy-link"><span class="ms">link</span>Копіювати посилання</span><button class="done-btn" id="roleDone" disabled>Готово</button></div>
+      </div>
+      <div class="fb-line" id="roleFb"></div>
+    </div>
+    <div class="note">Щоб документ зник назавжди, власник видаляє його, а потім очищає Кошик.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Способи доступу</div>
+    <h2>Адреса чи посилання?</h2>
+    <p>Доступ до файлу дають кнопкою <b>«Надати доступ»</b>. Є два способи:</p>
+    <ul>
+      <li><b>за адресою</b> — вписати електронну пошту конкретних людей; вони отримають лист-запрошення;</li>
+      <li><b>за посиланням</b> — у «Загальному доступі» обрати «Усі, хто має посилання», скопіювати посилання й надіслати, наприклад, у чат.</li>
+    </ul>
+    <p>Якщо стоїть <b>«Обмежений»</b>, за посиланням відкриють файл лише ті, кого додано за адресою.</p>
+    <p class="soft">Налаштуй «Загальний доступ» для кожного файлу й натисни «Готово».</p>
+    <div class="exercise" id="linkEx">
+      <div class="task-card"><span class="tnum" id="lnkNum"></span><span class="ttext" id="lnkTask"></span></div>
+      <div class="share-dlg" id="lnkDlg">
+        <div class="dlg-top"><h3 id="lnkTitle"></h3><span class="ms">help</span><span class="ms">settings</span></div>
+        <div class="fake-input">Додайте людей, групи й події календаря</div>
+        <div class="dlg-sub">Користувачі з доступом</div>
+        <div class="person"><div class="av" style="background:var(--me)">Я</div><div class="who"><b>Я (ви)</b><span>ya.7klas@gmail.com</span></div><span class="owner-tag">Власник</span></div>
+        <div class="dlg-sub" style="margin-top:14px">Загальний доступ</div>
+        <div class="person">
+          <div class="globe" id="lnkGlobe"><span class="ms">lock</span></div>
+          <div class="who">
+            <select class="g-sel" id="lnkGeneral"><option value="0">Обмежений</option><option value="1">Усі, хто має посилання</option></select>
+            <span id="lnkHint" style="display:block; padding-left:4px"></span>
+          </div>
+          <select class="g-sel" id="lnkRole"><option value="0">Читач</option><option value="1">Коментатор</option><option value="2">Редактор</option></select>
+        </div>
+        <div class="dlg-foot"><span class="copy-link"><span class="ms">link</span>Копіювати посилання</span><button class="done-btn" id="lnkDone">Готово</button></div>
+      </div>
+      <div class="fb-line" id="lnkFb"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Хмарні сервіси. Рівні та способи доступу до ресурсів» · 7 клас (Морзе)
+  <span class="credits">Логотипи Gmail, Google Диска, Документів, Таблиць, Презентацій, Форм, Meet і Classroom є торговельними марками їхніх власників і використані тут із навчальною метою.</span>
+</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+const ms = (name, cls = '')=>`<span class="ms ${cls}">${name}</span>`;
+
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Електронна послуга', desc:'Отримуєш через інтернет, здебільшого автоматично, без черги' },
+  { name:'Е-урядування', desc:'Держава надає свої послуги громадянам онлайн' },
+  { name:'Портал «Дія»', desc:'Державний застосунок і сайт, де можна оформити довідку зі смартфона' },
+  { name:'Симулятор', desc:'Відтворює справжній прилад: можна помилятися без наслідків' },
+  { name:'Тренажер', desc:'Багато однотипних завдань із миттєвою перевіркою' },
+  { name:'Онлайн-курс', desc:'Відео, конспекти й тести по черзі, а наприкінці — сертифікат' },
+  { name:'Електронна бібліотека', desc:'Офіційне місце, де підручники можна завантажити безкоштовно' },
+  { name:'Життєві події', desc:'Розділ «Дії», де зібрано всі послуги для однієї ситуації, як-от «Мені виповнилось 14»' }
+], 'recapProgress');
+
+/* ---------- КРОК 1: ОЛЯ ПИШЕ — ТАРАС БАЧИТЬ ---------- */
+(function(){
+  const LINES = ['Ігор Сікорський — конструктор гелікоптерів.', 'Леся Українка — авторка «Лісової пісні».', 'Марія Приймаченко — художниця.'];
+  const lap = document.getElementById('tdLap'), phone = document.getElementById('tdPhone');
+  const sync = document.getElementById('tdSync'), status = document.getElementById('tdStatus');
+  const html = (lines, caret)=>lines.map((l, k)=>`<p>${l}${caret && k === lines.length - 1 ? '<i class="td-caret"></i>' : ''}</p>`).join('');
+  let li = 0, ci = 0, idle = null, running = false;
+  const push = lines=>{
+    sync.classList.add('spin'); status.textContent = 'Зберігається…';
+    clearTimeout(idle);
+    idle = setTimeout(()=>{ phone.innerHTML = html(lines); sync.classList.remove('spin'); status.textContent = 'Збережено ✓'; }, 600);
+  };
+  const tick = ()=>{
+    if(!running) return;
+    const done = LINES.slice(0, li), cur = [...LINES[li]];
+    ci++;
+    const lines = [...done, cur.slice(0, ci).join('')];
+    lap.innerHTML = html(lines, true);
+    if(ci % 5 === 0 || ci === cur.length) push(lines);
+    if(ci < cur.length) return setTimeout(tick, 90);
+    li++; ci = 0;
+    if(li < LINES.length) return setTimeout(tick, 700);
+    setTimeout(()=>{ li = 0; lap.innerHTML = ''; push([]); setTimeout(tick, 900); }, 2600);
+  };
+  new IntersectionObserver(es=>{
+    const vis = es[0].isIntersecting;
+    if(vis && !running){ running = true; tick(); }
+    if(!vis) running = false;
+  }, {threshold:.3}).observe(lap);
+})();
+
+makeYesNo('plusList', [
+  { text:'Програми працюють у браузері — не треба нічого встановлювати', correct:true },
+  { text:'Файл, збережений у школі, відкривається вдома з телефона', correct:true },
+  { text:'Хмара працює навіть тоді, коли інтернету немає зовсім', correct:false,
+    why:'Щоб дістатися до серверів, потрібне підключення до інтернету.' },
+  { text:'Кілька людей можуть одночасно писати один документ', correct:true },
+  { text:'Пароль від облікового запису можна не запам\'ятовувати', correct:false,
+    why:'Без пароля до своїх файлів у хмарі не потрапиш.' },
+  { text:'Ноутбук зламався, а реферат на Диску вцілів', correct:true }
+], 'Так, перевага', 'Ні');
+
+/* ---------- КРОК 2: СЕРВІСИ GOOGLE ---------- */
+(function(){
+  // about — для галереї, card — коротко для картки гри (без слів із назви сервісу)
+  const SVC = [
+    { id:'gmail', name:'Gmail', about:'Електронна пошта: листи й вкладення з будь-якого пристрою', card:'Листи й вкладення' },
+    { id:'drive', name:'Google Диск', about:'Хмарне сховище для файлів і папок — 15 ГБ безкоштовно', card:'Сховище для файлів і папок' },
+    { id:'docs', name:'Google Документи', about:'Тексти: реферати, твори, спільні нотатки', card:'Реферат, який пишуть усією групою' },
+    { id:'sheets', name:'Google Таблиці', about:'Розрахунки, списки, діаграми', card:'Рахунки й діаграми' },
+    { id:'slides', name:'Google Презентації', about:'Слайди для виступу перед класом', card:'Слайди для виступу' },
+    { id:'forms', name:'Google Форми', about:'Опитування й тести: відповіді збираються самі', card:'Опитування всього класу' },
+    { id:'meet', name:'Google Meet', about:'Відеозустрічі й онлайн-уроки', card:'Відеоурок під час тривоги' },
+    { id:'classroom', name:'Google Classroom', about:'Віртуальний клас: завдання, здані роботи, оцінки', card:'Завдання від учителя й оцінки' }
+  ];
+  document.getElementById('svcList').innerHTML = SVC.map(v=>
+    `<div class="svc-it"><img src="images/${v.id}.svg" alt=""><b>${v.name}</b><span>${v.about}</span></div>`).join('');
+
+  const grid = document.getElementById('memoGrid'), fb = document.getElementById('memoFb');
+  const hit = trackTask(grid, SVC.length, SVC.length + 3);
+  const cards = shuffle(SVC.flatMap(v=>[{ v, side:'logo' }, { v, side:'text' }]));
+  let first = null, lock = false, found = 0;
+  cards.forEach(d=>{
+    const c = document.createElement('div');
+    c.className = 'memo-card';
+    c.innerHTML = `<div class="flip-inner"><div class="flip-face flip-front">${ms('cloud', 'fill')}</div><div class="flip-face flip-back">`
+      + (d.side === 'logo' ? `<img src="images/${d.v.id}.svg" alt=""><b>${d.v.name}</b>` : `<span>${d.v.card}</span>`) + '</div></div>';
+    c.addEventListener('click', ()=>{
+      if(lock || c.classList.contains('flipped')) return;
+      c.classList.add('flipped');
+      if(!first){ first = { c, d }; return; }
+      const a = first; first = null;
+      if(a.d.v === d.v){
+        a.c.classList.add('matched'); c.classList.add('matched');
+        fb.textContent = `✅ ${d.v.name} — ${d.v.about.charAt(0).toLowerCase() + d.v.about.slice(1)}.`;
+        addNeurons(1); hit();
+        if(++found === SVC.length){ addNeurons(3); fb.textContent = '🎉 Усі пари знайдено! Тепер ти знаєш головні сервіси Google.'; }
+        return;
+      }
+      lock = true;
+      setTimeout(()=>{
+        a.c.classList.add('wrong'); c.classList.add('wrong');
+        setTimeout(()=>{ [a.c, c].forEach(x=>x.classList.remove('flipped', 'wrong')); lock = false; }, 600);
+      }, 1100);
+    });
+    grid.appendChild(c);
+  });
+})();
+
+/* ---------- КРОК 3: РОЗДІЛИ GOOGLE ДИСКА ---------- */
+(function(){
+  const f = (ic, name, info)=>`<div class="gdr-row">${ic === 'folder' ? ms(ic, 'fill') : `<img src="images/${ic}.svg" alt="">`}${name}<small>${info}</small></div>`;
+  const NAV = [
+    { id:'home', icon:'home', name:'Головна', body:f('docs', 'Реферат «Леся Українка»', 'Ви відкривали · 10 хв тому') + f('folder', 'Проєкт сховище', 'Ви створили · учора') },
+    { id:'mine', icon:'hard_drive', name:'Мій диск', body:f('folder', 'Проєкт сховище', 'я') + f('folder', 'Фото з екскурсії', 'я') + f('docs', 'Реферат «Леся Українка»', 'я') + f('sheets', 'Розклад гуртків', 'я') },
+    { id:'pc', icon:'computer', name:'Комп\'ютери', body:'<div class="gdr-hint">Тут — папки, які автоматично копіюються з твого комп\'ютера. Зараз жодної немає.</div>' },
+    { gap:true },
+    { id:'shared', icon:'group', name:'Відкриті для мене', body:f('slides', 'Презентація проєкту', 'Ольга Барна') + f('docs', 'Список учасників', 'Оля Коваль') + f('sheets', 'Оцінки за проєкт', 'Вчителька') },
+    { id:'recent', icon:'schedule', name:'Останні', body:'<div class="gdr-hint">Сьогодні</div>' + f('docs', 'Реферат «Леся Українка»', '10 хв тому') + f('slides', 'Презентація проєкту', '1 год тому') },
+    { id:'star', icon:'star', name:'Із зірочкою', body:f('docs', 'План проєкту ⭐', 'я') },
+    { gap:true },
+    { id:'spam', icon:'report', name:'Спам', body:'<div class="gdr-hint">Підозрілі файли, якими з тобою поділилися незнайомці. Тут порожньо.</div>' },
+    { id:'trash', icon:'delete', name:'Кошик', body:'<div class="gdr-hint">Об\'єкти в кошику видаляються назавжди через 30 днів</div>' + f('folder', 'Фото з дня народження', 'видалено вчора') },
+    { id:'store', icon:'cloud', name:'Пам\'ять', body:'<div class="gdr-bar"><i></i></div>Використано 6,2 ГБ з 15 ГБ' }
+  ];
+  const TASKS = [
+    { t:'Учителька поділилася з тобою документом «Оцінки за проєкт». Де його шукати?', a:'shared', why:'«Відкриті для мене» — файли інших людей, до яких тобі дали доступ.' },
+    { t:'Учора ти випадково видалив папку з фото. Де вона зараз?', a:'trash', why:'Видалене лежить у Кошику ще 30 днів — звідти його можна відновити.' },
+    { t:'Годину тому ти працював над презентацією, але забув, як вона називається.', a:'recent', why:'«Останні» — файли, з якими ти працював нещодавно.' },
+    { t:'Покажи всі файли й папки, які ти створив сам.', a:'mine', why:'«Мій диск» — твоє особисте сховище.' },
+    { t:'Найважливіший файл проєкту ти колись позначив, щоб швидко знаходити.', a:'star', why:'Позначка-зірочка збирає важливі файли в одному розділі.' },
+    { t:'Скільки ще вільного місця лишилося на Диску?', a:'store', why:'У розділі «Пам\'ять» видно, скільки з 15 ГБ уже зайнято.' }
+  ];
+  const side = document.getElementById('drvSide'), main = document.getElementById('drvMain');
+  const num = document.getElementById('drvNum'), task = document.getElementById('drvTask'), fb = document.getElementById('drvFb');
+  const hit = trackTask(document.getElementById('driveEx'), TASKS.length, TASKS.length + 2);
+  let i = 0;
+  const open = n=>{
+    side.querySelectorAll('.nav-it').forEach(b=>b.classList.toggle('sel', b.dataset.id === n.id));
+    main.innerHTML = `<h4>${n.name}</h4>` + n.body;
+  };
+  const show = ()=>{
+    if(i >= TASKS.length){ num.textContent = '🎉'; task.textContent = 'Ти знаєш усі розділи Google Диска!'; return; }
+    num.textContent = `Завдання ${i + 1} з ${TASKS.length}`;
+    task.textContent = TASKS[i].t;
+  };
+  NAV.forEach(n=>{
+    if(n.gap){ side.insertAdjacentHTML('beforeend', '<div class="nav-gap"></div>'); return; }
+    const b = document.createElement('button');
+    b.className = 'nav-it'; b.dataset.id = n.id;
+    b.innerHTML = ms(n.icon) + n.name;
+    b.addEventListener('click', ()=>{
+      if(i >= TASKS.length){ open(n); return; }
+      if(n.id === TASKS[i].a){
+        open(n);
+        fb.textContent = '✅ ' + TASKS[i].why;
+        addNeurons(1); hit(); i++;
+        if(i === TASKS.length) addNeurons(2);
+        show();
+      } else {
+        b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake');
+        setTimeout(()=>b.classList.remove('shake'), 400);
+        fb.textContent = '🤔 Не тут. Подумай, чий це файл і що з ним сталося.';
+      }
+    });
+    side.appendChild(b);
+  });
+  open(NAV[1]);
+  show();
+})();
+
+/* ---------- КРОК 4: КОМУ ЯКИЙ ДОСТУП ---------- */
+(function(){
+  const OPTS = ['Читач', 'Коментатор', 'Редактор'];
+  const PEOPLE = [
+    { n:'Оля', mail:'olya.koval@gmail.com', c:'var(--olya)', why:'пише разом з тобою розділ про Лесю Українку', a:'Редактор',
+      ok:'Оля змінює текст — їй потрібен редактор.' },
+    { n:'Вчителька', mail:'o.barna@school.ua', c:'#C2185B', why:'перевіряє роботу й пише зауваження на полях', a:'Коментатор',
+      ok:'Вчителька підказує збоку, а виправляє команда сама.' },
+    { n:'Мама', mail:'mama.taras@ukr.net', c:'#5F6368', why:'хоче просто подивитися, що вийшло', a:'Читач',
+      ok:'Для перегляду досить читача.' },
+    { n:'Тарас', mail:'taras.2012@gmail.com', c:'var(--taras)', why:'шукає фото й вставляє їх у документ', a:'Редактор',
+      ok:'Вставляти фото — це змінювати документ, тож редактор.' },
+    { n:'Денис', mail:'denys.7b@gmail.com', c:'var(--denys)', why:'з іншої групи: може дати пораду, але нічого не змінює', a:'Коментатор',
+      ok:'Порада — це коментар, текст лишиться недоторканим.' }
+  ];
+  const box = document.getElementById('rolePeople'), fb = document.getElementById('roleFb'), done = document.getElementById('roleDone');
+  const hit = trackTask(document.getElementById('roleDlg'), PEOPLE.length, PEOPLE.length + 2);
+  let left = PEOPLE.length;
+  box.innerHTML = `<div class="person"><div class="av" style="background:var(--me)">Я</div><div class="who"><b>Я (ви)</b><span>ya.7klas@gmail.com</span></div><span class="owner-tag">Власник</span></div>`;
+  PEOPLE.forEach(p=>{
+    const row = document.createElement('div');
+    row.className = 'person';
+    row.innerHTML = `<div class="av" style="background:${p.c}">${p.n[0]}</div><div class="who"><b>${p.n}</b><span>${p.mail}</span><span class="why">${p.why}</span></div>`;
+    const s = document.createElement('select');
+    s.className = 'role-sel';
+    s.innerHTML = '<option value="">Обери…</option>' + OPTS.map((o, k)=>`<option value="${k}">${o}</option>`).join('');
+    s.addEventListener('change', ()=>{
+      if(s.value === '') return;
+      const k = +s.value, need = OPTS.indexOf(p.a);
+      if(k === need){
+        s.classList.remove('wrong'); s.classList.add('ok'); s.disabled = true;
+        fb.textContent = '✅ ' + p.ok;
+        addNeurons(1); hit();
+        if(--left === 0){ done.disabled = false; addNeurons(2); fb.textContent = '🎉 Доступ налаштовано! Кожен отримає лист-запрошення з посиланням на документ.'; }
+        return;
+      }
+      s.classList.remove('wrong'); void s.offsetWidth; s.classList.add('wrong');
+      fb.textContent = '🤔 ' + (k > need ? `Забагато: ${p.n} отримає більше прав, ніж треба, і може випадково щось змінити.` : `Замало: з таким доступом ${p.n} не зможе зробити те, що потрібно.`);
+      setTimeout(()=>{ s.value = ''; }, 500);
+    });
+    row.appendChild(s);
+    box.appendChild(row);
+  });
+})();
+
+/* ---------- КРОК 5: ЗАГАЛЬНИЙ ДОСТУП ---------- */
+(function(){
+  const ROLES = ['Читач', 'Коментатор', 'Редактор'];
+  const TASKS = [
+    { file:'Список учасників', t:'Посилання кинеш у чат класу: кожен має сам вписати себе в групу.', g:1, r:2,
+      ok:'Кожен, хто має посилання, зможе дописати своє ім\'я.' },
+    { file:'Фото з екскурсії', t:'Посилання надішлеш бабусі й друзям — хай просто подивляться.', g:1, r:0,
+      ok:'Переглянути зможуть, а випадково видалити фото — ні.' },
+    { file:'Мій щоденник', t:'Ніхто не повинен відкрити файл, навіть якщо посилання випадково перешлють.', g:0,
+      ok:'З обмеженим доступом за посиланням відкриють лише люди, яких ти додав сам.' },
+    { file:'Презентація проєкту', t:'Однокласники з чату мають залишити по два коментарі, але не змінювати слайди.', g:1, r:1,
+      ok:'Коментатори напишуть поради, а слайди залишаться такими, як є.' }
+  ];
+  const HINT = ['Лише користувачі з доступом можуть відкривати за цим посиланням',
+    'Будь-який користувач Інтернету, який має посилання, може відкрити'];
+  const dlg = document.getElementById('lnkDlg'), gen = document.getElementById('lnkGeneral'), role = document.getElementById('lnkRole');
+  const globe = document.getElementById('lnkGlobe'), hint = document.getElementById('lnkHint');
+  const num = document.getElementById('lnkNum'), task = document.getElementById('lnkTask');
+  const title = document.getElementById('lnkTitle'), fb = document.getElementById('lnkFb'), btn = document.getElementById('lnkDone');
+  const hit = trackTask(document.getElementById('linkEx'), TASKS.length, TASKS.length + 2);
+  let i = 0;
+  const sync = ()=>{
+    const pub = gen.value === '1';
+    role.hidden = !pub;
+    globe.classList.toggle('pub', pub);
+    globe.innerHTML = ms(pub ? 'public' : 'lock');
+    hint.textContent = HINT[+gen.value];
+  };
+  const show = ()=>{
+    if(i >= TASKS.length){
+      num.textContent = '🎉'; task.textContent = 'Усі файли налаштовано правильно!';
+      btn.disabled = true; gen.disabled = true; role.disabled = true;
+      return;
+    }
+    num.textContent = `Файл ${i + 1} з ${TASKS.length}`;
+    task.textContent = TASKS[i].t;
+    title.textContent = `Надати доступ до «${TASKS[i].file}»`;
+    gen.value = '0'; role.value = '0'; sync();
+  };
+  gen.addEventListener('change', sync);
+  btn.addEventListener('click', ()=>{
+    const cur = TASKS[i], g = +gen.value, r = +role.value;
+    if(g === cur.g && (g === 0 || r === cur.r)){
+      fb.textContent = '✅ ' + cur.ok;
+      addNeurons(1); hit(); i++;
+      if(i === TASKS.length) addNeurons(2);
+      show();
+      return;
+    }
+    dlg.classList.remove('shake'); void dlg.offsetWidth; dlg.classList.add('shake');
+    setTimeout(()=>dlg.classList.remove('shake'), 400);
+    if(g !== cur.g) fb.textContent = cur.g
+      ? '🤔 З обмеженим доступом люди з чату не відкриють файл — їх же не додано за адресою.'
+      : '🤔 Так файл відкриє будь-хто, до кого потрапить посилання. Чи цього ти хочеш?';
+    else if(r > cur.r) fb.textContent = `🤔 «${ROLES[r]}» — забагато: хтось може випадково щось зіпсувати.`;
+    else fb.textContent = `🤔 З рівнем «${ROLES[r]}» люди не зможуть зробити те, що потрібно.`;
+  });
+  show();
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що таке хмарні технології?', opts:['Передавання прогнозу погоди через супутник', 'Зберігання й опрацювання даних на віддалених серверах', 'Робота лише з програмами, встановленими на флешку'], correct:1 },
+  { q:'Учителька має перевіряти твою роботу й писати зауваження, але не змінювати текст. Який доступ їй дати?', opts:['Редактор', 'Коментатор', 'Читач'], correct:1 },
+  { q:'Скільки місця Google Диск дає безкоштовно?', opts:['2 ГБ', '15 ГБ', 'Безмежно'], correct:1 },
+  { q:'Оля й Тарас одночасно працюють в одному Google Документі. Що бачить Тарас?', opts:['Зміни Олі з\'являються в нього майже одразу', 'Нічого, поки Оля не надішле файл поштою', 'Лише стару версію'], correct:0 },
+  { q:'У якому розділі Google Диска файли, якими з тобою поділилися інші?', opts:['Мій диск', 'Відкриті для мене', 'Із зірочкою'], correct:1 },
+  { q:'Скільки днів видалений файл лежить у Кошику, перш ніж зникнути назавжди?', opts:['1 день', '7 днів', '30 днів'], correct:2 },
+  { q:'Хто може видалити документ так, щоб доступ зник в усіх?', opts:['Власник', 'Коментатор', 'Читач'], correct:0 },
+  { q:'Однокласники з чату мають залишити поради до презентації, але не змінювати її. Що обрати в «Загальному доступі»?', opts:['Усі, хто має посилання · Коментатор', 'Усі, хто має посилання · Редактор', 'Обмежений'], correct:0 },
+  { q:'Доступ до файлу «Обмежений». Посилання отримала людина, яку не додано за адресою. Що буде?', opts:['Вона відкриє файл', 'Вона не відкриє файл без дозволу власника', 'Файл видалиться'], correct:1 },
+  { q:'Тарас шукає фото й вставляє їх у спільний документ. Який доступ йому потрібен?', opts:['Читач', 'Коментатор', 'Редактор'], correct:2 },
+  { q:'Без чого не дістатися до своїх файлів у хмарі?', opts:['Без флешки', 'Без принтера', 'Без пароля від облікового запису'], correct:2 }
+], {summary:'Тепер ти знаєш, що таке хмарні технології, вмієш знайти потрібне на Google Диску, надати доступ за адресою чи посиланням на потрібному рівні.'});
+</script>
+
+</body>
+</html>
