@@ -103,27 +103,8 @@
   .quiz-opt.wrong{background:#FBE6E9; border-color:#D14B5E;}
   .quiz-nav{margin-top:16px;}
   .btn-next{padding:10px 20px;}
-  .guide{background:var(--surface); border:2px solid var(--pri); border-radius:var(--radius-l); padding:20px 20px 16px; margin-top:12px;}
-  .guide-head{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:6px;}
-  .guide-head h2{margin:0;}
-  .btn-print{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; background:var(--bg); color:var(--pri-dark); border:1.5px solid var(--line); padding:6px 14px; border-radius:var(--radius-s); cursor:pointer;}
-  .guide-card{border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; margin:10px 0; background:#FCFBFF;}
-  .guide-card h3{font-size:15px; margin-bottom:4px; display:flex; align-items:center; gap:8px;}
-  .guide-card h3 .n{width:24px; height:24px; border-radius:50%; background:var(--pri); color:#fff; font-size:12.5px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;}
-  .guide-card p, .guide-card li{font-size:14px !important;}
-  .guide-card .mini{margin-top:8px;}
-  .guide-card .mini .sheet-grid{min-width:0;}
   .menu{font-family:'Baloo 2',sans-serif; font-weight:700; color:var(--pri-dark); white-space:nowrap;}
-  .checklist{list-style:none; padding:0 !important;}
-  .checklist li{display:flex; gap:10px; align-items:flex-start; font-size:14px; padding:6px 0; border-bottom:1px dashed var(--line); margin:0 !important;}
-  .checklist input{width:18px; height:18px; margin-top:3px; accent-color:var(--pri); flex-shrink:0;}
   footer{padding:32px 24px 56px; font-size:13px;}
-  @media print{ section.block:not(#practice), .btn-print{display:none !important;}
-  .hero{display:none !important;}
-  footer{display:none !important;}
-  #practice{border-top:none; padding-top:0;}
-  .guide{border:none; padding:0;}
-  .guide-card{break-inside:avoid;} }
 </style>
 </head>
 <body data-lesson="lesson9-database-basics" data-hud="9 клас · Поняття бази даних">
@@ -268,75 +249,6 @@
     <div class="step-label">Підсумок</div>
     <h2>Коротка перевірка</h2>
     <div id="finalQuiz"></div>
-  </section>
-
-  <section class="block" id="practice" data-guide>
-    <div class="guide">
-      <div class="guide-head">
-        <div>
-          <div class="step-label">Практична робота №4</div>
-          <h2>Створення таблиці бази даних у Google Таблицях</h2>
-        </div>
-        <button class="btn-print" onclick="window.print()">🖨 Надрукувати</button>
-      </div>
-      <p>Створи базу даних «Улюблені фільми» свого класу. Потрібен лише Google-акаунт.</p>
-
-      <div class="guide-card">
-        <h3><span class="n">1</span>Нова таблиця</h3>
-        <p>Відкрий <span class="mono">sheets.new</span> — з'явиться порожня Google Таблиця. Назви файл «Фільми 9-А», а аркуш (унизу) — «Фільми».</p>
-      </div>
-
-      <div class="guide-card">
-        <h3><span class="n">2</span>Назви полів</h3>
-        <p>У першому рядку введи назви полів — по одній у комірці:</p>
-        <div class="mini sheet"><div class="sheet-scroll"><table class="sheet-grid">
-          <tr><th class="corner"></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th></tr>
-          <tr><th>1</th><td class="fname">ID</td><td class="fname">Назва</td><td class="fname">Рік</td><td class="fname">Жанр</td><td class="fname">Дата перегляду</td><td class="fname">Раджу</td></tr>
-        </table></div></div>
-        <p style="margin-top:8px;">Виділи рядок 1 і зроби його жирним. Потім <span class="menu">Вигляд → Закріпити → 1 рядок</span>.</p>
-      </div>
-
-      <div class="guide-card">
-        <h3><span class="n">3</span>Типи стовпців</h3>
-        <ul>
-          <li><b>A (ID) і C (Рік)</b> — виділи стовпці → <span class="menu">Формат → Число → Число</span>, потім зменш кількість знаків після коми до нуля.</li>
-          <li><b>E (Дата перегляду)</b> — <span class="menu">Формат → Число → Дата</span>.</li>
-          <li><b>F (Раджу)</b> — виділи комірки F2:F20 → <span class="menu">Вставити → Прапорець</span>.</li>
-          <li><b>B і D</b> — текст, змінювати нічого не треба.</li>
-        </ul>
-      </div>
-
-      <div class="guide-card">
-        <h3><span class="n">4</span>Записи</h3>
-        <p>Заповни щонайменше <b>5 записів</b> — фільми, які радять однокласники. ID став по порядку: 1, 2, 3… Жодних порожніх рядків між записами.</p>
-      </div>
-
-      <div class="guide-card">
-        <h3><span class="n">5</span>Захист ключа (додатково)</h3>
-        <p>Нехай таблиця сама підсвічує повторені ID. Виділи стовпець A → <span class="menu">Формат → Умовне форматування</span> → правило «Власна формула»:</p>
-        <p><span class="mono">=COUNTIF($A:$A;$A1)&gt;1</span> і обери червону заливку.</p>
-        <p>Перевір: введи в новий запис ID, який уже є, — комірки мають почервоніти.</p>
-      </div>
-
-      <div class="guide-card">
-        <h3><span class="n">6</span>Дай відповіді в окремому аркуші «Відповіді»</h3>
-        <ul>
-          <li>Скільки полів і скільки записів у твоїй таблиці?</li>
-          <li>Який тип даних у кожного поля?</li>
-          <li>Чому ключем обрано ID, а не «Назву»?</li>
-        </ul>
-      </div>
-
-      <h3 style="font-size:16px; margin:16px 0 4px;">Перевір себе перед здачею</h3>
-      <ul class="checklist">
-        <li><input type="checkbox" id="c1"><label for="c1">У першому рядку — назви 6 полів, рядок закріплено.</label></li>
-        <li><input type="checkbox" id="c2"><label for="c2">Стовпцям задано типи: числа, дата, прапорці.</label></li>
-        <li><input type="checkbox" id="c3"><label for="c3">Щонайменше 5 записів без порожніх рядків.</label></li>
-        <li><input type="checkbox" id="c4"><label for="c4">Кожен ID заповнений і не повторюється.</label></li>
-        <li><input type="checkbox" id="c5"><label for="c5">Аркуш «Відповіді» з відповідями на три запитання.</label></li>
-        <li><input type="checkbox" id="c6"><label for="c6">Доступ до файлу надано вчителю (<span class="menu">Надати доступ</span>).</label></li>
-      </ul>
-    </div>
   </section>
 
 </div>

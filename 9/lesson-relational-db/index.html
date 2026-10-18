@@ -147,30 +147,8 @@
   .quiz-opt.wrong{background:#FBE6E9; border-color:#D14B5E;}
   .quiz-nav{margin-top:16px;}
   .btn-next{padding:10px 20px;}
-  .guide{background:var(--surface); border:2px solid var(--pri); border-radius:var(--radius-l); padding:20px 20px 16px; margin-top:12px;}
-  @media (max-width:480px){ .guide{padding:16px 12px 12px;} }
-  .guide-head{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; margin-bottom:6px;}
-  .guide-head h2{margin:0;}
-  .btn-print, .btn-copy{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; background:var(--bg); color:var(--pri-dark); border:1.5px solid var(--line); padding:6px 14px; border-radius:var(--radius-s); cursor:pointer;}
-  .btn-copy{margin:6px 6px 0 0;}
-  .btn-copy.done{background:#E4F5E9; border-color:#3FAE58; color:#256B36;}
-  .guide-card{border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; margin:10px 0; background:#FBFDFC;}
-  .guide-card h3{font-size:15px; margin-bottom:4px; display:flex; align-items:center; gap:8px;}
-  .guide-card h3 .n{width:24px; height:24px; border-radius:50%; background:var(--pri); color:#fff; font-size:12.5px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0;}
-  .guide-card p, .guide-card li{font-size:14px !important;}
-  .guide-card .mini{margin-top:8px;}
-  .guide-card .mini .sheet-grid{min-width:0;}
   .menu{font-family:'Baloo 2',sans-serif; font-weight:700; color:var(--pri-dark); white-space:nowrap;}
-  .checklist{list-style:none; padding:0 !important;}
-  .checklist li{display:flex; gap:10px; align-items:flex-start; font-size:14px; padding:6px 0; border-bottom:1px dashed var(--line); margin:0 !important;}
-  .checklist input{width:18px; height:18px; margin-top:3px; accent-color:var(--pri); flex-shrink:0;}
   footer{padding:32px 24px 56px; font-size:13px;}
-  @media print{ section.block:not(#practice), .btn-print, .btn-copy{display:none !important;}
-  .hero{display:none !important;}
-  footer{display:none !important;}
-  #practice{border-top:none; padding-top:0;}
-  .guide{border:none; padding:0;}
-  .guide-card{break-inside:avoid;} }
 </style>
 </head>
 <body data-lesson="lesson9-relational-db" data-hud="9 клас · Реляційна база даних">
@@ -402,86 +380,6 @@
     <div class="step-label">Підсумок</div>
     <h2>Коротка перевірка</h2>
     <div id="finalQuiz"></div>
-  </section>
-
-  <section class="block" id="practice" data-guide>
-    <div class="guide">
-      <div class="guide-head">
-        <div>
-          <div class="step-label">Практична робота №5</div>
-          <h2>Зв'язані аркуші: учні та класи</h2>
-        </div>
-        <button class="btn-print" onclick="window.print()">🖨 Надрукувати</button>
-      </div>
-      <p>Зв'яжи два аркуші Google Таблиці так, щоб назва класу й класний керівник підставлялися самі за ID класу.</p>
-
-      <div class="guide-card">
-        <h3><span class="n">1</span>Відкрий шаблон</h3>
-        <p>Відкрий шаблон, який вчитель додав у Google Classroom, і створи свою копію (<span class="menu">Файл → Створити копію</span>).</p>
-        <p>Немає шаблону? Створи його сам за хвилину:</p>
-        <ul>
-          <li>відкрий <span class="mono">sheets.new</span>, назви файл «Зв'язані аркуші — Прізвище»;</li>
-          <li>перейменуй аркуш на «Учні», а кнопкою <b>+</b> унизу додай аркуш «Класи»;</li>
-          <li>скопіюй дані кнопками нижче, клацни комірку <b>A1</b> потрібного аркуша й встав (<b>Ctrl+V</b>).</li>
-        </ul>
-        <button class="btn-copy" data-copy="k">📋 Копіювати дані «Класи»</button>
-        <button class="btn-copy" data-copy="u">📋 Копіювати дані «Учні»</button>
-      </div>
-
-      <div class="guide-card">
-        <h3><span class="n">2</span>Розглянь структуру</h3>
-        <p>Аркуш «Класи» — довідник, аркуш «Учні» посилається на нього через стовпець <b>D (ID класу)</b>.</p>
-        <div class="mini sheet"><div class="sheet-title"><span class="doc"></span>Класи</div><div class="sheet-scroll"><table class="sheet-grid" id="pK"></table></div></div>
-        <div class="mini sheet"><div class="sheet-title"><span class="doc"></span>Учні</div><div class="sheet-scroll"><table class="sheet-grid" id="pU"></table></div></div>
-      </div>
-
-      <div class="guide-card">
-        <h3><span class="n">3</span>Підстав назву класу</h3>
-        <p>В аркуші «Учні» у комірку <b>E1</b> впиши заголовок «Клас», а в <b>E2</b> — формулу:</p>
-        <p><span class="mono">=VLOOKUP(D2;'Класи'!A:C;2;0)</span></p>
-        <p>Наведи курсор на правий нижній кутик E2 і протягни формулу вниз до останнього учня.</p>
-        <p class="soft">Якщо Таблиця не приймає формулу, заміни «;» на «,» — роздільник залежить від мовних налаштувань файлу.</p>
-      </div>
-
-      <div class="guide-card">
-        <h3><span class="n">4</span>Підстав класного керівника</h3>
-        <p>У <b>F1</b> — заголовок «Класний керівник», у <b>F2</b> — така сама формула, але з номером стовпця <b>3</b>. Протягни її вниз.</p>
-      </div>
-
-      <div class="guide-card">
-        <h3><span class="n">5</span>Захисти зв'язок спадним списком</h3>
-        <p>Виділи D2:D30 → <span class="menu">Дані → Перевірка даних</span> → правило «Спадне меню (з діапазону)» → діапазон <span class="mono">'Класи'!A2:A</span>. Тепер у ID класу можна вибрати лише наявний клас.</p>
-      </div>
-
-      <div class="guide-card">
-        <h3><span class="n">6</span>Перевір, що зв'язок працює</h3>
-        <ul>
-          <li>Переведи будь-якого учня в інший клас — зміни лише його ID класу.</li>
-          <li>Зміни класного керівника 9-В в аркуші «Класи» — подивись, що сталося в «Учнях».</li>
-          <li>Додай у «Класи» новий клас 9-Г з ID 4 і запиши туди одного учня.</li>
-        </ul>
-      </div>
-
-      <div class="guide-card">
-        <h3><span class="n">7</span>Дай відповіді в аркуші «Відповіді»</h3>
-        <ul>
-          <li>Яке поле — первинний ключ аркуша «Класи», а яке — зовнішній ключ в аркуші «Учні»?</li>
-          <li>Який тип зв'язку між класами й учнями? Чому?</li>
-          <li>Скільки комірок ти змінив(-ла), щоб оновити керівника в усіх учнів 9-В?</li>
-        </ul>
-      </div>
-
-      <h3 style="font-size:16px; margin:16px 0 4px;">Перевір себе перед здачею</h3>
-      <ul class="checklist">
-        <li><input type="checkbox" id="c1"><label for="c1">У файлі два аркуші з даними: «Учні» і «Класи».</label></li>
-        <li><input type="checkbox" id="c2"><label for="c2">Стовпці «Клас» і «Класний керівник» заповнюються формулою, а не вручну.</label></li>
-        <li><input type="checkbox" id="c3"><label for="c3">Формули протягнуто до кожного учня, помилок #N/A немає.</label></li>
-        <li><input type="checkbox" id="c4"><label for="c4">ID класу вибирається зі спадного списку.</label></li>
-        <li><input type="checkbox" id="c5"><label for="c5">Додано клас 9-Г і учня в ньому.</label></li>
-        <li><input type="checkbox" id="c6"><label for="c6">Аркуш «Відповіді» з відповідями на три запитання.</label></li>
-        <li><input type="checkbox" id="c7"><label for="c7">Доступ до файлу надано вчителю (<span class="menu">Надати доступ</span>).</label></li>
-      </ul>
-    </div>
   </section>
 
 </div>
@@ -909,42 +807,6 @@ makeClassify('relList', [
   }
   render();
 })();
-
-/* ---------- PRACTICAL: DATA ---------- */
-const P_K = { f:['ID класу','Назва','Класний керівник','Кабінет'], r:[
-  ['1','9-А','Олена Петренко','21'],
-  ['2','9-Б','Лідія Бондар','14'],
-  ['3','9-В','Тарас Кравець','32']
-]};
-const P_U = { f:['ID учня','Прізвище','Ім\'я','ID класу'], r:[
-  ['101','Мельник','Остап','1'], ['102','Коваль','Дарина','2'], ['103','Шевчук','Марко','1'],
-  ['104','Ткаченко','Софія','3'], ['105','Бойко','Назар','1'], ['106','Лисенко','Ірина','2'],
-  ['107','Гончаренко','Артем','3'], ['108','Савчук','Злата','2'], ['109','Кравчук','Денис','1'],
-  ['110','Романенко','Аліна','3']
-]};
-document.getElementById('pK').innerHTML = sheetHTML(P_K.f, P_K.r, { num:[0,3] });
-document.getElementById('pU').innerHTML = sheetHTML(P_U.f, P_U.r.slice(0,4).concat([['…','…','…','…']]), { num:[0,3] });
-function toTSV(d){ return [d.f, ...d.r].map(r=>r.join('\t')).join('\n'); }
-async function copyText(text){
-  try{ await navigator.clipboard.writeText(text); return true; }
-  catch(e){
-    const ta = document.createElement('textarea');
-    ta.value = text; document.body.appendChild(ta); ta.select();
-    let ok = false;
-    try{ ok = document.execCommand('copy'); }catch(err){}
-    ta.remove();
-    return ok;
-  }
-}
-document.querySelectorAll('.btn-copy').forEach(btn=>{
-  const label = btn.textContent;
-  btn.addEventListener('click', async ()=>{
-    const ok = await copyText(toTSV(btn.dataset.copy==='k' ? P_K : P_U));
-    btn.textContent = ok ? '✓ Скопійовано — встав у A1' : 'Не вдалося скопіювати';
-    btn.classList.toggle('done', ok);
-    setTimeout(()=>{ btn.textContent = label; btn.classList.remove('done'); }, 2500);
-  });
-});
 
 /* ---------- FINAL QUIZ ---------- */
 const questions = [
