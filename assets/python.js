@@ -11,6 +11,9 @@
          check(out, code) — власна перевірка: true — зараховано, рядок — підказка учневі.
      makeSandbox(id, code) — вільна пісочниця без обліку (у блоці має бути ще якась вправа або data-guide).
      makeFindBug(id, [{code, line, why}]) — «У якому рядку помилка?»: клац на рядок коду.
+     makeTrace(id, {code, steps}) — покрокове виконання: код, «Пам'ять» з коробками-змінними й консоль;
+       перед деякими рядками учень передбачає, що станеться (див. коментар біля функції).
+     varBox(name, 'значення') — коробка змінної для ілюстрацій (рядок HTML; тип — за записом значення).
      pyCode(src) — підсвічений блок коду (рядок HTML) — напр. для pre у makeChoices.
    Статичні приклади в розмітці: <pre class="py-code">…</pre> — підсвічуються самі.
    Skulpt (assets/skulpt/) вантажиться лише під час першого запуску чи фокуса в редакторі. */
@@ -346,5 +349,99 @@ function makeFindBug(id, items){
   });
 }
 
-Object.assign(window, { makeCodeTask, makeSandbox, makeFindBug, pyCode });
+/* ---------- ЗМІННІ-КОРОБКИ ---------- */
+// Тип за записом значення: "текст" — str, True/False — bool, з крапкою — float, інакше — int
+const litType = v=>/^["']/.test(v) ? 'str' : /^(True|False)$/.test(v) ? 'bool' : /\./.test(v) ? 'float' : 'int';
+const boxInner = val=>`<span class="vb-val">${esc(val)}</span>`;
+// Коробка змінної: назва зверху, значення всередині, колір — за типом
+const varBox = (name, val)=>`<div class="var-box t-${litType(val)}" data-name="${name}"><div class="vb-tag">${name}</div><div class="vb-body">${boxInner(val)}</div></div>`;
+
+/* Покрокове виконання: код ліворуч, «Пам'ять» з коробками й консоль праворуч.
+   steps — рядки в порядку виконання: [{line, set?:{назва:'значення як у Python'}, out?:'вивід', ask?:{q, opts, correct, why}}].
+   ask — учень спершу передбачає, що станеться в цьому рядку (+1 нейрончик), і лише тоді рядок виконується. */
+function makeTrace(id, {code, steps}){
+  const box = document.getElementById(id);
+  const src = code.replace(/^\n+|\s+$/g, '').split('\n');
+  const asks = steps.filter(s=>s.ask).length;
+  const hit = trackTask(box, asks || 1, asks);
+  box.classList.add('trace-wrap');
+  box.innerHTML = `
+    <div class="trace">
+      <div class="tr-code">${src.map((l, i)=>`<div class="tr-line"><span class="tr-n">${i + 1}</span><span class="tr-t">${hlLine(l) || ' '}</span></div>`).join('')}</div>
+      <div class="tr-side">
+        <div class="tr-title">Пам'ять</div>
+        <div class="tr-boxes"></div>
+        <div class="tr-title">Консоль</div>
+        <div class="tr-out"></div>
+      </div>
+    </div>
+    <div class="tr-ask" hidden></div>
+    <div class="tr-ctrl"><button class="btn-primary tr-next" type="button"></button><span class="tr-msg"></span></div>`;
+  const lines = [...box.querySelectorAll('.tr-line')], boxes = box.querySelector('.tr-boxes'), out = box.querySelector('.tr-out');
+  const askEl = box.querySelector('.tr-ask'), btn = box.querySelector('.tr-next'), msg = box.querySelector('.tr-msg');
+  let pos = 0, replay = false;
+
+  function mark(){
+    lines.forEach(l=>l.classList.remove('cur', 'next'));
+    if(pos > 0) lines[steps[pos - 1].line - 1].classList.add('cur');
+    if(pos < steps.length) lines[steps[pos].line - 1].classList.add('next');
+    btn.hidden = false;
+    if(pos < steps.length){ btn.textContent = `▶ Виконати рядок ${steps[pos].line}`; msg.textContent = ''; }
+    else { btn.textContent = '↺ Ще раз'; msg.textContent = 'Програма завершилась ✓'; }
+    if(!boxes.children.length) boxes.innerHTML = '<span class="tr-empty">Поки що порожньо</span>';
+  }
+  function exec(step){
+    boxes.querySelector('.tr-empty')?.remove();
+    Object.entries(step.set || {}).forEach(([name, val])=>{
+      const old = boxes.querySelector(`[data-name="${name}"]`);
+      if(!old){ boxes.insertAdjacentHTML('beforeend', varBox(name, val)); boxes.lastElementChild.classList.add('pop'); return; }
+      old.className = `var-box t-${litType(val)}`;
+      const v = old.querySelector('.vb-val');
+      v.classList.add('out');
+      v.insertAdjacentHTML('afterend', boxInner(val));
+      v.nextElementSibling.classList.add('drop');
+      setTimeout(()=>v.remove(), 450);
+    });
+    if(step.out !== undefined) out.insertAdjacentHTML('beforeend', `<div class="tr-o">${esc(step.out)}</div>`);
+    pos++;
+    mark();
+  }
+  function ask(step){
+    btn.hidden = true;
+    askEl.hidden = false;
+    askEl.innerHTML = `<p class="q">${step.ask.q}</p><div class="choice-row"></div><div class="choice-feedback"></div>`;
+    const row = askEl.querySelector('.choice-row'), fb = askEl.querySelector('.choice-feedback');
+    let answered = false;
+    step.ask.opts.forEach((o, i)=>{
+      const b = document.createElement('button');
+      b.className = 'choice-btn';
+      b.innerHTML = o;
+      b.addEventListener('click', ()=>{
+        if(answered) return;
+        if(i !== step.ask.correct){ b.classList.add('wrong'); fb.textContent = 'Ні, подумай ще.'; return; }
+        answered = true;
+        b.classList.add('correct');
+        fb.innerHTML = 'Правильно ✓ ' + (step.ask.why || '');
+        addNeurons(1); hit();
+        exec(step);
+      });
+      row.appendChild(b);
+    });
+  }
+  btn.addEventListener('click', ()=>{
+    if(pos === steps.length){        // ще раз — уже без запитань
+      pos = 0; replay = true;
+      boxes.innerHTML = ''; out.innerHTML = ''; askEl.hidden = true;
+      mark(); return;
+    }
+    askEl.hidden = true;
+    const step = steps[pos];
+    if(step.ask && !replay) ask(step);
+    else exec(step);
+    if(pos === steps.length && !asks) hit();
+  });
+  mark();
+}
+
+Object.assign(window, { makeCodeTask, makeSandbox, makeFindBug, makeTrace, pyCode, varBox });
 })();

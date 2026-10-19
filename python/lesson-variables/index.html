@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Змінні, типи даних і введення — Заняття</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<link rel="stylesheet" href="../../assets/python.css">
+<style>
+  :root{
+    --accent:#3776AB; --accent-dark:#25567F; --accent-soft:#E8F0F8;
+    --bg:#F4F7FB; --line:#DFE6F1; --ink-soft:#4F5A72;
+    --hud-bar:linear-gradient(90deg, #3776AB, #FFD43B);
+  }
+  .sort-chip{font-family:var(--code-font); font-weight:600;}
+</style>
+</head>
+<body data-lesson="py-variables" data-hud="Python Basic · Змінні">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Python Basic · Заняття 2</div>
+      <h1>Змінні: коробки для даних</h1>
+      <p>Навчишся зберігати дані, питати користувача й звертатися до нього на ім'я.</p>
+      <button class="btn-primary" onclick="document.getElementById('start').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none" aria-hidden="true">
+      <circle cx="70" cy="70" r="60" fill="#E8F0F8"/>
+      <path d="M22 78 H62 L60 84 H24 Z" fill="#E8743B"/>
+      <rect x="25" y="84" width="34" height="34" rx="5" fill="#FDEFE6" stroke="#E8743B" stroke-width="3"/>
+      <text x="42" y="107" text-anchor="middle" font-family="monospace" font-weight="700" font-size="14" fill="#1B1B3A">12</text>
+      <path d="M72 78 H116 L114 84 H74 Z" fill="#2E9E5B"/>
+      <rect x="75" y="84" width="38" height="34" rx="5" fill="#E4F5EA" stroke="#2E9E5B" stroke-width="3"/>
+      <text x="94" y="107" text-anchor="middle" font-family="monospace" font-weight="700" font-size="12" fill="#1B1B3A">"Оля"</text>
+      <path d="M46 34 H90 L88 40 H48 Z" fill="#3776AB"/>
+      <rect x="49" y="40" width="38" height="32" rx="5" fill="#E6EFF8" stroke="#3776AB" stroke-width="3"/>
+      <text x="68" y="61" text-anchor="middle" font-family="monospace" font-weight="700" font-size="11" fill="#1B1B3A">True</text>
+      <rect x="30" y="112" width="24" height="10" rx="3" fill="#FFF6C9" stroke="#E9D27A" stroke-width="1.5" transform="rotate(-4 42 117)"/>
+      <rect x="82" y="112" width="24" height="10" rx="3" fill="#FFF6C9" stroke="#E9D27A" stroke-width="1.5" transform="rotate(3 94 117)"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="start">
+    <div class="step-label">Крок 1 · Що таке змінна</div>
+    <h2>Змінна — коробка з наліпкою</h2>
+    <p>Змінна — це «коробка», у якій програма зберігає дані. У коробки є назва, а те, що лежить усередині, називають значенням.</p>
+    <div class="var-demo" id="demo1"></div>
+    <ul>
+      <li><code>name</code> — назва змінної;</li>
+      <li><code>=</code> — визначає вміст коробки;</li>
+      <li><code>"Оля"</code> — значення.</li>
+    </ul>
+    <p class="soft">Виконуй програму рядок за рядком і стеж за коробками.</p>
+    <div id="trace1"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Назви змінних</div>
+    <h2>Як назвати коробку</h2>
+    <p>Назва має підказувати, що лежить у коробці. Правила:</p>
+    <ul>
+      <li>латинські літери, цифри й знак <code>_</code>;</li>
+      <li>не починається з цифри;</li>
+      <li>без пробілів: замість них <code>_</code>, як у <code>best_score</code>;</li>
+      <li><code>age</code> і <code>Age</code> — різні змінні.</li>
+    </ul>
+    <div class="exercise">
+      <p class="soft">Чи можна так назвати змінну?</p>
+      <div class="yn-grid" id="namesList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Типи даних</div>
+    <h2>Що буває в коробках</h2>
+    <p>Python сам визначає тип даних за тим, як записано значення.</p>
+    <div class="var-gallery" id="gallery"></div>
+    <div class="trivia"><code>7</code> і <code>"7"</code> — різні речі: перше — число, друге — текст.</div>
+    <div class="exercise">
+      <p class="soft">Клацни значення, а потім тип.</p>
+      <div class="sort-buckets">
+        <div class="bucket" id="bkInt"><div class="bucket-title">int — ціле</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkFloat"><div class="bucket-title">float — дробове</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkStr"><div class="bucket-title">str — текст</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkBool"><div class="bucket-title">bool — так/ні</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="typesPool"></div>
+      <div class="progress-line" id="typesProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · f-рядки</div>
+    <h2>Змінна всередині тексту</h2>
+    <p>Щоб вставити значення змінної в текст, перед лапками пишуть <code>f</code>, а назву змінної — у фігурних дужках.</p>
+<pre class="py-code">
+name = "Оля"
+print(f"Привіт, {name}!")
+# у консолі: Привіт, Оля!
+</pre>
+    <div class="exercise">
+      <p class="soft">Що виведе програма?</p>
+      <div id="fList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Команда input()</div>
+    <h2>Питаємо користувача</h2>
+    <p><code>input()</code> ставить запитання й чекає, поки користувач введе відповідь і натисне Enter. Відповідь кладуть у змінну.</p>
+<pre class="py-code">
+name = input("Як тебе звати? ")
+</pre>
+    <div id="task1"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Текст чи число</div>
+    <h2>input() завжди повертає текст</h2>
+    <p>Навіть якщо ввести цифри, у коробку потрапить текст. Щоб рахувати, його перетворюють на число: <code>int()</code> — ціле, <code>float()</code> — дробове.</p>
+    <div id="trace2"></div>
+    <div id="task2"></div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Заняття 2 · «Змінні, типи даних і введення» · Гурток Python Basic</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script src="../../assets/python.js"></script>
+<script>
+/* ---------- КРОК 1 ---------- */
+document.getElementById('demo1').innerHTML = pyCode('name = "Оля"') + '<span class="arrow">→</span>' + varBox('name', '"Оля"');
+
+makeTrace('trace1', {
+  code:'name = "Оля"\nage = 11\nprint(name)\nage = 12\nprint(age)',
+  steps:[
+    { line:1, set:{ name:'"Оля"' } },
+    { line:2, set:{ age:'11' } },
+    { line:3, out:'Оля', ask:{ q:'Що виведе рядок 3?', opts:['name', 'Оля', '"Оля"'], correct:1, why:'name без лапок — це назва коробки, тож виводиться те, що в ній.' } },
+    { line:4, set:{ age:'12' }, ask:{ q:'Що буде в коробці age після рядка 4?', opts:['11', '12', '11 і 12'], correct:1, why:'Нове значення витісняє старе: у коробці завжди одне значення.' } },
+    { line:5, out:'12' }
+  ]
+});
+
+/* ---------- КРОК 2 ---------- */
+makeYesNo('namesList', [
+  { text:'<code>score</code>', correct:true },
+  { text:'<code>my score</code>', correct:false, why:'Пробіл не можна. Краще my_score.' },
+  { text:'<code>2player</code>', correct:false, why:'Назва не може починатися з цифри.' },
+  { text:'<code>player2</code>', correct:true, why:'Цифра не на початку — можна.' },
+  { text:'<code>best_score</code>', correct:true },
+  { text:'<code>best-score</code>', correct:false, why:'Дефіс Python сприйме як мінус.' }
+], 'Можна', 'Не можна');
+
+/* ---------- КРОК 3 ---------- */
+document.getElementById('gallery').innerHTML = [
+  ['age', '12', 'int', 'ціле число'],
+  ['height', '1.52', 'float', 'дробове, через крапку'],
+  ['name', '"Оля"', 'str', 'текст у лапках'],
+  ['is_ready', 'True', 'bool', 'True або False']
+].map(([n, v, t, d])=>`<figure>${varBox(n, v)}<figcaption><b>${t}</b>${d}</figcaption></figure>`).join('');
+
+makeSortBoard('typesPool', { i:'bkInt', f:'bkFloat', s:'bkStr', b:'bkBool' }, [
+  { text:'15', bucket:'i' },
+  { text:'-3', bucket:'i' },
+  { text:'2.5', bucket:'f' },
+  { text:'0.75', bucket:'f' },
+  { text:'"15"', bucket:'s' },
+  { text:'"кіт"', bucket:'s' },
+  { text:'True', bucket:'b' },
+  { text:'False', bucket:'b' }
+], 'typesProgress');
+
+/* ---------- КРОК 4 ---------- */
+makeChoices('fList', [
+  { pre:pyCode('pet = "Барсик"\nprint(f"Мій кіт — {pet}")'), text:'Що з’явиться в консолі?', opts:['Мій кіт — {pet}', 'Мій кіт — Барсик', 'Мій кіт — pet'], correct:1 },
+  { pre:pyCode('pet = "Барсик"\nprint("Мій кіт — {pet}")'), text:'А тут?', opts:['Мій кіт — Барсик', 'Помилка', 'Мій кіт — {pet}'], correct:2, why:'Без f перед лапками дужки не працюють — це звичайний текст.' },
+  { pre:pyCode('a = 3\nb = 4\nprint(f"{a} + {b} = {a + b}")'), text:'Що з’явиться в консолі?', opts:['3 + 4 = 7', '{a} + {b} = 7', '7 + 7 = 7'], correct:0, why:'У дужках можна навіть рахувати.' }
+]);
+
+/* ---------- КРОК 5 ---------- */
+makeCodeTask('task1', {
+  task:'Допиши програму: нехай вона ще запитає улюблену тварину й виведе речення з обома відповідями.',
+  code:'name = input("Як тебе звати? ")\nprint(f"Привіт, {name}!")',
+  hint:'Додай рядок animal = input("Яка твоя улюблена тварина? "), а в print — {animal}.',
+  check:(out, code)=>{
+    if((code.match(/input\(/g) || []).length < 2) return 'Потрібно два запитання — два input().';
+    if(!/f["'][^"'\n]*\{[^}]+\}[^"'\n]*\{[^}]+\}/.test(code)) return 'Виведи обидві відповіді в одному f-рядку: дві змінні у фігурних дужках.';
+    return true;
+  }
+});
+
+/* ---------- КРОК 6 ---------- */
+makeTrace('trace2', {
+  code:'age = input("Скільки тобі років? ")\nage = int(age)\nprint(age + 1)',
+  steps:[
+    { line:1, set:{ age:'"11"' }, out:'Скільки тобі років? 11', ask:{ q:'Користувач ввів 11. Що потрапить у коробку age?', opts:['число 11', 'текст "11"'], correct:1, why:'input() завжди повертає текст.' } },
+    { line:2, set:{ age:'11' }, ask:{ q:'Що зробить <code>int(age)</code>?', opts:['Виведе 11 на екран', 'Перетворить текст "11" на число 11', 'Видалить змінну age'], correct:1 } },
+    { line:3, out:'12' }
+  ]
+});
+
+makeCodeTask('task2', {
+  task:'Ця програма падає з помилкою. Виправ її за допомогою <code>int()</code>.',
+  code:'age = input("Скільки тобі років? ")\nprint(f"Через рік тобі буде {age + 1}")',
+  hint:'Перетвори відповідь на число одразу: age = int(input("Скільки тобі років? "))',
+  check:(out, code)=>/int\(/.test(code) || 'Використай int(), щоб перетворити текст на число.'
+});
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що виведе програма?' + pyCode('x = 5\nx = 8\nprint(x)'), opts:['5', '8', '5 8'], correct:1, why:'Нове значення замінює старе.' },
+  { q:'Якого типу значення <code>"42"</code>?', opts:['int', 'str', 'float'], correct:1, why:'У лапках — отже, текст.' },
+  { q:'Яку назву змінної Python не прийме?', opts:['<code>score2</code>', '<code>2score</code>', '<code>best_score</code>'], correct:1, why:'Назва не може починатися з цифри.' },
+  { q:'Що виведе програма?' + pyCode('city = "Київ"\nprint(f"Місто: {city}")'), opts:['Місто: {city}', 'Місто: city', 'Місто: Київ'], correct:2 },
+  { q:'Користувач ввів 5. Що станеться?' + pyCode('n = input("Число: ")\nprint(n + 1)'), opts:['Виведе 6', 'Виведе 51', 'Помилка: текст і число не додаються'], correct:2, why:'input() повертає текст "5", а до тексту не можна додати число.' }
+], {summary:'Тепер ти вмієш зберігати дані у змінних, питати користувача через input() і вставляти значення в текст f-рядками.', html:true});
+</script>
+
+</body>
+</html>

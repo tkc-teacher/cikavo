@@ -88,3 +88,50 @@ pre.py-code{font-family:var(--code-font); font-size:14.5px; line-height:1.6; bac
 .bug-line.wrong{background:rgba(255,107,74,.16); border-left-color:#FF6B4A; animation:shakeX .3s ease;}
 .bug-card.done .bug-line{cursor:default;}
 .bug-card.done .bug-line:not(.correct):hover{background:transparent;}
+
+/* Змінна-коробка (varBox): назва зверху, значення всередині; колір — за типом */
+.var-box{--vb:#E8743B; --vb-soft:#FDEFE6; display:inline-flex; flex-direction:column; align-items:flex-start; min-width:96px; vertical-align:top;}
+.var-box.t-float{--vb:#9B5DE5; --vb-soft:#F3EAFD;}
+.var-box.t-str{--vb:#2E9E5B; --vb-soft:#E4F5EA;}
+.var-box.t-bool{--vb:#3776AB; --vb-soft:#E6EFF8;}
+.vb-tag{font-family:var(--code-font); font-weight:600; font-size:13px; color:#fff; background:var(--vb); border-radius:8px 8px 0 0; padding:1px 10px; transition:background .3s ease;}
+.vb-body{position:relative; align-self:stretch; height:52px; padding:0 16px; display:flex; align-items:center; justify-content:center; background:var(--vb-soft); border:2px solid var(--vb); border-radius:0 10px 10px 10px; overflow:hidden; transition:background .3s ease, border-color .3s ease;}
+.vb-val{font-family:var(--code-font); font-weight:600; font-size:17px; color:var(--ink); white-space:nowrap;}
+.vb-val.out{position:absolute; animation:vb-out .45s ease forwards;}
+.vb-val.drop{animation:vb-drop .45s ease;}
+@keyframes vb-out{to{transform:translateY(-24px); opacity:0;}}
+@keyframes vb-drop{from{transform:translateY(-24px); opacity:0;}}
+.var-box.pop{animation:vb-pop .3s ease;}
+@keyframes vb-pop{from{transform:scale(.7); opacity:0;}}
+
+/* Покрокове виконання (makeTrace) */
+.trace-wrap{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:18px; margin-top:18px;}
+.trace{display:grid; grid-template-columns:minmax(0, 1.15fr) minmax(0, 1fr); gap:14px;}
+@media (max-width:640px){ .trace{grid-template-columns:1fr;} .trace-wrap{padding:14px;} }
+.tr-code{background:var(--code-bg); border-radius:var(--radius-m); padding:10px 0; overflow-x:auto; align-self:start;}
+.tr-line{display:flex; gap:14px; padding:3px 14px 3px 11px; border-left:3px solid transparent; font-family:var(--code-font); font-size:14.5px; line-height:1.5; color:var(--code-ink); white-space:pre; transition:background .2s ease;}
+.tr-n{color:#4E5873; min-width:1ch; text-align:right; user-select:none;}
+.tr-line.next{border-left-color:#FFD43B; background:rgba(255,212,59,.1);}
+.tr-line.next .tr-n{color:#FFD43B;}
+.tr-line.cur{background:rgba(63,174,88,.18); border-left-color:#3FAE58;}
+.tr-side{background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 14px 14px;}
+.tr-title{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-soft); margin:2px 0 6px;}
+.tr-boxes{display:flex; flex-wrap:wrap; gap:12px 10px; min-height:78px; align-items:flex-start; margin-bottom:10px;}
+.tr-empty{font-size:13.5px; color:var(--ink-soft); align-self:center;}
+.tr-out{font-family:var(--code-font); font-size:14px; line-height:1.5; background:var(--code-bg); color:var(--code-ink); border-radius:var(--radius-s); padding:8px 12px; min-height:40px; white-space:pre-wrap;}
+.tr-o{animation:vb-pop .3s ease;}
+.tr-ask{margin-top:14px; background:var(--sun-soft); border-radius:var(--radius-m); padding:12px 16px;}
+.tr-ask p.q{font-weight:700; font-size:15px; margin:0 0 10px;}
+.tr-ctrl{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-top:14px;}
+.tr-ctrl .btn-primary{font-size:15px; padding:10px 18px;}
+.tr-msg{font-family:'Baloo 2',sans-serif; font-weight:600; color:#256B36;}
+
+/* Ілюстрація «рядок коду → коробка» і галерея коробок */
+.var-demo{display:flex; align-items:center; gap:18px; flex-wrap:wrap; margin:16px 0;}
+.var-demo pre.py-code{margin:0; font-size:17px;}
+.var-demo .arrow{font-size:28px; color:var(--accent);}
+.var-gallery{display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; margin:16px 0;}
+@media (max-width:640px){ .var-gallery{grid-template-columns:repeat(2, 1fr);} }
+.var-gallery figure{margin:0; text-align:center;}
+.var-gallery figcaption{margin-top:8px; font-size:13.5px; line-height:1.35; color:var(--ink-soft);}
+.var-gallery figcaption b{display:block; font-family:var(--code-font); font-size:14px; color:var(--ink);}
