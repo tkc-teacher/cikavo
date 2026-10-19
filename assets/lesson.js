@@ -413,7 +413,8 @@ function makeSequence(doneId, qId, optsId, fbId, steps, finalText, onDone){
 
 
 /* ---------- ФІНАЛЬНИЙ ТЕСТ І ЕКРАН ЗАВЕРШЕННЯ ----------
-   makeFinalQuiz(id порожнього div, questions — [{q, opts:[...], correct, why?}], {summary, perCorrect = 2})
+   makeFinalQuiz(id порожнього div, questions — [{q, opts:[...], correct, why?}], {summary, perCorrect = 2, html = false})
+   html:true — q, opts і why вставляються як розмітка (код у <code> тощо), інакше — як звичайний текст.
    будує тест, а після нього — екран завершення. Тест можна перездати після «Повернутися до уроку»:
    нейрончики даються лише за відповіді понад найкращий результат, бонус +3 — лише за першу спробу.
    Урок без тесту (напр. завершується творчим проєктом): questions = [] — замість тесту кнопка «Завершити урок». */
@@ -425,7 +426,8 @@ const donutFig = (cls, title, sub)=>`
     <figcaption>${title}<small>${sub}</small></figcaption>
   </figure>`;
 
-function makeFinalQuiz(containerId, questions, {summary:text = '', perCorrect = 2} = {}){
+function makeFinalQuiz(containerId, questions, {summary:text = '', perCorrect = 2, html = false} = {}){
+  const put = html ? 'innerHTML' : 'textContent';     // html:true — у питаннях і варіантах можна розмітку (напр. <code>)
   const root = document.getElementById(containerId);
   const noQuiz = !questions.length;
   root.innerHTML = (noQuiz ? `
@@ -468,13 +470,13 @@ function makeFinalQuiz(containerId, questions, {summary:text = '', perCorrect = 
     nextBtn.classList.remove('active');
     const item = questions[qi];
     progEl.textContent = `Запитання ${qi + 1} з ${questions.length}`;
-    qEl.textContent = item.q;
+    qEl[put] = item.q;
     whyEl.textContent = '';
     optsEl.innerHTML = '';
     item.opts.forEach((opt, i)=>{
       const b = document.createElement('button');
       b.className = 'quiz-opt';
-      b.textContent = opt;
+      b[put] = opt;
       b.addEventListener('click', ()=>{
         if(answered) return;
         answered = true;
@@ -483,7 +485,7 @@ function makeFinalQuiz(containerId, questions, {summary:text = '', perCorrect = 
           else if(oi === i) ob.classList.add('wrong');
         });
         if(i === item.correct){ score++; if(score > best) addNeurons(perCorrect); }
-        if(item.why) whyEl.textContent = (i === item.correct ? '✓ ' : 'Правильну відповідь підсвічено. ') + item.why;
+        if(item.why) whyEl[put] = (i === item.correct ? '✓ ' : 'Правильну відповідь підсвічено. ') + item.why;
         nextBtn.classList.add('active');
         nextBtn.textContent = (qi === questions.length - 1) ? 'Завершити' : 'Далі';
       });

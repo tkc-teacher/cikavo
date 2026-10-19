@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Вступ до Python. Перша програма — Заняття</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<link rel="stylesheet" href="../../assets/python.css">
+<style>
+  :root{
+    --accent:#3776AB; --accent-dark:#25567F; --accent-soft:#E8F0F8;
+    --bg:#F4F7FB; --line:#DFE6F1; --ink-soft:#4F5A72;
+    --hud-bar:linear-gradient(90deg, #3776AB, #FFD43B);
+  }
+</style>
+</head>
+<body data-lesson="py-first-program" data-hud="Python Basic · Перша програма">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Python Basic · Заняття 1</div>
+      <h1>Привіт, Python! Перша програма</h1>
+      <p>Напишеш перші рядки коду просто тут, у браузері.</p>
+      <button class="btn-primary" onclick="document.getElementById('start').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none" aria-hidden="true">
+      <circle cx="70" cy="70" r="60" fill="#E8F0F8"/>
+      <rect x="24" y="38" width="74" height="52" rx="7" fill="#25567F"/>
+      <rect x="30" y="44" width="62" height="40" rx="3" fill="#1F2433"/>
+      <path d="M37 56 L44 61 L37 66" stroke="#FFD43B" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="49" y="64" width="16" height="3.5" rx="1.75" fill="#C3E88D"/>
+      <rect x="37" y="73" width="30" height="3.5" rx="1.75" fill="#82AAFF"/>
+      <path d="M16 92 H106 L99 102 H23 Z" fill="#3776AB"/>
+      <path d="M66 124 Q100 128 112 110 Q122 94 112 80 Q104 68 111 56" stroke="#FFD43B" stroke-width="12" stroke-linecap="round"/>
+      <circle cx="114" cy="48" r="12" fill="#FFD43B"/>
+      <circle cx="118" cy="45" r="2.8" fill="#1B1B3A"/>
+      <path d="M125 51 L132 53 L128 54 L132 57" stroke="#FF6B4A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="start">
+    <div class="step-label">Крок 1 · Перша програма</div>
+    <h2>Комп'ютер виконує команди дослівно</h2>
+    <p>Програма — це набір команд, які комп'ютер виконує по черзі й дослівно. Записують їх мовою програмування, наприклад Python.</p>
+    <p>Код пишуть у <b>редакторі</b>, запускають кнопкою, а результат з'являється в <b>консолі</b>. На наших заняттях усе це вже вбудовано в сторінку.</p>
+    <div class="note">Назва Python — не від змії, а від британського комедійного шоу «Monty Python».</div>
+    <div id="task1"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Команда print()</div>
+    <h2>print() виводить на екран</h2>
+    <p>Команда <code>print()</code> виводить у консоль те, що стоїть у дужках.</p>
+    <ul>
+      <li>текст — у лапках: <code>print("Привіт")</code>;</li>
+      <li>приклад — без лапок: <code>print(2 + 3)</code> виведе <code>5</code>;</li>
+      <li>кожен <code>print()</code> — окремий рядок.</li>
+    </ul>
+    <div class="exercise">
+      <p class="soft">Що виведе програма?</p>
+      <div id="step3List"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Перша власна програма</div>
+    <h2>Розкажи про себе</h2>
+    <p>Тепер код пишеш ти.</p>
+    <div id="task2"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Помилки</div>
+    <h2>Помилятися — нормально</h2>
+    <p>Python зупиняє програму й показує рядок з помилкою. Найчастіші помилки:</p>
+    <ul>
+      <li>забута лапка чи дужка: <code>print("Привіт)</code>;</li>
+      <li>велика літера: <code>Print("Привіт")</code>;</li>
+      <li>текст без лапок: <code>print(Привіт)</code>.</li>
+    </ul>
+    <div class="exercise">
+      <div id="bugList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Виправ програму</div>
+    <h2>Полагодь програму</h2>
+    <p>Тут три помилки. Запускай і виправляй по одній.</p>
+    <div id="task3"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Коментарі</div>
+    <h2>Нотатки для людей</h2>
+    <p>Коментар — текст після знака <code>#</code>. Python його пропускає, а людям він пояснює код.</p>
+<pre class="py-code">
+# Моя перша програма
+print("Привіт!")
+</pre>
+    <div class="exercise">
+      <p class="soft">Що виведе програма?</p>
+      <div id="step7List"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 7 · Малюємо символами</div>
+    <h2>Картинка з print()</h2>
+    <p>З рядків символів можна скласти малюнок. Лише не використовуй риску <code>\</code> — вона в Python особлива.</p>
+    <div id="task4"></div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Заняття 1 · «Вступ до Python. Перша програма» · Гурток Python Basic</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script src="../../assets/python.js"></script>
+<script>
+const lines = out=>out.split('\n').filter(l=>l.trim());
+
+/* ---------- КРОК 1 ---------- */
+makeCodeTask('task1', {
+  task:'Натисни «▶ Запустити» й подивись, що з’явиться в консолі.',
+  code:'print("Привіт, світ!")',
+  neurons:2,
+  check:out=>out.includes('Привіт, світ!') || 'Поверни початковий код кнопкою ↺ і запусти ще раз.'
+});
+
+/* ---------- КРОК 2 ---------- */
+makeChoices('step3List', [
+  { pre:pyCode('print("10 + 5")'), text:'Що з’явиться в консолі?', opts:['15', '10 + 5', '"10 + 5"'], correct:1, why:'У лапках — текст, і Python виводить його як є, без лапок.' },
+  { pre:pyCode('print(10 + 5)'), text:'А тепер?', opts:['10 + 5', '105', '15'], correct:2, why:'Без лапок це приклад, і Python його обчислює.' },
+  { pre:pyCode('print("Кіт")\nprint("Пес")'), text:'Як виглядатиме вивід?', opts:['КітПес', 'Кіт Пес в одному рядку', 'Кіт, а під ним Пес'], correct:2, why:'Кожен print() — окремий рядок.' }
+]);
+
+/* ---------- КРОК 3 ---------- */
+makeCodeTask('task2', {
+  task:'Виведи щонайменше три рядки: як тебе звати, у якому ти класі та що любиш робити. Заміни три крапки своїми словами.',
+  code:'print("Мене звати ...")\nprint("Я навчаюсь у ... класі")',
+  hint:'Скопіюй рядок з print() і зміни текст у лапках, наприклад: print("Я люблю малювати")',
+  check:out=>{
+    if(out.includes('...')) return 'Заміни три крапки своїми словами.';
+    if(lines(out).length < 3) return 'Поки що менше трьох рядків. Додай ще один print().';
+    return true;
+  }
+});
+
+/* ---------- КРОК 4 ---------- */
+makeFindBug('bugList', [
+  { code:'print("Ранок")\nprint("День)\nprint("Вечір")', line:2, why:'Текст «День» не закрито лапкою.' },
+  { code:'print("Один")\nprint("Два")\nPrint("Три")', line:3, why:'Print з великої літери — такої команди Python не знає.' },
+  { code:'print("Старт"\nprint("Фініш")', line:1, why:'Бракує закривальної дужки, хоча Python помітить це лише в рядку 2.' }
+]);
+
+/* ---------- КРОК 5 ---------- */
+makeCodeTask('task3', {
+  code:'print("Привіт!)\nPrint("Сьогодні ми вчимо Python")\nprint("Це просто"',
+  expect:'Привіт!\nСьогодні ми вчимо Python\nЦе просто',
+  neurons:4,
+  hint:'Перевір кожен рядок: дві лапки, дві дужки, print з малої літери.'
+});
+
+/* ---------- КРОК 6 ---------- */
+makeChoices('step7List', [
+  { pre:pyCode('# Вітаємося\nprint("Привіт")'), text:'Що з’явиться в консолі?', opts:['# Вітаємося і Привіт', 'Лише Привіт', 'Нічого'], correct:1, why:'Рядок з # — коментар, Python його пропускає.' },
+  { pre:pyCode('print("Раз")\n# print("Два")\nprint("Три")'), text:'Які рядки з’являться?', opts:['Раз, Два, Три', 'Лише Два', 'Раз і Три'], correct:2, why:'Команду в рядку 2 «вимкнено» знаком #.' }
+]);
+
+/* ---------- КРОК 7 ---------- */
+makeCodeTask('task4', {
+  task:'Зміни робота або намалюй свій малюнок — щонайменше 4 рядки. Над малюнком додай коментар з його назвою.',
+  code:'print("  [o_o]  ")\nprint(" --|=|-- ")\nprint("   | |   ")\nprint("  _| |_  ")',
+  file:'art.py',
+  hint:'Коментар пишуть так: # Мій робот. Щоб змінити малюнок, поміняй символи в лапках або додай ще один print().',
+  check:(out, code)=>{
+    if(lines(out).length < 4) return 'У малюнку має бути щонайменше 4 рядки.';
+    if(!/^\s*#/m.test(code)) return 'Додай над малюнком коментар з назвою, наприклад # Мій робот.';
+    if(/\[o_o\]/.test(code) && /--\|=\|--/.test(code) && lines(out).length === 4) return 'Тепер зміни малюнок: поміняй символи чи додай рядок.';
+    return true;
+  }
+});
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Скільки рядків з’явиться в консолі?' + pyCode('print("Раз")\n# print("Два")\nprint("Три")\nprint("Чотири")'), opts:['2', '3', '4'], correct:1, why:'Рядок з # — коментар, його Python пропускає.' },
+  { q:'Що виведе <code>print("3 + 4")</code>?', opts:['7', '3 + 4', '34'], correct:1, why:'У лапках — текст, він виводиться як є.' },
+  { q:'Який рядок написано без помилки?', opts:['<code>Print("Ура")</code>', '<code>print("Ура")</code>', '<code>print("Ура)</code>', '<code>print(Ура)</code>'], correct:1 },
+  { q:'Для чого в коді знак <code>#</code>?', opts:['Виводить решітку в консоль', 'Починає коментар, який Python пропускає', 'Запускає програму'], correct:1 },
+  { q:'Python пише: «Помилка в рядку 3». Що робити?', opts:['Видалити всю програму й почати заново', 'Перевірити рядок 3 і рядок над ним, виправити й запустити ще раз', 'Нічого: комп\'ютер зламався'], correct:1 }
+], {summary:'Тепер ти вмієш виводити текст і числа командою print(), писати коментарі й виправляти помилки.', html:true});
+</script>
+
+</body>
+</html>

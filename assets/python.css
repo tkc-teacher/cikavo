@@ -1,0 +1,90 @@
+/* Python-модуль ядра: редактор коду, консоль, підсвітка, механіки з кодом (assets/python.js).
+   Підключається після lesson.css. Шрифт коду — JetBrains Mono (Google Fonts, у <head> уроку). */
+
+:root{
+  --code-bg:#1F2433; --code-bar:#171B27; --code-ink:#E6EAF2; --code-soft:#7F8BA3; --code-line:#2C3347;
+  --code-font:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  --t-k:#C792EA; --t-b:#82AAFF; --t-s:#C3E88D; --t-n:#F78C6C; --t-c:#7F8BA3;
+}
+
+/* Код у тексті й статичні приклади */
+.block code, .classify-card code, .choice-btn code, .choice-feedback code, .note code, .trivia code, .py-out code, .quiz-q code, .quiz-opt code, .quiz-why code{
+  font-family:var(--code-font); font-size:.88em; background:var(--accent-soft); color:var(--accent-dark); padding:1px 6px; border-radius:6px; white-space:nowrap;
+}
+pre.py-code{font-family:var(--code-font); font-size:14.5px; line-height:1.6; background:var(--code-bg); color:var(--code-ink); padding:14px 18px; border-radius:var(--radius-m); margin:14px 0; overflow-x:auto; max-width:100%;}
+.classify-card pre.py-code{margin:0 0 12px;}
+.quiz-q pre.py-code{font-weight:400; margin:12px 0 0;}
+.t-k{color:var(--t-k);} .t-b{color:var(--t-b);} .t-s{color:var(--t-s);} .t-n{color:var(--t-n);} .t-c{color:var(--t-c); font-style:italic;}
+.ln.err{background:rgba(255,107,74,.22);}
+.py-hl .ln.err{display:inline-block; min-width:calc(100% + 32px); margin:0 -16px; padding:0 16px;}
+
+/* Редактор */
+.py-ed{background:var(--code-bg); border-radius:var(--radius-m); overflow:hidden; margin-top:12px; box-shadow:0 6px 18px rgba(23,27,39,.18);}
+.py-bar{display:flex; align-items:center; gap:12px; padding:8px 10px 8px 14px; background:var(--code-bar);}
+.py-dots{display:flex; gap:6px;}
+.py-dots i{width:10px; height:10px; border-radius:50%; background:#FF6B4A;}
+.py-dots i:nth-child(2){background:#FFC93C;} .py-dots i:nth-child(3){background:#3FAE58;}
+.py-file{font-family:var(--code-font); font-size:12.5px; color:var(--code-soft); flex:1; min-width:0;}
+.py-actions{display:flex; gap:6px;}
+.py-btn{white-space:nowrap; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; border:none; border-radius:8px; padding:5px 12px; cursor:pointer; background:var(--code-line); color:var(--code-ink); transition:background .15s ease, transform .1s ease;}
+.py-btn:hover{background:#3A4360;}
+.py-btn:active{transform:scale(.96);}
+.py-run{background:#3FAE58; color:#fff; padding:5px 16px;}
+.py-run:hover{background:#34964B;}
+.py-run.stop{background:#FF6B4A;}
+.py-body{display:flex; font-family:var(--code-font); font-size:15px; line-height:1.6;}
+.py-gutter{flex-shrink:0; padding:12px 10px 12px 14px; text-align:right; color:#4E5873; user-select:none; border-right:1px solid var(--code-line);}
+.py-gutter span{display:block;}
+.py-gutter span.err{color:#FF8A6B; font-weight:700;}
+.py-scroll{flex:1; min-width:0; overflow-x:auto;}
+.py-layer{position:relative; display:inline-block; min-width:100%; vertical-align:top;}
+.py-hl, .py-layer textarea{font:inherit; letter-spacing:0; tab-size:4; white-space:pre; margin:0; padding:12px 16px; border:0;}
+.py-hl{color:var(--code-ink); pointer-events:none; min-height:100%;}
+.py-layer textarea{position:absolute; inset:0; width:100%; height:100%; resize:none; overflow:hidden; background:transparent; color:transparent; caret-color:#FFD43B; outline:none;}
+.py-layer textarea::selection{background:rgba(130,170,255,.35);}
+.py-ed:focus-within{box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent), 0 6px 18px rgba(23,27,39,.18);}
+
+/* Консоль */
+.py-out{border-top:1px solid var(--code-line); background:#141823; padding:10px 16px 14px;}
+.py-out-title{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; letter-spacing:.04em; text-transform:uppercase; color:var(--code-soft); margin-bottom:4px;}
+.py-out-text{font-family:var(--code-font); font-size:14.5px; line-height:1.55; color:var(--code-ink); white-space:pre-wrap; overflow-wrap:anywhere; max-height:320px; overflow-y:auto;}
+.py-out-text .i{color:#FFD43B;}
+.py-out-text .m{color:var(--code-soft); font-family:'Nunito Sans',sans-serif; font-size:14px;}
+.py-out-text .e{display:block; white-space:normal; font-family:'Nunito Sans',sans-serif; font-size:14.5px; color:#FFD2C6; background:rgba(255,107,74,.13); border-left:3px solid #FF6B4A; border-radius:0 8px 8px 0; padding:8px 12px; margin-top:4px;}
+.py-out-text .e b{display:block; font-family:'Baloo 2',sans-serif; font-size:15px; color:#FF9C83;}
+.py-out-text .e small{display:block; margin-top:4px; font-family:var(--code-font); font-size:12px; color:var(--code-soft);}
+.py-out-text .e code{background:rgba(255,255,255,.1); color:#fff;}
+.py-input{font:inherit; color:#FFD43B; background:rgba(255,255,255,.06); border:1px solid var(--code-line); border-radius:6px; padding:1px 8px; outline:none; width:min(260px, 100%);}
+.py-input:focus{border-color:#FFD43B;}
+.py-ed.busy .py-hl{opacity:.85;}
+
+/* Задача на код (makeCodeTask) */
+.code-task{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:20px; margin-top:18px; transition:border-color .2s ease;}
+.code-task p.q{font-weight:700; font-size:15.5px; margin:0 0 10px;}
+.code-task.solved{border-color:var(--ok);}
+.code-task.wrong-try{animation:shakeX .3s ease;}
+.code-task .choice-feedback{font-size:14.5px; margin-top:12px;}
+.code-task .choice-feedback.ok{color:#256B36; font-weight:700;}
+.code-task .choice-feedback.tip{color:var(--sun-ink); background:var(--sun-soft); border-radius:var(--radius-s); padding:8px 12px;}
+.py-expect{background:var(--bg); border:1.5px dashed var(--line); border-radius:var(--radius-s); padding:8px 14px; margin:0 0 4px;}
+.py-expect .py-out-title{color:var(--ink-soft);}
+.py-expect pre{margin:0; font-family:var(--code-font); font-size:14px; line-height:1.55; white-space:pre-wrap;}
+@media (max-width:520px){
+  .code-task{padding:14px;}
+  .py-body{font-size:14px;}
+  .py-gutter{padding-left:10px; padding-right:8px;}
+  .py-hl, .py-layer textarea{padding:12px 12px;}
+  .py-hl .ln.err{min-width:calc(100% + 24px); margin:0 -12px; padding:0 12px;}
+  .py-file, .py-dots{display:none;}
+  .py-actions{flex:1; justify-content:flex-end;}
+}
+
+/* «У якому рядку помилка?» (makeFindBug) */
+.bug-code{background:var(--code-bg); border-radius:var(--radius-s); padding:8px 0; overflow-x:auto;}
+.bug-line{display:flex; gap:14px; width:100%; min-width:max-content; text-align:left; font-family:var(--code-font); font-size:14.5px; line-height:1.5; color:var(--code-ink); background:transparent; border:0; border-left:3px solid transparent; padding:4px 14px 4px 11px; cursor:pointer; white-space:pre;}
+.bug-line:hover{background:rgba(255,255,255,.06);}
+.bug-n{color:#4E5873; min-width:1ch; text-align:right; user-select:none;}
+.bug-line.correct{background:rgba(63,174,88,.22); border-left-color:#3FAE58;}
+.bug-line.wrong{background:rgba(255,107,74,.16); border-left-color:#FF6B4A; animation:shakeX .3s ease;}
+.bug-card.done .bug-line{cursor:default;}
+.bug-card.done .bug-line:not(.correct):hover{background:transparent;}
