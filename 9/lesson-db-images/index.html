@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Зображення в базі даних. Цілісність даних — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в інтерфейсі Google Таблиць -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  /* Гама «фотоальбом під замком»: малиновий + бірюзовий */
+  :root{
+    --pri:#B4235A; --pri-dark:#8A1A45; --teal:#0F766E; --teal-dark:#0B5A54;
+    --accent:var(--pri); --accent-dark:var(--pri-dark); --accent-soft:#FBE8EF;
+    --label:var(--teal);
+    --bg:#FBF6F8; --ink:#2A1622; --ink-soft:#6A4F5E; --line:#F0DDE5; --surface:#FFFFFF;
+    --note:var(--teal); --note-soft:#E2F3F1; --note-ink:var(--teal-dark);
+    --sun:#B45309; --sun-soft:#FEF3E2; --sun-ink:#7C3A06;
+    --hud-bar:linear-gradient(90deg,var(--pri),var(--teal));
+  }
+
+  .menu{font-family:'Baloo 2',sans-serif; font-weight:700; color:var(--pri-dark);}
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; background:#F6EEF2; padding:1px 6px; border-radius:5px; font-size:.92em;}
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:18px; line-height:1; display:inline-block; vertical-align:middle; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em;}
+
+  /* Крок 1: два способи зберігання */
+  .ways{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px;}
+  @media (max-width:600px){ .ways{grid-template-columns:1fr;} }
+  .way{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px; text-align:center;}
+  .way svg{width:100%; max-width:220px; height:auto;}
+  .way h3{font-size:17px; margin:6px 0 2px;}
+  .way p{margin:0; font-size:14px; color:var(--ink-soft);}
+
+  /* Імітація Google Таблиць */
+  .sheet{background:var(--surface); border:1.5px solid #D3D6E4; border-radius:var(--radius-s); overflow:hidden; font-size:12.5px; user-select:none; font-family:'Roboto',sans-serif;}
+  .sheet-title{display:flex; align-items:center; gap:8px; background:#FAFBFE; border-bottom:1px solid #D3D6E4; padding:6px 10px; font-weight:500; font-size:13.5px;}
+  .sheet-title img{width:15px; height:20px;}
+  .fx-bar{display:flex; align-items:center; gap:8px; border-bottom:1px solid #D3D6E4; padding:4px 10px; background:#fff; min-height:28px;}
+  .fx-bar .addr{min-width:34px; font-weight:700; color:#5F6368;}
+  .fx-bar .fx{color:#9AA0B4; font-style:italic; font-weight:700;}
+  .fx-bar .val{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .sheet-scroll{overflow-x:auto;}
+  .sheet-grid{border-collapse:collapse; width:100%; min-width:460px; table-layout:fixed;}
+  .sheet-grid th, .sheet-grid td{border:1px solid #E1E3E1; height:28px; padding:0 6px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;}
+  .sheet-grid th{background:#F8F9FA; font-weight:500; color:#5F6368; font-size:11px; text-align:center;}
+  .sheet-grid th.corner{width:30px;}
+  .sheet-grid td{background:#fff;}
+  .sheet-grid tr.head td{font-weight:700;}
+  .sheet-grid tr.head td, .sheet-grid tr.head th{border-bottom:3px solid #C4C7C5;}
+  .sheet-grid td.num{text-align:right;}
+  .sheet-grid td.active{box-shadow:inset 0 0 0 2px #1A73E8; background:#F3F8FF;}
+
+  /* Крок 2: інструкція з макетами Google Таблиць */
+  .key{display:inline-block; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:.9em; line-height:1.3; border:1.5px solid #E2C9D4; border-bottom-width:3px; border-radius:6px; padding:0 7px; background:#fff; color:var(--ink);}
+  .ins{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.1fr); gap:18px; align-items:start; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:16px 18px; margin-top:14px;}
+  @media (max-width:720px){ .ins{grid-template-columns:minmax(0,1fr);} }
+  .ins h3{display:flex; align-items:center; gap:10px; margin:0 0 6px; font-family:'Baloo 2',sans-serif; font-size:18px;}
+  .ins h3 .n{flex-shrink:0; width:28px; height:28px; border-radius:50%; background:var(--pri); color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:15px;}
+  .ins ul{margin:4px 0; padding-left:20px;}
+  .ins li{padding:2px 0;}
+  .ins .note, .ins .trivia{margin-top:8px;}
+  .gs{--g-line:#E1E3E1; --g-blue:#0B57D0; font-family:'Roboto',sans-serif; color:#1F1F1F; background:#F9FBFD; border:1px solid #DADCE0; border-radius:10px; overflow-x:auto; font-size:12.5px; user-select:none;}
+  .gs .ms{color:#444746;}
+  .gs-pad{padding:8px 10px 14px; background:#fff;}
+  .gs-menu{display:flex; gap:4px; font-size:13.5px; white-space:nowrap; overflow:hidden;}
+  .gs-menu span{padding:3px 6px; border-radius:4px;}
+  .gs-menu .open{background:#E1E5EA;}
+  .dd-wrap{position:relative; display:flex; align-items:flex-start; margin-top:4px;}
+  .dd{background:#fff; border-radius:6px; box-shadow:0 2px 6px rgba(60,64,67,.25), 0 1px 2px rgba(60,64,67,.2); padding:6px 0; min-width:140px; font-size:13px;}
+  .dd.sub{margin:96px 0 0 -14px; min-width:0; max-width:180px; position:relative; z-index:1;}
+  .dd.sub .it{white-space:normal; line-height:1.3;}
+  .dd .it{display:flex; align-items:center; gap:10px; padding:5px 12px; white-space:nowrap;}
+  .dd .it .r{margin-left:auto;}
+  .dd .it.on{background:#E8EAED;}
+  .dd.sub .it.on, .dd.ctx .it.on{background:#D3E3FD;}
+  .dd .sep{height:1px; background:var(--g-line); margin:5px 0;}
+  .gs-dialog{background:#fff; padding:14px 16px 16px;}
+  .dlg-head{display:flex; justify-content:space-between; align-items:center; font-size:17px; margin-bottom:10px;}
+  .dlg-tabs{display:flex; gap:14px; border-bottom:1px solid var(--g-line); font-size:12.5px; white-space:nowrap; overflow:hidden;}
+  .dlg-tabs span{padding:6px 0; color:#444746;}
+  .dlg-tabs .on{color:var(--g-blue); font-weight:500; box-shadow:inset 0 -3px 0 var(--g-blue);}
+  .dlg-drop{display:flex; flex-direction:column; align-items:center; gap:8px; border:2px dashed #C4C7C5; border-radius:8px; margin-top:12px; padding:18px 10px;}
+  .dlg-drop .ms.big{font-size:40px; width:auto; color:#A8C7FA;}
+  .dlg-drop .btn{background:var(--g-blue); color:#fff; border-radius:999px; padding:6px 20px; font-weight:500;}
+  .dlg-drop .hint{color:#5F6368;}
+  .gs-grid{border-collapse:collapse; width:100%; background:#fff;}
+  .gs-grid th, .gs-grid td{border:1px solid var(--g-line); height:24px; padding:0 6px; white-space:nowrap;}
+  .gs-grid th{background:#F8F9FA; color:#444746; font-weight:500; font-size:11px; text-align:center;}
+  .gs-grid th:first-child{width:28px;}
+  .gs-grid tr.hdr td{font-weight:700;}
+  .gs-grid tr.hdr th, .gs-grid tr.hdr td{border-bottom:3px solid #C4C7C5;}
+  .gs-grid td.num{text-align:right;}
+  .gs-grid td.cur{box-shadow:inset 0 0 0 2px #1A73E8;}
+  .gs-grid.pics td{height:52px;}
+  .gs-grid td.pcell{width:64px; text-align:center;}
+  .gs-grid td.pcell svg{width:44px; height:44px; display:block; margin:0 auto;}
+  .gs-fx{display:flex; align-items:center; gap:8px; background:#fff; border-bottom:1px solid var(--g-line); padding:6px 10px; font-size:12px;}
+  .gs-fx .addr{font-weight:700; color:#444746; min-width:22px;}
+  .gs-fx .fx{color:#9AA0A6; font-style:italic; font-weight:700;}
+  .gs-fx .f{font-family:ui-monospace,Menlo,Consolas,monospace; overflow-wrap:anywhere;}
+  .web-bar{display:flex; align-items:center; gap:6px; background:#F1F3F4; border-radius:999px; padding:4px 12px; font-size:12px; color:#444746;}
+  .web-bar .ms{font-size:14px;}
+  .web .dd-wrap{gap:0; margin-top:10px;}
+  .web-pic{flex-shrink:0; width:84px; height:84px; border-radius:8px; background:#E9F5E9; display:flex; align-items:center; justify-content:center; box-shadow:inset 0 0 0 2px #1A73E8;}
+  .web-pic svg{width:62px; height:62px;}
+  .dd.ctx{margin:34px 0 0 -18px; min-width:0;}
+
+  /* Крок 2: фото в клітинках */
+  .img-grid td{height:48px;}
+  .img-grid td.pic-cell{text-align:center; padding:2px;}
+  .img-grid td.pic-cell svg{width:40px; height:40px; display:block; margin:0 auto; animation:popIn .35s ease;}
+  @keyframes popIn{from{transform:scale(.3); opacity:0;}}
+  .img-q{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; margin:14px 0 8px;}
+  .img-q span{color:var(--pri);}
+  .img-q, .img-opts .choice-btn{overflow-wrap:anywhere;}
+  .img-opts{display:flex; flex-direction:column; gap:8px;}
+  .img-opts .choice-btn{border-radius:var(--radius-s); font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13px; font-weight:600;}
+  .img-opts .choice-btn.menu-opt{font-family:'Nunito Sans',sans-serif; font-size:13.5px; font-weight:700;}
+  .img-fb{min-height:24px; font-size:14px; margin-top:10px;}
+  .sort-btn{display:none; margin-top:12px; font-family:'Roboto',sans-serif; font-size:13px; font-weight:500; background:#fff; color:#0B57D0; border:1px solid #747775; border-radius:999px; padding:6px 14px; cursor:pointer; align-items:center; gap:6px;}
+  .sort-btn.show{display:inline-flex;}
+  .sort-btn .ms{color:#0B57D0;}
+
+</style>
+</head>
+<body data-lesson="lesson9-db-images" data-hud="9 клас · Зображення в базі даних">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Впорядкування даних</div>
+      <h1>Картинки в базі даних</h1>
+      <p>Як зберегти фото товару поруч із його назвою й ціною? Розберемо два способи й навчимося вставляти картинки просто в клітинки Google Таблиць.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: фото в рамці, прикуте ланцюжком до щита-охоронця -->
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="62" fill="#FBE8EF"/>
+      <rect x="18" y="28" width="66" height="54" rx="8" fill="#fff" stroke="#B4235A" stroke-width="3"/>
+      <rect x="26" y="36" width="50" height="38" rx="4" fill="#E2F3F1"/>
+      <circle cx="64" cy="46" r="5" fill="#F2A93B"/>
+      <path d="M26 74l14-16 10 10 8-7 18 13z" fill="#0F766E"/>
+      <circle cx="40" cy="96" r="5" stroke="#8A1A45" stroke-width="3"/>
+      <circle cx="52" cy="102" r="5" stroke="#8A1A45" stroke-width="3"/>
+      <path d="M40 82v9" stroke="#8A1A45" stroke-width="3" stroke-linecap="round"/>
+      <path d="M57 104h9" stroke="#8A1A45" stroke-width="3" stroke-linecap="round"/>
+      <path d="M96 66l22 8v16c0 14-10 23-22 28-12-5-22-14-22-28V74z" fill="#0F766E"/>
+      <circle cx="89" cy="88" r="3" fill="#fff"/><circle cx="103" cy="88" r="3" fill="#fff"/>
+      <path d="M89 96q7 5 14 0" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення 1 · Таблиця в Google Таблицях</div>
+    <h2>Що ти вже знаєш</h2>
+    <p>Минулого уроку ти створював таблицю бази даних у Google Таблицях: задавав поля, їхні формати й перевірку, а потім вносив записи.</p>
+    <p class="soft">Обери термін, а потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label recap">Повторення 2 · Типи даних</div>
+    <h2>Таблиця «Фільми» для кінотеатру</h2>
+    <p>Кінотеатр зберігає відомості про фільми. Який тип даних найкраще підходить кожному полю?</p>
+    <div id="typesList"></div>
+    <div class="note">А як бути з полем «Постер», де має зберігатися картинка? Про це — сьогоднішній урок.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label recap">Повторення 3 · Ключі й зв'язки</div>
+    <h2>База шкільного буфету</h2>
+    <p>Буфет веде три зв'язані таблиці: «Учні», «Страви» й «Замовлення». Пригадай, як вони пов'язані.</p>
+    <div id="keysList"></div>
+  </section>
+
+  <section class="block" data-guide>
+    <div class="step-label">Крок 1 · Де живе картинка</div>
+    <h2>Два способи зберегти зображення</h2>
+    <p>База даних може зберігати не лише текст і числа, а й зображення: фото учня, постер фільму, світлину товару. Це роблять двома способами:</p>
+    <ul>
+      <li><b>Вбудувати файл</b> — картинка стає частиною самої бази.</li>
+      <li><b>Зберегти посилання</b> — у полі лише адреса файлу, а сам файл лежить окремо: на диску чи на сервері.</li>
+    </ul>
+    <div class="ways">
+      <div class="way">
+        <svg viewBox="0 0 200 110" fill="none">
+          <ellipse cx="100" cy="22" rx="58" ry="14" fill="#FBE8EF" stroke="#B4235A" stroke-width="3"/>
+          <path d="M42 22v66c0 8 26 14 58 14s58-6 58-14V22" fill="#FBE8EF" stroke="#B4235A" stroke-width="3"/>
+          <rect x="74" y="44" width="52" height="40" rx="5" fill="#fff" stroke="#8A1A45" stroke-width="2.5"/>
+          <circle cx="114" cy="54" r="4" fill="#F2A93B"/>
+          <path d="M77 81l13-14 9 8 7-6 17 12z" fill="#0F766E"/>
+        </svg>
+        <h3>Усередині бази</h3>
+        <p>Фото зберігається в самому записі.<br>У Google Таблицях — <span class="menu">Вставити зображення в клітинку</span></p>
+      </div>
+      <div class="way">
+        <svg viewBox="0 0 200 110" fill="none">
+          <ellipse cx="54" cy="26" rx="40" ry="11" fill="#FBE8EF" stroke="#B4235A" stroke-width="3"/>
+          <path d="M14 26v54c0 6 18 11 40 11s40-5 40-11V26" fill="#FBE8EF" stroke="#B4235A" stroke-width="3"/>
+          <rect x="26" y="50" width="56" height="16" rx="4" fill="#fff" stroke="#8A1A45" stroke-width="2"/>
+          <path d="M33 58h42" stroke="#0B57D0" stroke-width="2" stroke-dasharray="4 3"/>
+          <path d="M96 58h40" stroke="#0F766E" stroke-width="2.5" stroke-dasharray="5 4"/>
+          <path d="M132 52l8 6-8 6" stroke="#0F766E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="146" y="38" width="44" height="38" rx="5" fill="#fff" stroke="#0F766E" stroke-width="2.5"/>
+          <circle cx="179" cy="48" r="4" fill="#F2A93B"/>
+          <path d="M149 73l12-13 8 7 6-5 12 11z" fill="#0F766E"/>
+        </svg>
+        <h3>За посиланням</h3>
+        <p>У записі лише адреса, файл лежить окремо.<br>У Google Таблицях — <span class="mono">=IMAGE("адреса")</span></p>
+      </div>
+    </div>
+    <div class="trivia">Інтернет-магазини з тисячами товарів майже завжди зберігають посилання: фото лежать на окремому сервері, а база лишається швидкою.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Фото в Google Таблицях</div>
+    <h2>Картинка просто в клітинці</h2>
+    <p>У Google Таблицях зображення додають у клітинку двома способами: через меню або формулою.</p>
+
+    <div class="ins">
+      <div class="ins-text">
+        <h3><span class="n">1</span>Фото з комп'ютера: меню</h3>
+        <ul>
+          <li>Клацни клітинку, де має бути фото.</li>
+          <li><span class="menu">Вставити → Зображення → Вставити зображення в клітинку</span>.</li>
+        </ul>
+        <div class="note">Пункт «Вставити зображення над клітинками» кладе фото поверх таблиці: воно не переїжджає разом із рядком. Для бази даних такий спосіб не годиться.</div>
+      </div>
+      <div class="gs gs-pad">
+        <div class="gs-menu big"><span>Змінити</span><span>Вигляд</span><span class="open">Вставити</span><span>Формат</span></div>
+        <div class="dd-wrap">
+          <div class="dd">
+            <div class="it"><span class="ms">table_rows</span>Рядки<span class="ms r">arrow_right</span></div>
+            <div class="it"><span class="ms">view_column</span>Стовпці<span class="ms r">arrow_right</span></div>
+            <div class="it"><span class="ms">add_box</span>Аркуш</div>
+            <div class="sep"></div>
+            <div class="it"><span class="ms">insert_chart</span>Діаграма</div>
+            <div class="it on"><span class="ms">image</span>Зображення<span class="ms r">arrow_right</span></div>
+            <div class="it"><span class="ms">draw</span>Малюнок</div>
+          </div>
+          <div class="dd sub">
+            <div class="it on">Вставити зображення в клітинку</div>
+            <div class="it">Вставити зображення над клітинками</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ins">
+      <div class="ins-text">
+        <h3><span class="n">2</span>Обери файл</h3>
+        <ul>
+          <li>Відкриється вікно «Вставити зображення».</li>
+          <li><b>Завантажити</b> — фото з комп'ютера: натисни «Огляд» або перетягни файл.</li>
+          <li><b>Google Диск</b> — фото, що вже лежить на твоєму Диску.</li>
+        </ul>
+      </div>
+      <div class="gs gs-dialog">
+        <div class="dlg-head"><span>Вставити зображення</span><span class="ms">close</span></div>
+        <div class="dlg-tabs"><span class="on">Завантажити</span><span>Камера</span><span>За URL-адресою</span><span>Google Фото</span><span>Google Диск</span></div>
+        <div class="dlg-drop">
+          <span class="ms big">cloud_upload</span>
+          <span class="btn">Огляд</span>
+          <span class="hint">або перетягніть файл сюди</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="ins">
+      <div class="ins-text">
+        <h3><span class="n">3</span>Фото — у клітинці</h3>
+        <ul>
+          <li>Зображення стає вмістом клітинки й підлаштовується під її розмір.</li>
+          <li>Щоб фото було більшим — збільш висоту рядка й ширину стовпця.</li>
+        </ul>
+      </div>
+      <div class="gs">
+        <table class="gs-grid pics">
+          <tr><th></th><th>B</th><th>C</th><th>D</th></tr>
+          <tr class="hdr"><th>1</th><td>Назва</td><td>Ціна, грн</td><td>Фото</td></tr>
+          <tr><th>4</th><td>Кросівки</td><td class="num">2 300,00 ₴</td><td class="cur pcell"><svg viewBox="0 0 40 40"><path d="M4 28V15c0-2 2-3 4-2l6 4c3 2 6 3 10 3l8 1c3 .5 5 3 5 6v1z" fill="#B4235A"/><path d="M4 28h33v4H4z" fill="#fff" stroke="#555" stroke-width="1.5"/><path d="M12 17l3-3M16 19l3-3M20 20l2-3" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="ins">
+      <div class="ins-text">
+        <h3><span class="n">4</span>Фото з інтернету: адреса</h3>
+        <ul>
+          <li>Клацни картинку на сайті правою кнопкою миші.</li>
+          <li>Обери <b>«Копіювати адресу зображення»</b>.</li>
+        </ul>
+        <div class="note">Адреса картинки зазвичай закінчується на <span class="mono">.png</span>, <span class="mono">.jpg</span> чи <span class="mono">.webp</span>.</div>
+      </div>
+      <div class="gs gs-pad web">
+        <div class="web-bar"><span class="ms">lock</span>sport.ua/catalog/balls</div>
+        <div class="dd-wrap">
+          <div class="web-pic"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="#fff"/><path d="M20.0 14.0L25.7 18.1L23.5 24.9L16.5 24.9L14.3 18.1z" fill="#333"/><path d="M20.0 8.0L14.2 5.5L16.2 3.4A17 17 0 0 1 23.8 3.4L25.8 5.5z" fill="#333"/><path d="M31.4 16.3L32.0 10.0L34.6 11.2A17 17 0 0 1 36.9 18.5L35.6 21.1z" fill="#333"/><path d="M27.1 29.7L33.2 28.3L32.8 31.2A17 17 0 0 1 26.6 35.6L23.8 35.1z" fill="#333"/><path d="M12.9 29.7L16.2 35.1L13.4 35.6A17 17 0 0 1 7.2 31.2L6.8 28.3z" fill="#333"/><path d="M8.6 16.3L4.4 21.1L3.1 18.5A17 17 0 0 1 5.4 11.2L8.0 10.0z" fill="#333"/><path d="M20.0 14.0L20.0 8.0M25.8 5.5L32.0 10.0M25.7 18.1L31.4 16.3M35.6 21.1L33.2 28.3M23.5 24.9L27.1 29.7M23.8 35.1L16.2 35.1M16.5 24.9L12.9 29.7M6.8 28.3L4.4 21.1M14.3 18.1L8.6 16.3M8.0 10.0L14.2 5.5" stroke="#333" stroke-width="1.3"/><circle cx="20" cy="20" r="17" fill="none" stroke="#333" stroke-width="2"/></svg></div>
+          <div class="dd ctx">
+            <div class="it">Відкрити зображення в новій вкладці</div>
+            <div class="it">Зберегти зображення як…</div>
+            <div class="it">Копіювати зображення</div>
+            <div class="it on">Копіювати адресу зображення</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ins">
+      <div class="ins-text">
+        <h3><span class="n">5</span>Формула IMAGE</h3>
+        <ul>
+          <li>У клітинці введи <span class="mono">=IMAGE("</span>, встав адресу (<span class="key">Ctrl</span>+<span class="key">V</span>) і закрий: <span class="mono">")</span>.</li>
+          <li>Натисни <span class="key">Enter</span> — у клітинці з'явиться картинка.</li>
+        </ul>
+        <div class="trivia">Формула не копіює картинку, а лише показує її за адресою. Якщо сайт видалить файл, клітинка стане порожньою.</div>
+      </div>
+      <div class="gs">
+        <div class="gs-fx"><span class="addr">D2</span><span class="fx">fx</span><span class="f">=IMAGE("https://sport.ua/img/ball.png")</span></div>
+        <table class="gs-grid pics">
+          <tr><th></th><th>B</th><th>C</th><th>D</th></tr>
+          <tr class="hdr"><th>1</th><td>Назва</td><td>Ціна, грн</td><td>Фото</td></tr>
+          <tr><th>2</th><td>М'яч футбольний</td><td class="num">600,00 ₴</td><td class="cur pcell"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="#fff"/><path d="M20.0 14.0L25.7 18.1L23.5 24.9L16.5 24.9L14.3 18.1z" fill="#333"/><path d="M20.0 8.0L14.2 5.5L16.2 3.4A17 17 0 0 1 23.8 3.4L25.8 5.5z" fill="#333"/><path d="M31.4 16.3L32.0 10.0L34.6 11.2A17 17 0 0 1 36.9 18.5L35.6 21.1z" fill="#333"/><path d="M27.1 29.7L33.2 28.3L32.8 31.2A17 17 0 0 1 26.6 35.6L23.8 35.1z" fill="#333"/><path d="M12.9 29.7L16.2 35.1L13.4 35.6A17 17 0 0 1 7.2 31.2L6.8 28.3z" fill="#333"/><path d="M8.6 16.3L4.4 21.1L3.1 18.5A17 17 0 0 1 5.4 11.2L8.0 10.0z" fill="#333"/><path d="M20.0 14.0L20.0 8.0M25.8 5.5L32.0 10.0M25.7 18.1L31.4 16.3M35.6 21.1L33.2 28.3M23.5 24.9L27.1 29.7M23.8 35.1L16.2 35.1M16.5 24.9L12.9 29.7M6.8 28.3L4.4 21.1M14.3 18.1L8.6 16.3M8.0 10.0L14.2 5.5" stroke="#333" stroke-width="1.3"/><circle cx="20" cy="20" r="17" fill="none" stroke="#333" stroke-width="2"/></svg></td></tr>
+        </table>
+      </div>
+    </div>
+
+    <p class="soft">Тепер спробуй сам: заповни стовпець «Фото» в таблиці спортивного магазину.</p>
+    <div class="exercise">
+      <div class="sheet">
+        <div class="sheet-title"><img src="images/sheets.svg" alt="">Спорттовари · аркуш «Товари»</div>
+        <div class="fx-bar"><span class="addr" id="imgAddr">D2</span><span class="fx">fx</span><span class="val" id="imgVal"></span></div>
+        <div class="sheet-scroll"><table class="sheet-grid img-grid" id="imgGrid"></table></div>
+      </div>
+      <button class="sort-btn" id="imgSort"><span class="ms">sort</span>Сортувати за ціною (за зростанням)</button>
+      <div class="img-q" id="imgQ"></div>
+      <div class="img-opts" id="imgOpts"></div>
+      <div class="img-fb" id="imgFb"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Зображення в базі даних. Цілісність даних» · 9 клас</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- ПОВТОРЕННЯ 1: ТАБЛИЦЯ В GOOGLE ТАБЛИЦЯХ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Рядок 1', desc:'Тут лише назви полів, по одній у комірці' },
+  { name:'Аркуш', desc:'Вкладка внизу файлу; кожна таблиця бази — на окремій' },
+  { name:'Закріпити рядок', desc:'Назви полів не зникають, коли прокручуєш таблицю донизу' },
+  { name:'Стовпець ID', desc:'Номер запису, який не повторюється в жодних двох рядках' },
+  { name:'Маркер заповнення', desc:'Синій квадратик, що продовжує нумерацію 1, 2, 3…' },
+  { name:'Формат «Валюта»', desc:'Ціни показуються зі знаком ₴ і двома знаками після коми' },
+  { name:'Прапорець', desc:'Поле з двома станами: так або ні' },
+  { name:'Перевірка даних', desc:'Правило, що не пропустить у стовпець недопустиме значення' },
+  { name:'Спадне меню', desc:'Значення в комірку обирають лише зі списку варіантів' }
+], 'recapProgress');
+
+/* ---------- ПОВТОРЕННЯ 2: ТИПИ ДАНИХ ---------- */
+makeClassify('typesList', [
+  { text:'«Назва фільму»: «Тіні забутих предків»', correct:0 },
+  { text:'«Тривалість, хв»: 97', correct:1 },
+  { text:'«Дата прем\'єри»: 04.09.1965', correct:2 },
+  { text:'«У прокаті»: так або ні', correct:3 },
+  { text:'«Ціна квитка»: 150,00 ₴', correct:1, why:'Ціна — число, з яким рахують; знак ₴ додає формат «Валюта».' },
+  { text:'«Вікове обмеження»: 12+', correct:0, why:'Знак «+» робить значення текстом, а рахувати з ним і не треба.' },
+  { text:'«Глядацький рейтинг»: 8,4', correct:1, why:'З рейтингом рахують середнє, тож це число з дробовою частиною.' },
+  { text:'«Телефон каси»: 044 123 45 67', correct:0, why:'Телефон складається з цифр, але рахувати з ним нічого — це текст.' }
+], ['Текст', 'Число', 'Дата/час', 'Логічний']);
+
+/* ---------- ПОВТОРЕННЯ 3: КЛЮЧІ Й ЗВ'ЯЗКИ ---------- */
+makeChoices('keysList', [
+  { text:'У таблиці «Учні» є поле, значення якого не повторюються в жодних двох записах. Що це?', opts:['Первинний ключ', 'Зовнішній ключ', 'Звичайне текстове поле'], correct:0 },
+  { text:'У таблиці «Замовлення» є поле «ID учня». Яку роль воно виконує?', opts:['Первинний ключ «Замовлень»', 'Зовнішній ключ: показує, хто зробив замовлення', 'Лічильник замовлень учня'], correct:1 },
+  { text:'Один учень за рік робить багато замовлень, а кожне замовлення належить одному учню. Який це зв\'язок?', opts:['Один до одного', 'Один до багатьох', 'Багато до багатьох'], correct:1 },
+  { text:'Учні ходять у кілька гуртків, а в кожному гуртку — багато учнів. Як утілюють такий зв\'язок?', opts:['Через проміжну таблицю «Учень — гурток»', 'Записують усі гуртки в одну клітинку через кому', 'Об\'єднують дві таблиці в одну'], correct:0 }
+]);
+
+/* ---------- КРОК 2: ФОТО В GOOGLE ТАБЛИЦЯХ ---------- */
+(function(){
+  const PICS = {
+    ball:`<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="17" fill="#fff"/><path d="M20.0 14.0L25.7 18.1L23.5 24.9L16.5 24.9L14.3 18.1z" fill="#333"/><path d="M20.0 8.0L14.2 5.5L16.2 3.4A17 17 0 0 1 23.8 3.4L25.8 5.5z" fill="#333"/><path d="M31.4 16.3L32.0 10.0L34.6 11.2A17 17 0 0 1 36.9 18.5L35.6 21.1z" fill="#333"/><path d="M27.1 29.7L33.2 28.3L32.8 31.2A17 17 0 0 1 26.6 35.6L23.8 35.1z" fill="#333"/><path d="M12.9 29.7L16.2 35.1L13.4 35.6A17 17 0 0 1 7.2 31.2L6.8 28.3z" fill="#333"/><path d="M8.6 16.3L4.4 21.1L3.1 18.5A17 17 0 0 1 5.4 11.2L8.0 10.0z" fill="#333"/><path d="M20.0 14.0L20.0 8.0M25.8 5.5L32.0 10.0M25.7 18.1L31.4 16.3M35.6 21.1L33.2 28.3M23.5 24.9L27.1 29.7M23.8 35.1L16.2 35.1M16.5 24.9L12.9 29.7M6.8 28.3L4.4 21.1M14.3 18.1L8.6 16.3M8.0 10.0L14.2 5.5" stroke="#333" stroke-width="1.3"/><circle cx="20" cy="20" r="17" fill="none" stroke="#333" stroke-width="2"/></svg>`,
+    racket:`<svg viewBox="0 0 40 40"><ellipse cx="22" cy="14" rx="11" ry="12" fill="#E2F3F1" stroke="#0F766E" stroke-width="3" transform="rotate(35 22 14)"/><path d="M15 9l14 10M13 15l14 10M19 5l9 7M17 21l8 5" stroke="#0F766E" stroke-width=".9" opacity=".6"/><path d="M14 23L5 35" stroke="#8A1A45" stroke-width="4" stroke-linecap="round"/></svg>`,
+    shoes:`<svg viewBox="0 0 40 40"><path d="M4 28V15c0-2 2-3 4-2l6 4c3 2 6 3 10 3l8 1c3 .5 5 3 5 6v1z" fill="#B4235A"/><path d="M4 28h33v4H4z" fill="#fff" stroke="#555" stroke-width="1.5"/><path d="M12 17l3-3M16 19l3-3M20 20l2-3" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>`,
+    bottle:`<svg viewBox="0 0 40 40"><rect x="16" y="3" width="8" height="5" rx="1.5" fill="#0F766E"/><path d="M15 8h10l2 5v22a2 2 0 0 1-2 2H15a2 2 0 0 1-2-2V13z" fill="#BFE3F8" stroke="#1A73E8" stroke-width="1.8"/><path d="M13 20h14v8H13z" fill="#1A73E8" opacity=".35"/></svg>`
+  };
+  const ROWS = [
+    { name:'М\'яч футбольний', price:600, pic:'ball',
+      q:'Фото м\'яча лежить на сайті: https://sport.ua/img/ball.png. Що ввести в D2?',
+      opts:[
+        ['=IMAGE("https://sport.ua/img/ball.png")'],
+        ['=IMAGE(https://sport.ua/img/ball.png)', 'Адресу треба взяти в лапки — без них таблиця не зрозуміє формулу.'],
+        ['=IMAGE("C:\\Фото\\ball.png")', 'IMAGE бачить лише картинки в інтернеті, а не файли на твоєму комп\'ютері.']
+      ] },
+    { name:'Ракетка', price:1450, pic:'racket',
+      q:'Фото ракетки: https://sport.ua/img/racket.png. Що ввести в D3?',
+      opts:[
+        ['=IMAGE("https://sport.ua/img/racket.png")'],
+        ['="https://sport.ua/img/racket.png"', 'Так у клітинці з\'явиться лише текст адреси, а не картинка.'],
+        ['=IMG("https://sport.ua/img/racket.png")', 'Такої функції немає. Функція, що показує картинку, — IMAGE.']
+      ] },
+    { name:'Кросівки', price:2300, pic:'shoes', menu:true,
+      q:'Фото кросівок є лише на твоєму комп\'ютері. Що зробити, коли активна клітинка D4?',
+      opts:[
+        ['Вставити → Зображення → Вставити зображення в клітинку'],
+        ['Вставити → Зображення → Вставити зображення над клітинками', 'Таке фото лежатиме поверх таблиці й не переїде разом із рядком під час сортування.'],
+        ['=IMAGE("D:\\кросівки.jpg")', 'IMAGE не відкриває файли з комп\'ютера. Для них є меню «Вставити → Зображення».']
+      ] },
+    { name:'Пляшка для води', price:180, pic:'bottle',
+      q:'Фото пляшки: https://sport.ua/img/bottle.png. Що ввести в D5?',
+      opts:[
+        ['=IMAGE("https://sport.ua/img/bottle.png")'],
+        ['=IMAGE("https://sport.ua/img/bottle.png"', 'Не вистачає закривальної дужки — формула не спрацює.'],
+        ['=IMAGE("Пляшка для води")', 'У лапках має бути адреса картинки, а не назва товару.']
+      ] }
+  ];
+  const grid = document.getElementById('imgGrid');
+  const qEl = document.getElementById('imgQ');
+  const opts = document.getElementById('imgOpts');
+  const fb = document.getElementById('imgFb');
+  const addr = document.getElementById('imgAddr');
+  const val = document.getElementById('imgVal');
+  const sortBtn = document.getElementById('imgSort');
+  const hit = trackTask(opts, ROWS.length, ROWS.length + 2);
+  const filled = ROWS.map(()=>'');   // що записано в клітинці D (формула чи «зображення»)
+  let pos = 0, order = ROWS.map((_, i)=>i);
+
+  function draw(){
+    grid.innerHTML = '<tr><th class="corner"></th><th style="width:40px">A</th><th>B</th><th style="width:90px">C</th><th style="width:70px">D</th></tr>'
+      + '<tr class="head"><th>1</th><td>ID</td><td>Назва</td><td>Ціна, грн</td><td>Фото</td></tr>'
+      + order.map((ri, k)=>{
+        const r = ROWS[ri], active = ri === pos && pos < ROWS.length;
+        return `<tr><th>${k + 2}</th><td class="num">${ri + 1}</td><td>${r.name}</td><td class="num">${r.price.toLocaleString('uk-UA')},00 ₴</td>`
+          + `<td class="pic-cell${active ? ' active' : ''}">${filled[ri] ? PICS[r.pic] : ''}</td></tr>`;
+      }).join('');
+  }
+  function render(){
+    opts.innerHTML = '';
+    draw();
+    if(pos === ROWS.length){
+      qEl.innerHTML = 'Усі фото на місці! 🎉';
+      fb.textContent = 'Тепер відсортуй товари за ціною — подивись, що станеться з фото.';
+      addr.textContent = ''; val.textContent = '';
+      sortBtn.classList.add('show');
+      return;
+    }
+    const r = ROWS[pos];
+    addr.textContent = 'D' + (pos + 2); val.textContent = '';
+    qEl.innerHTML = r.q.replace(/(D\d)/, '<span>$1</span>');
+    shuffle([...r.opts]).forEach(([text, bad])=>{
+      const b = document.createElement('button');
+      b.className = 'choice-btn' + (r.menu && !text.startsWith('=') ? ' menu-opt' : '');
+      b.textContent = text;
+      b.addEventListener('click', ()=>{
+        if(bad){
+          opts.querySelectorAll('.wrong').forEach(x=>x.classList.remove('wrong'));
+          b.classList.add('wrong');
+          fb.textContent = bad;
+          return;
+        }
+        filled[pos] = text;
+        fb.textContent = r.menu ? 'Правильно ✓ Фото тепер — вміст клітинки D4.' : 'Правильно ✓ Картинка з\'явилась у клітинці.';
+        addNeurons(1); hit();
+        pos++;
+        if(pos === ROWS.length) addNeurons(2);
+        render();
+      });
+      opts.appendChild(b);
+    });
+  }
+  sortBtn.addEventListener('click', ()=>{
+    order = [...order].sort((a, b)=>ROWS[a].price - ROWS[b].price);
+    draw();
+    sortBtn.classList.remove('show');
+    fb.textContent = 'Рядки помінялися місцями, а кожне фото переїхало разом зі своїм товаром — бо воно всередині клітинки.';
+  });
+  render();
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Як вставити в клітинку фото, що лежить на твоєму комп\'ютері?', opts:['Вставити → Зображення → Вставити зображення в клітинку', '=IMAGE("C:\\Фото\\cat.png")', 'Вставити → Зображення → Вставити зображення над клітинками'], correct:0 },
+  { q:'Чому для бази даних не годиться зображення над клітинками?', opts:['Воно погіршує якість фото', 'Воно не переїжджає разом із рядком під час сортування', 'Його не видно іншим користувачам'], correct:1 },
+  { q:'Магазин має 20 000 товарів із фото. Як краще зберігати фото?', opts:['Вбудувати всі фото в базу', 'Зберігати в базі посилання на файли', 'Не зберігати фото взагалі'], correct:1, why:'Так база лишається легкою й швидкою.' },
+  { q:'Яка формула покаже в клітинці картинку з інтернету?', opts:['=IMAGE(https://zoo.ua/cat.png)', '="https://zoo.ua/cat.png"', '=IMAGE("https://zoo.ua/cat.png")'], correct:2 }
+], {summary:'Тепер ти знаєш, як зберігати зображення в базі даних і як додавати їх у клітинки Google Таблиць.'});
+</script>
+
+</body>
+</html>
