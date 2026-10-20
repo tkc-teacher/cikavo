@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Текстові документи — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в інтерфейсі Google Документів -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --accent:#2F5BD3; --accent-dark:#1E40A0; --accent-soft:#E6EDFC;
+    --label:#E8710A;
+    --bg:#F5F7FD; --line:#DFE5F5;
+    --hud-bar:linear-gradient(90deg,#4285F4,#2F5BD3,#E8710A);
+    /* інтерфейс Google */
+    --g-blue:#0B57D0; --g-blue-soft:#C2E7FF; --g-ink:#1F1F1F; --g-soft:#444746; --g-line:#DADCE0; --g-bar:#EDF2FA; --g-canvas:#F9FBFD;
+    --g-sel:#ACCEF7;
+  }
+
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em;}
+
+  /* ---------- Крок 1: Блокнот і Google Документи ---------- */
+  .apps{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:16px 0 18px;}
+  .app{border:1px solid var(--g-line); border-radius:var(--radius-m); overflow:hidden; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.05);}
+  .app-bar{display:flex; align-items:center; gap:8px; padding:7px 10px; font-family:'Roboto',sans-serif; font-size:13px; background:#F3F3F3; border-bottom:1px solid var(--g-line); white-space:nowrap; overflow:hidden;}
+  .app-bar img{width:16px; height:22px;}
+  .app-bar .ms{font-size:18px; color:var(--g-soft);}
+  .app-menu{font-family:'Roboto',sans-serif; font-size:12px; color:var(--g-soft); padding:4px 10px; border-bottom:1px solid #EEE; white-space:nowrap; overflow:hidden;}
+  .app-body{padding:12px 14px; min-height:150px; font-size:13px; line-height:1.5;}
+  .np .app-body{font-family:Consolas,'Courier New',monospace; white-space:pre-wrap; color:#222;}
+  .gd .app-body{font-family:Arial,sans-serif; background:#fff;}
+  .gd .app-body h5{font-size:17px; color:#C2185B; text-align:center; margin:0 0 6px;}
+  .gd .app-body .row{display:flex; gap:10px; align-items:flex-start;}
+  .gd .app-body ul{margin:0; padding-left:18px;}
+  .gd .mini-pic{width:58px; height:46px; border-radius:4px; flex-shrink:0; background:linear-gradient(#9FD3F5 60%,#7BC47F 60%); position:relative; overflow:hidden;}
+  .gd .mini-pic::after{content:''; position:absolute; left:10px; bottom:12px; border:14px solid transparent; border-bottom:22px solid #5B8C5A; border-top:0;}
+  .app-cap{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; text-align:center; padding:8px; border-top:1px solid var(--line); color:var(--accent-dark); background:var(--accent-soft);}
+  @media (max-width:560px){ .apps{grid-template-columns:1fr;} }
+
+  /* Крок 1: Google Диск → новий документ */
+  .sub{font-family:'Baloo 2',sans-serif; font-size:19px; margin:22px 0 4px;}
+  .drv{border:1px solid var(--g-line); border-radius:var(--radius-m); overflow:hidden; font-family:'Roboto',sans-serif; color:var(--g-ink); box-shadow:0 2px 10px rgba(0,0,0,.06); min-height:450px;}
+  .drv.is-drive{background:#F8FAFD;}
+  .drv-top{display:flex; align-items:center; gap:8px; padding:10px 14px;}
+  .drv-top img{width:30px; height:30px;}
+  .drv-name{font-size:20px; color:var(--g-soft); width:150px;}
+  .drv-search{flex:1; max-width:420px; display:flex; align-items:center; gap:10px; background:#E9EEF6; border-radius:999px; padding:9px 14px; font-size:14.5px; color:var(--g-soft);}
+  .drv-body{display:grid; grid-template-columns:210px minmax(0,1fr); gap:6px; padding:0 10px 12px 6px;}
+  .drv-side{position:relative;}
+  .drv-new{display:inline-flex; align-items:center; gap:12px; font-family:'Roboto',sans-serif; font-weight:500; font-size:14px; color:var(--g-ink); background:#fff; border:none; border-radius:16px; padding:16px 20px 16px 16px; margin:4px 0 14px 4px; box-shadow:0 1px 2px rgba(60,64,67,.3),0 1px 3px 1px rgba(60,64,67,.15); cursor:pointer;}
+  .drv-new .ms{font-size:24px; width:24px;}
+  .drv-nav{display:flex; align-items:center; gap:14px; padding:6px 14px; border-radius:999px; font-size:14px; cursor:default;}
+  .drv-nav.on{background:#C2E7FF; font-weight:500;}
+  .drv-nav .ms{color:var(--g-soft);}
+  .drv-main{background:#fff; border-radius:16px; padding:14px 18px; min-height:330px;}
+  .drv-h{font-size:22px; margin-bottom:14px;}
+  .drv-cols{display:flex; justify-content:space-between; font-size:13px; font-weight:500; color:var(--g-soft); padding:0 4px 8px; border-bottom:1px solid var(--g-line);}
+  .drv-file{display:flex; align-items:center; gap:14px; padding:10px 4px; border-bottom:1px solid var(--g-line); font-size:14px; font-weight:500;}
+  .drv-file img{width:18px; height:18px;}
+  .drv-file .ms{color:var(--g-soft);}
+  .drv-file small{margin-left:auto; color:var(--g-soft); font-weight:400; font-size:13px; white-space:nowrap;}
+  .drv-menu{position:absolute; left:4px; top:4px; width:240px; background:#fff; border-radius:4px; padding:8px 0; box-shadow:0 2px 6px 2px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.3); z-index:3;}
+  .drv-menu[hidden]{display:none;}
+  .drv-sub{left:200px; top:146px; width:200px; z-index:4;}
+  .drv-it{display:flex; align-items:center; gap:14px; padding:8px 14px; font-size:14px; cursor:pointer;}
+  .drv-it:hover, .drv-it.on{background:#E9EEF6;}
+  .drv-it img{width:20px; height:20px;}
+  .drv-it .ms{color:var(--g-soft); width:20px;}
+  .drv-it .ms:last-child{margin-left:auto;}
+  .drv-sep{height:1px; background:var(--g-line); margin:6px 0;}
+  .drv .miss{background:#FAD2CF !important;}
+  .drv-title{border:1px solid transparent; border-radius:4px; padding:1px 5px; cursor:pointer;}
+  .drv-title:hover{border-color:#747775;}
+  .drv-title.typing{border-color:var(--g-blue); border-width:2px;}
+  .drv-page{background:#fff; margin:10px auto 16px; max-width:520px; min-height:250px; padding:30px 34px; box-shadow:0 1px 3px rgba(60,64,67,.25);}
+  .drv-caret{display:inline-block; width:2px; height:18px; background:#000; animation:blink 1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  .drv-fb{font-size:14px; min-height:1.4em; margin-top:12px;}
+  @media (max-width:640px){ .drv-body{grid-template-columns:1fr;} .drv-nav, .drv-name{display:none;} .drv-sub{left:40px; top:200px;} .drv-main{min-height:200px;} }
+
+  /* ---------- Крок 2: об'єкти ---------- */
+  .objs{display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; margin:14px 0 20px;}
+  .obj{display:flex; gap:12px; align-items:flex-start; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px;}
+  .obj-ico{width:44px; height:44px; border-radius:12px; background:var(--accent-soft); color:var(--accent-dark); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:20px;}
+  .obj-ico .ms{font-size:24px;}
+  .obj b{font-family:'Baloo 2',sans-serif; font-size:16.5px; display:block; line-height:1.2;}
+  .obj span{font-size:13.5px; color:var(--ink-soft); line-height:1.4;}
+
+
+  /* Крок 3: іконки властивостей у картках */
+  .sort-chip .ms{font-size:18px; width:18px; margin-right:6px; vertical-align:-4px; color:var(--g-soft);}
+
+  /* ---------- Крок 4: було / стало ---------- */
+  .ba{display:grid; grid-template-columns:1fr auto 1fr; gap:10px; align-items:stretch; margin-bottom:12px;}
+  .ba > .ms{align-self:center; color:var(--ink-soft); font-size:26px;}
+  .ba-card{background:#fff; border:1px solid var(--g-line); border-radius:4px; padding:8px 12px 12px; font-family:Arial,sans-serif; font-size:14px; line-height:1.5; color:#202124; box-shadow:0 1px 3px rgba(60,64,67,.15);}
+  .ba-card small{display:block; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;}
+  .ba-card p{margin:0 0 4px;}
+
+  #baList .choice-btn{min-width:58px; padding:8px 14px; line-height:1;}
+  #baList .choice-btn .ms{font-size:24px; width:24px;}
+
+  /* ---------- Крок 6: Налаштування сторінки ---------- */
+  .task-card{display:flex; align-items:center; gap:14px; background:var(--accent-soft); border-radius:var(--radius-m); padding:14px 18px; margin-bottom:16px; min-height:64px;}
+  .task-card .tnum{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:13px; color:var(--accent-dark); white-space:nowrap;}
+  .task-card .ttext{font-weight:700; font-size:16px;}
+  .sizes{display:flex; gap:18px; align-items:flex-end; flex-wrap:wrap; margin:6px 0 4px;}
+  .sizes svg{width:180px; height:auto; flex-shrink:0;}
+  .sizes ul{margin:0; flex:1; min-width:220px;}
+  .ps{display:grid; grid-template-columns:minmax(0,1fr) 240px; gap:18px; align-items:start;}
+  .ps-dlg{background:#fff; border-radius:8px; box-shadow:0 4px 8px 3px rgba(60,64,67,.15),0 1px 3px rgba(60,64,67,.3); padding:20px 22px 16px; font-family:'Roboto',sans-serif; color:var(--g-ink); font-size:14px;}
+  .ps-dlg h3{font-family:'Roboto',sans-serif; font-weight:400; font-size:21px; margin:0 0 12px;}
+  .ps-tabs{display:flex; border-bottom:1px solid var(--g-line); margin-bottom:14px; font-weight:500; font-size:13.5px; color:var(--g-soft);}
+  .ps-tabs span{flex:1; text-align:center; padding:8px 4px;}
+  .ps-tabs .on{color:var(--g-blue); box-shadow:inset 0 -3px 0 var(--g-blue);}
+  .ps-cols{display:grid; grid-template-columns:1.3fr 1fr; gap:22px;}
+  .ps-lbl{display:block; font-size:13px; color:var(--g-soft); margin:12px 0 6px;}
+  .ps-lbl:first-child{margin-top:0;}
+  .ps-static, .ps-dlg select{display:block; width:100%; font-family:'Roboto',sans-serif; font-size:14px; color:var(--g-ink); border:1px solid #747775; border-radius:4px; padding:8px 10px; background:#fff;}
+  .ps-static{color:var(--g-soft); display:flex; justify-content:space-between; align-items:center;}
+  .ps-dlg select{cursor:pointer;}
+  .ps-radios{display:flex; gap:18px; flex-wrap:wrap;}
+  .ps-radios label{display:flex; align-items:center; gap:6px; cursor:pointer;}
+  .ps-radios input{accent-color:var(--g-blue); width:17px; height:17px; margin:0;}
+  .ps-color{width:28px; height:28px; border-radius:50%; border:1px solid #747775; background:#fff;}
+  .ps-m{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:8px;}
+  .ps-m input{width:76px; font-family:'Roboto',sans-serif; font-size:14px; border:1px solid #747775; border-radius:4px; padding:7px 8px; color:var(--g-ink);}
+  .ps-m input:focus, .ps-dlg select:focus{outline:2px solid var(--g-blue); outline-offset:-1px;}
+  .ps-foot{display:flex; align-items:center; gap:10px; margin-top:16px; flex-wrap:wrap;}
+  .ps-foot .def{color:var(--g-blue); font-weight:500; font-size:13.5px; margin-right:auto;}
+  .ps-btn{font-family:'Roboto',sans-serif; font-weight:500; font-size:14px; border-radius:999px; padding:9px 22px; border:1px solid #747775; background:#fff; color:var(--g-blue);}
+  .ps-btn.ok{background:var(--g-blue); color:#fff; border-color:var(--g-blue); cursor:pointer;}
+  .ps-btn.ok.shake{background:var(--coral); border-color:var(--coral); animation:shakeX .35s ease;}
+  .ps-prev{background:#E8EAED; border-radius:var(--radius-m); padding:14px 10px; text-align:center; font-family:'Roboto',sans-serif;}
+  .ps-stage{height:224px; display:flex; align-items:center; justify-content:center;}
+  .ps-page{position:relative; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.25); transition:width .35s ease, height .35s ease;}
+  .ps-area{position:absolute; border:1px dashed #8AB4F8; background:repeating-linear-gradient(transparent 0 5px,#DADCE0 5px 7px); transition:all .35s ease;}
+  .ps-cap{font-size:13px; color:var(--g-soft); margin-top:8px;}
+  .ps-cap b{color:var(--g-ink); font-weight:500;}
+  .ps-fb{font-size:14px; min-height:1.4em; margin-top:12px;}
+  @media (max-width:700px){ .ps{grid-template-columns:1fr;} }
+  @media (max-width:480px){ .ps-cols{grid-template-columns:1fr; gap:6px;} }
+
+  /* ---------- Крок 5: Google Документ з панеллю інструментів ---------- */
+  .gdoc{border:1px solid var(--g-line); border-radius:var(--radius-m); overflow:hidden; background:var(--g-canvas); font-family:'Roboto',sans-serif; color:var(--g-ink); box-shadow:0 2px 10px rgba(0,0,0,.06);}
+  .gd-head{display:flex; align-items:center; gap:10px; padding:8px 12px 4px;}
+  .gd-head > img{width:26px; height:36px; flex-shrink:0;}
+  .gd-title{font-size:17px; white-space:nowrap; overflow:hidden; display:flex; align-items:center; gap:8px;}
+  .gd-title .ms{color:var(--g-soft); font-size:18px;}
+  .gd-menu{display:flex; gap:12px; font-size:13.5px; margin-top:3px; white-space:nowrap; overflow:hidden;}
+  .gd-tools{display:flex; align-items:center; gap:2px; margin:4px 10px 0; padding:4px 8px; background:var(--g-bar); border-radius:999px; overflow:hidden; white-space:nowrap;}
+  .gd-tools .tl{width:28px; height:28px; border-radius:4px; display:inline-flex; flex-direction:column; align-items:center; justify-content:center; color:var(--g-soft); flex-shrink:0; position:relative;}
+  .gd-tools .tl .ms{font-size:19px;}
+  .gd-tools .tl.on{background:#D3E3FD; color:#041E49;}
+  .gd-tools .tl.col i{position:absolute; left:6px; right:6px; bottom:3px; height:3px; border-radius:1px; background:#000;}
+  .gd-tools .tx{font-size:13px; color:var(--g-soft); padding:0 8px; flex-shrink:0;}
+  .gd-tools .size{border:1px solid #747775; border-radius:4px; padding:2px 6px; min-width:26px; text-align:center; color:var(--g-ink);}
+  .gd-tools .sep{width:1px; height:20px; background:#C7C7C7; margin:0 4px; flex-shrink:0;}
+  .gd-tools .tx.val{color:var(--g-ink);}
+  .insp{padding:10px 14px 16px;}
+  .insp-page{max-width:520px; margin:0 auto; background:#fff; box-shadow:0 1px 3px rgba(60,64,67,.25); padding:26px 30px; font-family:Arial,sans-serif; font-size:14.5px; line-height:1.6; color:#202124;}
+  .insp-page [data-id]{cursor:pointer; border-radius:2px;}
+  .insp-page [data-id]:hover{background:#F1F5FE;}
+  .insp-page [data-id].sel{background:var(--g-sel);}
+  .insp-page [data-id].ok{background:#CDEFD6;}
+  .insp-page [data-id].miss{background:#FAD2CF;}
+  .insp-page p{margin:0 0 10px;}
+  .insp-page .t{font-size:22px; font-weight:700; text-align:center; color:#1A3E8C;}
+  .insp-page .ind{text-indent:2em;}
+  .insp-page .right{text-align:right; font-size:13px;}
+  .insp-pics{display:flex; gap:18px; justify-content:center; margin:6px 0 12px;}
+  .insp-pics [data-id]{width:96px; height:80px; display:block; padding:3px;}
+  .insp-pics .framed{outline:3px solid #2F5BD3; outline-offset:-3px;}
+  .insp-pics svg{width:100%; height:100%; display:block;}
+  .insp-fb{font-size:14px; min-height:1.4em; margin-top:12px;}
+  @media (max-width:640px){ .gd-menu span:nth-child(n+5){display:none;} .insp-page{padding:20px 18px;} }
+</style>
+</head>
+<body data-lesson="lesson6-text-documents" data-hud="6 клас · Текстові документи">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Текстові документи</div>
+      <h1>З чого складається документ</h1>
+      <p>Символи, слова, абзаци, сторінки й малюнки — усе це об'єкти документа. Дізнаймося, які в них властивості та як їх змінювати.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: сторінка документа під лупою -->
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="72" r="56" fill="#E6EDFC"/>
+      <rect x="30" y="22" width="66" height="90" rx="6" fill="#fff" stroke="#2F5BD3" stroke-width="3"/>
+      <rect x="40" y="32" width="46" height="7" rx="3.5" fill="#2F5BD3"/>
+      <rect x="40" y="46" width="22" height="18" rx="3" fill="#9FD3F5"/>
+      <path d="M41 63 L49 53 L55 60 L58 57 L62 63 Z" fill="#5B8C5A"/>
+      <rect x="66" y="47" width="20" height="4" rx="2" fill="#CFD8F2"/>
+      <rect x="66" y="55" width="16" height="4" rx="2" fill="#CFD8F2"/>
+      <rect x="40" y="72" width="46" height="4" rx="2" fill="#CFD8F2"/>
+      <rect x="40" y="80" width="40" height="4" rx="2" fill="#CFD8F2"/>
+      <rect x="40" y="88" width="44" height="4" rx="2" fill="#CFD8F2"/>
+      <rect x="40" y="96" width="24" height="4" rx="2" fill="#CFD8F2"/>
+      <line x1="98" y1="96" x2="118" y2="116" stroke="#E8710A" stroke-width="9" stroke-linecap="round"/>
+      <circle cx="88" cy="84" r="22" fill="#FFF7EC" stroke="#E8710A" stroke-width="5"/>
+      <text x="88" y="93" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="25" fill="#1E40A0">Аа</text>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Спільна робота з документами</div>
+    <h2>Що ти вже знаєш</h2>
+    <p>Минулого разу ти дізнався, як працювати над одним документом усією командою.</p>
+    <p class="soft">Обери термін, а потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Програми для тексту</div>
+    <h2>Редактор чи процесор?</h2>
+    <p>Тексти створюють у двох видах програм:</p>
+    <ul>
+      <li><b>Текстовий редактор</b> — для простого набору тексту: ввести, виправити, скопіювати, знайти слово. Наприклад, Блокнот.</li>
+      <li><b>Текстовий процесор</b> — ще й гарно оформлює документ: шрифти, кольори, списки, таблиці, малюнки, номери сторінок. Наприклад, Google Документи чи Microsoft Word.</li>
+    </ul>
+    <div class="apps">
+      <div class="app np">
+        <div class="app-bar"><span class="ms">description</span>Похід.txt — Блокнот</div>
+        <div class="app-menu">Файл&nbsp;&nbsp; Редагування&nbsp;&nbsp; Вигляд</div>
+        <div class="app-body">Похід у суботу
+Взяти:
+- намет
+- ліхтарик
+- бутерброди</div>
+        <div class="app-cap">Текстовий редактор</div>
+      </div>
+      <div class="app gd">
+        <div class="app-bar"><img src="images/docs.svg" alt="">Похід — Google Документи</div>
+        <div class="app-menu">Файл&nbsp;&nbsp; Редагувати&nbsp;&nbsp; Вигляд&nbsp;&nbsp; Вставлення&nbsp;&nbsp; Формат</div>
+        <div class="app-body">
+          <h5>Похід у суботу</h5>
+          <div class="row"><span class="mini-pic"></span><ul><li>намет</li><li><b>ліхтарик</b></li><li>бутерброди</li></ul></div>
+        </div>
+        <div class="app-cap">Текстовий процесор</div>
+      </div>
+    </div>
+    <h3 class="sub">Як створити Google Документ</h3>
+    <p>Документ створюють просто на Google Диску — там він і зберігатиметься. Повтори дії за підказками.</p>
+    <div class="exercise" id="drvEx">
+      <div class="task-card"><span class="tnum" id="drvNum"></span><span class="ttext" id="drvTask"></span></div>
+      <div class="drv" id="drv"></div>
+      <div class="drv-fb" id="drvFb"></div>
+    </div>
+    <div class="note">Кнопки «Зберегти» в Google Документах немає: усе, що ти пишеш, зберігається на Диску саме.</div>
+  </section>
+
+  <section class="block" data-guide>
+    <div class="step-label">Крок 2 · Об'єкти документа</div>
+    <h2>Із чого складається документ</h2>
+    <p>Кожну частину документа, з якою можна щось зробити, називають <b>об'єктом</b>.</p>
+    <div class="objs">
+      <div class="obj"><span class="obj-ico">Ж</span><div><b>Символ</b><span>Одна літера, цифра, розділовий знак чи пропуск.</span></div></div>
+      <div class="obj"><span class="obj-ico">Аб</span><div><b>Слово</b><span>Кілька символів між двома пропусками.</span></div></div>
+      <div class="obj"><span class="obj-ico">.!?</span><div><b>Речення</b><span>Слова до крапки, знака оклику чи питання.</span></div></div>
+      <div class="obj"><span class="obj-ico"><span class="ms">format_paragraph</span></span><div><b>Абзац</b><span>Частина тексту від одного натискання Enter до наступного. Заголовок — теж абзац.</span></div></div>
+      <div class="obj"><span class="obj-ico"><span class="ms">description</span></span><div><b>Сторінка</b><span>Те, що вміститься на одному аркуші під час друку.</span></div></div>
+      <div class="obj"><span class="obj-ico"><span class="ms">image</span></span><div><b>Графічний об'єкт</b><span>Малюнок, фото, схема чи діаграма.</span></div></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Властивості об'єктів</div>
+    <h2>Кожен об'єкт має властивості</h2>
+    <p><b>Властивість</b> — ознака об'єкта, яку можна змінити. Наприклад, у символу є колір: він може бути чорним, червоним чи синім.</p>
+    <p class="soft">Розклади властивості: до якого об'єкта належить кожна? Клацни картку, а потім кошик.</p>
+    <div class="exercise">
+      <div class="sort-buckets">
+        <div class="bucket" id="bkChar"><div class="bucket-title">Ж Символ</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkPara"><div class="bucket-title">¶ Абзац</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkPage"><div class="bucket-title">📄 Сторінка</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkPic"><div class="bucket-title">🖼️ Малюнок</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="propPool"></div>
+      <div class="progress-line" id="propProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Редагування і форматування</div>
+    <h2>Яку кнопку натиснули?</h2>
+    <ul>
+      <li><b>Редагування</b> — змінюємо сам текст: додаємо, видаляємо, виправляємо, переставляємо слова чи ділимо на абзаци.</li>
+      <li><b>Форматування</b> — змінюємо вигляд: властивості об'єктів. Слова лишаються ті самі.</li>
+    </ul>
+    <p>Для форматування на панелі інструментів Google Документів є кнопки.</p>
+    <p class="soft">Порівняй «Було» і «Стало». Яку кнопку натиснули?</p>
+    <div id="baList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Властивості в Google Документах</div>
+    <h2>Знайди об'єкт за властивістю</h2>
+    <p>Клацни будь-яке слово, абзац чи малюнок — панель інструментів угорі покаже його властивості, як у справжньому Google Документі.</p>
+    <div class="exercise" id="inspEx">
+      <div class="task-card"><span class="tnum" id="inNum"></span><span class="ttext" id="inTask"></span></div>
+      <div class="gdoc">
+        <div class="gd-head">
+          <img src="images/docs.svg" alt="">
+          <div>
+            <div class="gd-title">Стіннівка 6-Б <span class="ms">star</span><span class="ms">cloud_done</span></div>
+            <div class="gd-menu"><span>Файл</span><span>Редагувати</span><span>Вигляд</span><span>Вставлення</span><span>Формат</span><span>Інструменти</span></div>
+          </div>
+        </div>
+        <div class="gd-tools" id="inTools"></div>
+        <div class="insp">
+          <div class="insp-page" id="inPage">
+            <p class="t" data-id="title">Новини нашого класу</p>
+            <p class="ind" data-id="p1">У п'ятницю 6-Б переміг у <i data-id="w-it">шкільній</i> вікторині з природознавства. Найважче було запитання про <span data-id="w-red" style="color:#D93025">вулкани</span>, але ми впорались!</p>
+            <div class="insp-pics">
+              <span data-id="pic1" class="framed"><svg viewBox="0 0 96 80"><rect width="96" height="80" fill="#FFF4D6"/><path d="M34 16h28v14a14 14 0 0 1-28 0z" fill="#F4B400"/><path d="M34 20h-8a8 8 0 0 0 8 12M62 20h8a8 8 0 0 1-8 12" stroke="#F4B400" stroke-width="4" fill="none"/><rect x="44" y="44" width="8" height="12" fill="#E09A00"/><rect x="36" y="56" width="24" height="8" rx="2" fill="#B07800"/></svg></span>
+              <span data-id="pic2"><svg viewBox="0 0 96 80"><rect width="96" height="80" fill="#DFF0FB"/><path d="M14 72 L40 26 h16 L82 72 Z" fill="#8D6E63"/><path d="M40 26 h16 l-4 10 h-8 z" fill="#E8710A"/><circle cx="44" cy="16" r="6" fill="#B0BEC5"/><circle cx="54" cy="10" r="8" fill="#CFD8DC"/><rect y="72" width="96" height="8" fill="#7CB342"/></svg></span>
+            </div>
+            <p data-id="p2">Наступна гра — у <b data-id="w-bold">грудні</b>. Приходьте вболівати за нашу команду!</p>
+            <p class="right" data-id="sign">Редакція стіннівки</p>
+          </div>
+        </div>
+      </div>
+      <div class="insp-fb" id="inFb"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Властивості сторінки</div>
+    <h2>Налаштовуємо сторінку</h2>
+    <p>У сторінки три головні властивості:</p>
+    <div class="sizes">
+      <ul>
+        <li><b>Орієнтація</b>: книжкова — аркуш стоїть вертикально, альбомна — лежить горизонтально.</li>
+        <li><b>Розмір паперу</b>: звичайний аркуш — А4 (21 × 29,7 см). А5 — його половина, А3 — удвічі більший.</li>
+        <li><b>Поля</b> (їх ще називають береги) — порожні смуги по краях аркуша, де немає тексту.</li>
+      </ul>
+      <!-- Розміри паперу: кожен наступний — половина попереднього -->
+      <svg viewBox="0 0 180 128" aria-hidden="true">
+        <rect x="1" y="1" width="178" height="126" fill="#E6EDFC" stroke="#2F5BD3" stroke-width="2"/>
+        <rect x="90" y="1" width="89" height="126" fill="#fff" stroke="#2F5BD3" stroke-width="2"/>
+        <rect x="90" y="64" width="89" height="63" fill="#FFF1E3" stroke="#E8710A" stroke-width="2"/>
+        <rect x="134.5" y="64" width="44.5" height="63" fill="#FDE4E1" stroke="#C2185B" stroke-width="2"/>
+        <g font-family="Baloo 2,Arial,sans-serif" font-weight="800" text-anchor="middle">
+          <text x="45" y="70" font-size="22" fill="#1E40A0">A3</text>
+          <text x="134" y="38" font-size="18" fill="#1E40A0">A4</text>
+          <text x="112" y="101" font-size="14" fill="#B05300">A5</text>
+          <text x="157" y="101" font-size="12" fill="#A0154C">A6</text>
+        </g>
+      </svg>
+    </div>
+    <p>У Google Документах їх змінюють через меню <b>Файл → Налаштування сторінки</b>. Виконай замовлення: зміни налаштування й натисни <b>OK</b>.</p>
+    <div class="exercise" id="psEx">
+      <div class="task-card"><span class="tnum" id="psNum"></span><span class="ttext" id="psTask"></span></div>
+      <div class="ps">
+        <div class="ps-dlg">
+          <h3>Налаштування сторінки</h3>
+          <div class="ps-tabs"><span class="on">З поділом на сторінки</span><span>Без поділу на сторінки</span></div>
+          <div class="ps-cols">
+            <div>
+              <span class="ps-lbl">Застосувати до</span>
+              <div class="ps-static">Увесь документ <span class="ms">arrow_drop_down</span></div>
+              <span class="ps-lbl">Орієнтація</span>
+              <div class="ps-radios">
+                <label><input type="radio" name="psOr" value="p" checked>Книжкова</label>
+                <label><input type="radio" name="psOr" value="l">Альбомна</label>
+              </div>
+              <span class="ps-lbl">Розмір паперу</span>
+              <select id="psPaper"></select>
+              <span class="ps-lbl">Колір сторінки</span>
+              <div class="ps-color"></div>
+            </div>
+            <div>
+              <span class="ps-lbl">Поля (сантиметри)</span>
+              <div class="ps-m"><span>Верхнє</span><input type="number" id="psT" min="0" max="6" step="0.5"></div>
+              <div class="ps-m"><span>Нижнє</span><input type="number" id="psB" min="0" max="6" step="0.5"></div>
+              <div class="ps-m"><span>Ліворуч</span><input type="number" id="psL" min="0" max="6" step="0.5"></div>
+              <div class="ps-m"><span>Праворуч</span><input type="number" id="psR" min="0" max="6" step="0.5"></div>
+            </div>
+          </div>
+          <div class="ps-foot"><span class="def">Установити за умовчанням</span><span class="ps-btn">Скасувати</span><button class="ps-btn ok" id="psOk">OK</button></div>
+        </div>
+        <div class="ps-prev">
+          <div class="ps-stage"><div class="ps-page" id="psPage"><div class="ps-area" id="psArea"></div></div></div>
+          <div class="ps-cap" id="psCap"></div>
+        </div>
+      </div>
+      <div class="ps-fb" id="psFb"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Текстові документи. Об'єкти текстового документа та їх властивості» · 6 клас</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+const ms = name=>`<span class="ms">${name}</span>`;
+
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Власник', desc:'Створив файл і може забрати доступ в інших' },
+  { name:'Редактор', desc:'Може змінювати текст документа' },
+  { name:'Коментатор', desc:'Читає й залишає примітки збоку від тексту' },
+  { name:'Читач', desc:'Може лише переглядати документ' },
+  { name:'Коментар', desc:'Примітка, яка не змінює сам текст' },
+  { name:'Історія версій', desc:'Показує, хто й коли змінював документ' }
+], 'recapProgress');
+
+/* ---------- КРОК 1: СТВОРЮЄМО ДОКУМЕНТ НА ДИСКУ ---------- */
+(function(){
+  const STEPS = [
+    { act:'new', t:'Натисни кнопку «Створити» ліворуч угорі.' },
+    { act:'docs', t:'У меню наведи на «Google Документи» й клацни.' },
+    { act:'blank', t:'Обери «Порожній документ».' },
+    { act:'title', t:'Документ створено! Клацни назву «Документ без назви», щоб перейменувати його.' }
+  ];
+  const NAV = [['home', 'Головна'], ['drive', 'Мій диск', true], ['computer', 'Комп\'ютери'], ['group', 'Відкриті для мене'],
+    ['schedule', 'Нещодавні'], ['star', 'Із зірочкою'], ['delete', 'Кошик']];
+  const row = (act, icon, text, more)=>`<div class="drv-it" data-act="${act}">${icon}<span>${text}</span>${more ? ms('chevron_right') : ''}</div>`;
+  const img = f=>`<img src="images/${f}.svg" alt="">`;
+  const drv = document.getElementById('drv'), ex = document.getElementById('drvEx');
+  const num = document.getElementById('drvNum'), task = document.getElementById('drvTask'), fb = document.getElementById('drvFb');
+
+  const driveView = ()=>`
+    <div class="drv-top">${img('drive')}<span class="drv-name">Диск</span><div class="drv-search">${ms('search')}<span>Пошук на Диску</span></div></div>
+    <div class="drv-body">
+      <div class="drv-side">
+        <button class="drv-new" data-act="new">${ms('add')}Створити</button>
+        ${NAV.map(([i, n, on])=>`<div class="drv-nav${on ? ' on' : ''}" data-act="nav">${ms(i)}<span>${n}</span></div>`).join('')}
+        <div class="drv-menu" id="drvMenu" hidden>
+          ${row('x', ms('create_new_folder'), 'Нова папка')}
+          <div class="drv-sep"></div>
+          ${row('x', ms('upload_file'), 'Завантажити файл')}
+          ${row('x', ms('drive_folder_upload'), 'Завантажити папку')}
+          <div class="drv-sep"></div>
+          ${row('docs', img('docs'), 'Google Документи', true)}
+          ${row('x', img('sheets'), 'Google Таблиці', true)}
+          ${row('x', img('slides'), 'Google Презентації', true)}
+          ${row('x', img('forms'), 'Google Форми', true)}
+          ${row('x', '<span class="ms"></span>', 'Більше', true)}
+        </div>
+        <div class="drv-menu drv-sub" id="drvSub" hidden>
+          ${row('blank', ms('note_add'), 'Порожній документ')}
+          ${row('x', ms('article'), 'З шаблону')}
+        </div>
+      </div>
+      <div class="drv-main">
+        <div class="drv-h">Мій диск ${ms('arrow_drop_down')}</div>
+        <div class="drv-cols"><span>Назва</span><span>Змінено</span></div>
+        <div class="drv-file" data-act="nav">${ms('folder')}<span>Classroom</span><small>12 вер.</small></div>
+        <div class="drv-file" data-act="nav">${img('docs')}<span>Мій улюблений ведмедик</span><small>вчора</small></div>
+        <div class="drv-file" data-act="nav">${img('slides')}<span>Презентація «Космос»</span><small>3 жовт.</small></div>
+      </div>
+    </div>`;
+  const docView = ()=>`
+    <div class="gd-head">
+      ${img('docs')}
+      <div>
+        <div class="gd-title"><span class="drv-title" data-act="title" id="drvTitle">Документ без назви</span><span class="ms">star</span><span class="ms">drive_file_move</span><span class="ms">cloud_done</span></div>
+        <div class="gd-menu"><span>Файл</span><span>Редагувати</span><span>Вигляд</span><span>Вставлення</span><span>Формат</span><span>Інструменти</span></div>
+      </div>
+    </div>
+    <div class="gd-tools">${['undo', 'redo', 'print', 'spellcheck'].map(i=>`<span class="tl">${ms(i)}</span>`).join('')}<span class="sep"></span><span class="tx">Звичайний текст</span><span class="sep"></span><span class="tx">Arial</span><span class="sep"></span>${['format_bold', 'format_italic', 'format_underlined', 'format_color_text'].map(i=>`<span class="tl">${ms(i)}</span>`).join('')}</div>
+    <div class="drv-page"><span class="drv-caret"></span></div>`;
+
+  const hit = trackTask(ex, STEPS.length, STEPS.length);
+  let i = 0;
+  const show = ()=>{
+    if(i >= STEPS.length){ num.textContent = '🎉'; task.textContent = 'Готово! Документ «Похід у суботу» лежить у тебе на Диску.'; return; }
+    num.textContent = `Дія ${i + 1} з ${STEPS.length}`;
+    task.textContent = STEPS[i].t;
+  };
+  drv.innerHTML = driveView();
+  drv.classList.add('is-drive');
+  drv.addEventListener('click', e=>{
+    const el = e.target.closest('[data-act]');
+    if(!el || i >= STEPS.length) return;
+    if(el.dataset.act !== STEPS[i].act){
+      el.classList.remove('miss'); void el.offsetWidth; el.classList.add('miss');
+      setTimeout(()=>el.classList.remove('miss'), 600);
+      fb.textContent = '🤔 Не туди. ' + STEPS[i].t;
+      return;
+    }
+    const act = STEPS[i].act;
+    if(act === 'new') document.getElementById('drvMenu').hidden = false;
+    if(act === 'docs'){ el.classList.add('on'); document.getElementById('drvSub').hidden = false; }
+    if(act === 'blank'){ drv.classList.remove('is-drive'); drv.classList.add('gdoc'); drv.innerHTML = docView(); }
+    if(act === 'title'){
+      const t = document.getElementById('drvTitle'), name = 'Похід у суботу';
+      t.classList.add('typing'); t.textContent = '';
+      [...name].forEach((c, k)=>setTimeout(()=>{ t.textContent += c; if(k === name.length - 1) t.classList.remove('typing'); }, 60 * k));
+    }
+    fb.textContent = '';
+    addNeurons(1); hit(); i++;
+    show();
+  });
+  show();
+})();
+
+/* ---------- КРОК 3: ВЛАСТИВОСТІ ---------- */
+makeSortBoard('propPool', { c:'bkChar', p:'bkPara', s:'bkPage', i:'bkPic' }, [
+  { icon:ms('font_download'), text:'Шрифт: Arial', bucket:'c' },
+  { icon:ms('format_size'), text:'Розмір шрифту: 14', bucket:'c' },
+  { icon:ms('format_color_text'), text:'Колір: червоний', bucket:'c' },
+  { icon:ms('format_italic'), text:'Накреслення: курсив', bucket:'c' },
+  { icon:ms('format_align_center'), text:'Вирівнювання: по центру', bucket:'p' },
+  { icon:ms('format_indent_increase'), text:'Відступ першого рядка', bucket:'p' },
+  { icon:ms('format_line_spacing'), text:'Міжрядковий інтервал', bucket:'p' },
+  { icon:ms('crop_landscape'), text:'Орієнтація: альбомна', bucket:'s' },
+  { icon:ms('article'), text:'Розмір паперу: А4', bucket:'s' },
+  { icon:ms('margin'), text:'Поля: 2 см', bucket:'s' },
+  { icon:ms('aspect_ratio'), text:'Ширина й висота', bucket:'i' },
+  { icon:ms('open_with'), text:'Місце розташування', bucket:'i' },
+  { icon:ms('border_style'), text:'Обрамлення (рамка)', bucket:'i' }
+], 'propProgress');
+
+/* ---------- КРОК 4: БУЛО / СТАЛО ---------- */
+const ba = (was, now)=>`<div class="ba"><div class="ba-card"><small>Було</small>${was}</div>${ms('arrow_forward')}<div class="ba-card"><small>Стало</small>${now}</div></div>`;
+/* Кнопки панелі інструментів Google Документів: іконка й підказка, як при наведенні */
+const BTN = {
+  format_bold:'Напівжирний (Ctrl+B)', format_italic:'Курсив (Ctrl+I)', format_underlined:'Підкреслити (Ctrl+U)',
+  format_color_text:'Колір тексту', ink_highlighter:'Колір виділення', text_increase:'Збільшити розмір шрифту', text_decrease:'Зменшити розмір шрифту',
+  format_align_left:'Вирівняти за лівим краєм', format_align_center:'Вирівняти по центру', format_align_right:'Вирівняти за правим краєм',
+  format_align_justify:'Вирівняти за шириною', format_line_spacing:'Міжрядковий інтервал', format_indent_increase:'Збільшити відступ',
+  format_list_bulleted:'Маркований список', format_list_numbered:'Нумерований список', checklist:'Контрольний список'
+};
+const btn = icon=>`<span class="ms" title="${BTN[icon]}">${icon}</span>`;
+const press = (pre, opts, correct)=>({ pre, text:'Яку кнопку натиснули?', opts:opts.map(btn), correct,
+  why:`Кнопка «${BTN[opts[correct]].replace(/ \(.*\)/, '')}».` });
+makeChoices('baList', [
+  press(ba('<p>Мій улюблений ведмедик</p>', '<p>Мій улюблений <b>ведмедик</b></p>'), ['format_italic', 'format_bold', 'format_underlined'], 1),
+  press(ba('<p>Казка про козу-дерезу</p>', '<p><i>Казка про козу-дерезу</i></p>'), ['format_bold', 'format_underlined', 'format_italic'], 2),
+  press(ba('<p>Домашнє завдання: вивчити вірш</p>', '<p>Домашнє завдання: <u>вивчити вірш</u></p>'), ['format_underlined', 'format_italic', 'format_bold'], 0),
+  press(ba('<p>Зошит, ручка, олівець</p>', '<p style="font-size:20px">Зошит, ручка, олівець</p>'), ['text_decrease', 'format_bold', 'text_increase'], 2),
+  press(ba('<p>Київ — столиця України</p>', '<p style="color:#1A73E8">Київ — столиця України</p>'), ['ink_highlighter', 'format_color_text', 'format_underlined'], 1),
+  press(ba('<p>Не забути: екскурсія в суботу</p>', '<p>Не забути: <span style="background:#FFF475">екскурсія в суботу</span></p>'), ['format_color_text', 'format_bold', 'ink_highlighter'], 2),
+  press(ba('<p>Осінь</p>', '<p style="text-align:center">Осінь</p>'), ['format_align_left', 'format_align_center', 'format_align_right'], 1),
+  press(ba('<p>Твій друг Сашко</p>', '<p style="text-align:right">Твій друг Сашко</p>'), ['format_align_right', 'format_align_center', 'format_align_justify'], 0),
+  press(ba('<p>Жила-була кицька.</p><p>Вона любила молоко.</p>', '<p style="line-height:2.2">Жила-була кицька.</p><p style="line-height:2.2">Вона любила молоко.</p>'),
+    ['format_indent_increase', 'format_line_spacing', 'format_align_justify'], 1),
+  press(ba('<p>Жила-була кицька. Вона любила молоко.</p>', '<p style="text-indent:2em">Жила-була кицька. Вона любила молоко.</p>'),
+    ['format_line_spacing', 'format_align_right', 'format_indent_increase'], 2),
+  press(ba('<p>Намет</p><p>Ліхтарик</p><p>Бутерброди</p>', '<ul style="margin:0;padding-left:20px"><li>Намет</li><li>Ліхтарик</li><li>Бутерброди</li></ul>'),
+    ['format_list_numbered', 'checklist', 'format_list_bulleted'], 2),
+  press(ba('<p>Прокинутися</p><p>Почистити зуби</p><p>Поснідати</p>', '<ol style="margin:0;padding-left:22px"><li>Прокинутися</li><li>Почистити зуби</li><li>Поснідати</li></ol>'),
+    ['format_list_bulleted', 'format_list_numbered', 'checklist'], 1)
+]);
+
+/* ---------- КРОК 5: ВЛАСТИВОСТІ В ДОКУМЕНТІ ---------- */
+(function(){
+  const TEXT = { font:'Arial', size:11, b:false, i:false, color:'#202124', colorName:'чорний' };
+  const P = {
+    title:{ ch:{ ...TEXT, size:16, b:true, color:'#1A3E8C', colorName:'темно-синій' }, align:'center', indent:'немає' },
+    p1:{ ch:TEXT, align:'left', indent:'1,27 см' },
+    p2:{ ch:TEXT, align:'left', indent:'немає' },
+    sign:{ ch:{ ...TEXT, size:10 }, align:'right', indent:'немає' },
+    'w-it':{ ch:{ ...TEXT, i:true } },
+    'w-red':{ ch:{ ...TEXT, color:'#D93025', colorName:'червоний' } },
+    'w-bold':{ ch:{ ...TEXT, b:true } },
+    pic1:{ pic:true },
+    pic2:{ pic:true }
+  };
+  const ALIGN = { left:'format_align_left', center:'format_align_center', right:'format_align_right' };
+  const TASKS = [
+    { t:'Клацни абзац, вирівняний по центру.', a:'title' },
+    { t:'Клацни слово, накреслення якого — курсив.', a:'w-it' },
+    { t:'Клацни слово червоного кольору.', a:'w-red' },
+    { t:'Клацни малюнок, у якого є обрамлення.', a:'pic1' },
+    { t:'Клацни абзац, вирівняний праворуч.', a:'sign' },
+    { t:'Клацни слово з напівжирним накресленням.', a:'w-bold' },
+    { t:'Клацни абзац, у якого є відступ першого рядка.', a:'p1' }
+  ];
+  const ex = document.getElementById('inspEx'), docPage = document.getElementById('inPage');
+  const tools = document.getElementById('inTools');
+  const num = document.getElementById('inNum'), task = document.getElementById('inTask'), fb = document.getElementById('inFb');
+
+  const tl = (icon, on, extra = '')=>`<span class="tl${on ? ' on' : ''}${extra}">${ms(icon)}</span>`;
+  const drawTools = (o, para)=>{
+    const c = o?.ch || TEXT;
+    const al = (para?.align || 'left');
+    tools.innerHTML = tl('undo') + tl('redo') + '<span class="sep"></span>'
+      + `<span class="tx">${o?.align === 'center' ? 'Заголовок' : 'Звичайний текст'}</span><span class="sep"></span>`
+      + `<span class="tx val">${o?.pic ? '' : c.font}</span><span class="sep"></span>`
+      + `<span class="tx">−</span><span class="tx size">${o?.pic ? '' : c.size}</span><span class="tx">+</span><span class="sep"></span>`
+      + tl('format_bold', !o?.pic && c.b) + tl('format_italic', !o?.pic && c.i) + tl('format_underlined')
+      + `<span class="tl col">${ms('format_color_text')}<i style="background:${o?.pic ? '#000' : c.color}"></i></span>`
+      + '<span class="sep"></span>' + tl(ALIGN[al], !!para) + tl('format_line_spacing') + tl('format_list_bulleted')
+      + '<span class="sep"></span>' + tl('image', !!o?.pic) + tl('link') + tl('add_comment');
+  };
+  drawTools(null);
+
+  const hit = trackTask(ex, TASKS.length, TASKS.length + 2);
+  let i = 0;
+  const show = ()=>{
+    if(i >= TASKS.length){ num.textContent = '🎉'; task.textContent = 'Ти вмієш бачити властивості об\'єктів!'; return; }
+    num.textContent = `Завдання ${i + 1} з ${TASKS.length}`;
+    task.textContent = TASKS[i].t;
+  };
+  docPage.addEventListener('click', e=>{
+    const el = e.target.closest('[data-id]');
+    if(!el) return;
+    const o = P[el.dataset.id];
+    const paraEl = el.closest('p[data-id]');
+    docPage.querySelectorAll('.sel').forEach(x=>x.classList.remove('sel'));
+    el.classList.add('sel');
+    drawTools(o, paraEl ? P[paraEl.dataset.id] : null);
+    if(i >= TASKS.length) return;
+    // зараховуємо й клік усередині потрібного абзацу (по слову в ньому)
+    let hitEl = null;
+    for(let x = el; x && x !== docPage; x = x.parentElement) if(x.dataset?.id === TASKS[i].a){ hitEl = x; break; }
+    if(hitEl){
+      hitEl.classList.add('ok'); setTimeout(()=>hitEl.classList.remove('ok'), 900);
+      fb.textContent = '✅ Так! Подивись, які кнопки ввімкнулися на панелі інструментів.';
+      addNeurons(1); hit(); i++;
+      if(i === TASKS.length) addNeurons(2);
+      show();
+    } else {
+      el.classList.remove('miss'); void el.offsetWidth; el.classList.add('miss');
+      setTimeout(()=>el.classList.remove('miss'), 700);
+      fb.textContent = '🤔 Ні, у цього об\'єкта інші властивості — подивись на панель інструментів.';
+    }
+  });
+  show();
+})();
+
+/* ---------- КРОК 6: НАЛАШТУВАННЯ СТОРІНКИ ---------- */
+(function(){
+  const PAPERS = { A3:[29.7, 42], A4:[21, 29.7], A5:[14.8, 21], A6:[10.5, 14.8], Letter:[21.6, 27.9] };
+  const cm = n=>String(n).replace('.', ',');
+  const TASKS = [
+    { t:'Розклад уроків має бути широким. Поверни аркуш, щоб він лежав горизонтально.',
+      ok:s=>s.or === 'l', hint:'Аркуш, що лежить горизонтально, — альбомна орієнтація.' },
+    { t:'Листівка для бабусі: аркуш має бути вдвічі меншим за звичайний.',
+      ok:s=>s.paper === 'A5', hint:'Звичайний аркуш — А4. Його половина — наступний за номером розмір.' },
+    { t:'Роботу підшиють у папку. Зроби поле зліва 3 см.',
+      ok:s=>s.m.l === 3, hint:'Потрібне поле «Ліворуч» = 3.' },
+    { t:'Тепер реферат: звичайний аркуш, який стоїть вертикально.',
+      ok:s=>s.or === 'p' && s.paper === 'A4', hint:'Потрібні розмір А4 і книжкова орієнтація.' },
+    { t:'Щоб на сторінку вміщалося більше тексту, зроби всі чотири поля по 1 см.',
+      ok:s=>['t', 'b', 'l', 'r'].every(k=>s.m[k] === 1), hint:'Перевір усі чотири поля: верхнє, нижнє, ліворуч і праворуч.' }
+  ];
+  const ex = document.getElementById('psEx'), paper = document.getElementById('psPaper');
+  const page = document.getElementById('psPage'), area = document.getElementById('psArea');
+  const cap = document.getElementById('psCap'), fb = document.getElementById('psFb'), okBtn = document.getElementById('psOk');
+  const num = document.getElementById('psNum'), task = document.getElementById('psTask');
+  const M = { t:'psT', b:'psB', l:'psL', r:'psR' };
+  Object.entries(PAPERS).forEach(([k, [w, h]])=>paper.insertAdjacentHTML('beforeend',
+    `<option value="${k}"${k === 'A4' ? ' selected' : ''}>${k} (${cm(w)} см x ${cm(h)} см)</option>`));
+  Object.values(M).forEach(id=>{ document.getElementById(id).value = '2.54'; });
+
+  const state = ()=>({
+    or: document.querySelector('input[name="psOr"]:checked').value,
+    paper: paper.value,
+    m: Object.fromEntries(Object.entries(M).map(([k, id])=>[k, parseFloat(document.getElementById(id).value) || 0]))
+  });
+  const draw = ()=>{
+    const s = state();
+    let [w, h] = PAPERS[s.paper];
+    if(s.or === 'l') [w, h] = [h, w];
+    const k = 5;   // пікселів на сантиметр
+    page.style.width = w * k + 'px'; page.style.height = h * k + 'px';
+    const m = s.m;
+    Object.assign(area.style, { left:m.l * k + 'px', right:m.r * k + 'px', top:m.t * k + 'px', bottom:m.b * k + 'px' });
+    cap.innerHTML = `<b>${s.paper}</b> · ${cm(w)} × ${cm(h)} см · ${s.or === 'l' ? 'альбомна' : 'книжкова'}`;
+  };
+  ex.addEventListener('input', draw);
+  ex.addEventListener('change', draw);
+  draw();
+
+  const hit = trackTask(ex, TASKS.length, TASKS.length + 2);
+  let i = 0;
+  const show = ()=>{
+    if(i >= TASKS.length){ num.textContent = '🎉'; task.textContent = 'Усі замовлення виконано!'; return; }
+    num.textContent = `Замовлення ${i + 1} з ${TASKS.length}`;
+    task.textContent = TASKS[i].t;
+  };
+  okBtn.addEventListener('click', ()=>{
+    if(i >= TASKS.length) return;
+    if(TASKS[i].ok(state())){
+      fb.textContent = '✅ Готово! Подивись, як змінилася сторінка.';
+      addNeurons(1); hit(); i++;
+      if(i === TASKS.length) addNeurons(2);
+      show();
+    } else {
+      okBtn.classList.remove('shake'); void okBtn.offsetWidth; okBtn.classList.add('shake');
+      setTimeout(()=>okBtn.classList.remove('shake'), 400);
+      fb.textContent = '🤔 Ще не так. ' + TASKS[i].hint;
+    }
+  });
+  show();
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Яка з програм — текстовий процесор?', opts:['Блокнот', 'Google Документи', 'Калькулятор'], correct:1,
+    why:'Він уміє не лише набирати текст, а й оформлювати документ.' },
+  { q:'Що таке абзац?', opts:['Частина тексту між двома натисканнями Enter', 'Будь-який рядок тексту', 'Одне слово'], correct:0 },
+  { q:'Яка властивість належить сторінці?', opts:['Накреслення', 'Орієнтація', 'Міжрядковий інтервал'], correct:1 },
+  { q:'Яка властивість є в символу?', opts:['Відступ першого рядка', 'Поля', 'Колір'], correct:2 },
+  { q:'Учень виправив «малако» на «молоко». Що він зробив?', opts:['Форматування', 'Редагування', 'Налаштування сторінки'], correct:1,
+    why:'Змінився сам текст, а не його вигляд.' },
+  { q:'Що таке форматування?', opts:['Зміна вигляду документа', 'Виправлення помилок', 'Збереження файлу'], correct:0 },
+  { q:'Аркуш лежить горизонтально. Яка це орієнтація?', opts:['Книжкова', 'Альбомна'], correct:1 },
+  { q:'Аркуш А5 порівняно з А4…', opts:['удвічі менший', 'удвічі більший', 'такий самий'], correct:0 },
+  { q:'Де в Google Документах змінити поля й розмір паперу?', opts:['Формат → Текст', 'Файл → Налаштування сторінки', 'Вставлення → Зображення'], correct:1 },
+  { q:'Що з цього — графічний об\'єкт?', opts:['Кома', 'Заголовок', 'Діаграма'], correct:2 }
+], {summary:'Тепер ти знаєш, з яких об\'єктів складається документ, які в них властивості й чим редагування відрізняється від форматування.'});
+</script>
+
+</body>
+</html>

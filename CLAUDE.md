@@ -151,7 +151,7 @@ _tools/lesson-template/index.html   ← шаблон нового уроку н�
 | `makeClassify(id, items, opts)` | ті самі картки, але спільні варіанти `opts` для всіх | `<div id="…"></div>` |
 | `makeYesNo(id, items, 'Так…', 'Ні…')` | `[{text, correct:true/false, why?}]` | `<div id="…"></div>` |
 | `makeMatching(poolId, listId, pairs, progressId?, bonus=2 \| onDone)` | `[{name, desc, icon?}]` | `<div class="match-pool" id="…"></div><div id="…"></div><div class="progress-line" id="…"></div>` |
-| `makeSortBoard(poolId, {ключ:'idКошика'}, items, progressId?)` | `[{text, bucket:ключ}]` | `.sort-buckets` з `.bucket#id` (усередині `.bucket-title` і `.bucket-items`), `<div class="sort-pool" id="…">` |
+| `makeSortBoard(poolId, {ключ:'idКошика'}, items, progressId?)` | `[{text, bucket:ключ, icon?}]` — `icon`: розмітка перед текстом чипа (напр. іконка Material Symbols) | `.sort-buckets` з `.bucket#id` (усередині `.bucket-title` і `.bucket-items`), `<div class="sort-pool" id="…">` |
 | `makeSequence(doneId, qId, optsId, fbId, steps, finalText, onDone?)` | `steps` — правильний порядок; учень обирає «ПЕРШИМ», «ДРУГИМ»… | `<ol class="seq-done">`, `.seq-q`, `.seq-opts`, `.choice-feedback` |
 | `makeFinalQuiz(id, questions, {summary, perCorrect=2})` | `[{q, opts, correct, why?}]`; `[]` — урок без тесту (кнопка «Завершити урок») | `<div id="finalQuiz"></div>` у секції «Підсумок» |
 | `loadPic(id \| елемент, файл, емодзі)` | фото з `images/` або емодзі-заглушка | `<div class="pic" id="…"></div>` |
@@ -340,6 +340,7 @@ addNeurons(1); hit();          // після останнього hit() впра
 | 6 | Етикет електронного листування (підсумок розділу «Електронна пошта») | `6/lesson-email-etiquette/` |
 | 6 | Мої інструменти для навчання. Персональне навчальне середовище та хмарні сервіси | `6/lesson-learning-tools/` |
 | 6 | Інтернет-ресурси для спільної роботи. Спільний доступ, колективне редагування, коментарі та історія змін | `6/lesson-collaboration/` |
+| 6 | Текстові документи. Об'єкти текстового документа та їх властивості (редактор і процесор, емулятор «створити документ на Google Диску», картки об'єктів, властивості по кошиках з іконками, «Яку кнопку натиснули?» з іконками панелі Google Документів, пошук об'єкта за властивістю, емулятор «Налаштування сторінки») | `6/lesson-text-documents/` |
 | 7 | Персональний цифровий простір | `7/lesson-digital-space/` |
 | 7 | Операційні системи та програмне забезпечення | `7/lesson-os-software/` |
 | 7 | Браузер. Порівняння браузерів. Налаштування. Розширення. Облікові записи | `7/lesson-browser/` |

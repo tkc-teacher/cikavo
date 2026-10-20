@@ -349,6 +349,7 @@ function makeSortBoard(poolId, bucketMap, items, progressId, bonus = 2){
     const chip = document.createElement('div');
     chip.className = 'sort-chip';
     chip.textContent = item.text;
+    if(item.icon) chip.insertAdjacentHTML('afterbegin', item.icon);
     chip.dataset.bucket = item.bucket;
     chip.addEventListener('click', ()=>{
       if(chip.classList.contains('placed')) return;
