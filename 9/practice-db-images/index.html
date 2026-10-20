@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Магазин спорттоварів — Зображення в базі даних</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в меню Google Таблиць -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#B4235A,#0F766E); --accent:#B4235A; --accent-dark:#8A1A45; --accent-soft:#FBE8EF; --bg:#FBF6F8; --line:#F0DDE5; }
+  .sample td.hd{font-weight:800; background:#FBE8EF;}
+  .sample td.c{text-align:center; font-size:22px; line-height:1;}
+  .sample tr.hdr td, .sample tr.hdr th{border-bottom:3px solid #C4C7C5;}
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:1.15em; line-height:1; display:inline-block; vertical-align:-.2em; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em; margin-right:3px; color:#444746;}
+  .menu{white-space:normal;}
+  .sample td.c .ms{font-size:20px; color:#0B57D0; margin:0;}
+  .dd{display:inline-block; border-radius:999px; padding:0 8px; font-size:.92em;}
+</style>
+</head>
+<body data-hud="9 клас · Практична · Магазин спорттоварів">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 9 клас · Зображення в базі даних</div>
+    <h1>⚽ Магазин спорттоварів</h1>
+    <p>Створи в Google Таблицях базу даних магазину: товари з цінами, кількістю й фото просто в клітинках.</p>
+    <div class="meta"><span>⏱ 20–25 хв</span><span><img src="../../assets/logos/sheets.svg" alt="">Google Таблиці</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="sheet-wrap">
+      <table class="sample">
+        <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th></tr>
+        <tr class="hdr"><th>1</th><td class="hd">ID</td><td class="hd">Фото</td><td class="hd">Назва</td><td class="hd">Категорія</td><td class="hd">Ціна</td><td class="hd">Кількість</td><td class="hd">В наявності</td></tr>
+        <tr><th>2</th><td class="r">1</td><td class="c">⚽</td><td>М'яч футбольний</td><td><span class="dd" style="background:#D4EDBC">М'ячі ▾</span></td><td class="r">600,00 ₴</td><td class="r">10</td><td class="c"><span class="ms">check_box</span></td></tr>
+        <tr><th>3</th><td class="r">2</td><td class="c">🎾</td><td>Тенісна ракетка</td><td><span class="dd" style="background:#BFE1F6">Ракетки ▾</span></td><td class="r">1 450,00 ₴</td><td class="r">0</td><td class="c"><span class="ms">check_box_outline_blank</span></td></tr>
+        <tr><th>…</th><td>…</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи таблицю</h3>
+        <p>Обери один зі способів:</p>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Таблиці</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Таблиці</span>.</li>
+              <li>Назви файл: <b>Магазин — Прізвище</b>.</li>
+            </ol>
+          </div>
+        </div>
+        <ul>
+          <li>Двічі клацни вкладку аркуша внизу й назви її <b>Товари</b>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Назви полів</h3>
+        <p>У рядок <b>1</b>, з A1 до G1: <b>ID</b>, <b>Фото</b>, <b>Назва</b>, <b>Категорія</b>, <b>Ціна</b>, <b>Кількість</b>, <b>В наявності</b>.</p>
+        <ul>
+          <li>Виділи рядок 1 і натисни <span class="menu"><span class="ms">format_bold</span>Жирний</span> на панелі інструментів.</li>
+          <li><span class="menu">Вигляд → <span class="ms">ac_unit</span>Закріпити → 1 рядок</span>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Типи стовпців</h3>
+        <p>Виділи клітинки і задай тип:</p>
+        <ul>
+          <li><b>E2:E6</b> (ціна) — <span class="menu">Формат → <span class="ms">123</span>Число → Валюта</span>;</li>
+          <li><b>F2:F6</b> (кількість) — <span class="menu">Формат → <span class="ms">123</span>Число → Число</span>;</li>
+          <li><b>G2:G6</b> (в наявності) — <span class="menu">Вставити → <span class="ms">check_box</span>Прапорець</span>;</li>
+          <li><b>D2:D6</b> (категорія) — <span class="menu">Вставити → <span class="ms">arrow_drop_down_circle</span>Спадне меню</span>. На панелі «Правила перевірки даних» впиши варіанти: <b>М'ячі</b>, <b>Ракетки</b>, <b>Взуття</b>, <b>Аксесуари</b> (новий рядок — <b>Додати інший елемент</b>) і натисни <b>Готово</b>.</li>
+        </ul>
+        <div class="tip">Якщо в F з'явилися нулі після коми, натисни <span class="menu"><span class="ms">decimal_decrease</span>Зменшити кількість десяткових знаків</span> на панелі інструментів.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Внеси товари</h3>
+        <p>ID пронумеруй маркером заповнення. Категорію обирай зі списку, у «В наявності» клацни прапорець, якщо товар є на складі. Стовпець B («Фото») поки що залиш порожнім — назву вводь у C.</p>
+        <div class="sheet-wrap">
+          <table class="sample">
+            <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th></tr>
+            <tr><th>2</th><td class="r">1</td><td></td><td>М'яч футбольний</td><td>М'ячі</td><td class="r">600</td><td class="r">10</td><td>так</td></tr>
+            <tr><th>3</th><td class="r">2</td><td></td><td>Тенісна ракетка</td><td>Ракетки</td><td class="r">1450</td><td class="r">0</td><td>ні</td></tr>
+            <tr><th>4</th><td class="r">3</td><td></td><td>Кросівки бігові</td><td>Взуття</td><td class="r">2300</td><td class="r">6</td><td>так</td></tr>
+            <tr><th>5</th><td class="r">4</td><td></td><td>Пляшка для води</td><td>Аксесуари</td><td class="r">180</td><td class="r">25</td><td>так</td></tr>
+            <tr><th>6</th><td class="r">5</td><td></td><td>Скакалка</td><td>Аксесуари</td><td class="r">150</td><td class="r">15</td><td>так</td></tr>
+          </table>
+        </div>
+        <div class="check-val">Перевір себе: прапорці стоять у 4 товарів, ціни показано в гривнях (600,00 ₴).</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Фото формулою IMAGE</h3>
+        <p>Для м'яча, ракетки й кросівок (B2, B3, B4):</p>
+        <ol>
+          <li>Знайди фото товару в Google: вкладка <span class="menu"><span class="ms">image</span>Зображення</span>. Відкрий фото.</li>
+          <li>Клацни фото правою кнопкою → <span class="menu"><span class="ms">link</span>Копіювати адресу зображення</span>.</li>
+          <li>У клітинці введи <span class="mono">=IMAGE("</span>, встав адресу й закрий <span class="mono">")</span>. Натисни <b>Enter</b>.</li>
+        </ol>
+        <div class="tip">Клітинка порожня? Деякі сайти не дають показувати свої картинки — візьми фото з іншого сайту.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Фото через меню</h3>
+        <p>Для пляшки й скакалки (B5, B6):</p>
+        <ol>
+          <li>Знайди фото в Google, клацни правою кнопкою → <span class="menu"><span class="ms">download</span>Зберегти зображення як…</span></li>
+          <li>Клацни клітинку в таблиці.</li>
+          <li><span class="menu">Вставити → <span class="ms">image</span>Зображення → Вставити зображення в клітинку</span>.</li>
+          <li>Обери збережений файл і натисни <b>Відкрити</b> або <b>Вибрати</b>.</li>
+        </ol>
+        <ul>
+          <li>Щоб фото були більшими, виділи рядки 2–6 і потягни нижню межу будь-якого з них донизу.</li>
+        </ul>
+        <div class="tip">Не обирай «поверх клітинок»: таке фото не переїде разом із рядком під час сортування.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">7</div>
+      <div>
+        <h3>Перевір сортуванням</h3>
+        <ol>
+          <li>Виділи <b>A1:G6</b>.</li>
+          <li><span class="menu">Дані → <span class="ms">sort</span>Відсортувати діапазон → Додаткові параметри сортування діапазону</span>.</li>
+          <li>Постав прапорець <b>Дані мають рядок для заголовка</b>, сортуй за полем <b>Ціна</b>, А → Я. Натисни <b>Сортувати</b>.</li>
+        </ol>
+        <div class="check-val">Перевір себе: першою стоїть скакалка (150,00 ₴), останніми — кросівки (2 300,00 ₴). Кожне фото й кожен прапорець переїхали разом зі своїм товаром.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Практична робота · «Зображення в базі даних. Цілісність даних» · 9 клас</footer>
+
+<script src="../../assets/practice.js"></script>
+</body>
+</html>
