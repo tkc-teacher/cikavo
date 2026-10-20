@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Арифметичні оператори — Заняття</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<link rel="stylesheet" href="../../assets/python.css">
+<style>
+  :root{
+    --accent:#3776AB; --accent-dark:#25567F; --accent-soft:#E8F0F8;
+    --bg:#F4F7FB; --line:#DFE6F1; --ink-soft:#4F5A72;
+    --hud-bar:linear-gradient(90deg, #3776AB, #FFD43B);
+  }
+  .match-chip, .desc-slot.filled, .sort-chip{font-family:var(--code-font); font-weight:600;}
+
+  /* Цукерки в пакетах: // і % */
+  .candy{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:18px 20px; margin-top:16px;}
+  .candy-ctrl{display:flex; gap:12px 22px; flex-wrap:wrap; margin-bottom:14px;}
+  .stepper{display:flex; align-items:center; gap:8px; font-weight:700; font-size:14.5px;}
+  .stepper button{width:32px; height:32px; border-radius:50%; border:1.5px solid var(--line); background:var(--bg); font-family:'Baloo 2',sans-serif; font-size:18px; font-weight:700; line-height:1; color:var(--accent-dark); cursor:pointer;}
+  .stepper button:hover{border-color:var(--accent);}
+  .stepper b{font-family:var(--code-font); font-size:17px; min-width:2ch; text-align:center;}
+  .candy-scene{display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end; min-height:64px;}
+  .bag{display:flex; flex-wrap:wrap; gap:1px; padding:6px 6px 8px; max-width:118px; background:#FFF4CC; border:2px solid #E9C548; border-radius:6px 6px 16px 16px; font-size:22px; line-height:1;}
+  .loose{display:flex; flex-wrap:wrap; gap:2px; padding:6px; font-size:22px; border:2px dashed #FF9C83; border-radius:12px;}
+  .loose:empty{display:none;}
+  .candy-math{display:grid; grid-template-columns:auto 1fr; gap:4px 14px; margin-top:14px; font-size:15px; align-items:baseline;}
+  .candy-math code{font-size:15px !important;}
+  .candy-math span{color:var(--ink-soft);}
+</style>
+</head>
+<body data-lesson="py-arithmetic" data-hud="Python Basic · Арифметика">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Python Basic · Заняття 3</div>
+      <h1>Python рахує: арифметичні оператори</h1>
+      <p>Навчишся рахувати в програмах, ділити з остачею й навіть «множити» текст.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none" aria-hidden="true">
+      <circle cx="70" cy="70" r="60" fill="#E8F0F8"/>
+      <rect x="38" y="24" width="64" height="92" rx="10" fill="#25567F"/>
+      <rect x="46" y="32" width="48" height="20" rx="4" fill="#1F2433"/>
+      <text x="88" y="47" text-anchor="end" font-family="monospace" font-weight="700" font-size="13" fill="#FFD43B">17%5</text>
+      <rect x="46" y="60" width="13" height="11" rx="3" fill="#E8F0F8"/><rect x="63" y="60" width="13" height="11" rx="3" fill="#E8F0F8"/><rect x="80" y="60" width="13" height="11" rx="3" fill="#FFD43B"/>
+      <rect x="46" y="76" width="13" height="11" rx="3" fill="#E8F0F8"/><rect x="63" y="76" width="13" height="11" rx="3" fill="#E8F0F8"/><rect x="80" y="76" width="13" height="11" rx="3" fill="#FFD43B"/>
+      <rect x="46" y="92" width="13" height="11" rx="3" fill="#E8F0F8"/><rect x="63" y="92" width="13" height="11" rx="3" fill="#E8F0F8"/><rect x="80" y="92" width="13" height="11" rx="3" fill="#3FAE58"/>
+      <path d="M96 118 Q122 120 120 100 Q118 86 108 84" stroke="#FFD43B" stroke-width="10" stroke-linecap="round"/>
+      <circle cx="106" cy="80" r="9" fill="#FFD43B"/><circle cx="104" cy="78" r="2.2" fill="#1B1B3A"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Заняття 1–2</div>
+    <h2>Що ти вже вмієш</h2>
+    <p>Ти вже виводиш текст, зберігаєш дані у змінних і питаєш користувача. Перевір, чи все пам'ятаєш.</p>
+    <div id="recapTask"></div>
+    <div class="exercise">
+      <p class="soft">Обери код, а потім клацни, що він робить.</p>
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Python як калькулятор</div>
+    <h2>Чотири дії</h2>
+    <p>Python рахує, як калькулятор. Знаки трохи інші, ніж у зошиті:</p>
+    <ul>
+      <li><code>+</code> додавання, <code>-</code> віднімання;</li>
+      <li><code>*</code> множення (зірочка замість ×);</li>
+      <li><code>/</code> ділення (скісна риска замість :).</li>
+    </ul>
+    <div class="note">Ділення <code>/</code> завжди дає дробове число: <code>10 / 2</code> — це <code>5.0</code>.</div>
+    <div id="calcTask"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Ділення націло й остача</div>
+    <h2>Розкладаємо цукерки в пакети</h2>
+    <p>Маємо 17 цукерок і пакети на 5 штук. Скільки вийде повних пакетів і скільки цукерок лишиться?</p>
+    <ul>
+      <li><code>//</code> — ділення націло: скільки повних пакетів;</li>
+      <li><code>%</code> — остача: скільки цукерок лишилось.</li>
+    </ul>
+    <div class="candy" id="candy">
+      <div class="candy-ctrl">
+        <div class="stepper">Цукерок: <button type="button" data-k="n" data-d="-1" aria-label="Менше цукерок">−</button><b id="cN"></b><button type="button" data-k="n" data-d="1" aria-label="Більше цукерок">+</button></div>
+        <div class="stepper">У пакеті: <button type="button" data-k="k" data-d="-1" aria-label="Менший пакет">−</button><b id="cK"></b><button type="button" data-k="k" data-d="1" aria-label="Більший пакет">+</button></div>
+      </div>
+      <div class="candy-scene" id="cScene"></div>
+      <div class="candy-math" id="cMath"></div>
+    </div>
+    <div class="exercise">
+      <p class="soft">Порахуй сам.</p>
+      <div id="divList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Порядок дій</div>
+    <h2>Спершу множення, потім додавання</h2>
+    <p>Python рахує в тому ж порядку, що й у математиці: спершу <code>*</code>, <code>/</code>, <code>//</code>, <code>%</code>, а потім <code>+</code> і <code>-</code>. Дужки змінюють порядок.</p>
+    <div class="exercise">
+      <p class="soft">Обери вираз, а потім клацни його результат.</p>
+      <div class="match-pool" id="orderPool"></div>
+      <div id="orderList"></div>
+      <div class="progress-line" id="orderProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Рахуємо зі змінними</div>
+    <h2>Новий вміст зі старого</h2>
+    <p>У виразах можна використовувати змінні. Запис <code>coins = coins + 5</code> означає: візьми те, що в коробці, додай 5 і поклади результат назад.</p>
+    <div id="trace1"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Задача</div>
+    <h2>Хвилини в години</h2>
+    <p>Мультфільм триває 135 хвилин. Скільки це годин і хвилин? Тут допоможуть <code>//</code> і <code>%</code>: у годині 60 хвилин.</p>
+    <div id="task1"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Операції з текстом</div>
+    <h2>Текст теж можна «додавати»</h2>
+    <ul>
+      <li><code>"Кіт" + "Пес"</code> склеює текст: <code>КітПес</code>;</li>
+      <li><code>"Ха" * 3</code> повторює текст: <code>ХаХаХа</code>;</li>
+      <li><code>"5" + "5"</code> — це <code>55</code>, бо в лапках текст, а не числа.</li>
+    </ul>
+    <div class="trivia">Текст і число через <code>+</code> не поєднати: <code>"5" + 5</code> — помилка.</div>
+    <div class="exercise">
+      <p class="soft">Клацни вираз, а потім — що вийде.</p>
+      <div class="sort-buckets">
+        <div class="bucket" id="bkNum"><div class="bucket-title">Число</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkStr"><div class="bucket-title">Текст</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkErr"><div class="bucket-title">Помилка</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="strPool"></div>
+      <div class="progress-line" id="strProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Заняття 3 · «Арифметичні оператори» · Гурток Python Basic</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script src="../../assets/python.js"></script>
+<script>
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'print("Привіт")', desc:'Виводить текст у консоль' },
+  { name:'# Привіт', desc:'Коментар: Python його пропускає' },
+  { name:'name = "Оля"', desc:'Кладе текст у коробку name' },
+  { name:'input("Ім\'я? ")', desc:'Питає користувача й чекає відповіді' },
+  { name:'int("12")', desc:'Перетворює текст на число' },
+  { name:'f"Привіт, {name}"', desc:'Вставляє значення змінної в текст' }
+], 'recapProgress');
+
+makeCodeTask('recapTask', {
+  task:'Розминка: у програмі дві помилки. Виправ їх.',
+  code:'name = input("Як тебе звати? ")\nPrint(f"Привіт, {name}!)',
+  hint:'Перевір, чи print написано з малої літери і чи закрито лапки.',
+  check:(out, code)=>/print\(f["']/.test(code) || 'Виведи привітання f-рядком, як і було.'
+});
+
+/* ---------- КРОК 1 ---------- */
+makeCodeTask('calcTask', {
+  task:'Скільки хвилин у тижні? Нехай порахує Python: у добі 24 години, у годині 60 хвилин.',
+  code:'print(7 * ...)',
+  hint:'Перемнож дні, години й хвилини: print(7 * 24 * 60)',
+  check:(out, code)=>{
+    if(!/\*/.test(code)) return 'Не рахуй у голові — запиши множення в print().';
+    return out.trim() === '10080' || 'Число не те. У тижні 7 днів, у добі 24 години, у годині 60 хвилин.';
+  }
+});
+
+/* ---------- КРОК 2: цукерки ---------- */
+(function(){
+  const st = { n:17, k:5 };
+  const LIM = { n:[0, 30], k:[2, 6] };
+  const C = '🍬';
+  function draw(){
+    const full = Math.floor(st.n / st.k), rest = st.n % st.k;
+    document.getElementById('cN').textContent = st.n;
+    document.getElementById('cK').textContent = st.k;
+    document.getElementById('cScene').innerHTML =
+      Array.from({length:full}, ()=>`<div class="bag">${C.repeat(st.k)}</div>`).join('') +
+      `<div class="loose">${C.repeat(rest)}</div>`;
+    document.getElementById('cMath').innerHTML =
+      `<code>${st.n} // ${st.k} = ${full}</code><span>повних пакетів</span>` +
+      `<code>${st.n} % ${st.k} = ${rest}</code><span>${rest ? 'цукерок лишилось' : 'нічого не лишилось'}</span>`;
+  }
+  document.querySelectorAll('#candy .stepper button').forEach(b=>b.addEventListener('click', ()=>{
+    const key = b.dataset.k, [lo, hi] = LIM[key];
+    st[key] = Math.min(hi, Math.max(lo, st[key] + +b.dataset.d));
+    draw();
+  }));
+  draw();
+})();
+
+makeChoices('divList', [
+  { pre:pyCode('print(20 // 6)'), text:'Скільки повних пакетів по 6 вийде з 20 цукерок?', opts:['2', '3', '3.33'], correct:1 },
+  { pre:pyCode('print(20 % 6)'), text:'Скільки цукерок лишиться?', opts:['2', '3', '0'], correct:0, why:'3 пакети по 6 — це 18, тож лишається 2.' },
+  { pre:pyCode('print(9 % 2)'), text:'Що з’явиться в консолі?', opts:['4', '1', '0'], correct:1, why:'У непарного числа остача від ділення на 2 — завжди 1.' }
+]);
+
+/* ---------- КРОК 3 ---------- */
+makeMatching('orderPool', 'orderList', [
+  { name:'2 + 3 * 4', desc:'14' },
+  { name:'(2 + 3) * 4', desc:'20' },
+  { name:'20 - 8 // 2', desc:'16' },
+  { name:'(20 - 8) // 2', desc:'6' }
+], 'orderProgress');
+
+/* ---------- КРОК 4 ---------- */
+makeTrace('trace1', {
+  code:'coins = 10\ncoins = coins + 5\ncoins = coins * 2\nprint(coins)',
+  steps:[
+    { line:1, set:{ coins:'10' } },
+    { line:2, set:{ coins:'15' }, ask:{ q:'Що буде в коробці coins після рядка 2?', opts:['5', '15', '10'], correct:1, why:'Було 10, додали 5.' } },
+    { line:3, set:{ coins:'30' }, ask:{ q:'А після рядка 3?', opts:['30', '20', '17'], correct:0, why:'Було 15, помножили на 2.' } },
+    { line:4, out:'30' }
+  ]
+});
+
+/* ---------- КРОК 5 ---------- */
+makeCodeTask('task1', {
+  task:'Допиши програму, щоб вона вивела, скільки це годин і хвилин.',
+  code:'minutes = 135\nhours = minutes // 60\nrest = ...\nprint(f"{hours} год {rest} хв")',
+  expect:'2 год 15 хв',
+  hint:'Хвилини, що лишились, — це остача від ділення на 60: rest = minutes % 60'
+});
+
+/* ---------- КРОК 6 ---------- */
+makeSortBoard('strPool', { n:'bkNum', s:'bkStr', e:'bkErr' }, [
+  { text:'5 + 5', bucket:'n' },
+  { text:'7 // 2', bucket:'n' },
+  { text:'"5" + "5"', bucket:'s' },
+  { text:'"Ха" * 3', bucket:'s' },
+  { text:'"5" + 5', bucket:'e' },
+  { text:'"Кіт" - "К"', bucket:'e' }
+], 'strProgress');
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що виведе програма?' + pyCode('print(3 + 2 * 5)'), opts:['25', '13', '30'], correct:1, why:'Спершу множення: 2 * 5 = 10, потім 3 + 10.' },
+  { q:'Що виведе програма?' + pyCode('print(17 // 5)'), opts:['3', '2', '3.4'], correct:0 },
+  { q:'Що виведе програма?' + pyCode('print(17 % 5)'), opts:['3', '2', '0'], correct:1, why:'3 пакети по 5 — це 15, лишається 2.' },
+  { q:'Що буде в змінній <code>x</code>?' + pyCode('x = 4\nx = x * 3'), opts:['4', '7', '12'], correct:2 },
+  { q:'Що виведе програма?' + pyCode('print("Ой" * 2)'), opts:['ОйОй', 'Ой 2', 'Помилка'], correct:0 }
+], {summary:'Тепер ти вмієш рахувати в Python, ділити націло й з остачею, змінювати змінні й працювати з текстом через + і *.', html:true});
+</script>
+
+</body>
+</html>

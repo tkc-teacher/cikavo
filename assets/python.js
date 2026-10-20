@@ -140,7 +140,11 @@ function explain(e, code){
   const lines = code.split('\n');
   if(e.message === 'STOP') return { line:0, text:'Програму зупинено.', raw:'' };
   if(e.message === 'BIG') return { line:0, text:'Програма вивела забагато тексту, тож її зупинено. Можливо, цикл ніколи не закінчується?', raw:'' };
-  if(!e.tp$name) return { line:0, text:esc(e.message || String(e)), raw:'' };
+  if(!e.tp$name){            // збій самого Skulpt (напр. на «...» у заготовці)
+    const dots = lines.findIndex(l=>outside(l).rest.includes('...'));
+    if(dots >= 0) return { line:dots + 1, text:'Заміни три крапки потрібним кодом.', raw:'' };
+    return { line:0, text:'Python не зміг виконати програму. Перевір, чи немає в коді незвичних символів.', raw:esc(e.message || String(e)) };
+  }
   const raw = e.toString().replace(/ on line \d+$/, '');
   const line = e.traceback?.[0]?.lineno || 0;
   const arg = String(e.args?.v?.[0] ?? '');
