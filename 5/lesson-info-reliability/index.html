@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Порівняння інформації з різних сайтів. Властивості інформації. Авторське право. Достовірність інформації. Поняття фейку — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --accent:#1F7A5C; --accent-dark:#155A43; --accent-soft:#E3F3EC;
+    --label:#D9480F;
+    --bg:#F5F8F6; --line:#DCE9E2;
+    --hud-bar:linear-gradient(90deg,#1F7A5C,#D9480F);
+  }
+  .block ul{padding-left:22px;}
+  .block li{margin-bottom:5px;}
+  .choice-row.col{flex-direction:column; align-items:stretch;}
+  .choice-row.col .choice-btn{text-align:left;}
+
+  /* Великі ілюстрації в повторенні */
+  #recapList .desc-text{display:flex; align-items:center; gap:16px; font-size:15px;}
+  #recapList .d-pic{width:64px; height:64px; flex-shrink:0; font-size:40px; line-height:64px; text-align:center; background:var(--accent-soft); border-radius:var(--radius-m);}
+
+  /* Великі ілюстрації до ситуацій кроку 1 */
+  #propCheck .q-head, #copyCheck .q-head{gap:16px; margin-bottom:12px;}
+  #propCheck .q-emoji, #copyCheck .q-emoji{width:64px; height:64px; font-size:42px; line-height:64px; background:var(--accent-soft); border-radius:var(--radius-m);}
+
+  /* Ілюстровані картки «Факт / Думка» */
+  .duo{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:4px 0 18px;}
+  @media (max-width:600px){ .duo{grid-template-columns:1fr;} }
+  .duo-card{display:flex; gap:14px; align-items:center; background:var(--surface); border:2px solid var(--c); border-radius:var(--radius-m); padding:14px 16px;}
+  .duo-card svg{width:76px; height:76px; flex-shrink:0;}
+  .duo-card b{font-family:'Baloo 2',sans-serif; font-size:20px; color:var(--c); display:block; line-height:1.2;}
+  .duo-card p{margin:2px 0 0; font-size:14.5px;}
+  .duo-card .eg{display:block; font-size:13px; color:var(--ink-soft); margin-top:4px;}
+
+  /* Картки «Факт чи думка» з великими ілюстраціями */
+  #factPool, .fact-board .bucket-items{gap:10px;}
+  .fact-board .sort-pool{display:grid; grid-template-columns:repeat(2,1fr); grid-auto-rows:1fr; gap:10px; margin-top:16px;}
+  @media (max-width:620px){ .fact-board .sort-pool{grid-template-columns:1fr;} }
+  .fact-board .sort-chip{display:flex; align-items:center; gap:12px; font-size:14.5px; padding:8px 14px 8px 8px; max-width:none; text-align:left; background:var(--surface);}
+  .fact-board .chip-pic{width:48px; height:48px; flex-shrink:0; font-size:32px; line-height:48px; text-align:center; background:var(--accent-soft); border-radius:var(--radius-s);}
+  .fact-board .chip-pic img{width:100%; height:100%; object-fit:cover; border-radius:inherit; display:block;}
+  .fact-board .sort-chip.placed{font-size:13.5px;}
+  .fact-board .sort-chip.placed .chip-pic{background:#fff;}
+  .fact-board .bucket-title{font-size:19px;}
+  .fact-board .b-pic{display:block; margin:0 auto 2px;}
+  .fact-board .b-pic svg{width:56px; height:56px; display:block; margin:0 auto;}
+
+  /* Крок 4: мольберт, твори, правила */
+  .author-hero{display:flex; gap:22px; align-items:center; margin:4px 0 18px;}
+  .author-hero .easel{width:190px; height:auto; flex-shrink:0;}
+  .author-hero p{margin:0 0 10px;}
+  @media (max-width:600px){ .author-hero{flex-direction:column; align-items:stretch;} .author-hero .easel{width:170px; align-self:center;} }
+  .works{display:flex; flex-wrap:wrap; gap:6px;}
+  .works span{background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:4px 11px; font-size:14px; font-weight:700;}
+  .rules{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:4px 0 16px;}
+  @media (max-width:600px){ .rules{grid-template-columns:1fr;} }
+  .rule{display:flex; gap:14px; align-items:center; background:var(--surface); border:2px solid var(--c); border-radius:var(--radius-m); padding:14px 16px;}
+  .rule svg{width:76px; height:76px; flex-shrink:0;}
+  .rule b{font-family:'Baloo 2',sans-serif; font-size:17px; line-height:1.2; color:var(--c); display:block;}
+  .rule p{margin:3px 0 0; font-size:14.5px;}
+
+  /* Галерея властивостей */
+  .flip-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  @media (max-width:620px){ .flip-grid{grid-template-columns:1fr 1fr;} .flip-grid .flip-card{height:190px;} }
+  .flip-front .art{width:84px; height:84px; display:block;}
+  .flip-front .name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; margin-top:8px; line-height:1.2;}
+  .flip-front .tap{font-size:12.5px; color:var(--ink-soft); margin-top:4px;}
+  .flip-back{font-size:14px; line-height:1.4;}
+  .flip-back b{font-family:'Baloo 2',sans-serif; color:var(--accent-dark); font-size:16px; display:block; margin-bottom:4px;}
+  .flip-back .ex{display:block; margin-top:6px; font-size:13px; color:var(--ink-soft);}
+
+  /* Ілюстрація справи в «Слідчому» */
+  .det-post{display:flex; gap:14px; align-items:center;}
+  .det-post .pic-e{font-size:44px; line-height:1; flex-shrink:0; width:64px; height:64px; display:flex; align-items:center; justify-content:center; background:var(--accent-soft); border-radius:var(--radius-m);}
+
+  /* Слідчий фейків */
+  .det{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); overflow:hidden;}
+  .det-top{display:flex; align-items:center; justify-content:space-between; gap:10px; background:var(--accent); color:#fff; padding:10px 16px;}
+  .det-top b{font-family:'Baloo 2',sans-serif; font-size:17px;}
+  .det-dots{display:flex; gap:6px;}
+  .det-dots i{width:12px; height:12px; border-radius:50%; background:rgba(255,255,255,.35);}
+  .det-dots i.on{background:#FFC93C;}
+  .det-dots i.cur{box-shadow:0 0 0 2px #fff;}
+  .det-body{padding:16px;}
+  .det-case{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--label); text-transform:uppercase; letter-spacing:.03em; margin-bottom:6px;}
+  .det-post{background:#fff; border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; font-size:15.5px; line-height:1.45;}
+  .det-post .who{font-size:12.5px; color:var(--ink-soft); margin-bottom:4px;}
+  .det-clues{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:12px 0 4px;}
+  @media (max-width:620px){ .det-clues{grid-template-columns:1fr;} }
+  .det-clue{font:inherit; text-align:left; color:var(--ink); background:var(--bg); border:2px dashed var(--line); border-radius:var(--radius-s); padding:8px 12px; font-size:14px; line-height:1.4; cursor:pointer; min-height:62px; transition:border-color .15s ease, background .15s ease;}
+  .det-clue:hover{border-color:var(--accent);}
+  .det-clue .v{display:block; color:var(--ink-soft); font-size:13px;}
+  .det-clue.open{background:var(--accent-soft); border:2px solid transparent; cursor:default;}
+  .det-clue.open .v{color:var(--ink); font-size:14px; animation:clueIn .3s ease both;}
+  .det-clue .k{display:block; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14.5px; color:var(--accent-dark);}
+  @keyframes clueIn{from{opacity:0; transform:translateY(-4px);} to{opacity:1; transform:none;}}
+  .det-verdict{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; align-items:center;}
+  .det-verdict .lbl{font-size:14px; color:var(--ink-soft);}
+  .det-btn{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; border:2px solid var(--line); background:#fff; border-radius:999px; padding:7px 20px; cursor:pointer; color:var(--ink);}
+  .det-btn:hover:not(:disabled){border-color:var(--accent);}
+  .det-btn:disabled{opacity:.45; cursor:not-allowed;}
+  .det-btn.correct{background:var(--ok-soft); border-color:var(--ok); color:#256B36;}
+  .det-btn.wrong{background:#FDE6E1; border-color:var(--coral); color:#B8412A;}
+  .det-fb{margin-top:10px; font-size:14.5px; color:var(--ink-soft); min-height:1.3em;}
+  .det-next{margin-top:12px;}
+</style>
+</head>
+<body data-lesson="lesson5-info-reliability" data-hud="5 клас · Достовірність інформації">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Інтернет та інформаційні процеси</div>
+      <h1>Правда чи фейк?</h1>
+      <p>Різні сайти часто розповідають про те саме по-різному. Навчись порівнювати джерела, перевіряти інформацію й не потрапляти на гачок фейків.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 160 160" fill="none">
+      <circle cx="80" cy="80" r="64" fill="#E3F3EC"/>
+      <rect x="30" y="34" width="78" height="96" rx="8" fill="#fff" stroke="#1F7A5C" stroke-width="4"/>
+      <rect x="40" y="46" width="58" height="10" rx="3" fill="#1F7A5C"/>
+      <rect x="40" y="64" width="26" height="22" rx="3" fill="#BFE3D3"/>
+      <rect x="72" y="65" width="26" height="5" rx="2.5" fill="#C9D6CF"/>
+      <rect x="72" y="75" width="22" height="5" rx="2.5" fill="#C9D6CF"/>
+      <rect x="40" y="94" width="58" height="5" rx="2.5" fill="#C9D6CF"/>
+      <rect x="40" y="104" width="50" height="5" rx="2.5" fill="#C9D6CF"/>
+      <rect x="40" y="114" width="40" height="5" rx="2.5" fill="#C9D6CF"/>
+      <rect x="112" y="112" width="16" height="40" rx="7" transform="rotate(-45 120 132)" fill="#D9480F"/>
+      <circle cx="104" cy="96" r="27" fill="#fff" fill-opacity=".85" stroke="#155A43" stroke-width="8"/>
+      <circle cx="95" cy="93" r="7" fill="#fff" stroke="#1B1B3A" stroke-width="2.5"/>
+      <circle cx="113" cy="93" r="7" fill="#fff" stroke="#1B1B3A" stroke-width="2.5"/>
+      <circle cx="97" cy="94" r="3.2" fill="#1B1B3A"/><circle cx="115" cy="94" r="3.2" fill="#1B1B3A"/>
+      <path d="M97 106 Q104 102 111 106" stroke="#1B1B3A" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="136" cy="38" r="7" fill="#FFC93C"/><circle cx="22" cy="118" r="5" fill="#1F7A5C"/><circle cx="142" cy="74" r="4" fill="#D9480F"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Пошук інформації в Інтернеті</div>
+    <h2>Що ти вже знаєш про пошук</h2>
+    <p>Минулого уроку ти вчився шукати інформацію. Сьогодні — як зрозуміти, чи можна їй вірити. Спершу пригадай головне.</p>
+    <p class="soft">Обери поняття, а потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Властивості інформації</div>
+    <h2>Якою буває інформація</h2>
+    <p>Щоб інформація допомогла, вона має бути «якісною». Переверни кожну картку й дізнайся, що означає кожна властивість.</p>
+    <div class="exercise">
+      <div class="flip-grid" id="propGrid"></div>
+    </div>
+    <p class="soft" style="margin-top:22px;">Якої властивості бракує інформації в кожній ситуації?</p>
+    <div id="propCheck"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Факт, думка чи фейк</div>
+    <h2>Чому можна вірити?</h2>
+    <div class="duo">
+      <div class="duo-card" style="--c:#1F7A5C">
+        <svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="38" fill="#E3F3EC"/><rect x="12" y="48" width="56" height="14" rx="3" fill="#FFC93C" stroke="#E0A800" stroke-width="2"/><path d="M20 48v6M28 48v4M36 48v6M44 48v4M52 48v6M60 48v4" stroke="#8A6A00" stroke-width="2" stroke-linecap="round"/><rect x="45" y="10" width="10" height="30" rx="5" fill="#fff" stroke="#1B1B3A" stroke-width="2.5"/><rect x="48" y="20" width="4" height="16" rx="2" fill="#D9480F"/><circle cx="50" cy="38" r="7" fill="#D9480F" stroke="#1B1B3A" stroke-width="2.5"/><rect x="16" y="16" width="22" height="28" rx="3" fill="#1F7A5C"/><rect x="19" y="16" width="3" height="28" fill="#155A43"/><rect x="25" y="22" width="10" height="3" rx="1.5" fill="#fff"/></svg>
+        <div><b>Факт</b><p>Можна перевірити: виміряти, порахувати, знайти в енциклопедії.</p><span class="eg">«Вода кипить за 100 °C»</span></div>
+      </div>
+      <div class="duo-card" style="--c:#7A5AC8">
+        <svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="38" fill="#EFEAFB"/><path d="M22 46a12 12 0 0 1 2-23 15 15 0 0 1 28-4 12 12 0 0 1 12 19 10 10 0 0 1-12 10H26a6 6 0 0 1-4-2z" fill="#fff" stroke="#7A5AC8" stroke-width="3"/><circle cx="22" cy="58" r="4.5" fill="#fff" stroke="#7A5AC8" stroke-width="2.5"/><circle cx="15" cy="68" r="3" fill="#fff" stroke="#7A5AC8" stroke-width="2"/><path d="M34 31c-3-4-9-1-7 4 1 3 7 7 7 7s6-4 7-7c2-5-4-8-7-4z" fill="#FF6B8A"/><path d="M52 26l1.8 3.8 4.2.6-3 2.9.7 4.2-3.7-2-3.7 2 .7-4.2-3-2.9 4.2-.6z" fill="#FFC93C"/></svg>
+        <div><b>Думка</b><p>Те, що людина відчуває чи вважає. Інший може думати інакше.</p><span class="eg">«Гаряче какао — найсмачніше»</span></div>
+      </div>
+    </div>
+    <p><b>Фейк</b> — неправдива інформація, яку <b>навмисно</b> видають за правду: щоб налякати, обдурити, виманити гроші чи зібрати перегляди. Фейк прикидається фактом, але його видають ознаки:</p>
+    <ul>
+      <li>крик великими літерами й багато «!!!»;</li>
+      <li>невідомо, хто автор: «якісь учені», «один знайомий»;</li>
+      <li>неймовірна обіцянка чи страшилка;</li>
+      <li>поспіх: «перешли всім, поки не видалили!».</li>
+    </ul>
+    <div class="note">💡 Не кожна неправда — фейк. Якщо людина помилилась ненавмисно — це помилка. Фейк вигадують <b>свідомо</b>.</div>
+    <p class="soft">Клацни картку, а потім кошик.</p>
+    <div class="exercise fact-board">
+      <div class="sort-buckets three">
+        <div class="bucket" id="bkFact"><div class="bucket-title"><span class="b-pic"><svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="38" fill="#E3F3EC"/><rect x="12" y="48" width="56" height="14" rx="3" fill="#FFC93C" stroke="#E0A800" stroke-width="2"/><path d="M20 48v6M28 48v4M36 48v6M44 48v4M52 48v6M60 48v4" stroke="#8A6A00" stroke-width="2" stroke-linecap="round"/><rect x="45" y="10" width="10" height="30" rx="5" fill="#fff" stroke="#1B1B3A" stroke-width="2.5"/><rect x="48" y="20" width="4" height="16" rx="2" fill="#D9480F"/><circle cx="50" cy="38" r="7" fill="#D9480F" stroke="#1B1B3A" stroke-width="2.5"/><rect x="16" y="16" width="22" height="28" rx="3" fill="#1F7A5C"/><rect x="19" y="16" width="3" height="28" fill="#155A43"/><rect x="25" y="22" width="10" height="3" rx="1.5" fill="#fff"/></svg></span>Факт</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkOpinion"><div class="bucket-title"><span class="b-pic"><svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="38" fill="#EFEAFB"/><path d="M22 46a12 12 0 0 1 2-23 15 15 0 0 1 28-4 12 12 0 0 1 12 19 10 10 0 0 1-12 10H26a6 6 0 0 1-4-2z" fill="#fff" stroke="#7A5AC8" stroke-width="3"/><circle cx="22" cy="58" r="4.5" fill="#fff" stroke="#7A5AC8" stroke-width="2.5"/><circle cx="15" cy="68" r="3" fill="#fff" stroke="#7A5AC8" stroke-width="2"/><path d="M34 31c-3-4-9-1-7 4 1 3 7 7 7 7s6-4 7-7c2-5-4-8-7-4z" fill="#FF6B8A"/><path d="M52 26l1.8 3.8 4.2.6-3 2.9.7 4.2-3.7-2-3.7 2 .7-4.2-3-2.9 4.2-.6z" fill="#FFC93C"/></svg></span>Думка</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkFake"><div class="bucket-title"><span class="b-pic"><svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="38" fill="#FDE6E1"/><rect x="18" y="12" width="40" height="52" rx="5" fill="#fff" stroke="#B8412A" stroke-width="3"/><rect x="25" y="21" width="26" height="4" rx="2" fill="#B8412A"/><rect x="25" y="30" width="22" height="3.5" rx="1.75" fill="#E8C3B9"/><rect x="25" y="37" width="26" height="3.5" rx="1.75" fill="#E8C3B9"/><rect x="25" y="44" width="16" height="3.5" rx="1.75" fill="#E8C3B9"/><circle cx="56" cy="56" r="14" fill="#FF6B4A" stroke="#fff" stroke-width="3"/><path d="M50.5 50.5l11 11M61.5 50.5l-11 11" stroke="#fff" stroke-width="4" stroke-linecap="round"/></svg></span>Фейк</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="factPool"></div>
+      <div class="progress-line" id="factProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Слідчий фейків</div>
+    <h2>Розслідуй вісім справ</h2>
+    <p>Прочитай повідомлення, клацни перевірки, які допоможуть, а тоді виріши: правда це чи фейк.</p>
+    <div class="exercise" style="padding:0; border:none; background:none;">
+      <div class="det" id="det">
+        <div class="det-top"><b>🔎 Слідчий фейків</b><div class="det-dots" id="detDots"></div></div>
+        <div class="det-body">
+          <div class="det-case" id="detCase"></div>
+          <div class="det-post" id="detPost"></div>
+          <div class="det-clues" id="detClues"></div>
+          <div class="det-verdict">
+            <span class="lbl">Твій висновок:</span>
+            <button class="det-btn" id="detTrue">✅ Правда</button>
+            <button class="det-btn" id="detFake">🚫 Фейк</button>
+          </div>
+          <div class="det-fb" id="detFb"></div>
+          <div class="det-next" id="detNext"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Авторське право</div>
+    <h2>Хто створив — той і автор</h2>
+    <div class="author-hero">
+      <svg class="easel" viewBox="0 0 170 160" fill="none">
+        <circle cx="85" cy="82" r="74" fill="#E3F3EC"/>
+        <path d="M58 132l-14 24M112 132l14 24M85 132v24" stroke="#8B5A2B" stroke-width="5" stroke-linecap="round"/>
+        <rect x="30" y="126" width="110" height="8" rx="4" fill="#A86B34"/>
+        <rect x="36" y="30" width="98" height="96" rx="4" fill="#fff" stroke="#8B5A2B" stroke-width="5"/>
+        <rect x="42" y="36" width="86" height="84" fill="#DDEFFC"/>
+        <circle cx="106" cy="56" r="10" fill="#FFC93C"/>
+        <path d="M42 98q20-24 40-6t46-8v36H42z" fill="#5DBB7A"/>
+        <path d="M42 106q26-16 52 0t34-4v18H42z" fill="#1F7A5C"/>
+        <path d="M58 84h16v14H58z" fill="#fff"/><path d="M55 85l11-10 11 10z" fill="#D9480F"/>
+        <text x="122" y="116" text-anchor="end" font-family="Baloo 2, sans-serif" font-weight="700" font-size="11" fill="#1B1B3A" font-style="italic">Оля</text>
+        <circle cx="134" cy="32" r="16" fill="#D9480F" stroke="#fff" stroke-width="3"/>
+        <text x="134" y="39" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="20" fill="#fff">©</text>
+        <ellipse cx="30" cy="132" rx="20" ry="13" fill="#F3D9B1" stroke="#A86B34" stroke-width="2.5"/>
+        <circle cx="22" cy="129" r="3.5" fill="#D9480F"/><circle cx="31" cy="126" r="3.5" fill="#3B7DD8"/><circle cx="39" cy="131" r="3.5" fill="#FFC93C"/><circle cx="27" cy="137" r="3.5" fill="#1F7A5C"/>
+      </svg>
+      <div>
+        <p>Малюнок, фото, вірш, пісня, відео, гра — усе, що людина створила сама, — це <b>твір</b>. А вона — його <b>автор</b>.</p>
+        <p><b>Авторське право</b> — права автора на твір: лише він вирішує, хто й як може ним користуватися.</p>
+        <div class="works"><span>🎨 малюнок</span><span>📷 фото</span><span>📜 вірш</span><span>🎵 пісня</span><span>🎬 відео</span><span>🎮 гра</span></div>
+      </div>
+    </div>
+    <p>Чотири правила, щоб не порушити чужі права:</p>
+    <div class="rules">
+      <div class="rule" style="--c:#D9480F">
+        <svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="38" fill="#FDECE3"/><rect x="14" y="14" width="40" height="32" rx="3" fill="#fff" stroke="#8B5A2B" stroke-width="3"/><rect x="18" y="18" width="32" height="24" fill="#DDEFFC"/><path d="M18 36q8-8 16-2t16-3v11H18z" fill="#5DBB7A"/><circle cx="42" cy="25" r="4" fill="#FFC93C"/><rect x="28" y="50" width="38" height="16" rx="5" fill="#fff" stroke="#1B1B3A" stroke-width="2.5"/><text x="47" y="62" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="11" fill="#1B1B3A">МОЄ</text><path d="M26 70l42-24" stroke="#D9480F" stroke-width="4.5" stroke-linecap="round"/></svg>
+        <div><b>Чуже не видавай за своє</b><p>Скопіювати чужий малюнок чи текст і підписати своїм ім'ям не можна.</p></div>
+      </div>
+      <div class="rule" style="--c:#C28F00">
+        <svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="38" fill="#FFF6D9"/><g stroke="#E0A800" stroke-width="3" stroke-linecap="round"><path d="M36 8v6M14 18l4 4M58 18l-4 4"/></g><circle cx="36" cy="36" r="15" fill="#FFC93C" stroke="#E0A800" stroke-width="2.5"/><rect x="29" y="48" width="14" height="6" rx="2" fill="#FFC93C" stroke="#E0A800" stroke-width="2.5"/><rect x="29" y="55" width="14" height="5" rx="2" fill="#8A8FA3"/><path d="M30 38l3-4 3 4 3-4 3 4" stroke="#D9480F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="58" cy="56" r="13" fill="#3FAE58" stroke="#fff" stroke-width="3"/><path d="M52 56l4.5 4.5 8-9" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div><b>Ідеї й факти — для всіх</b><p>Намалювати свого дракона може кожен. А от перемалювати чужого й назвати своїм — ні.</p></div>
+      </div>
+      <div class="rule" style="--c:#3B7DD8">
+        <svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="38" fill="#E8F0FB"/><rect x="10" y="14" width="56" height="34" rx="10" fill="#3B7DD8"/><path d="M22 47l-4 12 14-12z" fill="#3B7DD8"/><text x="38" y="44" text-anchor="middle" font-family="Georgia, serif" font-weight="700" font-size="36" fill="#fff">“ ”</text><rect x="32" y="53" width="40" height="16" rx="8" fill="#fff" stroke="#3B7DD8" stroke-width="2.5"/><text x="52" y="64.5" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="11" fill="#1B1B3A">Автор</text></svg>
+        <div><b>Цитуєш — вкажи автора</b><p>Кілька рядків з чужого твору в доповідь узяти можна, але з ім'ям автора.</p></div>
+      </div>
+      <div class="rule" style="--c:#1F7A5C">
+        <svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="38" fill="#E3F3EC"/><rect x="12" y="18" width="46" height="36" rx="4" fill="#fff" stroke="#1F7A5C" stroke-width="3"/><rect x="16" y="22" width="38" height="28" fill="#DDEFFC"/><path d="M16 44l10-11 8 8 6-5 14 12v2H16z" fill="#1F7A5C"/><circle cx="44" cy="30" r="4" fill="#FFC93C"/><circle cx="56" cy="56" r="14" fill="#fff" stroke="#1F7A5C" stroke-width="3"/><text x="56" y="61" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="13" fill="#1F7A5C">CC</text></svg>
+        <div><b>Автор дозволив — підпиши</b><p>На Вікісховищі автори самі дозволяють брати їхні фото. Треба лише вказати, чиє воно.</p></div>
+      </div>
+    </div>
+    <div class="note">💡 В Україні авторів захищає закон «Про авторське право і суміжні права». Значок <b>CC</b> (Creative Commons) означає, що автор дозволив користуватися твором на певних умовах.</div>
+    <p class="soft">Чи можна так робити?</p>
+    <div id="copyCheck"></div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Порівняння інформації з різних сайтів. Властивості інформації. Авторське право. Достовірність інформації. Поняття фейку» · 5 клас
+  <span class="credits">Фото Великої лаврської дзвіниці — Wavemeart, Вікісховище, ліцензія CC BY-SA 4.0.</span>
+</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Пошукова система', desc:'<span class="d-pic">🔎</span>Сайт, який допомагає швидко знайти потрібне в Інтернеті' },
+  { name:'Ключове слово', desc:'<span class="d-pic">🎯</span>Слово, що найточніше описує те, що ти шукаєш' },
+  { name:'Запит', desc:'<span class="d-pic">⌨️</span>Набір слів, які вводять у поле пошуку' },
+  { name:'Пошуковий робот', desc:'<span class="d-pic">🤖</span>Програма, що заздалегідь обходить сайти й збирає їхній вміст' },
+  { name:'Лапки "…"', desc:'<span class="d-pic">💬</span>Знайти фразу точно так, як її написано' },
+  { name:'Мінус -слово', desc:'<span class="d-pic">🚫</span>Прибрати сторінки, де є це слово' },
+  { name:'Індексатор', desc:'<span class="d-pic">🗂️</span>Впорядковує зібране, як покажчик у кінці книжки, щоб пошук тривав пів секунди' },
+  { name:'Браузер', desc:'<span class="d-pic">🖥️</span>Програма, якою відкривають сайти: Chrome, Firefox, Edge' }
+], 'recapProgress');
+
+/* ---------- КРОК 1: ГАЛЕРЕЯ ВЛАСТИВОСТЕЙ ---------- */
+(function(){
+  const cards = [
+    { c:'#1F7A5C', light:'#E3F3EC', name:'Достовірна', back:'<b>Достовірна</b>Відповідає дійсності, правдива.<span class="ex">Кит — ссавець, а не риба.</span>',
+      art:'<circle cx="40" cy="40" r="38" fill="#E3F3EC"/><rect x="17" y="12" width="38" height="50" rx="5" fill="#fff" stroke="#1F7A5C" stroke-width="3"/><rect x="24" y="21" width="24" height="4" rx="2" fill="#1F7A5C"/><rect x="24" y="30" width="20" height="3.5" rx="1.75" fill="#BFD6CC"/><rect x="24" y="37" width="24" height="3.5" rx="1.75" fill="#BFD6CC"/><rect x="24" y="44" width="14" height="3.5" rx="1.75" fill="#BFD6CC"/><circle cx="55" cy="55" r="14" fill="#3FAE58" stroke="#fff" stroke-width="3"/><path d="M48 55l5 5 9-10" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>' },
+    { c:'#3B7DD8', light:'#E8F0FB', name:'Повна', back:'<b>Повна</b>Містить усе, що потрібно, щоб зрозуміти й діяти.<span class="ex">Є і день, і час, і місце зустрічі.</span>',
+      art:'<circle cx="40" cy="40" r="38" fill="#E8F0FB"/><rect x="16" y="16" width="24" height="24" rx="4" fill="#3B7DD8"/><rect x="40" y="16" width="24" height="24" rx="4" fill="#FFC93C"/><rect x="40" y="40" width="24" height="24" rx="4" fill="#1F7A5C"/><rect x="16" y="40" width="24" height="24" rx="4" fill="#D9480F"/><circle cx="40" cy="28" r="5" fill="#3B7DD8"/><circle cx="52" cy="40" r="5" fill="#FFC93C"/><circle cx="40" cy="52" r="5" fill="#1F7A5C"/><circle cx="28" cy="40" r="5" fill="#D9480F"/><path d="M66 10l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#FFC93C"/>' },
+    { c:'#D9480F', light:'#FDECE3', name:'Актуальна', back:'<b>Актуальна</b>Потрібна саме зараз, не застаріла.<span class="ex">Прогноз погоди на сьогодні, а не на минулий тиждень.</span>',
+      art:'<circle cx="40" cy="40" r="38" fill="#FDECE3"/><rect x="12" y="18" width="46" height="44" rx="6" fill="#fff" stroke="#D9480F" stroke-width="3"/><path d="M12 24a6 6 0 0 1 6-6h34a6 6 0 0 1 6 6v6H12z" fill="#D9480F"/><rect x="21" y="12" width="4" height="11" rx="2" fill="#1B1B3A"/><rect x="45" y="12" width="4" height="11" rx="2" fill="#1B1B3A"/><g fill="#E7C9BA"><circle cx="21" cy="38" r="2.5"/><circle cx="30" cy="38" r="2.5"/><circle cx="39" cy="38" r="2.5"/><circle cx="48" cy="38" r="2.5"/><circle cx="21" cy="47" r="2.5"/><circle cx="39" cy="47" r="2.5"/><circle cx="21" cy="55" r="2.5"/></g><circle cx="30" cy="47" r="5.5" fill="none" stroke="#D9480F" stroke-width="2.5"/><circle cx="57" cy="57" r="14" fill="#FFC93C" stroke="#fff" stroke-width="3"/><path d="M57 49v8l5 4" stroke="#1B1B3A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>' },
+    { c:'#7A5AC8', light:'#EFEAFB', name:'Об\'єктивна', back:'<b>Об\'єктивна</b>Не залежить від чиїхось уподобань.<span class="ex">«Матч завершився 2:1», а не «наші грали найкраще».</span>',
+      art:'<circle cx="40" cy="40" r="38" fill="#EFEAFB"/><rect x="38" y="20" width="4" height="40" rx="2" fill="#7A5AC8"/><rect x="26" y="59" width="28" height="6" rx="3" fill="#7A5AC8"/><rect x="13" y="22" width="54" height="4" rx="2" fill="#7A5AC8"/><circle cx="40" cy="20" r="5" fill="#FFC93C" stroke="#7A5AC8" stroke-width="2"/><path d="M19 26l-7 18M19 26l7 18M61 26l-7 18M61 26l7 18" stroke="#1B1B3A" stroke-width="1.6"/><path d="M9 44h20a10 10 0 0 1-20 0zM51 44h20a10 10 0 0 1-20 0z" fill="#B9A6EA" stroke="#7A5AC8" stroke-width="2"/>' },
+    { c:'#E0A800', light:'#FFF6D9', name:'Корисна', back:'<b>Корисна</b>Допомагає розв\'язати твою задачу.<span class="ex">Розклад автобусів, коли їдеш на екскурсію.</span>',
+      art:'<circle cx="40" cy="40" r="38" fill="#FFF6D9"/><g stroke="#E0A800" stroke-width="3" stroke-linecap="round"><path d="M40 6v6M14 18l4 4M66 18l-4 4M8 36h6M66 36h6"/></g><circle cx="40" cy="35" r="17" fill="#FFC93C" stroke="#E0A800" stroke-width="2.5"/><rect x="32" y="48" width="16" height="7" rx="2" fill="#FFC93C" stroke="#E0A800" stroke-width="2.5"/><rect x="32" y="56" width="16" height="5" rx="2" fill="#8A8FA3"/><rect x="35" y="62" width="10" height="5" rx="2.5" fill="#5D6275"/><path d="M33 38l3.5-5 3.5 5 3.5-5 3.5 5" stroke="#D9480F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M31 28a10 10 0 0 1 6-5" stroke="#fff" stroke-width="3" stroke-linecap="round"/>' },
+    { c:'#0E8AA0', light:'#E2F3F6', name:'Зрозуміла', back:'<b>Зрозуміла</b>Записана мовою та словами, які ти знаєш.<span class="ex">Інструкція українською, а не незнайомою мовою.</span>',
+      art:'<circle cx="40" cy="40" r="38" fill="#E2F3F6"/><rect x="10" y="14" width="52" height="38" rx="11" fill="#0E8AA0"/><path d="M22 51l-5 13 16-13z" fill="#0E8AA0"/><text x="36" y="42" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="24" fill="#fff">Аа</text><circle cx="62" cy="56" r="11" fill="#FFC93C" stroke="#fff" stroke-width="3"/><circle cx="58.5" cy="54" r="1.6" fill="#1B1B3A"/><circle cx="65.5" cy="54" r="1.6" fill="#1B1B3A"/><path d="M57.5 59a5 5 0 0 0 9 0" stroke="#1B1B3A" stroke-width="1.8" stroke-linecap="round" fill="none"/>' }
+  ];
+  const grid = document.getElementById('propGrid');
+  const hit = trackTask(grid, cards.length, 0);
+  cards.forEach(c=>{
+    const el = document.createElement('div');
+    el.className = 'flip-card';
+    el.style.setProperty('--card-c', c.c);
+    el.style.setProperty('--card-c-light', c.light);
+    el.innerHTML = `<div class="flip-inner"><div class="flip-face flip-front"><svg class="art" viewBox="0 0 80 80" fill="none">${c.art}</svg><div class="name">${c.name}</div><div class="tap">клацни, щоб перевернути</div></div><div class="flip-face flip-back">${c.back}</div></div>`;
+    let seen = false;
+    el.addEventListener('click', ()=>{
+      el.classList.toggle('flipped');
+      if(!seen){ seen = true; hit(); }
+    });
+    grid.appendChild(el);
+  });
+})();
+
+makeClassify('propCheck', [
+  { logo:'🏕️', text:'У листопаді Оля читає на сайті школи оголошення про літній табір, який був у червні.', correct:2, why:'Подія вже минула — для Олі ця інформація застаріла.' },
+  { logo:'🚌', text:'Класна керівниця написала: «Завтра їдемо на екскурсію». Куди й о котрій збір — ані слова.', correct:1, why:'Бракує важливих подробиць, без них не зрозуміло, що робити.' },
+  { logo:'⚽', text:'Уболівальник пише: «Наша команда — найкраща у світі, а суперники взагалі не вміють грати».', correct:3, why:'Це враження прихильника, а не спокійний опис гри.' },
+  { logo:'⚡', text:'На сайті з «цікавими фактами» написано, що блискавка ніколи не влучає двічі в одне місце.', correct:0, why:'Насправді блискавка часто влучає в ті самі високі будівлі, наприклад у вежі й хмарочоси.' },
+  { logo:'🧱', text:'Тато дав Максимові інструкцію до конструктора китайською мовою.', correct:5, why:'Максим не знає китайської, тож прочитати інструкцію не зможе.' },
+  { logo:'🥞', text:'Ти шукаєш, як дійти до стадіону, а друг надсилає тобі рецепт млинців.', correct:4, why:'Рецепт може бути чудовим, але зараз він не допомагає.' }
+], ['Достовірність', 'Повнота', 'Актуальність', 'Об\'єктивність', 'Корисність', 'Зрозумілість']);
+
+/* ---------- КРОК 2 ---------- */
+makeSortBoard('factPool', { fact:'bkFact', opinion:'bkOpinion', fake:'bkFake' }, [
+  { text:'🇺🇦 Київ — столиця України', bucket:'fact' },
+  { text:'🗓️ У тижні сім днів', bucket:'fact' },
+  { text:'🧊 Вода замерзає за 0 °C', bucket:'fact' },
+  { text:'🌍 Земля обертається навколо Сонця', bucket:'fact' },
+  { text:'kyiv.jpg Київ — найгарніше місто у світі', bucket:'opinion' },
+  { text:'🧮 Математика — найцікавіший предмет', bucket:'opinion' },
+  { text:'😻 Котики миліші за собак', bucket:'opinion' },
+  { text:'🍿 Цей мультфільм — найкращий цього року', bucket:'opinion' },
+  { text:'🦘 Учені довели: стрибай щодня — виростеш на 20 см за місяць!!!', bucket:'fake' },
+  { text:'📱 Перешли це 10 друзям — і отримаєш телефон у подарунок!', bucket:'fake' },
+  { text:'🦈 ТЕРМІНОВО!!! У Дніпрі біля пляжу бачили акулу!!!', bucket:'fake' },
+  { text:'🎮 Опівночі всі ігри на телефонах зникнуть! Поширюй!!!', bucket:'fake' }
+], 'factProgress');
+/* велика ілюстрація на картці: перше «слово» тексту — емодзі або фото з images/ */
+document.querySelectorAll('#factPool .sort-chip').forEach(ch=>{
+  const [pic, ...rest] = ch.textContent.split(' ');
+  const img = pic.endsWith('.jpg') ? `<img src="images/${pic}" alt="">` : pic;
+  ch.innerHTML = `<span class="chip-pic">${img}</span><span>${rest.join(' ')}</span>`;
+});
+
+/* ---------- КРОК 3: СЛІДЧИЙ ФЕЙКІВ ---------- */
+(function(){
+  const TOOLS = [
+    { key:'site', label:'🌐 Сайт' },
+    { key:'author', label:'👤 Автор' },
+    { key:'date', label:'📅 Дата' },
+    { key:'others', label:'📰 Інші джерела' }
+  ];
+  const CASES = [
+    { pic:'📚', who:'Повідомлення на сайті міської ради',
+      text:'«З 1 листопада в нашому районі відкривається нова бібліотека з комп\'ютерним класом. Запис — безкоштовний».',
+      site:'Адреса закінчується на <b>.gov.ua</b> — це державний сайт.',
+      author:'Прес-служба міської ради, указано телефон для довідок.',
+      date:'Опубліковано вчора.',
+      others:'Про відкриття пишуть місцеві новини й сайт самої бібліотеки.',
+      fake:false, why:'Офіційний сайт, відомий автор, свіжа дата, і про подію пишуть інші джерела.' },
+    { pic:'🎧', who:'Реклама в соцмережі',
+      text:'«Чарівні навушники — вивчиш англійську уві сні за 3 ночі! Залишилось лише 2 штуки!»',
+      site:'<b>magic-shop-best.xyz</b> — невідомий інтернет-магазин.',
+      author:'Не вказано.',
+      date:'Немає. Та сама реклама «з останніми 2 штуками» висить уже кілька місяців.',
+      others:'Жоден освітній сайт не пише, що мову можна вивчити уві сні.',
+      fake:true, why:'Неможлива обіцянка, поспіх «залишилось 2 штуки», невідомий продавець — класична пастка, щоб виманити гроші.' },
+    { pic:'🦕', who:'Допис, який переслали 10 000 разів',
+      text:'«Сенсація! У Чорному морі рибалки зловили живого динозавра!» І розмите фото чогось темного у воді.',
+      site:'Соцмережа, допис переслано з невідомого каналу.',
+      author:'Акаунт «Новини_100%», створений тиждень тому.',
+      date:'Невідомо, коли й де зроблено фото.',
+      others:'Науковці й музеї природи про таку знахідку нічого не повідомляють.',
+      fake:true, why:'Сенсація без жодного підтвердження, новий анонімний акаунт і фото, на якому нічого не видно.' },
+    { pic:'🍂', who:'Стаття на освітньому сайті',
+      text:'«Восени листя жовтіє, бо в ньому руйнується зелена речовина хлорофіл, і стають помітні жовті барвники».',
+      site:'Адреса закінчується на <b>.edu.ua</b> — освітній сайт.',
+      author:'Вчителька біології, указано ім\'я та школу.',
+      date:'Два роки тому. Але цей факт з часом не змінюється.',
+      others:'Те саме пояснення є в підручнику природознавства й в енциклопедії.',
+      fake:false, why:'Відомий автор, освітній сайт, і пояснення підтверджують інші надійні джерела. Дата тут не важлива.' },
+    { pic:'🪙', who:'Повідомлення в чаті гри',
+      text:'«Роздаємо 10 000 монет кожному гравцю! Просто введи свій логін і пароль від гри на нашому сайті!»',
+      site:'<b>free-coins-game.xyz</b> — не офіційний сайт гри.',
+      author:'Невідомий гравець, профіль створено сьогодні.',
+      date:'Сьогодні. «Акція діє лише годину!»',
+      others:'Офіційний сайт гри попереджає: ніколи не вводь пароль на чужих сайтах.',
+      fake:true, why:'Безкоштовні подарунки за пароль — пастка, щоб украсти твій акаунт. Пароль не повідомляють нікому.' },
+    { pic:'🌠', who:'Новина на сайті обсерваторії',
+      text:'«У ніч на 14 грудня — зорепад Гемініди. За годину можна побачити кілька десятків «падаючих зірок»».',
+      site:'Адреса закінчується на <b>.edu.ua</b> — сайт університетської обсерваторії.',
+      author:'Астроном, указано ім\'я та посаду.',
+      date:'Тиждень тому — якраз перед подією.',
+      others:'Про зорепад пишуть енциклопедія й наукові новини: він буває щороку в грудні.',
+      fake:false, why:'Науковий сайт, автор-фахівець, і інші надійні джерела підтверджують: Гемініди справді щороку в грудні.' },
+    { pic:'🐧', who:'Відео в соцмережі',
+      text:'«У міському зоопарку пінгвіни навчилися літати! Дивись відео!»',
+      site:'Відеосервіс, канал «Смішні_тварини».',
+      author:'Автор каналу робить кумедні відео з ефектами.',
+      date:'Опубліковано 1 квітня.',
+      others:'Зоопарк нічого такого не повідомляв. Учені пояснюють: пінгвіни не літають, зате чудово плавають.',
+      fake:true, why:'Ролик змонтовано з ефектами, а «новину» опубліковано на День сміху. Пінгвіни не літають.' },
+    { pic:'🏫', who:'Оголошення на сайті школи',
+      text:'«У п\'ятницю уроки скорочені до 35 хвилин — увечері батьківські збори».',
+      site:'Офіційний сайт школи.',
+      author:'Заступниця директора, указано ім\'я.',
+      date:'Опубліковано вчора.',
+      others:'Те саме написала класна керівниця в Google Classroom.',
+      fake:false, why:'Офіційний сайт, відомий автор, свіжа дата, і класна керівниця підтверджує.' }
+  ];
+  // порядок справ: правда й фейки впереміш
+  const ORDER = [0, 1, 7, 2, 5, 4, 3, 6];
+  const LIST = ORDER.map(i=>CASES[i]);
+  const det = document.getElementById('det');
+  const dots = document.getElementById('detDots');
+  const caseEl = document.getElementById('detCase');
+  const postEl = document.getElementById('detPost');
+  const cluesEl = document.getElementById('detClues');
+  const btnTrue = document.getElementById('detTrue');
+  const btnFake = document.getElementById('detFake');
+  const fb = document.getElementById('detFb');
+  const next = document.getElementById('detNext');
+  const hit = trackTask(det, LIST.length, LIST.length + 2);
+  let cur = 0, solved = false;
+
+  LIST.forEach(()=>dots.appendChild(document.createElement('i')));
+
+  function show(){
+    const c = LIST[cur];
+    solved = false;
+    [...dots.children].forEach((d, i)=>d.classList.toggle('cur', i === cur));
+    caseEl.textContent = `Справа ${cur + 1} з ${LIST.length}`;
+    postEl.innerHTML = `<span class="pic-e">${c.pic}</span><div><div class="who">${c.who}</div>${c.text}</div>`;
+    cluesEl.innerHTML = '';
+    TOOLS.forEach(t=>{
+      const b = document.createElement('button');
+      b.className = 'det-clue';
+      b.innerHTML = `<span class="k">${t.label}</span><span class="v">відкрий підказку</span>`;
+      b.addEventListener('click', ()=>{
+        if(b.classList.contains('open')) return;
+        b.classList.add('open');
+        b.querySelector('.v').innerHTML = c[t.key];
+      });
+      cluesEl.appendChild(b);
+    });
+    fb.textContent = ''; next.innerHTML = '';
+    [btnTrue, btnFake].forEach(b=>{ b.disabled = false; b.classList.remove('correct', 'wrong'); });
+  }
+
+  function decide(saysFake, btn){
+    if(solved) return;
+    const c = LIST[cur];
+    if(saysFake === c.fake){
+      solved = true;
+      btn.classList.add('correct');
+      (btn === btnTrue ? btnFake : btnTrue).disabled = true;
+      fb.textContent = 'Правильно ✓ ' + c.why;
+      dots.children[cur].classList.add('on');
+      addNeurons(1); hit();
+      if(cur < LIST.length - 1){
+        const n = document.createElement('button');
+        n.className = 'btn-primary';
+        n.textContent = 'Наступна справа →';
+        n.addEventListener('click', ()=>{ cur++; show(); det.scrollIntoView({block:'nearest', behavior:'smooth'}); });
+        next.appendChild(n);
+      } else {
+        addNeurons(2);
+        fb.textContent += ' Усі справи розкрито — ти справжній слідчий! 🕵️';
+      }
+    } else {
+      btn.classList.add('wrong');
+      setTimeout(()=>btn.classList.remove('wrong'), 700);
+      fb.textContent = 'Не поспішай. Відкрий ще перевірки й подивись уважніше.';
+    }
+  }
+
+  btnTrue.addEventListener('click', ()=>decide(false, btnTrue));
+  btnFake.addEventListener('click', ()=>decide(true, btnFake));
+  show();
+})();
+
+/* ---------- КРОК 4 ---------- */
+makeYesNo('copyCheck', [
+  { logo:'🖼️', text:'Скопіювати малюнок однокласниці з її сторінки й надіслати на конкурс від свого імені.', correct:false, why:'Малюнок належить однокласниці. Видавати чужий твір за свій не можна.' },
+  { logo:'📜', text:'Узяти у презентацію два рядки з вірша Лесі Українки й підписати її ім\'я.', correct:true, why:'Коротку цитату в навчальній роботі можна, якщо вказати автора.' },
+  { logo:'🦸', text:'Намалювати власний комікс про супергероя-кота, бо вже бачив комікси про супергероїв.', correct:true, why:'Ідея «супергерой» нікому не належить. Твій малюнок — твій твір.' },
+  { logo:'🏴‍☠️', text:'Завантажити платну гру безкоштовно з «піратського» сайту.', correct:false, why:'Програми теж захищені авторським правом. Це порушення, а ще такі файли часто містять віруси.' },
+  { logo:'📷', text:'Узяти фото з Вікісховища для доповіді й підписати, хто автор фото.', correct:true, why:'Автори фото на Вікісховищі дозволили ними користуватися, якщо вказати авторство.' },
+  { logo:'📝', text:'Переписати чужий твір з Інтернету слово в слово й здати як свій.', correct:false, why:'Це списування й порушення прав автора.' }
+], '✅ Можна', '🚫 Не можна');
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Два сайти по-різному відповідають на те саме запитання. Що краще зробити?', opts:['Повірити першому сайту в списку', 'Перевірити відповідь у кількох надійних джерелах', 'Вирішити, що правильної відповіді немає'], correct:1 },
+  { q:'Яка інформація достовірна?', opts:['Та, що відповідає дійсності', 'Та, яку прочитало найбільше людей', 'Та, що написана великими літерами'], correct:0 },
+  { q:'Автобусний розклад минулого року. Чого йому бракує?', opts:['Об\'єктивності', 'Актуальності', 'Зрозумілості'], correct:1, why:'Розклад застарів, зараз він може не збігатися з дійсністю.' },
+  { q:'Що з цього — факт?', opts:['Літо — найкраща пора року', 'У році 12 місяців', 'Футбол — найцікавіша гра'], correct:1 },
+  { q:'Що таке фейк?', opts:['Неправдива інформація, яку навмисно видають за правду', 'Будь-яка новина з Інтернету', 'Ненавмисна помилка в тексті'], correct:0 },
+  { q:'Яка з ознак найбільше вказує на фейк?', opts:['Указано автора й дату', 'Про це пишуть кілька надійних сайтів', '«Терміново перешли всім, поки не видалили!!!»'], correct:2 },
+  { q:'Який сайт державний?', opts:['school-news.com', 'mon.gov.ua', 'super-info.xyz'], correct:1 },
+  { q:'Що НЕ захищене авторським правом?', opts:['Фотографія', 'Комп\'ютерна гра', 'Ідея намалювати дракона'], correct:2, why:'Захищений конкретний твір, а ідеї й факти — ні.' },
+  { q:'Як правильно використати чужу цитату в презентації?', opts:['Взяти коротку цитату й указати автора', 'Взяти весь твір і не вказувати автора', 'Змінити два слова й назвати своїм'], correct:0 }
+], {summary:'Тепер ти знаєш, якою буває інформація, як перевірити джерело, розпізнати фейк і поважати права авторів.'});
+</script>
+
+</body>
+</html>
