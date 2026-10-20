@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Осінній ярмарок — Текстові документи</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#E8A33D,#C2571A,#8C2F1B); --accent:#C2571A; --accent-dark:#8C3A10; --accent-soft:#FBEBDD; --bg:#FBF7F2; --line:#EEDFD0; }
+  .p-hero p{max-width:none;}
+  .ms{font-family:'Material Symbols Outlined'; font-weight:normal; font-style:normal; line-height:1; display:inline-block; -webkit-font-smoothing:antialiased;}
+  .ms.ic{font-size:19px; vertical-align:-5px; color:#444746; background:#EDF2FA; border-radius:4px; padding:1px;}
+
+  /* Що має вийти: альбомна сторінка оголошення */
+  .page-wrap{background:#E8EAED; border-radius:var(--radius-m); padding:18px; display:flex; justify-content:center;}
+  .page{width:100%; max-width:560px; aspect-ratio:29.7/21; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.25); padding:5.5% 6.7%; font-family:Arial,sans-serif; color:#202124; display:flex; flex-direction:column; justify-content:center; font-size:clamp(9px,2.1vw,12.5px); line-height:1.45;}
+  .page p{margin:0 0 .7em; text-align:justify;}
+  .page .t{font-size:2.3em; font-weight:700; text-align:center; color:#B5400F; margin-bottom:.4em; line-height:1.15;}
+  .page .c{text-align:center; font-size:1.6em; font-weight:700; color:#8C2F1B; margin:.3em 0 .6em;}
+  .page .r{text-align:right; font-style:italic;}
+  .page .pet{font-style:italic; color:#D98B04;}
+  /* Зразок не можна виділити й скопіювати — текст набирають самі */
+  .page{-webkit-user-select:none; user-select:none; -webkit-touch-callout:none;}
+
+</style>
+</head>
+<body data-hud="6 клас · Практична · Осінній ярмарок">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 6 клас · Текстові документи</div>
+    <h1>🍂 Оголошення про осінній ярмарок</h1>
+    <p>Створи в Google Документах оголошення: налаштуй сторінку, введи текст і зміни властивості його об'єктів.</p>
+    <div class="meta"><span>⏱ 20–25 хв</span><span><img src="../../assets/logos/docs.svg" alt="">Google Документи</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="page-wrap">
+      <div class="page" id="sample">
+        <p class="t">ОСІННІЙ ЯРМАРОК</p>
+        <p>У п'ятницю, <b>13 листопада</b>, на великій перерві в шкільному холі відбудеться благодійний ярмарок.</p>
+        <p>Приносьте домашню випічку, іграшки та листівки, зроблені власноруч. Усі гроші передамо на корм для <span class="pet">тварин із притулку</span>.</p>
+        <p class="c">Чекаємо на всіх!</p>
+        <p class="r">Учнівська рада 6-Б</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи документ</h3>
+        <p>Обери один зі способів:</p>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Документи</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Документи</span> → <span class="menu">Порожній документ</span>.</li>
+              <li>Клацни «Документ без назви» і назви файл: <b>Оголошення — Прізвище</b>.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Налаштуй сторінку</h3>
+        <ol>
+          <li><span class="menu">Файл → Налаштування сторінки</span>.</li>
+          <li>Орієнтація — <b>Альбомна</b>.</li>
+          <li>Розмір паперу — <b>A4</b>.</li>
+          <li>Поля: усі чотири — <b>2</b> см.</li>
+          <li>Натисни <span class="menu">OK</span>.</li>
+        </ol>
+        <div class="check-val">Перевір себе: аркуш став ширшим, ніж вищим.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Введи текст</h3>
+        <p>Набери текст оголошення зі зразка <b>«Що має вийти»</b> — поки без форматування. У ньому 5 абзаців: Enter натискай лише в кінці кожного.</p>
+        <div class="tip">Посеред абзацу Enter не натискай: текст сам перейде на новий рядок.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Відформатуй заголовок</h3>
+        <p>Виділи рядок «ОСІННІЙ ЯРМАРОК» і зміни властивості:</p>
+        <ul>
+          <li>вирівнювання — по центру <span class="ms ic">format_align_center</span>;</li>
+          <li>накреслення — напівжирний <span class="ms ic">format_bold</span>;</li>
+          <li>розмір шрифту — <b>32</b>;</li>
+          <li>колір — осінній: помаранчевий, червоний чи коричневий <span class="ms ic">format_color_text</span>.</li>
+        </ul>
+        <div class="tip">Щоб швидко виділити весь абзац, клацни в ньому тричі.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Відформатуй основний текст</h3>
+        <ul>
+          <li>Виділи 2-й і 3-й абзаци: розмір <b>16</b>, вирівнювання за шириною <span class="ms ic">format_align_justify</span>.</li>
+          <li>Слова «13 листопада» — напівжирний <span class="ms ic">format_bold</span>.</li>
+          <li>Слова «тварин із притулку» — курсив <span class="ms ic">format_italic</span> та інший колір.</li>
+        </ul>
+        <div class="tip">Слово виділяють подвійним клацанням.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Заверши оголошення</h3>
+        <ul>
+          <li>«Чекаємо на всіх!» — по центру <span class="ms ic">format_align_center</span>, напівжирний, розмір <b>24</b>, колір.</li>
+          <li>«Учнівська рада 6-Б» — праворуч <span class="ms ic">format_align_right</span>, курсив, розмір <b>14</b>.</li>
+        </ul>
+        <div class="check-val">Перевір себе: усе оголошення вміщається на одній сторінці.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Практична робота · «Текстові документи. Об'єкти текстового документа та їх властивості» · 6 клас</footer>
+
+<script src="../../assets/practice.js"></script>
+<script>
+  // Зразок оголошення: без виділення, копіювання й контекстного меню
+  const sample = document.getElementById('sample');
+  ['copy', 'cut', 'selectstart', 'contextmenu', 'dragstart'].forEach(t=>sample.addEventListener(t, e=>e.preventDefault()));
+</script>
+</body>
+</html>
