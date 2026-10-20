@@ -77,7 +77,11 @@ async function runPython(code, io){
   Sk.configure({
     output: t=>{ out += t; if(out.length > LIMIT_OUT) me.stop = 'big'; else io.write(t); },
     read: f=>{ const x = Sk.builtinFiles?.files[f]; if(x === undefined) throw new Error(`Модуль ${f} не знайдено`); return x; },
-    inputfun: p=>io.ask(p), inputfunTakesPrompt: true,
+    inputfun: p=>{             // час, поки учень вводить відповідь, не рахується в ліміт 8 с
+      const t = Date.now();
+      return Promise.resolve(io.ask(p)).then(v=>{ Sk.execStart = +Sk.execStart + (Date.now() - t); return v; });
+    },
+    inputfunTakesPrompt: true,
     __future__: Sk.python3, execLimit: LIMIT_MS, yieldLimit: 60, killableWhile: true, killableFor: true
   });
   try{
