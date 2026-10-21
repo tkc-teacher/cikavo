@@ -240,6 +240,43 @@
   .way{background:var(--surface); border:2px solid var(--line); border-top:5px solid var(--wc); border-radius:var(--radius-m); padding:12px 14px;}
   .way .t{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px;}
   .way ul{margin:4px 0 0 !important; padding-left:18px !important; font-size:13.5px !important; color:var(--ink-soft);}
+  .sync-ill{margin:6px 0 16px; background:linear-gradient(180deg,#E8F0FE 0%,#F8FAFD 100%); border-radius:var(--radius-l); padding:16px 12px 14px;}
+  .sync-ill svg{display:block; width:100%; max-width:600px; height:auto; margin:0 auto;}
+  .sync-ill text{font-family:'Nunito Sans',sans-serif; font-size:15px; font-weight:700; fill:#5F6368;}
+  .sync-ill text.b{font-family:'Baloo 2',sans-serif; font-size:17px; fill:#1A73E8;}
+  .sync-ill figcaption{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:8px;}
+  .sync-ill figcaption span{background:#fff; border-radius:999px; padding:4px 12px; font-size:13.5px; font-weight:700; box-shadow:0 1px 2px rgba(60,64,67,.15);}
+  .sync-ill text.w{font-size:8.5px; fill:#fff; font-weight:800;}
+  .sync-ill text.s{font-size:8.5px; fill:#1F1F1F; font-weight:700;}
+  .td{display:flex; align-items:center; justify-content:center; gap:14px; padding:10px 4px 2px;}
+  .td-laptop{flex:0 1 330px; min-width:0;}
+  .td-screen{background:#1F1F1F; border-radius:10px 10px 4px 4px; padding:7px;}
+  .td-base{height:10px; background:#5F6368; border-radius:0 0 10px 10px; margin:0 -14px;}
+  .td-bar{display:flex; align-items:center; gap:6px; background:#fff; border-radius:4px 4px 0 0; padding:5px 8px; font-size:12px; font-weight:800; border-bottom:1px solid #EEF0F2;}
+  .td-bar img{width:13px; height:16px;}
+  .td-status{margin-left:auto; font-weight:600; color:#5F6368; font-size:11px; white-space:nowrap;}
+  .td-page{background:#fff; min-height:110px; padding:10px 12px; font-size:14px; line-height:1.45; border-radius:0 0 4px 4px; word-wrap:break-word;}
+  .td-caret{display:inline-block; width:2px; height:1.05em; background:#1A73E8; vertical-align:-2px; animation:blink 1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  .td-mid{display:flex; flex-direction:column; align-items:center; gap:6px; flex-shrink:0;}
+  .td-cloud{width:64px; height:64px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 10px rgba(26,115,232,.2);}
+  .td-cloud img{width:34px; height:31px;}
+  .td-sync{width:28px; height:28px; border-radius:50%; background:#E8F0FE; display:flex; align-items:center; justify-content:center;}
+  .td-sync .gdi{width:18px; height:18px;}
+  .td-sync .gdi svg{fill:#1A73E8;}
+  .td-sync.spin .gdi{animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(-360deg);}}
+  .td-phone{flex:0 0 120px;}
+  .td-pscreen{background:#1F1F1F; border-radius:16px; padding:10px 5px;}
+  .td-pscreen .td-page{min-height:150px; font-size:11px; padding:7px;}
+  .td-pscreen .td-bar{font-size:10.5px; padding:4px 6px;}
+  .td-lbl{text-align:center; font-weight:700; font-size:13.5px; color:#5F6368; margin-top:6px;}
+  @media (max-width:520px){ .td{gap:6px;}
+  .td-phone{flex-basis:92px;}
+  .td-cloud{width:46px; height:46px;}
+  .td-cloud img{width:26px; height:24px;}
+  .td-page{font-size:12px; min-height:90px;}
+  .td-status{display:none;} }
 </style>
 </head>
 <body data-lesson="lesson7-cloud-services" data-hud="7 клас · Хмарні сервіси">
@@ -299,6 +336,83 @@
     <h2>Хмара — це сховище в інтернеті, доступне з будь-якого пристрою</h2>
     <p><b>Хмарні сервіси</b> — онлайн-платформи, що дозволяють зберігати, обробляти файли й обмінюватися ними через інтернет.</p>
     <p>Файли лежать не на твоєму ноутбуці, а на потужних серверах у <b>центрах обробки даних</b>. На схемах мережу здавна малюють хмаркою — звідси й назва.</p>
+    <figure class="sync-ill">
+      <svg viewBox="0 0 600 270" role="img" aria-label="Файл зі зміною піднімається з ноутбука в хмару Google Диска й опускається на телефон і планшет">
+        <defs>
+          <filter id="cloudShadow" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#1A73E8" flood-opacity=".18"/></filter>
+        </defs>
+        <!-- лінії зв’язку -->
+        <path id="pUp" d="M130 168 L262 112" stroke="#AECBFA" stroke-width="3" stroke-dasharray="6 7" fill="none"/>
+        <path id="pDn1" d="M300 122 L300 166" stroke="#AECBFA" stroke-width="3" stroke-dasharray="6 7" fill="none"/>
+        <path id="pDn2" d="M338 112 L470 168" stroke="#AECBFA" stroke-width="3" stroke-dasharray="6 7" fill="none"/>
+        <!-- хмара з логотипом Диска -->
+        <g filter="url(#cloudShadow)">
+          <circle cx="262" cy="78" r="34" fill="#fff"/><circle cx="306" cy="60" r="44" fill="#fff"/><circle cx="348" cy="84" r="30" fill="#fff"/>
+          <rect x="230" y="78" width="148" height="40" rx="20" fill="#fff"/>
+        </g>
+        <image href="images/drive.svg" x="282" y="64" width="46" height="41"/>
+        <!-- ноутбук -->
+        <rect x="70" y="170" width="94" height="58" rx="6" fill="#1F1F1F"/><rect x="76" y="176" width="82" height="46" rx="3" fill="#E8F0FE"/>
+        <path d="M58 232 H176 L170 240 H64 Z" fill="#5F6368"/>
+        <!-- телефон -->
+        <rect x="282" y="168" width="36" height="66" rx="7" fill="#1F1F1F"/><rect x="286" y="176" width="28" height="50" rx="3" fill="#E8F0FE"/>
+        <!-- планшет -->
+        <rect x="438" y="168" width="78" height="66" rx="8" fill="#1F1F1F"/><rect x="444" y="174" width="66" height="54" rx="4" fill="#E8F0FE"/>
+        <!-- документи в пристроях -->
+        <g transform="translate(117 199)"><rect x="-9" y="-11" width="18" height="22" rx="3" fill="#4285F4"/><rect x="-5" y="-4" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="0" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="4" width="6" height="2" rx="1" fill="#fff"/></g>
+        <g opacity="0"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.74;0.78;1" dur="4s" repeatCount="indefinite"/><g transform="translate(300 201)"><rect x="-9" y="-11" width="18" height="22" rx="3" fill="#4285F4"/><rect x="-5" y="-4" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="0" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="4" width="6" height="2" rx="1" fill="#fff"/></g></g>
+        <g opacity="0"><animate attributeName="opacity" values="0;0;1;1" keyTimes="0;0.74;0.78;1" dur="4s" repeatCount="indefinite"/><g transform="translate(477 201)"><rect x="-9" y="-11" width="18" height="22" rx="3" fill="#4285F4"/><rect x="-5" y="-4" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="0" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="4" width="6" height="2" rx="1" fill="#fff"/></g></g>
+        <!-- олівець: зміна на ноутбуці -->
+        <g><animate attributeName="opacity" values="1;1;0;0" keyTimes="0;0.12;0.16;1" dur="4s" repeatCount="indefinite"/>
+          <path d="M134 186 l10 -10 l4 4 l-10 10 h-4 z" fill="#FBBC04" stroke="#1F1F1F" stroke-width="1.5" stroke-linejoin="round"/></g>
+        <!-- документ летить угору в хмару -->
+        <g opacity="0">
+          <animateMotion dur="4s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.15;0.45;1" calcMode="linear"><mpath href="#pUp"/></animateMotion>
+          <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.14;0.17;0.44;0.48;1" dur="4s" repeatCount="indefinite"/>
+          <rect x="-9" y="-11" width="18" height="22" rx="3" fill="#4285F4"/><rect x="-5" y="-4" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="0" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="4" width="6" height="2" rx="1" fill="#fff"/>
+        </g>
+        <!-- і вниз на телефон та планшет -->
+        <g opacity="0">
+          <animateMotion dur="4s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.48;0.74;1" calcMode="linear"><mpath href="#pDn1"/></animateMotion>
+          <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.47;0.5;0.73;0.76;1" dur="4s" repeatCount="indefinite"/>
+          <rect x="-9" y="-11" width="18" height="22" rx="3" fill="#4285F4"/><rect x="-5" y="-4" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="0" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="4" width="6" height="2" rx="1" fill="#fff"/>
+        </g>
+        <g opacity="0">
+          <animateMotion dur="4s" repeatCount="indefinite" keyPoints="0;0;1;1" keyTimes="0;0.48;0.74;1" calcMode="linear"><mpath href="#pDn2"/></animateMotion>
+          <animate attributeName="opacity" values="0;0;1;1;0;0" keyTimes="0;0.47;0.5;0.73;0.76;1" dur="4s" repeatCount="indefinite"/>
+          <rect x="-9" y="-11" width="18" height="22" rx="3" fill="#4285F4"/><rect x="-5" y="-4" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="0" width="10" height="2" rx="1" fill="#fff"/><rect x="-5" y="4" width="6" height="2" rx="1" fill="#fff"/>
+        </g>
+        <!-- підписи -->
+        <text x="117" y="262" text-anchor="middle">Ноутбук</text>
+        <text x="300" y="262" text-anchor="middle">Телефон</text>
+        <text x="477" y="262" text-anchor="middle">Планшет</text>
+        <text x="306" y="22" text-anchor="middle" class="b">Google Диск</text>
+      </svg>
+    </figure>
+
+    <figure class="sync-ill">
+      <div class="td">
+        <div class="td-laptop">
+          <div class="td-screen">
+            <div class="td-bar"><img src="images/docs.svg" alt="">Реферат<span class="td-status" id="tdStatus">Збережено на Диску</span></div>
+            <div class="td-page"><span id="tdLap"></span><i class="td-caret"></i></div>
+          </div>
+          <div class="td-base"></div>
+          <div class="td-lbl">Ноутбук</div>
+        </div>
+        <div class="td-mid">
+          <div class="td-cloud"><img src="images/drive.svg" alt=""></div>
+          <div class="td-sync" id="tdSync"><span class="gdi" data-i="sync"></span></div>
+        </div>
+        <div class="td-phone">
+          <div class="td-pscreen">
+            <div class="td-bar"><img src="images/docs.svg" alt="">Реферат</div>
+            <div class="td-page" id="tdPhone"></div>
+          </div>
+          <div class="td-lbl">Телефон</div>
+        </div>
+      </div>
+    </figure>
     <div class="eco">
       <div class="eco-head"><img src="images/drive.svg" alt="Google Диск"><div><b>Google Диск — твоя хмара від Google</b><span>Він уже є в кожному обліковому записі Google, зокрема шкільному. Усе, що ти створюєш у сервісах Google, зберігається саме тут.</span></div></div>
       <div class="eco-apps">
@@ -684,6 +798,40 @@ const GDI = {
 };
 const gdi = (n, extra) => `<span class="gdi ${extra||''}"><svg viewBox="0 0 24 24" aria-hidden="true">${GDI[n]}</svg></span>`;
 document.querySelectorAll('.gdi[data-i]').forEach(el=>{ el.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true">${GDI[el.dataset.i]}</svg>`; });
+
+/* ---------- КРОК 1: ІЛЮСТРАЦІЇ ---------- */
+/* Друкуємо на ноутбуці — текст через хмару з’являється на телефоні */
+(function(){
+  const PHRASES = ['Хмара зберігає мої файли', 'Пишу на ноутбуці — читаю на телефоні', 'Google Диск синхронізує все сам'];
+  const lap = document.getElementById('tdLap');
+  const phone = document.getElementById('tdPhone');
+  const sync = document.getElementById('tdSync');
+  const status = document.getElementById('tdStatus');
+  let pi = 0, ci = 0, idle = null;
+  function pushToPhone(text){
+    sync.classList.add('spin');
+    status.textContent = 'Зберігається…';
+    clearTimeout(idle);
+    idle = setTimeout(()=>{
+      phone.textContent = text;
+      sync.classList.remove('spin');
+      status.textContent = 'Збережено на Диску ✓';
+    }, 650);
+  }
+  function tick(){
+    const phrase = PHRASES[pi];
+    const chars = [...phrase];
+    if(ci < chars.length){
+      ci++;
+      lap.textContent = chars.slice(0, ci).join('');
+      if(ci % 4 === 0 || ci === chars.length) pushToPhone(lap.textContent);
+      setTimeout(tick, 110);
+    } else {
+      setTimeout(()=>{ pi = (pi + 1) % PHRASES.length; ci = 0; lap.textContent = ''; pushToPhone(''); setTimeout(tick, 900); }, 2600);
+    }
+  }
+  tick();
+})();
 
 /* ---------- КРОК 3: GOOGLE ДИСК ЗСЕРЕДИНИ ---------- */
 (function(){
