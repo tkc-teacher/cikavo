@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Мій аватар — Соціальні мережі</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#6E4BD8,#B03A8C); --accent:#B03A8C; --accent-dark:#82266A; --accent-soft:#F8E8F3; --bg:#FBF6F9; --line:#EEDDE8; }
+  .p-hero p{max-width:none;}
+  .ms.ic{font-size:18px; vertical-align:-4px; color:#444746;}
+  .h-ava{width:1.35em; height:1.35em; border-radius:28%; vertical-align:-.3em; margin-right:.3em;}
+  .ms{font-family:'Material Symbols Outlined'; font-weight:normal; font-style:normal; line-height:1; display:inline-block; -webkit-font-smoothing:antialiased;}
+
+  /* Що має вийти: меню облікового запису Google */
+  .result{display:flex; gap:22px; align-items:center; flex-wrap:wrap;}
+  .result > p{flex:1; min-width:220px; margin:0; font-size:15px;}
+  .g-acc{width:330px; max-width:100%; background:#E9EEF6; border-radius:28px; padding:14px 14px 18px; font-family:Roboto,Arial,sans-serif; color:#1F1F1F; text-align:center; box-shadow:0 4px 14px rgba(0,0,0,.12);}
+  .g-acc .mail{font-size:14px; font-weight:500; margin:2px 0 14px;}
+  .g-acc .ph{position:relative; width:84px; height:84px; margin:0 auto;}
+  .g-acc .ph img{width:84px; height:84px; border-radius:50%; display:block;}
+  .g-acc .cam{position:absolute; right:-2px; bottom:-2px; width:28px; height:28px; border-radius:50%; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 3px rgba(0,0,0,.25);}
+  .g-acc .cam .ms{font-size:17px; color:#444746;}
+  .g-acc .hi{font-size:22px; margin:12px 0 14px;}
+  .g-acc .manage{display:inline-block; border:1px solid #747775; border-radius:100px; padding:8px 20px; font-size:14px; font-weight:500; color:#0B57D0;}
+
+  /* Кнопка-посилання на конструктор */
+  .go{display:inline-flex; align-items:center; gap:10px; background:var(--accent); color:#fff; text-decoration:none; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; border-radius:var(--radius-m); padding:10px 20px; margin:4px 0 8px;}
+  .go:hover{background:var(--accent-dark);}
+  .addr{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:14px; color:var(--ink-soft);}
+
+  /* Насип аватарів */
+  .pile{display:flex; flex-wrap:wrap; justify-content:center; padding:10px 0 16px 16px;}
+  .pile img{width:92px; height:92px; border-radius:22%; border:3px solid #fff; box-shadow:0 3px 10px rgba(27,27,58,.18); margin:0 0 -6px -16px; background:#fff;}
+  .pile img:nth-child(odd){transform:rotate(-7deg);}
+  .pile img:nth-child(even){transform:rotate(6deg) translateY(10px);}
+  .pile img:nth-child(3n){transform:rotate(-2deg) translateY(-4px);}
+  @media (max-width:520px){ .pile img{width:70px; height:70px; margin-left:-12px;} }
+</style>
+</head>
+<body data-hud="7 клас · Практична · Мій аватар">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 7 клас · Спілкуємося онлайн</div>
+    <h1><img class="h-ava" src="images/avatar-sample.svg" alt="">Мій власний аватар</h1>
+    <p>Намалюй себе в конструкторі аватарів і постав малюнок на фото профілю в Google. Аватар показує, хто ти, але не видає твого справжнього обличчя незнайомцям.</p>
+    <div class="meta"><span>⏱ 15–20 хв</span><span>🧑‍🎨 Конструктор аватарів cikavo.me</span><span>👤 Обліковий запис Google</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="result">
+      <div class="g-acc" aria-label="Приклад: меню облікового запису Google з аватаром">
+        <div class="mail">andrii.koval@gmail.com</div>
+        <div class="ph"><img src="images/avatar-sample.svg" alt=""><span class="cam"><span class="ms">edit</span></span></div>
+        <div class="hi">Вітаємо, Андрію!</div>
+        <span class="manage">Керувати обліковим записом Google</span>
+      </div>
+      <p>Твій аватар з'явиться в Google Classroom, Gmail і на Диску — скрізь, де ти входиш зі своїм обліковим записом.</p>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Відкрий конструктор</h3>
+        <a class="go" href="https://cikavo.me/labs/avatar-maker/" target="_blank" rel="noopener">Конструктор аватарів →</a>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Створи аватар</h3>
+        <p>Аватар має розповідати про тебе: схожа зачіска, улюблений колір, твоє хобі чи улюбленець. Щоб друзі одразу впізнали — це ти!</p>
+        <div class="pile" aria-hidden="true"><img src="images/pile-1.svg" alt=""><img src="images/pile-2.svg" alt=""><img src="images/pile-3.svg" alt=""><img src="images/pile-4.svg" alt=""><img src="images/pile-5.svg" alt=""><img src="images/pile-6.svg" alt=""><img src="images/pile-7.svg" alt=""></div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Збережи аватар</h3>
+        <p>Натисни <span class="menu">⬇ Зберегти</span> — файл <b>avatar.png</b> з'явиться в теці <b>Завантаження</b>.</p>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Постав аватар у профіль Google</h3>
+        <ol>
+          <li>У Google Classroom чи Gmail клацни свою іконку в правому верхньому куті.</li>
+          <li>Натисни олівчик <span class="ms ic">edit</span> на фото.</li>
+          <li>У вікні <span class="menu">Фото профілю</span> натисни <span class="menu">Змінити</span> → <span class="menu">З комп'ютера</span> і обери <b>avatar.png</b>.</li>
+        </ol>
+        <p>Посунь рамку, щоб обличчя було в центрі кола, і натисни <span class="menu">Зберегти як фото профілю</span>.</p>
+        <div class="tip">Нове фото може з'явитися не одразу — зачекай кілька хвилин. Якщо олівчика немає, у шкільному обліковому записі змінювати фото, мабуть, заборонено — скажи вчителю.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Перевір</h3>
+        <p>Онови сторінку Google Classroom.</p>
+        <div class="check-val">Перевір себе: у правому верхньому куті — твій аватар.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Практична робота · «Мій аватар» · 7 клас</footer>
+
+<script src="../../assets/practice.js"></script>
+</body>
+</html>

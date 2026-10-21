@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Спілкуємося онлайн — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --accent:#B03A8C; --accent-dark:#82266A; --accent-soft:#F8E8F3;
+    --bg:#FBF6F9; --line:#EEDDE8;
+    --plum:#B03A8C; --violet:#6E4BD8; --mint:#1FA97A;
+    --hud-bar:linear-gradient(90deg,var(--violet),var(--plum));
+  }
+
+  /* Плитки-поняття */
+  .tiles{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px; margin:14px 0 18px;}
+  .tile{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px;}
+  .tile .e{font-size:24px; line-height:1;}
+  .tile b{display:block; font-family:'Baloo 2',sans-serif; font-size:15px; margin:6px 0 2px;}
+  .tile span{font-size:13px; color:var(--ink-soft); line-height:1.35; display:block;}
+
+  /* Модератор чату */
+  .chat{background:#F3EEF6; border-radius:var(--radius-l); padding:16px; display:flex; flex-direction:column; gap:12px;}
+  .chat-top{display:flex; align-items:center; gap:10px; padding-bottom:10px; border-bottom:1px solid #E2D7EA;}
+  .chat-top .g{width:38px; height:38px; border-radius:50%; background:var(--violet); color:#fff; display:grid; place-items:center; font-family:'Baloo 2',sans-serif; font-weight:700;}
+  .chat-top b{font-family:'Baloo 2',sans-serif; font-size:15.5px; display:block; line-height:1.1;}
+  .chat-top span{font-size:12.5px; color:var(--ink-soft);}
+  .msg{display:grid; grid-template-columns:34px 1fr; gap:8px; align-items:start;}
+  .msg .ava{width:34px; height:34px; border-radius:50%; background:var(--c); color:#fff; display:grid; place-items:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px;}
+  .bub{background:#fff; border-radius:4px 16px 16px 16px; padding:8px 12px; box-shadow:0 1px 2px rgba(60,20,70,.08); max-width:520px; transition:opacity .3s;}
+  .bub .who{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--c);}
+  .bub .txt{font-size:14.5px;}
+  .bub .txt + .txt{margin-top:4px; padding-top:4px; border-top:1px dashed #EEE;}
+  .bub .photo{margin-top:6px; width:150px; height:90px; border-radius:10px; background:linear-gradient(135deg,#FFD1DC,#C9B6F2); display:grid; place-items:center; font-size:36px;}
+  .mod-row{grid-column:2; display:flex; gap:8px; flex-wrap:wrap; align-items:center;}
+  .mb{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; border:1.5px solid var(--line); background:#fff; border-radius:999px; padding:4px 12px; cursor:pointer;}
+  .mb:hover{border-color:var(--accent);}
+  .mb.wrong-flash{background:#FDE6E1; border-color:var(--coral); animation:shakeX .35s ease;}
+  .mod-why{grid-column:2; font-size:13px; color:var(--ink-soft);}
+  .msg.judged .mb{display:none;}
+  .msg.flagged .bub{opacity:.55;}
+  .verdict{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; border-radius:999px; padding:2px 10px;}
+  .verdict.okv{background:var(--ok-soft); color:#237A3A;}
+  .verdict.flv{background:#FDE6E1; color:#B8412A;}
+
+
+</style>
+</head>
+<body data-lesson="lesson7-online-communication" data-hud="7 клас · Спілкуємося онлайн">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · 7 клас · Тематичний урок</div>
+      <h1>Спілкуємося онлайн</h1>
+      <p>Як спілкуватися в мережі ввічливо, як розпізнати кібербулінг і що робити, якщо цькують тебе чи когось поруч. А спершу повторимо всю тему «Цифрове середовище для навчання та співпраці».</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="62" fill="#F8E8F3"/>
+      <path d="M26 40a14 14 0 0 1 14-14h50a14 14 0 0 1 14 14v30a14 14 0 0 1-14 14H52l-16 14v-14h0a14 14 0 0 1-10-13z" fill="#B03A8C"/>
+      <circle cx="52" cy="52" r="6" fill="#fff"/><circle cx="76" cy="52" r="6" fill="#fff"/>
+      <circle cx="53.5" cy="53" r="2.6" fill="#3A1030"/><circle cx="77.5" cy="53" r="2.6" fill="#3A1030"/>
+      <path d="M55 66q9 8 18 0" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="44" cy="64" r="4" fill="#E77BBE"/><circle cx="85" cy="64" r="4" fill="#E77BBE"/>
+      <path d="M80 92a10 10 0 0 1 10-10h24a10 10 0 0 1 10 10v12a10 10 0 0 1-10 10h-4v10l-12-10h-8a10 10 0 0 1-10-10z" fill="#6E4BD8"/>
+      <path d="M102 104c-6-4-9-7-9-10a4 4 0 0 1 9-2 4 4 0 0 1 9 2c0 3-3 6-9 10z" fill="#FFC93C"/>
+      <circle cx="30" cy="104" r="4" fill="#6E4BD8" opacity=".5"/><circle cx="44" cy="112" r="3" fill="#B03A8C" opacity=".5"/><circle cx="118" cy="40" r="4" fill="#FFC93C"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Цифрове середовище для навчання та співпраці</div>
+    <h2>Слова всієї теми</h2>
+    <p>За цю тему ти познайомився з операційними системами, браузером, хмарними сервісами й Google Документами. Пригадай головні поняття.</p>
+    <p class="soft">Обери термін, а потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Нетикет</div>
+    <h2>Ти — модератор чату класу</h2>
+    <p><b>Нетикет</b> — правила ввічливої поведінки в мережі. Головні з них:</p>
+    <ul>
+      <li>спілкуйся з повагою, без образ і грубих слів;</li>
+      <li>не викладай особисті дані: адресу, номер телефону;</li>
+      <li>не спам — не надсилай десяток повідомлень поспіль;</li>
+      <li>не пиши ВЕЛИКИМИ ЛІТЕРАМИ — у мережі це крик;</li>
+      <li>чужі фото поширюй лише з дозволу.</li>
+    </ul>
+    <p class="soft">Переглянь повідомлення й познач кожне: усе гаразд чи порушення нетикету?</p>
+    <div class="exercise">
+      <div class="chat" id="modChat">
+        <div class="chat-top"><div class="g">7А</div><div><b>7-А клас 💬</b><span>28 учасників</span></div></div>
+      </div>
+      <div class="progress-line" id="modProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Кібербулінг</div>
+    <h2>Як розпізнати цькування</h2>
+    <p><b>Кібербулінг</b> — цькування людини за допомогою цифрових технологій. Він буває різним:</p>
+    <ul>
+      <li>образи й погрози в чатах, коментарях чи в грі;</li>
+      <li>поширення чужих фото чи відео, щоб висміяти;</li>
+      <li>навмисне вилучення з групового чату;</li>
+      <li>фейкова сторінка від чужого імені.</li>
+    </ul>
+    <p>Не кожна сварка — це кібербулінг. Його ознаки:</p>
+    <div class="tiles">
+      <div class="tile"><div class="e">🎯</div><b>Навмисно</b><span>людину хочуть образити чи принизити</span></div>
+      <div class="tile"><div class="e">🔁</div><b>Повторюється</b><span>знову й знову, а не один раз</span></div>
+      <div class="tile"><div class="e">⚖️</div><b>Нерівні сили</b><span>кривдників багато або вони ховаються за анонімністю</span></div>
+    </div>
+    <p class="soft">Клацни ситуацію, а потім кошик.</p>
+    <div class="exercise">
+      <div class="sort-buckets">
+        <div class="bucket" id="bkBully"><div class="bucket-title">🚨 Кібербулінг</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkNotBully"><div class="bucket-title">💬 Неприємно, але не цькування</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="bullyPool"></div>
+      <div class="progress-line" id="bullyProgress"></div>
+    </div>
+    <div class="trivia">Те, що одного разу потрапило в мережу, швидко поширюється й лишається надовго. Тому образа в інтернеті часто болить сильніше, ніж сказана вголос.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Кібербулінг</div>
+    <h2>Що робити, якщо цькують</h2>
+    <p>Якщо цькують тебе, запам’ятай чотири кроки:</p>
+    <div class="tiles">
+      <div class="tile"><div class="e">✋</div><b>Не відповідай</b><span>кривдник чекає на твою реакцію</span></div>
+      <div class="tile"><div class="e">📸</div><b>Збережи докази</b><span>знімки екрана повідомлень і коментарів</span></div>
+      <div class="tile"><div class="e">🚫</div><b>Заблокуй і поскаржся</b><span>такі кнопки є в кожній соцмережі й грі</span></div>
+      <div class="tile"><div class="e">🗣️</div><b>Розкажи дорослому</b><span>батькам, учителю чи шкільному психологу</span></div>
+    </div>
+    <p>Якщо ти <b>свідок</b> — не мовчи: підтримай того, кого цькують, і повідом дорослих.</p>
+    <p class="soft">Що варто робити, а що — ні?</p>
+    <div id="bullyList"></div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Тематична перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Месенджери та відеоконференції. Правила нетикету. Соціальні мережі. Ігрові платформи. Кібербулінг» · 7 клас</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- ПОВТОРЕННЯ ТЕМИ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Операційна система', desc:'Керує всіма частинами пристрою й запускає інші програми' },
+  { name:'Системні вимоги', desc:'Яким має бути пристрій, щоб програма на ньому працювала' },
+  { name:'Розширення браузера', desc:'Невелика програма, що додає браузеру нову можливість' },
+  { name:'Кукі (cookie)', desc:'Дані, за якими сайт пам’ятає тебе й твої налаштування' },
+  { name:'Резервна копія', desc:'Запасний примірник файлів на випадок, якщо пристрій зламається' },
+  { name:'Синхронізація', desc:'Зміни у файлі за мить з’являються на всіх твоїх пристроях' },
+  { name:'Двофакторна автентифікація', desc:'Вхід у два кроки: пароль і ще код з телефона' }
+], 'recapProgress', 3);
+
+
+
+/* ---------- КРОК 1: МОДЕРАТОР ЧАТУ ---------- */
+(function(){
+  const MSGS = [
+    { who:'Марта', c:'#E0457B', txt:['Привіт! Хтось записав домашнє з алгебри? 🙏'], ok:true, why:'Звичайне ввічливе питання.' },
+    { who:'Тарас', c:'#2F6FE4', txt:['ХТО ВЗЯВ МОЮ РУЧКУ??? ВІДПОВІДАЙТЕ!!!'], ok:false, why:'Великі літери й купа знаків оклику — це крик.' },
+    { who:'Ліза', c:'#1FA97A', txt:['Дякую, Марто, що скинула конспект! 💛'], ok:true, why:'Подяка — завжди доречна.' },
+    { who:'Олег', c:'#E37400', txt:['ау', 'ау', 'ну ау', 'АУУУ відповідайте'], ok:false, why:'Багато повідомлень поспіль — це спам.' },
+    { who:'Софія', c:'#6E4BD8', txt:['Заходьте в гості: вул. Садова, 5, кв. 12, мій номер 067… 😊'], ok:false, why:'Адреса й номер телефону в чаті на 28 людей — особисті дані на виду.' },
+    { who:'Дмитро', c:'#0F8B7E', txt:['Гляньте, як смішно Катя спіткнулась 🤣'], photo:true, ok:false, why:'Чуже фото без дозволу й ще й для насмішок — так не можна.' },
+    { who:'Ірина Петрівна', c:'#82266A', txt:['Нагадую: завтра екскурсія, збір о 8:30 біля школи 🚌'], ok:true, why:'Корисне повідомлення для всіх.' }
+  ];
+  const chat = document.getElementById('modChat');
+  const progress = document.getElementById('modProgress');
+  const hit = trackTask(chat, MSGS.length, MSGS.length + 2);
+  let judged = 0;
+  const upd = ()=>{ progress.textContent = judged === MSGS.length ? 'Чат перевірено ✓' : `Перевірено: ${judged} з ${MSGS.length}`; };
+  MSGS.forEach(m=>{
+    const el = document.createElement('div');
+    el.className = 'msg';
+    el.style.setProperty('--c', m.c);
+    el.innerHTML = `<div class="ava">${m.who[0]}</div>
+      <div class="bub"><div class="who">${m.who}</div>${m.txt.map(t=>`<div class="txt">${t}</div>`).join('')}${m.photo ? '<div class="photo">📸</div>' : ''}</div>
+      <div class="mod-row"><button class="mb" data-v="1">👍 Усе гаразд</button><button class="mb" data-v="0">🚩 Порушення</button></div>
+      <div class="mod-why"></div>`;
+    const why = el.querySelector('.mod-why');
+    el.querySelectorAll('.mb').forEach(b=>b.addEventListener('click', ()=>{
+      if(el.classList.contains('judged')) return;
+      if((b.dataset.v === '1') === m.ok){
+        el.classList.add('judged');
+        if(!m.ok) el.classList.add('flagged');
+        el.querySelector('.mod-row').insertAdjacentHTML('beforeend', m.ok ? '<span class="verdict okv">✓ Усе гаразд</span>' : '<span class="verdict flv">🚩 Порушення</span>');
+        why.textContent = m.why;
+        judged++; upd();
+        addNeurons(1); hit();
+        if(judged === MSGS.length) addNeurons(2);
+      } else {
+        b.classList.remove('wrong-flash'); void b.offsetWidth; b.classList.add('wrong-flash');
+        why.textContent = m.ok ? 'Придивись: чи справді тут щось не так?' : 'Перечитай правила нетикету вище — одне з них тут порушено.';
+      }
+    }));
+    chat.appendChild(el);
+  });
+  upd();
+})();
+
+
+/* ---------- КРОК 2 ---------- */
+makeSortBoard('bullyPool', { yes:'bkBully', no:'bkNotBully' }, [
+  { text:'Тиждень поспіль під кожним фото Андрія з різних акаунтів пишуть «нікчема»', bucket:'yes' },
+  { text:'Однокласники створили чат «Без Віки» і викладають туди її фото з насмішками', bucket:'yes' },
+  { text:'Хтось завів сторінку з фото Максима й пише від його імені гидоти', bucket:'yes' },
+  { text:'У грі той самий гравець щодня шукає Іру й погрожує «знайти її в школі»', bucket:'yes' },
+  { text:'Друзі посварилися в чаті через гру, а наступного дня помирилися', bucket:'no' },
+  { text:'Подруга пожартувала про твою зачіску, ти попросила так не робити — і вона перестала', bucket:'no' },
+  { text:'Учитель у Classroom написав, що в роботі є помилки', bucket:'no' }
+], 'bullyProgress');
+
+/* ---------- КРОК 3 ---------- */
+makeYesNo('bullyList', [
+  { text:'Відповісти кривдникові ще грубіше', correct:false, why:'Агресія у відповідь лише розпалює цькування.' },
+  { text:'Зробити знімки екрана з образами', correct:true, why:'Це докази для дорослих і для скарги.' },
+  { text:'Заблокувати кривдника й поскаржитися на нього в застосунку', correct:true, why:'У кожній соцмережі, месенджері й грі є така кнопка.' },
+  { text:'Мовчати й нікому нічого не розповідати', correct:false, why:'Самому впоратися важко — розкажи батькам, учителеві чи психологу.' },
+  { text:'Написати однокласникові, якого цькують, слова підтримки', correct:true, why:'Свідок, який підтримав, дуже допомагає.' },
+  { text:'Переслати образливе фото друзям «по приколу»', correct:false, why:'Той, хто поширює, теж стає учасником цькування.' }
+], 'Варто ✓', 'Не варто ✗');
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Яка програма керує всіма частинами пристрою й запускає інші програми?', opts:['Браузер', 'Операційна система', 'Антивірус'], correct:1 },
+  { q:'Учитель має лише переглядати твій документ на Google Диску. Яку роль йому надати?', opts:['Редактор', 'Власник', 'Читач'], correct:2 },
+  { q:'Навіщо вмикати двофакторну автентифікацію?', opts:['Щоб без пароля й коду з телефона ніхто не ввійшов у твій обліковий запис', 'Щоб входити взагалі без пароля', 'Щоб на Диску стало вдвічі більше місця'], correct:0 },
+  { q:'Що з цього — кібербулінг?', opts:['Одна суперечка в чаті, після якої друзі помирилися', 'Учитель вказав на помилки в роботі', 'Учня щодня висміюють у коментарях з різних акаунтів'], correct:2, why:'Цькування навмисне й повторюється знову й знову.' },
+  { q:'Яке з цих повідомлень у чаті класу порушує нетикет?', opts:['«Дякую за конспект!»', '«Нагадую: завтра екскурсія о 8:30»', '«ЧОМУ НІХТО НЕ ВІДПОВІДАЄ???»'], correct:2, why:'Великі літери в мережі сприймаються як крик.' },
+  { q:'Що НЕ є ознакою кібербулінгу?', opts:['Образи повторюються знову й знову', 'Людину хочуть навмисно принизити', 'Друзі один раз не погодилися в суперечці'], correct:2 },
+  { q:'Навіщо робити знімки екрана образливих повідомлень?', opts:['Щоб переслати їх друзям', 'Щоб мати докази для дорослих і для скарги', 'Щоб відповісти кривдникові його ж словами'], correct:1 },
+  { q:'Ти бачиш, як однокласника висміюють у груповому чаті. Що зробити?', opts:['Підтримати його й розповісти дорослим', 'Поставити 😂, щоб не стати наступним', 'Мовчки вийти з чату'], correct:0, why:'Свідок, який не мовчить, може зупинити цькування.' },
+  { q:'Хтось створив сторінку з твоїм фото й пише від твого імені. Що робити?', opts:['Створити фейк у відповідь', 'Нічого — само мине', 'Поскаржитися на сторінку в соцмережі й розповісти дорослим'], correct:2 },
+  { q:'Тебе ображають у чаті кілька днів поспіль. Що зробити?', opts:['Відповісти так само', 'Зберегти знімки екрана, заблокувати кривдника й розповісти дорослому', 'Видалити всі свої облікові записи'], correct:1 }
+], {summary:'Тепер ти знаєш правила нетикету, умієш відрізнити кібербулінг від звичайної сварки і знаєш, як діяти, якщо цькують тебе чи когось поруч.'});
+</script>
+
+</body>
+</html>
