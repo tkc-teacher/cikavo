@@ -113,6 +113,11 @@
   .btn:active{transform:scale(.97);}
   .btn.main{background:var(--teal); color:#fff; grid-column:1 / -1; font-size:17px; padding:10px 14px;}
   .btn.main:hover{background:var(--teal-dark);}
+  .rand-row{grid-column:1 / -1; display:flex; gap:8px;}
+  .rand-row .btn.main{flex:1; min-width:0;}
+  .btn.hist{flex:0 0 auto; width:44px; padding:0; display:grid; place-items:center;}
+  .btn.hist svg{width:22px; height:22px;}
+  .btn.hist:disabled{opacity:.35; cursor:default; background:var(--surface); transform:none;}
 
   /* ---------- Panel ---------- */
   .panel{min-width:0;}
@@ -162,6 +167,7 @@
     .actions{width:auto; flex:1; min-width:0; max-width:260px;}
     .btn{font-size:13.5px; padding:6px 6px;}
     .btn.main{font-size:15px; padding:7px 10px;}
+    .btn.hist{width:36px;} .btn.hist svg{width:19px; height:19px;}
     .opts{grid-template-columns:repeat(auto-fill,minmax(78px,1fr)); gap:8px;}
     .group{padding:14px;}
   }
@@ -184,7 +190,11 @@
       <div class="tap-hint" id="tapHint" aria-hidden="true"><span class="ripple"></span><svg viewBox="0 0 24 24"><path d="M9 11 V4.2 a1.7 1.7 0 0 1 3.4 0 V10 a1.6 1.6 0 0 1 3.2 .3 a1.6 1.6 0 0 1 3.1 .6 a1.5 1.5 0 0 1 2.9 .8 V16 c0 3.6 -2.6 6 -6 6 h-1.6 c-2 0 -3.4 -.8 -4.6 -2.4 L5.2 15.6 a1.6 1.6 0 0 1 2.5 -2 L9 15 Z" fill="#fff" stroke="#1B1B3A" stroke-width="1.3" stroke-linejoin="round"/><path d="M12.4 10 V13.2 M15.6 10.3 V13.4 M18.7 11 V13.6" fill="none" stroke="#1B1B3A" stroke-width="1.1" stroke-linecap="round"/></svg></div>
     </div>
     <div class="actions">
-      <button class="btn main" id="randomBtn">Випадковий</button>
+      <div class="rand-row">
+        <button class="btn hist" id="undoBtn" title="Скасувати (Ctrl+Z)" aria-label="Скасувати" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
+        <button class="btn main" id="randomBtn">Випадковий</button>
+        <button class="btn hist" id="redoBtn" title="Повернути (Ctrl+Shift+Z)" aria-label="Повернути" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></svg></button>
+      </div>
       <button class="btn" id="saveBtn"><span class="ic">⬇ </span>Зберегти</button>
       <button class="btn" id="shareBtn" title="Скопіювати посилання на аватар"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M10 7.5H7a4.5 4.5 0 0 0 0 9h3"/><path d="M14 7.5h3a4.5 4.5 0 0 1 0 9h-3"/><path d="M8.5 12h7"/></svg>Посилання</button>
     </div>
@@ -1036,10 +1046,23 @@ function renderGroups(){
   }).join('');
 }
 
-function setState(next){
+/* Історія змін для «Скасувати» / «Повернути» */
+const undoStack = [], redoStack = [];
+function remember(prev){
+  undoStack.push(prev); if(undoStack.length > 100) undoStack.shift();
+  redoStack.length = 0; updateHist();
+}
+function updateHist(){ $('undoBtn').disabled = !undoStack.length; $('redoBtn').disabled = !redoStack.length; }
+function stepHist(from, to){
+  if(!from.length) return;
+  to.push(state); setState(from.pop(), true);
+}
+
+function setState(next, fromHist){
   if(encode(next)===encode(state)) return;
+  if(!fromHist) remember(state);
   state = next;
-  saveState(); renderAvatar(); renderGroups();
+  saveState(); renderAvatar(); renderGroups(); updateHist();
   // Після змін посилання з #a=… вже не відповідає аватару — прибираємо його
   if(location.hash) try{ history.replaceState(null, '', location.pathname + location.search); }catch(e){}
 }
@@ -1051,6 +1074,15 @@ $('tabs').addEventListener('click', e=>{
 $('groups').addEventListener('click', e=>{
   const b = e.target.closest('[data-k]'); if(!b) return;
   setState({...state, [b.dataset.k]: +b.dataset.v});
+});
+
+$('undoBtn').addEventListener('click', ()=>stepHist(undoStack, redoStack));
+$('redoBtn').addEventListener('click', ()=>stepHist(redoStack, undoStack));
+document.addEventListener('keydown', e=>{
+  if(!(e.ctrlKey || e.metaKey) || e.altKey) return;
+  const k = e.code;
+  if(k==='KeyZ' && !e.shiftKey){ e.preventDefault(); stepHist(undoStack, redoStack); }
+  else if((k==='KeyZ' && e.shiftKey) || k==='KeyY'){ e.preventDefault(); stepHist(redoStack, undoStack); }
 });
 
 /* Випадковий аватар: рідкісні речі (шапки, вушка тварин, фантастична шкіра) — не щоразу */
@@ -1107,7 +1139,7 @@ avatarEl.addEventListener('pointermove', e=>{
   if(!drag) return;
   const mx = e.clientX-drag.x, my = e.clientY-drag.y;
   if(!drag.moved && Math.hypot(mx, my) < 5) return;
-  if(!drag.moved){ drag.moved = true; avatarEl.setPointerCapture(e.pointerId); avatarEl.classList.add('dragging'); }
+  if(!drag.moved){ drag.moved = true; drag.before = {...state}; avatarEl.setPointerCapture(e.pointerId); avatarEl.classList.add('dragging'); }
   const lim = v => Math.max(0, Math.min(drag.n-1, Math.round(v)));
   state[drag.kx] = lim(drag.x0 + mx*drag.k); state[drag.ky] = lim(drag.y0 + my*drag.k);
   avatarEl.querySelector('.fig')?.setAttribute('transform', `translate(${(state.ox-SHIFT_C)*SHIFT_STEP} ${(state.oy-SHIFT_C)*SHIFT_STEP})`);
@@ -1117,6 +1149,7 @@ function endDrag(){
   if(!drag) return;
   if(drag.moved){
     dragged = true; avatarEl.classList.remove('dragging'); saveState();
+    if(encode(drag.before)!==encode(state)) remember(drag.before);
     if(location.hash) try{ history.replaceState(null, '', location.pathname + location.search); }catch(e){}
   }
   drag = null;
