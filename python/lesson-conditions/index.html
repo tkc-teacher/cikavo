@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Умови: if, elif, else — Заняття</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<link rel="stylesheet" href="../../assets/python.css">
+<style>
+  :root{
+    --accent:#2F7D6D; --accent-dark:#1F5C50; --accent-soft:#E3F2EE;
+    --bg:#F3F8F6; --line:#DCE9E4; --ink-soft:#4C5E58;
+    --hud-bar:linear-gradient(90deg, #3776AB, #2F7D6D, #FFD43B);
+  }
+  .match-chip, .desc-slot.filled, .sort-chip{font-family:var(--code-font); font-weight:600;}
+
+  /* Таблиця операторів порівняння */
+  .ops{display:grid; grid-template-columns:repeat(auto-fill, minmax(150px, 1fr)); gap:8px; margin:12px 0;}
+  .op{display:flex; align-items:center; gap:10px; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-s); padding:8px 12px; font-size:14.5px;}
+  .op code{font-family:var(--code-font); font-weight:700; font-size:17px !important; color:var(--accent-dark); background:var(--accent-soft); border-radius:6px; padding:2px 8px; min-width:3ch; text-align:center;}
+
+  /* Що вдягнути: живий if / elif / else */
+  .wear{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:18px 20px; margin-top:16px;}
+  .wear-top{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:14px;}
+  .wear-top label{font-weight:700; font-size:14.5px;}
+  .wear-top input{flex:1; min-width:160px; accent-color:var(--accent);}
+  .wear-t{font-family:var(--code-font); font-weight:700; font-size:20px; color:var(--accent-dark); min-width:5ch; text-align:right;}
+  .wear-grid{display:grid; grid-template-columns:minmax(0, 1fr) 150px; gap:16px; align-items:center;}
+  .wear pre.py-code{margin:0;}
+  .wear .ln{display:inline-block; width:100%; border-radius:4px; transition:opacity .25s, background .25s;}
+  .wear .ln.skip{opacity:.35;}
+  .wear .ln.run{background:rgba(255,212,59,.18);}
+  .wear .ln[data-v]::after{content:attr(data-v); float:right; font-size:11px; font-weight:700; padding:0 7px; border-radius:20px; margin-top:2px;}
+  .wear .ln[data-v="True"]::after{background:#3FAE58; color:#fff;}
+  .wear .ln[data-v="False"]::after{background:#5A6275; color:#D5D9E3;}
+  .wear .ln[data-v="не перевіряється"]::after{background:transparent; color:#8C93A6; font-weight:600;}
+  .wear-pic{text-align:center;}
+  .wear-pic .em{font-size:64px; line-height:1.1; display:block; transition:transform .3s;}
+  .wear-pic .em.pop{animation:wearPop .35s;}
+  .wear-pic .tx{font-family:var(--code-font); font-size:13px; font-weight:600; color:var(--accent-dark); margin-top:6px;}
+  @keyframes wearPop{0%{transform:scale(.6)} 70%{transform:scale(1.1)} 100%{transform:scale(1)}}
+  /* Розминка: запитання по одному */
+  .wu-head{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px;}
+  .wu-count{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:var(--accent-dark);}
+  .wu-dots{display:flex; gap:6px;}
+  .wu-dot{width:12px; height:12px; border-radius:50%; background:var(--line); transition:background .25s, transform .25s;}
+  .wu-dot.cur{background:var(--accent); transform:scale(1.25);}
+  .wu-dot.ok{background:#3FAE58;}
+  .wu-dot.retry{background:#E8A33D;}
+  .wu-card pre.py-code{margin-top:0;}
+  .wu-card .q{font-weight:700; font-size:15.5px;}
+  .wu-card.in{animation:wuIn .3s ease;}
+  .wu-next{margin-top:12px;}
+  .wu-end{text-align:center; padding:10px 0 4px;}
+  .wu-end .big{font-size:44px; line-height:1.2;}
+  .wu-end h3{font-family:'Baloo 2',sans-serif; font-size:21px; margin:6px 0 4px;}
+  .wu-end p{color:var(--ink-soft); margin:0;}
+  @keyframes wuIn{from{opacity:0; transform:translateX(16px)} to{opacity:1; transform:none}}
+
+  /* Як працює if: блок-схема з маркером */
+  .flow{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:18px 20px; margin-top:16px;}
+  .flow-grid{display:grid; grid-template-columns:minmax(0, 300px) minmax(0, 1fr); gap:20px; align-items:start;}
+  .stepper{display:flex; align-items:center; gap:8px; font-weight:700; font-size:14.5px;}
+  .stepper button{width:32px; height:32px; border-radius:50%; border:1.5px solid var(--line); background:var(--bg); font-family:'Baloo 2',sans-serif; font-size:18px; font-weight:700; line-height:1; color:var(--accent-dark); cursor:pointer;}
+  .stepper button:hover{border-color:var(--accent);}
+  .stepper b{font-family:var(--code-font); font-size:17px; min-width:2ch; text-align:center;}
+  .flow svg{width:100%; height:auto; display:block;}
+  .fl-node{fill:#fff; stroke:#B9CCC5; stroke-width:2; transition:fill .3s, stroke .3s, opacity .3s;}
+  .fl-node.on{fill:#FFF6D6; stroke:#E9B92C;}
+  .fl-node.t{fill:#E2F5E6; stroke:#3FAE58;}
+  .fl-node.f{fill:#E9EBF0; stroke:#5A6275;}
+  .fl-g.skip{opacity:.3;}
+  .fl-g{transition:opacity .3s;}
+  .fl-txt{font-family:var(--code-font); font-size:12.5px; fill:var(--ink); text-anchor:middle; dominant-baseline:middle;}
+  .fl-txt.s{font-family:'Nunito Sans',sans-serif; font-weight:700; fill:var(--ink-soft);}
+  .fl-line{fill:none; stroke:#9FB5AD; stroke-width:2;}
+  .fl-lbl{font-family:var(--code-font); font-size:12px; font-weight:700;}
+  .fl-side{display:flex; flex-direction:column; gap:12px;}
+  .fl-side pre.py-code{margin:0;}
+  .fl-side .ln{display:inline-block; width:100%; border-radius:4px; transition:background .25s, opacity .25s;}
+  .fl-side .ln.cur{background:rgba(255,212,59,.25);}
+  .fl-side .ln.skip{opacity:.35;}
+  .fl-ctrl .btn-primary:disabled{opacity:.5; cursor:default;}
+  .fl-ctrl{display:flex; align-items:center; gap:12px 18px; flex-wrap:wrap;}
+  .fl-out{background:var(--code-bg); color:var(--code-ink); font-family:var(--code-font); font-size:14px; border-radius:var(--radius-s); padding:10px 14px; min-height:64px; white-space:pre-line;}
+  .fl-out .ttl{display:block; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--code-soft); margin-bottom:4px; font-family:'Nunito Sans',sans-serif; font-weight:700;}
+  .fl-msg{font-size:14px; color:var(--ink-soft); min-height:1.3em;}
+  .fl-msg b{font-family:var(--code-font);}
+  @media (max-width:640px){ .flow-grid{grid-template-columns:1fr;} .flow svg{max-width:300px; margin:0 auto;} }
+  @media (max-width:560px){ .wear-grid{grid-template-columns:1fr;} .wear-pic .em{font-size:48px;} }
+</style>
+</head>
+<body data-lesson="py-conditions" data-hud="Python Basic · Умови">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Python Basic · Заняття 4</div>
+      <h1>Якщо… то… інакше: умови в Python</h1>
+      <p>Навчишся порівнювати значення й писати програми, які самі обирають, що робити далі.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none" aria-hidden="true">
+      <circle cx="70" cy="70" r="60" fill="#E3F2EE"/>
+      <rect x="66" y="30" width="8" height="90" rx="3" fill="#6B5A45"/>
+      <path d="M74 36 H112 L122 46 L112 56 H74 Z" fill="#3FAE58"/>
+      <text x="96" y="50" text-anchor="middle" font-family="monospace" font-weight="700" font-size="12" fill="#fff">True</text>
+      <path d="M66 62 H26 L16 72 L26 82 H66 Z" fill="#5A6275"/>
+      <text x="43" y="76" text-anchor="middle" font-family="monospace" font-weight="700" font-size="11" fill="#fff">False</text>
+      <rect x="54" y="116" width="32" height="8" rx="4" fill="#C9DCD5"/>
+      <path d="M86 120 Q114 122 112 102 Q110 90 100 90" stroke="#FFD43B" stroke-width="10" stroke-linecap="round"/>
+      <circle cx="98" cy="88" r="9" fill="#FFD43B"/><circle cx="96" cy="86" r="2.2" fill="#1B1B3A"/>
+      <text x="40" y="112" text-anchor="middle" font-family="monospace" font-weight="800" font-size="22" fill="#2F7D6D">?</text>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Заняття 1–3</div>
+    <h2>Розминка</h2>
+    <p>Перш ніж почати нове, згадаймо, що ти вже вмієш: вивід, змінні, введення й арифметику. Запитання з'являтимуться по одному.</p>
+    <div class="exercise" id="warmup"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Порівняння</div>
+    <h2>Правда чи ні?</h2>
+    <p>Python уміє порівнювати значення. Відповідь завжди одна з двох: <code>True</code> (правда) або <code>False</code> (неправда) — це тип <code>bool</code>.</p>
+    <div class="ops">
+      <div class="op"><code>&gt;</code>більше</div>
+      <div class="op"><code>&lt;</code>менше</div>
+      <div class="op"><code>&gt;=</code>більше або дорівнює</div>
+      <div class="op"><code>&lt;=</code>менше або дорівнює</div>
+      <div class="op"><code>==</code>дорівнює</div>
+      <div class="op"><code>!=</code>не дорівнює</div>
+    </div>
+    <div class="trivia">Один знак <code>=</code> кладе значення в змінну, а два <code>==</code> — порівнюють. Їх часто плутають.</div>
+    <div class="exercise">
+      <p class="soft">Що покаже <code>print()</code> для кожного виразу?</p>
+      <div id="cmpList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Команда if</div>
+    <h2>Якщо умова правдива — виконуй</h2>
+    <p>Команда <code>if</code> («якщо») перевіряє умову. Рядки під нею виконуються, лише коли умова — <code>True</code>.</p>
+    <pre class="py-code">if age &gt;= 10:
+    print("Можна на гірку")</pre>
+    <ul>
+      <li>після умови — двокрапка <code>:</code>;</li>
+      <li>рядки всередині <code>if</code> мають відступ — 4 пробіли (клавіша Tab).</li>
+    </ul>
+    <p>Програму з <code>if</code> можна уявити як дорогу з розвилкою. На розвилці Python перевіряє умову й обирає шлях: <b>True</b> — через рядок з відступом, <b>False</b> — в обхід нього. Далі обидва шляхи сходяться.</p>
+    <div class="flow" id="flow">
+      <div class="flow-grid">
+        <svg viewBox="0 0 320 450" aria-label="Блок-схема: перевірка умови age >= 10">
+          <defs><marker id="flArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#9FB5AD"/></marker></defs>
+          <path class="fl-line" d="M160 48 V70" marker-end="url(#flArr)"/>
+          <path class="fl-line" d="M160 110 V130" marker-end="url(#flArr)"/>
+          <path class="fl-line" d="M160 210 V250" marker-end="url(#flArr)"/>
+          <path class="fl-line" d="M160 290 V330" marker-end="url(#flArr)"/>
+          <path class="fl-line" d="M250 170 H292 V310 H160" />
+          <path class="fl-line" d="M160 370 V392" marker-end="url(#flArr)"/>
+          <text class="fl-lbl" x="170" y="234" fill="#3FAE58">True</text>
+          <text class="fl-lbl" x="258" y="160" fill="#5A6275">False</text>
+          <g class="fl-g"><rect class="fl-node" id="flStart" x="110" y="14" width="100" height="34" rx="17"/><text class="fl-txt s" x="160" y="31">Початок</text></g>
+          <g class="fl-g"><rect class="fl-node" id="flSet" x="80" y="70" width="160" height="40" rx="6"/><text class="fl-txt" id="flSetTx" x="160" y="90">age = 12</text></g>
+          <g class="fl-g"><path class="fl-node" id="flIf" d="M160 130 L250 170 L160 210 L70 170 Z"/><text class="fl-txt" x="160" y="170">age &gt;= 10 ?</text></g>
+          <g class="fl-g" id="flYesG"><rect class="fl-node" id="flYes" x="40" y="250" width="240" height="40" rx="6"/><text class="fl-txt" x="160" y="270">print("Можна на гірку")</text></g>
+          <g class="fl-g"><rect class="fl-node" id="flAll" x="40" y="330" width="240" height="40" rx="6"/><text class="fl-txt" x="160" y="350">print("Гарного дня!")</text></g>
+          <g class="fl-g"><rect class="fl-node" id="flEnd" x="110" y="392" width="100" height="34" rx="17"/><text class="fl-txt s" x="160" y="409">Кінець</text></g>
+          <path id="flR1" d="M160 48 V70" fill="none"/>
+          <path id="flR2" d="M160 110 V130" fill="none"/>
+          <path id="flRT" d="M160 210 V250" fill="none"/>
+          <path id="flRT2" d="M160 290 V330" fill="none"/>
+          <path id="flRF" d="M250 170 H292 V310 H160 V330" fill="none"/>
+          <path id="flR4" d="M160 370 V392" fill="none"/>
+          <circle id="flDot" r="7" cx="160" cy="48" fill="#FFD43B" stroke="#C99A00" stroke-width="2" opacity="0"/>
+        </svg>
+        <div class="fl-side">
+          <div class="fl-ctrl">
+            <div class="stepper">Вік: <button type="button" data-d="-1" aria-label="Менше">−</button><b id="flAge"></b><button type="button" data-d="1" aria-label="Більше">+</button></div>
+            <button class="btn-primary" type="button" id="flRun">▶ Запустити</button>
+          </div>
+          <div id="flCode"></div>
+          <div class="fl-msg" id="flMsg">Обери вік і запусти програму.</div>
+          <div class="fl-out" id="flOut"><span class="ttl">Консоль</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="note">Спробуй вік 10: чи пустить програма на гірку? Знак <code>&gt;=</code> вмикає і саме число 10.</div>
+    <p class="soft">Виконай програму покроково для двох гостей парку.</p>
+    <div id="trace1"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Інакше: else</div>
+    <h2>Два шляхи</h2>
+    <p>Слово <code>else</code> («інакше») додає другий шлях: його рядки виконуються, коли умова — <code>False</code>. Умову після <code>else</code> не пишуть.</p>
+    <pre class="py-code">if password == "python":
+    print("Вхід дозволено")
+else:
+    print("Неправильний пароль")</pre>
+    <div id="task1"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Двокрапки й відступи</div>
+    <h2>Знайди помилку</h2>
+    <p>За відступами Python розуміє, які рядки належать до <code>if</code>, а які — ні. Тому відступ і двокрапка тут дуже важливі.</p>
+    <div class="exercise">
+      <p class="soft">Клацни рядок, у якому помилка.</p>
+      <div id="bugList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Кілька шляхів: elif</div>
+    <h2>Що вдягнути?</h2>
+    <p>Коли шляхів більше двох, між <code>if</code> і <code>else</code> ставлять <code>elif</code> («інакше, якщо»). Python перевіряє умови згори вниз і виконує лише <b>першу</b> правдиву.</p>
+    <div class="wear" id="wear">
+      <div class="wear-top">
+        <label for="wearT">Температура за вікном:</label>
+        <input type="range" id="wearT" min="-15" max="35" step="1" value="18">
+        <span class="wear-t" id="wearVal"></span>
+      </div>
+      <div class="wear-grid">
+        <div id="wearCode"></div>
+        <div class="wear-pic"><span class="em" id="wearEm"></span><div class="tx" id="wearTx"></div></div>
+      </div>
+    </div>
+    <div class="note">Коли одна умова спрацювала, решту Python навіть не перевіряє — пересунь повзунок і подивись на підписи.</div>
+    <div class="exercise">
+      <p class="soft">Що виведе програма?</p>
+      <div id="elifList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · and, or, not</div>
+    <h2>Складні умови</h2>
+    <p>Кілька умов можна поєднати в одну:</p>
+    <ul>
+      <li><code>and</code> («і») — правда, коли правдиві <b>обидві</b> умови;</li>
+      <li><code>or</code> («або») — правда, коли правдива <b>хоча б одна</b>;</li>
+      <li><code>not</code> («не») — перевертає: <code>True</code> стає <code>False</code>, і навпаки.</li>
+    </ul>
+    <pre class="py-code">if age &gt;= 7 and height &gt;= 120:
+    print("Можна на американські гірки")</pre>
+    <div class="exercise">
+      <p class="soft">Обери умову словами, а потім клацни її запис у Python.</p>
+      <div class="match-pool" id="logicPool"></div>
+      <div id="logicList"></div>
+      <div class="progress-line" id="logicProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 7 · Задача</div>
+    <h2>Який у тебе рівень?</h2>
+    <p>Програма питає бал за 12-бальною шкалою й каже рівень. Перевірка неможливого бала вже є — допиши решту рівнів:</p>
+    <ul>
+      <li>10–12 — високий;</li>
+      <li>7–9 — достатній;</li>
+      <li>4–6 — середній;</li>
+      <li>1–3 — початковий.</li>
+    </ul>
+    <div id="task2"></div>
+    <div class="note">Запусти програму кілька разів з різними балами: 12, 8, 5, 2 і 15. Кожен раз має з'являтися свій рівень.</div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Заняття 4 · «Умови: if, elif, else» · Гурток Python Basic</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script src="../../assets/python.js"></script>
+<script>
+/* ---------- ПОВТОРЕННЯ: розминка, запитання по одному ---------- */
+(function(){
+  const Q = [
+    { code:'print("2 + 3")', q:'Що виведе програма?', opts:['5', '2 + 3', 'Помилка'], correct:1, why:'У лапках — текст, тож Python виводить його як є і нічого не рахує.' },
+    { code:'Print("Привіт")', q:'Що станеться, якщо запустити цю програму?', opts:['Виведе Привіт', 'Виведе Print("Привіт")', 'Буде помилка'], correct:2, why:'Python розрізняє великі й малі літери: команда пишеться print.' },
+    { code:'# print("Привіт")\nprint("Бувай")', q:'Що з’явиться в консолі?', opts:['Привіт і Бувай', 'Бувай', 'Нічого'], correct:1, why:'Рядок з # — це коментар, Python його пропускає.' },
+    { q:'Яка назва змінної правильна?', opts:['my score', '2score', 'my_score'], correct:2, why:'У назві не можна пробілів, і вона не може починатися з цифри. Слова з’єднують підкресленням.' },
+    { code:'name = "Оля"\nprint(f"Привіт, {name}!")', q:'Що виведе програма?', opts:['Привіт, {name}!', 'Привіт, name!', 'Привіт, Оля!'], correct:2, why:'У f-рядку на місце {name} стає вміст змінної.' },
+    { code:'x = 3.5', q:'Якого типу значення в змінній x?', opts:['int', 'float', 'str', 'bool'], correct:1, why:'Число з крапкою — дробове, тип float.' },
+    { code:'age = input("Вік? ")', q:'Користувач увів 12. Що лежить у змінній age?', opts:['Число 12', 'Текст "12"', 'Нічого'], correct:1, why:'input() завжди повертає текст. Щоб отримати число, пишуть int(input()).' },
+    { code:'print(10 / 2)', q:'Що виведе програма?', opts:['5', '5.0', '10 / 2'], correct:1, why:'Ділення / завжди дає дробове число.' },
+    { code:'print(2 + 3 * 4)', q:'Що виведе програма?', opts:['20', '14', '24'], correct:1, why:'Спершу множення: 3 * 4 = 12, потім 2 + 12.' },
+    { code:'print(17 // 5)\nprint(17 % 5)', q:'Що з’явиться в консолі?', opts:['3 і 2', '3.4 і 0', '2 і 3'], correct:0, why:'У 17 вміщається три п’ятірки (15), лишається 2.' },
+    { code:'print("5" + "5")', q:'Що виведе програма?', opts:['10', '55', 'Помилка'], correct:1, why:'У лапках — текст, а + склеює текст.' },
+    { code:'coins = 10\ncoins = coins + 5\nprint(coins)', q:'Що виведе програма?', opts:['10', '15', 'coins + 5'], correct:1, why:'Було 10, додали 5 і поклали назад у ту саму коробку.' }
+  ];
+  const box = document.getElementById('warmup');
+  const hit = trackTask(box, Q.length, Q.length);
+  const res = [];            // true — з першої спроби, false — з помилкою
+  box.innerHTML = `<div class="wu-head"><span class="wu-count"></span><span class="wu-dots">${Q.map(()=>'<i class="wu-dot"></i>').join('')}</span></div><div class="wu-card"></div>`;
+  const count = box.querySelector('.wu-count'), dots = [...box.querySelectorAll('.wu-dot')], card = box.querySelector('.wu-card');
+  function show(n){
+    dots.forEach((d, i)=>d.classList.toggle('cur', i === n));
+    if(n === Q.length){ finish(); return; }
+    const it = Q[n];
+    count.textContent = `Запитання ${n + 1} з ${Q.length}`;
+    card.innerHTML = (it.code ? pyCode(it.code) : '') + `<p class="q">${it.q}</p><div class="choice-row"></div><div class="choice-feedback"></div>`;
+    card.classList.remove('in'); void card.offsetWidth; card.classList.add('in');
+    const row = card.querySelector('.choice-row'), fb = card.querySelector('.choice-feedback');
+    let done = false, missed = false;
+    it.opts.forEach((o, i)=>{
+      const b = document.createElement('button');
+      b.className = 'choice-btn'; b.type = 'button'; b.textContent = o;
+      b.addEventListener('click', ()=>{
+        if(done) return;
+        if(i !== it.correct){ b.classList.add('wrong'); missed = true; fb.textContent = 'Ні, подумай ще.'; return; }
+        done = true;
+        b.classList.add('correct');
+        fb.textContent = 'Правильно ✓ ' + it.why;
+        res[n] = !missed;
+        dots[n].classList.add(missed ? 'retry' : 'ok');
+        addNeurons(1); hit();
+        const next = document.createElement('button');
+        next.className = 'btn-primary wu-next'; next.type = 'button';
+        next.textContent = n + 1 < Q.length ? 'Далі →' : 'Завершити розминку';
+        next.addEventListener('click', ()=>show(n + 1));
+        card.appendChild(next);
+        next.focus({preventScroll:true});
+      });
+      row.appendChild(b);
+    });
+  }
+  function finish(){
+    const first = res.filter(Boolean).length;
+    count.textContent = 'Розминку завершено ✓';
+    const [em, title] = first === Q.length ? ['🏆', 'Усе з першої спроби!'] : first >= Q.length - 3 ? ['💪', 'Чудова форма!'] : ['🙂', 'Пам’ять розім’ято!'];
+    card.innerHTML = `<div class="wu-end"><div class="big">${em}</div><h3>${title}</h3><p>З першої спроби: ${first} з ${Q.length}. Оранжеві кружечки — запитання, до яких варто повернутися в попередніх заняттях.</p></div>`;
+    card.classList.remove('in'); void card.offsetWidth; card.classList.add('in');
+  }
+  show(0);
+})();
+
+/* ---------- КРОК 1 ---------- */
+makeYesNo('cmpList', [
+  { text:'<code>7 &gt; 3</code>', correct:true },
+  { text:'<code>5 &gt;= 5</code>', correct:true, why:'5 не більше за 5, але дорівнює — а >= дозволяє обидва випадки.' },
+  { text:'<code>5 &lt; 5</code>', correct:false, why:'5 не менше за саме себе.' },
+  { text:'<code>10 % 2 == 0</code>', correct:true, why:'Остача від ділення 10 на 2 — це 0. Так перевіряють, чи число парне.' },
+  { text:'<code>3 != 3</code>', correct:false, why:'!= питає «не дорівнює?», а 3 дорівнює 3.' },
+  { text:'<code>"кіт" == "Кіт"</code>', correct:false, why:'Для Python мала й велика літери — різні символи.' }
+], 'True', 'False');
+
+/* ---------- КРОК 2: блок-схема if ---------- */
+(function(){
+  const $ = id=>document.getElementById(id);
+  const dot = $('flDot'), out = $('flOut'), msg = $('flMsg'), run = $('flRun');
+  const SRC = 'age = {A}\nif age >= 10:\n    print("Можна на гірку")\nprint("Гарного дня!")';
+  const NODES = ['flStart', 'flSet', 'flIf', 'flYes', 'flAll', 'flEnd'];
+  const slow = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let age = 12, busy = false;
+  const wait = ms=>new Promise(ok=>setTimeout(ok, slow ? ms : 0));
+  function move(id){                 // маркер біжить стрілкою до наступного блоку й «заходить» у нього
+    const p = $(id), len = p.getTotalLength(), ms = Math.max(450, len * 9);
+    const at = k=>{ const pt = p.getPointAtLength(len * k); dot.setAttribute('cx', pt.x); dot.setAttribute('cy', pt.y); };
+    at(0); dot.setAttribute('opacity', 1);
+    return new Promise(done=>{
+      const ok = ()=>{ dot.setAttribute('opacity', 0); done(); };
+      if(!slow){ ok(); return; }
+      const t0 = performance.now();
+      (function frame(t){
+        const k = Math.min(1, (t - t0) / ms), e = k < .5 ? 2*k*k : 1 - (-2*k + 2)**2 / 2;
+        at(e);
+        k < 1 ? requestAnimationFrame(frame) : ok();
+      })(t0);
+    });
+  }
+  const lines = ()=>[...document.querySelectorAll('#flCode .ln')];
+  function cur(n){ lines().forEach((l, i)=>l.classList.toggle('cur', i + 1 === n)); }
+  function light(id, cls = 'on'){ $(id).classList.remove('on', 't', 'f'); if(cls) $(id).classList.add(cls); }
+  function reset(){
+    $('flAge').textContent = age;
+    $('flSetTx').textContent = `age = ${age}`;
+    $('flCode').innerHTML = pyCode(SRC.replace('{A}', age));
+    NODES.forEach(id=>light(id, ''));
+    $('flYesG').classList.remove('skip');
+    out.innerHTML = '<span class="ttl">Консоль</span>';
+    dot.setAttribute('opacity', 0);
+  }
+  const print = t=>out.insertAdjacentHTML('beforeend', t + '\n');
+  async function go(){
+    if(busy) return;
+    busy = true; run.disabled = true;
+    reset();
+    msg.textContent = 'Програма стартує…';
+    light('flStart'); await wait(500);
+    await move('flR1'); light('flStart', ''); light('flSet'); cur(1);
+    msg.innerHTML = `Кладемо ${age} у коробку <b>age</b>.`; await wait(900);
+    await move('flR2'); light('flSet', ''); cur(2);
+    const ok = age >= 10;
+    msg.innerHTML = `Розвилка: <b>${age} &gt;= 10</b>?`; light('flIf'); await wait(1000);
+    light('flIf', ok ? 't' : 'f');
+    msg.innerHTML = `<b>${age} &gt;= 10</b> — це <b>${ok ? 'True' : 'False'}</b>. ` + (ok ? 'Ідемо всередину if.' : 'Обходимо рядок з відступом.');
+    await wait(1100);
+    if(ok){
+      await move('flRT'); light('flYes'); cur(3);
+      print('Можна на гірку'); await wait(900);
+      await move('flRT2'); light('flYes', '');
+    } else {
+      $('flYesG').classList.add('skip');
+      lines()[2].classList.add('skip');
+      await move('flRF');
+    }
+    light('flAll'); cur(4);
+    msg.textContent = 'Цей рядок без відступу — він виконується завжди.';
+    print('Гарного дня!'); await wait(1000);
+    await move('flR4'); light('flAll', ''); light('flEnd'); cur(0);
+    msg.textContent = ok ? 'Готово! Зміни вік на менший за 10 і запусти ще раз.' : 'Готово! Рядок усередині if пропущено. Спробуй вік 10.';
+    busy = false; run.disabled = false;
+  }
+  document.querySelectorAll('#flow .stepper button').forEach(b=>b.addEventListener('click', ()=>{
+    if(busy) return;
+    age = Math.min(16, Math.max(5, age + +b.dataset.d));
+    reset(); msg.textContent = 'Запусти програму з новим віком.';
+  }));
+  run.addEventListener('click', go);
+  reset();
+})();
+
+makeTrace('trace1', {
+  code:'age = 12\nif age >= 10:\n    print("Можна на гірку")\nage = 8\nif age >= 10:\n    print("Можна на гірку")\nprint("Гарного дня!")',
+  steps:[
+    { line:1, set:{ age:'12' } },
+    { line:2, ask:{ q:'Умова <code>age &gt;= 10</code> зараз — це…', opts:['True', 'False'], correct:0, why:'12 більше за 10, тож рядок 3 виконається.' } },
+    { line:3, out:'Можна на гірку' },
+    { line:4, set:{ age:'8' } },
+    { line:5, ask:{ q:'А тепер? Який рядок виконається після 5-го?', opts:['Рядок 6', 'Рядок 7'], correct:1, why:'8 менше за 10: умова — False, тож рядок 6 з відступом пропускається.' } },
+    { line:7, out:'Гарного дня!' }
+  ]
+});
+
+/* ---------- КРОК 3 ---------- */
+makeCodeTask('task1', {
+  task:'Програма каже лише про парні числа. Додай <code>else</code>, щоб для непарних вона виводила «Непарне». Потім зміни число на інше й перевір ще раз.',
+  code:'number = 7\nif number % 2 == 0:\n    print("Парне")',
+  hint:'Під if, без відступу, допиши else: — а під ним, з відступом, print("Непарне")',
+  check:(out, code)=>{
+    if(!/^else\s*:/m.test(code)) return 'Додай рядок else: — без відступу, на одному рівні з if.';
+    if(!/^\s+print\(\s*["']Непарне["']\s*\)/m.test(code.split(/^else\s*:/m)[1] || '')) return 'Під else: з відступом має бути print("Непарне").';
+    return /^(Парне|Непарне)$/.test(out.trim()) || 'Програма має вивести одне слово: «Парне» або «Непарне».';
+  }
+});
+
+/* ---------- КРОК 4 ---------- */
+makeFindBug('bugList', [
+  { code:'age = 12\nif age > 10\n    print("Привіт, старшокласнику!")', line:2, why:'Після умови бракує двокрапки: <code>if age &gt; 10:</code>' },
+  { code:'score = 5\nif score == 5:\nprint("Відмінно!")', line:3, why:'Рядок усередині <code>if</code> має бути з відступом.' },
+  { code:'color = "червоний"\nif color = "зелений":\n    print("Можна йти")', line:2, why:'Для порівняння потрібні два знаки: <code>==</code>.' },
+  { code:'n = 4\nif n > 5:\n    print("Багато")\nelse n <= 5:\n    print("Мало")', line:4, why:'Після <code>else</code> умову не пишуть — лише <code>else:</code>' }
+]);
+
+/* ---------- КРОК 5: що вдягнути ---------- */
+(function(){
+  const SRC = 't = {T}\nif t >= 25:\n    print("Шорти й футболка")\nelif t >= 10:\n    print("Легка куртка")\nelif t >= 0:\n    print("Тепла куртка")\nelse:\n    print("Пуховик і шапка")';
+  const BR = [            // [рядок умови, рядок print, умова, картинка]
+    [2, 3, t=>t >= 25, '🩳'], [4, 5, t=>t >= 10, '🧥'], [6, 7, t=>t >= 0, '🧣'], [8, 9, ()=>true, '🧤']
+  ];
+  const TEXT = ['Шорти й футболка', 'Легка куртка', 'Тепла куртка', 'Пуховик і шапка'];
+  const range = document.getElementById('wearT'), em = document.getElementById('wearEm');
+  let last = -1;
+  function draw(){
+    const t = +range.value;
+    document.getElementById('wearVal').textContent = (t > 0 ? '+' : '') + t + '°';
+    document.getElementById('wearCode').innerHTML = pyCode(SRC.replace('{T}', t));
+    const ln = [...document.querySelectorAll('#wearCode .ln')];
+    ln.forEach((l, i)=>l.classList.toggle('run', i === 0));
+    const hit = BR.findIndex(b=>b[2](t));
+    BR.forEach(([c, p], i)=>{
+      if(i < 3) ln[c - 1].dataset.v = i < hit ? 'False' : i === hit ? 'True' : 'не перевіряється';
+      ln[c - 1].classList.add(i <= hit ? 'run' : 'skip');
+      ln[p - 1].classList.add(i === hit ? 'run' : 'skip');
+    });
+    em.textContent = BR[hit][3];
+    document.getElementById('wearTx').textContent = TEXT[hit];
+    if(hit !== last){ em.classList.remove('pop'); void em.offsetWidth; em.classList.add('pop'); last = hit; }
+  }
+  range.addEventListener('input', draw);
+  draw();
+})();
+
+makeChoices('elifList', [
+  { pre:pyCode('t = 30\nif t >= 25:\n    print("Шорти")\nelif t >= 10:\n    print("Куртка")'), text:'30 більше і за 25, і за 10. Що з’явиться в консолі?', opts:['Шорти', 'Куртка', 'Шорти й Куртка'], correct:0, why:'Перша правдива умова — t >= 25. Після неї решту Python не перевіряє.' },
+  { pre:pyCode('t = -5\nif t >= 25:\n    print("Шорти")\nelif t >= 10:\n    print("Куртка")\nelse:\n    print("Пуховик")'), text:'А що тепер?', opts:['Куртка', 'Пуховик', 'Нічого'], correct:1, why:'Обидві умови — False, тож спрацьовує else.' },
+  { pre:pyCode('t = 30\nif t >= 10:\n    print("Куртка")\nelif t >= 25:\n    print("Шорти")'), text:'Умови переставили місцями. Що виведе програма?', opts:['Шорти', 'Куртка', 'Помилка'], correct:1, why:'30 >= 10 — правда, і це перша умова. До «Шорти» черга не доходить. Тому порядок умов важливий: спершу — найвужча.' }
+]);
+
+/* ---------- КРОК 6 ---------- */
+makeMatching('logicPool', 'logicList', [
+  { name:'age &gt;= 10 and age &lt;= 14', desc:'Вік від 10 до 14 років' },
+  { name:'age &lt; 7 or age &gt;= 65', desc:'Молодший за 7 або від 65 років' },
+  { name:'day == "сб" or day == "нд"', desc:'Сьогодні вихідний' },
+  { name:'n &gt; 10 and n % 2 == 0', desc:'Парне число, більше за 10' },
+  { name:'not rain', desc:'Дощу немає' }
+], 'logicProgress');
+
+/* ---------- КРОК 7 ---------- */
+makeCodeTask('task2', {
+  task:'Заміни три крапки й допиши решту рівнів.',
+  code:'score = int(input("Твій бал (1–12): "))\nif score < 1 or score > 12:\n    print("Такого бала немає")\nelif score >= 10:\n    print("Високий рівень")\nelif ...:\n    print("Достатній рівень")',
+  hint:'Достатній — це score >= 7 (бали 10–12 уже «забрала» умова вище). Далі ще один elif для score >= 4, а в кінці else: для початкового рівня.',
+  neurons:4,
+  check:(out, code)=>{
+    if(/\.\.\./.test(code)) return 'Заміни три крапки умовою.';
+    if((code.match(/^\s*elif\b/gm) || []).length < 3) return 'Рівнів має бути чотири: додай ще elif для середнього рівня.';
+    if(!/^else\s*:/m.test(code)) return 'Для найнижчого рівня допиши в кінці else:';
+    if(!/Середній рівень/.test(code) || !/Початковий рівень/.test(code)) return 'Додай рядки print("Середній рівень") і print("Початковий рівень").';
+    return /^(Такого бала немає|(Високий|Достатній|Середній|Початковий) рівень)$/.test(out.trim()) || 'Програма має вивести один рядок — рівень.';
+  }
+});
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що виведе програма?' + pyCode('print(8 >= 8)'), opts:['True', 'False', '8'], correct:0 },
+  { q:'Який запис <b>порівнює</b> x з п’ятьма?', opts:['<code>x = 5</code>', '<code>x == 5</code>', '<code>x := 5</code>'], correct:1, why:'Один знак <code>=</code> кладе 5 у змінну.' },
+  { q:'Що виведе програма?' + pyCode('x = 3\nif x > 5:\n    print("A")\nprint("B")'), opts:['A', 'B', 'A і B'], correct:1, why:'Умова — False, рядок з відступом пропущено, а <code>print("B")</code> стоїть поза <code>if</code>.' },
+  { q:'Що виведе програма?' + pyCode('n = 15\nif n > 20:\n    print("A")\nelif n > 10:\n    print("B")\nelif n > 5:\n    print("C")\nelse:\n    print("D")'), opts:['B', 'B і C', 'D'], correct:0, why:'Виконується лише перша правдива умова — <code>n &gt; 10</code>.' },
+  { q:'Чого бракує в рядку?' + pyCode('if score > 5'), opts:['Лапок', 'Двокрапки', 'Дужок'], correct:1 },
+  { q:'Коли <code>a and b</code> — це <code>True</code>?', opts:['Коли правдива хоча б одна умова', 'Коли правдиві обидві умови', 'Завжди'], correct:1 }
+], {summary:'Тепер ти вмієш порівнювати значення, писати умови з if, elif і else та поєднувати їх через and, or і not.', html:true});
+</script>
+
+</body>
+</html>

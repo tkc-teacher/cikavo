@@ -6,6 +6,8 @@
   --code-font:'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
   --t-k:#C792EA; --t-b:#82AAFF; --t-s:#C3E88D; --t-n:#F78C6C; --t-c:#7F8BA3;
 }
+/* Без лігатур: >= і == мають виглядати так, як їх набирають, а не ≥ чи суцільною рискою */
+body, button, textarea, input{font-variant-ligatures:none;}
 
 /* Код у тексті й статичні приклади */
 .block code, .classify-card code, .choice-btn code, .choice-feedback code, .note code, .trivia code, .py-out code, .quiz-q code, .quiz-opt code, .quiz-why code{

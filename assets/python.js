@@ -133,8 +133,27 @@ function lint(lines, upto){
     if(closes > opens + depth) return [n, 'Тут зайва закривальна дужка <code>)</code>.'];
     depth += opens - closes;
     if(depth > 0 && n === upto - 1 && /^\s*\w+\s*\(/.test(lines[i + 1] || '')) return [n, 'Бракує закривальної дужки <code>)</code> в кінці рядка.'];
-    if(/^\s+\S/.test(line) && !/:\s*(#.*)?$/.test(lines[i - 1] || '') && depth <= 0 && !/^\s/.test(lines[i - 1] || ''))
-      return [n, 'Зайвий пробіл на початку рядка. Python уважно стежить за відступами: рядок має починатися з самого краю.'];
+    if(depth > 0 || !rest.trim()) continue;
+    const code = rest.replace(/\s+$/, ''), ind = line.match(/^\s*/)[0].length;
+    let p = i - 1;            // попередній непорожній рядок
+    while(p >= 0 && !outside(lines[p]).rest.trim()) p--;
+    const prev = p >= 0 ? outside(lines[p]).rest.replace(/\s+$/, '') : '', pind = p >= 0 ? lines[p].match(/^\s*/)[0].length : 0;
+    if(/^\s*else\s+if\b/.test(code)) return [n, 'У Python пишуть <code>elif</code>, а не <code>else if</code>.'];
+    if(/=>|=</.test(code)) return [n, 'Знак рівності ставлять другим: <code>&gt;=</code> і <code>&lt;=</code>.'];
+    if(/^\s*(if|elif|while)\b/.test(code) && /(^|[^=!<>])=($|[^=])/.test(code)) return [n, 'Щоб порівняти, пиши два знаки <code>==</code>. Один знак <code>=</code> кладе значення в змінну.'];
+    if(/^\s*elif\s*:?$/.test(code)) return [n, 'Після <code>elif</code> потрібна умова, як після <code>if</code>.'];
+    if(/^\s*else\b/.test(code) && !/^\s*else\s*:$/.test(code)) return [n, 'Після <code>else</code> умови не пишуть — лише двокрапку: <code>else:</code>'];
+    if(/^\s*(if|elif|else|while|for|def)\b/.test(code) && !/:$/.test(code)) return [n, 'Наприкінці цього рядка бракує двокрапки <code>:</code>'];
+    if(/^\s*(elif|else)\b/.test(code)){
+      let q = i - 1;          // шукаємо рядок з тим самим відступом — це має бути if чи elif
+      while(q >= 0 && (!outside(lines[q]).rest.trim() || lines[q].match(/^\s*/)[0].length > ind)) q--;
+      if(q < 0 || lines[q].match(/^\s*/)[0].length < ind || !/^\s*(if|elif|for|while)\b/.test(lines[q]))
+        return [n, `<code>${code.trim().split(/\W/)[0]}</code> має стояти одразу під блоком <code>if</code> і з тим самим відступом, що й <code>if</code>.`];
+    }
+    if(/:$/.test(prev) && ind <= pind) return [n, 'Після рядка з двокрапкою команди пишуть з відступом — 4 пробіли (клавіша Tab).'];
+    if(ind > pind && !/:$/.test(prev))
+      return [n, pind ? 'Зайвий відступ: цей рядок зсунуто далі, ніж рядок над ним.' : 'Зайвий пробіл на початку рядка. Python уважно стежить за відступами: рядок має починатися з самого краю.'];
+    if(ind % 4) return [n, 'Відступ має бути 4 пробіли (всередині вкладеного блоку — 8). Тут пробілів інша кількість.'];
   }
   if(depth > 0) return [Math.min(lines.length, upto), 'Бракує закривальної дужки <code>)</code>. Кожна відкрита дужка має закритися.'];
   return null;
@@ -169,6 +188,7 @@ function explain(e, code){
       return res(`Python не знає, що таке <code>${esc(name)}</code>. Якщо це текст — візьми його в лапки. Якщо змінна — перевір, чи вона створена вище.`);
     }
     case 'TypeError':
+      if(/not supported between/.test(arg)) return res('Не можна порівнювати текст і число. Якщо число ввів користувач — перетвори його: <code>int(input())</code>.');
       if(/concatenate|must be str|unsupported operand/.test(arg)) return res('Не можна поєднати текст і число через <code>+</code>. Перетвори число на текст <code>str(…)</code> або текст на число <code>int(…)</code>.');
       if(/not callable/.test(arg)) return res('Тут щось викликається як команда з дужками, хоча це не команда.');
       return res('Дані тут не того типу, що потрібен.');
@@ -222,6 +242,9 @@ function editor(host, code, {file = 'main.py', onRun, extra = ''} = {}){
     const {selectionStart:a, selectionEnd:b, value:v} = ta;
     const put = s=>{ ta.setRangeText(s, a, b, 'end'); ta.dispatchEvent(new Event('input')); };
     if(e.key === 'Tab' && !e.shiftKey){ e.preventDefault(); put('    '); }
+    else if(e.key === 'Backspace' && a === b && a >= 4 && /(^|\n) *$/.test(v.slice(0, a)) && v.slice(a - 4, a) === '    '){
+      e.preventDefault(); ta.setRangeText('', a - 4, a, 'end'); ta.dispatchEvent(new Event('input'));   // відступ стирається цілим
+    }
     else if(e.key === 'Enter'){      // зберігаємо відступ, після двокрапки — додаємо
       const line = v.slice(v.lastIndexOf('\n', a - 1) + 1, a);
       const indent = line.match(/^\s*/)[0] + (/:\s*$/.test(line) ? '    ' : '');

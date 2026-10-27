@@ -65,7 +65,17 @@ body.insertAdjacentHTML('afterbegin', `
     </div>
   </div>`);
 const hud = body.querySelector('.hud');
-hud.querySelector('.hud-title').textContent = body.dataset.hud || '';
+// Підпис HUD: перша частина до « · » (клас, курс) — посилання на список уроків, решта — назва уроку
+{
+  const [head, ...rest] = (body.dataset.hud || '').split(' · ');
+  const title = hud.querySelector('.hud-title'), link = document.createElement('a');
+  link.className = 'hud-link'; link.href = '../index.html'; link.title = 'До списку уроків'; link.textContent = head;
+  title.append(link, rest.length ? ' · ' + rest.join(' · ') : '');
+}
+// Прогрес уроку на сайті ще не зберігається (розділ 6 гайду), тож перед виходом — попередження
+hud.querySelector('.hud-link').addEventListener('click', e=>{
+  if(neurons > 0 && !confirm(`Ти вже маєш нейрончиків: ${neurons}. Якщо вийдеш до списку уроків, прогрес цього уроку не збережеться. Вийти?`)) e.preventDefault();
+});
 const markEl = hud.querySelector('.session-mark');
 function showMark(){ markEl.textContent = MARK[0]; markEl.title = MARK[1]; markEl.setAttribute('aria-label', `Знак уроку: ${MARK[1]}. Змінити`); }
 showMark();
