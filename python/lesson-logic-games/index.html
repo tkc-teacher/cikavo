@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практикум: логічні ігри — Заняття</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<link rel="stylesheet" href="../../assets/python.css">
+<style>
+  :root{
+    --accent:#6D4BC3; --accent-dark:#4B2F92; --accent-soft:#EFEAFA;
+    --bg:#F7F5FC; --line:#E3DDF3; --ink-soft:#57506E;
+    --hud-bar:linear-gradient(90deg, #6D4BC3, #3776AB, #FFD43B);
+  }
+  #demoGame{margin-bottom:18px;}
+  /* кубик */
+  .dice-demo{display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:28px; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:20px 22px; margin:16px 0;}
+  .die{flex:none; width:104px; height:104px; padding:0; border:none; background:none; cursor:pointer; filter:drop-shadow(0 6px 8px rgba(75,47,146,.25));}
+  .die svg{width:100%; height:100%; display:block;}
+  .die.rolling{animation:tumble .75s ease-out;}
+  @keyframes tumble{0%{transform:translateY(0) rotate(0)} 25%{transform:translateY(-34px) rotate(160deg)} 50%{transform:translateY(0) rotate(300deg)} 70%{transform:translateY(-10px) rotate(340deg)} 100%{transform:translateY(0) rotate(360deg)}}
+  @media (max-width:520px){ .dice-demo{gap:16px; padding:16px;} .die{width:84px; height:84px;} }
+  /* randint з повзунками */
+  .rnd-demo{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:20px 22px; margin:16px 0;}
+  .rnd-code{font-family:var(--code-font); font-size:16px; background:var(--code-bg); color:var(--code-ink); padding:12px 16px; border-radius:var(--radius-m); overflow-x:auto; white-space:nowrap;}
+  .rnd-code .t-b{color:var(--t-b);} .rnd-code .t-n{color:var(--t-n); font-weight:600;}
+  .rnd-ctrls{display:grid; grid-template-columns:1fr 1fr; gap:10px 22px; margin:16px 0 6px;}
+  .rnd-ctrls label{font-weight:700; font-size:14px; color:var(--ink-soft);}
+  .rnd-ctrls b{font-family:'Baloo 2',sans-serif; font-size:18px; color:var(--accent-dark); margin-left:6px;}
+  .rnd-ctrls input{display:block; width:100%; accent-color:var(--accent); margin-top:4px;}
+  .rnd-line{display:grid; grid-template-columns:repeat(21,1fr); gap:3px; margin:14px 0 4px;}
+  .rc{display:flex; justify-content:center;}
+  .rc .num{width:100%; aspect-ratio:1; max-width:34px; border-radius:6px; display:grid; place-items:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; background:#F1F0F5; color:#B4B0C4; opacity:.35; transition:background .15s, color .15s, transform .15s, opacity .15s;}
+  .rc.in .num{background:var(--accent-soft); color:var(--accent-dark); opacity:1;}
+  .rc.hop .num{background:#FFE9A0; color:#1B1B3A;}
+  .rc.hit .num{position:relative; z-index:1; background:#FFD43B; color:#1B1B3A; transform:scale(1.45); box-shadow:0 0 0 2px #F0A830, 0 3px 10px rgba(255,170,0,.45); animation:pop .35s ease-out;}
+  @keyframes pop{0%{transform:scale(1)} 60%{transform:scale(1.7)} 100%{transform:scale(1.45)}}
+  .rnd-btns{display:flex; flex-wrap:wrap; gap:10px; margin-top:14px;}
+  .rnd-btns button:disabled{opacity:.45; cursor:default;}
+  .rnd-out{margin-top:12px; font-weight:600;}
+  .rnd-out:empty{display:none;}
+  .rnd-out.err{color:#C0392B;}
+  @media (max-width:520px){ .rnd-demo{padding:16px;} .rnd-line{gap:2px;} .rc .num{font-size:10px; border-radius:4px;} .rnd-ctrls{gap:10px 14px;} }
+</style>
+</head>
+<body data-lesson="py-logic-games" data-hud="Python Basic · Логічні ігри">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Python Basic · Заняття 5 · Практикум</div>
+      <h1>Логічні ігри: вікторина з випадковими прикладами</h1>
+      <p>Пригадаєш усе, що вивчив за чотири заняття, познайомишся з випадковими числами й зіграєш у вікторину, де щоразу нові приклади.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none" aria-hidden="true">
+      <circle cx="70" cy="70" r="60" fill="#EFEAFA"/>
+      <rect x="30" y="34" width="52" height="52" rx="10" fill="#6D4BC3" transform="rotate(-10 56 60)"/>
+      <circle cx="44" cy="50" r="4.5" fill="#fff"/><circle cx="58" cy="58" r="4.5" fill="#fff"/><circle cx="72" cy="66" r="4.5" fill="#fff"/>
+      <rect x="66" y="58" width="44" height="54" rx="8" fill="#fff" stroke="#4B2F92" stroke-width="3"/>
+      <text x="88" y="95" text-anchor="middle" font-family="'Baloo 2',sans-serif" font-weight="800" font-size="34" fill="#4B2F92">?</text>
+      <path d="M34 118 Q22 112 30 100 Q36 92 46 96" stroke="#FFD43B" stroke-width="9" stroke-linecap="round"/>
+      <circle cx="48" cy="96" r="8" fill="#FFD43B"/><circle cx="50" cy="94" r="2" fill="#1B1B3A"/>
+      <path d="M104 30 l3 7 7 1 -5 5 1 7 -6 -3 -6 3 1 -7 -5 -5 7 -1 z" fill="#FFD43B"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Заняття 1–4</div>
+    <h2>Велика розминка</h2>
+    <p>Дванадцять запитань про все, що вже знаєш: вивід, змінні, арифметику й умови. Кожне — з кодом, який треба «виконати» в голові.</p>
+    <div class="exercise" id="warmup"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label recap">Повторення · Помилки</div>
+    <h2>Знайди помилку</h2>
+    <p>Тут зібрано найчастіші помилки з усіх чотирьох занять.</p>
+    <div class="exercise">
+      <p class="soft">Клацни рядок, у якому помилка.</p>
+      <div id="bugList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label recap">Повторення · Задача</div>
+    <h2>Квиток у кіно</h2>
+    <p>Каса кінотеатру продає квитки за віком:</p>
+    <ul>
+      <li>до 7 років або від 65 — безкоштовно;</li>
+      <li>до 18 років — дитячий квиток, 80 грн;</li>
+      <li>решта — дорослий квиток, 150 грн.</li>
+    </ul>
+    <div id="ticketTask"></div>
+    <div class="note">Перевір програму кілька разів: для 5, 12, 30 і 70 років.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Випадкові числа</div>
+    <h2>Як комп'ютер кидає кубик</h2>
+    <div class="dice-demo">
+      <button class="die" id="die" aria-label="Кинути кубик"><svg viewBox="0 0 100 100" id="dieSvg"></svg></button>
+      <div class="rnd-code">random.randint(<span class="t-n">1</span>, <span class="t-n">6</span>)</div>
+    </div>
+    <p>Випадкові числа комп'ютер обчислює за хитрою формулою, а першим числом бере, наприклад, поточний час до мільйонних часток секунди.</p>
+    <p>У Python випадкові числа дає модуль <code>random</code> — набір готових команд.</p>
+    <pre class="py-code">import random                 # підключаємо модуль
+a = random.randint(2, 9)      # випадкове ціле від 2 до 9</pre>
+    <p>Спробуй сам: обери найменше й найбільше число і запусти. Випаде будь-яке ціле число з цього проміжку, причому обидва краї теж можуть випасти.</p>
+    <div class="rnd-demo">
+      <div class="rnd-code"><span class="t-b">print</span>(random.randint(<span class="t-n" id="rMinV">2</span>, <span class="t-n" id="rMaxV">9</span>))</div>
+      <div class="rnd-ctrls">
+        <label>Найменше <b id="rMinL">2</b><input type="range" id="rMin" min="0" max="20" value="2"></label>
+        <label>Найбільше <b id="rMaxL">9</b><input type="range" id="rMax" min="0" max="20" value="9"></label>
+      </div>
+      <div class="rnd-line" id="rLine"></div>
+      <div class="rnd-btns">
+        <button class="btn-primary" id="rGo">▶ Запустити</button>
+      </div>
+      <div class="rnd-out" id="rOut"></div>
+    </div>
+    <div class="exercise">
+      <div id="rndList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Випадковий приклад</div>
+    <h2>Нехай відповідь рахує Python</h2>
+    <p>Якою буде правильна відповідь, наперед не знаєш навіть ти. Тож нехай її рахує Python: <code>if answer == a * b:</code>.</p>
+    <div id="task2"></div>
+  </section>
+
+  <section class="block" data-guide>
+    <div class="step-label">Крок 3 · Зіграй у вікторину</div>
+    <h2>Вікторина «Швидкий рахунок»</h2>
+    <p>Три випадкові приклади, бали й оцінка наприкінці. Натисни «▶ Запустити» кілька разів — щоразу приклади будуть нові.</p>
+    <div id="demoGame"></div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Заняття 5 · «Практикум: логічні ігри» · Гурток Python Basic</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script src="../../assets/python.js"></script>
+<script>
+/* ---------- ПОВТОРЕННЯ: велика розминка ---------- */
+makeWarmup('warmup', [
+  { pre:pyCode('name = input("Ім\'я? ")\nprint(f"Привіт, {name}!")'), text:'Користувач увів «Тарас». Що з’явиться в консолі?', opts:['Привіт, {name}!', 'Привіт, Тарас!', 'Привіт, name!'], correct:1 },
+  { pre:pyCode('a = int("4")\nb = "4"\nprint(a * 2, b * 2)'), text:'Що виведе програма?', opts:['8 8', '8 44', '44 44'], correct:1, why:'a — число, тож 4 * 2 = 8. b — текст, а текст * 2 повторюється двічі.' },
+  { pre:pyCode('x = 7\nprint(x % 2 == 1)'), text:'Що виведе програма?', opts:['1', 'True', 'False'], correct:1, why:'Остача від ділення 7 на 2 — це 1, тож порівняння правдиве.' },
+  { text:'Який оператор означає «не дорівнює»?', opts:['<code>&lt;&gt;</code>', '<code>!=</code>', '<code>=!</code>'], correct:1 },
+  { pre:pyCode('t = 12\nif t > 10:\n    print("A")\nelse:\n    print("B")\nprint("C")'), text:'Що з’явиться в консолі?', opts:['A', 'A і C', 'B і C'], correct:1, why:'Умова правдива — виконується A. Рядок C без відступу виконується завжди.' },
+  { pre:pyCode('x = 3\nif x > 5:\n    print("A")\n    print("B")\nprint("C")'), text:'Що з’явиться в консолі?', opts:['C', 'B і C', 'A, B і C'], correct:0, why:'Обидва рядки з відступом належать до if, тож пропускаються разом.' },
+  { pre:pyCode('n = 0\nif n > 0:\n    print("плюс")\nelif n < 0:\n    print("мінус")\nelse:\n    print("нуль")'), text:'Що виведе програма?', opts:['плюс', 'мінус', 'нуль'], correct:2 },
+  { pre:pyCode('age = 15\nprint(age >= 10 and age <= 14)'), text:'Що виведе програма?', opts:['True', 'False'], correct:1, why:'Перша умова правдива, а друга — ні. Для and потрібні обидві.' },
+  { pre:pyCode('day = "сб"\nprint(day == "сб" or day == "нд")'), text:'Що виведе програма?', opts:['True', 'False'], correct:0, why:'Для or достатньо однієї правдивої умови.' },
+  { pre:pyCode('print(not 5 > 3)'), text:'Що виведе програма?', opts:['True', 'False', 'Помилка'], correct:1, why:'5 > 3 — це True, а not перевертає його на False.' },
+  { pre:pyCode('score = 0\nscore = score + 1\nscore = score + 1\nprint(f"Бали: {score}")'), text:'Що виведе програма?', opts:['Бали: 0', 'Бали: 1', 'Бали: 2'], correct:2 },
+  { pre:pyCode('secret = 7\nguess = 5\nif guess == secret:\n    print("Вгадав!")\nelif guess < secret:\n    print("Більше!")\nelse:\n    print("Менше!")'), text:'Що виведе програма?', opts:['Вгадав!', 'Більше!', 'Менше!'], correct:1, why:'5 не дорівнює 7, але менше за 7 — спрацьовує elif.' }
+]);
+
+makeFindBug('bugList', [
+  { code:'name = "Марко"\nprint("Привіт, + name)', line:2, why:'Текст «Привіт, » не закрито лапкою.' },
+  { code:'age = input("Вік? ")\nif age > 10:\n    print("Старший за 10")', line:2, why:'input() повертає текст, а текст не можна порівняти з числом. Треба age = int(input("Вік? ")) — але Python помітить помилку саме в рядку 2.' },
+  { code:'x = 10\nif x == 10:\n    print("Десять")\nelse:\nprint("Не десять")', line:5, why:'Рядок усередині <code>else</code> має бути з відступом.' },
+  { code:'a = 5\nb = 3\nif a > b\n    print("a більше")', line:3, why:'Після умови бракує двокрапки.' }
+]);
+
+makeCodeTask('ticketTask', {
+  task:'Заміни три крапки умовами. Для першої знадобиться <code>or</code>.',
+  code:'age = int(input("Скільки тобі років? "))\nif ...:\n    print("Безкоштовно")\nelif ...:\n    print("Дитячий квиток: 80 грн")\nelse:\n    print("Дорослий квиток: 150 грн")',
+  hint:'Перша умова: <code>age &lt; 7 or age &gt;= 65</code>. Друга: <code>age &lt; 18</code> (менших за 7 уже «забрала» перша умова).',
+  check:(out, code)=>{
+    if(/\.\.\./.test(code)) return 'Заміни три крапки умовами.';
+    if(!/^if\b.*\bor\b/m.test(code)) return 'Перша умова має перевіряти два випадки: молодший за 7 або від 65 років. Поєднай їх через or.';
+    return /^(Безкоштовно|Дитячий квиток: 80 грн|Дорослий квиток: 150 грн)$/.test(out.trim()) || 'Програма має вивести один рядок — ціну квитка.';
+  }
+});
+
+/* ---------- КРОК 3 ---------- */
+makeSandbox('demoGame', `import random
+score = 0
+print("Вікторина «Швидкий рахунок»: 3 приклади")
+
+a = random.randint(2, 9)
+b = random.randint(2, 9)
+answer = int(input(f"{a} * {b} = "))
+if answer == a * b:
+    print("Правильно!")
+    score = score + 1
+else:
+    print(f"Ні, це {a * b}")
+
+a = random.randint(10, 50)
+b = random.randint(10, 50)
+answer = int(input(f"{a} + {b} = "))
+if answer == a + b:
+    print("Правильно!")
+    score = score + 1
+else:
+    print(f"Ні, це {a + b}")
+
+a = random.randint(50, 99)
+b = random.randint(1, 49)
+answer = int(input(f"{a} - {b} = "))
+if answer == a - b:
+    print("Правильно!")
+    score = score + 1
+else:
+    print(f"Ні, це {a - b}")
+
+print(f"Твій результат: {score} з 3")
+if score == 3:
+    print("Блискавичний рахунок! ⚡")
+elif score >= 1:
+    print("Непогано!")
+else:
+    print("Спробуй ще раз!")`);
+
+
+/* ---------- КРОК 1 ---------- */
+// кубик
+(() => {
+  const PIPS = {1:[[50,50]], 2:[[28,28],[72,72]], 3:[[28,28],[50,50],[72,72]], 4:[[28,28],[72,28],[28,72],[72,72]],
+    5:[[28,28],[72,28],[50,50],[28,72],[72,72]], 6:[[28,26],[72,26],[28,50],[72,50],[28,74],[72,74]]};
+  const svg = document.getElementById('dieSvg'), die = document.getElementById('die');
+  const face = n => svg.innerHTML = '<rect x="4" y="4" width="92" height="92" rx="18" fill="#fff" stroke="#4B2F92" stroke-width="4"/>' +
+    PIPS[n].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="8.5" fill="${n === 1 ? '#C0392B' : '#4B2F92'}"/>`).join('');
+  const rnd = () => 1 + Math.floor(Math.random() * 6);
+  face(5);
+  let busy = false;
+  die.addEventListener('click', () => {
+    if(busy) return;
+    busy = true;
+    die.classList.remove('rolling'); void die.offsetWidth; die.classList.add('rolling');
+    const spin = setInterval(() => face(rnd()), 70);
+    setTimeout(() => {
+      clearInterval(spin);
+      const n = rnd(); face(n);
+      busy = false;
+    }, 750);
+  });
+})();
+
+// randint з повзунками
+(() => {
+  const N = 21, $ = id => document.getElementById(id);
+  const line = $('rLine'), out = $('rOut'), go = $('rGo');
+  line.innerHTML = Array.from({length:N}, (_, i) => `<div class="rc"><div class="num">${i}</div></div>`).join('');
+  const cells = [...line.children];
+  let busy = false;
+  const lo = () => +$('rMin').value, hi = () => +$('rMax').value;
+  const pick = () => lo() + Math.floor(Math.random() * (hi() - lo() + 1));
+  function update(){
+    const a = lo(), b = hi();
+    $('rMinV').textContent = $('rMinL').textContent = a;
+    $('rMaxV').textContent = $('rMaxL').textContent = b;
+    cells.forEach((c, i) => { c.className = 'rc' + (i >= a && i <= b ? ' in' : ''); });
+    const bad = a > b;
+    go.disabled = bad;
+    out.className = 'rnd-out' + (bad ? ' err' : '');
+    out.textContent = bad ? 'Python покаже помилку: перше число не може бути більшим за друге.' : '';
+  }
+  $('rMin').addEventListener('input', update);
+  $('rMax').addEventListener('input', update);
+  go.addEventListener('click', () => {
+    if(busy) return;
+    busy = true; go.disabled = true;
+    let k = 0;
+    const hop = setInterval(() => {
+      cells.forEach(c => c.classList.remove('hop', 'hit'));
+      if(++k < 9){ cells[pick()].classList.add('hop'); return; }
+      clearInterval(hop);
+      const n = pick();
+      cells[n].classList.add('hit');
+      busy = false; go.disabled = false;
+    }, 70);
+  });
+  update();
+})();
+
+makeChoices('rndList', [
+  { pre:pyCode('import random\nprint(random.randint(1, 3))'), text:'Що може вивести ця програма?', opts:['1, 2 або 3', 'Лише 1 або 2', 'Будь-яке число'], correct:0, why:'randint бере обидві межі: і 1, і 3 можуть випасти.' },
+  { pre:pyCode('import random\nx = random.randint(1, 6)\nprint(x)\nprint(x)'), text:'Що буде в консолі, якщо запустити програму?', opts:['Два різні числа', 'Те саме число двічі', 'Помилка'], correct:1, why:'Випадкове число задумується один раз і лежить у коробці x.' },
+  { pre:pyCode('import random\na = random.randint(2, 5)\nb = random.randint(2, 5)\nprint(f"{a} * {b} = {a * b}")'), text:'Що з цього програма точно не виведе?', opts:['2 * 3 = 6', '5 * 5 = 25', '6 * 2 = 12'], correct:2, why:'Числа беруться лише від 2 до 5, тож 6 випасти не може.' }
+]);
+
+/* ---------- КРОК 2 ---------- */
+makeCodeTask('task2', {
+  task:'Зроби приклад випадковим: додай <code>import random</code> на початку, заміни 7 і 8 на <code>random.randint(2, 9)</code>, а 56 в обох місцях — на <code>a * b</code>. Запусти кілька разів.',
+  code:'a = 7\nb = 8\nanswer = int(input(f"{a} * {b} = "))\nif answer == 56:\n    print("Правильно!")\nelse:\n    print("Ні, це 56")',
+  hint:'Ось як має виглядати програма:' + pyCode('import random\na = random.randint(2, 9)\nb = random.randint(2, 9)\nanswer = int(input(f"{a} * {b} = "))\nif answer == a * b:\n    print("Правильно!")\nelse:\n    print(f"Ні, це {a * b}")'),
+  neurons:4,
+  check:(out, code)=>{
+    if(!/^import random\s*$/m.test(code)) return 'Додай на початку рядок import random.';
+    if(!/^a\s*=\s*random\.randint\(/m.test(code) || !/^b\s*=\s*random\.randint\(/m.test(code)) return 'Заміни 7 і 8 на random.randint(2, 9).';
+    if(/56/.test(code)) return 'Заміни 56 на a * b — і в if, і в else. У print знадобиться f-рядок: f"Ні, це {a * b}".';
+    if(!/==\s*a\s*\*\s*b|==\s*b\s*\*\s*a/.test(code)) return 'Порівнюй відповідь з добутком: if answer == a * b:';
+    return /Правильно!|Ні, це \d+/.test(out) || 'Програма має сказати «Правильно!» або правильну відповідь.';
+  }
+});
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Які числа може дати <code>random.randint(1, 6)</code>?', opts:['Від 1 до 5', 'Від 1 до 6', 'Від 0 до 6'], correct:1, why:'Обидві межі входять.' },
+  { q:'Навіщо в програмі рядок <code>import random</code>?', opts:['Підключає готові команди для випадкових чисел', 'Задумує випадкове число', 'Виводить випадковий текст'], correct:0, why:'Саме число задумує <code>random.randint()</code>.' },
+  { q:'Чому у вікторині з випадковими числами пишуть <code>if answer == a * b:</code>, а не готове число?', opts:['Числа щоразу нові, тож правильну відповідь має рахувати Python', 'Так коротше', 'Інакше Python покаже помилку'], correct:0 },
+  { q:'Що виведе програма?' + pyCode('a = 3\nb = 4\nprint(f"{a} * {b} = {a * b}")'), opts:['3 * 4 = 12', '{a} * {b} = {a * b}', '12 = 12'], correct:0, why:'У f-рядку замість кожних фігурних дужок підставляється значення.' },
+  { q:'Скільки балів виведе програма?' + pyCode('score = 0\nif 2 + 2 == 4:\n    score = score + 1\nif 10 // 3 == 3:\n    score = score + 1\nif 7 % 2 == 0:\n    score = score + 1\nprint(score)'), opts:['1', '2', '3'], correct:1, why:'Перші дві умови правдиві, а 7 % 2 — це 1, не 0.' },
+  { q:'Що виведе програма?' + pyCode('score = 2\nif score == 3:\n    print("Відмінно")\nelif score >= 1:\n    print("Непогано")\nelse:\n    print("Спробуй ще")'), opts:['Відмінно', 'Непогано', 'Спробуй ще'], correct:1 },
+  { q:'Гравець відповів «київ». Чи спрацює <code>if answer == "Київ":</code>?', opts:['Так', 'Ні'], correct:1, why:'Для Python мала й велика літери — різні символи.' }
+], {summary:'Ти пригадав заняття 1–4 і познайомився з модулем random: тепер твої програми можуть щоразу задумувати нові числа.', html:true});
+</script>
+
+</body>
+</html>

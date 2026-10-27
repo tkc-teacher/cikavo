@@ -42,23 +42,6 @@
   .wear-pic .em.pop{animation:wearPop .35s;}
   .wear-pic .tx{font-family:var(--code-font); font-size:13px; font-weight:600; color:var(--accent-dark); margin-top:6px;}
   @keyframes wearPop{0%{transform:scale(.6)} 70%{transform:scale(1.1)} 100%{transform:scale(1)}}
-  /* Розминка: запитання по одному */
-  .wu-head{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px;}
-  .wu-count{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:var(--accent-dark);}
-  .wu-dots{display:flex; gap:6px;}
-  .wu-dot{width:12px; height:12px; border-radius:50%; background:var(--line); transition:background .25s, transform .25s;}
-  .wu-dot.cur{background:var(--accent); transform:scale(1.25);}
-  .wu-dot.ok{background:#3FAE58;}
-  .wu-dot.retry{background:#E8A33D;}
-  .wu-card pre.py-code{margin-top:0;}
-  .wu-card .q{font-weight:700; font-size:15.5px;}
-  .wu-card.in{animation:wuIn .3s ease;}
-  .wu-next{margin-top:12px;}
-  .wu-end{text-align:center; padding:10px 0 4px;}
-  .wu-end .big{font-size:44px; line-height:1.2;}
-  .wu-end h3{font-family:'Baloo 2',sans-serif; font-size:21px; margin:6px 0 4px;}
-  .wu-end p{color:var(--ink-soft); margin:0;}
-  @keyframes wuIn{from{opacity:0; transform:translateX(16px)} to{opacity:1; transform:none}}
 
   /* Як працює if: блок-схема з маркером */
   .flow{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:18px 20px; margin-top:16px;}
@@ -288,67 +271,21 @@ else:
 <script src="../../assets/lesson.js"></script>
 <script src="../../assets/python.js"></script>
 <script>
-/* ---------- ПОВТОРЕННЯ: розминка, запитання по одному ---------- */
-(function(){
-  const Q = [
-    { code:'print("2 + 3")', q:'Що виведе програма?', opts:['5', '2 + 3', 'Помилка'], correct:1, why:'У лапках — текст, тож Python виводить його як є і нічого не рахує.' },
-    { code:'Print("Привіт")', q:'Що станеться, якщо запустити цю програму?', opts:['Виведе Привіт', 'Виведе Print("Привіт")', 'Буде помилка'], correct:2, why:'Python розрізняє великі й малі літери: команда пишеться print.' },
-    { code:'# print("Привіт")\nprint("Бувай")', q:'Що з’явиться в консолі?', opts:['Привіт і Бувай', 'Бувай', 'Нічого'], correct:1, why:'Рядок з # — це коментар, Python його пропускає.' },
-    { q:'Яка назва змінної правильна?', opts:['my score', '2score', 'my_score'], correct:2, why:'У назві не можна пробілів, і вона не може починатися з цифри. Слова з’єднують підкресленням.' },
-    { code:'name = "Оля"\nprint(f"Привіт, {name}!")', q:'Що виведе програма?', opts:['Привіт, {name}!', 'Привіт, name!', 'Привіт, Оля!'], correct:2, why:'У f-рядку на місце {name} стає вміст змінної.' },
-    { code:'x = 3.5', q:'Якого типу значення в змінній x?', opts:['int', 'float', 'str', 'bool'], correct:1, why:'Число з крапкою — дробове, тип float.' },
-    { code:'age = input("Вік? ")', q:'Користувач увів 12. Що лежить у змінній age?', opts:['Число 12', 'Текст "12"', 'Нічого'], correct:1, why:'input() завжди повертає текст. Щоб отримати число, пишуть int(input()).' },
-    { code:'print(10 / 2)', q:'Що виведе програма?', opts:['5', '5.0', '10 / 2'], correct:1, why:'Ділення / завжди дає дробове число.' },
-    { code:'print(2 + 3 * 4)', q:'Що виведе програма?', opts:['20', '14', '24'], correct:1, why:'Спершу множення: 3 * 4 = 12, потім 2 + 12.' },
-    { code:'print(17 // 5)\nprint(17 % 5)', q:'Що з’явиться в консолі?', opts:['3 і 2', '3.4 і 0', '2 і 3'], correct:0, why:'У 17 вміщається три п’ятірки (15), лишається 2.' },
-    { code:'print("5" + "5")', q:'Що виведе програма?', opts:['10', '55', 'Помилка'], correct:1, why:'У лапках — текст, а + склеює текст.' },
-    { code:'coins = 10\ncoins = coins + 5\nprint(coins)', q:'Що виведе програма?', opts:['10', '15', 'coins + 5'], correct:1, why:'Було 10, додали 5 і поклали назад у ту саму коробку.' }
-  ];
-  const box = document.getElementById('warmup');
-  const hit = trackTask(box, Q.length, Q.length);
-  const res = [];            // true — з першої спроби, false — з помилкою
-  box.innerHTML = `<div class="wu-head"><span class="wu-count"></span><span class="wu-dots">${Q.map(()=>'<i class="wu-dot"></i>').join('')}</span></div><div class="wu-card"></div>`;
-  const count = box.querySelector('.wu-count'), dots = [...box.querySelectorAll('.wu-dot')], card = box.querySelector('.wu-card');
-  function show(n){
-    dots.forEach((d, i)=>d.classList.toggle('cur', i === n));
-    if(n === Q.length){ finish(); return; }
-    const it = Q[n];
-    count.textContent = `Запитання ${n + 1} з ${Q.length}`;
-    card.innerHTML = (it.code ? pyCode(it.code) : '') + `<p class="q">${it.q}</p><div class="choice-row"></div><div class="choice-feedback"></div>`;
-    card.classList.remove('in'); void card.offsetWidth; card.classList.add('in');
-    const row = card.querySelector('.choice-row'), fb = card.querySelector('.choice-feedback');
-    let done = false, missed = false;
-    it.opts.forEach((o, i)=>{
-      const b = document.createElement('button');
-      b.className = 'choice-btn'; b.type = 'button'; b.textContent = o;
-      b.addEventListener('click', ()=>{
-        if(done) return;
-        if(i !== it.correct){ b.classList.add('wrong'); missed = true; fb.textContent = 'Ні, подумай ще.'; return; }
-        done = true;
-        b.classList.add('correct');
-        fb.textContent = 'Правильно ✓ ' + it.why;
-        res[n] = !missed;
-        dots[n].classList.add(missed ? 'retry' : 'ok');
-        addNeurons(1); hit();
-        const next = document.createElement('button');
-        next.className = 'btn-primary wu-next'; next.type = 'button';
-        next.textContent = n + 1 < Q.length ? 'Далі →' : 'Завершити розминку';
-        next.addEventListener('click', ()=>show(n + 1));
-        card.appendChild(next);
-        next.focus({preventScroll:true});
-      });
-      row.appendChild(b);
-    });
-  }
-  function finish(){
-    const first = res.filter(Boolean).length;
-    count.textContent = 'Розминку завершено ✓';
-    const [em, title] = first === Q.length ? ['🏆', 'Усе з першої спроби!'] : first >= Q.length - 3 ? ['💪', 'Чудова форма!'] : ['🙂', 'Пам’ять розім’ято!'];
-    card.innerHTML = `<div class="wu-end"><div class="big">${em}</div><h3>${title}</h3><p>З першої спроби: ${first} з ${Q.length}. Оранжеві кружечки — запитання, до яких варто повернутися в попередніх заняттях.</p></div>`;
-    card.classList.remove('in'); void card.offsetWidth; card.classList.add('in');
-  }
-  show(0);
-})();
+/* ---------- ПОВТОРЕННЯ: розминка ---------- */
+makeWarmup('warmup', [
+  { pre:pyCode('print("2 + 3")'), text:'Що виведе програма?', opts:['5', '2 + 3', 'Помилка'], correct:1, why:'У лапках — текст, тож Python виводить його як є і нічого не рахує.' },
+  { pre:pyCode('Print("Привіт")'), text:'Що станеться, якщо запустити цю програму?', opts:['Виведе Привіт', 'Виведе Print("Привіт")', 'Буде помилка'], correct:2, why:'Python розрізняє великі й малі літери: команда пишеться print.' },
+  { pre:pyCode('# print("Привіт")\nprint("Бувай")'), text:'Що з’явиться в консолі?', opts:['Привіт і Бувай', 'Бувай', 'Нічого'], correct:1, why:'Рядок з # — це коментар, Python його пропускає.' },
+  { text:'Яка назва змінної правильна?', opts:['my score', '2score', 'my_score'], correct:2, why:'У назві не можна пробілів, і вона не може починатися з цифри. Слова з’єднують підкресленням.' },
+  { pre:pyCode('name = "Оля"\nprint(f"Привіт, {name}!")'), text:'Що виведе програма?', opts:['Привіт, {name}!', 'Привіт, name!', 'Привіт, Оля!'], correct:2, why:'У f-рядку на місце {name} стає вміст змінної.' },
+  { pre:pyCode('x = 3.5'), text:'Якого типу значення в змінній x?', opts:['int', 'float', 'str', 'bool'], correct:1, why:'Число з крапкою — дробове, тип float.' },
+  { pre:pyCode('age = input("Вік? ")'), text:'Користувач увів 12. Що лежить у змінній age?', opts:['Число 12', 'Текст "12"', 'Нічого'], correct:1, why:'input() завжди повертає текст. Щоб отримати число, пишуть int(input()).' },
+  { pre:pyCode('print(10 / 2)'), text:'Що виведе програма?', opts:['5', '5.0', '10 / 2'], correct:1, why:'Ділення / завжди дає дробове число.' },
+  { pre:pyCode('print(2 + 3 * 4)'), text:'Що виведе програма?', opts:['20', '14', '24'], correct:1, why:'Спершу множення: 3 * 4 = 12, потім 2 + 12.' },
+  { pre:pyCode('print(17 // 5)\nprint(17 % 5)'), text:'Що з’явиться в консолі?', opts:['3 і 2', '3.4 і 0', '2 і 3'], correct:0, why:'У 17 вміщається три п’ятірки (15), лишається 2.' },
+  { pre:pyCode('print("5" + "5")'), text:'Що виведе програма?', opts:['10', '55', 'Помилка'], correct:1, why:'У лапках — текст, а + склеює текст.' },
+  { pre:pyCode('coins = 10\ncoins = coins + 5\nprint(coins)'), text:'Що виведе програма?', opts:['10', '15', 'coins + 5'], correct:1, why:'Було 10, додали 5 і поклали назад у ту саму коробку.' }
+]);
 
 /* ---------- КРОК 1 ---------- */
 makeYesNo('cmpList', [

@@ -196,6 +196,14 @@ function explain(e, code){
       if(/invalid literal/.test(arg)) return res('Цей текст не можна перетворити на число. Введи саме число, без літер і пробілів.');
       return res('Неправильне значення.');
     case 'ZeroDivisionError': return res('Ділити на нуль не можна.');
+    case 'ImportError': case 'ModuleNotFoundError': {
+      const mod = (arg.match(/named '?([\w.]+)/) || [])[1] || '';
+      return res(`Модуля <code>${esc(mod)}</code> немає. Перевір написання: назви модулів пишуть малими літерами, наприклад <code>import random</code>.`);
+    }
+    case 'AttributeError': {
+      const name = (arg.match(/attribute '(.+?)'/) || [])[1] || '';
+      return res(`Такої команди <code>${esc(name)}</code> тут немає. Перевір написання — великі й малі літери теж: наприклад, <code>random.randint</code>.`);
+    }
     case 'TimeLimitError': return res('Програма працює надто довго, тож її зупинено. Можливо, цикл ніколи не закінчується?');
     case 'IndexError': return res('Такого номера елемента немає: список коротший.');
     default: return res('Під час виконання сталася помилка.');

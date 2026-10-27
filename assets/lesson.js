@@ -12,7 +12,7 @@
        <script> makeMatching(...); ...; makeFinalQuiz('finalQuiz', [...], {summary:'…'}); </script>
 
    Для уроку доступні: addNeurons, stepTask, trackTask, shuffle, loadPic, makeChoices, makeClassify, makeYesNo,
-   makeMatching, makeSortBoard, makeSequence, makeFinalQuiz. Власна вправа уроку підключається через trackTask. */
+   makeWarmup, makeMatching, makeSortBoard, makeSequence, makeFinalQuiz. Власна вправа уроку підключається через trackTask. */
 (()=>{
 'use strict';
 
@@ -389,6 +389,58 @@ function makeSortBoard(poolId, bucketMap, items, progressId, bonus = 2){
     });
   });
   updateProgress();
+}
+
+// Розминка: запитання по одному з кружечками прогресу (зелений — з першої спроби, оранжевий — з помилкою),
+// після правильної відповіді — пояснення й «Далі →», наприкінці — підсумок.
+// items — [{pre?, text, opts, correct, why?}]; pre — розмітка над запитанням (напр. pyCode(...)); text, opts, why — HTML
+function makeWarmup(containerId, items){
+  const box = document.getElementById(containerId);
+  const hit = trackTask(box, items.length, items.length);
+  const res = [];            // true — з першої спроби
+  box.classList.add('warmup');
+  box.innerHTML = `<div class="wu-head"><span class="wu-count"></span><span class="wu-dots">${items.map(()=>'<i class="wu-dot"></i>').join('')}</span></div><div class="wu-card"></div>`;
+  const count = box.querySelector('.wu-count'), dots = [...box.querySelectorAll('.wu-dot')], card = box.querySelector('.wu-card');
+  const slide = ()=>{ card.classList.remove('in'); void card.offsetWidth; card.classList.add('in'); };
+  function show(n){
+    dots.forEach((d, i)=>d.classList.toggle('cur', i === n));
+    if(n === items.length){ finish(); return; }
+    const it = items[n];
+    count.textContent = `Запитання ${n + 1} з ${items.length}`;
+    card.innerHTML = (it.pre || '') + `<p class="q">${it.text}</p><div class="choice-row"></div><div class="choice-feedback"></div>`;
+    slide();
+    const row = card.querySelector('.choice-row'), fb = card.querySelector('.choice-feedback');
+    let done = false, missed = false;
+    it.opts.forEach((o, i)=>{
+      const b = document.createElement('button');
+      b.className = 'choice-btn'; b.type = 'button'; b.innerHTML = o;
+      b.addEventListener('click', ()=>{
+        if(done) return;
+        if(i !== it.correct){ b.classList.add('wrong'); missed = true; fb.textContent = 'Ні, подумай ще.'; return; }
+        done = true;
+        b.classList.add('correct');
+        fb.innerHTML = 'Правильно ✓ ' + (it.why || '');
+        res[n] = !missed;
+        dots[n].classList.add(missed ? 'retry' : 'ok');
+        addNeurons(1); hit();
+        const next = document.createElement('button');
+        next.className = 'btn-primary wu-next'; next.type = 'button';
+        next.textContent = n + 1 < items.length ? 'Далі →' : 'Завершити розминку';
+        next.addEventListener('click', ()=>show(n + 1));
+        card.appendChild(next);
+        next.focus({preventScroll:true});
+      });
+      row.appendChild(b);
+    });
+  }
+  function finish(){
+    const first = res.filter(Boolean).length, all = items.length;
+    count.textContent = 'Розминку завершено ✓';
+    const [em, title] = first === all ? ['🏆', 'Усе з першої спроби!'] : first >= all * .75 ? ['💪', 'Чудова форма!'] : ['🙂', 'Пам’ять розім’ято!'];
+    card.innerHTML = `<div class="wu-end"><div class="big">${em}</div><h3>${title}</h3><p>З першої спроби: ${first} з ${all}.${first < all ? ' Оранжеві кружечки — запитання, до яких варто повернутися.' : ''}</p></div>`;
+    slide();
+  }
+  show(0);
 }
 
 // Покроковий вибір: «Що робиш ПЕРШИМ?» → «ДРУГИМ?»…; steps — правильний порядок; onDone — після останнього кроку
@@ -775,5 +827,5 @@ if(/[?&]selftest\b/.test(location.search)){
 }
 
 
-Object.assign(window, { addNeurons, stepTask, trackTask, shuffle, loadPic, makeChoices, makeClassify, makeYesNo, makeMatching, makeSortBoard, makeSequence, makeFinalQuiz });
+Object.assign(window, { addNeurons, stepTask, trackTask, shuffle, loadPic, makeChoices, makeClassify, makeYesNo, makeWarmup, makeMatching, makeSortBoard, makeSequence, makeFinalQuiz });
 })();

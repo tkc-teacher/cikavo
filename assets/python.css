@@ -14,7 +14,7 @@ body, button, textarea, input{font-variant-ligatures:none;}
   font-family:var(--code-font); font-size:.88em; background:var(--accent-soft); color:var(--accent-dark); padding:1px 6px; border-radius:6px; white-space:nowrap;
 }
 pre.py-code{font-family:var(--code-font); font-size:14.5px; line-height:1.6; background:var(--code-bg); color:var(--code-ink); padding:14px 18px; border-radius:var(--radius-m); margin:14px 0; overflow-x:auto; max-width:100%;}
-.classify-card pre.py-code{margin:0 0 12px;}
+.classify-card pre.py-code, .wu-card pre.py-code{margin:0 0 12px;}
 .quiz-q pre.py-code{font-weight:400; margin:12px 0 0;}
 .t-k{color:var(--t-k);} .t-b{color:var(--t-b);} .t-s{color:var(--t-s);} .t-n{color:var(--t-n);} .t-c{color:var(--t-c); font-style:italic;}
 .ln.err{background:rgba(255,107,74,.22);}

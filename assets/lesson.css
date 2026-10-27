@@ -113,6 +113,23 @@ section.block{padding:38px 0; border-top:1px solid var(--line); scroll-margin-to
 @media (max-width:560px){ .yn-grid{grid-template-columns:1fr;} }
 .yn-grid .classify-card{margin:6px 0;}
 
+/* Розминка (makeWarmup): запитання по одному */
+.wu-head{display:flex; align-items:center; justify-content:space-between; gap:10px 12px; flex-wrap:wrap; margin-bottom:14px;}
+.wu-count{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:var(--accent-dark);}
+.wu-dots{display:flex; gap:6px; flex-wrap:wrap;}
+.wu-dot{width:12px; height:12px; border-radius:50%; background:var(--line); transition:background .25s, transform .25s;}
+.wu-dot.cur{background:var(--accent); transform:scale(1.25);}
+.wu-dot.ok{background:var(--ok);}
+.wu-dot.retry{background:#E8A33D;}
+.wu-card .q{font-weight:700; font-size:15.5px;}
+.wu-card.in{animation:wuIn .3s ease;}
+.wu-next{margin-top:12px;}
+.wu-end{text-align:center; padding:10px 0 4px;}
+.wu-end .big{font-size:44px; line-height:1.2;}
+.wu-end h3{font-family:'Baloo 2',sans-serif; font-size:21px; margin:6px 0 4px;}
+.wu-end p{color:var(--ink-soft); margin:0;}
+@keyframes wuIn{from{opacity:0; transform:translateX(16px)} to{opacity:1; transform:none}}
+
 /* ЗІСТАВЛЕННЯ (makeMatching) */
 .match-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:14px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:16px;}
 .match-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:8px 14px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
