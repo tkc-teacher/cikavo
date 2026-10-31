@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Шкільний буфет — Графіки та діаграми</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#4285F4,#A8327E); --accent:#A8327E; --accent-dark:#7E1F5D; --accent-soft:#FAE9F3; --bg:#FBF6F9; --line:#EDDDE7; }
+  .sample td.hd{font-weight:800; background:#FAE9F3;}
+  .guide-card > div{min-width:0;}
+  @media (max-width:520px){ .sample th, .sample td{padding:4px 5px;} }
+  .done-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px;}
+  @media (max-width:640px){ .done-grid{grid-template-columns:1fr;} }
+  .done-chart{display:block; width:100%; background:#fff; border:1px solid #DADCE0; border-radius:10px; font-family:'Roboto',sans-serif; font-size:13px;}
+  .done-chart text{fill:#444746;}
+  .done-chart .tt{font-size:15px; font-weight:500; fill:#202124;}
+  .done-chart .in{fill:#fff; font-weight:500;}
+</style>
+</head>
+<body data-hud="8 клас · Практична · Шкільний буфет">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 8 клас · Графіки та діаграми</div>
+    <h1>🥐 Шкільний буфет</h1>
+    <p>Порахуй продажі за тиждень і покажи їх двома діаграмами: стовпчастою та секторною.</p>
+    <div class="meta"><span>⏱ 20–25 хв</span><span><img src="../../assets/logos/sheets.svg" alt="">Google Таблиці</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="done-grid">
+      <svg class="done-chart" viewBox="0 0 384 245" role="img" aria-label="Стовпчаста діаграма: продажі кожного товару за днями тижня">
+        <text class="tt" x="192" y="24" text-anchor="middle">Продажі в буфеті за тиждень</text>
+        <line x1="44" y1="192" x2="376" y2="192" stroke="#9AA0A6"/><text x="38" y="196" text-anchor="end">0</text>
+        <line x1="44" y1="141" x2="376" y2="141" stroke="#E0E2E5"/><text x="38" y="145" text-anchor="end">5</text>
+        <line x1="44" y1="91" x2="376" y2="91" stroke="#E0E2E5"/><text x="38" y="95" text-anchor="end">10</text>
+        <line x1="44" y1="40" x2="376" y2="40" stroke="#E0E2E5"/><text x="38" y="44" text-anchor="end">15</text>
+        <rect x="52" y="91" width="9" height="101" rx="1" fill="#4285F4"/><rect x="62" y="70" width="9" height="122" rx="1" fill="#EA4335"/><rect x="72" y="81" width="9" height="111" rx="1" fill="#D99A00"/><rect x="82" y="60" width="9" height="132" rx="1" fill="#9334E6"/><rect x="92" y="50" width="9" height="142" rx="1" fill="#12A4AF"/><text x="77" y="210" text-anchor="middle">Булочки</text>
+        <rect x="117" y="111" width="9" height="81" rx="1" fill="#4285F4"/><rect x="127" y="101" width="9" height="91" rx="1" fill="#EA4335"/><rect x="137" y="91" width="9" height="101" rx="1" fill="#D99A00"/><rect x="147" y="81" width="9" height="111" rx="1" fill="#9334E6"/><rect x="157" y="70" width="9" height="122" rx="1" fill="#12A4AF"/><text x="142" y="210" text-anchor="middle">Піца</text>
+        <rect x="182" y="101" width="9" height="91" rx="1" fill="#4285F4"/><rect x="192" y="111" width="9" height="81" rx="1" fill="#EA4335"/><rect x="202" y="111" width="9" height="81" rx="1" fill="#D99A00"/><rect x="212" y="121" width="9" height="71" rx="1" fill="#9334E6"/><rect x="222" y="111" width="9" height="81" rx="1" fill="#12A4AF"/><text x="207" y="210" text-anchor="middle">Чай</text>
+        <rect x="247" y="141" width="9" height="51" rx="1" fill="#4285F4"/><rect x="257" y="131" width="9" height="61" rx="1" fill="#EA4335"/><rect x="267" y="131" width="9" height="61" rx="1" fill="#D99A00"/><rect x="277" y="131" width="9" height="61" rx="1" fill="#9334E6"/><rect x="287" y="121" width="9" height="71" rx="1" fill="#12A4AF"/><text x="272" y="210" text-anchor="middle">Сік</text>
+        <rect x="312" y="151" width="9" height="41" rx="1" fill="#4285F4"/><rect x="322" y="151" width="9" height="41" rx="1" fill="#EA4335"/><rect x="332" y="162" width="9" height="30" rx="1" fill="#D99A00"/><rect x="342" y="141" width="9" height="51" rx="1" fill="#9334E6"/><rect x="352" y="151" width="9" height="41" rx="1" fill="#12A4AF"/><text x="337" y="210" text-anchor="middle">Яблука</text>
+        <text x="12" y="115" text-anchor="middle" transform="rotate(-90 12 115)">Продано, шт.</text>
+        <rect x="87" y="225" width="11" height="11" rx="2" fill="#4285F4"/><text x="102" y="235">Пн</text><rect x="131" y="225" width="11" height="11" rx="2" fill="#EA4335"/><text x="146" y="235">Вт</text><rect x="175" y="225" width="11" height="11" rx="2" fill="#D99A00"/><text x="190" y="235">Ср</text><rect x="219" y="225" width="11" height="11" rx="2" fill="#9334E6"/><text x="234" y="235">Чт</text><rect x="263" y="225" width="11" height="11" rx="2" fill="#12A4AF"/><text x="278" y="235">Пт</text>
+      </svg>
+      <svg class="done-chart" viewBox="0 0 384 245" role="img" aria-label="Секторна діаграма: булочки 30%, піца 25%, чай 20%, сік 15%, яблука 10%">
+        <text class="tt" x="192" y="24" text-anchor="middle">Частка кожного товару</text>
+        <path d="M128 134 L128.0 46.0 A88 88 0 0 1 211.7 161.2 Z" fill="#4285F4" stroke="#fff" stroke-width="2"/>
+        <text x="174.3" y="104.4" text-anchor="middle" class="in">30%</text>
+        <path d="M128 134 L211.7 161.2 A88 88 0 0 1 100.8 217.7 Z" fill="#EA4335" stroke="#fff" stroke-width="2"/>
+        <text x="154.0" y="189.0" text-anchor="middle" class="in">25%</text>
+        <path d="M128 134 L100.8 217.7 A88 88 0 0 1 40.0 134.0 Z" fill="#D99A00" stroke="#fff" stroke-width="2"/>
+        <text x="81.7" y="171.6" text-anchor="middle" class="in">20%</text>
+        <path d="M128 134 L40.0 134.0 A88 88 0 0 1 76.3 62.8 Z" fill="#9334E6" stroke="#fff" stroke-width="2"/>
+        <text x="77.0" y="112.0" text-anchor="middle" class="in">15%</text>
+        <path d="M128 134 L76.3 62.8 A88 88 0 0 1 128.0 46.0 Z" fill="#12A4AF" stroke="#fff" stroke-width="2"/>
+        <text x="110.3" y="83.6" text-anchor="middle" class="in">10%</text>
+        <rect x="248" y="68" width="11" height="11" rx="2" fill="#4285F4"/><text x="265" y="78">Булочки</text>
+        <rect x="248" y="92" width="11" height="11" rx="2" fill="#EA4335"/><text x="265" y="102">Піца</text>
+        <rect x="248" y="116" width="11" height="11" rx="2" fill="#D99A00"/><text x="265" y="126">Чай</text>
+        <rect x="248" y="140" width="11" height="11" rx="2" fill="#9334E6"/><text x="265" y="150">Сік</text>
+        <rect x="248" y="164" width="11" height="11" rx="2" fill="#12A4AF"/><text x="265" y="174">Яблука</text>
+        
+      </svg>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи таблицю</h3>
+        <p>Обери один зі способів:</p>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Таблиці</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Таблиці</span>.</li>
+              <li>Назви файл: <b>Шкільний буфет — Прізвище</b>.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Введи дані</h3>
+        <div class="sheet-wrap">
+          <table class="sample">
+            <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th><th>G</th></tr>
+            <tr><th>1</th><td class="hd">Товар</td><td class="hd">Пн</td><td class="hd">Вт</td><td class="hd">Ср</td><td class="hd">Чт</td><td class="hd">Пт</td><td class="hd">Разом</td></tr>
+            <tr><th>2</th><td>Булочки</td><td class="r">10</td><td class="r">12</td><td class="r">11</td><td class="r">13</td><td class="r">14</td><td></td></tr>
+            <tr><th>3</th><td>Піца</td><td class="r">8</td><td class="r">9</td><td class="r">10</td><td class="r">11</td><td class="r">12</td><td></td></tr>
+            <tr><th>4</th><td>Чай</td><td class="r">9</td><td class="r">8</td><td class="r">8</td><td class="r">7</td><td class="r">8</td><td></td></tr>
+            <tr><th>5</th><td>Сік</td><td class="r">5</td><td class="r">6</td><td class="r">6</td><td class="r">6</td><td class="r">7</td><td></td></tr>
+            <tr><th>6</th><td>Яблука</td><td class="r">4</td><td class="r">4</td><td class="r">3</td><td class="r">5</td><td class="r">4</td><td></td></tr>
+            <tr><th>7</th><td>Усього</td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Порахуй підсумки</h3>
+        <ol>
+          <li>У <b>G2</b> введи <span class="mono">=SUM(B2:F2)</span> і потягни маркер заповнення до <b>G6</b>.</li>
+          <li>У <b>B7</b> введи <span class="mono">=SUM(B2:B6)</span> і потягни маркер заповнення вправо до <b>G7</b>.</li>
+        </ol>
+        <div class="check-val">Перевір себе: у G2 — 60, у F7 — 45, у G7 — 200.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Побудуй стовпчасту діаграму</h3>
+        <ol>
+          <li>Виділи діапазон <b>A1:F6</b>. Рядок «Усього» й стовпчик «Разом» не виділяй.</li>
+          <li>Відкрий <span class="menu">Вставити → Діаграма</span>.</li>
+          <li>Якщо з'явився інший тип, у полі <b>Тип діаграми</b> обери <b>Стовпчаста діаграма</b>.</li>
+        </ol>
+        <div class="check-val">Перевір себе: біля кожного товару п'ять стовпців, по одному на день.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Налаштуй стовпчасту діаграму</h3>
+        <p>Двічі клацни діаграму, щоб відкрити налаштування. На вкладці <span class="menu">Налаштувати</span>:</p>
+        <ol>
+          <li>Назва діаграми: <b>Продажі в буфеті за тиждень</b>.</li>
+          <li>Назва вертикальної осі: <b>Продано, шт.</b></li>
+          <li><span class="menu">Умовні позначення</span> (легенда): <b>Знизу</b>. Рядів п'ять, тож легенда тут потрібна.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Побудуй секторну діаграму</h3>
+        <ol>
+          <li>Виділи <b>A1:A6</b>.</li>
+          <li>Затисни <b>Ctrl</b> (на Mac — <b>⌘</b>) і виділи <b>G1:G6</b>.</li>
+          <li>Відкрий <span class="menu">Вставити → Діаграма</span>.</li>
+          <li>У полі <b>Тип діаграми</b> обери <b>Секторна діаграма</b>.</li>
+          <li>На вкладці <span class="menu">Налаштувати</span> введи назву: <b>Частка кожного товару</b>.</li>
+          <li>Перетягни діаграму вбік, щоб вона не закривала першу.</li>
+        </ol>
+        <div class="tip">Секторній потрібен один ряд чисел: підсумок за тиждень зі стовпчика «Разом».</div>
+        <div class="check-val">Перевір себе: булочки — 30%, яблука — 10%.</div>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+<footer>Практична робота · «Графіки та діаграми» · 8 клас</footer>
+
+<script src="../../assets/practice.js"></script>
+</body>
+</html>
