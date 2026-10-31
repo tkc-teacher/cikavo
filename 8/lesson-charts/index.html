@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Графіки та діаграми — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в інтерфейсі Google Таблиць -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --pri:#A8327E; --pri-dark:#7E1F5D; --accent:var(--pri); --accent-dark:var(--pri-dark); --accent-soft:#FAE9F3;
+    --bg:#FBF6F9; --ink:#2A1A25; --ink-soft:#6A5563; --line:#EDDDE7; --surface:#FFFFFF;
+    --note:#3B78E7; --note-soft:#E8F0FE; --note-ink:#21508F;
+    --sun:#D99A00; --sun-soft:#FDF3D9; --sun-ink:#7A5600;
+    --hud-bar:linear-gradient(90deg,#4285F4,var(--pri));
+  }
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:18px; line-height:1; display:inline-block; vertical-align:middle; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em;}
+  .menu{font-family:'Baloo 2',sans-serif; font-weight:700; color:var(--pri-dark);}
+  .center{text-align:center;}
+  .hot-prompt{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; line-height:1.4; text-align:center; margin-bottom:12px; min-height:1.4em;}
+  .hot-prompt b{color:var(--pri-dark);}
+  .choice-feedback:empty, .progress-line:empty{margin-top:0; min-height:0;}
+
+  /* --- Діаграма (власний SVG-рендер уроку) --- */
+  .ch{display:block; width:100%; height:auto; font-family:'Roboto',sans-serif; user-select:none; -webkit-user-select:none;}
+  .ch text{fill:#444746;}
+  .ch .tt{font-size:15px; font-weight:500; fill:#202124;}
+  .chart-box{background:#fff; border:1px solid #DADCE0; border-radius:10px; padding:8px; max-width:520px; margin:0 auto;}
+  .shake{animation:shakeX .35s ease;}
+  .q-chart{background:#fff; border:1px solid #E6E7EA; border-radius:10px; padding:6px; margin-bottom:12px;}
+  #readList .choice-row{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px;}
+  #readList .choice-btn{margin:0; text-align:center; padding-left:6px; padding-right:6px;}
+
+  /* --- Крок 1: хто швидше --- */
+  .race-stage{min-height:236px; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+  .race-clock{display:flex; align-items:center; justify-content:center; gap:6px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:24px; color:var(--pri-dark); font-variant-numeric:tabular-nums; margin-bottom:8px;}
+  .race-clock .ms{font-size:24px; width:1em;}
+  .race-clock[hidden], .race-again[hidden]{display:none;}
+  .race-again{display:flex; align-items:center; gap:6px; margin:12px auto 0; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px; color:var(--pri-dark); background:none; border:1.5px solid var(--line); border-radius:20px; padding:5px 14px; cursor:pointer;}
+  .race-again:hover{border-color:var(--pri);}
+  .oops{animation:shakeX .35s ease;}
+  .race-cell.oops{background:#FCE8E6; border-color:#C5221F;}
+  .race-table{display:grid; grid-template-columns:repeat(4,1fr); gap:6px; width:100%;}
+  .race-cell{font-family:'Roboto',sans-serif; font-size:15px; background:#fff; border:1px solid #DADCE0; border-radius:6px; padding:10px 4px; cursor:pointer; display:flex; justify-content:center; gap:8px; color:var(--ink);}
+  .race-cell span{color:var(--ink-soft);}
+  .race-cell b{font-weight:500;}
+  .race-cell:hover{border-color:var(--pri);}
+  .race-cell.miss{background:#FCE8E6; border-color:#C5221F;}
+  .race-chart{width:100%; max-width:520px;}
+  .race-chart [data-i]{cursor:pointer;}
+  .race-chart [data-i]:hover{fill:#00000010;}
+  .times{width:100%; max-width:460px; margin:14px auto 0;}
+  .time-row{display:grid; grid-template-columns:82px 1fr; gap:8px; align-items:center; margin-bottom:8px; font-size:14px;}
+  .time-row .tr{background:var(--accent-soft); border-radius:6px; overflow:hidden;}
+  .time-row i{display:block; font-style:normal; color:#fff; background:var(--pri); padding:3px 8px; font-weight:700; font-size:13.5px; white-space:nowrap; min-width:58px; border-radius:6px; box-sizing:border-box;}
+  .time-row.t i{background:#7B6B76;}
+  @media (max-width:520px){ .race-table{grid-template-columns:repeat(3,1fr);} .race-cell{font-size:14px; gap:6px;} }
+
+  /* --- Крок 2: клікабельні частини --- */
+  .parts-ex{padding:14px;}
+  .parts-fig{margin:0; user-select:none; -webkit-user-select:none;}
+  .parts-fig .pcard{cursor:grab;}
+  .parts-fig .pcard.on rect{stroke:#A8327E; stroke-width:2.5;}
+  .parts-fig .ptgt{cursor:pointer;}
+  .parts-fig .ptgt.hl:hover{fill:#00000012;}
+  .parts-fig rect.ptgt:not(.hl):hover{opacity:.8;}
+  .parts-fig.over .pcard, .parts-fig.over .ptgt{cursor:default;}
+  .parts-fig.over .ptgt.hl:hover{fill:transparent;}
+  .parts-fig.over rect.ptgt:not(.hl):hover{opacity:1;}
+
+  /* --- Крок 3: типи й примірка --- */
+  .types{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:14px 0 8px;}
+  .type-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; display:grid; grid-template-columns:104px 1fr; gap:12px; align-items:center;}
+  .type-card h3{margin:0 0 2px; font-size:16px;}
+  .type-card p{margin:0; font-size:14.5px;}
+  @media (max-width:640px){ .types{grid-template-columns:1fr;} }
+  .q-sheet{border-collapse:collapse; width:100%; font-family:'Roboto',sans-serif; font-size:13px; color:#1F1F1F; background:#fff; margin-bottom:12px; border:1px solid #DADCE0;}
+  .q-sheet th, .q-sheet td{border:1px solid #E1E3E1; height:25px; padding:0 8px; white-space:nowrap;}
+  .q-sheet th{background:#F8F9FA; color:#444746; font-weight:500; font-size:11px; text-align:center;}
+  .q-sheet th:first-child{width:28px; padding:0;}
+  .q-sheet td.n{text-align:right;}
+  .q-sheet tr.hdr td{font-weight:700;}
+  .fit-chart{background:#fff; border:1px solid #E6E7EA; border-radius:10px; padding:6px; margin:0 auto 12px; max-width:440px;}
+  .fit-chart:empty{display:none;}
+  @media (max-width:520px){ .q-sheet{font-size:11.5px;} .q-sheet th, .q-sheet td{padding:0 3px;} .q-sheet th:first-child{width:18px;} }
+
+  /* --- Макет Google Таблиць --- */
+  .gs{--g-line:#E1E3E1; --g-blue:#0B57D0; position:relative; font-family:'Roboto',sans-serif; color:#1F1F1F; background:#F9FBFD; border:1px solid #DADCE0; border-radius:10px; font-size:13px; user-select:none; -webkit-user-select:none;}
+  .gs-top{display:flex; align-items:center; gap:8px; padding:8px 12px 2px; font-size:16px;}
+  .gs-top svg{width:22px; height:28px; flex-shrink:0;}
+  .gs-menu{display:flex; gap:2px; padding:2px 8px 6px 40px; font-size:13.5px; white-space:nowrap; overflow:hidden;}
+  .gs-menu button{all:unset; padding:3px 7px; border-radius:4px; cursor:default;}
+  .gs-menu button.live{cursor:pointer;}
+  .gs-menu button.live:hover, .gs-menu button.open{background:#E1E5EA;}
+  .gs-drop{position:absolute; z-index:6; top:64px; background:#fff; border-radius:8px; box-shadow:0 2px 10px #0000003D; padding:6px 0; min-width:200px; font-size:13.5px;}
+  .gs-drop div{display:flex; align-items:center; gap:12px; padding:6px 14px; cursor:pointer;}
+  .gs-drop div:hover{background:#F1F3F4;}
+  .gs-drop div.miss{background:#FCE8E6;}
+  .gs-drop .ms{color:#444746;}
+  .gs-fx{display:flex; align-items:center; gap:8px; background:#fff; border-top:1px solid var(--g-line); border-bottom:1px solid var(--g-line); padding:5px 10px; font-size:12.5px; min-height:18px;}
+  .gs-fx .addr{font-weight:700; color:#444746; min-width:30px;}
+  .gs-fx .fx{color:#9AA0A6; font-style:italic; font-weight:700;}
+  .gs-body{display:grid; grid-template-columns:minmax(0,1fr); background:#fff; border-radius:0 0 10px 10px; overflow:hidden;}
+  .gs-body.side{grid-template-columns:minmax(0,1fr) 216px;}
+  .gs-left{min-width:0;}
+  .gs-grid{border-collapse:collapse; width:100%; table-layout:fixed; background:#fff;}
+  .gs-grid th, .gs-grid td{border:1px solid var(--g-line); height:25px; padding:0 6px; white-space:nowrap; overflow:hidden; font-size:12.5px;}
+  .gs-grid th{background:#F8F9FA; color:#444746; font-weight:500; font-size:11px; text-align:center;}
+  .gs-grid th:first-child{width:30px; padding:0;}
+  .gs-grid td{cursor:cell;}
+  .gs-grid td.num{text-align:right;}
+  .gs-grid tr:nth-child(2) td{font-weight:700;}
+  .gs-grid td.in{background:#E8F0FE;}
+  .gs.selecting .gs-grid{touch-action:none;}
+  .gs-chart{margin:10px auto; width:calc(100% - 20px); max-width:460px; border:1px solid #DADCE0;}
+
+  /* Редактор діаграм */
+  .ce{border-left:1px solid var(--g-line); background:#fff; font-size:12.5px; padding:0 12px 12px;}
+  .ce-head{display:flex; justify-content:space-between; align-items:center; font-size:14px; padding:10px 0 6px; font-weight:500;}
+  .ce-tabs{display:flex; border-bottom:1px solid var(--g-line); margin:0 -12px 10px;}
+  .ce-tabs span{flex:1; text-align:center; padding:6px 2px; color:#5F6368; font-weight:500; font-size:12px;}
+  .ce-tabs span.on{color:var(--g-blue); box-shadow:inset 0 -2px 0 var(--g-blue);}
+  .ce label, .ce .lab{display:block; font-weight:500; color:#444746; margin:10px 0 4px; font-size:12px;}
+  .ce-field{border:1px solid #DADCE0; border-radius:4px; padding:5px 8px; min-height:16px; color:#1F1F1F; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .ce-field.empty{color:#9AA0A6;}
+  .ce-seg{display:flex; border:1px solid #747775; border-radius:4px; overflow:hidden;}
+  .ce-seg button{all:unset; flex:1; text-align:center; padding:4px 2px; cursor:pointer; font-size:12px;}
+  .ce-seg button.on{background:#D3E3FD; font-weight:500;}
+  .nudge{animation:nudge 1.4s ease-in-out infinite;}
+  @keyframes nudge{0%,100%{box-shadow:0 0 0 0 #1A73E855;} 50%{box-shadow:0 0 0 5px #1A73E800;}}
+  .pick{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:0 0 12px;}
+  .pick-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:14px; padding:6px 14px; border-radius:18px; border:1.5px solid var(--line); background:#fff; cursor:pointer; color:var(--ink);}
+  .pick-btn:hover{border-color:var(--pri);}
+  .pick-btn.shake{animation:shakeX .35s ease; border-color:#C5221F; background:#FCE8E6;}
+  @media (max-width:640px){ .gs-body.side{grid-template-columns:1fr;} .ce{border-left:none; border-top:1px solid var(--g-line);} }
+
+</style>
+</head>
+<body data-lesson="lesson8-charts" data-hud="8 клас · Графіки та діаграми">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Працюємо з числами · Тема 7</div>
+      <h1>Графіки та діаграми</h1>
+      <p>Як перетворити стовпчик чисел на картинку, яку зрозуміють за секунду.</p>
+      <button class="btn-primary" onclick="document.getElementById('rev').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <!-- стовпчики з обличчям і лінія тренду -->
+      <rect x="18" y="124" width="104" height="4" rx="2" fill="#7E1F5D"/>
+      <rect x="24" y="82" width="24" height="42" rx="4" fill="#4285F4"/>
+      <rect x="58" y="46" width="24" height="78" rx="4" fill="#A8327E"/>
+      <rect x="92" y="66" width="24" height="58" rx="4" fill="#D99A00"/>
+      <circle cx="65" cy="66" r="3.4" fill="#fff"/><circle cx="75" cy="66" r="3.4" fill="#fff"/>
+      <path d="M64 76 C67 80 73 80 76 76" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M36 62 L70 26 L104 44" stroke="#2A1A25" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="36" cy="62" r="6" fill="#fff" stroke="#2A1A25" stroke-width="3.5"/>
+      <circle cx="70" cy="26" r="6" fill="#fff" stroke="#2A1A25" stroke-width="3.5"/>
+      <circle cx="104" cy="44" r="6" fill="#fff" stroke="#2A1A25" stroke-width="3.5"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="rev" style="border-top:none; padding-top:0;">
+    <div class="step-label recap">Повторення · Формули й посилання</div>
+    <h2>Що ти вже знаєш</h2>
+    <p>Діаграма будується з тих самих діапазонів, що й формули. Обери термін, а потім клацни пояснення.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s1">
+    <div class="step-label">Крок 1 · Навіщо діаграма</div>
+    <h2>Таблиця проти картинки</h2>
+    <p><b>Діаграма</b> — це дані, показані фігурами. Порівнювати фігури оку легше, ніж читати числа. Перевір це на собі: 12 класів змагаються у шкільному квесті.</p>
+    <div class="exercise">
+      <div class="hot-prompt" id="racePrompt"></div>
+      <div class="race-clock" id="raceClock" hidden><span class="ms">timer</span><span>0,0 с</span></div>
+      <div class="race-stage" id="raceStage"></div>
+      <div class="progress-line" id="raceStatus"></div>
+      <button class="race-again" id="raceAgain" hidden><span class="ms">replay</span>Почати спочатку</button>
+    </div>
+  </section>
+
+  <section class="block" id="s2">
+    <div class="step-label">Крок 2 · Будова діаграми</div>
+    <h2>З чого складається діаграма</h2>
+    <p>Кожна частина діаграми відповідає на своє запитання. Прочитай картки й з'єднай кожну лінією з частиною, яку вона описує.</p>
+    <div class="exercise parts-ex">
+      <div class="hot-prompt" id="hotPrompt"></div>
+      <figure class="parts-fig" id="partsFig"></figure>
+      <div class="progress-line" id="hotStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s3">
+    <div class="step-label">Крок 3 · Типи діаграм</div>
+    <h2>Кожне питання має свою діаграму</h2>
+    <p>Тип обирають не за красою, а за запитанням, на яке має відповісти картинка.</p>
+    <div class="types" id="types"></div>
+    <h3>Яка діаграма підійде найкраще?</h3>
+    <div id="fitList"></div>
+  </section>
+
+  <section class="block" id="s4">
+    <div class="step-label">Крок 4 · Будуємо в Google Таблицях</div>
+    <h2>Від таблиці до діаграми за дві дії</h2>
+    <p>Спершу виділи дані разом із заголовками, а потім встав діаграму: вона візьме підписи із заголовків.</p>
+    <div class="exercise">
+      <div class="hot-prompt" id="gsPrompt"></div>
+      <div id="gsHost"></div>
+      <div class="progress-line" id="gsStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s5">
+    <div class="step-label">Крок 5 · Оформлення</div>
+    <h2>Налаштовуємо діаграму</h2>
+    <p>Щоб відкрити налаштування, двічі клацни діаграму.</p>
+    <div class="exercise">
+      <div class="hot-prompt" id="ceoPrompt"></div>
+      <div class="pick" id="ceoPick"></div>
+      <div id="ceoHost"></div>
+      <div class="progress-line" id="ceoStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s6">
+    <div class="step-label">Крок 6 · Читаємо діаграму</div>
+    <h2>Що каже картинка?</h2>
+    <p>Спершу прочитай заголовок і підписи, а вже потім дивись на фігури.</p>
+    <div id="readList"></div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Графіки та діаграми» · 8 клас</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+const $ = id=>document.getElementById(id);
+const num = v=>String(Math.round(v * 100) / 100).replace('.', ',');
+function flash(el, cls = 'shake', ms = 450){ el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), ms); }
+const ms = n=>`<span class="ms">${n}</span>`;
+
+/* ================= РЕНДЕР ДІАГРАМ =================
+   chart({type, cats, series:[{name, vals}], pts, title, xName, yName, legend, labels, yMin, w, h, bare, hit, pct3d})
+   type: 'col' | 'line' | 'pie' | 'scatter'; legend: 'none' | 'top' | 'bottom' */
+const NARROW = innerWidth < 520, CHART_W = NARROW ? 340 : 440;
+const COLORS = ['#4285F4', '#EA4335', '#D99A00', '#9334E6', '#12A4AF', '#C2185B'];
+function niceStep(range){
+  const raw = range / 5, p = 10 ** Math.floor(Math.log10(raw));
+  return [1, 2, 2.5, 5, 10].find(x=>x * p >= raw) * p;
+}
+function chart(o){
+  const {type = 'col', cats = [], series = [], pts = null, title = '', xName = '', yName = '', legend = 'none', labels = false,
+         yMin = 0, yStep = 0, w = CHART_W, h = 270, bare = false, hit = false} = o;
+  const text = (x, y, s, a = '')=>`<text x="${x}" y="${y}" ${a}>${s}</text>`;
+  let g = '';
+  const top = bare ? 8 : (title ? 36 : 14) + (legend === 'top' ? 22 : 0);
+  const low = (legend === 'bottom' ? 24 : 0) + (xName ? 18 : 0);
+  if(title) g += `<g data-part="title"><rect x="${w / 2 - 170}" y="6" width="340" height="24" fill="transparent"/>${text(w / 2, 24, title, 'class="tt" text-anchor="middle"')}</g>`;
+  if(legend !== 'none'){
+    const names = type === 'pie' ? cats : series.map(s=>s.name);
+    const widths = names.map(n=>n.length * 7 + 22);
+    let x = w / 2 - widths.reduce((a, b)=>a + b, 0) / 2;
+    const y = legend === 'top' ? (title ? 44 : 14) : h - 6;
+    g += `<g data-part="legend"><rect x="${x - 6}" y="${y - 12}" width="${widths.reduce((a, b)=>a + b, 0) + 12}" height="18" fill="transparent"/>`;
+    names.forEach((n, i)=>{
+      g += `<rect x="${x}" y="${y - 9}" width="10" height="10" rx="2" fill="${COLORS[i % COLORS.length]}"/>` + text(x + 14, y, n, 'font-size="12.5"');
+      x += widths[i];
+    });
+    g += '</g>';
+  }
+  if(type === 'pie'){
+    const vals = series[0].vals, sum = vals.reduce((a, b)=>a + b, 0);
+    const R = bare ? (h - 16) / 2 : Math.min(88, (h - top - low) / 2 - 18, w / 2 - 108);
+    const cx = w / 2, cy = bare ? h / 2 : (top + h - low) / 2;
+    let a = -Math.PI / 2;
+    const polar = (r, t)=>[(cx + r * Math.cos(t)).toFixed(1), (cy + r * Math.sin(t)).toFixed(1)];
+    vals.forEach((v, i)=>{
+      const d = v / sum * Math.PI * 2, b = a + d, [x1, y1] = polar(R, a), [x2, y2] = polar(R, b);
+      const p = Math.round(v / sum * 100);
+      g += `<path d="M${cx} ${cy} L${x1} ${y1} A${R} ${R} 0 ${d > Math.PI ? 1 : 0} 1 ${x2} ${y2} Z" fill="${COLORS[i % COLORS.length]}" stroke="#fff" stroke-width="2"><title>${cats[i]}: ${num(v)}</title></path>`;
+      if(!bare && vals.length <= 8){
+        const m = a + d / 2, [lx, ly] = polar(R + 8, m), right = Math.cos(m) >= 0;
+        g += text(lx, +ly + 4, `${cats[i]} ${p}%`, `font-size="12.5" text-anchor="${right ? 'start' : 'end'}"`);
+      }
+      a = b;
+    });
+    return `<svg class="ch" viewBox="0 0 ${w} ${h}" role="img" aria-label="${title || 'Секторна діаграма'}">${g}</svg>`;
+  }
+  const L = bare ? 6 : 34 + (yName ? 16 : 0), R = w - (bare ? 6 : 12), T = top, B = bare ? h - 6 : h - 24 - low;
+  const all = pts ? pts.map(p=>p[1]) : series.flatMap(s=>s.vals);
+  const step = yStep || niceStep(Math.max(...all) - yMin), yTop = yMin + Math.ceil((Math.max(...all) - yMin) / step - 1e-9) * step;
+  const Y = v=>B - (v - yMin) / (yTop - yMin) * (B - T);
+  let grid = '<g data-part="grid">', axis = `<g data-part="ax-y"><rect x="0" y="${T - 8}" width="${L - 2}" height="${B - T + 16}" fill="transparent"/>`;
+  for(let v = yMin; v <= yTop + 1e-9; v += step){
+    const y = Y(v).toFixed(1);
+    if(v > yMin) grid += `<line x1="${L}" y1="${y}" x2="${R}" y2="${y}" stroke="#E0E2E5"/><line x1="${L}" y1="${y}" x2="${R}" y2="${y}" stroke="transparent" stroke-width="9"/>`;
+    if(!bare) axis += text(L - 6, +y + 4, num(v), 'font-size="12" text-anchor="end"');
+  }
+  g += grid + '</g>' + axis + '</g>';
+  g += `<line x1="${L}" y1="${B}" x2="${R}" y2="${B}" stroke="#9AA0A6"/>`;
+  if(yName) g += text(14, (T + B) / 2, yName, `font-size="12.5" text-anchor="middle" transform="rotate(-90 14 ${(T + B) / 2})"`);
+  if(xName) g += text((L + R) / 2, B + 38, xName, 'font-size="12.5" text-anchor="middle"');
+  if(pts){
+    const xs = pts.map(p=>p[0]), xStep = niceStep(Math.max(...xs)), xTop = Math.ceil(Math.max(...xs) / xStep) * xStep;
+    const X = v=>L + 10 + v / xTop * (R - L - 20);
+    if(!bare) for(let v = 0; v <= xTop; v += xStep) g += text(X(v), B + 18, num(v), 'font-size="12" text-anchor="middle"');
+    g += '<g data-part="s0">' + pts.map(p=>`<circle cx="${X(p[0]).toFixed(1)}" cy="${Y(p[1]).toFixed(1)}" r="${bare ? 4 : 6}" fill="${COLORS[0]}" stroke="#fff" stroke-width="2"><title>${p[0]} год — ${p[1]} балів</title></circle>`).join('') + '</g>';
+    return `<svg class="ch" viewBox="0 0 ${w} ${h}" role="img" aria-label="${title || 'Точкова діаграма'}">${g}</svg>`;
+  }
+  const n = cats.length, band = (R - L) / n, cx = i=>L + band * (i + .5);
+  if(!bare){
+    const fs = Math.max(9.5, Math.min(12, band / (Math.max(...cats.map(c=>String(c).length)) * .58)));
+    g += `<g data-part="ax-x"><rect x="${L}" y="${B + 2}" width="${R - L}" height="22" fill="transparent"/>` +
+      cats.map((c, i)=>text(cx(i).toFixed(1), B + 18, c, `font-size="${fs.toFixed(1)}" text-anchor="middle"`)).join('') + '</g>';
+  }
+  series.forEach((s, k)=>{
+    const color = COLORS[k % COLORS.length];
+    g += `<g data-part="s${k}">`;
+    if(type === 'col'){
+      const inner = band * .68, bw = inner / series.length;
+      s.vals.forEach((v, i)=>{
+        const x = cx(i) - inner / 2 + bw * k, y = Y(v);
+        g += `<rect x="${(x + .5).toFixed(1)}" y="${y.toFixed(1)}" width="${(bw - 1).toFixed(1)}" height="${(B - y).toFixed(1)}" rx="1.5" fill="${color}"><title>${cats[i]}: ${num(v)}</title></rect>`;
+        if(labels) g += text((x + bw / 2).toFixed(1), (y - 5).toFixed(1), num(v), 'font-size="12" font-weight="500" text-anchor="middle"');
+      });
+    } else {
+      if(type === 'line') g += `<polyline points="${s.vals.map((v, i)=>`${cx(i).toFixed(1)},${Y(v).toFixed(1)}`).join(' ')}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round"/>`;
+      s.vals.forEach((v, i)=>{
+        g += `<circle cx="${cx(i).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="${type === 'line' ? (bare ? 3 : 4) : 5.5}" fill="${color}" stroke="#fff" stroke-width="1.5"><title>${cats[i]}: ${num(v)}</title></circle>`;
+        if(labels) g += text(cx(i).toFixed(1), (Y(v) + (v < s.vals[i - 1] && v < s.vals[i + 1] ? 19 : -9)).toFixed(1), num(v), 'font-size="12" font-weight="500" text-anchor="middle"');
+      });
+    }
+    g += '</g>';
+  });
+  if(hit) cats.forEach((c, i)=>{ g += `<rect data-i="${i}" x="${(L + band * i).toFixed(1)}" y="${T}" width="${band.toFixed(1)}" height="${B - T + 22}" fill="transparent"/>`; });
+  return `<svg class="ch" viewBox="0 0 ${w} ${h}" role="img" aria-label="${title || 'Діаграма'}">${g}</svg>`;
+}
+
+/* ================= ПОВТОРЕННЯ ================= */
+makeMatching('recapPool', 'recapList', [
+  { name:'A1:B7', desc:'Діапазон: прямокутник комірок від A1 до B7' },
+  { name:'$B$1', desc:'Абсолютне посилання: не зсувається під час копіювання' },
+  { name:'=SUM(B2:B7)', desc:'Додає всі числа стовпчика' },
+  { name:'=COUNTIF(B2:B7;">100")', desc:'Рахує, скільки значень перевищують сотню' },
+  { name:'Рядок формул', desc:'Показує, що насправді записано в комірці' }
+], 'recapProgress');
+
+/* ================= КРОК 1: ТАБЛИЦЯ ПРОТИ ДІАГРАМИ ================= */
+(function(){
+  const CL = ['5-А','5-Б','5-В','6-А','6-Б','6-В','7-А','7-Б','7-В','8-А','8-Б','8-В'];
+  const V = [61, 74, 58, 83, 67, 96, 70, 55, 79, 64, 84, 72];
+  const stage = $('raceStage'), prompt = $('racePrompt'), status = $('raceStatus'), clock = $('raceClock'), again = $('raceAgain');
+  const hit = trackTask(stage, 2, 3);
+  const paid = [false, false];   // нейрончики лише за перше проходження раунду
+  let t = [0, 0], t0 = 0, tick = 0, onClick = null, replay = false;
+  const sec = v=>(v / 1000).toFixed(1).replace('.', ',') + ' с';
+  const showClock = v=>{ clock.lastChild.textContent = sec(v); };
+  const stop = ()=>{
+    clearInterval(tick); tick = 0;
+    if(onClick){ stage.removeEventListener('click', onClick); onClick = null; }
+  };
+  function intro(i){
+    prompt.innerHTML = i ? 'Тепер ті самі класи, але новий раунд квесту: знайди переможця <b>на діаграмі</b>.' : 'Раунд 1: знайди клас із найбільшою кількістю балів <b>у таблиці</b>.';
+    stage.innerHTML = `<button class="btn-primary">${i ? 'Показати діаграму' : 'Показати таблицю'}</button>`;
+    stage.firstChild.addEventListener('click', ()=>play(i));
+  }
+  function play(i){
+    const vals = shuffle(V), best = vals.indexOf(96);
+    prompt.innerHTML = 'Клацни клас із <b>найбільшою</b> кількістю балів!';
+    stage.innerHTML = !i
+      ? '<div class="race-table">' + CL.map((c, k)=>`<button class="race-cell" data-i="${k}"><span>${c}</span><b>${vals[k]}</b></button>`).join('') + '</div>'
+      : '<div class="race-chart">' + chart({cats:CL, series:[{name:'Бали', vals}], h:230, hit:true}) + '</div>';
+    again.hidden = false;
+    t0 = Date.now();
+    showClock(0); clock.hidden = false;
+    tick = setInterval(()=>showClock(Date.now() - t0), 100);
+    onClick = e=>{
+      const el = e.target.closest('[data-i]');
+      if(!el) return;
+      if(+el.dataset.i !== best){
+        // під час повторної спроби помилка не впливає на точність: клас oops ядро не рахує
+        if(i){ flash(stage, replay ? 'oops' : 'shake'); status.textContent = 'Це не найвищий стовпець.'; }
+        else { flash(el, replay ? 'oops' : 'miss', 500); status.textContent = 'Є число більше.'; }
+        return;
+      }
+      t[i] = Date.now() - t0;
+      stop(); showClock(t[i]);
+      status.textContent = '';
+      if(!paid[i]){ paid[i] = true; addNeurons(1); hit(); if(i) addNeurons(1); }
+      if(i) result(); else intro(1);
+    };
+    stage.addEventListener('click', onClick);
+  }
+  function result(){
+    const max = Math.max(...t);
+    const row = (name, v, cls)=>`<div class="time-row ${cls}"><span>${name}</span><div class="tr"><i style="width:${Math.max(18, v / max * 100)}%">${sec(v)}</i></div></div>`;
+    prompt.innerHTML = t[1] < t[0]
+      ? `На діаграмі вийшло у ${num(Math.round(t[0] / t[1] * 10) / 10)} раза швидше.`
+      : 'Цього разу таблиця встояла: у ній лише 12 чисел. А уяви, що їх 1000.';
+    stage.innerHTML = `<div class="times">${row('Таблиця', t[0], 't')}${row('Діаграма', t[1], '')}</div>`;
+    stage.style.minHeight = '0';
+    clock.hidden = true;
+  }
+  again.addEventListener('click', ()=>{
+    stop();
+    replay = paid[0] || replay;
+    t = [0, 0];
+    status.textContent = '';
+    stage.style.minHeight = '';
+    clock.hidden = true; again.hidden = true;
+    intro(0);
+  });
+  intro(0);
+})();
+
+/* ================= КРОК 2: ЧАСТИНИ ДІАГРАМИ ================= */
+const TEAM = {cats:['Сокіл','Блискавка','Титан','Вогонь'], series:[{name:'Перемоги', vals:[9, 6, 3, 7]}, {name:'Поразки', vals:[2, 5, 8, 4]}]};
+// Вправа-ілюстрація: картки перемішані навколо діаграми, учень з'єднує кожну лінією з частиною, яку вона описує
+(function(){
+  const PARTS = [
+    { id:'title', name:'Заголовок', desc:['Одним рядком каже,', 'про що діаграма'], at:[300, 58] },
+    { id:'y', name:'Вісь значень', desc:['Шкала з числами,', 'зазвичай вертикальна'], at:[236, 198] },
+    { id:'x', name:'Вісь категорій', desc:['Підписує те, що ми', 'порівнюємо'], at:[270, 319] },
+    { id:'grid', name:'Лінії сітки', desc:['Ведуть око від фігури', 'до числа на шкалі'], at:[548, 144] },
+    { id:'series', name:'Ряд даних', desc:['Числа з одного стовпчика', 'таблиці, один колір'], at:[524, 197] },
+    { id:'legend', name:'Легенда', desc:['Пояснює кожен колір.', 'У Таблицях — «Умовні', 'позначення»'], at:[452, 348] }
+  ];
+  const L = 270, R = 548, B = 300, Y = v=>B - v / 40 * 208, band = (R - L) / 4, bw = 23;
+  const CATS = ['Пн', 'Вт', 'Ср', 'Чт'], BUNS = [30, 22, 26, 34], JUICE = [18, 24, 15, 20];
+  const [VW, VH, TX, TY] = NARROW ? [366, 600, -207, 220] : [780, 396, 0, 0];
+  const INK = '#A8327E';
+  const fig = $('partsFig'), prompt = $('hotPrompt'), status = $('hotStatus');
+  const hit = trackTask(fig, PARTS.length, PARTS.length + 2);
+  const links = {};            // id частини → точка, куди прийшла лінія
+  // перемішуємо в межах своєї сторони, щоб лінії не перетинали всю діаграму
+  const order = [...shuffle([0, 1, 2]), ...shuffle([3, 4, 5])];
+  let sel = null, dragging = false, finished = false;
+
+  const slot = i=>{
+    if(NARROW){ const x = i < 3 ? 6 : 186, y = 6 + (i % 3) * 76; return {x, y, w:174, h:70, ax:x + 87, ay:y + 70}; }
+    const left = i < 3, x = left ? 12 : 585, y = 24 + (i % 3) * 126;
+    return {x, y, w:183, h:96, ax:left ? 195 : 585, ay:y + 48};
+  };
+  const curve = (a, b)=>{
+    if(NARROW){ const m = (a[1] + b[1]) / 2; return `M${a[0]} ${a[1]} C${a[0]} ${m} ${b[0]} ${m} ${b[0]} ${b[1]}`; }
+    const m = (a[0] + b[0]) / 2; return `M${a[0]} ${a[1]} C${m} ${a[1]} ${m} ${b[1]} ${b[0]} ${b[1]}`;
+  };
+  const zone = (id, x, y, w, h)=>{
+    const p = PARTS.find(q=>q.id === id);
+    return `<rect class="ptgt hl" data-part="${id}" data-ax="${p.at[0]}" data-ay="${p.at[1]}" x="${x}" y="${y}" width="${w}" height="${h}" rx="6" fill="transparent"/>`;
+  };
+  const text = (x, y, t, a = 'font-size="13.5"')=>`<text x="${x}" y="${y}" pointer-events="none" ${a}>${t}</text>`;
+  function drawChart(){
+    let c = zone('title', 300, 44, 180, 29) + text(390, 64, 'Продажі в буфеті', 'class="tt" text-anchor="middle"');
+    c += zone('y', 236, 84, 30, 226);
+    [10, 20, 30, 40].forEach(v=>{
+      c += `<line x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="#E0E2E5" pointer-events="none"/>`;
+      c += `<line class="ptgt" data-part="grid" data-ax="548" data-ay="${Y(v)}" x1="${L}" y1="${Y(v)}" x2="${R}" y2="${Y(v)}" stroke="transparent" stroke-width="13"/>`;
+    });
+    [0, 10, 20, 30, 40].forEach(v=>{ c += text(260, Y(v) + 4.5, v, 'text-anchor="end" font-size="13"'); });
+    c += `<line x1="${L}" y1="${B}" x2="${R}" y2="${B}" stroke="#9AA0A6"/>`;
+    c += zone('x', L, 308, 278, 23);
+    const bar = (x, v, fill)=>`<rect class="ptgt" data-part="series" data-ax="${x + bw / 2}" data-ay="${Y(v)}" x="${x + .5}" y="${Y(v)}" width="${bw - 1}" height="${B - Y(v)}" rx="1.5" fill="${fill}"/>`;
+    CATS.forEach((n, i)=>{
+      const mid = L + band * (i + .5);
+      c += bar(mid - bw, BUNS[i], COLORS[0]) + bar(mid, JUICE[i], COLORS[1]) + text(mid, 324, n, 'text-anchor="middle" font-size="13.5"');
+    });
+    c += zone('legend', 312, 336, 140, 24);
+    c += `<rect x="322" y="343" width="11" height="11" rx="2" fill="${COLORS[0]}" pointer-events="none"/>` + text(338, 353, 'Булочки') + `<rect x="405" y="343" width="11" height="11" rx="2" fill="${COLORS[1]}" pointer-events="none"/>` + text(421, 353, 'Сік');
+    return `<g transform="translate(${TX} ${TY})">${c}</g>`;
+  }
+  function card(k, i){
+    const p = PARTS[k], s = slot(i), on = links[p.id];
+    let g = `<g class="pcard${sel === k ? ' on' : ''}" data-card="${k}"><rect x="${s.x}" y="${s.y}" width="${s.w}" height="${s.h}" rx="10" fill="#fff" stroke="${on ? INK : '#DADCE0'}" stroke-width="1.5"/>`;
+    g += `<text x="${s.x + 12}" y="${s.y + (NARROW ? 20 : 28)}" style="font:700 ${NARROW ? 14 : 15.5}px 'Baloo 2',sans-serif; fill:${on ? INK : '#2A1A25'}">${p.name}</text>`;
+    p.desc.forEach((d, n)=>{ g += `<text x="${s.x + 12}" y="${s.y + (NARROW ? 36 + n * 14 : 50 + n * 16)}" style="font:600 ${NARROW ? 12 : 13}px 'Nunito Sans',sans-serif; fill:#5A4A55">${d}</text>`; });
+    return g + '</g>';
+  }
+  function draw(){
+    let lines = '';
+    order.forEach((k, i)=>{
+      const to = links[PARTS[k].id];
+      if(!to) return;
+      const s = slot(i), b = [to[0] + TX, to[1] + TY];
+      lines += `<path d="${curve([s.ax, s.ay], b)}" fill="none" stroke="${INK}" stroke-width="1.5" stroke-linecap="round" pointer-events="none"/><circle cx="${b[0]}" cy="${b[1]}" r="3.5" fill="${INK}" pointer-events="none"/>`;
+    });
+    fig.classList.toggle('over', finished);
+    fig.innerHTML = `<svg class="ch" viewBox="0 0 ${VW} ${VH}" role="img" aria-label="Будова діаграми: заголовок, вісь значень, вісь категорій, лінії сітки, ряд даних, легенда">${drawChart()}${lines}<path id="partsRubber" fill="none" stroke="${INK}" stroke-width="1.5" stroke-dasharray="6 5" stroke-linecap="round" pointer-events="none"/>${order.map(card).join('')}</svg>`;
+  }
+  const toSvg = e=>{
+    const svg = fig.querySelector('svg'), pt = svg.createSVGPoint();
+    pt.x = e.clientX; pt.y = e.clientY;
+    const q = pt.matrixTransform(svg.getScreenCTM().inverse());
+    return [q.x, q.y];
+  };
+  const rubber = e=>{
+    const r = fig.querySelector('#partsRubber');
+    if(!e || sel === null){ r.removeAttribute('d'); return; }
+    const s = slot(order.indexOf(sel));
+    r.setAttribute('d', curve([s.ax, s.ay], toSvg(e)));
+  };
+  const select = k=>{
+    sel = k;
+    fig.querySelectorAll('.pcard').forEach(g=>g.classList.toggle('on', +g.dataset.card === k));
+  };
+  function connect(el){
+    const p = PARTS[sel], id = el.dataset.part;
+    if(id !== p.id){
+      const other = PARTS.find(q=>q.id === id);
+      flash(fig);
+      status.textContent = `Ні, тут ${other.name.toLowerCase()}. Спробуй іншу частину.`;
+      return;
+    }
+    links[id] = [+el.dataset.ax, +el.dataset.ay];
+    sel = null; status.textContent = '';
+    addNeurons(1); hit();
+    const n = Object.keys(links).length;
+    prompt.innerHTML = `З'єднано: ${n} з ${PARTS.length}`;
+    if(n === PARTS.length){
+      addNeurons(2);
+      finished = true;
+      prompt.innerHTML = 'Усі частини з\'єднано ✓';
+    }
+    draw();
+  }
+  // touch-action на елементах SVG не діє, тож прокрутку з картки вимикаємо тут; решта діаграми гортається як завжди
+  fig.addEventListener('touchstart', e=>{ if(!finished && e.target.closest?.('[data-card]')) e.preventDefault(); }, {passive:false});
+  fig.addEventListener('pointerdown', e=>{
+    if(finished) return;
+    const c = e.target.closest('[data-card]');
+    if(c){
+      const k = +c.dataset.card;
+      if(links[PARTS[k].id]) return;
+      e.preventDefault();
+      select(k); dragging = true;
+      fig.setPointerCapture(e.pointerId);
+      status.textContent = '';
+      return;
+    }
+    const t = e.target.closest('[data-part]');
+    if(t && sel !== null) connect(t);
+    else if(t) status.textContent = 'Спершу обери картку.';
+  });
+  fig.addEventListener('pointermove', e=>{ if(dragging) rubber(e); });
+  const up = e=>{
+    if(!dragging) return;
+    dragging = false; rubber(null);
+    const t = document.elementFromPoint(e.clientX, e.clientY)?.closest?.('[data-part]');
+    if(t && sel !== null) connect(t);
+  };
+  fig.addEventListener('pointerup', up);
+  fig.addEventListener('pointercancel', ()=>{ dragging = false; rubber(null); });
+  prompt.innerHTML = 'Затисни картку й потягни лінію до її частини діаграми. Або клацни картку, а потім частину.';
+  draw();
+})();
+
+/* ================= КРОК 3: ТИПИ Й ПРИМІРКА ================= */
+const HOURS = [[1, 5], [2, 4], [2, 7], [3, 6], [4, 5], [4, 8], [5, 7], [6, 9], [6, 7], [7, 10], [8, 9], [8, 11]];
+(function(){
+  const mini = {w:104, h:76, bare:true};
+  const CARDS = [
+    { name:'Стовпчаста', use:'<b>Порівняти</b> кілька окремих значень: хто більше, хто менше.', c:{type:'col', cats:[1, 2, 3, 4], series:[{name:'', vals:[5, 8, 3, 6]}]} },
+    { name:'Лінійна (графік)', use:'Показати, <b>як значення змінюється з часом</b>: зростає чи падає.', c:{type:'line', cats:[1, 2, 3, 4, 5], series:[{name:'', vals:[3, 5, 4, 7, 9]}]} },
+    { name:'Секторна', use:'Показати <b>частини одного цілого</b>, що разом дають 100%.', c:{type:'pie', cats:['а', 'б', 'в'], series:[{name:'', vals:[50, 30, 20]}]} },
+    { name:'Точкова', use:'Перевірити, <b>чи пов\'язані дві величини</b>: кожна точка — пара чисел.', c:{type:'col', pts:[[1, 2], [2, 3], [3, 3], [4, 5], [5, 4], [6, 6], [7, 7], [8, 6]]} }
+  ];
+  $('types').innerHTML = CARDS.map(c=>`<div class="type-card">${chart({...c.c, ...mini})}<div><h3>${c.name}</h3><p>${c.use}</p></div></div>`).join('');
+})();
+
+// Міні-аркуш Google Таблиць: літери стовпчиків, номери рядків, сітка
+const qt = (head, vals)=>{
+  const cell = v=>`<td${typeof v === 'number' || /^\d/.test(v) ? ' class="n"' : ''}>${v}</td>`;
+  return `<table class="q-sheet"><tr><th></th>${head.map((_, i)=>`<th>${'ABCDEFGHIJKLMN'[i]}</th>`).join('')}</tr>
+    <tr class="hdr"><th>1</th>${head.map(cell).join('')}</tr><tr><th>2</th>${vals.map(cell).join('')}</tr></table>`;
+};
+const FIT = [
+  { pre:qt(['Гурток', 'Шахи', 'Футбол', 'Хор', 'Малювання'], ['Учнів', 9, 22, 12, 16]),
+    cats:['Шахи', 'Футбол', 'Хор', 'Малювання'], vals:[9, 22, 12, 16],
+    text:'У якому гуртку найбільше учнів і на скільки він більший за шахи?',
+    correct:0, hint:'Тут окремі значення стоять поруч, і їх треба порівняти між собою.', why:'Стовпці стоять поруч, і різницю видно одразу.' },
+  { pre:qt(['Час', '6:00', '9:00', '12:00', '15:00', '18:00', '21:00'], ['Темп.', '8°', '12°', '17°', '19°', '15°', '11°']),
+    cats:['6:00', '9:00', '12:00', '15:00', '18:00', '21:00'], vals:[8, 12, 17, 19, 15, 11],
+    text:'Як теплішало й холоднішало протягом дня?',
+    correct:1, hint:'Значення йдуть одне за одним, і важливий увесь шлях від ранку до вечора.', why:'Лінія показує весь шлях: підйом, вершину й спад.' },
+  { pre:qt(['Стаття', 'Екскурсія', 'Подарунки', 'Канцтовари', 'Інше'], ['Сума, ₴', 450, 300, 150, 100]),
+    cats:['Екскурсія', 'Подарунки', 'Канцтовари', 'Інше'], vals:[450, 300, 150, 100],
+    text:'Класний фонд — 1000 ₴. Покажи батькам, куди розійшлися гроші.',
+    correct:2, hint:'Усі суми разом дають один фонд.', why:'Коло — це вся тисяча, і видно, що майже половина пішла на екскурсію.' },
+  { pre:qt(['Години', ...HOURS.map(p=>p[0])], ['Бал', ...HOURS.map(p=>p[1])]),
+    cats:HOURS.map(p=>p[0]), vals:HOURS.map(p=>p[1]), pts:HOURS,
+    text:'Чи справді той, хто довше готується, отримує вищий бал? Є дані 12 учнів.',
+    correct:3, hint:'У кожного учня по два числа, і нас цікавить зв\'язок між ними.', why:'Кожна точка — один учень. Якщо точки йдуть угору вправо, зв\'язок є.' }
+];
+makeClassify('fitList', FIT.map(f=>({...f, pre:f.pre + '<div class="fit-chart"></div>'})), ['Стовпчаста', 'Лінійна', 'Секторна', 'Точкова']);
+
+// Завдання — над таблицею
+$('fitList').querySelectorAll('.classify-card').forEach(c=>c.prepend(c.querySelector('.q')));
+
+// Під час вибору типу в картці з'являється діаграма цього типу; після правильної відповіді вона лишається
+$('fitList').addEventListener('click', e=>{
+  const btn = e.target.closest('.choice-btn'), card = btn?.closest('.classify-card');
+  if(!card || card.dataset.locked) return;
+  const f = FIT[[...$('fitList').children].indexOf(card)];
+  const type = ['col', 'line', 'pie', 'scatter'][[...btn.parentNode.children].indexOf(btn)];
+  const cfg = {type, cats:f.cats, series:[{name:'', vals:f.vals}], h:230};
+  if(type === 'scatter' && f.pts) Object.assign(cfg, {pts:f.pts, xName:'Години підготовки', yName:'Бал', yStep:2});
+  card.querySelector('.fit-chart').innerHTML = chart(cfg);
+  if(btn.classList.contains('correct')) card.dataset.locked = 1;
+});
+
+/* ================= ДАНІ ДЛЯ ЕМУЛЯТОРІВ ================= */
+const PAPER = {head:['Місяць', 'Зібрано, кг'], rows:[['Вересень', 120], ['Жовтень', 145], ['Листопад', 96], ['Грудень', 86], ['Січень', 110], ['Лютий', 150]]};
+const paperChart = (rows, extra = {})=>({cats:rows.map(r=>r[0]), series:[{name:PAPER.head[1], vals:rows.map(r=>r[1])}], h:250, ...extra});
+const SHEETS_ICON = '<svg viewBox="0 0 22 28"><path d="M2 0h13l7 7v19a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2z" fill="#0F9D58"/><path d="M15 0l7 7h-5a2 2 0 0 1-2-2z" fill="#87CEAC"/><path d="M5 12h12v10H5z" fill="#fff"/><path d="M6.5 13.5h4v2.3h-4zm5 0h4v2.3h-4zm-5 3.3h4v2.3h-4zm5 0h4v2.3h-4z" fill="#0F9D58"/></svg>';
+
+/* ================= КРОК 4: ЕМУЛЯТОР ТАБЛИЦІ ================= */
+(function(){
+  const COLS = 'ABCD', ROWS = 8;
+  const rows = PAPER.rows.map(r=>[...r]);
+  const host = $('gsHost'), prompt = $('gsPrompt'), status = $('gsStatus');
+  host.innerHTML = `<div class="gs selecting" id="gs">
+    <div class="gs-top">${SHEETS_ICON}<span>Збір макулатури</span></div>
+    <div class="gs-menu" id="gsMenu">${['Файл', 'Редагувати', 'Вигляд', 'Вставити', 'Формат', 'Дані', 'Інструменти', 'Розширення', 'Довідка'].map(m=>`<button${m === 'Вставити' ? ' class="live" id="gsInsert"' : ''}>${m}</button>`).join('')}</div>
+    <div class="gs-fx"><span class="addr" id="gsAddr"></span><span class="fx">fx</span><span id="gsVal"></span></div>
+    <div class="gs-body"><div class="gs-left"><table class="gs-grid" id="gsGrid"></table><div id="gsChartWrap"></div></div></div>
+  </div>`;
+  const gs = $('gs'), grid = $('gsGrid'), wrap = $('gsChartWrap');
+  const value = (c, r)=>{
+    if(r === 1) return PAPER.head[c] ?? '';
+    const row = rows[r - 2];
+    return row ? row[c] ?? '' : '';
+  };
+  grid.innerHTML = `<tr><th></th>${[...COLS].map(c=>`<th>${c}</th>`).join('')}</tr>` + Array.from({length:ROWS}, (_, i)=>{
+    const r = i + 1;
+    return `<tr><th>${r}</th>${[...COLS].map((_, c)=>`<td data-c="${c}" data-r="${r}"${typeof value(c, r) === 'number' ? ' class="num"' : ''}>${value(c, r)}</td>`).join('')}</tr>`;
+  }).join('');
+  const td = (c, r)=>grid.querySelector(`td[data-c="${c}"][data-r="${r}"]`);
+  const hit = trackTask(gs, 2, 3);
+  let phase = 0, range = null;   // фази: 0 виділення, 1 меню, 2 готово
+
+  const TEXT = [
+    'Виділи діапазон <b>A1:B7</b>: натисни на A1 і, не відпускаючи, тягни до B7.',
+    'Дані виділено. Тепер відкрий меню <b>Вставити</b> й обери діаграму.',
+    'Діаграму готово ✓'
+  ];
+  const go = p=>{ phase = p; prompt.innerHTML = TEXT[p]; gs.classList.toggle('selecting', p === 0); $('gsInsert').classList.toggle('nudge', p === 1); };
+
+  /* виділення діапазону */
+  function paint(a, b){
+    const c1 = Math.min(a.c, b.c), c2 = Math.max(a.c, b.c), r1 = Math.min(a.r, b.r), r2 = Math.max(a.r, b.r);
+    grid.querySelectorAll('td').forEach(t=>{
+      const c = +t.dataset.c, r = +t.dataset.r, on = c >= c1 && c <= c2 && r >= r1 && r <= r2;
+      t.classList.toggle('in', on);
+      const s = [];
+      if(on){
+        if(c === c1) s.push('inset 2px 0 0 #1A73E8');
+        if(c === c2) s.push('inset -2px 0 0 #1A73E8');
+        if(r === r1) s.push('inset 0 2px 0 #1A73E8');
+        if(r === r2) s.push('inset 0 -2px 0 #1A73E8');
+      }
+      t.style.boxShadow = s.join(',');
+    });
+    range = {c1, c2, r1, r2};
+    const name = (c, r)=>COLS[c] + r;
+    $('gsAddr').textContent = c1 === c2 && r1 === r2 ? name(c1, r1) : `${name(c1, r1)}:${name(c2, r2)}`;
+    $('gsVal').textContent = c1 === c2 && r1 === r2 ? value(c1, r1) : '';
+  }
+  const cellAt = e=>{
+    const t = document.elementFromPoint(e.clientX, e.clientY)?.closest('td[data-c]');
+    return t && grid.contains(t) ? {c:+t.dataset.c, r:+t.dataset.r} : null;
+  };
+  let anchor = null;
+  grid.addEventListener('pointerdown', e=>{
+    if(phase !== 0) return;
+    const a = cellAt(e); if(!a) return;
+    e.preventDefault();
+    anchor = a; grid.setPointerCapture(e.pointerId); paint(a, a); status.textContent = '';
+  });
+  grid.addEventListener('pointermove', e=>{
+    if(!anchor) return;
+    const b = cellAt(e); if(b) paint(anchor, b);
+  });
+  const release = ()=>{
+    if(!anchor) return;
+    anchor = null;
+    const {c1, c2, r1, r2} = range;
+    if(c1 === 0 && c2 === 1 && r1 === 1 && r2 === 7){ addNeurons(1); hit(); status.textContent = '✓ Заголовки й усі місяці виділено.'; go(1); return; }
+    if(c1 === c2 && r1 === r2){ status.textContent = 'Затисни кнопку миші на A1 і, не відпускаючи, тягни до B7.'; return; }
+    flash(grid);
+    status.textContent = r1 === 2 ? 'Перший рядок лишився поза виділенням, а без нього діаграма не матиме заголовків.'
+      : c1 === 1 ? 'Без стовпчика A діаграма не знатиме назв місяців.'
+      : r2 < 7 ? 'Не всі місяці потрапили у виділення.'
+      : r2 > 7 || c2 > 1 ? 'Порожні комірки у виділенні не потрібні.'
+      : 'Потрібен діапазон від A1 до B7.';
+  };
+  grid.addEventListener('pointerup', release);
+  grid.addEventListener('pointercancel', release);
+
+  /* меню «Вставити» */
+  let drop = null;
+  const closeDrop = ()=>{ drop?.remove(); drop = null; $('gsInsert').classList.remove('open'); };
+  $('gsInsert').addEventListener('click', e=>{
+    e.stopPropagation();
+    if(drop){ closeDrop(); return; }
+    if(phase < 1){ status.textContent = 'Спершу виділи дані: діаграма будується з виділеного.'; return; }
+    if(phase > 1) return;
+    drop = document.createElement('div');
+    drop.className = 'gs-drop';
+    drop.style.left = Math.min($('gsInsert').offsetLeft, gs.clientWidth - 210) + 'px';
+    [['table', 'Клітинки'], ['table_rows', 'Рядки'], ['view_column', 'Стовпці'], ['add_box', 'Аркуш'], ['insert_chart', 'Діаграма'], ['pivot_table_chart', 'Зведена таблиця'], ['image', 'Зображення'], ['functions', 'Функція'], ['link', 'Посилання']].forEach(([ic, name])=>{
+      const it = document.createElement('div');
+      it.innerHTML = ms(ic) + name;
+      it.addEventListener('click', ev=>{
+        ev.stopPropagation();
+        if(name !== 'Діаграма'){ flash(it, 'miss', 500); status.textContent = `Пункт «${name}» тут не допоможе.`; return; }
+        closeDrop(); insert();
+      });
+      drop.appendChild(it);
+    });
+    gs.appendChild(drop);
+    $('gsInsert').classList.add('open');
+  });
+  document.addEventListener('click', closeDrop);
+
+  function insert(){
+    addNeurons(2); hit();
+    status.textContent = '';
+    go(2);
+    wrap.innerHTML = `<div class="gs-chart">${chart(paperChart(rows, {type:'col', legend:'bottom'}))}</div>`;
+    wrap.scrollIntoView({block:'nearest', behavior:'smooth'});
+  }
+  go(0);
+})();
+
+/* ================= КРОК 5: ОФОРМЛЕННЯ ================= */
+(function(){
+  const rows = PAPER.rows.map(r=>[...r]);
+  const host = $('ceoHost'), prompt = $('ceoPrompt'), pick = $('ceoPick'), status = $('ceoStatus');
+  const st = {title:'', yName:'', legend:'bottom'};
+  host.innerHTML = `<div class="gs"><div class="gs-body side" style="border-radius:10px;">
+    <div class="gs-left"><div id="ceoChart"></div></div>
+    <aside class="ce">
+      <div class="ce-head">Редактор діаграм ${ms('close')}</div>
+      <div class="ce-tabs"><span>Налаштування</span><span class="on">Налаштувати</span></div>
+      <div class="lab">Назва діаграми</div><div class="ce-field empty" id="fTitle">Текст назви</div>
+      <div class="lab">Назва вертикальної осі</div><div class="ce-field empty" id="fY">Текст назви</div>
+      <div class="lab">Умовні позначення (легенда)</div>
+      <div class="ce-seg" id="fLeg"><button data-v="bottom">Знизу</button><button data-v="top">Зверху</button><button data-v="none">Немає</button></div>
+    </aside></div></div>`;
+  const hit = trackTask(host, 3, 4);
+  const draw = ()=>{
+    $('ceoChart').innerHTML = `<div class="gs-chart">${chart(paperChart(rows, {type:'col', title:st.title, yName:st.yName, legend:st.legend}))}</div>`;
+    $('fLeg').querySelectorAll('button').forEach(b=>b.classList.toggle('on', b.dataset.v === st.legend));
+  };
+  const TASKS = [
+    { q:'Обери назву діаграми: вона має пояснювати, що на ній показано.', key:'title', el:'fTitle',
+      opts:[['Діаграма 1', 'Така назва нічого не пояснює. З неї не видно, що показано на діаграмі.'], ['Зібрано', 'Незрозуміло, що саме зібрали і коли.'], ['Збір макулатури, вересень–лютий', '']], right:2 },
+    { q:'Обери підпис вертикальної осі: у чому виміряно числа 50, 100, 150?', key:'yName', el:'fY',
+      opts:[['Маса, кг', ''], ['Місяці', 'Місяці вже підписано внизу. А що показують числа збоку?'], ['Вісь Y', 'Це лише назва осі. З неї не видно, у чому виміряно числа.']], right:0 },
+    { q:'На діаграмі лише один ряд даних, тож легенда не потрібна. Обери в налаштуваннях <b>Немає</b>.', legend:true }
+  ];
+  let k = 0;
+  function ask(){
+    const t = TASKS[k];
+    pick.innerHTML = '';
+    if(!t){ prompt.innerHTML = 'Готово ✓ Діаграма має назву й підпис осі, а зайвої легенди немає.'; return; }
+    prompt.innerHTML = t.q;
+    (t.opts || []).forEach(([txt, msg], i)=>{
+      const b = document.createElement('button');
+      b.className = 'pick-btn'; b.textContent = txt;
+      b.addEventListener('click', ()=>{
+        if(i !== t.right){ flash(b); status.textContent = msg; return; }
+        st[t.key] = txt;
+        $(t.el).textContent = txt; $(t.el).classList.remove('empty');
+        draw(); done();
+      });
+      pick.appendChild(b);
+    });
+  }
+  function done(){
+    status.textContent = '';
+    addNeurons(1); hit();
+    if(++k === TASKS.length) addNeurons(1);
+    ask();
+  }
+  $('fLeg').addEventListener('click', e=>{
+    const b = e.target.closest('button'); if(!b) return;
+    st.legend = b.dataset.v; draw();
+    if(!TASKS[k]?.legend) return;
+    if(st.legend === 'none') done();
+    else { flash($('fLeg')); status.textContent = 'Легенда лише перемістилась. Щоб прибрати її, обери «Немає».'; }
+  });
+  draw(); ask();
+})();
+
+/* ================= КРОК 6: ЧИТАЄМО ================= */
+const wide = o=>`<div class="q-chart">${chart({...(NARROW ? {h:240} : {w:690, h:270}), ...o})}</div>`;
+const CONCLUDE = 'Який висновок можна зробити з діаграми?';
+makeChoices('readList', [
+  { pre:wide({type:'line', title:'Відвідувачі бібліотеки', cats:['1 тиж.', '2 тиж.', '3 тиж.', '4 тиж.', '5 тиж.', '6 тиж.'], series:[{name:'Учні', vals:[40, 48, 44, 70, 72, 52]}]}),
+    text:CONCLUDE, opts:['Постійне зростання', 'Постійне падіння', 'Стрибок на 4-му тижні', 'Без змін'], correct:2,
+    hint:'Подивись, де лінія йде вгору найкрутіше.', why:'Між 3-м і 4-м тижнями лінія різко йде вгору: із 44 до 70.' },
+  { pre:wide({type:'pie', title:'Як 32 учні добираються до школи', cats:['Пішки', 'Автобус', 'Метро', 'Авто'], series:[{name:'Учні', vals:[16, 8, 5, 3]}]}),
+    text:CONCLUDE, opts:['Половина ходить пішки', 'Більшість — автобусом', 'Найбільше — метро', 'Усюди порівну'], correct:0,
+    hint:'Порівняй розміри секторів і відсотки в підписах.', why:'Сектор «Пішки» займає половину кола: 50%, тобто 16 учнів із 32.' },
+  { pre:wide({type:'col', title:'Волейбольний турнір', legend:'bottom', ...TEAM}),
+    text:CONCLUDE, opts:['Усі частіше виграють', 'Вогонь — лідер', 'Блискавка — остання', 'Титан частіше програє'], correct:3,
+    hint:'Порівняй синій і червоний стовпці кожної команди.', why:'Лише в Титана червоний стовпець вищий за синій: 8 проти 3.' },
+  { pre:wide({type:'col', title:'Підготовка і результат', pts:HOURS, xName:'Години підготовки', yName:'Бал', yStep:2}),
+    text:CONCLUDE, opts:['Підготовка шкодить', 'Підготовка допомагає', 'Бали однакові', 'Зв\'язку немає'], correct:1,
+    hint:'Куди загалом ідуть точки: вгору чи вниз?', why:'Точки піднімаються вправо. Винятки є, але загальний напрям видно.' }
+]);
+
+/* ================= ФІНАЛЬНИЙ ТЕСТ ================= */
+makeFinalQuiz('finalQuiz', [
+  { q:'Навіщо дані показують на діаграмі?', opts:['Щоб таблиця займала менше місця', 'Щоб порівнювати фігури швидше, ніж читати числа', 'Щоб формули рахували точніше', 'Щоб захистити дані від змін'], correct:1 },
+  { q:'Який діапазон виділити, щоб побудувати діаграму за стовпчиками A і B з 10 рядків даних під заголовком?', opts:['A2:B11', 'A1:B11', 'B1:B11', 'A1:A11'], correct:1, why:'Разом із рядком заголовків і стовпчиком підписів.' },
+  { q:'Де в Google Таблицях додати діаграму?', opts:['Формат → Діаграма', 'Вставити → Діаграма', 'Дані → Діаграма', 'Вигляд → Діаграма'], correct:1 },
+  { q:'Навіщо виділяти дані разом із заголовками?', opts:['Щоб діаграма взяла з них підписи', 'Щоб формули рахували швидше', 'Щоб заголовки стали жирними', 'Щоб захистити таблицю'], correct:0 },
+  { q:'Що пояснює легенда?', opts:['Що означає кожен колір', 'Про що вся діаграма', 'Хто автор таблиці', 'Де лежать дані'], correct:0 },
+  { q:'Як показати курс долара за рік?', opts:['Стовпчаста', 'Лінійна', 'Секторна', 'Точкова'], correct:1, why:'Значення змінюється з часом.' },
+  { q:'Бюджет шкільного свята: музика, частування, декорації. Що покаже, скільки від усієї суми забирає кожна стаття?', opts:['Секторна', 'Лінійна', 'Точкова', 'Стовпчаста'], correct:0 },
+  { q:'Чи пов\'язані зріст учнів і розмір їхнього взуття? Яка діаграма це покаже?', opts:['Секторна', 'Лінійна', 'Точкова', 'Стовпчаста'], correct:2, why:'Кожна точка — пара чисел одного учня.' }
+], {summary:'Ти обираєш тип діаграми за запитанням, будуєш і оформлюєш її в Google Таблицях і робиш висновки з чужих діаграм.'});
+</script>
+
+</body>
+</html>
