@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Посилання — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --pri:#0A7B8C; --pri-dark:#075C69; --amber:#E2622B; --amber-dark:#B0451A;
+    --accent:var(--pri); --accent-dark:var(--pri-dark); --accent-soft:#E0F2F4;
+    --bg:#F3F8F9; --ink:#14282E; --ink-soft:#4C646B; --line:#D8E7EA; --surface:#FFFFFF;
+    --note:#3D6FC4; --note-soft:#E8EFFB; --note-ink:#2A4F91;
+    --sun:#E2622B; --sun-soft:#FDEEE6; --sun-ink:#94401A;
+    --hud-bar:linear-gradient(90deg,var(--amber),var(--pri));
+    --cell-line:#D3E0E3; --head-bg:#EBF3F4; --sel:#1A73E8;
+    --yes:#188038; --yes-soft:#E3F3E7; --no:#C5221F; --no-soft:#FCE8E6;
+  }
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; background:var(--head-bg); padding:1px 6px; border-radius:5px; font-size:.92em; white-space:nowrap;}
+  .hot-prompt{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15.5px; line-height:1.4; text-align:center; margin-bottom:12px; min-height:1.4em;}
+  .hot-prompt b{color:var(--pri-dark);}
+  .hot-prompt code{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:800; color:var(--pri-dark);}
+  .fline{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; font-size:14px; text-align:center; margin:10px 0 4px; overflow-wrap:anywhere; color:var(--ink);}
+  .fline .k{color:var(--pri);}
+  .fline .t{color:var(--yes);}
+  .fline .f{color:var(--no);}
+  .fline .pin{color:var(--amber-dark); font-weight:800;}
+
+  /* --- Міні-таблиця (власний віджет уроку) --- */
+  .sheet{position:relative; background:var(--surface); border:1.5px solid var(--cell-line); border-radius:var(--radius-s); overflow:hidden; font-size:12.5px; user-select:none; -webkit-user-select:none; max-width:520px; margin:0 auto;}
+  .fbar{display:flex; align-items:stretch; border-bottom:1px solid var(--cell-line); font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13px; background:#fff; min-height:30px;}
+  .fbar .ref{width:46px; display:flex; align-items:center; justify-content:center; border-right:1px solid var(--cell-line); color:var(--ink-soft); font-weight:700; flex-shrink:0;}
+  .fbar .fx{display:flex; align-items:center; padding:0 8px; color:var(--ink-soft); font-style:italic; border-right:1px solid var(--cell-line);}
+  .fbar .val{display:flex; align-items:center; padding:4px 8px; white-space:pre; overflow:hidden; flex:1; font-weight:600;}
+  .fbar .val b{font-weight:800;}
+  .sheet-grid{border-collapse:collapse; width:100%; table-layout:fixed;}
+  .sheet-grid th, .sheet-grid td{border:1px solid var(--cell-line); height:30px; padding:0;}
+  .sheet-grid th{background:var(--head-bg); font-weight:700; color:var(--ink-soft); font-size:11px; text-align:center;}
+  .sheet-grid td{background:#fff; position:relative; cursor:pointer;}
+  .sheet-grid td .cv{padding:0 6px; white-space:nowrap; overflow:hidden; line-height:28px;}
+  .sheet-grid td .cv.num{text-align:right;}
+  .sheet-grid td .cv.spill{overflow:visible;}
+  .sheet-grid td .cv.err{color:#C5221F; font-weight:700; text-align:right;}
+  .sheet-grid td.hdr{background:#F4F9FA; font-weight:800;}
+  .sheet-grid td.sel{box-shadow:inset 0 0 0 2px var(--sel) !important;}
+  .sheet-grid td.rsel{background:#E8F0FE;}
+  .sheet-grid td.copied{outline:2px dashed var(--sel); outline-offset:-4px;}
+  .sheet-grid td.fill-prev{box-shadow:inset 0 0 0 2px var(--sel); background:#F1F6FE; outline:1px dashed var(--sel); outline-offset:-4px;}
+  .sheet-grid td.shake{background:#FCE6E2 !important; animation:shakeX .35s ease;}
+  .sheet-grid td.bad{background:#FCE6E2 !important;}
+  .sheet-grid td.pop{animation:cellPop .9s ease;}
+  @keyframes cellPop{0%{background:#BFE6EB;} 100%{background:#fff;}}
+  .fh{position:absolute; right:-5px; bottom:-5px; width:10px; height:10px; background:var(--sel); border:2px solid #fff; border-radius:2px; z-index:4; cursor:crosshair; touch-action:none;}
+  .fh::before{content:''; position:absolute; inset:-12px;}
+  .fh.hint{animation:fhPulse 1.4s ease-in-out infinite;}
+  @keyframes fhPulse{0%,100%{box-shadow:0 0 0 0 rgba(26,115,232,.5);} 50%{box-shadow:0 0 0 7px rgba(26,115,232,0);}}
+  .arrows{position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:5;}
+  .arrows path{fill:none; stroke-width:2; stroke-linecap:round; stroke-dasharray:5 5; animation:arrowRun 1s linear infinite;}
+  @keyframes arrowRun{to{stroke-dashoffset:-10;}}
+
+  /* --- Ілюстрація: формула в кожному рядку --- */
+  .copy-demo{margin:18px 0;}
+  .copy-demo .mini{font-size:14px; margin-bottom:8px;}
+  .copy-demo td.f{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:600;}
+  .copy-demo .ra{color:#1A73E8; font-weight:800;}
+  .copy-demo .rb{color:#E8710A; font-weight:800;}
+
+  /* --- Крок 4: ситуації в таблицях --- */
+  .mini.sit{font-size:12.5px; margin-bottom:14px;}
+  .mini.sit td{padding:4px 7px;}
+  .mini.sit td.m-a{background:#1A73E81F; box-shadow:inset 0 0 0 2px #1A73E8; font-weight:800;}
+  .mini.sit td.m-b{background:#E8710A1F; box-shadow:inset 0 0 0 2px #E8710A; font-weight:800;}
+  .mini.sit td.m-q{box-shadow:inset 0 0 0 2px var(--pri); background:var(--accent-soft);}
+  .choice-feedback:empty, .progress-line:empty, .quiz-why:empty{margin-top:0; min-height:0;}
+
+  /* --- Лагодимо формулу: F4 --- */
+  .fix-bar{display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:6px; margin-top:14px; font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:18px;}
+  .fref{font:inherit; min-width:66px; padding:6px 12px; border-radius:9px; border:2px solid var(--cell-line); background:#fff; color:var(--ink); cursor:pointer;}
+  .fref:hover{border-color:var(--pri);}
+  .fref.cur{border-color:var(--sel); box-shadow:0 0 0 3px #1A73E833;}
+  .key{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:16px; min-width:52px; padding:7px 12px; margin-left:10px; border-radius:9px; border:1.5px solid var(--cell-line); border-bottom-width:3px; background:var(--accent-soft); color:var(--pri-dark); cursor:pointer;}
+  .key:hover{border-color:var(--pri);}
+  .key:active{transform:translateY(1px);}
+
+  .pin-ref{display:flex; justify-content:center; align-items:center; gap:4px; margin-bottom:12px;}
+  .pin-part{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:22px; padding:6px 10px; min-width:58px; border-radius:10px; border:2px dashed var(--cell-line); background:#fff; color:var(--ink); cursor:pointer;}
+  .pin-part:hover{border-color:var(--pri);}
+  .pin-part i{font-style:normal; color:transparent;}
+  .pin-part.on{border-style:solid; border-color:var(--amber); background:var(--sun-soft);}
+  .pin-part.on i{color:var(--amber-dark);}
+  .pin-grid{border-collapse:collapse; margin:0 auto 12px; font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:15px;}
+  .pin-grid th{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12px; color:var(--ink-soft); padding:3px 8px; white-space:nowrap;}
+  .pin-grid td{border:1.5px solid var(--cell-line); background:#fff; width:92px; height:40px; text-align:center;}
+  .pin-grid td.src{background:var(--accent-soft);}
+  .pin-grid .mv{color:var(--amber-dark); background:var(--sun-soft); border-radius:4px; padding:0 2px;}
+  .pin-grid.shake{animation:shakeX .35s ease;}
+  .center{text-align:center;}
+
+  /* --- IF із посиланнями --- */
+  .mini{border-collapse:collapse; margin:0 auto 10px; font-size:13px; background:#fff; border:1.5px solid var(--cell-line);}
+  .mini th, .mini td{border:1px solid var(--cell-line); padding:4px 10px; height:28px; white-space:nowrap;}
+  .mini th{background:var(--head-bg); color:var(--ink-soft); font-size:11px; font-weight:700; padding:2px 8px;}
+  .mini td.hdr{background:#F4F9FA; font-weight:800;}
+  .mini td.num{text-align:right;}
+  .mini td.out{min-width:96px; font-weight:700;}
+  .mini td.key-cell{box-shadow:inset 0 0 0 2px var(--amber); font-weight:800;}
+  .mini td.pop{animation:cellPop .9s ease;}
+  .if-formula{display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:4px; font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:16px; margin:4px 0 14px;}
+  .if-formula .kw{color:var(--pri);}
+  .slot{min-width:92px; padding:6px 10px; border:2px dashed var(--cell-line); border-radius:9px; text-align:center; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12.5px; color:var(--ink-soft); background:#fff;}
+  .slot.active{border-color:var(--pri); background:var(--accent-soft); color:var(--pri-dark);}
+  .slot.filled{border-style:solid; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:15px; font-weight:800;}
+  .slot.filled.s0{border-color:var(--pri); color:var(--pri-dark); background:var(--accent-soft);}
+  .slot.filled.s1{border-color:var(--yes); color:var(--yes); background:var(--yes-soft);}
+  .slot.filled.s2{border-color:var(--no); color:var(--no); background:var(--no-soft);}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-bottom:14px;}
+  .fchip{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:800; font-size:15px; padding:7px 14px; border-radius:20px; border:1.5px solid var(--cell-line); border-bottom-width:3px; background:#fff; cursor:pointer; color:var(--ink);}
+  .fchip:hover{border-color:var(--pri);}
+  .fchip.shake{animation:shakeX .35s ease; border-color:var(--no); background:var(--no-soft);}
+  .fchip[hidden]{display:none;}
+</style>
+</head>
+<body data-lesson="lesson8-references" data-hud="8 клас · Посилання">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Працюємо з числами · Тема 6</div>
+      <h1>Посилання</h1>
+      <p>Чому після копіювання формула раптом показує нуль чи помилку — і як один знак <b>$</b> це лагодить.</p>
+      <button class="btn-primary" onclick="document.getElementById('rev').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <!-- комірка з обличчям, зафіксована шпилькою зі знаком $ -->
+      <rect x="20" y="42" width="100" height="80" rx="10" fill="#fff" stroke="#0A7B8C" stroke-width="4.5"/>
+      <path d="M20 68 H120 M20 96 H120 M54 42 V122 M86 42 V122" stroke="#D3E0E3" stroke-width="2"/>
+      <rect x="52" y="66" width="36" height="32" fill="#E0F2F4" stroke="#1A73E8" stroke-width="3.5"/>
+      <rect x="83" y="93" width="9" height="9" rx="1.5" fill="#1A73E8" stroke="#fff" stroke-width="1.5"/>
+      <circle cx="63" cy="79" r="3.8" fill="#14282E"/><circle cx="77" cy="79" r="3.8" fill="#14282E"/>
+      <path d="M64 88 C67 91.5 73 91.5 76 88" stroke="#14282E" stroke-width="2.8" stroke-linecap="round"/>
+      <path d="M70 34 L70 66" stroke="#B0451A" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="70" cy="24" r="19" fill="#E2622B"/>
+      <text x="70" y="32" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-weight="800" font-size="24" fill="#fff">$</text>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="rev" style="border-top:none; padding-top:0;">
+    <div class="step-label recap">Повторення · Google Таблиці</div>
+    <h2>Розминка: усе про таблиці</h2>
+    <p>Шістнадцять запитань по всіх уроках про Google Таблиці: від адреси комірки до функції <span class="mono">IF</span>. Вони знадобляться вже в цьому уроці.</p>
+    <div class="exercise" id="warmup"></div>
+  </section>
+
+  <section class="block" id="s1">
+    <div class="step-label">Крок 1 · Відносне посилання</div>
+    <h2>Під час копіювання адреси зсуваються</h2>
+    <p><b>Посилання</b> — це адреса комірки у формулі. Формула <span class="mono">=A2+B2</span> у комірці C2 додає числа з A2 і B2.</p>
+    <p>Під час копіювання формули такі адреси зсуваються разом із нею.</p>
+    <div class="copy-demo">
+      <table class="mini">
+        <tr><th></th><th>A</th><th>B</th><th>C</th></tr>
+        <tr><th>1</th><td class="hdr">Зошити, ₴</td><td class="hdr">Ручки, ₴</td><td class="hdr">Разом, ₴</td></tr>
+        <tr><th>2</th><td class="num">120</td><td class="num">45</td><td class="f">=<span class="ra">A2</span>+<span class="rb">B2</span></td></tr>
+        <tr><th>3</th><td class="num">96</td><td class="num">30</td><td class="f">=<span class="ra">A3</span>+<span class="rb">B3</span></td></tr>
+        <tr><th>4</th><td class="num">150</td><td class="num">60</td><td class="f">=<span class="ra">A4</span>+<span class="rb">B4</span></td></tr>
+      </table>
+      <p class="soft center">Формулу з C2 скопіювали вниз. У кожному рядку вона бере свої числа.</p>
+    </div>
+    <div class="exercise">
+      <div class="hot-prompt" id="pathPrompt"></div>
+      <div id="pathSheet"></div>
+      <div class="progress-line" id="pathStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s2">
+    <div class="step-label">Крок 2 · Пастка</div>
+    <h2>Коли зсув усе ламає</h2>
+    <p>Клас їде на екскурсію. Ціна квитка одна для всіх — вона лежить в одній комірці <span class="mono">B1</span>. У <span class="mono">C4</span> вже є правильна формула.</p>
+    <div class="exercise">
+      <div class="hot-prompt" id="trapPrompt">Потягни синій квадратик у комірці <b>C4</b> вниз до <b>C7</b>.</div>
+      <div id="trapSheet"></div>
+      <div class="progress-line" id="trapStatus"></div>
+    </div>
+    <div id="trapList" style="margin-top:18px;"></div>
+  </section>
+
+  <section class="block" id="s3">
+    <div class="step-label">Крок 3 · Абсолютне посилання</div>
+    <h2>Знак $ фіксує адресу</h2>
+    <p>Щоб адреса не зсувалась під час копіювання, перед літерою й перед числом ставлять <b>$</b>: <span class="mono">$B$1</span>. Це <b>абсолютне посилання</b>.</p>
+    <p>Друкувати знаки не обов'язково: клацни адресу у формулі й натисни <b>F4</b>.</p>
+    <div class="note">Знак $ тут не про гроші. На результат формули він не впливає — лише на копіювання.</div>
+    <div class="exercise">
+      <div class="hot-prompt" id="fixPrompt">Яка адреса має лишитися на місці? Клацни її під таблицею, натисни <b>F4</b> і потягни квадратик.</div>
+      <div id="fixSheet"></div>
+      <div class="fix-bar" id="fixBar"></div>
+      <div class="progress-line" id="fixStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s4">
+    <div class="step-label">Крок 4 · Вибір посилання</div>
+    <h2>Зсувати чи фіксувати?</h2>
+    <p>Спитай себе: кожен рядок бере свої дані чи всі беруть те саме значення з однієї комірки?</p>
+    <p class="soft">Кольором виділено комірку з формулою й комірки, які вона бере.</p>
+    <div id="kindList"></div>
+  </section>
+
+  <section class="block" id="s5">
+    <div class="step-label">Крок 5 · IF і посилання</div>
+    <h2>Дорожче чи дешевше за середню?</h2>
+    <p>Абсолютне посилання працює всередині будь-якої функції. Зберемо <span class="mono">IF</span>, яка порівнює кожну ціну з однією середньою.</p>
+    <div class="exercise">
+      <div class="hot-prompt">Ціни — у стовпчику B, середня — у комірці <b>B7</b>. Формула буде в C2, а потім скопіюється вниз.</div>
+      <div class="if-formula" id="ifFormula">
+        <span class="kw">=IF(</span><span class="slot" data-i="0">умова</span><span class="kw">;</span><span class="slot" data-i="1">якщо так</span><span class="kw">;</span><span class="slot" data-i="2">якщо ні</span><span class="kw">)</span>
+      </div>
+      <div class="chips" id="ifChips"></div>
+      <table class="mini" id="ifTable"></table>
+      <div class="progress-line" id="ifStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="s6">
+    <div class="step-label">Крок 6 · Мішане посилання</div>
+    <h2>Можна зафіксувати лише половину</h2>
+    <p>Знак $ тримає лише те, що стоїть одразу за ним. Посилання, де зафіксовано тільки літеру чи тільки число, — <b>мішане</b>. Воно трапляється рідше, але його варто впізнавати.</p>
+    <div class="note">Копіюєш вниз — змінюються числа, тож $ став перед числом. Копіюєш вправо — змінюються літери, тож $ став перед літерою.</div>
+    <div class="exercise">
+      <div class="hot-prompt" id="pinPrompt"></div>
+      <div class="pin-ref" id="pinRef"></div>
+      <table class="pin-grid" id="pinGrid"></table>
+      <div class="center"><button class="btn-primary" id="pinGo">Перевірити</button></div>
+      <div class="progress-line" id="pinStatus"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Посилання» · 8 клас</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+const $ = id=>document.getElementById(id);
+const esc = s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const num2 = v=>String(Math.round(v * 100) / 100).replace('.', ',');
+const m = s=>`<span class="mono">${s}</span>`;
+function flash(el, cls, ms = 450){ el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), ms); }
+
+/* ================= ОБЧИСЛЕННЯ ФОРМУЛ ================= */
+const RE_REF = /^[A-Z]+\d+$/;
+// Значення комірки: {v} число, {t} текст, {err} помилка, {empty}
+function evalRaw(cells, a, stack = []){
+  const raw = cells[a];
+  if(raw === undefined || raw === '') return {empty:true, v:0};
+  if(typeof raw === 'number') return {v:raw};
+  if(raw[0] !== '=') return {t:raw};
+  if(stack.includes(a)) return {err:'#REF!'};
+  try{ return {v: calc(raw.slice(1), cells, [...stack, a])}; }
+  catch(e){ return {err: e.message}; }
+}
+function calc(src, cells, stack){
+  if(src.includes('#REF!')) throw new Error('#REF!');
+  const toks = src.replace(/\$/g, '').match(/[A-Z]+\d+|\d+(?:[.,]\d+)?|\S/g) || [];
+  let p = 0;
+  const peek = ()=>toks[p], next = ()=>toks[p++];
+  const fail = m=>{ throw new Error(m); };
+  const val = x=>{ if(x.err) fail(x.err); if(x.t !== undefined) fail('#VALUE!'); return x.v; };
+  const expr = ()=>{ let v = term(); while(peek() === '+' || peek() === '-'){ const o = next(), r = term(); v = o === '+' ? v + r : v - r; } return v; };
+  const term = ()=>{ let v = prim(); while(peek() === '*' || peek() === '/'){ const o = next(), r = prim(); v = o === '*' ? v * r : v / r; } return v; };
+  function prim(){
+    const t = next();
+    if(t === undefined) fail('#ERROR!');
+    if(/^\d/.test(t)) return parseFloat(t.replace(',', '.'));
+    if(RE_REF.test(t)) return val(evalRaw(cells, t, stack));
+    fail('#ERROR!');
+  }
+  return expr();
+}
+// Копіювання формули: зсув на dc стовпців і dr рядків; $ тримає свою частину адреси
+function shift(f, dc, dr){
+  return f.replace(/(\$?)([A-Z])(\$?)(\d+)/g, (_, pc, c, pr, r)=>{
+    const nc = pc ? c : String.fromCharCode(c.charCodeAt(0) + dc), nr = pr ? +r : +r + dr;
+    return nc < 'A' || nr < 1 ? '#REF!' : pc + nc + pr + nr;
+  });
+}
+
+/* ================= МІНІ-ТАБЛИЦЯ ================= */
+const PAL = ['#1A73E8', '#E8710A', '#9334E6'];
+function colorize(f){
+  const refs = [];
+  if(typeof f !== 'string' || f[0] !== '=') return {html: esc(f ?? ''), refs};
+  const html = esc(f).replace(/\$?[A-Z]+\$?\d+/g, x=>{
+    const c = PAL[refs.length % PAL.length];
+    refs.push({a: x.replace(/\$/g, ''), c});
+    return `<b style="color:${c}">${x}</b>`;
+  });
+  return {html, refs};
+}
+function makeSheet(host, {cols, rows, cells, widths, hdr = 0}){
+  const S = {cells:{...cells}, sel:null, copied:null, onDown:null, after:null};
+  host.innerHTML = `<div class="sheet"><div class="fbar"><span class="ref"></span><span class="fx">fx</span><span class="val"></span></div>
+    <table class="sheet-grid"></table></div>`;
+  const refEl = host.querySelector('.ref'), valEl = host.querySelector('.val'), table = host.querySelector('table');
+  let h = '<colgroup><col style="width:9%">' + widths.map(w=>`<col style="width:${w}">`).join('') + '</colgroup>';
+  h += '<tr><th></th>' + [...cols].map(c=>`<th>${c}</th>`).join('') + '</tr>';
+  for(let r = 1; r <= rows; r++) h += `<tr><th>${r}</th>` + [...cols].map(c=>`<td data-a="${c}${r}"><div class="cv"></div></td>`).join('') + '</tr>';
+  table.innerHTML = h;
+  S.box = host.querySelector('.sheet');
+  S.table = table;
+  S.td = a=>table.querySelector(`td[data-a="${a}"]`);
+  S.render = ()=>{
+    const raw = S.sel ? S.cells[S.sel] : undefined;
+    const {html, refs} = colorize(raw);
+    const paint = {};
+    refs.forEach(r=>{ if(!paint[r.a]) paint[r.a] = r.c; });
+    table.querySelectorAll('td').forEach(td=>{
+      const a = td.dataset.a, cv = td.querySelector('.cv');
+      td.classList.toggle('sel', S.sel === a);
+      td.classList.toggle('copied', S.copied === a);
+      td.classList.toggle('hdr', +a.slice(1) === hdr);
+      td.style.boxShadow = paint[a] ? `inset 0 0 0 2px ${paint[a]}` : '';
+      td.style.background = paint[a] ? paint[a] + '1F' : '';
+      const x = evalRaw(S.cells, a);
+      const right = cols[cols.indexOf(a[0]) + 1];
+      const nextEmpty = !right || S.cells[right + a.slice(1)] === undefined;
+      cv.className = 'cv' + (x.err ? ' err' : x.t !== undefined ? (nextEmpty ? ' spill' : '') : ' num');
+      cv.textContent = x.err || (x.t !== undefined ? x.t : x.empty ? '' : num2(x.v));
+    });
+    refEl.textContent = S.sel || '';
+    valEl.innerHTML = typeof raw === 'string' ? html : esc(raw === undefined ? '' : num2(raw));
+    S.after && S.after(refs);
+  };
+  table.addEventListener('pointerdown', e=>{
+    const td = e.target.closest('td[data-a]');
+    if(!td || e.target.closest('.fh')) return;
+    S.onDown && S.onDown(td.dataset.a);
+  });
+  S.render();
+  return S;
+}
+// Маркер заповнення у стовпчику col: тягнемо від рядка first до last, onFill(to) — коли відпустили
+function makeFill(S, {col, first, last, onFill}){
+  const fh = document.createElement('div');
+  fh.className = 'fh hint';
+  let dragging = false, to = first;
+  const preview = ()=>{ for(let r = first + 1; r <= last; r++) S.td(col + r).classList.toggle('fill-prev', dragging && r <= to); };
+  fh.addEventListener('pointerdown', e=>{ e.preventDefault(); fh.setPointerCapture(e.pointerId); dragging = true; to = first; fh.classList.remove('hint'); });
+  fh.addEventListener('pointermove', e=>{
+    if(!dragging) return;
+    const td = document.elementFromPoint(e.clientX, e.clientY)?.closest('td[data-a]');
+    if(td && S.table.contains(td)) to = Math.min(last, Math.max(first, +td.dataset.a.slice(1)));
+    preview();
+  });
+  const up = ()=>{
+    if(!dragging) return;
+    dragging = false; preview();
+    onFill(to);
+  };
+  fh.addEventListener('pointerup', up);
+  fh.addEventListener('pointercancel', up);
+  S.td(col + first).appendChild(fh);
+  return {hide: ()=>fh.remove(), show: ()=>{ fh.classList.add('hint'); S.td(col + first).appendChild(fh); }};
+}
+
+/* ================= ПОВТОРЕННЯ ================= */
+const pre = (rows, f = '')=>'<table class="mini"><tr><th></th>' + rows[0].map((_, c)=>`<th>${'ABC'[c]}</th>`).join('') + '</tr>'
+  + rows.map((row, r)=>`<tr><th>${r + 1}</th>` + row.map(v=>`<td${typeof v === 'number' ? ' class="num"' : ''}>${v}</td>`).join('') + '</tr>').join('')
+  + '</table>' + (f ? `<div class="fline">${f}</div>` : '');
+makeWarmup('warmup', [
+  { text:'Яка адреса комірки на перетині стовпчика D і рядка 7?', opts:['7D', 'D7', 'D:7'], correct:1, why:'Спершу літера стовпчика, потім номер рядка.' },
+  { text:`Скільки комірок у діапазоні ${m('B2:C4')}?`, opts:['2', '4', '5', '6'], correct:3, why:'2 стовпчики × 3 рядки.' },
+  { pre:pre([['Кількість'], [12], ['12 шт.'], [8]]), text:'Чому «12 шт.» притиснуте до лівого краю?', opts:['Це найбільше значення', 'Таблиця сприйняла його як текст', 'Комірку об\'єднано'], correct:1, why:'Числа стають праворуч, текст — ліворуч. З «шт.» формула вже не порахує.' },
+  { text:'До комірки з числом 0,25 застосували формат «Відсоток». Вона показує 25%. Що всередині?', opts:['Як і раніше, 0,25', 'Тепер 25', 'Текст «25%»'], correct:0, why:'Формат змінює лише вигляд.' },
+  { text:'У стовпчик «Оцінка» мають вводити лише числа від 1 до 12. Що це забезпечить?', opts:['Об\'єднання клітинок', 'Перевірка даних', 'Перенесення тексту', 'Формат «Відсоток»'], correct:1 },
+  { text:'Комірка показує 150. Де дізнатися, чи це формула?', opts:['У рядку формул', 'У назві файлу', 'У меню «Вигляд»'], correct:0 },
+  { pre:pre([['Час, с'], [9], [7], [8]], '=MIN(A2:A4)'), text:'Що покаже формула?', opts:['7', '8', '9', '24'], correct:0 },
+  { text:'Що робить маркер заповнення?', opts:['Зафарбовує комірку', 'Копіює формулу в сусідні комірки', 'Видаляє дублікати'], correct:1, why:'Сьогодні розберемося, що при цьому стається з адресами.' },
+  { text:`У комірку ввели ${m('=2*3^2')}. Що вона покаже?`, opts:['36', '18', '12'], correct:1, why:'Спершу степінь: 3^2 = 9, потім 2 * 9.' },
+  { text:'У класі 30 учнів, із них 6 — відмінники. Яка формула дасть їхню частку?', opts:[m('=30/6'), m('=6/30'), m('=6*30')], correct:1, why:'Частина ділиться на ціле.' },
+  { pre:pre([['Бали'], [5], ['н/я'], [8], ['']], '=COUNTA(A2:A5)'), text:'Що покаже формула?', opts:['2', '3', '4'], correct:1, why:'COUNTA рахує всі непорожні комірки. COUNT показав би 2.' },
+  { pre:pre([['Місто'], ['Київ']], '=LEFT(A2;2)'), text:'Що покаже формула?', opts:['Ки', 'їв', 'Київ'], correct:0 },
+  { pre:pre([['Бал', 'Результат'], [4, '?']], '=IF(A2&gt;=4;"Так";"Ні")'), text:'Що покаже комірка B2?', opts:['Так', 'Ні', 'TRUE'], correct:0, why:'«Більше або дорівнює» пропускає й саму четвірку.' },
+  { pre:pre([['СР', 'КР'], [8, 5]], '=AND(A2&gt;6;B2&gt;6)'), text:'Що покаже формула?', opts:['TRUE', 'FALSE', '8'], correct:1, why:'AND потребує всіх умов, а 5 не більше за 6.' },
+  { pre:pre([['Оцінка'], [9], [7], [8], [10], [5]], '=COUNTIF(A2:A6;"&gt;=8")'), text:'Що покаже формула?', opts:['2', '3', '4'], correct:1, why:'Підходять 9, 8 і 10.' },
+  { text:`Хтось написав ${m('=СУМ(A1:A5)')} кирилицею. Що покаже комірка?`, opts:[m('#NAME?'), m('#DIV/0!'), '0'], correct:0, why:'#NAME? — таблиця не знає такої функції. А #DIV/0! з\'являється під час ділення на нуль.' }
+]);
+
+/* ================= КРОК 1: ШЛЯХ ФОРМУЛИ ================= */
+(function(){
+  const HOME = 'C2', F = '=A2+B2';
+  const host = $('pathSheet'), status = $('pathStatus');
+  const data = [[4, 9, 2, 6, 1], [5, 3, F, 7, 2], [8, 1, 6, 4, 3], [2, 7, 5, 9, 6], [6, 4, 3, 8, 5]];
+  const cells = {};
+  data.forEach((row, r)=>row.forEach((v, c)=>{ cells['ABCDE'[c] + (r + 1)] = v; }));
+  const S = makeSheet(host, {cols:'ABCDE', rows:5, cells, widths:['18%', '18%', '18%', '18%', '18%']});
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(svgNS, 'svg');
+  svg.setAttribute('class', 'arrows');
+  S.box.appendChild(svg);
+  // Дуги від формули до комірок, на які вона посилається
+  S.after = refs=>{
+    svg.innerHTML = '';
+    const from = S.sel && S.td(S.sel);
+    if(!from) return;
+    const box = S.box.getBoundingClientRect(), f = from.getBoundingClientRect();
+    const x1 = f.left + f.width / 2 - box.left, y1 = f.top + 6 - box.top;
+    refs.forEach((r, i)=>{
+      const td = S.td(r.a); if(!td) return;
+      const t = td.getBoundingClientRect();
+      const x2 = t.left + t.width / 2 - box.left, y2 = t.top + 6 - box.top;
+      const path = document.createElementNS(svgNS, 'path');
+      path.setAttribute('d', `M${x1} ${y1} Q${(x1 + x2) / 2} ${Math.min(y1, y2) - 30 - i * 14} ${x2} ${y2}`);
+      path.setAttribute('stroke', r.c);
+      const dot = document.createElementNS(svgNS, 'circle');
+      dot.setAttribute('cx', x2); dot.setAttribute('cy', y2); dot.setAttribute('r', 3.5); dot.setAttribute('fill', r.c);
+      svg.append(path, dot);
+    });
+  };
+  addEventListener('resize', S.render);
+  const TASKS = [
+    { want:'=A5+B5', ok:'На 3 рядки нижче — і числа в адресах більші на 3.' },
+    { want:'=B3+C3', ok:'Вправо на 1 і вниз на 1 — зсунулись і літери, і числа.' },
+    { oops:true, ok:'#REF! означає: такої комірки не існує. Ліворуч від стовпчика A таблиці немає.' }
+  ];
+  const hit = trackTask(host, TASKS.length, TASKS.length + 2);
+  let k = 0, spot = null, saved;
+  const prompt = ()=>{
+    const t = TASKS[k];
+    $('pathPrompt').innerHTML = !t ? 'Клацай будь-які комірки й дивись, як змінюються адреси.'
+      : t.oops ? 'Куди формулу вставити <b>не вийде</b>, бо шлях заведе за межі таблиці?'
+      : `Формулу з C2 скопійовано. Клацни комірку, де вона стане <code>${t.want}</code>.`;
+  };
+  const restore = ()=>{ if(spot){ S.cells[spot] = saved; spot = null; } };
+  S.sel = HOME; S.copied = HOME;
+  S.onDown = a=>{
+    restore();
+    if(a === HOME){ S.sel = a; S.render(); return; }
+    const dc = a.charCodeAt(0) - HOME.charCodeAt(0), dr = +a.slice(1) - 2;
+    const f = shift(F, dc, dr);
+    saved = S.cells[a]; spot = a; S.cells[a] = f; S.sel = a; S.render();
+    const t = TASKS[k];
+    if(!t) return;
+    const lost = f.includes('#REF!');
+    if(t.oops ? lost : f === t.want){
+      addNeurons(1); hit();
+      status.textContent = '✓ ' + t.ok;
+      if(++k === TASKS.length) addNeurons(2);
+      prompt();
+      return;
+    }
+    flash(S.td(a), 'shake');
+    status.textContent = lost ? 'Вийшло #REF! — шлях завів за межі таблиці. Спробуй іншу комірку.' : `Тут вийшло ${f}. Шукаємо іншу комірку.`;
+  };
+  S.render(); prompt();
+})();
+
+/* ================= КРОК 2–3: ДАНІ «ЕКСКУРСІЯ» ================= */
+const PRICE = 180, TRIP = [['8-А', 28], ['8-Б', 25], ['8-В', 30], ['8-Г', 27]];
+function tripCells(){
+  const c = {A1:'Ціна квитка, ₴', B1:PRICE, A3:'Клас', B3:'Учнів', C3:'Сума, ₴'};
+  TRIP.forEach((t, i)=>{ const r = i + 4; c['A' + r] = t[0]; c['B' + r] = t[1]; });
+  return c;
+}
+const W3 = ['37%', '23%', '31%'];
+
+/* ================= КРОК 2: ПАСТКА ================= */
+(function(){
+  const host = $('trapSheet'), status = $('trapStatus');
+  const S = makeSheet(host, {cols:'ABC', rows:7, cells:{...tripCells(), C4:'=B4*B1'}, widths:W3, hdr:3});
+  const hit = trackTask(host, 1, 2);
+  S.sel = 'C4';
+  S.onDown = a=>{ S.sel = a; S.render(); };
+  const fill = makeFill(S, {col:'C', first:4, last:7, onFill: to=>{
+    if(to < 7){ status.textContent = 'Затисни квадратик і, не відпускаючи, тягни до C7.'; return; }
+    for(let r = 5; r <= 7; r++){ S.cells['C' + r] = shift('=B4*B1', 0, r - 4); }
+    fill.hide();
+    S.sel = 'C5'; S.render();
+    for(let r = 5; r <= 7; r++) flash(S.td('C' + r), 'pop', 900);
+    addNeurons(2); hit();
+    status.textContent = 'Щось пішло не так. Розберімося чому.';
+    $('trapPrompt').innerHTML = 'Клацай <b>C5</b>, <b>C6</b>, <b>C7</b>. Кольорові рамки покажуть, куди дивиться формула.';
+  }});
+  S.render();
+})();
+
+makeChoices('trapList', [
+  { text:`У ${m('C5')} вийшло 0. Яку комірку формула взяла за ціну квитка?`, opts:[`Порожню ${m('B2')}`, `Комірку ${m('B1')} з ціною`, `Комірку ${m('B5')} з учнями`], correct:0, why:'Адреса B1 зсунулась разом із формулою. У порожній комірці — нуль. Далі вона доїхала до заголовка B3, а текст множити не можна — звідси #VALUE!.' },
+  { text:`У ${m('C7')} вийшло 756. Це правильна сума для 27 учнів?`, opts:['Так, усе гаразд', 'Ні, сума має бути більшою'], correct:1, why:'Найпідступніший випадок: помилки не видно, а сума хибна. Насправді 27 × 180 = 4860.' }
+]);
+
+/* ================= КРОК 3: F4 ================= */
+(function(){
+  const host = $('fixSheet'), status = $('fixStatus'), bar = $('fixBar');
+  const S = makeSheet(host, {cols:'ABC', rows:7, cells:{...tripCells(), C4:'=B4*B1'}, widths:W3, hdr:3});
+  const hit = trackTask(host, 1, 3);
+  const refs = [{c:'B', r:4, m:0}, {c:'B', r:1, m:0}];  // m: 0 — A1, 1 — $A$1, 2 — A$1, 3 — $A1
+  const txt = x=>((x.m === 1 || x.m === 3) ? '$' : '') + x.c + ((x.m === 1 || x.m === 2) ? '$' : '') + x.r;
+  let cur = null, locked = false;
+  S.sel = 'C4';
+  S.onDown = a=>{ S.sel = a; S.render(); };
+  bar.innerHTML = '=<button class="fref" data-i="0"></button>*<button class="fref" data-i="1"></button><button class="key" id="fixF4" title="Змінює вид посилання">F4</button>';
+  const btns = [...bar.querySelectorAll('.fref')];
+  function formula(){
+    const f = `=${txt(refs[0])}*${txt(refs[1])}`;
+    S.cells.C4 = f;
+    btns.forEach((b, i)=>{ b.textContent = txt(refs[i]); b.classList.toggle('cur', cur === i); });
+    return f;
+  }
+  const clear = ()=>{ for(let r = 5; r <= 7; r++) delete S.cells['C' + r]; };
+  bar.addEventListener('click', e=>{
+    if(locked) return;
+    const b = e.target.closest('.fref');
+    if(b){ cur = +b.dataset.i; formula(); status.textContent = 'Тепер натисни F4.'; return; }
+    if(!e.target.closest('#fixF4')) return;
+    if(cur === null){ status.textContent = 'Спершу клацни адресу у формулі.'; return; }
+    refs[cur].m = (refs[cur].m + 1) % 4;
+    formula(); clear(); S.sel = 'C4'; S.render();
+    status.textContent = `Тепер це ${txt(refs[cur])}. Ще раз F4 — наступний вид.`;
+  });
+  const fill = makeFill(S, {col:'C', first:4, last:7, onFill: to=>{
+    if(locked) return;
+    if(to < 7){ status.textContent = 'Затисни квадратик і, не відпускаючи, тягни до C7.'; return; }
+    const f = S.cells.C4;
+    for(let r = 5; r <= 7; r++) S.cells['C' + r] = shift(f, 0, r - 4);
+    S.sel = 'C7'; S.render();
+    const good = TRIP.every((t, i)=>evalRaw(S.cells, 'C' + (i + 4)).v === t[1] * PRICE);
+    if(good){
+      locked = true; fill.hide(); cur = null; formula();
+      for(let r = 5; r <= 7; r++) flash(S.td('C' + r), 'pop', 900);
+      addNeurons(3); hit();
+      status.textContent = refs[1].m === 2
+        ? '✓ Сума кожного класу правильна. B$1 тут теж годиться: вниз зсувається лише число.'
+        : '✓ Сума кожного класу правильна.';
+      $('fixPrompt').innerHTML = 'Клацай <b>C5</b>, <b>C6</b>, <b>C7</b>: адреса з $ стоїть на місці.';
+      return;
+    }
+    locked = true;
+    for(let r = 5; r <= 7; r++) flash(S.td('C' + r), 'shake', 900);
+    status.textContent = (refs[0].m === 1 || refs[0].m === 2)
+      ? `Зафіксовано кількість учнів: усі класи рахуються як 8-А. Учні мають зсуватись, а ціна — ні.`
+      : `Ціна знову поїхала вниз: ${S.cells.C5}. Зафіксуй її адресу.`;
+    setTimeout(()=>{ clear(); S.sel = 'C4'; S.render(); fill.show(); locked = false; }, 1800);
+  }});
+  formula(); S.render();
+})();
+
+/* ================= КРОК 6: ПЕРЕМИКАЧ $ ================= */
+(function(){
+  const COL = 'C', ROW = 4;
+  const TASKS = [
+    { pc:false, pr:true, t:'Вниз адреса <b>не змінюється</b>, а вправо — змінюється.', ok:'C$4 — рядок зафіксовано.', hint:'Вниз змінюється число, тож зафіксувати треба лише число.' },
+    { pc:true, pr:false, t:'Вправо адреса <b>не змінюється</b>, а вниз — змінюється.', ok:'$C4 — стовпець зафіксовано.', hint:'Вправо змінюється літера, тож зафіксувати треба лише літеру.' }
+  ];
+  const grid = $('pinGrid'), status = $('pinStatus'), go = $('pinGo');
+  const hit = trackTask(go, TASKS.length, TASKS.length + 2);
+  const st = {pc:false, pr:false};
+  let k = 0;
+  $('pinRef').innerHTML = `<button class="pin-part" data-k="pc"><i>$</i>${COL}</button><button class="pin-part" data-k="pr"><i>$</i>${ROW}</button>`;
+  const parts = [...$('pinRef').children];
+  const ref = (dc, dr)=>{
+    const c = st.pc ? COL : String.fromCharCode(COL.charCodeAt(0) + dc), r = st.pr ? ROW : ROW + dr;
+    const a = (st.pc ? '$' : '') + (dc && !st.pc ? `<span class="mv">${c}</span>` : c);
+    const b = (st.pr ? '$' : '') + (dr && !st.pr ? `<span class="mv">${r}</span>` : r);
+    return a + b;
+  };
+  function draw(){
+    parts.forEach(p=>p.classList.toggle('on', st[p.dataset.k]));
+    grid.innerHTML = `<tr><th></th><th>формула</th><th>копія вправо →</th></tr>
+      <tr><th></th><td class="src">${ref(0, 0)}</td><td>${ref(1, 0)}</td></tr>
+      <tr><th>копія вниз ↓</th><td>${ref(0, 1)}</td><td>${ref(1, 1)}</td></tr>`;
+    $('pinPrompt').innerHTML = k < TASKS.length ? TASKS[k].t + ' Клацай літеру чи число, щоб поставити $.' : 'Мішані посилання пройдено ✓';
+  }
+  $('pinRef').addEventListener('click', e=>{
+    const p = e.target.closest('.pin-part'); if(!p || k >= TASKS.length) return;
+    st[p.dataset.k] = !st[p.dataset.k]; status.textContent = ''; draw();
+  });
+  go.addEventListener('click', ()=>{
+    if(k >= TASKS.length) return;
+    const t = TASKS[k];
+    if(st.pc !== t.pc || st.pr !== t.pr){ flash(grid, 'shake'); status.textContent = '🤔 ' + t.hint; return; }
+    addNeurons(1); hit();
+    status.textContent = '✓ ' + t.ok;
+    if(++k === TASKS.length){ addNeurons(2); go.hidden = true; }
+    draw();
+  });
+  draw();
+})();
+
+/* ================= КРОК 4: ЯКЕ ПОСИЛАННЯ ================= */
+// Ситуація в таблиці: hdr — номер рядка із заголовками, marks — {адреса: 'a' | 'b' (комірки, які бере формула) | 'q' (комірка з формулою)}
+const sit = (rows, hdr, marks = {})=>'<table class="mini sit"><tr><th></th>' + rows[0].map((_, c)=>`<th>${'ABCD'[c]}</th>`).join('') + '</tr>'
+  + rows.map((row, r)=>`<tr><th>${r + 1}</th>` + row.map((v, c)=>{
+    const a = 'ABCD'[c] + (r + 1);
+    const k = [r + 1 === hdr ? 'hdr' : '', typeof v === 'number' ? 'num' : '', marks[a] ? 'm-' + marks[a] : ''].filter(Boolean).join(' ');
+    return `<td${k ? ` class="${k}"` : ''}>${v}</td>`;
+  }).join('') + '</tr>').join('') + '</table>';
+makeClassify('kindList', [
+  { pre:sit([['Товар', 'Ціна, ₴', 'Кількість', 'Вартість, ₴'], ['Зошит', 32, 3, ''], ['Ручка', 18, 5, ''], ['Фарби', 140, 1, '']], 1, {B2:'a', C2:'b', D2:'q'}),
+    text:'Вартість кожного товару: ціна × кількість з того самого рядка.', correct:0, why:'Обидві адреси мають «їхати» разом із рядком.' },
+  { pre:sit([['Прохідний бал', 7, ''], ['Учень', 'Оцінка', 'Склав?'], ['Оля', 9, ''], ['Тарас', 6, ''], ['Іра', 8, '']], 2, {B3:'a', B1:'b', C3:'q'}),
+    text:'Кожну оцінку порівнюємо з прохідним балом у комірці B1.', correct:1, why:'Прохідний бал один, його адреса не має зсуватись.' },
+  { pre:sit([['Курс євро', 48, ''], ['Товар', 'Ціна, ₴', 'Ціна, €'], ['Рюкзак', 960, ''], ['Кросівки', 2400, ''], ['Книга', 240, '']], 2, {B3:'a', B1:'b', C3:'q'}),
+    text:'Ціни в гривнях ділимо на курс євро з комірки B1.', correct:1, why:'Курс один на всю таблицю.' },
+  { pre:sit([['Місяць', 'Зошити, ₴', 'Ручки, ₴', 'Фарби, ₴'], ['Вересень', 120, 45, 140], ['Жовтень', 96, 30, 80], ['Разом', '', '', '']], 1, {B2:'a', B3:'a', B4:'q'}),
+    text:'Під стовпчиком стоїть SUM. Копіюємо вправо, щоб порахувати інші стовпчики.', correct:0, why:'Кожен стовпчик рахує свої числа, тож діапазон має зсуватись.' }
+], ['Відносне', 'Абсолютне']);
+
+/* ================= КРОК 5: IF І ПОСИЛАННЯ ================= */
+(function(){
+  const GOODS = [['Ручка', 18], ['Зошит', 32], ['Олівець', 12], ['Фарби', 140], ['Альбом', 78]];
+  const AVG = GOODS.reduce((s, g)=>s + g[1], 0) / GOODS.length;
+  const rows = [['Товар', 'Ціна, ₴', 'Порівняння'], ...GOODS.map(g=>[g[0], g[1], '']), ['Середня', AVG, '']];
+  const table = $('ifTable'), status = $('ifStatus');
+  table.innerHTML = '<tr><th></th><th>A</th><th>B</th><th>C</th></tr>' + rows.map((row, r)=>`<tr><th>${r + 1}</th>` + row.map((v, c)=>{
+    const k = [r === 0 ? 'hdr' : typeof v === 'number' ? 'num' : '', c === 2 && r ? 'out' : '', r === 6 && c === 1 ? 'key-cell' : ''].filter(Boolean).join(' ');
+    return `<td data-r="${r}" data-c="${c}"${k ? ` class="${k}"` : ''}>${v}</td>`;
+  }).join('') + '</tr>').join('');
+  const CHIPS = [
+    { t:'B2>$B$7', slot:0 },
+    { t:'"Дорожчий"', slot:1 },
+    { t:'"Дешевший"', slot:2 },
+    { t:'B2>B7', msg:'Після копіювання B7 стане B8, B9… — там порожньо. Середню треба зафіксувати.' },
+    { t:'$B$2>$B$7', msg:'Тоді в кожному рядку перевірятиметься ручка. Ціна має зсуватись.' },
+    { t:'Дорожчий', msg:'Текст без лапок таблиця не зрозуміє.' }
+  ];
+  const WHY = [
+    'Спершу — умова: що саме порівнюємо?',
+    'Друге місце — що показати, коли ціна більша за середню.',
+    'Третє місце — що показати, коли ціна не більша за середню.'
+  ];
+  const slots = [...$('ifFormula').querySelectorAll('.slot')];
+  const chipsEl = $('ifChips');
+  const hit = trackTask(chipsEl, 3, 5);
+  let cur = 0;
+  const mark = ()=>slots.forEach((s, i)=>s.classList.toggle('active', i === cur));
+  shuffle(CHIPS).forEach(ch=>{
+    const b = document.createElement('button');
+    b.className = 'fchip'; b.textContent = ch.t;
+    b.addEventListener('click', ()=>{
+      if(cur > 2) return;
+      if(ch.slot !== cur){
+        flash(b, 'shake');
+        status.textContent = '🤔 ' + (ch.msg || WHY[cur]);
+        return;
+      }
+      const s = slots[cur];
+      s.textContent = ch.t; s.classList.add('filled', 's' + cur);
+      b.hidden = true; status.textContent = '';
+      addNeurons(1); hit();
+      cur++; mark();
+      if(cur === 3) fill();
+    });
+    chipsEl.appendChild(b);
+  });
+  function fill(){
+    chipsEl.querySelectorAll('.fchip').forEach(b=>b.hidden = true);
+    status.textContent = 'Копіюємо формулу вниз маркером заповнення…';
+    GOODS.forEach((g, i)=>setTimeout(()=>{
+      const td = table.querySelector(`td[data-r="${i + 1}"][data-c="2"]`);
+      const yes = g[1] > AVG;
+      td.textContent = yes ? 'Дорожчий' : 'Дешевший';
+      td.style.color = yes ? 'var(--no)' : 'var(--yes)';
+      flash(td, 'pop', 900);
+      if(i === GOODS.length - 1){ status.textContent = `✓ Ціна зсувалась рядок за рядком, а $B$7 стояла на місці.`; addNeurons(2); }
+    }, 400 * (i + 1)));
+  }
+  mark();
+})();
+
+/* ================= ФІНАЛЬНИЙ ТЕСТ ================= */
+makeFinalQuiz('finalQuiz', [
+  { q:'У B1 записано =A1*2. Формулу скопіювали в B4. Що в B4?', opts:['=A1*2', '=A4*2', '=A4*8', '=B4*2'], correct:1, why:'На 3 рядки нижче — адреса A1 стала A4, а число 2 лишилось.' },
+  { q:'У C1 записано =A1+B1. Формулу скопіювали в D1. Що в D1?', opts:['=A1+B1', '=B1+C1', '=A2+B2', '=B2+C2'], correct:1, why:'Зсув на 1 стовпчик вправо.' },
+  { q:'Навіщо у формулі знак $?', opts:['Показує, що число — це гроші', 'Не дає адресі зсуватись під час копіювання', 'Округлює результат', 'Захищає комірку від змін'], correct:1 },
+  { q:'Яка клавіша перемикає вид посилання?', opts:['F1', 'F2', 'F4', 'Enter'], correct:2 },
+  { q:'Формулу =$B$2*C3 скопіювали на 2 рядки вниз. Що вийде?', opts:['=$B$2*C5', '=$B$4*C5', '=$B$2*C3', '=$B$4*C3'], correct:0, why:'$B$2 стоїть на місці, а C3 — відносне посилання.' },
+  { q:'Ціна в D2, знижка — в одній комірці F1. Яку формулу можна копіювати вниз?', opts:['=D2*F1', '=D2*$F$1', '=$D$2*F1', '=$D$2*$F$1'], correct:1, why:'Ціна зсувається, знижка — ні.' },
+  { q:'Формулу =B$2 скопіювали на 1 стовпчик вправо й на 3 рядки вниз. Що вийде?', opts:['=B$2', '=C$2', '=B$5', '=C$5'], correct:1, why:'Рядок зафіксовано, тож змінилась лише літера.' },
+  { q:'У комірці з\'явилося #REF!. Що це означає?', opts:['Формула посилається на комірку, якої немає', 'Стовпчик завузький', 'Ділення на нуль', 'Назву функції написано з помилкою'], correct:0 }
+], {summary:'Ти знаєш, чому адреси зсуваються під час копіювання, фіксуєш потрібні знаком $ і відрізняєш відносне, абсолютне й мішане посилання.'});
+</script>
+
+</body>
+</html>

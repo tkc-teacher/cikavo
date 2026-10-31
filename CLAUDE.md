@@ -360,6 +360,7 @@ addNeurons(1); hit();          // після останнього hit() впра
 | 8 | Прості обчислення (+ практична робота «Піца-вечірка» — `8/practice-simple-calculations/`) | `8/lesson-simple-calculations/` |
 | 8 | Складні розрахунки | `8/lesson-complex-calculations/` |
 | 8 | Логічні та вкладені функції (IF, вкладені IF, AND/OR, COUNTIF) (+ практична робота «Табель класу» — `8/practice-logical-functions/`) | `8/lesson-logical-functions/` |
+| 8 | Посилання (розминка `makeWarmup` з 16 запитань по всіх уроках про Google Таблиці; відносні й абсолютні, F4, «пастка» з ціною квитка, IF з `$`; мішані — коротко. Таблицю множення й окремий крок про помилки за рішенням вчителя прибрано) | `8/lesson-references/` |
 | 9 | Життя з розумними пристроями | `9/lesson-smart-classroom/` |
 | 9 | Поняття бази даних | `9/lesson-database-basics/` |
 | 9 | Поняття реляційної бази даних. Зв'язані аркуші в Google Таблицях | `9/lesson-relational-db/` |
