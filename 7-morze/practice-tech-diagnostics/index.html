@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Медична картка комп'ютера — Діагностика</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#3F51B5,#7C5CD6,#F0566A); --accent:#3F51B5; --accent-dark:#2C3A8C; --accent-soft:#E9ECFA; --bg:#F5F6FC; --line:#DFE3F4; --ink:#1A1F3D; --ink-soft:#4E5475; }
+
+  /* Таблиця-картка */
+  .sample td{white-space:normal;}
+  .sample td.b{font-weight:800; background:var(--accent-soft);}
+  .sample td.ok{color:#21603A; font-weight:700;}
+  .card-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; margin-bottom:2px;}
+  .card-end{font-size:14px; margin-top:8px;}
+  .paper{background:#fff; border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px;}
+
+  /* Ілюстрації: вікна Windows, системний шрифт */
+  .win{margin:10px 0 6px; max-width:520px; background:#fff; border:1px solid #D5D8E2; border-radius:8px; overflow:hidden; box-shadow:0 3px 10px rgba(10,25,70,.14); font-family:'Segoe UI',system-ui,-apple-system,sans-serif; color:#1b1b1b; font-size:12.5px; line-height:1.3;}
+  .win-title{display:flex; align-items:center; gap:7px; padding:6px 10px; background:#F3F3F3; font-size:12px;}
+  .win-ctl{margin-left:auto; color:#555; letter-spacing:9px; font-size:11px;}
+  .about{padding:10px 12px;}
+  .about h4{margin:0 0 6px; font-size:13.5px; font-weight:600;}
+  .about div{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:10px; padding:3px 5px; border-radius:4px;}
+  .about span{color:#555;}
+  .hl{outline:2.5px solid #F0566A; outline-offset:1px; border-radius:4px;}
+  .disk{display:grid; grid-template-columns:34px 1fr; gap:8px; align-items:center; padding:10px 12px;}
+  .disk svg{width:34px; height:34px;}
+  .disk-bar{height:13px; background:#E6E6E6; border:1px solid #BCBCBC; margin:2px 0;}
+  .disk-bar i{display:block; height:100%; width:77%; background:#26A0DA;}
+  .disk small{color:#555; font-size:12px;}
+  .tm-head,.tm-row{display:grid; grid-template-columns:1fr 62px 72px; align-items:center;}
+  .tm-head{border-bottom:1px solid #E5E5E5; color:#444;}
+  .tm-head>*{padding:4px 8px;}
+  .tm-head b{display:block; font-size:14px; font-weight:600; color:#1b1b1b;}
+  .tm-row{border-bottom:1px solid #F4F4F4;}
+  .tm-row>span{padding:5px 8px;}
+  .num{text-align:right;}
+  .h1{background:#FFF8DC;} .h2{background:#FFEFB5;} .h3{background:#FFC58A;}
+  .dm{padding:6px 8px;}
+  .dm-cat{padding:2px 0 2px 16px; color:#333;}
+  .dm-cat::before{content:'▾'; color:#777; margin-right:6px;}
+  .dm-row{display:flex; align-items:center; gap:6px; margin-left:38px; padding:3px 6px; width:fit-content;}
+  .warn{width:15px; height:14px; flex-shrink:0;}
+  .fast{text-align:center; padding:16px 12px 18px; background:#fff;}
+  .fast .s{font-size:12px; color:#555;}
+  .fast .v{font-size:44px; line-height:1.1; font-weight:300; color:#1b1b1b;}
+  .fast .v small{font-size:17px; color:#555;}
+</style>
+</head>
+<body data-hud="7 клас · Практична · Медична картка">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 7 клас · Засоби діагностики</div>
+    <h1>🩺 Медична картка комп'ютера</h1>
+    <p>Обстеж свій комп'ютер справжніми засобами діагностики, запиши результати в картку й постав йому діагноз.</p>
+    <div class="meta"><span>⏱ 20–25 хв</span><span><img src="../../assets/logos/docs.svg" alt="">Google Документи</span><span>💻 Комп'ютер із Windows</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="paper">
+      <div class="card-title">Медична картка мого комп'ютера</div>
+      <div class="sheet-wrap">
+        <table class="sample">
+          <tr><td class="b">Що перевіряємо</td><td class="b">Результат</td><td class="b">Діагноз</td></tr>
+          <tr><td>Операційна система</td><td>Windows 11 Home</td><td>—</td></tr>
+          <tr><td>Оперативна пам'ять</td><td>8 ГБ</td><td>—</td></tr>
+          <tr><td>Вільне місце на диску C:</td><td>54 ГБ з 238 ГБ</td><td class="ok">Норма</td></tr>
+          <tr><td>Навантаження на процесор</td><td>12%, найбільше — Google Chrome</td><td class="ok">Норма</td></tr>
+          <tr><td>Пристрої з жовтим трикутником</td><td>Немає</td><td class="ok">Норма</td></tr>
+          <tr><td>Швидкість інтернету</td><td>64 Мбіт/с</td><td class="ok">Норма</td></tr>
+        </table>
+      </div>
+      <div class="card-end"><b>Висновок:</b> комп'ютер здоровий. Місця на диску вже не надто багато, тому раз на місяць очищатиму Кошик.</div>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи документ</h3>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Документи</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Документи</span>.</li>
+              <li>Назви файл: <b>Медична картка — Прізвище</b>.</li>
+            </ol>
+          </div>
+        </div>
+        <div class="tip">Обстежуй лише, нічого не змінюй: не завершуй завдань, не оновлюй драйвери й не видаляй файли. Лікувати будемо тільки разом із дорослим.</div>
+        <div class="tip">Немає комп'ютера з Windows? Обстеж свій пристрій: дані про систему й пам'ять шукай у налаштуваннях, а <span class="mono">fast.com</span> працює всюди. Рядки, які не вдасться перевірити, познач «Немає засобу».</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Підготуй картку</h3>
+        <ol>
+          <li>Напиши заголовок: <b>Медична картка мого комп'ютера</b>.</li>
+          <li>Встав таблицю: <span class="menu">Вставлення → Таблиця</span>, розмір <b>3 × 7</b>.</li>
+          <li>Заповни перший рядок і перший стовпчик, як у зразку вгорі.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Запиши систему й пам'ять</h3>
+        <ol>
+          <li>Відкрий Провідник (<span class="mono">Win</span> + <span class="mono">E</span>).</li>
+          <li>Правою кнопкою клацни <span class="menu">Цей ПК → Властивості</span>.</li>
+          <li>Знайди рядки <b>Випуск</b> та <b>Оперативна пам'ять</b> і перенеси їх у картку.</li>
+        </ol>
+        <div class="win">
+          <div class="win-title">Параметри<span class="win-ctl">─ ▢ ✕</span></div>
+          <div class="about">
+            <h4>Характеристики пристрою</h4>
+            <div class="hl"><span>Установлена оперативна пам'ять</span>8,00 ГБ</div>
+            <div><span>Тип системи</span>64-розрядна операційна система</div>
+            <h4 style="margin-top:10px;">Характеристики Windows</h4>
+            <div class="hl"><span>Випуск</span>Windows 11 Home</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Подивись на диск</h3>
+        <ol>
+          <li>У Провіднику відкрий <span class="menu">Цей ПК</span>.</li>
+          <li>Запиши, скільки вільно на диску C:.</li>
+          <li>Подивись на колір смужки: <b>синя</b> — норма, <b>червона</b> — увага.</li>
+        </ol>
+        <div class="win">
+          <div class="win-title">Цей ПК<span class="win-ctl">─ ▢ ✕</span></div>
+          <div class="disk">
+            <svg viewBox="0 0 34 34" fill="none" aria-hidden="true"><rect x="3" y="10" width="28" height="15" rx="2" fill="#E6E6E6" stroke="#8A8A8A" stroke-width="1.5"/><path d="M3 20 H31" stroke="#8A8A8A"/><circle cx="26" cy="22.5" r="1" fill="#2E9E5B"/></svg>
+            <div>Windows (C:)<div class="disk-bar"><i></i></div><small>54 ГБ вільно з 238 ГБ</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Обстеж процесор</h3>
+        <ol>
+          <li>Закрий зайві програми, лиши лише браузер.</li>
+          <li>Натисни <span class="mono">Ctrl</span> + <span class="mono">Shift</span> + <span class="mono">Esc</span>. Це Диспетчер завдань.</li>
+          <li>Клацни заголовок стовпчика <b>ЦП</b>, щоб угорі опинилась найактивніша програма.</li>
+          <li>Запиши загальний відсоток ЦП і назву програми.</li>
+        </ol>
+        <div class="win">
+          <div class="win-title">Диспетчер завдань<span class="win-ctl">─ ▢ ✕</span></div>
+          <div class="tm-head"><span>Ім'я</span><span class="num hl"><b>12%</b>ЦП</span><span class="num"><b>64%</b>Пам'ять</span></div>
+          <div class="tm-row"><span>Google Chrome</span><span class="num h2">8%</span><span class="num h3">1 204 МБ</span></div>
+          <div class="tm-row"><span>Провідник</span><span class="num h1">2%</span><span class="num h1">96 МБ</span></div>
+          <div class="tm-row"><span>Служба Windows</span><span class="num h1">1%</span><span class="num h1">48 МБ</span></div>
+        </div>
+        <div class="tip">Вікно маленьке, без стовпчиків? Натисни <b>Докладніше</b> внизу.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Перевір пристрої</h3>
+        <ol>
+          <li>Правою кнопкою клацни <span class="menu">Пуск → Диспетчер пристроїв</span>.</li>
+          <li>Пошукай у списку жовті трикутники. Якщо їх не видно, напиши <b>Немає</b>.</li>
+          <li>Якщо є, запиши назву пристрою.</li>
+        </ol>
+        <div class="win">
+          <div class="win-title">Диспетчер пристроїв<span class="win-ctl">─ ▢ ✕</span></div>
+          <div class="dm">
+            <div class="dm-cat">Вебкамери</div>
+            <div class="dm-row"><svg class="warn" viewBox="0 0 16 15" aria-hidden="true"><path d="M8 1 L15 14 H1 Z" fill="#FFC93C" stroke="#1b1b1b" stroke-width="1"/><path d="M8 5 V10" stroke="#1b1b1b" stroke-width="1.6"/><circle cx="8" cy="12" r=".9" fill="#1b1b1b"/></svg>USB-камера HD</div>
+            <div class="dm-cat">Клавіатури</div>
+            <div class="dm-row">Стандартна клавіатура</div>
+          </div>
+        </div>
+        <div class="tip">Це приклад пристрою з проблемою. Здоровий пристрій значка не має.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">7</div>
+      <div>
+        <h3>Виміряй швидкість інтернету</h3>
+        <ol>
+          <li>Відкрий у браузері сайт <span class="mono">fast.com</span>. Тест почнеться сам.</li>
+          <li>Зачекай, поки число перестане змінюватись, і запиши його.</li>
+        </ol>
+        <div class="win">
+          <div class="win-title">fast.com<span class="win-ctl">─ ▢ ✕</span></div>
+          <div class="fast"><div class="s">Ваша швидкість інтернету</div><div class="v">64 <small>Мбіт/с</small></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">8</div>
+      <div>
+        <h3>Постав діагноз</h3>
+        <p>Порівняй результати з таблицею й заповни останній стовпчик картки:</p>
+        <div class="sheet-wrap">
+          <table class="sample">
+            <tr><td class="b">Показник</td><td class="b">Норма</td><td class="b">Увага</td></tr>
+            <tr><td>Вільне місце</td><td>Смужка синя</td><td>Смужка червона</td></tr>
+            <tr><td>Процесор без важких програм</td><td>До 50%</td><td>Понад 50%</td></tr>
+            <tr><td>Пристрої</td><td>Немає трикутників</td><td>Є жовтий трикутник</td></tr>
+            <tr><td>Швидкість інтернету</td><td>5 Мбіт/с і більше</td><td>Менше ніж 5 Мбіт/с</td></tr>
+          </table>
+        </div>
+        <p style="margin-top:10px;">Під таблицею напиши <b>Висновок</b>: чи здоровий комп'ютер і що одне варто зробити, щоб він працював краще.</p>
+        <div class="check-val">Перевір себе: у картці заповнено всі рядки, а біля кожної «Уваги» у висновку є порада.</div>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+<footer>Практична робота · «Медична картка комп'ютера» · 7 клас</footer>
+
+<script src="../../assets/practice.js"></script>
+</body>
+</html>
