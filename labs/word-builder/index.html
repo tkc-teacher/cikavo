@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Words · Labs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
+    --teal:#16A3A0; --teal-dark:#0E7C7A; --teal-soft:#E3F7F6; --coral:#FF6B4A; --coral-soft:#FFEFE9;
+    --yellow:#FFC93C; --yellow-soft:#FFF4D6; --yellow-dark:#D9920F; --green:#2FA84F; --green-dark:#1F7A38; --green-soft:#E4F7E9;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  [hidden]{display:none !important;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;}
+  h1,h2{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
+  button,input{font:inherit;}
+
+  /* ---------- Top bar ---------- */
+  .topbar{position:sticky; top:0; z-index:10; background:rgba(246,245,251,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .topbar-inner{max-width:1000px; margin:0 auto; padding:10px 16px; display:flex; align-items:center; gap:12px;}
+  .back-link{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px; color:var(--teal-dark); text-decoration:none; white-space:nowrap; background:none; border:none; padding:0; cursor:pointer;}
+  .back-link:hover{text-decoration:underline;}
+  .game-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .player-btn{margin-left:auto; max-width:190px; overflow:hidden; text-overflow:ellipsis; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; border:1.5px solid var(--teal); background:var(--surface); color:var(--teal-dark); border-radius:999px; padding:4px 14px; cursor:pointer; white-space:nowrap;}
+  .player-btn:hover{background:var(--teal-soft);}
+  @media (max-width:560px){ .game-title{display:none;} .topbar-inner{gap:8px;} .player-btn{max-width:130px;} }
+
+  /* ---------- Packs ---------- */
+  .map{max-width:1000px; margin:0 auto; padding:24px 16px 40px;}
+  .map h1{font-size:clamp(28px, 6vw, 40px); line-height:1.15; margin-bottom:18px;}
+  .packs{display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); grid-auto-rows:1fr; gap:12px;}
+  .pack{position:relative; text-align:left; border:2px solid var(--line); border-radius:var(--radius-m); background:var(--surface); box-shadow:0 3px 0 var(--line); padding:14px 70px 14px 16px; cursor:pointer; color:var(--ink); transition:transform .15s ease, border-color .2s ease;}
+  .pack:hover{border-color:var(--teal); transform:translateY(-2px);}
+  .pack:focus-visible,.btn:focus-visible,.tile:focus-visible,.pic:focus-visible,.review:focus-visible{outline:3px solid var(--teal); outline-offset:3px;}
+  .pack .p-emoji{font-size:38px; line-height:1.2; display:block;}
+  .pack .p-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; line-height:1.2; display:block; margin-top:4px;}
+  .pack .p-words{font-size:13px; color:var(--ink-soft); display:block; white-space:nowrap;}
+  .nfield{position:relative; display:block; width:116px; height:116px; margin:0 auto; font-size:18px;}
+  .nfield .nr{position:absolute; left:calc(var(--x) * (100% - 1em)); top:calc(var(--y) * (100% - 1em)); background:var(--neuron) center/contain no-repeat;}
+  .pack .nfield{position:absolute; right:8px; top:50%; width:58px; height:58px; margin:-29px 0 0; font-size:11px;}   /* уявне коло праворуч, картка за висотою тексту */
+  .nr{width:1em; height:1em; flex:none; vertical-align:-.16em;}
+  .nr.off{filter:grayscale(1); opacity:.45;}
+  /* ---------- Хмаринка слів ---------- */
+  .cloud{margin-top:26px;}
+  .cloud h2{font-size:clamp(26px, 5vw, 32px); line-height:1.2; text-align:center; margin-bottom:6px;}
+  .sky{position:absolute; left:10px; top:6px; width:calc(100% - 20px); height:calc(100% - 26px); z-index:-1; pointer-events:none; filter:drop-shadow(0 5px 7px rgba(120,160,210,.24));}
+  .sky.tall{display:none;}
+  .net{position:absolute; inset:0; width:100%; height:100%; z-index:-1; pointer-events:none;}
+  @media (max-width:640px){ .sky{display:none;} .sky.tall{display:block;} }
+  .sphere{position:relative; isolation:isolate; overflow:hidden; cursor:grab; touch-action:pan-y; user-select:none; -webkit-user-select:none;}
+  .sphere.grabbing{cursor:grabbing;}
+  .cw{position:absolute; left:50%; top:50%; border:none; background:none; padding:2px 6px; cursor:pointer; font-family:'Baloo 2',sans-serif; font-weight:700; line-height:1.1; white-space:nowrap; will-change:transform;}
+  .cw:hover{text-decoration:underline;}
+  .cw:focus-visible{outline:3px solid var(--teal); border-radius:8px;}
+  .cw-pic{position:absolute; left:50%; top:50%; pointer-events:none;}
+  .cw-pic span.card{display:block; background:var(--surface); border:2px solid var(--teal); border-radius:18px; padding:5px 9px; box-shadow:0 6px 16px rgba(27,27,58,.18); font-size:44px; line-height:1; opacity:0; transition:opacity .25s ease;}
+  .cw-pic.show span.card{opacity:1;}
+  .known{display:inline-flex; align-items:center; gap:4px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:var(--ink); background:var(--yellow-soft); border-radius:999px; padding:3px 12px 3px 8px; white-space:nowrap;}
+  .known .nr{font-size:20px;}
+  .known.up{animation:pop .4s ease;}
+
+  /* ---------- Word ---------- */
+  .play{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:clamp(12px, 3vh, 26px); min-height:calc(100dvh - 58px); padding:14px 16px 20px;}
+  .pic{position:relative; width:clamp(120px, 25vh, 200px); aspect-ratio:1; border:2px solid var(--line); border-radius:var(--radius-l); background:var(--surface); box-shadow:0 4px 0 var(--line); cursor:pointer; padding:0; display:flex; align-items:center; justify-content:center;}
+  .pic .emoji{font-size:clamp(76px, 17vh, 126px); line-height:1;}
+  .pic .spk{position:absolute; right:-10px; bottom:-10px; width:46px; height:46px; border-radius:50%; background:var(--yellow); box-shadow:0 3px 0 var(--yellow-dark); display:flex; align-items:center; justify-content:center; font-size:21px;}
+  .pic:hover .spk{transform:scale(1.08);}
+  .pic.speak .spk{animation:pop .4s ease;}
+  .pic.won{animation:pop .5s ease; border-color:var(--green); box-shadow:0 4px 0 var(--green);}
+
+  .word-view{display:contents;}
+
+  .review{width:100%; display:flex; align-items:center; gap:14px; text-align:left; border:2px solid var(--teal); border-radius:var(--radius-m); background:var(--teal-soft); box-shadow:0 3px 0 var(--teal); padding:10px 16px; margin-top:14px; cursor:pointer; color:var(--ink);}
+  .review:hover{transform:translateY(-2px);}
+  .review .r-pic{font-size:34px; line-height:1;}
+  .review b{display:block; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:20px; line-height:1.2;}
+  .group{display:inline-flex; align-items:flex-end; justify-content:center;}
+  .group span{font-size:.62em; line-height:1;}
+  .group span:nth-child(2){margin-left:-.28em;}
+  .group span:nth-child(3){position:relative; font-size:.46em; margin-left:-.72em; margin-right:.2em;}
+
+  /* ---------- Знайди пару ---------- */
+  .memo-view{width:min(100%, 640px, calc((100dvh - 150px) * 1.33)); text-align:center;}
+  .memo-view h2{font-size:clamp(22px, 4vh, 30px); line-height:1.2; margin-bottom:12px;}
+  .memo{display:grid; grid-template-columns:repeat(4, 1fr); gap:clamp(6px, 1.6vw, 12px);}
+  .m-card{aspect-ratio:1; border:none; background:none; padding:0; cursor:pointer; perspective:700px; container-type:inline-size;}
+  .m-card:focus-visible{outline:3px solid var(--teal); outline-offset:3px; border-radius:var(--radius-m);}
+  .m-inner{position:relative; display:block; width:100%; height:100%; transform-style:preserve-3d; transition:transform .35s ease;}
+  .m-card.flipped .m-inner{transform:rotateY(180deg);}
+  .m-face{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; border-radius:var(--radius-m); -webkit-backface-visibility:hidden; backface-visibility:hidden;}
+  .m-cover{background:var(--teal); box-shadow:0 4px 0 var(--teal-dark); color:#fff; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:40cqw;}
+  .m-card:hover:not(.flipped) .m-cover{background:var(--teal-dark);}
+  .m-back{background:var(--surface); border:2px solid var(--line); box-shadow:0 4px 0 var(--line); transform:rotateY(180deg);} /* без цього повороту картка «зникає» */
+  .m-back .m-emoji{font-size:58cqw; line-height:1;}
+  .m-back .m-word{font-family:'Baloo 2',sans-serif; font-weight:700; line-height:1; font-size:min(32cqw, calc(150cqw / var(--n)));}
+  .m-card.miss .m-back{border-color:var(--coral); background:var(--coral-soft); animation:shake .35s ease;}
+  .m-card.matched{cursor:default; animation:memo-pop .4s ease;}
+  @keyframes memo-pop{50%{scale:1.1;}}   /* лише scale: transform на звороті картки тримає поворот, анімація його не сміє перебивати */
+  .m-card.matched .m-back{border-color:var(--green); background:var(--green-soft); box-shadow:0 4px 0 var(--green); color:var(--green-dark);}
+
+  .slots,.tray{display:flex; justify-content:center; gap:8px; flex-wrap:wrap;}
+  .slots{flex-wrap:nowrap;}
+  .slot,.tile{width:var(--tile); height:var(--tile); border-radius:var(--radius-m); font-family:'Baloo 2',sans-serif; font-weight:700; font-size:calc(var(--tile) * .62); line-height:1; display:flex; align-items:center; justify-content:center; padding:0 0 .08em;}
+  .slot.syl,.tile.syl{width:calc(var(--tile) * (.3 + .38 * var(--n)));}
+  .slot{border:3px dashed #C9C5E4; background:var(--surface); color:var(--ink); transition:background .2s ease, border-color .2s ease, transform .15s ease;}
+  .slot.hover{border-color:var(--teal); background:var(--teal-soft); transform:scale(1.08);}
+  .slot.filled{border:3px solid var(--teal); background:var(--teal-soft); color:var(--teal-dark); animation:pop .3s ease;}
+  .slot.wrong{animation:shake .35s ease; border-color:var(--coral); background:var(--coral-soft);}
+  .slots.done .slot{border-color:var(--green); background:var(--green-soft); color:var(--green-dark);}
+
+  .tray{min-height:var(--tile); max-width:640px;}
+  .tile{position:relative; border:2px solid var(--yellow-dark); background:var(--yellow); color:var(--ink); box-shadow:0 4px 0 var(--yellow-dark); cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none;}
+  .tile:hover{filter:brightness(1.04);}
+  .tile.dragging{z-index:20; cursor:grabbing; box-shadow:0 10px 18px rgba(27,27,58,.25);}
+  .tile.back{transition:transform .22s ease;}
+  .tile.used{visibility:hidden;}
+  .tile.wrong{animation:shake .35s ease;}
+  @keyframes pop{50%{transform:scale(1.14);}}
+  @keyframes shake{25%{translate:-6px 0;} 75%{translate:6px 0;}}
+
+  .btn{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; border:none; border-radius:999px; padding:9px 24px; cursor:pointer;}
+  .btn-primary{background:var(--teal); color:#fff;}
+  .btn-primary:hover{background:var(--teal-dark);}
+  .btn-ghost{background:var(--surface); border:1.5px solid var(--line); color:var(--ink-soft);}
+  .btn-ghost:hover{border-color:var(--teal); color:var(--teal-dark);}
+
+  /* ---------- Windows ---------- */
+  .overlay{position:fixed; inset:0; z-index:30; background:rgba(27,27,58,.45); display:none; align-items:center; justify-content:center; padding:16px;}
+  .overlay.show{display:flex;}
+  .win{width:min(100%, 430px); max-height:calc(100dvh - 32px); overflow:auto; background:var(--surface); border-radius:var(--radius-l); padding:24px 22px; text-align:center;}
+  .win .big{font-size:50px; line-height:1.2;}
+  .win h2{font-size:27px; line-height:1.2; margin-bottom:12px;}
+  .win-neurons .nfield{margin-bottom:10px;}
+  .sub{margin:0 0 16px; color:var(--ink-soft); font-weight:700;}
+  .win-actions{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:14px;}
+  .players{display:flex; flex-direction:column; gap:7px; margin-bottom:14px;}
+  .pl-row{display:flex; align-items:center; gap:6px;}
+  .pl-pick{flex:1; min-width:0; display:flex; justify-content:space-between; gap:10px; font-weight:800; border:2px solid var(--line); border-radius:var(--radius-s); background:var(--bg); padding:7px 12px; cursor:pointer; color:var(--ink);}
+  .pl-pick:hover{border-color:var(--teal);}
+  .pl-pick.me{border-color:var(--teal); background:var(--teal-soft);}
+  .pl-pick span:first-child{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .pl-pick span:last-child{white-space:nowrap;}
+  .pl-del{border:none; background:none; color:#8E8BA8; cursor:pointer; font-size:17px; padding:6px;}
+  .pl-del:hover{color:var(--coral);}
+  .field{display:flex; gap:8px;}
+  .field input{flex:1; min-width:0; border:2px solid var(--line); border-radius:999px; padding:8px 16px; font-weight:700; color:var(--ink); background:var(--surface);}
+  .field input:focus{outline:none; border-color:var(--teal);}
+  .err{min-height:22px; margin:6px 0 0; color:#C8401F; font-size:14px; font-weight:700;}
+  .confetti{position:fixed; top:-12px; z-index:40; width:10px; height:14px; pointer-events:none; animation:fall linear forwards;}
+  @keyframes fall{to{transform:translateY(105vh) rotate(540deg);}}
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="back-link" id="labsLink" href="../index.html">← Labs</a>
+  <button class="back-link" id="packsBtn" type="button" hidden>← Packs</button>
+  <span class="game-title" id="gameTitle">My Words</span>
+  <span class="known" id="known" hidden title="Words I know"></span>
+  <button class="player-btn" id="playerBtn" type="button" title="Change player">👤 <span id="playerName">Player</span></button>
+</div></div>
+
+<main class="map" id="map">
+  <h1 id="hello">My Words</h1>
+  <div class="packs" id="packs"></div>
+  <button class="review" id="reviewBtn" type="button" hidden><span class="r-pic">🧩</span><b>Find the pairs</b></button>
+  <section class="cloud" id="cloudBox" hidden aria-label="Words I know">
+    <h2>I know:</h2>
+    <div class="sphere" id="sphere">
+      <svg class="sky" viewBox="0 141 1000 419" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="skyFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#DDEBFA"/></linearGradient></defs>
+        <path fill="url(#skyFill)" stroke="#D3E3F5" stroke-width="3" vector-effect="non-scaling-stroke"
+          d="M178 492 C74 492 12 428 12 352 C12 276 74 214 178 214 C250 158 356 154 424 190 C490 150 590 150 650 190 C716 158 800 170 846 214 C926 214 988 290 988 378 C988 444 926 492 846 492 C800 536 716 548 650 516 C590 556 490 556 424 516 C356 552 250 548 178 492 Z"/>
+      </svg>
+      <svg class="sky tall" viewBox="0 125 600 635" preserveAspectRatio="none" aria-hidden="true">
+        <defs><linearGradient id="skyTall" gradientUnits="userSpaceOnUse" x1="0" y1="125" x2="0" y2="740"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#DDEBFA"/></linearGradient></defs>
+        <g fill="url(#skyTall)">
+          <circle cx="300" cy="260" r="135"/><circle cx="135" cy="275" r="125"/><circle cx="465" cy="280" r="130"/>
+          <circle cx="115" cy="425" r="110"/><circle cx="485" cy="420" r="110"/><circle cx="300" cy="400" r="210"/>
+          <circle cx="135" cy="595" r="125"/><circle cx="465" cy="590" r="130"/><circle cx="300" cy="610" r="135"/>
+          <ellipse cx="300" cy="445" rx="272" ry="290"/>
+        </g>
+      </svg>
+      <canvas class="net" id="net" aria-hidden="true"></canvas>
+    </div>
+  </section>
+</main>
+
+<main class="play" id="play" hidden>
+  <div class="word-view" id="wordView">
+  <button class="pic" id="pic" type="button" aria-label="Hear the word"><span class="emoji" id="emoji"></span><span class="spk" aria-hidden="true">🔊</span></button>
+  <div class="slots" id="slots"></div>
+  <div class="tray" id="tray"></div>
+  </div>
+  <div class="memo-view" id="memoView" hidden>
+    <h2>Find the pairs</h2>
+    <div class="memo" id="memo"></div>
+  </div>
+</main>
+
+<!-- Гравець -->
+<div class="overlay" id="nameOverlay">
+  <div class="win" role="dialog" aria-labelledby="nameTitle">
+    <div class="big">👋</div>
+    <h2 id="nameTitle">What's your name?</h2>
+    <div class="players" id="players"></div>
+    <form class="field" id="nameForm">
+      <input id="nameInput" maxlength="24" placeholder="Your name" autocomplete="off" aria-label="Your name">
+      <button class="btn btn-primary" type="submit">Start</button>
+    </form>
+    <p class="err" id="nameErr"></p>
+    <div class="win-actions">
+      <button class="btn btn-ghost" id="resetBtn" type="button" hidden>Reset my words</button>
+      <button class="btn btn-ghost" id="nameClose" type="button" hidden>Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Кінець пакета -->
+<div class="overlay" id="winOverlay">
+  <div class="win" role="dialog" aria-labelledby="winTitle">
+    <div class="big">🏆</div>
+    <h2 id="winTitle">Well done!</h2>
+    <div class="win-neurons" id="winNeurons"></div>
+    <p class="sub" id="winSub"></p>
+    <div class="win-actions">
+      <button class="btn btn-primary" id="winNext" type="button">Next pack →</button>
+      <button class="btn btn-ghost" id="winAgain" type="button">Play again</button>
+      <button class="btn btn-ghost" id="winPacks" type="button">All packs</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= Пакети слів: маленькі тематичні світи, від простих до складних =================
+   Порядок у масиві — лише рекомендована складність. id — ключ, не змінювати. title — одне слово, icon — картинка на картці.
+   Лише слова до 7 літер (довші не вміщаються на телефоні) з картинкою-емодзі. Кожне слово — лише в одному пакеті.
+   Дефіс ділить слово на склади ('ham-ster'): таке слово проходить етапи зі складів, складів із літерами й самих літер.
+   Кілька емодзі через + стають однією картинкою (див. picHTML). */
+const PACKS = [
+  // Перші теми
+  { id:'pets', title:'Pets', icon:'🐱', words:[['cat','🐱'],['dog','🐶'],['rat','🐀'],['fish','🐟'],['bird','🕊️'],['mouse','🐭'],['rab-bit','🐰'],['par-rot','🦜'],['tur-tle','🐢'],['ham-ster','🐹']] },
+  { id:'family', title:'Family', icon:'👨+👩+👧', words:[['mum','👩'],['dad','👨'],['boy','👦'],['girl','👧'],['baby','👶'],['gran-ny','👵'],['sis-ter','👧'],['broth-er','👦'],['grand-pa','👴'],['fam-i-ly','👨+👩+👧']] },
+  { id:'farm', title:'Farm', icon:'🐮', words:[['pig','🐷'],['hen','🐔'],['cow','🐮'],['egg','🥚'],['duck','🦆'],['goat','🐐'],['sheep','🐑'],['horse','🐴'],['chick','🐥'],['trac-tor','🚜']] },
+  { id:'body', title:'Body', icon:'✋', words:[['ear','👂'],['leg','🦵'],['lip','👄'],['arm','💪'],['hand','✋'],['foot','🦶'],['nose','👃'],['face','🙂'],['eyes','👀'],['tooth','🦷']] },
+  { id:'numbers', title:'Numbers', icon:'🔟', words:[['one','1️⃣'],['two','2️⃣'],['six','6️⃣'],['ten','🔟'],['four','4️⃣'],['five','5️⃣'],['nine','9️⃣'],['three','3️⃣'],['sev-en','7️⃣'],['eight','8️⃣']] },
+  { id:'weather', title:'Weather', icon:'⛅', words:[['sun','☀️'],['hot','🥵'],['ice','🧊'],['fog','🌫️'],['cold','🥶'],['rain','🌧️'],['wind','💨'],['snow','❄️'],['cloud','☁️'],['storm','⛈️']] },
+  { id:'rainbow', title:'Colors', icon:'🎨', words:[['red','🔴'],['blue','🔵'],['gold','🥇'],['black','⚫'],['white','⚪'],['green','🟢'],['brown','🟤'],['yel-low','🟡'],['or-ange','🟠'],['pur-ple','🟣'],['rain-bow','🌈']] },
+  { id:'wardrobe', title:'Wardrobe', icon:'👕', words:[['hat','👒'],['cap','🧢'],['sock','🧦'],['shoe','👟'],['coat','🧥'],['shirt','👕'],['dress','👗'],['jeans','👖'],['scarf','🧣'],['boots','👢'],['gloves','🧤']] },
+  // Школа й дім
+  { id:'school', title:'School', icon:'🏫', words:[['pen','🖊️'],['bag','🎒'],['map','🗺️'],['book','📖'],['pa-per','📄'],['ru-ler','📏'],['cray-on','🖍️'],['pen-cil','✏️'],['school','🏫'],['teach-er','🧑‍🏫']] },
+  { id:'homework', title:'Homework', icon:'📚', words:[['read','📚'],['draw','🎨'],['idea','💡'],['plus','➕'],['test','📝'],['count','🔢'],['think','🤔'],['paint','🖌️'],['write','✍️'],['spell','🔤']] },
+  { id:'home', title:'Home', icon:'🏠', words:[['bed','🛏️'],['key','🔑'],['bath','🛁'],['door','🚪'],['sofa','🛋️'],['clock','🕐'],['chair','🪑'],['show-er','🚿'],['win-dow','🪟'],['mir-ror','🪞']] },
+  { id:'kitchen', title:'Kitchen', icon:'🍳', words:[['cup','☕'],['pot','🍲'],['pan','🍳'],['fork','🍴'],['spoon','🥄'],['plate','🍽️'],['bot-tle','🍼']] },
+  // Друзі й свята
+  { id:'friends', title:'Friends', icon:'🤗', words:[['hug','🤗'],['love','❤️'],['wave','👋'],['hap-py','😄'],['smile','😊'],['laugh','😂'],['friend','🧑‍🤝‍🧑'],['let-ter','✉️'],['se-cret','🤫']] },
+  { id:'feelings', title:'Feelings', icon:'😄', words:[['sad','😢'],['shy','😳'],['sick','🤒'],['cool','😎'],['an-gry','😠'],['tired','😴'],['bored','😒'],['fun-ny','🤣'],['hun-gry','🤤'],['scared','😨']] },
+  { id:'party', title:'Party', icon:'🥳', words:[['cake','🎂'],['gift','🎁'],['par-ty','🥳'],['can-dy','🍬'],['piz-za','🍕'],['mu-sic','🎶'],['dance','💃'],['can-dle','🕯️'],['pop-corn','🍿'],['bal-loon','🎈']] },
+  { id:'toys', title:'Toys', icon:'🧸', words:[['ball','⚽'],['dice','🎲'],['kite','🪁'],['game','🎮'],['ted-dy','🧸'],['ro-bot','🤖'],['puz-zle','🧩']] },
+  // Навколо нас
+  { id:'garden', title:'Garden', icon:'🌷', words:[['ant','🐜'],['bee','🐝'],['bug','🐞'],['web','🕸️'],['rose','🌹'],['tree','🌳'],['leaf','🍃'],['snail','🐌'],['tu-lip','🌷'],['spi-der','🕷️'],['flow-er','🌸']] },
+  { id:'forest', title:'Forest', icon:'🦊', words:[['fox','🦊'],['owl','🦉'],['bat','🦇'],['nut','🌰'],['frog','🐸'],['deer','🦌'],['wolf','🐺'],['bad-ger','🦡'],['rac-coon','🦝']] },
+  { id:'travel', title:'Travel', icon:'🚆', words:[['car','🚗'],['bus','🚌'],['van','🚐'],['taxi','🚕'],['bike','🚲'],['boat','⛵'],['ship','🚢'],['train','🚆'],['plane','✈️'],['truck','🚚'],['scoot-er','🛴']] },
+  { id:'city', title:'City', icon:'🏙️', words:[['park','🏞️'],['road','🛣️'],['shop','🏪'],['bank','🏦'],['tow-er','🗼'],['bridge','🌉'],['church','⛪'],['mu-se-um','🏛️'],['sta-di-um','🏟️']] },
+  { id:'market', title:'Market', icon:'🍎', words:[['pear','🍐'],['ap-ple','🍎'],['lem-on','🍋'],['grape','🍇'],['mel-on','🍈'],['cher-ry','🍒'],['ba-na-na','🍌'],['car-rot','🥕'],['to-ma-to','🍅'],['po-ta-to','🥔']] },
+  { id:'breakfast', title:'Breakfast', icon:'🥣', words:[['tea','🍵'],['milk','🥛'],['rice','🍚'],['bread','🍞'],['juice','🧃'],['hon-ey','🍯'],['ba-con','🥓'],['but-ter','🧈'],['cheese','🧀'],['ce-re-al','🥣']] },
+  // Далекі світи
+  { id:'zoo', title:'Zoo', icon:'🦁', words:[['lion','🦁'],['bear','🐻'],['ze-bra','🦓'],['ti-ger','🐯'],['pan-da','🐼'],['ko-a-la','🐨'],['hip-po','🦛'],['mon-key','🐵'],['gi-raffe','🦒'],['pen-guin','🐧']] },
+  { id:'sea', title:'Sea', icon:'🐳', words:[['crab','🦀'],['seal','🦭'],['whale','🐳'],['shark','🦈'],['shell','🐚'],['squid','🦑'],['o-cean','🌊'],['dol-phin','🐬'],['oc-to-pus','🐙']] },
+  { id:'music', title:'Music', icon:'🎵', words:[['bell','🔔'],['drum','🥁'],['sing','🎤'],['song','🎵'],['pi-a-no','🎹'],['ra-di-o','📻'],['vi-o-lin','🎻'],['gui-tar','🎸'],['trum-pet','🎺']] },
+  { id:'sport', title:'Sport', icon:'🏅', words:[['run','🏃'],['ski','🎿'],['swim','🏊'],['goal','🥅'],['skate','⛸️'],['med-al','🏅'],['ten-nis','🎾'],['hock-ey','🏒'],['ka-ra-te','🥋']] },
+  { id:'holiday', title:'Holiday', icon:'🏖️', words:[['tent','⛺'],['fire','🔥'],['beach','🏖️'],['ho-tel','🏨'],['tick-et','🎫'],['cam-er-a','📷'],['is-land','🏝️']] },
+  { id:'space', title:'Space', icon:'🚀', words:[['star','⭐'],['moon','🌙'],['earth','🌍'],['a-li-en','👽'],['com-et','☄️'],['plan-et','🪐'],['rock-et','🚀']] },
+  { id:'magic', title:'Kingdom', icon:'👑', words:[['king','🤴'],['ring','💍'],['crown','👑'],['queen','👸'],['mag-ic','🪄'],['ghost','👻'],['witch','🧙'],['drag-on','🐉'],['cas-tle','🏰'],['u-ni-corn','🦄']] },
+  { id:'jobs', title:'Jobs', icon:'🧑‍🚒', words:[['cook','🧑‍🍳'],['nurse','🧑‍⚕️'],['pi-lot','🧑‍✈️'],['doc-tor','🩺'],['farm-er','🧑‍🌾'],['art-ist','🧑‍🎨'],['sing-er','🧑‍🎤'],['po-lice','👮'],['build-er','👷'],['fire-man','🧑‍🚒']] }
+];
+PACKS.forEach((k, pack)=>{ k.words = k.words.map(([raw, emoji])=>({ word:raw.replace(/-/g, ''), emoji, syl:raw.split('-'), pack })); });
+const ALL_WORDS = PACKS.flatMap(k=>k.words);
+const MEMO_PAIRS = 6;                                    // пар у грі «Знайди пару»
+const NEXT_PAUSE = 1800;                                 // пауза, мс: готове слово вимовляється ще раз, далі — наступне
+// Запам'ятованість слова — число від 0 до 1. Рахуємо лише раунди з літер.
+const KNOWN = .3;                                        // від цього значення слово вважається знайомим (у хмаринці й лічильнику)
+const WEAK = .34, FIRM = .67, LEARNED = 1;               // межі етапів: зі складів, із частково складів, лише літери; також рівні прозорості
+const FAST_GAIN = .34, SLOW_GAIN = .15, MISS_LOSS = .25, PAIR_GAIN = .1;
+const FAST_BASE = 2, FAST_PER_LETTER = 1.5;              // швидка відповідь, секунд: основа + на кожну літеру
+const NEURON_SVG = `<line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/><line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/><line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/><line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/><line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/><line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/><circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#E0A800" opacity="0.6"/>`;
+const NEURON_URI = 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="48" height="48">${NEURON_SVG}</svg>`);
+document.documentElement.style.setProperty('--neuron', `url("${NEURON_URI}")`);   // поля пакетів: сотні нейрончиків по одному елементу, а не по п'ятнадцять
+const neuron = () => `<svg class="nr" viewBox="0 0 24 24" aria-hidden="true">${NEURON_SVG}</svg>`;
+const $ = id => document.getElementById(id);
+const replay = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };   // перезапуск CSS-анімації
+// Емодзі сімей на Apple — сірі силуети, тому родину складаємо з окремих кольорових облич
+const picHTML = pic => pic.includes('+') ? `<span class="group">${pic.split('+').map(e=>`<span>${e}</span>`).join('')}</span>` : pic;
+const esc = s => String(s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function shuffle(a){
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+/* ================= Гравці (localStorage цього пристрою) ================= */
+const STORE_KEY = 'word-builder-v1';
+let store = { v:2, current:null, players:[] };            // players: [{ name, words:{ слово: запам'ятованість 0–1 } }]
+try{ const s = JSON.parse(localStorage.getItem(STORE_KEY)); if(s && Array.isArray(s.players)) store = s; }catch(e){}
+// Старі профілі зберігали зірки пакетів: лишаємо імена, словниковий запас починається спочатку
+store.players.forEach(p=>{ p.words = p.words || {}; delete p.packs; });
+if(store.v !== 2){                                       // раніше слово мало рівень 0–3, тепер запам'ятованість 0–1
+  store.players.forEach(p=>Object.keys(p.words).forEach(w=>{ p.words[w] = Math.min(1, p.words[w] / 3); }));
+  store.v = 2;
+}
+function saveStore(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }catch(e){} }
+const sameName = (a, b) => a.toLocaleLowerCase() === b.toLocaleLowerCase();
+const findPlayer = name => store.players.find(p=>sameName(p.name, name));
+let player = null;
+
+function enter(name){
+  player = findPlayer(name);
+  if(!player){ player = { name, words:{} }; store.players.push(player); }
+  store.current = player.name;
+  saveStore();
+  toMap();
+}
+const level = (p, w) => p?.words[w.word || w] || 0;
+const isKnown = (p, w) => level(p, w) >= KNOWN;
+const knownWords = p => ALL_WORDS.filter(w=>isKnown(p, w)).length;
+function addMemory(w, delta){
+  player.words[w] = Math.min(LEARNED, Math.max(0, level(player, w) + delta));
+  saveStore();
+}
+// Поле нейрончиків пакета: 1 слово — 1 нейрончик у випадковому місці, прозорість показує запам'ятованість.
+// Місця залежать лише від слова, тож нейрончики не стрибають між відкриттями.
+function seeded(text){
+  let h = 2166136261;
+  for(const ch of text) h = Math.imul(h ^ ch.codePointAt(0), 16777619);
+  return () => { h = Math.imul(h ^ (h >>> 15), 2246822519) + 1 | 0; return (h >>> 0) / 4294967296; };
+}
+PACKS.forEach(k=>{
+  const rnd = seeded(k.id), spots = [];
+  k.words.forEach(w=>{
+    let best = null, bestGap = -1;
+    for(let t = 0; t < 40; t++){                               // із кількох випадкових місць беремо найдальше від сусідів
+      const r = Math.sqrt(rnd()) * .46, a = rnd() * Math.PI * 2;  // рівномірно в межах кола
+      const p = { x:.5 + r * Math.cos(a), y:.5 + r * Math.sin(a) };
+      const gap = Math.min(9, ...spots.map(q=>Math.hypot(p.x - q.x, p.y - q.y)));
+      if(gap > bestGap){ best = p; bestGap = gap; }
+    }
+    spots.push(best);
+    w.spot = best;
+  });
+});
+const neuronField = k => `<span class="nfield">${k.words.map(w=>{
+  const m = level(player, w), place = `--x:${w.spot.x.toFixed(3)}; --y:${w.spot.y.toFixed(3)}`;
+  return m > 0 ? `<i class="nr" style="${place}; opacity:${memoryOpacity(m)}"></i>` : `<i class="nr off" style="${place}"></i>`;
+}).join('')}</span>`;
+// Слово без прогресу має сірий нейрончик, далі що міцніше запам'ятоване, то непрозоріший жовтий
+const memoryOpacity = m => m >= LEARNED ? 1 : m >= FIRM ? .8 : m >= WEAK ? .55 : .35;
+const practised = () => ALL_WORDS.filter(w=>level(player, w) > 0);   // слова, які вже траплялись у пакетах
+const wordsText = n => `${n} ${n === 1 ? 'word' : 'words'}`;
+
+function openNames(){
+  $('nameClose').hidden = !player;
+  $('resetBtn').hidden = !player;
+  $('nameTitle').textContent = store.players.length ? "Who's playing?" : "What's your name?";
+  $('nameInput').value = '';
+  $('nameErr').textContent = '';
+  const list = $('players');
+  list.innerHTML = store.players.map((p, i)=>{
+    const known = knownWords(p);
+    return `<div class="pl-row">
+    <button type="button" class="pl-pick${p === player ? ' me' : ''}" data-i="${i}"><span>${esc(p.name)}</span><span>${known ? `${neuron()} ${known}` : ''}</span></button>
+    <button type="button" class="pl-del" data-del="${i}" aria-label="Delete ${esc(p.name)}" title="Delete player">✕</button>
+  </div>`;
+  }).join('');
+  list.querySelectorAll('[data-i]').forEach(b=>b.addEventListener('click', ()=>enter(store.players[+b.dataset.i].name)));
+  list.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click', ()=>removePlayer(store.players[+b.dataset.del])));
+  $('nameOverlay').classList.add('show');
+  $('nameInput').focus();
+}
+function removePlayer(p){
+  if(!confirm(`Delete ${p.name} and all words?`)) return;
+  store.players = store.players.filter(x=>x !== p);
+  if(p === player){ player = null; store.current = null; renderPlayer(); }
+  saveStore();
+  openNames();
+}
+$('nameForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const n = $('nameInput').value.trim().replace(/\s+/g, ' ');
+  if(n.length < 2){ $('nameErr').textContent = 'Type your name (2 letters or more).'; $('nameInput').focus(); return; }
+  enter(n);   // таке ім'я вже є — просто продовжуємо його прогрес
+});
+$('nameClose').addEventListener('click', ()=>$('nameOverlay').classList.remove('show'));
+$('resetBtn').addEventListener('click', ()=>{
+  if(!player || !confirm(`Reset all words for ${player.name}?`)) return;
+  player.words = {};
+  saveStore();
+  toMap();
+});
+$('playerBtn').addEventListener('click', openNames);
+function renderPlayer(){ $('playerName').textContent = player ? player.name : 'Player'; }
+
+/* ================= Голос: системний синтезатор ================= */
+const GOOD_VOICES = ['Google UK English Female','Google UK English Male','Serena','Kate','Daniel','Samantha','Google US English'];
+let enVoice = null;
+function pickVoice(){
+  const en = speechSynthesis.getVoices().filter(v=>v.lang && v.lang.replace('_','-').startsWith('en'));
+  enVoice = GOOD_VOICES.map(n=>en.find(v=>v.name.startsWith(n))).find(Boolean)
+    || en.find(v=>v.lang.replace('_','-') === 'en-GB') || en[0] || null;
+}
+const canSpeak = 'speechSynthesis' in window;
+if(canSpeak){ pickVoice(); speechSynthesis.addEventListener?.('voiceschanged', pickVoice); }
+function say(text){
+  if(!canSpeak) return;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = enVoice?.lang || 'en-GB';
+    if(enVoice) u.voice = enVoice;
+    u.rate = 0.8;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function sayWord(){
+  say(game.round.word);
+  replay($('pic'), 'speak');
+}
+
+/* ================= Звук успіху (Web Audio, без файлів) ================= */
+let audioCtx = null;
+function chime(){
+  try{
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if(audioCtx.state === 'suspended') audioCtx.resume();
+    const t0 = audioCtx.currentTime;
+    [1046.5, 1318.5, 1568].forEach((freq, i)=>{
+      const t = t0 + i * 0.09;
+      const osc = audioCtx.createOscillator(), gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.14, t + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.45);
+      osc.connect(gain).connect(audioCtx.destination);
+      osc.start(t);
+      osc.stop(t + 0.5);
+    });
+  }catch(e){}
+}
+
+/* ================= Екран пакетів ================= */
+function toMap(){
+  game = null;
+  if(canSpeak) speechSynthesis.cancel();
+  $('play').hidden = true; $('map').hidden = false;
+  $('labsLink').hidden = false; $('packsBtn').hidden = true; $('known').hidden = true;
+  $('gameTitle').textContent = 'My Words';
+  $('winOverlay').classList.remove('show');
+  $('nameOverlay').classList.remove('show');
+  renderPlayer();
+  $('hello').textContent = player ? `Hi, ${player.name}!` : 'My Words';
+  $('packs').innerHTML = PACKS.map((k, i)=>`<button type="button" class="pack" data-i="${i}">
+      <span class="p-emoji">${picHTML(k.icon)}</span>
+      <span class="p-title">${k.title}</span>
+      <span class="p-words">${k.words.slice(0, 2).map(w=>w.word).join(' · ')}</span>
+      ${neuronField(k)}
+    </button>`).join('');
+  $('packs').querySelectorAll('.pack').forEach(b=>b.addEventListener('click', ()=>startPack(+b.dataset.i)));
+  $('reviewBtn').hidden = !player || practised().length < MEMO_PAIRS;
+  renderCloud();
+}
+$('packsBtn').addEventListener('click', toMap);
+$('reviewBtn').addEventListener('click', startReview);
+
+/* ================= Хмаринка знайомих слів: куля, яку можна крутити =================
+   Розмір слова — запам'ятованість, колір — тема. Натиск на слово вимовляє його й показує картинку. */
+const CLOUD_COLORS = ['#6C5CE7','#0E7C7A','#D2502F','#2D7FB8','#D13C7F','#A87208','#2F8F46'];
+const IDLE_SPIN = matchMedia('(prefers-reduced-motion:reduce)').matches ? 0 : .0006;   // радіан за кадр: повний оберт приблизно за 3 хвилини
+const cloud = { items:[], raf:0, seen:false, skip:false, vx:0, vy:IDLE_SPIN, drag:null, links:[], W:0, H:0, rx:0, ry:0, cy:0, tip:null, fitKey:'' };
+const depthScale = z => .6 + .65 * (z + 1) / 2;           // ближчі слова більші; fitCloud і drawCloud мають рахувати однаково
+const NET_SIZE = 16, NET_SIZE_SMALL = 13, NET_ROOM = NET_SIZE * 2.5;   // нейрончик під словом і місце для нього в контурі
+
+function renderCloud(){
+  stopCloud();
+  const sphere = $('sphere');
+  sphere.querySelectorAll('.cw, .cw-pic').forEach(el=>el.remove());
+  cloud.tip = null;
+  const words = player ? ALL_WORDS.filter(w=>isKnown(player, w)).map(w=>({ ...w, m:level(player, w) })) : [];
+  cloud.items = [];
+  $('cloudBox').hidden = !words.length;
+  if(!words.length) return;
+  const n = words.length, turn = Math.PI * (3 - Math.sqrt(5));
+  const fit = n > 120 ? .78 : n > 60 ? .88 : 1;                // чим більше слів, тим менший шрифт
+  sphere.style.height = Math.min(sphere.clientWidth < 640 ? 640 : 630, Math.max(360, 305 + n * 2.7)) + 'px';
+  cloud.items = shuffle(words).map((w, i)=>{                   // рівномірно по кулі: спіраль Фібоначчі
+    const y = 1 - 2 * (i + .5) / n, r = Math.sqrt(1 - y * y), a = turn * i;
+    const el = document.createElement('button');
+    el.type = 'button';
+    el.className = 'cw';
+    el.textContent = w.word;
+    el.style.fontSize = (15 + w.m * 12) * fit + 'px';
+    el.style.color = CLOUD_COLORS[w.pack % CLOUD_COLORS.length];
+    const item = { el, w, x:Math.cos(a) * r, y, z:Math.sin(a) * r };
+    el.addEventListener('click', e=>{ if(e.detail === 0) showCloudWord(item); });   // клавіатура; мишу й дотик веде куля
+    el.cloudItem = item;
+    sphere.appendChild(el);
+    return item;
+  });
+  fitCloud();
+  buildNet();
+  cloud.vx = 0; cloud.vy = IDLE_SPIN;
+  drawCloud();
+  startSpin();
+}
+// Найбільший еліпс слів, що повністю вміщається в контур намальованої хмаринки, з урахуванням розміру найбільшого слова.
+function fitCloud(){
+  const sphere = $('sphere'), W = sphere.clientWidth, H = sphere.clientHeight;
+  const wordW = Math.max(...cloud.items.map(p=>p.el.offsetWidth)), wordH = Math.max(...cloud.items.map(p=>p.el.offsetHeight));
+  const key = [W, H, wordW, wordH].join();
+  if(cloud.fitKey === key) return;
+  cloud.fitKey = key;
+  const svg = [...sphere.querySelectorAll('.sky')].find(el=>el.getBoundingClientRect().width > 0);
+  const box = sphere.getBoundingClientRect(), r = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal;
+  const shapes = [...svg.querySelectorAll('path, circle, ellipse')], point = svg.createSVGPoint();
+  const inside = (x, y) => {                                   // x, y — від центру блока, у пікселях
+    point.x = vb.x + (x + W / 2 + box.left - r.left) / r.width * vb.width;
+    point.y = vb.y + (y + H / 2 + box.top - r.top) / r.height * vb.height;
+    return shapes.some(sh=>sh.isPointInFill(point));
+  };
+  const rings = [[1, 0], [.95, .31], [.87, .5], [.71, .71], [.5, .87]];   // [частка радіуса, глибина z]: на краю слова дрібніші, спереду більші
+  const fits = (rx, ry, cy) => rings.every(([k, z])=>{
+    const scale = depthScale(z), hw = wordW * scale / 2 + 6, hh = (wordH + NET_ROOM) * scale / 2 + 6;
+    for(let a = 0; a < 36; a++){
+      const x = Math.cos(a * Math.PI / 18) * rx * k, y = Math.sin(a * Math.PI / 18) * ry * k + cy;
+      if(!inside(x - hw, y - hh) || !inside(x + hw, y - hh) || !inside(x - hw, y + hh) || !inside(x + hw, y + hh)) return false;
+    }
+    return true;
+  });
+  let best = { area:0 };
+  for(const stretch of [.8, 1, 1.25, 1.55])                     // пропорції еліпса: ширший чи вищий за блок
+    for(const shift of [0, .03, .06, .09, .12]){                // низ хмаринки ширший за верх: центр еліпса зсуваємо вниз
+      const cy = shift * H, bw = W / 2 * Math.sqrt(stretch), bh = H / 2 / Math.sqrt(stretch);
+      const beat = Math.sqrt(best.area / (bw * bh));            // менший за це варіант уже не кращий: не шукаємо його точний розмір
+      if(beat >= 1 || (best.area && !fits(bw * beat, bh * beat, cy))) continue;
+      let lo = 0, hi = 1;
+      for(let i = 0; i < 7; i++){
+        const k = (lo + hi) / 2;
+        if(fits(bw * k, bh * k, cy)) lo = k; else hi = k;
+      }
+      const area = bw * bh * lo * lo;
+      if(area > best.area) best = { area, rx:bw * lo, ry:bh * lo, cy };
+    }
+  cloud.rx = (best.rx || W * .2) * .94; cloud.ry = (best.ry || H * .2) * .94; cloud.cy = best.cy || 0;   // невеликий запас від контуру
+}
+/* Під кожним словом малий нейрончик, між нейрончиками випадкові зв'язки. Запам'ятованість слова видно з яскравості нейрончика й чіткості зв'язків.
+   Малюємо на canvas: при сотнях слів це значно легше за окремі елементи сторінки. */
+const NET_LINKS_MAX = 140;
+const netSprite = new Image();
+netSprite.src = NEURON_URI;
+netSprite.onload = () => { if(cloud.items.length) drawCloud(); };
+function sizeNet(){
+  const sphere = $('sphere'), net = $('net'), dpr = Math.min(window.devicePixelRatio || 1, 2);
+  cloud.W = sphere.clientWidth; cloud.H = sphere.clientHeight;
+  net.width = cloud.W * dpr; net.height = cloud.H * dpr;
+  net.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+function buildNet(){
+  sizeNet();
+  const items = cloud.items, n = items.length;
+  items.forEach(p=>{ p.eh = p.el.offsetHeight; });
+  cloud.links = n < 2 ? [] : Array.from({ length:Math.min(n + 2, NET_LINKS_MAX) }, ()=>{
+    const a = Math.floor(Math.random() * n), b = (a + 1 + Math.floor(Math.random() * (n - 1))) % n;
+    return [items[a], items[b]];
+  });
+}
+function drawNet(){
+  const ctx = $('net').getContext('2d'), size = cloud.W > 640 ? NET_SIZE : NET_SIZE_SMALL;
+  ctx.clearRect(0, 0, cloud.W, cloud.H);
+  cloud.items.forEach(p=>{
+    p.nx = cloud.W / 2 + p.sx;
+    p.ny = cloud.H / 2 + p.sy + (p.eh / 2 + size * .5 + 1) * p.scale;
+  });
+  ctx.strokeStyle = '#E0A400';
+  cloud.links.forEach(([a, b])=>{                                // зв'язок чіткий, лише якщо обидва слова запам'ятовані міцно
+    const m = Math.min(a.w.m, b.w.m);
+    ctx.globalAlpha = Math.min(a.alpha, b.alpha) * (.06 + .74 * m * m);
+    ctx.lineWidth = .7 + 1.1 * m;
+    ctx.beginPath(); ctx.moveTo(a.nx, a.ny); ctx.lineTo(b.nx, b.ny); ctx.stroke();
+  });
+  if(!netSprite.complete) return;
+  cloud.items.forEach(p=>{
+    const w = size * p.scale * (.8 + .5 * p.w.m);                // що міцніше слово, то яскравіший і більший нейрончик
+    ctx.globalAlpha = p.alpha * (.22 + .78 * p.w.m);
+    ctx.drawImage(netSprite, p.nx - w / 2, p.ny - w / 2, w, w);
+  });
+}
+function stopCloud(){ cancelAnimationFrame(cloud.raf); cloud.raf = 0; }
+function startSpin(){ if(cloud.seen && !cloud.raf && cloud.items.length) cloud.raf = requestAnimationFrame(spinCloud); }
+// Хмаринка внизу сторінки: поки її не видно, нічого не малюємо
+new IntersectionObserver(([e])=>{ cloud.seen = e.isIntersecting; cloud.seen ? startSpin() : stopCloud(); }).observe($('cloudBox'));
+function rotateCloud(ax, ay){
+  const cx = Math.cos(ax), sx = Math.sin(ax), cy = Math.cos(ay), sy = Math.sin(ay);
+  cloud.items.forEach(p=>{
+    const x = p.x * cy + p.z * sy, z1 = p.z * cy - p.x * sy;
+    const y = p.y * cx - z1 * sx, z = p.y * sx + z1 * cx;
+    p.x = x; p.y = y; p.z = z;
+  });
+}
+function drawCloud(){
+  cloud.items.forEach(p=>{
+    const near = (p.z + 1) / 2;                                 // 0 — зворотний бік кулі, 1 — найближче до дитини
+    p.scale = depthScale(p.z);
+    p.alpha = .14 + .86 * near * near;
+    p.layer = Math.round(near * 400);
+    p.sx = p.x * cloud.rx; p.sy = p.y * cloud.ry + cloud.cy;
+    p.el.style.transform = `translate(-50%, -50%) translate(${p.sx.toFixed(1)}px, ${p.sy.toFixed(1)}px) scale(${p.scale.toFixed(3)})`;
+    p.el.style.opacity = p.alpha.toFixed(3);
+    p.el.style.zIndex = p.layer;
+    p.el.style.pointerEvents = near > .4 ? 'auto' : 'none';
+  });
+  drawNet();
+  const tip = cloud.tip;
+  if(tip){                                                      // картинка на тій самій глибині, що й слово: рухається, меншає й тьмяніє разом із ним
+    const p = tip.item, x = p.sx, y = p.sy, gap = 16 * p.scale;
+    const below = y - tip.height * p.scale - gap < -cloud.ry - 20;
+    tip.el.style.transformOrigin = below ? '50% 0' : '50% 100%';
+    tip.el.style.transform = `translate(-50%, ${below ? 0 : '-100%'}) translate(${x.toFixed(1)}px, ${(below ? y + gap : y - gap).toFixed(1)}px) scale(${p.scale.toFixed(3)})`;
+    tip.el.style.opacity = p.alpha.toFixed(3);
+    tip.el.style.zIndex = p.layer;
+  }
+}
+function spinCloud(){
+  cloud.raf = requestAnimationFrame(spinCloud);
+  if(cloud.drag) return;
+  cloud.vx *= .95;
+  cloud.vy += (IDLE_SPIN - cloud.vy) * .04;                     // інерція згасає до повільного обертання
+  const idle = !cloud.tip && Math.abs(cloud.vx) < 1e-4 && Math.abs(cloud.vy - IDLE_SPIN) < 1e-4;
+  if(idle && !IDLE_SPIN){ stopCloud(); return; }
+  if(idle && (cloud.skip = !cloud.skip)) return;                // повільне обертання малюємо через кадр: рух менший за піксель
+  const k = idle ? 2 : 1;
+  rotateCloud(cloud.vx * k, cloud.vy * k);
+  drawCloud();
+}
+function hideCloudTip(){
+  const tip = cloud.tip;
+  if(!tip) return;
+  clearTimeout(tip.timer);
+  cloud.tip = null;
+  tip.el.classList.remove('show');
+  setTimeout(()=>tip.el.remove(), 300);
+}
+function showCloudWord(item){
+  say(item.w.word);
+  hideCloudTip();
+  const el = document.createElement('div');
+  el.className = 'cw-pic';
+  el.innerHTML = `<span class="card">${picHTML(item.w.emoji)}</span>`;
+  $('sphere').appendChild(el);
+  cloud.tip = { item, el, height:el.offsetHeight, timer:setTimeout(hideCloudTip, 2600) };
+  drawCloud();
+  void el.offsetWidth;
+  el.classList.add('show');
+  startSpin();
+}
+(function bindCloud(){
+  const sphere = $('sphere');
+  sphere.addEventListener('pointerdown', e=>{
+    if(e.button > 0) return;
+    cloud.drag = { x:e.clientX, y:e.clientY, sx:e.clientX, sy:e.clientY, id:e.pointerId, moved:false };
+    sphere.setPointerCapture(e.pointerId);
+    startSpin();
+  });
+  sphere.addEventListener('pointermove', e=>{
+    const d = cloud.drag;
+    if(!d || e.pointerId !== d.id) return;
+    if(Math.hypot(e.clientX - d.sx, e.clientY - d.sy) > 6){ d.moved = true; sphere.classList.add('grabbing'); }
+    if(!d.moved) return;
+    cloud.vy = (e.clientX - d.x) * .006;
+    cloud.vx = (d.y - e.clientY) * .006;                        // вниз тягнемо — передні слова йдуть униз
+    d.x = e.clientX; d.y = e.clientY;
+    rotateCloud(cloud.vx, cloud.vy);
+    drawCloud();
+  });
+  const end = e => {
+    const d = cloud.drag;
+    if(!d || e.pointerId !== d.id) return;
+    cloud.drag = null;
+    sphere.classList.remove('grabbing');
+    if(d.moved || e.type === 'pointercancel') return;
+    const hit = document.elementsFromPoint(e.clientX, e.clientY).find(el=>el.classList?.contains('cw'));
+    if(hit) showCloudWord(hit.cloudItem);
+  };
+  sphere.addEventListener('pointerup', end);
+  sphere.addEventListener('pointercancel', end);
+})();
+// Лише оновлюємо межі. На телефоні resize стається під час гортання, коли ховається адресний рядок, а розмір блока не змінюється
+window.addEventListener('resize', ()=>{
+  const sphere = $('sphere');
+  if($('cloudBox').hidden || $('map').hidden || (sphere.clientWidth === cloud.W && sphere.clientHeight === cloud.H)) return;
+  fitCloud(); sizeNet(); drawCloud();
+});
+
+/* ================= Гра ================= */
+let game = null;   // пакет: { pack, queue, asked:Set, knownBefore, round, slips, over, t0 }; повторення: { memo }
+
+// Склади вперемішку з літерами: частина складів розпадається на літери, принаймні один лишається цілим.
+// Якщо довгий склад у слові лише один ('o-cean'), проміжного етапу немає: вийшли б просто всі літери.
+function mixedParts(w){
+  const long = w.syl.map((p, i)=>p.length > 1 ? i : -1).filter(i=>i >= 0);   // за номерами: склади можуть повторюватись (ba-na-na)
+  if(long.length < 2) return null;
+  const broken = new Set(shuffle(long).slice(0, Math.ceil(long.length / 2)));
+  return w.syl.flatMap((p, i)=>broken.has(i) ? [...p] : [p]);
+}
+// Черга раундів { word, emoji, parts, letters }: parts — склади, склади з літерами або літери.
+// Беремо лише ще не вивчені слова; якщо вивчено все — повторюємо весь пакет.
+// Нове довге слово проходить усі три етапи, знайоме — два останні, міцне — лише літери.
+function buildQueue(words){
+  const open = words.filter(w=>level(player, w) < LEARNED);
+  const pool = open.length ? open : words;
+  const byLength = (a, b) => a.word.length - b.word.length;
+  const round = (w, parts) => ({ word:w.word, emoji:w.emoji, parts, letters:parts.length === w.word.length });
+  const letters = w => round(w, [...w.word]);
+  const short = shuffle(pool.filter(w=>w.syl.length < 2)).sort(byLength);
+  const long = shuffle(pool.filter(w=>w.syl.length > 1)).sort(byLength);
+  const stage1 = long.filter(w=>level(player, w) < WEAK).map(w=>round(w, w.syl));
+  const stage2 = long.filter(w=>level(player, w) < FIRM).map(w=>round(w, mixedParts(w))).filter(r=>r.parts);
+  return [...short.map(letters), ...stage1, ...stage2, ...shuffle(long).map(letters)];
+}
+
+function showPlay(title, memo){
+  stopCloud();
+  $('map').hidden = true; $('play').hidden = false;
+  $('labsLink').hidden = true; $('packsBtn').hidden = false;
+  renderKnown();
+  $('gameTitle').textContent = title;
+  $('winOverlay').classList.remove('show');
+  $('wordView').hidden = memo; $('memoView').hidden = !memo;
+}
+function startPack(i){
+  game = { pack:i, queue:buildQueue(PACKS[i].words), asked:new Set(), knownBefore:knownWords(player) };
+  showPlay(PACKS[i].title, false);
+  nextWord();
+}
+
+function nextWord(){
+  const item = game.queue.shift();
+  if(!item){ finishPack(); return; }
+  game.round = item;
+  game.slips = 0; game.over = false;
+  $('emoji').innerHTML = picHTML(item.emoji);
+  $('pic').classList.remove('won');
+
+  // Довге слово має вміститись в один рядок навіть на телефоні
+  const bySyl = !item.letters;
+  const width = bySyl ? item.parts.reduce((n, p)=>n + .3 + .38 * p.length, 0) + .1 * item.parts.length : item.parts.length;
+  const cells = Math.max(width, 5);
+  $('play').style.setProperty('--tile', `min(84px, calc((100vw - 32px - ${8 * (Math.ceil(cells) - 1)}px) / ${cells.toFixed(2)}))`);
+  const cell = (el, part) => {
+    if(!bySyl) return;
+    el.classList.add('syl');
+    el.style.setProperty('--n', part.length);
+  };
+
+  const slots = $('slots');
+  slots.classList.remove('done');
+  slots.innerHTML = '';
+  item.parts.forEach(part=>{
+    const el = document.createElement('div');
+    el.className = 'slot';
+    el.dataset.letter = part;
+    cell(el, part);
+    slots.appendChild(el);
+  });
+
+  const tray = $('tray');
+  tray.innerHTML = '';
+  let tiles, tries = 0;
+  do{ tiles = shuffle(item.parts.slice()); }
+  while(tiles.join('') === item.word && ++tries < 30);   // частини не повинні одразу стояти готовим словом
+  tiles.forEach(part=>{
+    const t = document.createElement('button');
+    t.type = 'button';
+    t.className = 'tile';
+    t.textContent = t.dataset.letter = part;
+    cell(t, part);
+    bindTile(t);
+    tray.appendChild(t);
+  });
+  sayWord();
+  game.t0 = performance.now();
+}
+const emptySlots = () => [...$('slots').querySelectorAll('.slot:not(.filled)')];
+
+function place(tile, slot){
+  if(!game || game.over || !slot || slot.classList.contains('filled')){ snapBack(tile); return; }
+  if(tile.dataset.letter !== slot.dataset.letter){ miss(tile, slot); return; }
+  slot.textContent = tile.dataset.letter;
+  slot.classList.add('filled');
+  tile.style.transform = '';
+  tile.classList.remove('dragging');
+  tile.classList.add('used');
+  tile.disabled = true;
+  if(!emptySlots().length){ finishWord(); return; }
+  $('tray').querySelector('.tile:not(.used)')?.focus({ preventScroll:true });
+}
+function miss(tile, slot){
+  game.slips++;
+  snapBack(tile);
+  [tile, slot].forEach(el=>{ replay(el, 'wrong'); setTimeout(()=>el.classList.remove('wrong'), 400); });
+}
+function snapBack(tile){
+  tile.classList.remove('dragging');
+  tile.classList.add('back');
+  tile.style.transform = '';
+  setTimeout(()=>tile.classList.remove('back'), 240);
+}
+$('pic').addEventListener('click', sayWord);
+
+function finishWord(){
+  game.over = true;
+  if(game.round.letters) remember();                     // запам'ятованість рахуємо лише за раундами з літер
+  $('slots').classList.add('done');
+  $('pic').classList.add('won');
+  chime();
+  const g = game;                                        // дитина могла вийти до списку пакетів під час паузи
+  setTimeout(()=>{ if(game === g) say(g.round.word); }, 350);
+  setTimeout(()=>{ if(game === g) nextWord(); }, NEXT_PAUSE);
+}
+
+/* Швидка відповідь без помилок додає багато. Повільна додає мало, і слово ще раз спитається пізніше.
+   З помилкою значення падає, а слово повертається двічі: скоро і наприкінці. Усе зберігається одразу, тож вийти можна будь-коли. */
+function remember(){
+  const w = game.round.word, before = knownWords(player), q = game.queue;
+  const seconds = (performance.now() - game.t0) / 1000;
+  const waiting = () => q.filter(r=>r.word === w).length;
+  let delta = FAST_GAIN;
+  if(game.slips){
+    delta = -MISS_LOSS;
+    if(!waiting()) q.splice(Math.min(2, q.length), 0, game.round);
+    if(waiting() < 2) q.push(game.round);
+  } else if(seconds > FAST_BASE + FAST_PER_LETTER * w.length){
+    delta = SLOW_GAIN;
+    if(!game.asked.has(w) && !waiting()){ game.asked.add(w); q.push(game.round); }
+  }
+  addMemory(w, delta);
+  renderKnown(knownWords(player) > before);
+}
+function renderKnown(up){
+  const el = $('known');
+  const known = knownWords(player);
+  el.innerHTML = `${neuron()}${known}`;
+  el.hidden = !known;
+  if(up) replay(el, 'up');
+}
+
+/* ================= Знайди пару: картинка + написане слово =================
+   Гра для повторення: бере слова з найнижчою запам'ятованістю, а кожна знайдена пара їх зміцнює.
+   Кожна відкрита картка вимовляє своє слово. Сюди ж можна додавати інші ігри для повторення. */
+function startReview(){
+  const pick = shuffle(practised()).sort((a, b)=>level(player, a) - level(player, b)).slice(0, MEMO_PAIRS);   // найслабше запам'ятовані
+  game = { memo:{ open:[], left:pick.length, busy:false } };
+  const cards = shuffle(pick.flatMap(({ word, emoji })=>[{ word, emoji }, { word }]));
+  const memo = $('memo');
+  memo.innerHTML = '';
+  cards.forEach(c=>{
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'm-card';
+    b.dataset.word = c.word;
+    b.setAttribute('aria-label', 'Card');
+    const face = c.emoji ? `<span class="m-emoji">${picHTML(c.emoji)}</span>` : `<span class="m-word" style="--n:${c.word.length}">${c.word}</span>`;
+    b.innerHTML = `<span class="m-inner"><span class="m-face m-cover">?</span><span class="m-face m-back">${face}</span></span>`;
+    b.addEventListener('click', ()=>flip(b));
+    memo.appendChild(b);
+  });
+  showPlay('Find the pairs', true);
+  say('Find the pairs');
+}
+function flip(card){
+  const g = game, m = g.memo;
+  if(m.busy || card.classList.contains('flipped')) return;
+  card.classList.add('flipped');
+  say(card.dataset.word);
+  m.open.push(card);
+  if(m.open.length < 2) return;
+  const [a, b] = m.open;
+  m.open = [];
+  if(a.dataset.word === b.dataset.word){
+    a.classList.add('matched'); b.classList.add('matched');
+    m.left--;
+    addMemory(a.dataset.word, PAIR_GAIN);                // знайдена пара трохи зміцнює слово
+    chime();
+    if(!m.left) setTimeout(()=>{ if(game === g) finishReview(); }, 1300);
+    return;
+  }
+  m.busy = true;
+  a.classList.add('miss'); b.classList.add('miss');
+  setTimeout(()=>{
+    a.classList.remove('miss', 'flipped'); b.classList.remove('miss', 'flipped');
+    m.busy = false;
+  }, 1100);
+}
+
+function showWin(title, field, sub, next){
+  $('winTitle').textContent = title;
+  $('winNeurons').innerHTML = field;
+  $('winSub').textContent = sub;
+  $('winNext').hidden = !next;
+  $('winOverlay').classList.add('show');
+  confetti();
+  (next ? $('winNext') : $('winAgain')).focus();
+}
+function finishPack(){
+  const i = game.pack, k = PACKS[i], gained = knownWords(player) - game.knownBefore;
+  const all = k.words.every(w=>level(player, w) >= LEARNED), known = wordsText(knownWords(player));
+  say(`I know ${known}!`);
+  showWin(all ? 'Super memory!' : 'Well done!', neuronField(k), `I know ${known}!` + (gained ? ` +${gained}` : ''), PACKS[i + 1]);
+}
+function finishReview(){
+  say('Well done!');
+  showWin('Well done!', '', `I know ${wordsText(knownWords(player))}!`, null);
+}
+$('winNext').addEventListener('click', ()=>startPack(game.pack + 1));
+$('winAgain').addEventListener('click', ()=>game.memo ? startReview() : startPack(game.pack));
+$('winPacks').addEventListener('click', toMap);
+
+function confetti(){
+  const colors = ['#6C5CE7','#16A3A0','#FF6B4A','#FFC93C','#FF5D9E','#2D9CDB'];
+  for(let i=0;i<60;i++){
+    const d = document.createElement('div');
+    d.className = 'confetti';
+    d.style.left = Math.random()*100 + 'vw';
+    d.style.background = colors[i % colors.length];
+    d.style.animationDuration = (2 + Math.random()*2) + 's';
+    d.style.animationDelay = Math.random()*0.6 + 's';
+    document.body.appendChild(d);
+    setTimeout(()=>d.remove(), 5000);
+  }
+}
+
+/* ================= Перетягування (миша й дотик) + простий дотик ================= */
+let hoverSlot = null;
+function setHover(slot){
+  if(hoverSlot === slot) return;
+  hoverSlot?.classList.remove('hover');
+  hoverSlot = slot;
+  hoverSlot?.classList.add('hover');
+}
+const slotAt = (x, y) => document.elementsFromPoint(x, y).find(el=>el.matches('.slot:not(.filled)')) || null;
+
+function bindTile(tile){
+  let drag = null;
+  tile.addEventListener('pointerdown', e=>{
+    if(game?.over || e.button > 0) return;
+    drag = { x:e.clientX, y:e.clientY, id:e.pointerId, moved:false };
+    tile.setPointerCapture(e.pointerId);
+  });
+  tile.addEventListener('pointermove', e=>{
+    if(!drag || e.pointerId !== drag.id) return;
+    const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+    if(!drag.moved && Math.hypot(dx, dy) < 8) return;
+    if(!drag.moved){ drag.moved = true; tile.classList.add('dragging'); }
+    tile.style.transform = `translate(${dx}px, ${dy}px) scale(1.06)`;
+    setHover(slotAt(e.clientX, e.clientY));
+  });
+  const end = e => {
+    if(!drag || e.pointerId !== drag.id) return;
+    // Простий дотик — у першу порожню клітинку, без цілі літера повертається
+    const target = e.type === 'pointercancel' ? null : drag.moved ? hoverSlot : emptySlots()[0];
+    drag = null;
+    setHover(null);
+    place(tile, target);
+  };
+  tile.addEventListener('pointerup', end);
+  tile.addEventListener('pointercancel', end);
+  // Клавіатура: Enter чи пробіл на літері (detail === 0 — клік не від миші)
+  tile.addEventListener('click', e=>{ if(e.detail === 0) place(tile, emptySlots()[0]); });
+}
+
+/* ================= Старт ================= */
+if(store.current && findPlayer(store.current)) enter(store.current);
+else { toMap(); openNames(); }
+</script>
+</body>
+</html>
