@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Переваги й небезпеки технологій. Діагностика — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --accent:#3F51B5; --accent-dark:#2C3A8C; --accent-soft:#E9ECFA;
+    --bg:#F5F6FC; --line:#DFE3F4; --ink:#1A1F3D; --ink-soft:#4E5475;
+    --note:#0F9D8A; --note-soft:#E2F6F2; --note-ink:#0A5F54;
+    --hud-bar:linear-gradient(90deg,#3F51B5,#7C5CD6,#F0566A);
+    --good:#0F9D8A; --good-soft:#E2F6F2; --bad:#E5484D; --bad-soft:#FDE8E9;
+  }
+
+  /* ---------- КРОК 1: ВАГИ ---------- */
+  .scale-svg{display:block; width:100%; max-width:520px; margin:0 auto;}
+  .scale-beam{transform-box:view-box; transform-origin:230px 48px; transition:transform .7s cubic-bezier(.3,1.5,.5,1);}
+  .scale-pan{transition:transform .7s cubic-bezier(.3,1.5,.5,1);}
+  .coin{animation:coinIn .35s ease;}
+  @keyframes coinIn{from{opacity:0; transform:translateY(-22px);}}
+  .sc-card{text-align:center; background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px; margin:14px 0 12px; min-height:112px; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+  .sc-card.shake{animation:shakeX .35s ease;}
+  .sc-card .who{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; color:var(--accent-dark); background:var(--accent-soft); border-radius:999px; padding:1px 10px; margin-bottom:6px;}
+  .sc-card .txt{font-weight:700; font-size:16px; line-height:1.4;}
+  .sc-btns{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .sc-btn{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; color:#fff; border:none; border-radius:var(--radius-s); padding:11px 8px; cursor:pointer; transition:filter .15s ease, transform .1s ease;}
+  .sc-btn:hover{filter:brightness(.93);}
+  .sc-btn:active{transform:scale(.97);}
+  .sc-btn.good{background:var(--good);}
+  .sc-btn.bad{background:var(--bad);}
+  .sc-q{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px;}
+  .sc-q div{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-s); padding:8px 6px; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:var(--accent-dark);}
+  @media (max-width:480px){ .sc-q{grid-template-columns:1fr;} }
+
+  /* ---------- КРОК 2: ТРИ ЗАГРОЗИ ---------- */
+  .threats{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:16px 0 4px;}
+  .threat{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px 14px; text-align:center;}
+  .threat svg{display:block; width:100%; max-width:170px; height:auto; margin:0 auto 8px;}
+  .threat b{display:block; font-family:'Baloo 2',sans-serif; font-size:16.5px; line-height:1.2; color:var(--ink);}
+  .threat span{display:block; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; color:var(--bad); margin-bottom:4px;}
+  .threat p{font-size:14px; line-height:1.4; margin:0; color:var(--ink-soft);}
+  @media (max-width:620px){ .threats{grid-template-columns:1fr;} .threat svg{max-width:150px;} }
+
+  /* ---------- КРОК 3: СТРІЧКА ---------- */
+  .feedlab{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:26px; align-items:center;}
+  @media (max-width:640px){ .feedlab{grid-template-columns:1fr;} }
+  .bubble{position:relative; padding:34px 26px;}
+  .bubble::before,.bubble::after{content:''; position:absolute; inset:0; border-radius:50%/46%; pointer-events:none; opacity:var(--b,0); transition:opacity .6s ease;}
+  .bubble::before{background:radial-gradient(closest-side, rgba(124,92,214,.05) 55%, rgba(124,92,214,.2) 84%, rgba(240,86,106,.34) 100%); box-shadow:inset 0 0 0 2px rgba(124,92,214,.45), 0 0 26px rgba(124,92,214,.22);}
+  .bubble::after{background:radial-gradient(26% 18% at 24% 15%, rgba(255,255,255,.95), transparent 72%), radial-gradient(11% 7% at 79% 87%, rgba(255,255,255,.85), transparent 72%);}
+  .bubble-tag{position:absolute; z-index:3; left:50%; bottom:6px; transform:translate(-50%,8px); white-space:nowrap; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:#fff; background:linear-gradient(90deg,#7C5CD6,#F0566A); border-radius:999px; padding:2px 13px; opacity:0; transition:opacity .5s ease, transform .5s ease;}
+  .bubble.closed .bubble-tag{opacity:1; transform:translate(-50%,0);}
+  .phone{position:relative; z-index:1; width:100%; max-width:256px; margin:0 auto; background:#14182F; border-radius:28px; padding:8px;}
+  .phone-in{background:#fff; border-radius:22px; overflow:hidden;}
+  .phone-top{display:flex; align-items:center; gap:6px; padding:9px 12px 7px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; border-bottom:1px solid #EEF0F7;}
+  .phone-top i{width:20px; height:14px; border-radius:4px; background:#F0566A; position:relative; display:inline-block;}
+  .phone-top i::after{content:''; position:absolute; left:8px; top:4px; border-left:6px solid #fff; border-top:3px solid transparent; border-bottom:3px solid transparent;}
+  .vid{display:grid; grid-template-columns:78px 1fr; gap:9px; width:100%; align-items:center; border:none; background:none; padding:7px 10px; cursor:pointer; text-align:left; font-family:'Nunito Sans',sans-serif; color:var(--ink); transition:background .15s ease;}
+  .vid:hover:not(:disabled){background:var(--accent-soft);}
+  .vid:disabled{cursor:default;}
+  .vid.in{animation:wuIn .3s ease;}
+  .vid .th{height:48px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:23px;}
+  .vid .tt{font-size:12.5px; font-weight:700; line-height:1.25;}
+  .vid .ch{display:block; font-size:10.5px; font-weight:600; color:var(--ink-soft); margin-top:1px;}
+  .lab-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; margin-bottom:8px;}
+  .bar-row{display:grid; grid-template-columns:26px 1fr; align-items:center; gap:7px; margin-bottom:7px; transition:opacity .4s ease;}
+  .bar-row .e{font-size:18px; line-height:1;}
+  .bar-row .n{font-size:12.5px; font-weight:700; display:flex; justify-content:space-between; color:var(--ink-soft);}
+  .bar-row .t{height:8px; background:var(--bg); border-radius:99px; overflow:hidden;}
+  .bar-row .f{height:100%; border-radius:99px; transition:width .5s ease;}
+  .bar-row.off{opacity:.38;}
+  .feed-count{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--accent-dark); margin-top:10px; min-height:1.4em;}
+  .feed-end{display:none; margin-top:16px;}
+  .feed-end.show{display:block; animation:wuIn .3s ease;}
+
+  /* ---------- КРОК 4: ЗАЛІЗО І ПРОГРАМИ ---------- */
+  .hwsw{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0;}
+  .hwsw>div{border-radius:var(--radius-m); padding:14px; background:var(--surface); border:1.5px solid var(--line);}
+  .hwsw svg{display:block; width:100%; max-width:230px; height:auto; margin:0 auto 8px;}
+  .hwsw b{display:block; font-family:'Baloo 2',sans-serif; font-size:17px; line-height:1.2; text-align:center;}
+  .hwsw p{font-size:14px; line-height:1.4; color:var(--ink-soft); text-align:center; margin:4px 0 0;}
+  @media (max-width:480px){ .hwsw{grid-template-columns:1fr;} }
+  .rule{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:14px 0 4px;}
+  .rule div{border-radius:var(--radius-s); padding:9px 12px; font-size:14.5px; line-height:1.4; font-weight:700;}
+  .rule div small{display:block; font-family:'Baloo 2',sans-serif; font-size:12.5px; font-weight:600; opacity:.85;}
+  .rule .a{background:#FFF1DE; color:#8A4E0F;}
+  .rule .b{background:var(--accent-soft); color:var(--accent-dark);}
+  @media (max-width:480px){ .rule{grid-template-columns:1fr;} }
+
+  /* ---------- КРОК 5: ЗАСОБИ Й КАБІНЕТ ---------- */
+  .route{display:flex; flex-wrap:wrap; gap:6px 4px; align-items:center; margin:14px 0 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14.5px;}
+  .route span{background:var(--accent-soft); color:var(--accent-dark); border-radius:999px; padding:3px 13px;}
+  .route i{font-style:normal; color:var(--ink-soft);}
+  .tools{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0;}
+  @media (max-width:560px){ .tools{grid-template-columns:1fr;} }
+  .tool-card{display:grid; grid-template-columns:48px 1fr; gap:12px; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px;}
+  .tool-card svg{width:48px; height:48px;}
+  .tool-card b{display:block; font-family:'Baloo 2',sans-serif; font-size:16px; line-height:1.2;}
+  .tool-card p{font-size:13.5px; line-height:1.4; margin:3px 0 4px;}
+  .tool-card small{display:block; font-size:12.5px; line-height:1.35; color:var(--ink-soft);}
+  .tool-card kbd{font-family:inherit; font-weight:700; background:var(--bg); border:1px solid var(--line); border-bottom-width:2px; border-radius:5px; padding:0 4px; white-space:nowrap;}
+
+  .clinic-head{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px;}
+  .clinic-head b{font-family:'Baloo 2',sans-serif; font-size:16px; color:var(--accent-dark);}
+  .patient{display:grid; grid-template-columns:48px 1fr; gap:10px; align-items:start; margin-bottom:14px;}
+  .patient .ava{width:48px; height:48px; border-radius:50%; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; font-size:26px;}
+  .patient .say{background:var(--bg); border-radius:4px 16px 16px 16px; padding:8px 12px; font-size:14.5px; line-height:1.45;}
+  .patient .say b{display:block; font-family:'Baloo 2',sans-serif; font-size:14px; color:var(--accent-dark);}
+  .desktop{border-radius:12px; overflow:hidden; background:linear-gradient(150deg,#1C4E9E 0%,#3F7BD6 52%,#8AB8EE 100%);}
+  .screen{padding:14px; min-height:286px; display:flex; align-items:center; justify-content:center;}
+  .hint-screen{color:#fff; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; line-height:1.35;}
+  .taskbar{display:grid; grid-template-columns:repeat(4,1fr); gap:4px; padding:6px; background:rgba(238,242,250,.94);}
+  @media (max-width:520px){ .taskbar{grid-template-columns:1fr 1fr;} .screen{padding:8px;} }
+  .tb{display:flex; align-items:center; justify-content:center; gap:6px; border:1.5px solid transparent; background:none; border-radius:7px; padding:5px 4px; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12.5px; line-height:1.15; color:#1F2747; cursor:pointer; transition:background .15s ease;}
+  .tb svg{width:24px; height:24px; flex-shrink:0;}
+  .tb:hover{background:#fff;}
+  .tb.on{background:#fff; border-color:var(--accent);}
+  .tb.miss{background:#FDE8E9; border-color:var(--bad);}
+
+  /* вікна Windows: шрифт системний, щоб виглядало як справжнє */
+  .win{width:100%; background:#fff; border-radius:8px; overflow:hidden; box-shadow:0 8px 24px rgba(10,25,70,.35); font-family:'Segoe UI',system-ui,-apple-system,sans-serif; color:#1b1b1b; font-size:12.5px; line-height:1.3; animation:winIn .22s ease;}
+  @keyframes winIn{from{opacity:0; transform:translateY(8px) scale(.98);}}
+  .win-title{display:flex; align-items:center; gap:7px; padding:6px 10px; background:#F3F3F3; font-size:12px;}
+  .win-title svg{width:15px; height:15px;}
+  .win-ctl{margin-left:auto; color:#555; letter-spacing:9px; font-size:11px;}
+  .win-tools{display:flex; align-items:center; justify-content:space-between; gap:8px; padding:6px 10px; border-bottom:1px solid #E5E5E5;}
+  .win-tools .path{color:#555;}
+  .w-act{font:inherit; font-weight:600; padding:4px 10px; border:1px solid #C9C9C9; border-radius:5px; background:#FBFBFB; color:#1b1b1b; cursor:pointer; white-space:nowrap;}
+  .w-act:not(:disabled){background:#0067C0; border-color:#0067C0; color:#fff;}
+  .w-act:not(:disabled):hover{background:#0058A6;}
+  .w-act:disabled{color:#A0A0A0; cursor:default;}
+  .tm-head,.tm-row{display:grid; grid-template-columns:1fr 62px 72px; align-items:center;}
+  .tm-head{border-bottom:1px solid #E5E5E5; color:#444;}
+  .tm-head>*{padding:4px 8px;}
+  .tm-head b{display:block; font-size:14px; font-weight:600; color:#1b1b1b;}
+  .tm-head .num{text-align:right;}
+  .tm-row{width:100%; border:none; background:#fff; font:inherit; text-align:left; padding:0; cursor:default; color:inherit; border-bottom:1px solid #F4F4F4;}
+  .tm-row>span{padding:5px 8px;}
+  .tm-row .num{text-align:right;}
+  button.tm-row{cursor:pointer;}
+  button.tm-row:hover>span:first-child{background:#EEF4FB;}
+  .tm-row.sel{outline:1.5px solid #0067C0; outline-offset:-1.5px;}
+  .tm-row.shake{animation:shakeX .35s ease;}
+  .h1{background:#FFF8DC;} .h2{background:#FFEFB5;} .h3{background:#FFC58A;} .h4{background:#F4896B; color:#fff; font-weight:600;}
+
+  .dm{padding:6px 8px;}
+  .dm-root{display:flex; gap:6px; align-items:center; padding:2px 0;}
+  .dm-cat{padding:2px 0 2px 16px; color:#333;}
+  .dm-cat::before{content:'▸'; color:#777; margin-right:6px;}
+  .dm-cat.open::before{content:'▾';}
+  .dm-row{display:flex; align-items:center; gap:6px; width:calc(100% - 38px); margin-left:38px; font:inherit; border:none; background:none; color:inherit; text-align:left; padding:3px 6px; border-radius:3px; cursor:pointer;}
+  button.dm-row:hover{background:#EEF4FB;}
+  div.dm-row{cursor:default;}
+  .dm-row.sel{background:#CCE4F7;}
+  .dm-row.shake{animation:shakeX .35s ease;}
+  .warn{width:15px; height:14px; flex-shrink:0;}
+
+  .pc{padding:10px 12px;}
+  .disk{display:grid; grid-template-columns:34px 1fr; gap:8px; align-items:center; margin-bottom:10px;}
+  .disk svg{width:34px; height:34px;}
+  .disk-bar{height:13px; background:#E6E6E6; border:1px solid #BCBCBC; margin:2px 0;}
+  .disk-bar i{display:block; height:100%; background:#26A0DA; transition:width .7s ease;}
+  .disk-bar.full i{background:#DA2626;}
+  .disk small{color:#555; font-size:12px;}
+  .fold{display:flex; justify-content:space-between; gap:10px; width:100%; border:none; background:none; font:inherit; color:inherit; padding:5px 7px; border-radius:3px; text-align:left; cursor:pointer; border-bottom:1px solid #F1F1F1;}
+  .fold span:last-child{color:#555; white-space:nowrap;}
+  .fold:hover{background:#EEF4FB;}
+  .fold.sel{background:#CCE4F7;}
+  .fold.shake{animation:shakeX .35s ease;}
+  .fold.static{cursor:default; background:none;}
+
+  .speed{padding:12px; text-align:center;}
+  .speed svg{display:block; width:190px; max-width:100%; margin:0 auto;}
+  .speed-arc{transition:stroke-dashoffset 1s cubic-bezier(.3,.8,.4,1);}
+  .speed .val{font-size:27px; font-weight:600; line-height:1; margin-top:-26px;}
+  .speed .val small{font-size:12px; font-weight:400; color:#666;}
+  .speed-opts{display:flex; flex-direction:column; gap:6px; margin-top:12px;}
+  .speed-opts button{font:inherit; font-weight:600; padding:6px 10px; border:1px solid #C9C9C9; border-radius:5px; background:#FBFBFB; cursor:pointer; color:#1b1b1b;}
+  .speed-opts button:hover{background:#EDEDED;}
+  .speed-opts button.wrong{background:#FDE8E9; border-color:var(--bad);}
+
+  .clinic-msg{min-height:1.5em; margin-top:12px; font-size:14.5px; line-height:1.45; color:var(--ink-soft);}
+  .clinic-msg.ok{background:var(--ok-soft); color:#21603A; border-radius:var(--radius-s); padding:10px 13px;}
+  .clinic-next{margin-top:10px;}
+  .clinic-end{text-align:center; padding:10px 6px; color:#fff;}
+  .clinic-end svg{width:92px; height:92px;}
+  .clinic-end b{display:block; font-family:'Baloo 2',sans-serif; font-size:21px; line-height:1.2;}
+  .clinic-end p{color:#fff; font-size:14.5px; margin:4px 0 0;}
+</style>
+</head>
+<body data-lesson="lesson7m-tech-diagnostics" data-hud="7 клас · Технології й діагностика">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Цифрова безпека · Урок 9</div>
+      <h1>Технології: друзі, вороги й пацієнти</h1>
+      <p>Кожна технологія має дві сторони. Зважимо переваги й небезпеки, зазирнемо всередину стрічки рекомендацій, а потім станемо цифровими лікарями й з'ясуємо, що болить у пристрою.</p>
+      <button class="btn-primary" onclick="document.getElementById('step1').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: ноутбук-пацієнт зі стетоскопом і кардіограмою на екрані -->
+    <svg class="mascot" viewBox="0 0 160 160" fill="none" aria-hidden="true">
+      <circle cx="80" cy="82" r="66" fill="#E9ECFA"/>
+      <rect x="32" y="40" width="96" height="66" rx="9" fill="#2C3A8C"/>
+      <rect x="39" y="47" width="82" height="52" rx="4" fill="#fff"/>
+      <path d="M44 74 H62 L68 60 L76 88 L83 66 L88 74 H116" stroke="#F0566A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M22 108 H138 L130 118 Q129 120 126 120 H34 Q31 120 30 118 Z" fill="#3F51B5"/>
+      <rect x="68" y="108" width="24" height="4" rx="2" fill="#8D9AE0"/>
+      <path d="M112 30 V52 Q112 66 126 66 Q140 66 140 80 V100" stroke="#0F9D8A" stroke-width="4.5" stroke-linecap="round"/>
+      <circle cx="112" cy="27" r="5" fill="#0F9D8A"/>
+      <circle cx="140" cy="108" r="11" fill="#0F9D8A"/><circle cx="140" cy="108" r="5.5" fill="#E2F6F2"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="step1">
+    <div class="step-label">Крок 1 · Дві сторони технологій</div>
+    <h2>Поклади на ваги</h2>
+    <p>Цифрові технології допомагають людині й суспільству, але водночас створюють нові ризики. Постав кожну ситуацію на потрібну шальку.</p>
+    <div class="exercise" id="scale">
+      <svg class="scale-svg" viewBox="0 0 460 212" aria-hidden="true">
+        <path d="M230 44 V192" stroke="#2C3A8C" stroke-width="9" stroke-linecap="round"/>
+        <path d="M178 202 Q230 176 282 202 Z" fill="#2C3A8C"/>
+        <g class="scale-beam" id="scBeam">
+          <rect x="102" y="43" width="256" height="10" rx="5" fill="#3F51B5"/>
+        </g>
+        <circle cx="230" cy="48" r="11" fill="#FFC93C" stroke="#2C3A8C" stroke-width="3"/>
+        <g class="scale-pan" id="panGood">
+          <path d="M112 48 L52 142 M112 48 L172 142" stroke="#8C95BC" stroke-width="2"/>
+          <path d="M38 142 H186 Q178 164 148 164 H76 Q46 164 38 142 Z" fill="#0F9D8A"/>
+          <text x="112" y="158" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="700" font-size="13" fill="#fff">Переваги</text>
+          <g id="coinsGood"></g>
+        </g>
+        <g class="scale-pan" id="panBad">
+          <path d="M348 48 L288 142 M348 48 L408 142" stroke="#8C95BC" stroke-width="2"/>
+          <path d="M274 142 H422 Q414 164 384 164 H312 Q282 164 274 142 Z" fill="#E5484D"/>
+          <text x="348" y="158" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="700" font-size="13" fill="#fff">Небезпеки</text>
+          <g id="coinsBad"></g>
+        </g>
+      </svg>
+      <div id="scPlay">
+        <div class="sc-card" id="scCard"></div>
+        <div class="sc-btns">
+          <button class="sc-btn good" id="scGood">Перевага</button>
+          <button class="sc-btn bad" id="scBad">Небезпека</button>
+        </div>
+      </div>
+      <div class="progress-line" id="scProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Загрози для даних</div>
+    <h2>Три способи нашкодити даним</h2>
+    <p>Дані в безпеці, коли їх бачать лише ті, кому можна, вони правильні й доступні тоді, коли потрібні. Кожній із цих трьох умов відповідає своя загроза.</p>
+    <div class="threats">
+      <div class="threat">
+        <svg viewBox="0 0 170 104" aria-hidden="true">
+          <rect x="30" y="34" width="110" height="66" rx="8" fill="#E9ECFA" stroke="#3F51B5" stroke-width="3"/>
+          <path d="M30 42 L85 76 L140 42" stroke="#3F51B5" stroke-width="3" fill="none" stroke-linejoin="round"/>
+          <path d="M48 26 Q85 -6 122 26 Q85 58 48 26 Z" fill="#fff" stroke="#E5484D" stroke-width="3.5"/>
+          <circle cx="85" cy="26" r="11" fill="#E5484D"/><circle cx="85" cy="26" r="4.5" fill="#1A1F3D"/><circle cx="89" cy="22" r="2.5" fill="#fff"/>
+        </svg>
+        <b>Конфіденційність</b>
+        <span>загроза — витік</span>
+        <p>Дані дізнався той, хто не мав права їх бачити.</p>
+      </div>
+      <div class="threat">
+        <svg viewBox="0 0 170 104" aria-hidden="true">
+          <rect x="30" y="6" width="110" height="92" rx="7" fill="#fff" stroke="#3F51B5" stroke-width="3"/>
+          <rect x="30" y="6" width="110" height="20" rx="7" fill="#E9ECFA"/>
+          <rect x="42" y="13" width="56" height="6" rx="3" fill="#3F51B5"/>
+          <rect x="42" y="38" width="44" height="6" rx="3" fill="#C8CDE6"/>
+          <rect x="42" y="60" width="44" height="6" rx="3" fill="#C8CDE6"/>
+          <rect x="42" y="82" width="44" height="6" rx="3" fill="#C8CDE6"/>
+          <text x="112" y="46" font-family="Baloo 2,sans-serif" font-weight="700" font-size="16" fill="#1A1F3D" text-anchor="middle">9</text>
+          <text x="112" y="90" font-family="Baloo 2,sans-serif" font-weight="700" font-size="16" fill="#1A1F3D" text-anchor="middle">10</text>
+          <text x="104" y="69" font-family="Baloo 2,sans-serif" font-weight="700" font-size="16" fill="#8C95BC" text-anchor="middle">4</text>
+          <path d="M97 64 L111 58" stroke="#E5484D" stroke-width="3" stroke-linecap="round"/>
+          <text x="125" y="70" font-family="Baloo 2,sans-serif" font-weight="800" font-size="19" fill="#E5484D" text-anchor="middle">12</text>
+        </svg>
+        <b>Цілісність</b>
+        <span>загроза — підміна</span>
+        <p>Дані змінили без дозволу або зіпсували через збій.</p>
+      </div>
+      <div class="threat">
+        <svg viewBox="0 0 170 104" aria-hidden="true">
+          <rect x="22" y="8" width="126" height="90" rx="8" fill="#fff" stroke="#3F51B5" stroke-width="3"/>
+          <path d="M22 28 H148" stroke="#3F51B5" stroke-width="3"/>
+          <circle cx="34" cy="18" r="3.5" fill="#E5484D"/><circle cx="45" cy="18" r="3.5" fill="#FFC93C"/><circle cx="56" cy="18" r="3.5" fill="#0F9D8A"/>
+          <rect x="66" y="52" width="38" height="30" rx="6" fill="#E5484D"/>
+          <path d="M74 52 V44 a11 11 0 0 1 22 0 V52" stroke="#E5484D" stroke-width="5" fill="none"/>
+          <circle cx="85" cy="65" r="4" fill="#fff"/><rect x="83" y="66" width="4" height="9" rx="2" fill="#fff"/>
+        </svg>
+        <b>Доступність</b>
+        <span>загроза — блокування</span>
+        <p>Дані чи сервіс є, але дістатися до них неможливо.</p>
+      </div>
+    </div>
+    <p class="soft" style="margin-top:16px;">Яку умову порушено в кожній історії?</p>
+    <div id="threatList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Алгоритми рекомендацій</div>
+    <h2>Хто обирає, що ти бачиш?</h2>
+    <p><b>Алгоритм рекомендацій</b> — це штучний інтелект, який вирішує, кому який вміст показати. Він навчається на тому, що ти дивишся, вподобуєш і коментуєш.</p>
+    <p class="soft">Подивись, як це працює: обери шість відео, які тобі цікаві, і стеж за стрічкою.</p>
+    <div class="exercise" id="feedLab">
+      <div class="feedlab">
+        <div class="bubble" id="bubble">
+          <div class="phone"><div class="phone-in">
+            <div class="phone-top"><i></i> Рекомендації</div>
+            <div id="feed"></div>
+          </div></div>
+          <span class="bubble-tag">Бульбашка фільтрів</span>
+        </div>
+        <div>
+          <div class="lab-title">Що алгоритм думає про тебе</div>
+          <div id="bars"></div>
+          <div class="feed-count" id="feedCount"></div>
+        </div>
+      </div>
+      <div class="feed-end note" id="feedEnd"></div>
+    </div>
+    <div id="feedList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Що «захворіло»</div>
+    <h2>Залізо чи програма?</h2>
+    <p>Пристрої теж хворіють. Спершу треба зрозуміти, де джерело проблеми, адже від цього залежить, як її лікувати.</p>
+    <div class="hwsw">
+      <div>
+        <svg viewBox="0 0 230 120" aria-hidden="true">
+          <rect x="52" y="8" width="126" height="78" rx="7" fill="#2C3A8C"/>
+          <rect x="59" y="15" width="112" height="64" fill="#CFD6F4"/>
+          <path d="M118 15 L104 40 L122 50 L110 79" stroke="#fff" stroke-width="2.5" fill="none"/>
+          <path d="M34 90 H196 L186 106 H44 Z" fill="#3F51B5"/>
+          <g fill="#C8CDE6"><rect x="58" y="93" width="9" height="4"/><rect x="71" y="93" width="9" height="4"/><rect x="84" y="93" width="9" height="4"/><rect x="97" y="93" width="9" height="4"/><rect x="110" y="93" width="9" height="4"/><rect x="123" y="93" width="9" height="4"/><rect x="136" y="93" width="9" height="4"/><rect x="149" y="93" width="9" height="4"/><rect x="162" y="93" width="9" height="4"/><rect x="88" y="100" width="54" height="3.5"/></g>
+          <circle cx="24" cy="46" r="17" fill="#FFF1DE" stroke="#E37400" stroke-width="3"/>
+          <path d="M24 46 Q24 32 32 34 Q30 42 24 46 Q38 46 36 54 Q28 52 24 46 Q24 60 16 58 Q18 50 24 46 Q10 46 12 38 Q20 40 24 46 Z" fill="#E37400"/>
+          <rect x="192" y="34" width="32" height="20" rx="4" fill="#FFF1DE" stroke="#E37400" stroke-width="3"/>
+          <rect x="224" y="40" width="4" height="8" rx="1" fill="#E37400"/>
+          <rect x="197" y="39" width="7" height="10" rx="1.5" fill="#E37400"/>
+        </svg>
+        <b>Апаратна проблема</b>
+        <p>Несправна фізична частина: екран, клавіша, батарея, вентилятор. Її можна торкнутися.</p>
+      </div>
+      <div>
+        <svg viewBox="0 0 230 120" aria-hidden="true">
+          <rect x="34" y="8" width="118" height="82" rx="7" fill="#fff" stroke="#3F51B5" stroke-width="3"/>
+          <path d="M34 26 H152" stroke="#3F51B5" stroke-width="3"/>
+          <rect x="82" y="30" width="118" height="82" rx="7" fill="#E9ECFA" stroke="#3F51B5" stroke-width="3"/>
+          <path d="M82 48 H200" stroke="#3F51B5" stroke-width="3"/>
+          <circle cx="188" cy="39" r="4" fill="#E5484D"/>
+          <circle cx="141" cy="74" r="14" fill="#E5484D"/>
+          <path d="M135 68 L147 80 M147 68 L135 80" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>
+          <text x="141" y="104" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="700" font-size="11" fill="#2C3A8C">не відповідає</text>
+        </svg>
+        <b>Програмна проблема</b>
+        <p>Збій у застосунку, операційній системі чи драйвері. Торкнутися її не можна.</p>
+      </div>
+    </div>
+    <div class="rule">
+      <div class="a"><small>Збій усюди, у кожній програмі</small>Зазвичай це залізо</div>
+      <div class="b"><small>Збій лише в одній програмі</small>Зазвичай це програма</div>
+    </div>
+    <div class="exercise">
+      <p class="soft" style="margin-top:0;">Клацни картку, а потім кошик.</p>
+      <div class="sort-buckets">
+        <div class="bucket" id="bkHw"><div class="bucket-title">Апаратна</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkSw"><div class="bucket-title">Програмна</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="hwPool"></div>
+      <div class="progress-line" id="hwProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Засоби діагностики</div>
+    <h2>Кабінет цифрового лікаря</h2>
+    <p>Лікар не вгадує хворобу, а робить аналізи. Так само й із пристроєм: перед лікуванням його обстежують.</p>
+    <div class="route"><span>Опиши симптом</span><i>→</i><span>Перезапусти</span><i>→</i><span>Запусти діагностику</span><i>→</i><span>Виправ</span><i>→</i><span>Перевір</span></div>
+    <div class="tools">
+      <div class="tool-card"><span data-ico="tm"></span><div><b>Диспетчер завдань</b><p>Показує, які програми навантажують процесор і пам'ять.</p><small><kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Esc</kbd></small></div></div>
+      <div class="tool-card"><span data-ico="dm"></span><div><b>Диспетчер пристроїв</b><p>Показує всі пристрої. Жовтий трикутник означає проблему з драйвером або пристроєм.</p><small>Правий клік на «Пуск»</small></div></div>
+      <div class="tool-card"><span data-ico="pc"></span><div><b>Цей ПК</b><p>Показує вільне місце на дисках. Червона смужка: місце закінчується.</p><small>Провідник → Цей ПК</small></div></div>
+      <div class="tool-card"><span data-ico="sp"></span><div><b>Тест швидкості</b><p>Вимірює, наскільки швидкий інтернет у цю мить.</p><small>Сайт, наприклад Speedtest</small></div></div>
+    </div>
+    <div class="exercise" id="clinic">
+      <div class="clinic-head"><b id="clinicNum"></b><div class="wu-dots" id="clinicDots"></div></div>
+      <div class="patient" id="patient"></div>
+      <div class="desktop">
+        <div class="screen" id="screen"></div>
+        <div class="taskbar" id="taskbar"></div>
+      </div>
+      <div class="clinic-msg" id="clinicMsg"></div>
+    </div>
+    <div class="note"><b>Браузер не відкриває сайт?</b> Якщо бачиш код <code>ERR_NAME_NOT_RESOLVED</code>, адресу не вдалося знайти. Спершу перевір, чи немає в ній хибної літери.</div>
+    <div class="trivia"><b>Безпека лікаря.</b> Не розбирай пристрій сам і не став «чудо-прискорювачі» з випадкових сайтів: під корисні програми часто маскуються шкідливі. Якщо не впевнений, поклич дорослого або майстра.</div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Переваги і небезпеки цифрових технологій. Засоби діагностики апаратних і програмних проблем» · 7 клас</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- КРОК 1: ВАГИ ---------- */
+(function(){
+  const CARDS = [
+    { e:'🩻', who:'Для суспільства', text:'Лікар за секунду отримує знімок із лікарні в іншому місті', side:'good' },
+    { e:'🎧', who:'Для людини', text:'Незряча людина слухає книжку, яку смартфон читає вголос', side:'good' },
+    { e:'📲', who:'Для суспільства', text:'Застосунок миттєво попереджає всю область про повітряну тривогу', side:'good' },
+    { e:'🌍', who:'Для людини', text:'Учень із маленького селища проходить безкоштовний курс від університету', side:'good' },
+    { e:'🛌', who:'Для людини', text:'Після семи годин у телефоні болить шия, а заснути ніяк не вдається', side:'bad' },
+    { e:'📰', who:'Для суспільства', text:'За годину мільйони людей поширюють вигадану новину', side:'bad' },
+    { e:'📷', who:'Для суспільства', text:'Компанія за камерами з розпізнаванням обличчя знає, куди ти ходиш', side:'bad' },
+    { e:'💳', who:'Для людини', text:'Шахрай вкрав дані картки й оплатив ними чужі покупки', side:'bad' }
+  ];
+  const deck = shuffle(CARDS);
+  const root = document.getElementById('scale');
+  const card = document.getElementById('scCard');
+  const progress = document.getElementById('scProgress');
+  const hit = trackTask(root, CARDS.length, CARDS.length + 2);
+  const count = { good:0, bad:0 };
+  const COIN_X = [-48, -16, 16, 48];
+  let i = 0;
+
+  function show(){
+    const c = deck[i];
+    card.innerHTML = `<span class="who">${c.who}</span><span class="txt">${c.text}</span>`;
+    progress.textContent = `Зважено: ${i} з ${deck.length}`;
+  }
+  function tilt(){
+    const deg = Math.max(-11, Math.min(11, (count.bad - count.good) * 5.5));
+    const dy = 118 * Math.sin(deg * Math.PI / 180);
+    document.getElementById('scBeam').style.transform = `rotate(${deg}deg)`;
+    document.getElementById('panGood').style.transform = `translateY(${-dy}px)`;
+    document.getElementById('panBad').style.transform = `translateY(${dy}px)`;
+  }
+  function addCoin(side, emoji){
+    const cx = (side === 'good' ? 112 : 348) + COIN_X[count[side] - 1];
+    const fill = side === 'good' ? '#E2F6F2' : '#FDE8E9';
+    const stroke = side === 'good' ? '#0F9D8A' : '#E5484D';
+    const box = document.getElementById(side === 'good' ? 'coinsGood' : 'coinsBad');
+    box.insertAdjacentHTML('beforeend', `<g class="coin"><circle cx="${cx}" cy="126" r="15" fill="${fill}" stroke="${stroke}" stroke-width="2.5"/><text x="${cx}" y="132" text-anchor="middle" font-size="16">${emoji}</text></g>`);
+  }
+  function answer(side){
+    if(i >= deck.length) return;
+    const c = deck[i];
+    if(c.side !== side){
+      card.classList.add('shake');
+      setTimeout(()=>card.classList.remove('shake'), 350);
+      return;
+    }
+    count[side]++;
+    addCoin(side, c.e);
+    tilt();
+    addNeurons(1); hit();
+    if(++i < deck.length){ show(); return; }
+    addNeurons(2);
+    progress.textContent = 'Усе зважено ✓';
+    document.getElementById('scPlay').innerHTML = `
+      <div class="note" style="margin-bottom:0;"><b>Ваги вирівнялись!</b> Технологія сама по собі не добра й не зла. Те, корисна вона чи ризикована, залежить від трьох запитань:
+        <div class="sc-q"><div>Хто використовує?</div><div>Навіщо?</div><div>Як це впливає на приватність?</div></div>
+      </div>`;
+  }
+  document.getElementById('scGood').addEventListener('click', ()=>answer('good'));
+  document.getElementById('scBad').addEventListener('click', ()=>answer('bad'));
+  show();
+})();
+
+/* ---------- КРОК 2: ТРИ ЗАГРОЗИ ---------- */
+makeClassify('threatList', [
+  { text:'Список домашніх адрес учнів випадково опинився у відкритому чаті.', correct:0, why:'Адреси побачили люди, яким їх бачити не можна.' },
+  { text:'Зловмисник зайшов в електронний журнал і виправив собі оцінки.', correct:1, why:'Дані перестали бути правильними.' },
+  { text:'Перед олімпіадою сайт завалили мільйонами запитів, і ніхто не може на нього потрапити.', correct:2, why:'Сайт існує, але дістатися до нього неможливо.' },
+  { text:'Через збій диска у файлі з твором половина тексту перетворилась на незрозумілі знаки.', correct:1, why:'Зміст файлу зіпсовано, хоч ніхто цього й не хотів.' }
+], ['Конфіденційність', 'Цілісність', 'Доступність']);
+
+/* ---------- КРОК 3: СТРІЧКА ---------- */
+(function(){
+  const TOPICS = [
+    { id:'games', e:'🎮', name:'Ігри', c:'#7C5CD6', bg:'#ECE7FB', ch:'PixelBro', v:['Найскладніший рівень гри','Топ-5 ігор цієї осені','Де сховано секретну зброю?','Пройшов гру за 10 хвилин','Новий сезон: що змінилось','Чому всі грають у це?'] },
+    { id:'pets', e:'🐱', name:'Тварини', c:'#E8913A', bg:'#FDEFDD', ch:'Хвостики', v:['Кіт вперше бачить сніг','Собака вчиться кататися','Найкумедніші кошенята','Папуга повторює будильник','Їжак у рукавичці','Лабрадор проти пилососа'] },
+    { id:'ball', e:'⚽', name:'Футбол', c:'#2E9E5B', bg:'#E0F4E8', ch:'Гол ТВ', v:['Топ-10 голів тижня','Як бити штрафні','Найкращі сейви сезону','Фінт, який вивчить кожен','Огляд матчу за 5 хвилин','Тренування форварда'] },
+    { id:'sci', e:'🔬', name:'Наука', c:'#1E88C7', bg:'#DFF0FA', ch:'Чому так?', v:['Що всередині блискавки?','Вулкан у пляшці','Чому небо блакитне?','Як працює магніт','Подорож на дно океану','Скільки важить хмара?'] },
+    { id:'music', e:'🎸', name:'Музика', c:'#D6457E', bg:'#FBE4EE', ch:'Акорд', v:['Гітара за 5 хвилин','Пісня, яку всі наспівують','Як написати свій біт','Концерт просто на даху','Барабани для новачків','Хіт, зіграний на ложках'] },
+    { id:'food', e:'🍰', name:'Кулінарія', c:'#B5832E', bg:'#F6EDDA', ch:'Смаколик', v:['Торт за 15 хвилин','Млинці, що вдаються завжди','Піца на сковороді','Морозиво з двох продуктів','Шоколадне печиво','Сніданок за 3 хвилини'] }
+  ];
+  const GOAL = 6, SLOTS = 4;
+  const root = document.getElementById('feedLab');
+  const feed = document.getElementById('feed');
+  const hit = trackTask(root, GOAL, 0);
+  const score = Object.fromEntries(TOPICS.map(t=>[t.id, 1]));
+  const seen = Object.fromEntries(TOPICS.map(t=>[t.id, 0]));
+  let clicks = 0, shown = [];
+
+  const topic = id=>TOPICS.find(t=>t.id === id);
+  const nextVideo = t=>t.v[seen[t.id]++ % t.v.length];
+
+  function pickFeed(){
+    const liked = TOPICS.filter(t=>score[t.id] > 1).sort((a, b)=>score[b.id] - score[a.id]).slice(0, 2);
+    const personal = Math.min(SLOTS, Math.round(clicks * .8));
+    const out = [];
+    for(let i = 0; i < personal; i++){
+      // улюблена тема отримує більшість місць
+      out.push(liked.length > 1 && i % 3 === 2 ? liked[1] : liked[0]);
+    }
+    const rest = shuffle(TOPICS.filter(t=>!liked.includes(t)));
+    while(out.length < SLOTS) out.push(rest.pop() || liked[0]);
+    return shuffle(out);
+  }
+  function drawBars(){
+    const total = Object.values(score).reduce((a, b)=>a + b, 0);
+    const box = document.getElementById('bars');
+    if(!box.children.length){
+      TOPICS.forEach(t=>box.insertAdjacentHTML('beforeend', `<div class="bar-row" data-t="${t.id}"><span class="e">${t.e}</span><div><div class="n"><span>${t.name}</span><span class="p"></span></div><div class="t"><div class="f" style="background:${t.c}"></div></div></div></div>`));
+    }
+    TOPICS.forEach(t=>{
+      const row = box.querySelector(`[data-t="${t.id}"]`), p = Math.round(score[t.id] / total * 100);
+      row.querySelector('.p').textContent = p + '%';
+      row.querySelector('.f').style.width = p + '%';
+      row.classList.toggle('off', !shown.includes(t.id));
+    });
+  }
+  function draw(){
+    const list = pickFeed();
+    shown = [...new Set(list.map(t=>t.id))];
+    feed.innerHTML = '';
+    list.forEach(t=>{
+      const b = document.createElement('button');
+      b.className = 'vid in';
+      b.innerHTML = `<span class="th" style="background:${t.bg}">${t.e}</span><span class="tt">${nextVideo(t)}<span class="ch">${t.ch}</span></span>`;
+      b.addEventListener('click', ()=>watch(t));
+      feed.appendChild(b);
+    });
+    drawBars();
+    document.getElementById('bubble').style.setProperty('--b', clicks / GOAL);
+    document.getElementById('feedCount').textContent = clicks < GOAL ? `Переглянуто: ${clicks} з ${GOAL} · тем у стрічці: ${shown.length}` : `Тем у стрічці: було 4, стало ${shown.length}`;
+  }
+  function watch(t){
+    if(clicks >= GOAL) return;
+    clicks++;
+    score[t.id] += 3;
+    hit();
+    draw();
+    if(clicks === GOAL){
+      feed.querySelectorAll('.vid').forEach(v=>v.disabled = true);
+      const end = document.getElementById('feedEnd');
+      end.innerHTML = '<b>Це бульбашка фільтрів.</b> Стрічка все більше схожа на саму себе, а решта тем зникає з очей. Ти ніби живеш у кулі, де є лише те, що тобі вже відомо.';
+      end.classList.add('show');
+      document.getElementById('bubble').classList.add('closed');
+    }
+  }
+  draw();
+})();
+
+makeChoices('feedList', [
+  { text:'Навіщо соцмережі показувати саме те, що тобі подобається?', opts:['Щоб ти швидше знайшов потрібне й закрив застосунок', 'Щоб ти залишався довше й бачив більше реклами', 'Щоб заощадити твій інтернет'], correct:1, why:'Чим довше ти в застосунку, тим більше реклами побачиш і тим більше заробить платформа.' },
+  { text:'Як вибратися з бульбашки фільтрів?', opts:['Дивитись ще більше схожих відео', 'Частіше оновлювати сторінку', 'Самому шукати нові теми й різні думки'], correct:2, why:'Алгоритм вчиться на твоїх діях, тож нові запити змінюють і стрічку.' }
+]);
+
+/* ---------- КРОК 4: ЗАЛІЗО ЧИ ПРОГРАМА ---------- */
+makeSortBoard('hwPool', { hw:'bkHw', sw:'bkSw' }, [
+  { text:'Літера «Е» не друкується в жодній програмі', bucket:'hw' },
+  { text:'На екрані тріщина й темна смуга', bucket:'hw' },
+  { text:'Навушники грають лише в одне вухо на будь-якому телефоні', bucket:'hw' },
+  { text:'Ноутбук не вмикається навіть під зарядкою', bucket:'hw' },
+  { text:'Гра вилітає, а решта застосунків працює добре', bucket:'sw' },
+  { text:'Після оновлення один застосунок перестав запускатися', bucket:'sw' },
+  { text:'Фото не відкривається в одному редакторі, а в іншому відкривається', bucket:'sw' },
+  { text:'Після «безкоштовної» програми в браузері скрізь вискакує реклама', bucket:'sw' }
+], 'hwProgress');
+
+/* ---------- КРОК 5: КАБІНЕТ ЛІКАРЯ ---------- */
+(function(){
+  const ICONS = {
+    tm:'<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="5" y="8" width="38" height="32" rx="4" fill="#E9ECFA" stroke="#3F51B5" stroke-width="3"/><path d="M10 26 H17 L21 16 L27 33 L31 24 H38" stroke="#F0566A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    dm:'<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="10" y="10" width="26" height="26" rx="4" fill="#E9ECFA" stroke="#3F51B5" stroke-width="3"/><path d="M17 10 V4 M29 10 V4 M17 42 V36 M29 42 V36 M10 17 H4 M10 29 H4 M42 17 H36 M42 29 H36" stroke="#3F51B5" stroke-width="3" stroke-linecap="round"/><path d="M33 26 L46 46 H20 Z" fill="#FFC93C" stroke="#1A1F3D" stroke-width="2" stroke-linejoin="round"/><path d="M33 33 V39" stroke="#1A1F3D" stroke-width="2.5" stroke-linecap="round"/><circle cx="33" cy="42.5" r="1.4" fill="#1A1F3D"/></svg>',
+    pc:'<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><rect x="5" y="9" width="38" height="25" rx="3" fill="#E9ECFA" stroke="#3F51B5" stroke-width="3"/><path d="M17 41 H31 M24 34 V41" stroke="#3F51B5" stroke-width="3" stroke-linecap="round"/><rect x="11" y="18" width="26" height="7" fill="#fff" stroke="#3F51B5" stroke-width="1.5"/><rect x="11" y="18" width="22" height="7" fill="#E5484D"/></svg>',
+    sp:'<svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><path d="M7 36 A19 19 0 1 1 41 36" stroke="#3F51B5" stroke-width="5" stroke-linecap="round"/><path d="M24 30 L34 16" stroke="#F0566A" stroke-width="3.5" stroke-linecap="round"/><circle cx="24" cy="30" r="4.5" fill="#2C3A8C"/></svg>'
+  };
+  document.querySelectorAll('[data-ico]').forEach(el=>el.innerHTML = ICONS[el.dataset.ico]);
+
+  const NAMES = { tm:'Диспетчер завдань', dm:'Диспетчер пристроїв', pc:'Цей ПК', sp:'Тест швидкості' };
+  const WARN = '<svg class="warn" viewBox="0 0 16 15" aria-hidden="true"><path d="M8 1 L15 14 H1 Z" fill="#FFC93C" stroke="#1b1b1b" stroke-width="1"/><path d="M8 5 V10" stroke="#1b1b1b" stroke-width="1.6"/><circle cx="8" cy="12" r=".9" fill="#1b1b1b"/></svg>';
+  const DISK = '<svg viewBox="0 0 34 34" fill="none" aria-hidden="true"><rect x="3" y="10" width="28" height="15" rx="2" fill="#E6E6E6" stroke="#8A8A8A" stroke-width="1.5"/><path d="M3 20 H31" stroke="#8A8A8A"/><circle cx="26" cy="22.5" r="1" fill="#2E9E5B"/></svg>';
+
+  const CASES = [
+    { ava:'👧', name:'Оксана', tool:'tm', say:'Ноутбук страшенно гальмує: кожне вікно відкривається цілу хвилину! Учора я встановила програму з безкоштовними скінами для гри.',
+      ask:'Знайди програму, яка забирає найбільше ресурсів, і заверши її.',
+      done:'Програма зі скінами таємно забирала весь процесор. Завдання завершено, але її варто ще й видалити та перевірити комп\'ютер антивірусом.' },
+    { ava:'👦', name:'Марко', tool:'dm', say:'Я під\'єднав нову вебкамеру, щоб бути на онлайн-уроці, а програма каже, що камери немає.',
+      ask:'Знайди пристрій із жовтим трикутником і онови його драйвер.',
+      done:'Система не мала потрібного драйвера. Драйвер — це програма, яка вчить комп\'ютер працювати з пристроєм.' },
+    { ava:'👩‍🦰', name:'Настя', tool:'pc', say:'Хочу завантажити підручник, а комп\'ютер пише, що місця немає. Хоча я нічого великого не зберігала!',
+      ask:'Диск майже повний. Обери те, що можна безпечно очистити.',
+      done:'У Кошику лежало 52 ГБ старих файлів: видалені файли займають місце, поки Кошик не очищено. Системну теку Windows чіпати не можна!' },
+    { ava:'🧑', name:'Денис', tool:'sp', say:'Комп\'ютер працює швидко, програми відкриваються миттю. Але відео на уроці зависає, а сайти ледве вантажаться.',
+      ask:'Швидкість майже нульова. Що спробувати спершу?',
+      done:'Комп\'ютер був здоровий, а проблема ховалась у мережі. Перезапуск роутера часто лікує її за кілька хвилин.' }
+  ];
+
+  const root = document.getElementById('clinic');
+  const screen = document.getElementById('screen');
+  const msg = document.getElementById('clinicMsg');
+  const taskbar = document.getElementById('taskbar');
+  const hit = trackTask(root, CASES.length, CASES.length * 2 + 2);
+  let idx = 0, found = false, solved = false, cur = null, token = 0;
+
+  const win = (t, tools, body)=>`<div class="win"><div class="win-title">${ICONS[t]}${NAMES[t]}<span class="win-ctl">─ ▢ ✕</span></div>${tools}${body}</div>`;
+  const heat = v=>v >= 60 ? 'h4' : v >= 25 ? 'h3' : v >= 8 ? 'h2' : 'h1';
+
+  /* Диспетчер завдань */
+  function tmView(active, cured){
+    const rows = [['Google Chrome', 4, 412], ['Провідник', 1, 74], ['Microsoft Word', 1, 118], ['Служба Windows', 0, 46]];
+    if(active && !cured) rows.unshift(['Free Skins Helper', 94, 1980]);
+    const cpu = active && !cured ? 99 : 8, ram = active && !cured ? 91 : 38;
+    const body = `<div class="tm-head"><span>Ім'я</span><span class="num"><b>${cpu}%</b>ЦП</span><span class="num"><b>${ram}%</b>Пам'ять</span></div>`
+      + rows.map(([n, c, m], i)=>`<${active && !cured ? 'button' : 'div'} class="tm-row" data-pick="${i}"><span>${n}</span><span class="num ${heat(c)}">${c}%</span><span class="num ${heat(m / 25)}">${m} МБ</span></${active && !cured ? 'button' : 'div'}>`).join('');
+    const tools = `<div class="win-tools"><span class="path">Процеси</span>${active && !cured ? '<button class="w-act" id="wAct" disabled>Завершити завдання</button>' : ''}</div>`;
+    return { html:win('tm', tools, body), right:0, wrong:'Ця програма майже не навантажує систему. Подивись на стовпчики ЦП і Пам\'ять.' };
+  }
+  /* Диспетчер пристроїв */
+  function dmView(active, cured){
+    const broken = active && !cured;
+    const devs = [['Аудіовиходи', ['Динаміки Realtek']], ['Вебкамери', [active ? 'USB-камера HD' : 'Вбудована камера']], ['Клавіатури', ['Стандартна клавіатура']], ['Миша', ['USB-миша']]];
+    let n = 0;
+    const body = '<div class="dm"><div class="dm-root">💻 НОУТБУК</div>' + devs.map(([cat, list])=>`<div class="dm-cat open">${cat}</div>` + list.map(d=>{
+      const isCam = active && d.startsWith('USB-камера');
+      const inner = (isCam && broken ? WARN : '') + d;
+      const tag = broken ? 'button' : 'div';
+      return `<${tag} class="dm-row" data-pick="${isCam ? 'x' : n++}">${inner}</${tag}>`;
+    }).join('')).join('') + '</div>';
+    const tools = `<div class="win-tools"><span class="path">Дія · Вигляд</span>${broken ? '<button class="w-act" id="wAct" disabled>Оновити драйвер</button>' : ''}</div>`;
+    return { html:win('dm', tools, body), right:'x', wrong:'Цей пристрій працює добре: біля нього немає значка-попередження.' };
+  }
+  /* Цей ПК */
+  function pcView(active, cured){
+    const broken = active && !cured;
+    const free = broken ? 1.2 : active ? 53.2 : 61, total = 119;
+    const pct = Math.round((1 - free / total) * 100);
+    const label = `${String(free).replace('.', ',')} ГБ вільно з ${total} ГБ`;
+    const folders = [['Програми', '24 ГБ'], ['Кошик', '52 ГБ'], ['Windows (системна тека)', '31 ГБ'], ['Документи (шкільні роботи)', '9 ГБ']];
+    const list = broken ? folders.map(([n, s], i)=>`<button class="fold" data-pick="${i}"><span>${n}</span><span>${s}</span></button>`).join('') : '';
+    const body = `<div class="pc"><div class="disk">${DISK}<div>Windows (C:)<div class="disk-bar${broken ? ' full' : ''}"><i style="width:${pct}%"></i></div><small>${label}</small></div></div>${list}</div>`;
+    const tools = `<div class="win-tools"><span class="path">Цей ПК › Windows (C:)</span>${broken ? '<button class="w-act" id="wAct" disabled>Очистити</button>' : ''}</div>`;
+    return { html:win('pc', tools, body), right:'1', wrong:'Ці файли потрібні системі чи тобі. Пошукай те, що вже видалене.' };
+  }
+  /* Тест швидкості */
+  function spView(value, opts){
+    const body = `<div class="speed"><svg viewBox="0 0 190 104" aria-hidden="true"><path d="M15 96 A80 80 0 0 1 175 96" fill="none" stroke="#E6E6E6" stroke-width="13" stroke-linecap="round"/><path class="speed-arc" id="spArc" d="M15 96 A80 80 0 0 1 175 96" fill="none" stroke="${value < 5 ? '#E5484D' : '#2E9E5B'}" stroke-width="13" stroke-linecap="round" stroke-dasharray="252" stroke-dashoffset="252"/></svg>
+      <div class="val"><span id="spVal">…</span> <small>Мбіт/с</small></div>${opts || ''}</div>`;
+    return win('sp', '<div class="win-tools"><span class="path">Завантаження</span></div>', body);
+  }
+  function runSpeed(value){
+    const my = ++token;
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      const arc = document.getElementById('spArc');
+      if(arc) arc.style.strokeDashoffset = 252 - 252 * Math.min(1, Math.sqrt(value / 100));
+    }));
+    setTimeout(()=>{ const v = document.getElementById('spVal'); if(v && my === token) v.textContent = String(value).replace('.', ','); }, 700);
+  }
+
+  function solve(cureTool){
+    if(solved) return;
+    solved = true;
+    addNeurons(1); hit();
+    const c = CASES[idx];
+    if(cureTool === 'sp'){ screen.innerHTML = spView(48); runSpeed(48); }
+    else screen.innerHTML = VIEW[cureTool](true, true).html;
+    msg.className = 'clinic-msg ok';
+    const last = idx === CASES.length - 1;
+    msg.innerHTML = `<b>Вилікувано!</b> ${c.done}<br><button class="btn-next active clinic-next" id="nextCase">${last ? 'Закрити кабінет' : 'Наступний пацієнт →'}</button>`;
+    document.getElementById('nextCase').addEventListener('click', ()=>{
+      if(last) finishAll(); else { idx++; openCase(); }
+    });
+    dots();
+  }
+
+  const VIEW = { tm:tmView, dm:dmView, pc:pcView };
+
+  function bindPicker(view){
+    let sel = null;
+    const act = document.getElementById('wAct');
+    screen.querySelectorAll('button[data-pick]').forEach(r=>r.addEventListener('click', ()=>{
+      screen.querySelectorAll('[data-pick]').forEach(x=>x.classList.remove('sel'));
+      r.classList.add('sel'); sel = r; act.disabled = false;
+    }));
+    act.addEventListener('click', ()=>{
+      if(!sel) return;
+      if(sel.dataset.pick === String(view.right)){ solve(CASES[idx].tool); return; }
+      sel.classList.add('shake');
+      msg.textContent = view.wrong;
+      const s = sel;
+      setTimeout(()=>s.classList.remove('shake'), 350);
+    });
+  }
+
+  function useTool(t, btn){
+    if(solved) return;
+    const c = CASES[idx], right = t === c.tool;
+    token++;
+    [...taskbar.children].forEach(b=>b.classList.remove('on'));
+    btn.classList.add('on');
+    if(right){
+      btn.classList.remove('miss');
+      if(!found){ found = true; addNeurons(1); }
+      msg.className = 'clinic-msg';
+      msg.textContent = c.ask;
+    } else {
+      btn.classList.add('miss');
+      msg.className = 'clinic-msg';
+      msg.textContent = `${NAMES[t]}: тут усе гаразд. Подумай, який засіб підходить до симптому.`;
+    }
+    if(t === 'sp'){
+      const value = right ? 0.6 : 86;
+      const opts = right ? `<div class="speed-opts">${[['Перевстановити Windows', 0], ['Перезапустити роутер і сісти ближче до нього', 1], ['Купити новий ноутбук', 0]].map(([o, ok])=>`<button data-ok="${ok}">${o}</button>`).join('')}</div>` : '';
+      screen.innerHTML = spView(value, opts);
+      runSpeed(value);
+      screen.querySelectorAll('.speed-opts button').forEach(b=>b.addEventListener('click', ()=>{
+        if(b.dataset.ok === '1') solve('sp');
+        else { b.classList.add('wrong'); msg.textContent = 'Це довго й дорого, а комп\'ютер здоровий. Спершу спробуй просте.'; }
+      }));
+      return;
+    }
+    const view = VIEW[t](right, false);
+    screen.innerHTML = view.html;
+    if(right) bindPicker(view);
+  }
+
+  function dots(){
+    document.getElementById('clinicDots').innerHTML = CASES.map((_, i)=>`<span class="wu-dot${i < idx || (i === idx && solved) ? ' ok' : i === idx ? ' cur' : ''}"></span>`).join('');
+  }
+  function openCase(){
+    const c = CASES[idx];
+    found = false; solved = false; token++;
+    document.getElementById('clinicNum').textContent = `Пацієнт ${idx + 1} з ${CASES.length}`;
+    document.getElementById('patient').innerHTML = `<span class="ava">${c.ava}</span><div class="say"><b>${c.name}</b>${c.say}</div>`;
+    screen.innerHTML = '<div class="hint-screen">Який засіб запустимо?<br>Обери його на панелі внизу ↓</div>';
+    msg.className = 'clinic-msg'; msg.textContent = '';
+    taskbar.innerHTML = '';
+    Object.keys(NAMES).forEach(t=>{
+      const b = document.createElement('button');
+      b.className = 'tb';
+      b.innerHTML = ICONS[t] + `<span>${NAMES[t]}</span>`;
+      b.addEventListener('click', ()=>useTool(t, b));
+      taskbar.appendChild(b);
+    });
+    dots();
+  }
+  function finishAll(){
+    addNeurons(2);
+    idx = CASES.length; solved = true;
+    dots();
+    document.getElementById('clinicNum').textContent = 'Усіх вилікувано ✓';
+    document.getElementById('patient').style.display = 'none';
+    taskbar.style.display = 'none';
+    msg.className = 'clinic-msg'; msg.textContent = '';
+    screen.innerHTML = `<div class="clinic-end">
+      <svg viewBox="0 0 92 92" fill="none" aria-hidden="true"><circle cx="46" cy="46" r="42" fill="#fff"/><path d="M26 47 L40 61 L67 32" stroke="#0F9D8A" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <b>Кабінет порожній, усі здорові!</b>
+      <p>Спершу обстеження, потім лікування: так проблему знаходять, а не вгадують.</p></div>`;
+  }
+  openCase();
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Від чого залежить, корисною чи ризикованою буде технологія?', opts:['Лише від її ціни', 'Від того, хто, навіщо й як її використовує', 'Лише від її новизни'], correct:1, why:'Те саме розпізнавання обличчя може розблоковувати телефон, а може стежити за людиною.' },
+  { q:'Хтось без дозволу змінив суму в електронному документі. Що порушено?', opts:['Цілісність', 'Конфіденційність', 'Доступність'], correct:0, why:'Дані лишились на місці, але стали неправильними.' },
+  { q:'Що таке бульбашка фільтрів?', opts:['Захист від вірусів у браузері', 'Програма для очищення кешу', 'Стрічка, де лишається тільки схоже на те, що ти вже дивився'], correct:2, why:'Алгоритм показує знайоме, а інші теми й думки зникають.' },
+  { q:'Клавіша не працює ні в Документах, ні в браузері, ні в грі. Де шукати причину?', opts:['У браузері', 'В апаратній частині', 'В одній із програм'], correct:1, why:'Збій усюди зазвичай вказує на залізо.' },
+  { q:'Комп\'ютер раптово почав гальмувати. Що покаже, яка програма його навантажує?', opts:['Тест швидкості', 'Цей ПК', 'Диспетчер завдань'], correct:2, why:'У Диспетчері завдань видно навантаження на процесор і пам\'ять.' },
+  { q:'Що означає жовтий трикутник у Диспетчері пристроїв?', opts:['З пристроєм або драйвером є проблема', 'Пристрій новий', 'Пристрій вимкнено на ніч'], correct:0, why:'Часто допомагає оновлення драйвера.' },
+  { q:'Браузер показує ERR_NAME_NOT_RESOLVED. Що зробити спершу?', opts:['Перевстановити браузер', 'Перевірити, чи правильно введено адресу', 'Очистити Кошик'], correct:1, why:'Одна хибна літера в адресі — і сайт не знайдено.' }
+], {summary:'Тепер ти вмієш зважувати переваги й небезпеки технологій, розрізняти загрози для даних і знаходити причину проблеми засобами діагностики.'});
+</script>
+
+</body>
+</html>
