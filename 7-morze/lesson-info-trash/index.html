@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Інформаційне сміття — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --accent:#2E7D4F; --accent-dark:#1F5A38; --accent-soft:#E4F3E9;
+    --bg:#F5F9F5; --line:#DCE9DF; --ink:#17281E; --ink-soft:#4A5F52;
+    --hud-bar:linear-gradient(90deg,#2E7D4F,#8CBF3F,#F2A93B);
+    --red:#D9483B; --blue:#2F7FC1; --amber:#E0902B;
+  }
+
+  /* ---------- КРОК 1: СОРТУВАЛЬНА СТАНЦІЯ ---------- */
+  .belt-wrap{position:relative; margin-bottom:12px; overflow:hidden;}
+  .item{display:flex; align-items:center; gap:12px; max-width:420px; min-height:72px; margin:0 auto 8px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:10px 14px; font-weight:700; font-size:15.5px; line-height:1.3; box-shadow:0 4px 10px rgba(23,40,30,.1); animation:beltIn .4s cubic-bezier(.2,.8,.3,1);}
+  .item .ic{font-size:32px; line-height:1; flex-shrink:0;}
+  .item.go{animation:none; transform:translateY(46px) scale(.8); opacity:0; transition:transform .28s ease-in, opacity .28s ease-in;}
+  @keyframes beltIn{from{transform:translateX(-110%);}}
+  .belt{height:16px; border-radius:8px; background:repeating-linear-gradient(90deg,#3B4A42 0 14px,#55675D 14px 28px);}
+  .belt.run{animation:beltRun .4s linear;}
+  @keyframes beltRun{to{background-position:56px 0;}}
+  .bins{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:12px;}
+  .bin{position:relative; display:flex; flex-direction:column; align-items:center; gap:2px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:8px 6px 9px; cursor:pointer; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14.5px; line-height:1.15; color:var(--ink); transition:border-color .15s ease, transform .1s ease;}
+  .bin:hover{border-color:var(--accent);}
+  .bin:active{transform:scale(.98);}
+  .bin.shake{animation:shakeX .35s ease; border-color:var(--red);}
+  .bin svg{width:64px; height:64px;}
+  .bin .lid{transform-box:view-box; transform-origin:12px 22px; transition:transform .2s ease;}
+  .bin.open .lid{transform:rotate(-26deg);}
+  .bin .cnt{position:absolute; top:6px; right:8px; min-width:22px; font-size:13px; color:#fff; background:var(--accent); border-radius:999px; padding:0 6px; text-align:center;}
+  .sort-msg{min-height:1.5em; margin-top:10px; text-align:center; font-size:14px; color:var(--ink-soft);}
+  @media (max-width:440px){ .bin{font-size:12.5px;} .bin svg{width:50px; height:50px;} }
+
+  /* ---------- КРОК 2: ПРОВІДНИК І КОШИК ---------- */
+  .win{background:#fff; border:1px solid #CFD6D1; border-radius:8px; overflow:hidden; box-shadow:0 4px 14px rgba(23,40,30,.12); font-family:'Segoe UI',system-ui,-apple-system,sans-serif; color:#1b1b1b; font-size:12.5px; line-height:1.3;}
+  .win-title{display:flex; align-items:center; gap:7px; padding:6px 10px; background:#F3F3F3; font-size:12px;}
+  .win-ctl{margin-left:auto; color:#555; letter-spacing:9px; font-size:11px;}
+  .win-path{padding:5px 10px; border-bottom:1px solid #E5E5E5; color:#555;}
+  .file{display:grid; grid-template-columns:22px 1fr auto; gap:8px; align-items:center; width:100%; border:none; background:#fff; border-bottom:1px solid #F3F3F3; font:inherit; color:inherit; padding:6px 10px; text-align:left; cursor:pointer;}
+  .file:hover{background:#E9F2FB;}
+  .file.shake{animation:shakeX .35s ease; background:#FDE9E7;}
+  .file .sz{color:#666; white-space:nowrap;}
+  .file.gone{display:none;}
+  .pc-row{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px; margin-top:12px;}
+  @media (max-width:560px){ .pc-row{grid-template-columns:1fr;} }
+  .panel{background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-s); padding:10px 12px;}
+  .panel h3{margin:0 0 4px; font-size:15px;}
+  .trash{display:grid; grid-template-columns:46px 1fr; gap:10px; align-items:center;}
+  .trash svg{width:46px; height:46px;}
+  .trash small{display:block; color:var(--ink-soft); font-size:13px;}
+  .disk-bar{height:14px; background:#E6E6E6; border:1px solid #BCBCBC; margin:6px 0 3px;}
+  .disk-bar i{display:block; height:100%; background:#DA2626; transition:width .8s ease, background .8s ease;}
+  .disk-bar.ok i{background:#26A0DA;}
+  .panel small.d{font-size:13px; color:var(--ink-soft);}
+  .btn-empty{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; background:var(--accent); color:#fff; border:none; border-radius:8px; padding:6px 12px; margin-top:8px; cursor:pointer;}
+  .btn-empty:disabled{opacity:.4; cursor:default;}
+  .dlg{margin-top:12px; max-width:380px; margin-left:auto; margin-right:auto; animation:wuIn .25s ease;}
+  .dlg-body{padding:12px 14px 6px; display:grid; grid-template-columns:32px 1fr; gap:10px; align-items:center; font-size:13.5px;}
+  .dlg-btns{display:flex; justify-content:flex-end; gap:8px; padding:8px 12px; background:#F3F3F3;}
+  .dlg-btns button{font:inherit; min-width:68px; padding:4px 10px; border:1px solid #BDBDBD; border-radius:4px; background:#FDFDFD; cursor:pointer;}
+  .dlg-btns button.main{background:#0067C0; border-color:#0067C0; color:#fff;}
+
+  /* ---------- КРОК 3: ПОСТ-ФЕЙК ---------- */
+  .post{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); overflow:hidden;}
+  .post-head{display:flex; align-items:center; gap:9px; padding:10px 14px 4px;}
+  .post-head i{width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,#F2A93B,#D9483B); display:flex; align-items:center; justify-content:center; font-style:normal; color:#fff; font-weight:800;}
+  .post-head b{font-size:14.5px; line-height:1.2;}
+  .post-head small{display:block; font-weight:600; color:var(--ink-soft); font-size:12px;}
+  .post-text{padding:2px 14px 10px; font-size:15px; line-height:1.45;}
+  .scene{display:block; width:100%; height:auto;}
+  .spot{cursor:pointer;}
+  .spot.miss{animation:shakeX .35s ease;}
+  .ring{animation:ringIn .3s cubic-bezier(.3,1.6,.5,1); transform-box:fill-box; transform-origin:center;}
+  @keyframes ringIn{from{transform:scale(.3); opacity:0;}}
+  .hunt-count{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:var(--accent-dark); margin:12px 0 6px;}
+  .hunt-msg{min-height:1.5em; font-size:14.5px; color:var(--ink-soft);}
+  .hunt-log{list-style:none; margin:8px 0 0 !important; padding:0 !important; display:grid; gap:6px;}
+  .hunt-log li{background:var(--ok-soft); border-radius:var(--radius-s); padding:6px 11px; margin:0; font-size:14px; line-height:1.4;}
+
+  /* ---------- КРОК 4: РОЗСЛІДУВАННЯ ---------- */
+  .tools{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:14px 0;}
+  @media (max-width:560px){ .tools{grid-template-columns:1fr;} }
+  .tool{display:grid; grid-template-columns:42px 1fr; gap:10px; align-items:center; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 12px;}
+  .tool .e{width:42px; height:42px; border-radius:12px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; font-size:23px;}
+  .tool b{display:block; font-family:'Baloo 2',sans-serif; font-size:15.5px; line-height:1.2;}
+  .tool span{display:block; font-size:13.5px; line-height:1.35; color:var(--ink-soft);}
+  .case{position:relative;}
+  .case-top{display:grid; grid-template-columns:minmax(0,5fr) minmax(0,6fr); gap:14px; align-items:start; margin-bottom:14px;}
+  @media (max-width:600px){ .case-top{grid-template-columns:1fr;} }
+  .vid{position:relative; border-radius:var(--radius-s); overflow:hidden; background:#000;}
+  .vid svg{display:block; width:100%; height:auto;}
+  .vid .pl{position:absolute; inset:0; margin:auto; width:46px; height:46px; border-radius:50%; background:rgba(0,0,0,.55);}
+  .vid .pl::after{content:''; position:absolute; left:18px; top:13px; border-left:15px solid #fff; border-top:10px solid transparent; border-bottom:10px solid transparent;}
+  .case-post{font-size:14.5px; line-height:1.4;}
+  .case-post b{display:block;}
+  .case-post small{display:block; margin-top:4px; color:var(--ink-soft); font-weight:600; font-size:12.5px;}
+  .clue-q{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16.5px; margin-bottom:8px;}
+  .clue-opts{display:flex; flex-wrap:wrap; gap:8px;}
+  .clue-fb{min-height:1.3em; font-size:13.5px; color:var(--ink-soft); margin-top:8px;}
+  .dossier{list-style:none; margin:12px 0 0 !important; padding:0 !important; display:grid; gap:6px;}
+  .dossier li{display:grid; grid-template-columns:26px 1fr; gap:8px; align-items:start; background:var(--bg); border:1.5px dashed var(--line); border-radius:var(--radius-s); padding:7px 10px; margin:0; font-size:14px; line-height:1.4; animation:wuIn .3s ease;}
+  .stamp{display:none; width:max-content; margin:16px auto 4px; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:34px; letter-spacing:.06em; line-height:1; color:var(--red); border:5px solid var(--red); border-radius:10px; padding:8px 18px 4px; transform:rotate(-6deg);}
+  .stamp.show{display:block; animation:stampIn .35s cubic-bezier(.3,1.6,.5,1);}
+  @keyframes stampIn{from{transform:rotate(-6deg) scale(2.4); opacity:0;}}
+  .rules{display:none; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px;}
+  .rules.show{display:grid; animation:wuIn .3s ease;}
+  .rules div{background:var(--accent-soft); color:var(--accent-dark); border-radius:var(--radius-s); padding:9px 10px; font-size:13.5px; line-height:1.35; text-align:center;}
+  .rules b{display:block; font-family:'Baloo 2',sans-serif; font-size:15.5px;}
+  @media (max-width:520px){ .rules.show{grid-template-columns:1fr;} }
+</style>
+</head>
+<body data-lesson="lesson7m-info-trash" data-hud="7 клас · Інформаційне сміття">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Цифрова безпека · Урок 10</div>
+      <h1>Інформаційне сміття: час прибрати</h1>
+      <p>Сміття буває не лише на вулиці, а й у телефоні, поштовій скриньці та стрічці новин. Навчимось його сортувати, прибирати й викривати фейки, які зовні схожі на справжні новини.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: усміхнений смітник із файлами -->
+    <svg class="mascot" viewBox="0 0 160 160" fill="none" aria-hidden="true">
+      <circle cx="80" cy="84" r="66" fill="#E4F3E9"/>
+      <rect x="52" y="20" width="30" height="38" rx="3" fill="#fff" stroke="#2F7FC1" stroke-width="3" transform="rotate(-12 67 39)"/>
+      <path d="M58 30 L74 27 M59 37 L75 34" stroke="#2F7FC1" stroke-width="3" stroke-linecap="round"/>
+      <rect x="84" y="16" width="34" height="42" rx="3" fill="#fff" stroke="#E0902B" stroke-width="3" transform="rotate(10 101 37)"/>
+      <circle cx="102" cy="33" r="6" fill="#E0902B"/>
+      <path d="M46 62 H114 L106 136 Q105 142 99 142 H61 Q55 142 54 136 Z" fill="#2E7D4F"/>
+      <rect x="38" y="54" width="84" height="12" rx="6" fill="#1F5A38"/>
+      <circle cx="68" cy="92" r="6" fill="#fff"/><circle cx="92" cy="92" r="6" fill="#fff"/>
+      <circle cx="69" cy="93" r="2.8" fill="#17281E"/><circle cx="93" cy="93" r="2.8" fill="#17281E"/>
+      <path d="M67 110 Q80 122 93 110" stroke="#fff" stroke-width="4.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Переваги, небезпеки, діагностика</div>
+    <h2>Що ти пам'ятаєш з минулого уроку</h2>
+    <p class="soft">Обери термін, а потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" id="step1">
+    <div class="step-label">Крок 1 · Сортувальна станція</div>
+    <h2>Що таке інформаційне сміття</h2>
+    <p><b>Інформаційне сміття</b> — це інформація, яка з'явилась під час роботи людей чи пристроїв, але більше ні для чого не потрібна. Воно буває двох видів:</p>
+    <ul>
+      <li><b>цифрове</b> — зайві файли, застарілі чи перекопійовані сайти, спам;</li>
+      <li><b>нецифрове</b> — застарілі папери, неважливі документи, непотрібна поштова реклама.</li>
+    </ul>
+    <p class="soft">Обережно: не все старе є сміттям! Постав кожну знахідку в правильний смітник.</p>
+    <div class="exercise" id="station">
+      <div class="belt-wrap"><div id="stItem"></div><div class="belt" id="stBelt"></div></div>
+      <div class="bins" id="stBins"></div>
+      <div class="sort-msg" id="stMsg"></div>
+      <div class="progress-line" id="stProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Цифрове прибирання</div>
+    <h2>Куди насправді зникають файли</h2>
+    <p>Коли ти видаляєш файл, він не зникає, а переїжджає до Кошика й далі займає місце. Лише очищений Кошик звільняє диск. Диск цього ноутбука майже повний, тож приберімо теку.</p>
+    <p class="soft">Клацни п'ять зайвих файлів, щоб видалити їх. Тут є копії, застарілі й порожні файли.</p>
+    <div class="exercise" id="cleanup">
+      <div class="win">
+        <div class="win-title">Завантаження<span class="win-ctl">─ ▢ ✕</span></div>
+        <div class="win-path">Цей ПК › Завантаження</div>
+        <div id="files"></div>
+      </div>
+      <div class="pc-row">
+        <div class="panel trash">
+          <svg viewBox="0 0 46 46" fill="none" aria-hidden="true"><path d="M11 13 H35 L32 41 H14 Z" fill="#E8F1FA" stroke="#2F7FC1" stroke-width="2.5" stroke-linejoin="round"/><path d="M7 12 H39 M18 12 V7 H28 V12" stroke="#2F7FC1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 19 L20 35 M27 19 L26 35" stroke="#2F7FC1" stroke-width="2"/></svg>
+          <div><b>Кошик</b><small id="binInfo">Порожній</small><button class="btn-empty" id="btnEmpty" disabled>Очистити кошик</button></div>
+        </div>
+        <div class="panel">
+          <b>Диск C:</b>
+          <div class="disk-bar" id="diskBar"><i id="diskFill" style="width:96%"></i></div>
+          <small class="d" id="diskInfo">Вільно 2,4 ГБ з 60 ГБ</small>
+        </div>
+      </div>
+      <div id="dlgBox"></div>
+      <div class="progress-line" id="cleanMsg"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Фотофейк</div>
+    <h2>Знайди чотири ознаки підробки</h2>
+    <p>Фото легко змінити, але підробка часто видає себе дрібницями. Перевіряй пропорції, тіні й віддзеркалення.</p>
+    <p class="soft">Клацай на частини фото. Лише чотири місця справді видають підробку.</p>
+    <div class="exercise" id="hunt">
+      <div class="post">
+        <div class="post-head"><i>Н</i><b>Новини Сенсацій<small>2 години тому</small></b></div>
+        <div class="post-text"><b>ШОК!!!</b> На городі під Черкасами виріс кавун, більший за автівку!</div>
+        <svg class="scene" id="scene" viewBox="0 0 600 380" aria-label="Фото: велетенський кавун на подвір'ї біля автівки">
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A9DBF5"/><stop offset="1" stop-color="#E5F4FB"/></linearGradient>
+            <clipPath id="melonClip"><circle cx="326" cy="188" r="76"/></clipPath>
+            <radialGradient id="melonShade" cx=".38" cy=".32" r=".78"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#0B3A1C" stop-opacity=".42"/></radialGradient>
+            <clipPath id="pool"><ellipse cx="380" cy="335" rx="190" ry="32"/></clipPath>
+            <g id="carShape">
+              <path d="M410 256 V232 Q410 224 420 222 L448 202 Q452 199 458 199 H506 Q512 199 516 204 L534 222 Q546 224 546 234 V256 Z" fill="#2F7FC1"/>
+              <path d="M432 222 L454 206 H478 V222 Z M484 206 H506 L522 222 H484 Z" fill="#D9EEF9"/>
+              <circle cx="438" cy="258" r="14" fill="#2A3331"/><circle cx="438" cy="258" r="6" fill="#C9D2CE"/>
+              <circle cx="518" cy="258" r="14" fill="#2A3331"/><circle cx="518" cy="258" r="6" fill="#C9D2CE"/>
+            </g>
+          </defs>
+          <rect width="600" height="205" fill="url(#sky)"/>
+          <rect y="200" width="600" height="180" fill="#D8D0BD"/>
+          <rect y="196" width="600" height="10" fill="#9CC36A"/>
+          <!-- тіні: сонце праворуч, усе падає ліворуч, чітко й довго -->
+          <path d="M48 226 L4 262 L130 262 L184 226 Z" fill="#000" opacity=".3"/>
+          <ellipse cx="184" cy="254" rx="66" ry="11" transform="rotate(-14 184 254)" fill="#000" opacity=".3"/>
+          <path d="M410 268 L380 286 L516 286 L546 268 Z" fill="#000" opacity=".3"/>
+          <g class="spot" data-id="sun"><circle cx="522" cy="58" r="30" fill="#FFD24A"/><g stroke="#FFD24A" stroke-width="5" stroke-linecap="round"><path d="M522 12 V20 M522 96 V104 M476 58 H484 M560 58 H568 M490 26 L496 32 M548 84 L554 90 M554 26 L548 32 M496 84 L490 90"/></g></g>
+          <g class="spot" data-id="cloud"><g fill="#fff"><circle cx="156" cy="60" r="19"/><circle cx="184" cy="50" r="25"/><circle cx="214" cy="62" r="17"/><rect x="138" y="60" width="92" height="19" rx="9"/></g></g>
+          <g class="spot" data-id="house">
+            <rect x="48" y="104" width="136" height="122" fill="#F3E4C7"/>
+            <path d="M36 108 L116 52 L196 108 Z" fill="#B65A3C"/>
+            <rect x="68" y="130" width="34" height="34" fill="#A9DBF5" stroke="#fff" stroke-width="3"/>
+            <rect x="130" y="130" width="34" height="34" fill="#A9DBF5" stroke="#fff" stroke-width="3"/>
+            <rect x="100" y="176" width="32" height="50" fill="#7A5230"/>
+          </g>
+          <g class="spot" data-id="tree"><rect x="232" y="146" width="14" height="92" fill="#7A5230"/><circle cx="239" cy="124" r="42" fill="#5B9E46"/><circle cx="212" cy="140" r="26" fill="#6BAE52"/><circle cx="266" cy="142" r="26" fill="#4F8F3D"/></g>
+          <g class="spot" data-id="car"><use href="#carShape"/></g>
+          <!-- калюжа перед автівкою й кавуном: автівка відбита, кавуна немає -->
+          <g class="spot" data-id="puddle">
+            <ellipse cx="380" cy="335" rx="190" ry="32" fill="#BFDDEA"/>
+            <g clip-path="url(#pool)"><use href="#carShape" transform="translate(0,467) scale(1,-.55)" opacity=".6"/></g>
+          </g>
+          <!-- кавун вставлено: завеликий і без тіні -->
+          <g class="spot" data-id="melon">
+            <circle cx="326" cy="188" r="76" fill="#57B05A"/>
+            <g transform="rotate(16 326 188)" clip-path="url(#melonClip)">
+              <path d="M326.0 112.0 L317.1 112.6 L308.6 114.3 L299.5 117.0 L291.3 120.9 L282.7 125.7 L276.2 131.5 L269.3 138.1 L265.4 145.5 L259.5 153.5 L256.8 162.0 L252.4 170.9 L251.6 180.1 L250.3 189.3 L252.7 198.6 L253.7 207.7 L258.3 216.5 L260.4 224.8 L265.9 232.7 L270.7 239.8 L278.2 246.2 L285.3 251.7 L294.2 256.3 L302.1 259.9 L310.9 262.3 L319.6 263.7 L319.7 263.7 L311.6 262.3 L303.3 259.9 L296.4 256.3 L287.6 251.7 L281.4 246.2 L273.5 239.8 L270.8 232.7 L265.2 224.8 L265.6 216.5 L259.6 207.7 L259.9 198.6 L254.9 189.3 L257.8 180.1 L257.1 170.9 L263.8 162.0 L264.9 153.5 L271.4 145.5 L273.0 138.1 L279.6 131.5 L284.7 125.7 L293.4 120.9 L300.8 117.0 L309.5 114.3 L317.4 112.6 L326.0 112.0 Z M326.0 112.0 L319.6 112.6 L312.9 114.3 L304.8 117.0 L299.5 120.9 L292.5 125.7 L290.7 131.5 L283.3 138.1 L281.4 145.5 L271.9 153.5 L271.5 162.0 L265.5 170.9 L270.6 180.1 L267.6 189.3 L273.7 198.6 L269.1 207.7 L273.7 216.5 L271.7 224.8 L279.6 232.7 L282.7 239.8 L292.2 246.2 L295.8 251.7 L302.9 256.3 L307.3 259.9 L314.4 262.3 L321.1 263.7 L321.5 263.7 L315.8 262.3 L310.0 259.9 L307.5 256.3 L302.0 251.7 L300.6 246.2 L291.9 239.8 L290.7 232.7 L283.1 224.8 L287.6 216.5 L283.2 207.7 L290.0 198.6 L282.7 189.3 L286.3 180.1 L278.9 170.9 L285.4 162.0 L284.0 153.5 L293.6 145.5 L293.4 138.1 L299.6 131.5 L298.9 125.7 L304.4 120.9 L307.8 117.0 L314.7 114.3 L320.2 112.6 L326.0 112.0 Z M326.0 112.0 L322.8 112.6 L320.0 114.3 L316.3 117.0 L316.5 120.9 L311.8 125.7 L311.7 131.5 L302.7 138.1 L303.1 145.5 L295.7 153.5 L302.3 162.0 L297.8 170.9 L305.2 180.1 L296.6 189.3 L300.5 198.6 L292.6 207.7 L300.3 216.5 L298.7 224.8 L308.6 232.7 L307.0 239.8 L312.3 246.2 L310.1 251.7 L314.5 256.3 L316.5 259.9 L321.5 262.3 L324.3 263.7 L324.8 263.7 L323.4 262.3 L320.1 259.9 L320.3 256.3 L317.9 251.7 L322.7 246.2 L319.5 239.8 L323.3 232.7 L314.7 224.8 L318.0 216.5 L310.9 207.7 L320.2 198.6 L316.4 189.3 L325.3 180.1 L316.9 170.9 L320.6 162.0 L312.0 153.5 L318.1 145.5 L315.6 138.1 L322.8 131.5 L320.5 125.7 L323.0 120.9 L320.5 117.0 L322.3 114.3 L323.6 112.6 L326.0 112.0 Z M326.0 112.0 L327.5 112.6 L330.2 114.3 L331.1 117.0 L333.8 120.9 L330.2 125.7 L332.4 131.5 L328.1 138.1 L335.5 145.5 L332.9 153.5 L341.0 162.0 L333.2 170.9 L337.1 180.1 L327.1 189.3 L334.2 198.6 L329.8 207.7 L339.4 216.5 L334.3 224.8 L338.2 232.7 L330.3 239.8 L332.2 246.2 L328.6 251.7 L331.8 256.3 L330.2 259.9 L330.0 262.3 L327.5 263.7 L328.0 263.7 L331.9 262.3 L333.9 259.9 L337.5 256.3 L336.7 251.7 L342.5 246.2 L342.9 239.8 L352.3 232.7 L350.6 224.8 L356.8 216.5 L348.9 207.7 L353.8 198.6 L347.4 189.3 L356.6 180.1 L352.4 170.9 L358.6 162.0 L349.7 153.5 L350.4 145.5 L341.4 138.1 L343.4 131.5 L338.9 125.7 L340.0 120.9 L335.3 117.0 L332.6 114.3 L328.4 112.6 L326.0 112.0 Z M326.0 112.0 L332.1 112.6 L338.2 114.3 L341.8 117.0 L347.0 120.9 L348.6 125.7 L356.5 131.5 L358.4 138.1 L366.9 145.5 L364.1 153.5 L368.9 162.0 L362.0 170.9 L368.4 180.1 L364.5 189.3 L372.9 198.6 L367.7 207.7 L370.6 216.5 L361.1 224.8 L361.2 232.7 L354.0 239.8 L355.4 246.2 L350.2 251.7 L348.2 256.3 L341.3 259.9 L336.0 262.3 L329.9 263.7 L330.3 263.7 L337.4 262.3 L344.1 259.9 L352.2 256.3 L356.4 251.7 L363.1 246.2 L364.2 239.8 L372.3 232.7 L374.1 224.8 L383.2 216.5 L382.1 207.7 L386.9 198.6 L380.6 189.3 L383.6 180.1 L377.8 170.9 L382.2 162.0 L377.0 153.5 L377.3 145.5 L368.5 138.1 L364.7 131.5 L355.7 125.7 L352.0 120.9 L345.2 117.0 L340.0 114.3 L332.7 112.6 L326.0 112.0 Z M326.0 112.0 L334.6 112.6 L343.0 114.3 L350.2 117.0 L358.9 120.9 L365.6 125.7 L374.0 131.5 L378.1 138.1 L384.2 145.5 L384.5 153.5 L390.3 162.0 L390.3 170.9 L396.2 180.1 L394.5 189.3 L396.4 198.6 L390.6 207.7 L389.8 216.5 L383.1 224.8 L382.3 232.7 L376.1 239.8 L372.2 246.2 L364.0 251.7 L357.0 256.3 L348.2 259.9 L340.5 262.3 L332.1 263.7 L332.3 263.7 L341.2 262.3 L349.6 259.9 L358.7 256.3 L366.5 251.7 L374.5 246.2 L380.3 239.8 L386.6 232.7 L389.8 224.8 L395.3 216.5 L397.5 207.7 L400.9 198.6 L400.8 189.3 L401.1 180.1 L397.7 170.9 L396.2 162.0 L391.2 153.5 L388.3 145.5 L382.2 138.1 L376.5 131.5 L368.5 125.7 L360.9 120.9 L351.9 117.0 L343.7 114.3 L334.9 112.6 L326.0 112.0 Z" fill="#1F6E37"/>
+            </g>
+            <circle cx="326" cy="188" r="76" fill="url(#melonShade)"/>
+            <ellipse cx="296" cy="150" rx="24" ry="15" transform="rotate(-32 296 150)" fill="#fff" opacity=".28"/>
+            <path d="M347 115 Q352 103 362 104 Q370 106 366 112 Q361 116 358 110" stroke="#6E8F3A" stroke-width="5" fill="none" stroke-linecap="round"/>
+          </g>
+          <!-- під кавуном тіні немає: широка зона кліку -->
+          <ellipse class="spot" data-id="noshadow" cx="312" cy="282" rx="96" ry="19" fill="transparent"/>
+          <!-- людина: довга темна тінь падає до сонця -->
+          <g class="spot" data-id="man">
+            <path d="M82 296 L98 292 L240 304 L228 316 Z" fill="#000" opacity=".42"/>
+            <rect x="78" y="256" width="9" height="38" fill="#37474F"/><rect x="91" y="256" width="9" height="38" fill="#37474F"/>
+            <rect x="74" y="214" width="30" height="46" rx="7" fill="#D9483B"/>
+            <circle cx="89" cy="201" r="13" fill="#F2C9A5"/>
+            <path d="M76 198 Q89 180 102 198 Z" fill="#E9D18A"/>
+          </g>
+        </svg>
+      </div>
+      <div class="hunt-count" id="huntCount"></div>
+      <div class="hunt-msg" id="huntMsg"></div>
+      <ol class="hunt-log" id="huntLog"></ol>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Агенція «Розвінчувачі фейків»</div>
+    <h2>Розслідуй вірусне відео</h2>
+    <p>Перш ніж вірити відео чи фото, його перевіряють. Для кожного запитання є свій інструмент:</p>
+    <div class="tools">
+      <div class="tool"><span class="e">🖼️</span><div><b>Пошук за зображенням</b><span>Google чи TinEye: де й коли це фото вже з'являлось.</span></div></div>
+      <div class="tool"><span class="e">🏷️</span><div><b>Метадані файлу</b><span>Камера, програма, дата: наприклад, Metadata2Go.</span></div></div>
+      <div class="tool"><span class="e">🗺️</span><div><b>Перегляд вулиць</b><span>Google Карти показують, чи це справді те місце.</span></div></div>
+      <div class="tool"><span class="e">🌦️</span><div><b>Архів погоди</b><span>WolframAlpha покаже погоду в будь-який день.</span></div></div>
+      <div class="tool"><span class="e">👤</span><div><b>Перевірка джерела</b><span>Хто автор, що ще публікує, хто це поширює.</span></div></div>
+    </div>
+    <div class="exercise case" id="caseBox">
+      <div class="case-top">
+        <div class="vid">
+          <svg viewBox="0 0 320 180" aria-hidden="true">
+            <rect width="320" height="180" fill="#C9D6E2"/>
+            <rect x="0" y="40" width="72" height="100" fill="#8FA3B5"/><rect x="72" y="20" width="84" height="120" fill="#A0B2C2"/><rect x="226" y="30" width="94" height="110" fill="#8FA3B5"/>
+            <g fill="#DCE6EE"><rect x="12" y="56" width="12" height="16"/><rect x="36" y="56" width="12" height="16"/><rect x="88" y="40" width="12" height="16"/><rect x="118" y="40" width="12" height="16"/><rect x="88" y="72" width="12" height="16"/><rect x="118" y="72" width="12" height="16"/><rect x="244" y="50" width="12" height="16"/><rect x="284" y="50" width="12" height="16"/></g>
+            <path d="M0 140 H320 V180 H0 Z" fill="#F4F8FB"/>
+            <path d="M126 180 L150 140 H176 L206 180 Z" fill="#E2EAF1"/>
+            <g fill="#fff"><circle cx="30" cy="30" r="2.5"/><circle cx="66" cy="96" r="2"/><circle cx="110" cy="16" r="2.5"/><circle cx="150" cy="60" r="2"/><circle cx="196" cy="24" r="2.5"/><circle cx="220" cy="84" r="2"/><circle cx="268" cy="24" r="2"/><circle cx="302" cy="94" r="2.5"/></g>
+            <!-- замазаний логотип у кутку -->
+            <rect x="252" y="144" width="60" height="26" rx="6" fill="#7E8C97" opacity=".85"/>
+          </svg>
+          <span class="pl"></span>
+        </div>
+        <div class="case-post">
+          <b>ТЕРМІНОВО! Щойно на Хрещатику випав сніг! ПОШИРЮЙ, поки не видалили!</b>
+          Знято 20 липня. Акаунт @shok_24.
+          <small>1,2 млн переглядів · 40 тис. поширень за 3 години</small>
+        </div>
+      </div>
+      <div id="clueBox">
+        <div class="clue-q" id="clueQ"></div>
+        <div class="clue-opts" id="clueOpts"></div>
+        <div class="clue-fb" id="clueFb"></div>
+      </div>
+      <ul class="dossier" id="dossier"></ul>
+      <div class="stamp" id="stamp">ФЕЙК</div>
+      <div class="rules" id="rules">
+        <div><b>Перевір</b>перш ніж вірити</div>
+        <div><b>Не поширюй</b>те, у чому не впевнений</div>
+        <div><b>Прибирай</b>файли й підписки</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Інформаційне "сміття" цифрового і нецифрового формату» · 7 клас</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Цілісність', desc:'Дані правильні, ніхто не змінив їх без дозволу' },
+  { name:'Апаратна проблема', desc:'Несправна фізична частина пристрою' },
+  { name:'Диспетчер завдань', desc:'Показує, яка програма навантажує процесор' },
+  { name:'Драйвер', desc:'Програма, яка вчить комп\'ютер працювати з пристроєм' },
+  { name:'Конфіденційність', desc:'Дані бачать лише ті, кому це дозволено' },
+  { name:'Алгоритм рекомендацій', desc:'Штучний інтелект, який вирішує, кому що показати' }
+], 'recapProgress');
+
+/* ---------- КРОК 1: СОРТУВАЛЬНА СТАНЦІЯ ---------- */
+(function(){
+  const BINS = [
+    { id:'dig', name:'Цифрове сміття', c:'#2F7FC1' },
+    { id:'pap', name:'Нецифрове сміття', c:'#E0902B' },
+    { id:'keep', name:'Не сміття, лишаємо', c:'#2E7D4F' }
+  ];
+  const ITEMS = [
+    { e:'📸', t:'300 однакових скріншотів у телефоні', b:'dig' },
+    { e:'📧', t:'Реклама, яка щодня падає на пошту', b:'dig' },
+    { e:'🌐', t:'Сайт про подію 2015 року, який давно ніхто не оновлює', b:'dig' },
+    { e:'📬', t:'Купа рекламних листівок у поштовій скриньці', b:'pap' },
+    { e:'🗂️', t:'Позаторішній розклад уроків у шафі', b:'pap' },
+    { e:'📰', t:'Стос газет із телепрограмою за минулий рік', b:'pap' },
+    { e:'📝', t:'Файл із твором, який треба здати завтра', b:'keep' },
+    { e:'🖼️', t:'Єдине фото з бабусиного ювілею', b:'keep' },
+    { e:'📄', t:'Свідоцтво про народження в теці з документами', b:'keep' }
+  ];
+  const deck = shuffle(ITEMS);
+  const root = document.getElementById('station');
+  const box = document.getElementById('stItem');
+  const bins = document.getElementById('stBins');
+  const msg = document.getElementById('stMsg');
+  const progress = document.getElementById('stProgress');
+  const belt = document.getElementById('stBelt');
+  const hit = trackTask(root, deck.length, deck.length + 2);
+  let i = 0, busy = false;
+
+  const binSvg = c=>`<svg viewBox="0 0 64 64" fill="none" aria-hidden="true"><path class="body" d="M14 24 H50 L46 58 Q46 60 43 60 H21 Q18 60 18 58 Z" fill="${c}"/><path d="M26 30 L27 54 M38 30 L37 54 M32 30 V54" stroke="#fff" stroke-opacity=".45" stroke-width="2.5" stroke-linecap="round"/><g class="lid"><rect x="10" y="17" width="44" height="7" rx="3.5" fill="${c}"/><rect x="26" y="11" width="12" height="7" rx="3" stroke="${c}" stroke-width="3"/></g></svg>`;
+
+  function show(){
+    const it = deck[i];
+    box.innerHTML = `<div class="item"><span class="ic">${it.e}</span>${it.t}</div>`;
+    belt.classList.remove('run'); void belt.offsetWidth; belt.classList.add('run');
+    progress.textContent = `Розсортовано: ${i} з ${deck.length}`;
+  }
+  BINS.forEach(b=>{
+    const el = document.createElement('button');
+    el.className = 'bin';
+    el.innerHTML = `<span class="cnt" hidden>0</span>${binSvg(b.c)}${b.name}`;
+    el.addEventListener('click', ()=>{
+      if(busy || i >= deck.length) return;
+      if(deck[i].b !== b.id){
+        el.classList.add('shake');
+        msg.textContent = b.id === 'keep' ? 'Чи знадобиться це ще комусь? Навряд.' : 'Ця річ ще потрібна або вона іншого виду.';
+        setTimeout(()=>el.classList.remove('shake'), 350);
+        return;
+      }
+      busy = true; msg.textContent = '';
+      el.classList.add('open');
+      const c = el.querySelector('.cnt');
+      c.hidden = false; c.textContent = +c.textContent + 1;
+      box.firstChild.classList.add('go');
+      addNeurons(1); hit();
+      setTimeout(()=>{
+        el.classList.remove('open');
+        busy = false;
+        if(++i < deck.length){ show(); return; }
+        addNeurons(2);
+        box.innerHTML = '';
+        progress.textContent = 'Станцію очищено ✓';
+        msg.textContent = 'Старе не завжди означає непотрібне: сміттям інформацію робить те, що вона вже нікому не корисна.';
+      }, 380);
+    });
+    bins.appendChild(el);
+  });
+  show();
+})();
+
+/* ---------- КРОК 2: ЦИФРОВЕ ПРИБИРАННЯ ---------- */
+(function(){
+  const FILES = [
+    { n:'Реферат_історія.docx', s:'24 КБ', i:'📘' },
+    { n:'канікули.jpg', s:'3 МБ', i:'🖼️' },
+    { n:'канікули (1).jpg', s:'3 МБ', i:'🖼️', mb:3, junk:'копія' },
+    { n:'канікули (2).jpg', s:'3 МБ', i:'🖼️', mb:3, junk:'копія' },
+    { n:'setup_game_2021_old.exe', s:'9,4 ГБ', i:'⚙️', mb:9400, junk:'застарілий' },
+    { n:'Підручник_математика.pdf', s:'48 МБ', i:'📕' },
+    { n:'Новий текстовий документ.txt', s:'0 КБ', i:'📄', mb:0, junk:'порожній' },
+    { n:'відео_з_телефона_копія.mp4', s:'6,1 ГБ', i:'🎬', mb:6100, junk:'копія' }
+  ];
+  const JUNK = FILES.filter(f=>f.junk).length;
+  const root = document.getElementById('cleanup');
+  const list = document.getElementById('files');
+  const info = document.getElementById('binInfo');
+  const empty = document.getElementById('btnEmpty');
+  const msg = document.getElementById('cleanMsg');
+  const hit = trackTask(root, JUNK + 1, JUNK + 3);
+  let count = 0, mb = 0;
+  const gb = v=>(v / 1000).toFixed(1).replace('.', ',');
+
+  msg.textContent = `Видалено: 0 з ${JUNK}`;
+  FILES.forEach(f=>{
+    const b = document.createElement('button');
+    b.className = 'file';
+    b.innerHTML = `<span>${f.i}</span><span>${f.n}</span><span class="sz">${f.s}</span>`;
+    b.addEventListener('click', ()=>{
+      if(!f.junk){
+        b.classList.add('shake');
+        msg.textContent = 'Цей файл ще потрібен! Шукай зайві.';
+        setTimeout(()=>b.classList.remove('shake'), 350);
+        return;
+      }
+      b.classList.add('gone');
+      count++; mb += f.mb;
+      addNeurons(1); hit();
+      info.textContent = `Елементів: ${count}, ${gb(mb)} ГБ`;
+      if(count < JUNK){ msg.textContent = `Видалено: ${count} з ${JUNK}. Місця на диску поки не побільшало!`; return; }
+      msg.textContent = 'Усе зайве в Кошику, але диск досі повний. Що зробити далі?';
+      empty.disabled = false;
+    });
+    list.appendChild(b);
+  });
+  empty.addEventListener('click', ()=>{
+    empty.disabled = true;
+    const box = document.getElementById('dlgBox');
+    box.innerHTML = `<div class="win dlg"><div class="win-title">Видалити кілька елементів<span class="win-ctl">✕</span></div>
+      <div class="dlg-body"><svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><path d="M16 3 L30 28 H2 Z" fill="#FFC93C" stroke="#1b1b1b" stroke-width="1.5"/><path d="M16 12 V20" stroke="#1b1b1b" stroke-width="3"/><circle cx="16" cy="24" r="1.7" fill="#1b1b1b"/></svg>Дійсно остаточно видалити ці об'єкти (${JUNK})?</div>
+      <div class="dlg-btns"><button class="main" id="dlgYes">Так</button><button id="dlgNo">Ні</button></div></div>`;
+    document.getElementById('dlgNo').addEventListener('click', ()=>{ box.innerHTML = ''; empty.disabled = false; msg.textContent = 'Файли лишились у Кошику й далі займають місце.'; });
+    document.getElementById('dlgYes').addEventListener('click', ()=>{
+      box.innerHTML = '';
+      info.textContent = 'Порожній';
+      document.getElementById('diskBar').classList.add('ok');
+      document.getElementById('diskFill').style.width = '70%';
+      document.getElementById('diskInfo').textContent = `Вільно ${gb(2400 + mb)} ГБ з 60 ГБ`;
+      addNeurons(3); hit();
+      msg.textContent = 'Диск вільний ✓ Після очищення Кошика файли зникають безповоротно, тож спершу подумай.';
+    });
+  });
+})();
+
+/* ---------- КРОК 3: ФОТОФЕЙК ---------- */
+(function(){
+  const REAL = {
+    melon:{ n:'Пропорції', t:'кавун більший за автівку й майже такий заввишки, як дерево. Таких не буває: його вставили у фото.', x:326, y:188, r:88 },
+    noshadow:{ n:'Тіні', t:'будинок, дерево й автівка мають тінь, а кавун завбільшки з авто її не має.', x:312, y:283, r:21 },
+    man:{ n:'Напрямок тіні', t:'сонце праворуч, тож тіні падають ліворуч. Тінь людини падає до сонця!', x:150, y:276, r:96 },
+    puddle:{ n:'Віддзеркалення', t:'автівка у воді відбивається, а величезний кавун ні.', x:326, y:336, r:27 }
+  };
+  const DECOY = { sun:'Сонце як сонце, тут усе природно.', cloud:'Звичайна хмара, нічого підозрілого.', house:'Будинок виглядає цілком природно.', tree:'Дерево з нормальною тінню.', car:'Автівка звичайна, і тінь у неї правильна.' };
+  const TOTAL = 4;
+  const root = document.getElementById('hunt');
+  const scene = document.getElementById('scene');
+  const log = document.getElementById('huntLog');
+  const msg = document.getElementById('huntMsg');
+  const count = document.getElementById('huntCount');
+  const hit = trackTask(root, TOTAL, TOTAL + 2);
+  const found = new Set();
+  const NS = 'http://www.w3.org/2000/svg';
+
+  const update = ()=>{ count.textContent = found.size < TOTAL ? `Знайдено ознак: ${found.size} з ${TOTAL}` : 'Усі ознаки знайдено ✓'; };
+  function add(name, text){
+    log.insertAdjacentHTML('beforeend', `<li><b>${name}:</b> ${text}</li>`);
+    addNeurons(1); hit();
+    msg.textContent = '';
+    update();
+    if(found.size === TOTAL){
+      addNeurons(2);
+      msg.textContent = 'Такий кавун існує лише у фоторедакторі. А гучні слова в підписі, як-от «шок» чи «сенсація», теж мають насторожити.';
+    }
+  }
+  scene.querySelectorAll('.spot').forEach(s=>s.addEventListener('click', ()=>{
+    const id = s.dataset.id;
+    if(found.has(id)) return;
+    if(REAL[id]){
+      const r = REAL[id];
+      found.add(id);
+      const c = document.createElementNS(NS, 'circle');
+      c.setAttribute('class', 'ring');
+      Object.entries({ cx:r.x, cy:r.y, r:r.r, fill:'none', stroke:'#FFC93C', 'stroke-width':5, 'pointer-events':'none' }).forEach(([k, v])=>c.setAttribute(k, v));
+      scene.appendChild(c);
+      add(r.n, r.t);
+    } else {
+      s.classList.add('miss');
+      msg.textContent = DECOY[id];
+      setTimeout(()=>s.classList.remove('miss'), 350);
+    }
+  }));
+  update();
+})();
+
+/* ---------- КРОК 4: РОЗСЛІДУВАННЯ ---------- */
+(function(){
+  const TOOLS = ['Пошук за зображенням', 'Метадані файлу', 'Перегляд вулиць', 'Архів погоди', 'Перевірка джерела'];
+  const CLUES = [
+    { q:'Чи міг у цей день іти сніг?', a:3, e:'🌦️', r:'Київ, 20 липня: +27 °C і ясно. Снігу не було.' },
+    { q:'Чи справді це Хрещатик?', a:2, e:'🗺️', r:'На Хрещатику інші будинки. Цієї вулиці там немає.' },
+    { q:'Чи не з\'являвся цей кадр раніше?', a:0, e:'🖼️', r:'Такий самий кадр знайдено на сайті, у дописі 2019 року.' },
+    { q:'Коли й чим створено файл?', a:1, e:'🏷️', r:'Знято в січні 2019, потім оброблено у відеоредакторі. Логотип у кутку замазано.' },
+    { q:'Кому належить акаунт @shok_24?', a:4, e:'👤', r:'Акаунт створено два дні тому. У ньому лише «сенсації», а поширюють їх боти.' }
+  ];
+  const root = document.getElementById('caseBox');
+  const hit = trackTask(root, CLUES.length, CLUES.length + 2);
+  const q = document.getElementById('clueQ');
+  const opts = document.getElementById('clueOpts');
+  const fb = document.getElementById('clueFb');
+  const dossier = document.getElementById('dossier');
+  let i = 0;
+
+  function show(){
+    const c = CLUES[i];
+    q.textContent = `Доказ ${i + 1} з ${CLUES.length}. ${c.q}`;
+    fb.textContent = 'Який інструмент допоможе?';
+    opts.innerHTML = '';
+    TOOLS.forEach((t, n)=>{
+      const b = document.createElement('button');
+      b.className = 'choice-btn';
+      b.textContent = t;
+      b.addEventListener('click', ()=>{
+        if(n !== c.a){ b.classList.add('wrong'); fb.textContent = 'Цей інструмент тут не відповість. Подивись на картки вище.'; return; }
+        dossier.insertAdjacentHTML('beforeend', `<li><span>${c.e}</span><span>${c.r}</span></li>`);
+        addNeurons(1); hit();
+        if(++i < CLUES.length){ show(); return; }
+        addNeurons(2);
+        document.getElementById('clueBox').style.display = 'none';
+        document.getElementById('stamp').classList.add('show');
+        document.getElementById('rules').classList.add('show');
+      });
+      opts.appendChild(b);
+    });
+  }
+  show();
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що таке інформаційне сміття?', opts:['Будь-які старі файли й папери', 'Інформація, яка більше ні для чого не потрібна', 'Лише реклама на сайтах'], correct:1, why:'Старе фото з родинного свята може бути цінним, а вчорашня реклама вже нікому не потрібна.' },
+  { q:'Що з переліченого є нецифровим інформаційним сміттям?', opts:['Спам в електронній пошті', 'Копії файлів на диску', 'Застаріла реклама в поштовій скриньці'], correct:2, why:'Це паперове сміття, яке існує поза пристроями.' },
+  { q:'Ти видалив великий файл, але місця на диску не побільшало. Чому?', opts:['Файл лежить у Кошику', 'Диск зламався', 'Файл перемістився в хмару'], correct:0, why:'Місце звільниться лише після очищення Кошика.' },
+  { q:'Яка ознака може видати змінене фото?', opts:['Фото кольорове', 'Тіні падають у різні боки', 'Фото зроблено вдень'], correct:1, why:'Від одного сонця всі тіні падають в один бік.' },
+  { q:'Як дізнатися, де й коли фото вже з\'являлося раніше?', opts:['Збільшити яскравість', 'Переслати його другові', 'Скористатися пошуком за зображенням'], correct:2, why:'Google чи TinEye знаходять копії фото і їхні дати.' },
+  { q:'Відео завантажили вчора, а його вже поширили сотні тисяч разів з нових акаунтів. Що це може означати?', opts:['Це роботи проплачених ботів', 'Відео точно правдиве', 'Сайт несправний'], correct:0, why:'Така швидкість від нових акаунтів часто означає злагоджену роботу ботів.' },
+  { q:'Як вчинити з новиною, у якій ти не впевнений?', opts:['Поширити із застереженням', 'Перевірити й не поширювати, доки не впевнишся', 'Поширити, поки не видалили'], correct:1, why:'Кожне поширення робить інформаційне сміття ще більшим.' }
+], {summary:'Тепер ти вмієш відрізняти інформаційне сміття від потрібного, прибирати файли й перевіряти фото та відео.'});
+</script>
+
+</body>
+</html>
