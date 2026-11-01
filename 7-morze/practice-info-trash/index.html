@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Справа про сакуру — Інформаційне сміття</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#2E7D4F,#8CBF3F,#F2A93B); --accent:#2E7D4F; --accent-dark:#1F5A38; --accent-soft:#E4F3E9; --bg:#F5F9F5; --line:#DCE9DF; --ink:#17281E; --ink-soft:#4A5F52; }
+
+  /* Зразок: мініатюри слайдів */
+  .deck{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px;}
+  @media (max-width:620px){ .deck{grid-template-columns:repeat(2,minmax(0,1fr));} }
+  @media (max-width:380px){ .deck{grid-template-columns:1fr;} }
+  .sl-wrap{position:relative;}
+  .sl-num{font-family:Roboto,Arial,sans-serif; font-size:12px; color:#5F6368; margin-bottom:3px;}
+  .sl{aspect-ratio:16/9; background:#fff; border:1px solid #DADCE0; border-radius:4px; padding:7% 8%; font-family:Roboto,Arial,sans-serif; color:#202124; overflow:hidden; display:flex; flex-direction:column; justify-content:center; font-size:11px; line-height:1.3;}
+  .sl b{font-weight:500; font-size:13px; line-height:1.2; margin-bottom:4px; color:var(--accent-dark);}
+  .sl.t{background:var(--accent); text-align:center;}
+  .sl.t b{color:#fff; font-size:15px;}
+  .sl.t span{color:#DDF0E3;}
+  .sl ul{margin:0; padding-left:14px;}
+  .slot{color:var(--accent-dark); font-weight:500;}
+
+  /* Допис-справа */
+  .post{display:grid; grid-template-columns:200px 1fr; gap:14px; align-items:center; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px; }
+  @media (max-width:520px){ .post{grid-template-columns:1fr;} }
+  .post img{display:block; width:100%; max-width:240px; aspect-ratio:1; object-fit:cover; border-radius:var(--radius-s);}
+  .post .who{display:flex; align-items:center; gap:8px; font-weight:800; font-size:14.5px; margin-bottom:5px;}
+  .post .who i{width:30px; height:30px; border-radius:50%; background:linear-gradient(135deg,#F2A93B,#D9483B); color:#fff; font-style:normal; display:flex; align-items:center; justify-content:center;}
+  .post p{margin:0; font-size:15.5px; line-height:1.45;}
+  .post small{display:block; margin-top:6px; color:var(--ink-soft); font-weight:600; font-size:12.5px;}
+  .claims{margin:12px 0 0; padding-left:20px; font-size:15px;}
+  .claims li{margin-bottom:3px;}
+  /* Що записати на слайд */
+  .give{background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:9px 13px; margin:6px 0; font-size:14.5px;}
+  .give b.h{display:block; font-family:'Baloo 2',sans-serif; font-size:15.5px; margin-bottom:2px;}
+  .give i{color:var(--accent-dark);}
+  footer .credits{display:block; margin-top:8px; font-size:11.5px; opacity:.8;}
+</style>
+</head>
+<body data-hud="7 клас · Практична · Справа про сакуру">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 7 клас · Інформаційне сміття</div>
+    <h1>🕵️ Справа про сакуру</h1>
+    <p>Ти працюєш в агенції «Розвінчувачі фейків». До вас надійшов підозрілий допис. Перевір його справжніми інструментами й винеси вердикт.</p>
+    <div class="meta"><span>⏱ 25–30 хв</span><span><img src="../../assets/logos/slides.svg" alt="">Google Презентації</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Матеріали справи</h2>
+    <div class="post">
+      <img src="images/case-photo.jpg" alt="Фото з допису: дзвіниця й цвіт сакури">
+      <div>
+        <div class="who"><i>Д</i>Дива Києва</div>
+        <p><b>Неймовірно!</b> Київ, 23 липня 2011 року. У спеку +38 °C без жодної хмаринки біля дзвіниці Софійського собору зацвіла сакура!</p>
+        <small>Вигаданий допис для тренування</small>
+      </div>
+    </div>
+    <p style="margin:12px 0 0;">У дописі чотири твердження. Перевір кожне:</p>
+    <ol class="claims">
+      <li>На фото дзвіниця Софійського собору.</li>
+      <li>Дзвіниця на фото схожа на справжню дзвіницю Софії.</li>
+      <li>Того дня в Києві була спека +38 °C і ясне небо.</li>
+      <li>Сакура в Києві може цвісти в липні.</li>
+    </ol>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="deck">
+      <div class="sl-wrap"><div class="sl-num">1</div><div class="sl t"><b>Справа про сакуру</b><span>Агенція «Розвінчувачі фейків»</span></div></div>
+      <div class="sl-wrap"><div class="sl-num">2</div><div class="sl"><b>Доказ 1. Що на фото?</b><div>Інструмент: <span class="slot">…</span></div><div>Знахідка: <span class="slot">…</span></div></div></div>
+      <div class="sl-wrap"><div class="sl-num">3</div><div class="sl"><b>Доказ 2. Яке це місце?</b><div>Інструмент: <span class="slot">…</span></div><div>Знахідка: <span class="slot">…</span></div></div></div>
+      <div class="sl-wrap"><div class="sl-num">4</div><div class="sl"><b>Доказ 3. Яка була погода?</b><div>Інструмент: <span class="slot">…</span></div><div>Знахідка: <span class="slot">…</span></div></div></div>
+      <div class="sl-wrap"><div class="sl-num">5</div><div class="sl"><b>Доказ 4. Коли цвіте сакура?</b><div>Інструмент: <span class="slot">…</span></div><div>Знахідка: <span class="slot">…</span></div></div></div>
+      <div class="sl-wrap"><div class="sl-num">6</div><div class="sl"><b>Вердикт</b><div><span class="slot">Правда чи фейк, і чому</span></div></div></div>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи презентацію</h3>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Презентації</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Презентації</span>.</li>
+              <li>Назви файл: <b>Справа про сакуру — Прізвище</b>.</li>
+            </ol>
+          </div>
+        </div>
+        <ol>
+          <li>На першому слайді напиши заголовок <b>Справа про сакуру</b> і підзаголовок <b>Агенція «Розвінчувачі фейків»</b>.</li>
+          <li>Для кожного доказу додавай новий слайд: <span class="mono">Ctrl</span> + <span class="mono">M</span>.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Доказ 1. Що на фото?</h3>
+        <ol>
+          <li>Правою кнопкою клацни фото в матеріалах справи → <span class="menu">Копіювати адресу зображення</span>.</li>
+          <li>Відкрий <span class="mono">images.google.com</span> і натисни значок камери.</li>
+          <li>Встав адресу в поле посилання й запусти пошук.</li>
+          <li>Подивись результати: яка це споруда?</li>
+        </ol>
+        <div class="give"><b class="h">На слайд: Доказ 1. Що на фото?</b>Інструмент: <i>пошук за зображенням</i>. Знахідка: <i>яку споруду ти побачив у результатах</i>.</div>
+        <div class="tip">Результатів немає? Спробуй шукати словами: <b>дзвіниця сакура Київ</b>, і порівняй фото.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Доказ 2. Яке це місце?</h3>
+        <ol>
+          <li>Відкрий <span class="mono">maps.google.com</span> і знайди <b>Софійський собор, Київ</b>.</li>
+          <li>Розглянь фото місця й увімкни Перегляд вулиць, якщо він доступний.</li>
+          <li>Порівняй дзвіницю Софії з дзвіницею на фото: колір, форму, висоту.</li>
+        </ol>
+        <div class="give"><b class="h">На слайд: Доказ 2. Яке це місце?</b>Інструмент: <i>Google Карти</i>. Знахідка: <i>дві відмінності між дзвіницями</i>.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Доказ 3. Яка була погода?</h3>
+        <ol>
+          <li>Відкрий <span class="mono">wolframalpha.com</span>.</li>
+          <li>Введи запит англійською: <span class="mono">weather Kyiv 23/07/2011</span>.</li>
+          <li>Знайди температуру й опис погоди.</li>
+        </ol>
+        <div class="give"><b class="h">На слайд: Доказ 3. Яка була погода?</b>Інструмент: <i>WolframAlpha</i>. Знахідка: <i>температура й хмарність того дня</i>.</div>
+        <div class="check-val">Перевір себе: приблизно від +16 до +22 °C, ішов дощ.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Доказ 4. Коли цвіте сакура?</h3>
+        <ol>
+          <li>Знайди в Google: <span class="mono">коли цвіте сакура в Києві</span>.</li>
+          <li>Звір відповідь щонайменше на двох сайтах.</li>
+        </ol>
+        <div class="give"><b class="h">На слайд: Доказ 4. Коли цвіте сакура?</b>Інструмент: <i>пошук Google</i>. Знахідка: <i>місяць цвітіння й назви двох сайтів</i>.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Винеси вердикт</h3>
+        <ol>
+          <li>Додай слайд <b>Вердикт</b>.</li>
+          <li>Напиши, правда це чи фейк, і назви найсильніший доказ.</li>
+          <li>Допиши одне речення: що варто зробити людині, яка побачила такий допис.</li>
+          <li>Натисни на панелі інструментів <span class="menu">Тема</span> й обери оформлення.</li>
+        </ol>
+        <div class="check-val">Перевір себе: у презентації 6 слайдів, і на кожному доказі є інструмент і твоя знахідка.</div>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+<footer>Практична робота · «Справа про сакуру» · 7 клас<span class="credits">Фото Великої лаврської дзвіниці — Wavemeart, Вікісховище, ліцензія CC BY-SA 4.0.</span></footer>
+
+<script src="../../assets/practice.js"></script>
+</body>
+</html>
