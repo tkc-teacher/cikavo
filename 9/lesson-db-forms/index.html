@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Форми в базах даних — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в інтерфейсі Google Форм і Таблиць -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  /* Гама «форма → таблиця»: фіолетовий Google Форм + зелений Google Таблиць */
+  :root{
+    --pri:#673AB7; --pri-dark:#4A2A8A; --grn:#188038; --grn-dark:#0D652D;
+    --accent:var(--pri); --accent-dark:var(--pri-dark); --accent-soft:#EFE9F8;
+    --label:var(--grn);
+    --bg:#F7F5FB; --ink:#1F1A2E; --ink-soft:#5E5672; --line:#E4DDF2; --surface:#FFFFFF;
+    --note:var(--grn); --note-soft:#E6F4EA; --note-ink:var(--grn-dark);
+    --hud-bar:linear-gradient(90deg,var(--pri),var(--grn));
+    --gf-bg:#F0EBF8;
+  }
+
+  .menu{font-family:'Baloo 2',sans-serif; font-weight:700; color:var(--pri-dark);}
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em; color:#5F6368;}
+  .hl{outline:2.5px solid #E8590C; outline-offset:2px; border-radius:6px;}
+
+  /* Крок 1: таблиця проти форми */
+  .vs{display:grid; grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); gap:14px; margin-top:14px; align-items:start;}
+  @media (max-width:680px){ .vs{grid-template-columns:minmax(0,1fr);} }
+  .vs-cap{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; margin-bottom:6px;}
+  .vs-cap span{color:var(--ink-soft); font-weight:600; font-size:13.5px;}
+
+  /* Мініатюрна таблиця (Google Таблиці) */
+  .mini-wrap{overflow-x:auto; border:1px solid #DADCE0; border-radius:8px; background:#fff;}
+  .mini{border-collapse:collapse; width:100%; font-family:'Roboto',sans-serif; font-size:12px; color:#1F1F1F;}
+  .mini th, .mini td{border:1px solid #E1E3E1; padding:3px 7px; white-space:nowrap; height:22px;}
+  .mini th{background:#F8F9FA; color:#5F6368; font-weight:500; font-size:10.5px; text-align:center;}
+  .mini tr.hdr td{font-weight:700; border-bottom:2px solid #C4C7C5;}
+  .mini td.r{text-align:right;}
+  .mini td.bad{background:#FCE8E6; color:#B3261E;}
+  .mini tr.sel td{background:#E8F0FE;}
+  .q-pre{margin-bottom:10px; display:inline-block; max-width:100%;}
+  .q-pre .mini{width:auto; min-width:260px;}
+  .mini th:first-child{width:26px;}
+
+  /* Форма застосунку бази даних (умовна) */
+  .app{background:#fff; border:1.5px solid #CFC6E4; border-radius:12px; overflow:hidden; font-family:'Roboto',sans-serif; color:#1F1F1F; font-size:13.5px; user-select:none;}
+  .app-bar{display:flex; align-items:center; gap:8px; background:var(--pri); color:#fff; padding:8px 12px; font-weight:500;}
+  .app-bar .ms{color:#fff; font-size:18px;}
+  .app-body{padding:12px 14px; display:grid; grid-template-columns:auto minmax(0,1fr); gap:9px 12px; align-items:center;}
+  .app-body .full{grid-column:1 / -1;}
+  .app-in{border:1px solid #9AA0A6; border-radius:4px; padding:4px 8px; background:#fff; min-height:26px; display:flex; align-items:center;}
+  .app-sel{justify-content:space-between;}
+  .app-radio, .app-check{display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+  .app-radio span, .app-check span{display:inline-flex; align-items:center; gap:5px;}
+  .dot, .box{width:13px; height:13px; border:2px solid #5F6368; display:inline-block; flex-shrink:0;}
+  .dot{border-radius:50%;}
+  .dot.on{border-color:var(--pri); background:radial-gradient(circle,var(--pri) 0 45%,#fff 50%);}
+  .box{border-radius:2px;}
+  .box.on{border-color:var(--pri); background:var(--pri) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.2 8.4l3.1 3.1 6.5-6.7' fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 100% 100% no-repeat;}
+  .app-btns{display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;}
+  .app-btn{background:#EFE9F8; color:var(--pri-dark); border:1px solid #CFC6E4; border-radius:6px; padding:5px 12px; font-weight:500;}
+  .app-nav{display:flex; align-items:center; justify-content:center; gap:10px; background:#F6F3FB; border-top:1px solid #E4DDF2; padding:6px 10px; font-size:12.5px; color:#5F6368;}
+  .app-nav b{display:inline-flex; width:24px; height:22px; align-items:center; justify-content:center; border:1px solid #CFC6E4; border-radius:4px; background:#fff; color:var(--pri-dark); font-weight:500;}
+  .app.small{font-size:12.5px;}
+  .app.small .app-body{gap:7px 10px; padding:10px 12px;}
+
+
+
+  /* Google Форма */
+  .gf{background:var(--gf-bg); border-radius:var(--radius-m); padding:12px; font-family:'Roboto',Arial,sans-serif; color:#202124; font-size:14px;}
+  .gf-card{background:#fff; border:1px solid #DADCE0; border-radius:8px; padding:12px 16px; margin-bottom:10px; position:relative;}
+  .gf-card:last-child{margin-bottom:0;}
+  .gf-head{border-top:10px solid var(--pri);}
+  .gf-head .t{font-size:21px; line-height:1.25; margin-bottom:4px;}
+  .gf-head .d{font-size:13px; color:#5F6368;}
+  .gf-q{font-size:14.5px; margin-bottom:8px;}
+  .gf-q .star{color:#D93025;}
+  .gf-opt{display:flex; align-items:center; gap:10px; margin:5px 0; padding:2px 4px; border-radius:4px;}
+  .gf-opt .dot, .gf-opt .box{width:16px; height:16px;}
+  .gf-line{border-bottom:1px solid #9AA0A6; padding:4px 0; min-height:26px; width:80%; color:#70757A; font-size:13.5px;}
+  .gf-line.filled{color:#202124; border-bottom:2px solid var(--pri);}
+  .gf-sel{display:inline-flex; align-items:center; gap:20px; border:1px solid #DADCE0; border-radius:4px; padding:6px 6px 6px 12px; font-size:13.5px;}
+  .gf-sel .ms{font-size:18px;}
+  .gf-menu{position:absolute; z-index:5; background:#fff; border-radius:4px; box-shadow:0 2px 6px 2px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.3); padding:6px 0; min-width:150px;}
+  .gf-menu div{padding:7px 16px; cursor:pointer;}
+  .gf-menu div:hover{background:#F1F3F4;}
+  .gf-send{display:flex; align-items:center; justify-content:space-between; margin-top:10px;}
+  .gf-send .b{background:var(--pri); color:#fff; border:0; border-radius:4px; padding:8px 24px; font:500 14px 'Roboto',sans-serif; cursor:pointer;}
+  .gf-send .c{color:var(--pri); font-weight:500; font-size:13.5px; cursor:pointer; background:none; border:0; font-family:'Roboto',sans-serif;}
+  .gf-card.err{border-color:#D93025;}
+  .err-line{display:none; align-items:center; gap:6px; color:#D93025; font-size:12.5px; margin-top:8px;}
+  .err-line .ms{color:#D93025; font-size:17px;}
+  .gf-card.err .err-line{display:flex;}
+  .gf .clk{cursor:pointer;}
+  .gf .clk:hover{background:#F6F3FB;}
+  .gf-sent{text-align:left;}
+  .gf-sent .t{font-size:21px; margin-bottom:8px;}
+  .gf-sent a{color:var(--pri); font-size:13.5px;}
+
+  /* Крок 4: емулятор «форма → таблиця» */
+  .emu{display:grid; grid-template-columns:minmax(0,.8fr) minmax(0,1.3fr); gap:14px; align-items:start;}
+  .emu .sheet{position:sticky; top:76px;}
+  .emu .mini{font-size:11.5px;}
+  .emu .mini th, .emu .mini td{padding:3px 5px;}
+  @media (max-width:760px){ .emu{grid-template-columns:minmax(0,1fr);} .emu .sheet{position:static;} }
+  .sheet{background:#fff; border:1px solid #DADCE0; border-radius:8px; overflow:hidden; font-family:'Roboto',sans-serif;}
+  .sheet-title{display:flex; align-items:center; gap:8px; background:#F9FBFD; border-bottom:1px solid #DADCE0; padding:7px 10px; font-weight:500; font-size:13px;}
+  .sheet-title img{width:15px; height:20px;}
+  .sheet-tabs{display:flex; gap:2px; background:#F9FBFD; border-top:1px solid #DADCE0; padding:0 8px; font-size:12px;}
+  .sheet-tabs span{padding:6px 12px; color:#444746;}
+  .sheet-tabs .on{background:#E1E9F7; color:#0B57D0; font-weight:500; border-radius:0 0 6px 6px;}
+  .sheet .mini-wrap{border:0; border-radius:0; max-height:300px; overflow-y:auto;}
+  .gf-input{width:80%; border:0; border-bottom:1px solid #9AA0A6; padding:4px 0; font:14px 'Roboto',sans-serif; color:#202124; background:transparent; outline:none;}
+  .gf-input:focus{border-bottom:2px solid var(--pri);}
+  .sheet .mini td{max-width:150px; overflow:hidden; text-overflow:ellipsis;}
+  .mini tr.new td{animation:rowIn 1.6s ease;}
+  @keyframes rowIn{0%{background:#C4EED0;} 100%{background:#fff;}}
+  .emu-fb{margin-top:12px; font-size:14.5px; min-height:22px;}
+  .emu-fb.ok{color:var(--grn-dark); font-weight:700;}
+  .emu-fb.no{color:#B3261E;}
+
+  /* Крок 5: типи запитань */
+  .types{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:8px; margin:12px 0 18px; font-family:'Roboto',sans-serif;}
+  .type{background:#fff; border:1px solid #DADCE0; border-radius:8px; padding:9px 12px; display:flex; flex-direction:column; gap:8px;}
+  .tp-head{display:flex; gap:10px; align-items:flex-start;}
+  .tp{margin-top:auto; background:var(--gf-bg); border-radius:6px; padding:9px 11px; font-size:12.5px; color:#202124; user-select:none;}
+  .tp-q{font-size:12.5px; margin-bottom:6px;}
+  .tp-line{border-bottom:1px solid #9AA0A6; padding:2px 0; width:75%; color:#70757A;}
+  .tp-line.on{color:#202124; border-bottom:2px solid var(--pri);}
+  .tp-line.wide{width:100%; line-height:1.4;}
+  .tp-o{display:flex; align-items:center; gap:8px; margin:3px 0;}
+  .tp .dot, .tp .box{width:13px; height:13px;}
+  .tp-sel, .tp-date{display:inline-flex; align-items:center; gap:14px; background:#fff; border:1px solid #DADCE0; border-radius:4px; padding:3px 4px 3px 9px;}
+  .tp-sel .ms, .tp-date .ms{font-size:17px;}
+  .tp-date{gap:22px; padding:4px 8px 4px 9px;}
+  .tp-menu{background:#fff; border-radius:4px; box-shadow:0 1px 3px rgba(60,64,67,.3); width:88px; margin-top:3px; padding:3px 0;}
+  .tp-menu div{padding:2px 9px;}
+  .tp-menu .on{background:#E8DEF8;}
+  .tp-scale{display:flex; align-items:flex-end; gap:9px; flex-wrap:wrap;}
+  .tp-scale span{display:flex; flex-direction:column; align-items:center; gap:3px;}
+  .tp-scale small{color:#5F6368; font-size:11px; padding-bottom:1px;}
+  .type .ms{color:#5F6368; margin-top:1px; flex-shrink:0;}
+  .match-chip .ms, .desc-slot .ms{flex-shrink:0; margin-right:6px; vertical-align:-5px; color:inherit;}
+  .type b{font-weight:500; display:block; font-size:14px;}
+  .type small{color:#5F6368; font-size:12.5px; line-height:1.35; display:block; font-family:'Nunito Sans',sans-serif;}
+
+  /* Крок 6: налаштування запитання */
+  .tools{list-style:none; padding:0 !important;}
+  .tools li{display:flex; gap:10px; align-items:flex-start; margin:8px 0;}
+  .tools li .ms{color:var(--pri); flex-shrink:0; margin-top:1px;}
+  .q-foot{display:flex; align-items:center; justify-content:flex-end; gap:14px; border-top:1px solid #DADCE0; margin-top:10px; padding-top:10px; font-size:14px; flex-wrap:wrap;}
+  .q-foot .vr{width:1px; height:26px; background:#DADCE0;}
+  .q-req{display:inline-flex; align-items:center; gap:10px; padding:2px 4px;}
+  .toggle{width:34px; height:14px; border-radius:7px; background:#C5B3E6; position:relative; display:inline-block;}
+  .toggle::after{content:""; position:absolute; right:-2px; top:-3px; width:20px; height:20px; border-radius:50%; background:var(--pri); box-shadow:0 1px 3px rgba(0,0,0,.3);}
+  .q-top{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:10px;}
+  .q-field{flex:1 1 200px; background:#F1F3F4; border-bottom:2px solid var(--pri); padding:9px 12px; font-size:14.5px;}
+  .q-type{display:inline-flex; align-items:center; gap:8px; border:1px solid #DADCE0; border-radius:4px; padding:7px 8px 7px 12px; font-size:13.5px; white-space:nowrap;}
+  .val-row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; font-size:13.5px; margin-top:6px;}
+  .val-row span{border-bottom:1px solid #9AA0A6; padding:3px 6px; display:inline-flex; align-items:center; gap:6px;}
+  .val-row .ms{font-size:18px;}
+  .ctx-menu{width:max-content; margin:8px 0 0 auto; background:#fff; border-radius:4px; box-shadow:0 2px 6px 2px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.3); padding:6px 0; font-size:13px; min-width:190px;}
+  .ctx-menu div{padding:6px 14px;}
+  .ctx-menu .k{color:#5F6368; font-size:12px;}
+
+  /* Крок 7: вкладка «Відповіді» і вікно вибору таблиці */
+  .f-tabs{display:flex; justify-content:center; gap:22px; background:#fff; border-radius:8px; padding:0 10px; margin-bottom:10px; font-size:14px; overflow-x:auto;}
+  .f-tabs span{padding:10px 2px; color:#5F6368; white-space:nowrap; display:inline-flex; align-items:center; gap:6px;}
+  .f-tabs .on{color:var(--pri); box-shadow:inset 0 -3px 0 var(--pri); font-weight:500;}
+  .f-tabs i{font-style:normal; background:var(--pri); color:#fff; font-size:11px; border-radius:999px; padding:1px 6px;}
+  .r-top{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .r-top .n{font-size:20px; margin-right:auto;}
+  .link-btn{display:inline-flex; align-items:center; gap:8px; border:1px solid #DADCE0; border-radius:4px; padding:6px 12px; color:#188038; font-weight:500; font-size:13.5px; white-space:nowrap;}
+  .link-btn img{width:13px; height:18px;}
+  .r-acc{display:flex; justify-content:flex-end; align-items:center; gap:10px; font-size:13.5px; color:#5F6368; margin-top:12px;}
+  .r-tabs{display:flex; justify-content:center; gap:30px; font-size:13.5px; border-top:1px solid #DADCE0; margin-top:10px; padding-top:8px;}
+  .r-tabs .on{color:var(--pri); font-weight:500;}
+  .dlg{background:#fff; border-radius:8px; padding:18px 20px; max-width:430px; margin:12px auto 0; box-shadow:0 2px 6px 2px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.3);}
+  .dlg .h{font-size:18px; margin-bottom:14px;}
+  .dlg .opt{display:flex; gap:10px; align-items:flex-start; margin:10px 0;}
+  .dlg .opt .dot{margin-top:2px; width:16px; height:16px;}
+  .dlg .name{border-bottom:2px solid var(--pri); padding:4px 0; margin-top:6px; font-size:13.5px; display:flex; align-items:center; gap:6px;}
+  .dlg .name img{width:13px; height:18px;}
+  .dlg .btns{display:flex; justify-content:flex-end; gap:8px; margin-top:16px;}
+  .dlg .btns span{border-radius:4px; padding:7px 16px; font-weight:500; font-size:14px; color:var(--pri);}
+  .dlg .btns .main{background:var(--pri); color:#fff;}
+  .ill-cap{font-size:13px; color:var(--ink-soft); margin:8px 0 0; text-align:center;}
+</style>
+</head>
+<body data-lesson="lesson9-db-forms" data-hud="9 клас · Форми в базах даних">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Впорядкування даних</div>
+      <h1>Форми: вхідні двері бази даних</h1>
+      <p>Як заповнити базу, не відкриваючи саму таблицю? З'ясуємо, навіщо потрібні форми, з чого вони складаються, і зробимо так, щоб відповіді з Google Форми самі лягали в Google Таблицю.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: картка Google Форми, з якої відповіді стрілкою «їдуть» у таблицю -->
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="62" fill="#EFE9F8"/>
+      <rect x="14" y="26" width="62" height="78" rx="8" fill="#fff" stroke="#673AB7" stroke-width="3"/>
+      <path d="M14 34a8 8 0 0 1 8-8h46a8 8 0 0 1 8 8v4H14z" fill="#673AB7"/>
+      <circle cx="26" cy="54" r="4.5" stroke="#673AB7" stroke-width="2.5"/>
+      <rect x="35" y="51" width="30" height="6" rx="3" fill="#D9CDEF"/>
+      <circle cx="26" cy="70" r="4.5" fill="#673AB7"/>
+      <rect x="35" y="67" width="24" height="6" rx="3" fill="#D9CDEF"/>
+      <rect x="22" y="84" width="22" height="11" rx="3" fill="#673AB7"/>
+      <path d="M80 66h14" stroke="#188038" stroke-width="3.5" stroke-linecap="round"/>
+      <path d="M90 59l7 7-7 7" stroke="#188038" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="100" y="40" width="30" height="54" rx="5" fill="#fff" stroke="#188038" stroke-width="3"/>
+      <path d="M100 53h30M100 66h30M100 79h30M114 40v54" stroke="#188038" stroke-width="2"/>
+      <rect x="102" y="68" width="10" height="9" fill="#C4EED0"/>
+      <circle cx="52" cy="88" r="2.6" fill="#FFC93C"/><circle cx="60" cy="88" r="2.6" fill="#FFC93C"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · База даних у Google Таблицях</div>
+    <h2>Що ти вже знаєш</h2>
+    <p>На попередніх уроках ти проєктував базу даних, створював її таблиці в Google Таблицях і додавав у записи фото.</p>
+    <p class="soft">Обери термін, а потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Навіщо форма</div>
+    <h2>Таблиця чи форма?</h2>
+    <p>Таблиця показує всі записи разом, з усіма полями. <b>Форма</b> — це «вікно» бази даних: вона показує один запис гарно й без зайвого, і через неї люди працюють з даними.</p>
+    <div class="vs">
+      <div>
+        <div class="vs-cap">Таблиця <span>· усі записи одразу</span></div>
+        <div class="mini-wrap">
+          <table class="mini">
+            <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th></tr>
+            <tr class="hdr"><th>1</th><td>ID</td><td>Кличка</td><td>Вид</td><td>Стать</td><td>Щеплена</td><td>Ціна</td></tr>
+            <tr><th>2</th><td class="r">1</td><td>Кеша</td><td>Папуга</td><td>хлопчик</td><td>TRUE</td><td class="r">850</td></tr>
+            <tr><th>3</th><td class="r">2</td><td>Пиріжок</td><td>Хом'як</td><td>хлопчик</td><td>FALSE</td><td class="r">300</td></tr>
+            <tr class="sel"><th>4</th><td class="r">3</td><td>Мурка</td><td>Кіт</td><td>дівчинка</td><td>TRUE</td><td class="r">1100</td></tr>
+            <tr><th>5</th><td class="r">4</td><td>Рекс</td><td>Пес</td><td>хлопчик</td><td>TRUE</td><td class="r">2500</td></tr>
+            <tr><th>6</th><td class="r">5</td><td>Сніжка</td><td>Кролик</td><td>дівчинка</td><td>FALSE</td><td class="r">650</td></tr>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="vs-cap">Форма <span>· запис 3</span></div>
+        <div class="app small">
+          <div class="app-bar"><span class="ms">pets</span>Картка тварини</div>
+          <div class="app-body">
+            <span>Кличка</span><span class="app-in">Мурка</span>
+            <span>Вид</span><span class="app-in app-sel">Кіт<span class="ms">arrow_drop_down</span></span>
+            <span>Стать</span><span class="app-radio"><span><i class="dot"></i>хлопчик</span><span><i class="dot on"></i>дівчинка</span></span>
+            <span>Ціна</span><span class="app-in">1100</span>
+            <span class="app-check full"><span><i class="box on"></i>Щеплена</span></span>
+          </div>
+          <div class="app-nav"><b>◀</b>Запис 3 з 5<b>▶</b></div>
+        </div>
+      </div>
+    </div>
+    <p>Через форму з базою роблять усе те саме, що й у таблиці, але зручніше:</p>
+    <ul>
+      <li><b>додають</b> нові записи;</li>
+      <li><b>переглядають</b> записи по одному;</li>
+      <li><b>змінюють</b> дані в записі;</li>
+      <li><b>шукають</b> і відбирають потрібні записи;</li>
+      <li><b>видаляють</b> записи, які більше не потрібні.</li>
+    </ul>
+    <p class="soft">Зоомагазин «Лапка» веде базу тварин. Яку дію через форму виконують у кожній ситуації?</p>
+    <div id="useList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Google Форми</div>
+    <h2>Форма, що сама заповнює таблицю</h2>
+    <p>Google Форму можна зв'язати з Google Таблицею. Тоді кожна надіслана відповідь стає новим записом бази:</p>
+    <ul>
+      <li>кожне <b>запитання</b> форми — це <b>поле</b>, тобто стовпець таблиці;</li>
+      <li>кожна <b>надіслана відповідь</b> — це <b>запис</b>, тобто новий рядок;</li>
+      <li>перший стовпець, <b>«Позначка часу»</b>, Google додає сам: коли саме надійшла відповідь.</li>
+    </ul>
+    <p class="soft">Заповни форму будь-якими даними й натисни «Надіслати». Стеж за таблицею праворуч: кожна відповідь потрапляє в неї сама. Надсилай скільки завгодно відповідей.</p>
+    <div class="exercise">
+      <div class="emu">
+        <div class="gf" id="emuForm"></div>
+        <div class="sheet">
+          <div class="sheet-title"><img src="../../assets/logos/sheets.svg" alt="">Запис на гуртки (Відповіді)</div>
+          <div class="mini-wrap"><table class="mini" id="emuSheet"></table></div>
+          <div class="sheet-tabs"><span class="on">Відповіді форми 1</span></div>
+        </div>
+      </div>
+      <div class="emu-fb" id="emuFb"></div>
+    </div>
+    <div class="trivia">Учень, який заповнює форму, таблиці не бачить і нічого в ній не зіпсує: він лише додає новий запис. Таблицю бачить тільки власник форми.</div>
+    <div class="note">Google Форми — приклад технології <b>No-code</b>: форму й таблицю для відповідей збирають мишею з готових деталей, без написання програмного коду.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Типи запитань</div>
+    <h2>Яке запитання — такий і стовпець</h2>
+    <p>Тип запитання в Google Формі — це те саме, що елемент форми бази даних. Його обирають праворуч від тексту запитання:</p>
+    <div class="types">
+      <div class="type"><div class="tp-head"><span class="ms">short_text</span><div><b>Коротка відповідь</b><small>Один рядок тексту чи число.</small></div></div>
+        <div class="tp"><div class="tp-q">Ім'я та прізвище</div><div class="tp-line on">Оксана Мельник</div></div></div>
+      <div class="type"><div class="tp-head"><span class="ms">subject</span><div><b>Абзац</b><small>Довгий текст на кілька речень.</small></div></div>
+        <div class="tp"><div class="tp-q">Опиши свою ідею</div><div class="tp-line on wide">Хочу провести квест бібліотекою, де кожна підказка схована в книзі…</div></div></div>
+      <div class="type"><div class="tp-head"><span class="ms">radio_button_checked</span><div><b>Кілька варіантів</b><small>Перемикачі: обрати лише один варіант.</small></div></div>
+        <div class="tp"><div class="tp-q">Гурток</div><div class="tp-o"><i class="dot"></i>Робототехніка</div><div class="tp-o"><i class="dot on"></i>Шахи</div><div class="tp-o"><i class="dot"></i>Хор</div></div></div>
+      <div class="type"><div class="tp-head"><span class="ms">check_box</span><div><b>Прапорці</b><small>Обрати кілька варіантів; у таблиці вони стануть через кому.</small></div></div>
+        <div class="tp"><div class="tp-q">Зручні дні</div><div class="tp-o"><i class="box on"></i>Пн</div><div class="tp-o"><i class="box"></i>Вт</div><div class="tp-o"><i class="box on"></i>Ср</div></div></div>
+      <div class="type"><div class="tp-head"><span class="ms">arrow_drop_down_circle</span><div><b>Спадний список</b><small>Один варіант з довгого списку.</small></div></div>
+        <div class="tp"><div class="tp-q">Клас</div><div class="tp-sel">9-Б<span class="ms">arrow_drop_down</span></div><div class="tp-menu"><div>9-А</div><div class="on">9-Б</div><div>9-В</div><div>…</div></div></div></div>
+      <div class="type"><div class="tp-head"><span class="ms">linear_scale</span><div><b>Лінійна шкала</b><small>Оцінка числом, наприклад від 1 до 5.</small></div></div>
+        <div class="tp"><div class="tp-q">Наскільки цікаво?</div><div class="tp-scale"><small>Нудно</small><span>1<i class="dot"></i></span><span>2<i class="dot"></i></span><span>3<i class="dot"></i></span><span>4<i class="dot on"></i></span><span>5<i class="dot"></i></span><small>Супер</small></div></div></div>
+      <div class="type"><div class="tp-head"><span class="ms">event</span><div><b>Дата</b><small>Календар для вибору дня.</small></div></div>
+        <div class="tp"><div class="tp-q">День народження</div><div class="tp-date">14.03.2011<span class="ms">calendar_today</span></div></div></div>
+    </div>
+    <p class="soft">Обери тип запитання, а потім клацни запитання, для якого він найкращий.</p>
+    <div class="exercise">
+      <div class="match-pool" id="typePool"></div>
+      <div id="typeList"></div>
+      <div class="progress-line" id="typeProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Чисті дані</div>
+    <h2>Форма як охоронець бази</h2>
+    <p>Що вільніше люди вводять відповіді, то більше безладу в таблиці. Форма може не пропустити хибні дані ще до того, як вони потраплять у базу:</p>
+    <ul class="tools">
+      <li><span class="ms">toggle_on</span><span><b>Обов'язкове</b> — без відповіді на це запитання форму не надіслати.</span></li>
+      <li><span class="ms">list</span><span><b>Готові варіанти</b> замість вільного тексту — усі пишуть значення однаково.</span></li>
+      <li><span class="ms">rule</span><span><b>Перевірка відповідей</b> (<span class="ms" style="font-size:16px">more_vert</span> унизу картки запитання) — правило для введеного: число в межах, електронна адреса, довжина тексту.</span></li>
+    </ul>
+    <div class="gf">
+      <div class="gf-card" style="border-left:6px solid #4285F4">
+        <div class="q-top">
+          <div class="q-field">Скільки тобі років?</div>
+          <span class="q-type"><span class="ms">short_text</span>Коротка відповідь<span class="ms">arrow_drop_down</span></span>
+        </div>
+        <div class="val-row"><span>Число<span class="ms">arrow_drop_down</span></span><span>Між<span class="ms">arrow_drop_down</span></span><span>10</span>і<span>16</span><span style="flex:1; color:#70757A">Користувацький текст помилки</span></div>
+        <div class="q-foot">
+          <span class="ms">content_copy</span><span class="ms">delete</span><span class="vr"></span>
+          <span class="q-req">Обов'язкове<span class="toggle"></span></span>
+          <span class="ms hl">more_vert</span>
+        </div>
+        <div class="ctx-menu"><div class="k">Показати</div><div>Опис</div><div style="background:#E8EAED">✓ Перевірка відповідей</div></div>
+      </div>
+    </div>
+    <p class="ill-cap">Запитання з перевіркою: відповідь «сто» чи «25» форма не прийме.</p>
+    <div class="note">Так форма береже <b>цілісність даних</b>: у базу потрапляють лише правильні й однаково записані значення.</div>
+    <p class="soft">Подивись на таблицю відповідей. Як треба було налаштувати форму, щоб такого не сталося?</p>
+    <div id="cleanList"></div>
+  </section>
+
+  <section class="block" data-guide>
+    <div class="step-label">Крок 5 · Форма + таблиця</div>
+    <h2>Як зв'язати форму з таблицею</h2>
+    <p>Відповіді збираються у вкладці <span class="menu">Відповіді</span> самої форми. Щоб вони потрапляли в Google Таблицю, там є кнопка <span class="menu">Зв'язати з Таблицями</span>.</p>
+    <div class="gf">
+      <div class="f-tabs"><span>Запитання</span><span class="on">Відповіді <i>4</i></span><span>Налаштування</span></div>
+      <div class="gf-card">
+        <div class="r-top"><span class="n">4 відповіді</span><span class="link-btn hl"><img src="../../assets/logos/sheets.svg" alt="">Зв'язати з Таблицями</span><span class="ms">more_vert</span></div>
+        <div class="r-acc">Приймаються відповіді <span class="toggle"></span></div>
+        <div class="r-tabs"><span class="on">Підсумок</span><span>Запитання</span><span>Окрема відповідь</span></div>
+      </div>
+      <div class="dlg">
+        <div class="h">Вибрати місце для відповідей</div>
+        <div class="opt"><i class="dot on"></i><div>Створити нову таблицю<div class="name"><img src="../../assets/logos/sheets.svg" alt="">Запис на гуртки (Відповіді)</div></div></div>
+        <div class="opt"><i class="dot"></i><div>Вибрати наявну таблицю</div></div>
+        <div class="btns"><span>Скасувати</span><span class="main hl">Створити</span></div>
+      </div>
+    </div>
+    <div class="trivia">Таблиця оновлюється сама: щойно хтось надіслав форму, у таблиці з'являється новий рядок. Нічого копіювати не треба.</div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Форми в базах даних: призначення та основні елементи» · 9 клас</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Поле', desc:'Одна характеристика об\'єкта; у таблиці — стовпець' },
+  { name:'Запис', desc:'Усі відомості про один об\'єкт; у таблиці — рядок' },
+  { name:'Первинний ключ', desc:'Поле, значення якого не повторюються: ID' },
+  { name:'Зовнішній ключ', desc:'ID з іншої таблиці, що зв\'язує записи двох таблиць' },
+  { name:'Перевірка даних', desc:'Правило, що не пропустить у стовпець недопустиме значення' },
+  { name:'Спадне меню', desc:'Значення в клітинку обирають лише зі списку варіантів' },
+  { name:'=IMAGE("адреса")', desc:'Показує в клітинці картинку з інтернету' }
+], 'recapProgress');
+
+/* ---------- КРОК 1: НАВІЩО ФОРМА ---------- */
+const USE_OPTS = ['Додати запис', 'Переглянути запис', 'Змінити запис', 'Знайти записи', 'Видалити запис'];
+makeClassify('useList', [
+  { text:'У магазин привезли трьох папуг, і продавчиня заносить кожного в базу.', correct:0 },
+  { text:'Покупець питає, чи щеплена Мурка і скільки вона коштує. Продавець відкриває лише її картку.', correct:1 },
+  { text:'Мурка подорожчала: тепер вона коштує не 1100, а 1200 гривень.', correct:2 },
+  { text:'Покупець хоче побачити лише тих кролів, які коштують до 700 гривень.', correct:3 },
+  { text:'Хом\'яка Пиріжка купили, і його картка в базі більше не потрібна.', correct:4 }
+], USE_OPTS);
+
+/* ---------- КРОК 2: ЕМУЛЯТОР «ФОРМА → ТАБЛИЦЯ» ----------
+   Вільне заповнення: будь-які відповіді стають рядками таблиці. Завдання зараховано після першого надсилання, далі — скільки завгодно. */
+(function(){
+  const CLASSES = ['9-А', '9-Б', '9-В'];
+  const CLUBS = ['Робототехніка', 'Шахи', 'Хор', 'Баскетбол'];
+  const DAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт'];
+  const GOAL = 1;
+  const FIRST = ['Оксана', 'Денис', 'Софія', 'Максим', 'Дарина', 'Артем', 'Вікторія', 'Назар', 'Злата', 'Богдан', 'Мирослава', 'Тарас', 'Анна', 'Остап', 'Соломія', 'Матвій'];
+  const LAST = ['Мельник', 'Коваль', 'Бондар', 'Шевченко', 'Кравець', 'Ткачук', 'Олійник', 'Савчук', 'Гончар', 'Лисенко', 'Поліщук', 'Мороз', 'Климко', 'Руденко'];
+  const used = new Set();
+  let typing = null;
+  function randomName(){
+    let n;
+    do n = FIRST[Math.floor(Math.random() * FIRST.length)] + ' ' + LAST[Math.floor(Math.random() * LAST.length)];
+    while(used.has(n) && used.size < 100);
+    used.add(n);
+    return n;
+  }
+  const formEl = document.getElementById('emuForm');
+  const sheet = document.getElementById('emuSheet');
+  const sheetWrap = sheet.parentElement;
+  const fb = document.getElementById('emuFb');
+  const hit = trackTask(formEl, GOAL, GOAL + 2);
+  const rows = [['02.11.2026 18:40:12', 'Марко Ткаченко', '9-А', 'Баскетбол', 'Пн, Ср']];
+  let sentCount = 0, st, fresh = -1;
+
+  const pad = n=>String(n).padStart(2, '0');
+  const stamp = ()=>{ const d = new Date(); return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${d.getHours()}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; };
+  const esc = t=>t.replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  function drawSheet(){
+    const letters = ['A','B','C','D','E'];
+    let h = `<tr><th></th>${letters.map(l=>`<th>${l}</th>`).join('')}</tr>`
+      + '<tr class="hdr"><th>1</th><td>Позначка часу</td><td>Ім\'я та прізвище</td><td>Клас</td><td>Гурток</td><td>Зручні дні</td></tr>';
+    rows.forEach((r, i)=>{ h += `<tr${i === fresh ? ' class="new"' : ''}><th>${i + 2}</th>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`; });
+    for(let i = rows.length; i < 5; i++) h += `<tr><th>${i + 2}</th><td></td><td></td><td></td><td></td><td></td></tr>`;
+    sheet.innerHTML = h;
+    sheetWrap.scrollTop = sheetWrap.scrollHeight;
+  }
+
+  function blank(){ st = { name:'', cls:'', club:'', days:new Set(), menu:false, err:{} }; }
+
+  function drawForm(){
+    const err = k=>st.err[k] ? ' err' : '';
+    const errLine = '<div class="err-line"><span class="ms">error</span>Це обов\'язкове запитання</div>';
+    formEl.innerHTML = `
+      <div class="gf-card gf-head"><div class="t">Запис на гуртки</div><div class="d">Гуртки 9 класів, осінь 2026</div></div>
+      <div class="gf-card${err('name')}"><div class="gf-q">Ім'я та прізвище <span class="star">*</span></div>
+        <input class="gf-input" maxlength="40" placeholder="Ваша відповідь (клацни — ім'я з'явиться саме)" value="${esc(st.name)}">${errLine}</div>
+      <div class="gf-card${err('cls')}"><div class="gf-q">Клас <span class="star">*</span></div>
+        <span class="gf-sel clk" data-act="menu">${st.cls || 'Вибрати'}<span class="ms">arrow_drop_down</span></span>
+        ${st.menu ? `<div class="gf-menu">${CLASSES.map(c=>`<div data-cls="${c}">${c}</div>`).join('')}</div>` : ''}${errLine}</div>
+      <div class="gf-card${err('club')}"><div class="gf-q">Гурток <span class="star">*</span></div>
+        ${CLUBS.map(c=>`<div class="gf-opt clk" data-club="${c}"><i class="dot${st.club === c ? ' on' : ''}"></i>${c}</div>`).join('')}${errLine}</div>
+      <div class="gf-card"><div class="gf-q">Зручні дні</div>
+        ${DAYS.map(d=>`<div class="gf-opt clk" data-day="${d}"><i class="box${st.days.has(d) ? ' on' : ''}"></i>${d}</div>`).join('')}</div>
+      <div class="gf-send"><button class="b" data-act="send">Надіслати</button><button class="c" data-act="clear">Очистити форму</button></div>`;
+    const inp = formEl.querySelector('.gf-input');
+    inp.addEventListener('input', ()=>{ st.name = inp.value; });
+    // клацання по порожньому полю — ім'я «друкується» саме
+    inp.addEventListener('click', ()=>{
+      if(inp.value.trim() || typing) return;
+      const name = randomName();
+      let i = 0;
+      typing = setInterval(()=>{
+        st.name = name.slice(0, ++i);
+        const cur = formEl.querySelector('.gf-input');   // форма могла перемалюватись
+        if(cur) cur.value = st.name;
+        if(i >= name.length){ clearInterval(typing); typing = null; }
+      }, 40);
+    });
+    inp.addEventListener('keydown', e=>{ if(e.key === 'Enter') e.preventDefault(); });
+  }
+
+  function sent(){
+    formEl.innerHTML = `<div class="gf-card gf-head gf-sent"><div class="t">Запис на гуртки</div><div>Вашу відповідь записано.</div>
+      <p style="margin:12px 0 0"><a href="#" data-act="again">Надіслати ще одну відповідь</a></p></div>`;
+  }
+
+  formEl.addEventListener('click', e=>{
+    const t = e.target.closest('[data-act],[data-cls],[data-club],[data-day]');
+    if(!t){ if(st.menu){ st.menu = false; drawForm(); } return; }
+    if(t.dataset.act === 'again'){ e.preventDefault(); blank(); drawForm(); fb.textContent = ''; formEl.querySelector('.gf-input').focus(); return; }
+    if(typing && t.dataset.act !== 'menu' && !t.dataset.cls && !t.dataset.club && !t.dataset.day) return;
+    if(t.dataset.act === 'menu'){ st.menu = !st.menu; drawForm(); return; }
+    if(t.dataset.cls){ st.cls = t.dataset.cls; st.menu = false; delete st.err.cls; drawForm(); return; }
+    if(t.dataset.club){ st.club = t.dataset.club; delete st.err.club; drawForm(); return; }
+    if(t.dataset.day){ const d = t.dataset.day; st.days.has(d) ? st.days.delete(d) : st.days.add(d); drawForm(); return; }
+    if(t.dataset.act === 'clear'){ blank(); drawForm(); fb.textContent = ''; return; }
+    if(t.dataset.act === 'send'){
+      st.name = st.name.trim();
+      st.menu = false;
+      st.err = {};
+      if(!st.name) st.err.name = 1;
+      if(!st.cls) st.err.cls = 1;
+      if(!st.club) st.err.club = 1;
+      if(Object.keys(st.err).length){
+        drawForm();
+        fb.className = 'emu-fb no';
+        fb.textContent = 'Форма не надіслалась: заповни обов\'язкові запитання (із зірочкою).';
+        return;
+      }
+      rows.push([stamp(), st.name, st.cls, st.club, DAYS.filter(d=>st.days.has(d)).join(', ')]);
+      fresh = rows.length - 1;
+      drawSheet(); sent();
+      sentCount++;
+      fb.className = 'emu-fb ok';
+      if(sentCount <= GOAL){ addNeurons(1); hit(); }
+      if(sentCount === GOAL){
+        addNeurons(2);
+        fb.textContent = 'Чудово! Відповідь стала рядком таблиці, а позначку часу Google поставив сам. Додай ще кілька — подивись, як росте таблиця.';
+      } else {
+        fb.textContent = `Рядок ${rows.length + 1} з'явився в таблиці сам. Якщо позначив кілька днів, вони записались в одну клітинку через кому.`;
+      }
+    }
+  });
+
+  blank(); drawSheet(); drawForm();
+})();
+
+/* ---------- КРОК 3: ТИПИ ЗАПИТАНЬ ---------- */
+makeMatching('typePool', 'typeList', [
+  { name:'Коротка відповідь', desc:'Твоє ім\'я та прізвище', icon:'<span class="ms">short_text</span>' },
+  { name:'Абзац', desc:'Опиши свою ідею для шкільного свята', icon:'<span class="ms">subject</span>' },
+  { name:'Кілька варіантів', desc:'Яку одну мову програмування ти хочеш вивчати?', icon:'<span class="ms">radio_button_checked</span>' },
+  { name:'Прапорці', desc:'Які з цих застосунків є на твоєму телефоні?', icon:'<span class="ms">check_box</span>' },
+  { name:'Спадний список', desc:'Твоя школа (одна з 60 шкіл району)', icon:'<span class="ms">arrow_drop_down_circle</span>' },
+  { name:'Лінійна шкала', desc:'Наскільки цікавим був урок: від 1 до 5?', icon:'<span class="ms">linear_scale</span>' },
+  { name:'Дата', desc:'Коли в тебе день народження?', icon:'<span class="ms">event</span>' }
+], 'typeProgress');
+
+/* ---------- КРОК 4: ЧИСТІ ДАНІ ---------- */
+const mini = (head, vals, bad)=>`<div class="mini-wrap q-pre"><table class="mini"><tr><th></th><th>C</th></tr><tr class="hdr"><th>1</th><td>${head}</td></tr>`
+  + vals.map((v, i)=>`<tr><th>${i + 2}</th><td${bad.includes(i) ? ' class="bad"' : ''}>${v}</td></tr>`).join('') + '</table></div>';
+makeChoices('cleanList', [
+  { pre:mini('Клас', ['9-А', '9а', 'дев\'ятий А', '9 - А'], [1,2,3]),
+    text:'Учні вписували клас самі, і той самий клас записано чотирма способами. Як мала бути налаштована форма?',
+    opts:['Тип «Спадний список» з готовими класами', 'Тип «Абзац», щоб було більше місця', 'Увімкнути «Обов\'язкове»'], correct:0,
+    why:'Коли варіанти готові, усі обирають однаково записане значення.' },
+  { pre:mini('Ім\'я та прізвище', ['Оксана Мельник', '', 'Денис Коваль', ''], [1,3]),
+    text:'Дві заявки прийшли без імені, і тепер невідомо, чиї вони. Що треба було зробити?',
+    opts:['Змінити тип на «Прапорці»', 'Увімкнути «Обов\'язкове» для цього запитання', 'Додати опис до форми'], correct:1 },
+  { pre:mini('Вік', ['14', 'чотирнадцять', '140', '15'], [1,2]),
+    text:'У стовпці «Вік» — слова й неможливі числа. Що допоможе?',
+    opts:['Перевірка відповідей: Число, між 10 і 16', 'Тип «Абзац»', 'Перевірка відповідей: Текст, електронна адреса'], correct:0 },
+  { pre:mini('Електронна пошта', ['oksana@gmail.com', 'oksana.gmail', 'немає', 'den@ukr.net'], [1,2]),
+    text:'На деякі адреси не вдасться надіслати лист. Яке правило не пропустило б їх?',
+    opts:['Перевірка відповідей: Число, більше 0', 'Тип «Лінійна шкала»', 'Перевірка відповідей: Текст, електронна адреса'], correct:2 }
+]);
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що таке форма бази даних?', opts:['Окрема таблиця з копією всіх даних', 'Зручне «вікно», через яке додають, переглядають і змінюють записи', 'Звіт, який друкують на папері'], correct:1 },
+  { q:'Чим форма відрізняється від таблиці?', opts:['Форма показує один запис, без зайвих деталей', 'Форма показує всі записи одразу', 'У формі не можна змінювати дані'], correct:0 },
+  { q:'Учень має позначити всі дні, коли може ходити на гурток. Який тип запитання Google Форми потрібен?', opts:['Кілька варіантів', 'Прапорці', 'Лінійна шкала'], correct:1, why:'Лише прапорці дозволяють обрати кілька варіантів одразу.' },
+  { q:'Учень обирає один клас із 12. Який тип запитання Google Форми найкращий?', opts:['Спадний список', 'Абзац', 'Прапорці'], correct:0 },
+  { q:'Чим у таблиці відповідей стає кожна надіслана форма?', opts:['Новим стовпцем', 'Новим рядком-записом', 'Новим аркушем'], correct:1 },
+  { q:'Де в Google Формах зв\'язують форму з таблицею?', opts:['Налаштування → Тест', 'Відповіді → Зв\'язати з Таблицями', 'Запитання → Додати зображення'], correct:1 },
+  { q:'Як не допустити у формі відповіді «сто» в запитанні «Вік»?', opts:['Увімкнути «Обов\'язкове»', 'Додати перевірку відповідей: Число', 'Обрати тип «Абзац»'], correct:1, why:'«Обов\'язкове» лише вимагає відповіді, але не перевіряє, що в ній.' },
+  { q:'Що означає No-code?', opts:['Створення баз, форм і застосунків без написання коду', 'Базу даних без паролю', 'Програму, яка не працює без інтернету'], correct:0 }
+], {summary:'Тепер ти знаєш, навіщо базі даних форми, з яких елементів вони складаються і як зібрати відповіді з Google Форми в Google Таблицю.'});
+</script>
+
+</body>
+</html>
