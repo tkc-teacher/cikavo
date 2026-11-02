@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Реєстрація на турнір — Форми в базах даних</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в інтерфейсі Google -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#673AB7,#188038); --accent:#673AB7; --accent-dark:#4A2A8A; --accent-soft:#EFE9F8; --bg:#F7F5FB; --line:#E4DDF2; --gf:#673AB7; --gf-bg:#F0EBF8; }
+
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em; color:#5F6368;}
+  .menu .ms{color:inherit; font-size:1.1em; vertical-align:-.15em; margin-right:2px;}
+  .shot{margin:10px 0 6px; background:var(--gf-bg); border-radius:12px; padding:14px; font-family:Roboto,Arial,sans-serif; color:#202124; font-size:14px; overflow-x:auto;}
+  .hl{outline:2.5px solid #E8590C; outline-offset:2px; border-radius:6px;}
+  .gf-card{background:#fff; border:1px solid #DADCE0; border-radius:8px; padding:14px 18px;}
+  .focus{border-left:6px solid #4285F4 !important;}
+
+  /* Редактор запитання */
+  .q-top{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-bottom:10px;}
+  .q-field{flex:1 1 200px; background:#F1F3F4; border-bottom:2px solid var(--gf); padding:10px 12px; font-size:15px;}
+  .q-type{display:inline-flex; align-items:center; gap:8px; border:1px solid #DADCE0; border-radius:4px; padding:8px 8px 8px 12px; font-size:14px; white-space:nowrap;}
+  .q-foot{display:flex; align-items:center; justify-content:flex-end; gap:14px; border-top:1px solid #DADCE0; margin-top:12px; padding-top:10px; font-size:14px; flex-wrap:wrap;}
+  .q-foot .vr{width:1px; height:26px; background:#DADCE0;}
+  .q-req{display:inline-flex; align-items:center; gap:10px; padding:2px 4px;}
+  .toggle{width:34px; height:14px; border-radius:7px; background:#C5B3E6; position:relative; display:inline-block;}
+  .toggle::after{content:""; position:absolute; right:-2px; top:-3px; width:20px; height:20px; border-radius:50%; background:var(--gf); box-shadow:0 1px 3px rgba(0,0,0,.3);}
+  .val-row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; font-size:13.5px;}
+  .val-row span{border-bottom:1px solid #9AA0A6; padding:3px 6px; display:inline-flex; align-items:center; gap:6px;}
+  .ctx-menu{width:max-content; margin:8px 0 0 auto; background:#fff; border-radius:4px; box-shadow:0 2px 6px 2px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.3); padding:6px 0; font-size:13px;}
+  .ctx-menu div{padding:6px 14px;}
+  .ctx-menu .k{color:#5F6368; font-size:12px;}
+  .ctx-menu .on{background:#E8EAED;}
+
+  /* Меню типів запитань */
+  .t-menu{background:#fff; border-radius:6px; padding:6px 0; box-shadow:0 2px 6px 2px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.3); max-width:290px;}
+  .d-row{display:flex; align-items:center; gap:14px; padding:7px 16px; margin:0 6px; font-size:13.5px; white-space:nowrap;}
+  .d-sep{height:1px; background:#E0E0E0; margin:6px 0;}
+
+  /* Верхня панель редактора і вкладки */
+  .f-bar{display:flex; align-items:center; gap:12px; background:#fff; border-radius:8px; padding:8px 12px; flex-wrap:wrap;}
+  .f-bar img{width:26px; height:26px;}
+  .f-bar .ttl{font-size:16px; margin-right:auto; white-space:nowrap;}
+  .f-bar .ms{font-size:22px; padding:4px;}
+  .f-pub{background:var(--gf); color:#fff; border-radius:4px; padding:7px 16px; font-weight:500; font-size:14px;}
+  .f-tabs{display:flex; justify-content:center; gap:22px; background:#fff; border-radius:8px; padding:0 10px; margin-top:8px; font-size:14px; overflow-x:auto;}
+  .f-tabs span{padding:10px 2px; color:#5F6368; white-space:nowrap; display:inline-flex; align-items:center; gap:6px;}
+  .f-tabs .on{color:var(--gf); box-shadow:inset 0 -3px 0 var(--gf); font-weight:500;}
+  .f-tabs i{font-style:normal; background:var(--gf); color:#fff; font-size:11px; border-radius:999px; padding:1px 6px;}
+
+  /* Вкладка «Відповіді» і вікно вибору таблиці */
+  .r-top{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .r-top .n{font-size:20px; margin-right:auto;}
+  .link-btn{display:inline-flex; align-items:center; gap:8px; border:1px solid #DADCE0; border-radius:4px; padding:6px 12px; color:#188038; font-weight:500; font-size:13.5px; white-space:nowrap;}
+  .link-btn img{width:13px; height:18px;}
+  .dlg{background:#fff; border-radius:8px; padding:18px 20px; max-width:430px; margin-top:12px; box-shadow:0 2px 6px 2px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.3);}
+  .dlg .h{font-size:18px; margin-bottom:14px;}
+  .dlg .opt{display:flex; gap:10px; align-items:flex-start; margin:10px 0;}
+  .dot{width:16px; height:16px; border:2px solid #5F6368; border-radius:50%; flex-shrink:0; margin-top:2px; display:inline-block;}
+  .dot.on{border-color:var(--gf); background:radial-gradient(circle,var(--gf) 0 45%,#fff 50%);}
+  .dlg .name{border-bottom:2px solid var(--gf); padding:4px 0; margin-top:6px; font-size:13.5px; display:flex; align-items:center; gap:6px;}
+  .dlg .name img{width:13px; height:18px;}
+  .dlg .btns{display:flex; justify-content:flex-end; gap:8px; margin-top:16px;}
+  .dlg .btns span{border-radius:4px; padding:7px 16px; font-weight:500; font-size:14px; color:var(--gf);}
+  .dlg .btns .main{background:var(--gf); color:#fff;}
+
+  /* Помилка перевірки у формі */
+  .gf-q{font-size:15px; margin-bottom:10px;}
+  .gf-q .star{color:#D93025;}
+  .gf-ans{border-bottom:2px solid #D93025; width:60%; padding:4px 0; font-size:14px;}
+  .err-line{display:flex; align-items:center; gap:8px; color:#D93025; font-size:12.5px; margin-top:10px;}
+  .err-line .ms{color:#D93025; font-size:18px;}
+  .gf-card.err{border-color:#D93025;}
+
+  .sample td{white-space:normal;}
+  .sample td.b{font-weight:800; background:var(--accent-soft);}
+  .sample td.hd{font-weight:800; background:#E6F4EA;}
+  .sample tr.hdr td, .sample tr.hdr th{border-bottom:3px solid #C4C7C5;}
+  .sample .sm{font-size:12px; white-space:nowrap;}
+</style>
+</head>
+<body data-hud="9 клас · Практична · Реєстрація на турнір">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 9 клас · Форми в базах даних</div>
+    <h1>🏆 Реєстрація на шкільний турнір</h1>
+    <p>Створи Google Форму для запису на турнір, налаштуй перевірку відповідей і зв'яжи форму з Google Таблицею, щоб заявки самі ставали записами бази.</p>
+    <div class="meta"><span>⏱ 25–30 хв</span><span><img src="../../assets/logos/forms.svg" alt="">Google Форми</span><span><img src="../../assets/logos/sheets.svg" alt="">Google Таблиці</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <p>Таблиця, яку заповнює сама форма:</p>
+    <div class="sheet-wrap">
+      <table class="sample">
+        <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th><th>F</th></tr>
+        <tr class="hdr"><th>1</th><td class="hd">Позначка часу</td><td class="hd">Ім'я та прізвище</td><td class="hd">Клас</td><td class="hd">Вид спорту</td><td class="hd">Вік</td><td class="hd">Зручні дні</td></tr>
+        <tr><th>2</th><td class="sm">04.11.2026 10:12:45</td><td>Оксана Мельник</td><td>9-Б</td><td>Волейбол</td><td class="r">14</td><td>Вт, Чт</td></tr>
+        <tr><th>3</th><td class="sm">04.11.2026 10:14:03</td><td>Денис Коваль</td><td>9-А</td><td>Футбол</td><td class="r">15</td><td>Пн, Ср, Пт</td></tr>
+        <tr><th>4</th><td class="sm">04.11.2026 10:15:30</td><td>Софія Бондар</td><td>9-В</td><td>Настільний теніс</td><td class="r">14</td><td>Ср</td></tr>
+        <tr><th>5</th><td>…</td><td></td><td></td><td></td><td></td><td></td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи форму</h3>
+        <p>Обери один зі способів:</p>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Форми</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Форми → Порожня форма</span>.</li>
+              <li>Назви файл: <b>Турнір — Прізвище</b>.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Назва й опис</h3>
+        <ul>
+          <li>Клацни «Форма без назви» і введи: <b>Реєстрація на шкільний турнір</b>.</li>
+          <li>В «Опис форми» введи: <b>Заповни, щоб потрапити до турнірної таблиці.</b></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Запитання</h3>
+        <p>Створи п'ять запитань. Нове запитання — кнопкою <span class="menu"><span class="ms">add_circle</span>Додати запитання</span> на панелі праворуч, тип — у списку праворуч від тексту запитання.</p>
+        <div class="sheet-wrap">
+          <table class="sample">
+            <tr><td class="b">Запитання</td><td class="b">Тип</td><td class="b">Варіанти</td><td class="b">Обов'язкове</td></tr>
+            <tr><td>Ім'я та прізвище</td><td>Коротка відповідь</td><td>—</td><td>так</td></tr>
+            <tr><td>Клас</td><td>Спадний список</td><td>9-А · 9-Б · 9-В · 9-Г</td><td>так</td></tr>
+            <tr><td>Вид спорту</td><td>Кілька варіантів</td><td>Футбол · Баскетбол · Волейбол · Настільний теніс</td><td>так</td></tr>
+            <tr><td>Вік</td><td>Коротка відповідь</td><td>—</td><td>так</td></tr>
+            <tr><td>Зручні дні</td><td>Прапорці</td><td>Пн · Вт · Ср · Чт · Пт</td><td>ні</td></tr>
+          </table>
+        </div>
+        <div class="shot">
+          <div class="t-menu">
+            <div class="d-row hl"><span class="ms">short_text</span>Коротка відповідь</div>
+            <div class="d-row"><span class="ms">subject</span>Абзац</div>
+            <div class="d-sep"></div>
+            <div class="d-row hl"><span class="ms">radio_button_checked</span>Кілька варіантів</div>
+            <div class="d-row hl"><span class="ms">check_box</span>Прапорці</div>
+            <div class="d-row hl"><span class="ms">arrow_drop_down_circle</span>Спадний список</div>
+            <div class="d-sep"></div>
+            <div class="d-row"><span class="ms">linear_scale</span>Лінійна шкала</div>
+          </div>
+        </div>
+        <div class="tip">Перемикач <b>Обов'язкове</b> — унизу картки кожного запитання.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Перевірка віку</h3>
+        <p>На турнір записують учнів від 13 до 16 років. Не пропустимо інших значень:</p>
+        <ol>
+          <li>Клацни запитання <b>Вік</b>.</li>
+          <li>Унизу картки: <span class="menu"><span class="ms">more_vert</span> → Перевірка відповідей</span>.</li>
+          <li>Обери: <span class="menu">Число → Між</span>, впиши <b>13</b> і <b>16</b>.</li>
+          <li>У «Користувацький текст помилки» введи: <b>Вік — число від 13 до 16</b>.</li>
+        </ol>
+        <div class="shot">
+          <div class="gf-card focus">
+            <div class="q-top">
+              <div class="q-field">Вік</div>
+              <span class="q-type"><span class="ms">short_text</span>Коротка відповідь<span class="ms">arrow_drop_down</span></span>
+            </div>
+            <div class="val-row"><span class="hl">Число<span class="ms">arrow_drop_down</span></span><span class="hl">Між<span class="ms">arrow_drop_down</span></span><span>13</span>і<span>16</span><span style="flex:1">Вік — число від 13 до 16</span></div>
+            <div class="q-foot">
+              <span class="ms">content_copy</span><span class="ms">delete</span><span class="vr"></span>
+              <span class="q-req">Обов'язкове<span class="toggle"></span></span>
+              <span class="ms hl">more_vert</span>
+            </div>
+            <div class="ctx-menu"><div class="k">Показати</div><div>Опис</div><div class="on">✓ Перевірка відповідей</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Опублікуй форму</h3>
+        <ol>
+          <li>Угорі клацни <span class="menu">Опублікувати</span>.</li>
+          <li>У вікні нічого не змінюй і натисни <span class="menu">Опублікувати</span> ще раз.</li>
+        </ol>
+        <div class="shot">
+          <div class="f-bar">
+            <img src="../../assets/logos/forms.svg" alt=""><span class="ttl">Реєстрація на шкільний турнір</span>
+            <span class="ms">palette</span><span class="ms">visibility</span><span class="ms">undo</span>
+            <span class="f-pub hl">Опублікувати</span><span class="ms">more_vert</span>
+          </div>
+        </div>
+        <div class="tip">Без публікації форма — лише чернетка: відповісти на неї не може ніхто.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Зв'яжи форму з таблицею</h3>
+        <ol>
+          <li>Угорі перейди на вкладку <span class="menu">Відповіді</span>.</li>
+          <li>Натисни <span class="menu">Зв'язати з Таблицями</span>.</li>
+          <li>Залиш <b>Створити нову таблицю</b> і натисни <span class="menu">Створити</span>.</li>
+        </ol>
+        <div class="shot">
+          <div class="f-tabs"><span>Запитання</span><span class="on hl">Відповіді</span><span>Налаштування</span></div>
+          <div class="gf-card" style="margin-top:8px">
+            <div class="r-top"><span class="n">Відповідей немає</span><span class="link-btn hl"><img src="../../assets/logos/sheets.svg" alt="">Зв'язати з Таблицями</span><span class="ms">more_vert</span></div>
+          </div>
+          <div class="dlg">
+            <div class="h">Вибрати місце для відповідей</div>
+            <div class="opt"><i class="dot on"></i><div>Створити нову таблицю<div class="name"><img src="../../assets/logos/sheets.svg" alt="">Реєстрація на шкільний турнір (Відповіді)</div></div></div>
+            <div class="opt"><i class="dot"></i><div>Вибрати наявну таблицю</div></div>
+            <div class="btns"><span>Скасувати</span><span class="main hl">Створити</span></div>
+          </div>
+        </div>
+        <div class="check-val">Перевір себе: відкрилась нова таблиця, а в рядку 1 — назви стовпців: «Позначка часу» і п'ять твоїх запитань.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">7</div>
+      <div>
+        <h3>Перевір, як працює перевірка</h3>
+        <ol>
+          <li>Поверніся до вкладки з формою. Угорі клацни <span class="menu"><span class="ms">link</span>Копіювати посилання</span> і відкрий його в новій вкладці.</li>
+          <li>Заповни форму за Оксану Мельник (дані — у кроці 8), але у «Вік» введи <b>25</b>.</li>
+          <li>Натисни <span class="menu">Надіслати</span>.</li>
+        </ol>
+        <div class="shot">
+          <div class="gf-card err">
+            <div class="gf-q">Вік <span class="star">*</span></div>
+            <div class="gf-ans">25</div>
+            <div class="err-line"><span class="ms">error</span>Вік — число від 13 до 16</div>
+          </div>
+        </div>
+        <div class="check-val">Перевір себе: форма не надіслалась і показала твій текст помилки. Виправ вік на <b>14</b> і надішли.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">8</div>
+      <div>
+        <h3>Внеси заявки</h3>
+        <p>Після кожної заявки натискай <span class="menu">Надіслати ще одну відповідь</span>.</p>
+        <div class="sheet-wrap">
+          <table class="sample">
+            <tr><td class="b">Ім'я та прізвище</td><td class="b">Клас</td><td class="b">Вид спорту</td><td class="b">Вік</td><td class="b">Зручні дні</td></tr>
+            <tr><td>Оксана Мельник</td><td>9-Б</td><td>Волейбол</td><td class="r">14</td><td>Вт, Чт</td></tr>
+            <tr><td>Денис Коваль</td><td>9-А</td><td>Футбол</td><td class="r">15</td><td>Пн, Ср, Пт</td></tr>
+            <tr><td>Софія Бондар</td><td>9-В</td><td>Настільний теніс</td><td class="r">14</td><td>Ср</td></tr>
+            <tr><td><i>Ти</i></td><td><i>твій клас</i></td><td><i>на вибір</i></td><td class="r"><i>твій вік</i></td><td><i>на вибір</i></td></tr>
+          </table>
+        </div>
+        <div class="tip">Заявка Оксани вже є з кроку 7 — вдруге її не заповнюй.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">9</div>
+      <div>
+        <h3>Подивись на базу</h3>
+        <ol>
+          <li>Відкрий вкладку з таблицею <b>Реєстрація на шкільний турнір (Відповіді)</b>.</li>
+          <li>Подвійним клацанням по межі між буквами стовпців підбери їхню ширину.</li>
+        </ol>
+        <div class="check-val">Перевір себе: у таблиці 4 записи (рядки 2–5), у кожного своя позначка часу, а в «Зручні дні» в Дениса — <b>Пн, Ср, Пт</b> в одній клітинці.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Практична робота · «Форми в базах даних: призначення та основні елементи» · 9 клас</footer>
+
+<script src="../../assets/practice.js"></script>
+</body>
+</html>
