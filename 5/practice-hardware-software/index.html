@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Паспорт мого пристрою — Апаратна і програмна складові</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#2B59C3,#F08C00); --accent:#2B59C3; --accent-dark:#1E3F8C; --accent-soft:#E6EDFB; --bg:#F5F7FC; --line:#DDE4F3; }
+
+  /* Зразок паспорта */
+  .paper{background:#fff; border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px;}
+  .card-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; margin-bottom:6px;}
+  .paper h4{font-family:'Baloo 2',sans-serif; font-size:15px; margin:12px 0 4px; color:var(--accent-dark);}
+  .paper p{margin:4px 0; font-size:14.5px;}
+
+  /* Ілюстрації: вікна Windows, системний шрифт */
+  .win{margin:10px 0 6px; max-width:520px; background:#fff; border:1px solid #D5D8E2; border-radius:8px; overflow:hidden; box-shadow:0 3px 10px rgba(10,25,70,.14); font-family:'Segoe UI',system-ui,-apple-system,sans-serif; color:#1b1b1b; font-size:12.5px; line-height:1.3;}
+  .win-title{display:flex; align-items:center; gap:7px; padding:6px 10px; background:#F3F3F3; font-size:12px;}
+  .win-ctl{margin-left:auto; color:#555; letter-spacing:9px; font-size:11px;}
+  .about{padding:10px 12px;}
+  .about h4{margin:0 0 6px; font-size:13.5px; font-weight:600;}
+  .about div{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:10px; padding:3px 5px; border-radius:4px;}
+  .about span{color:#555;}
+  .hl{outline:2.5px solid #F08C00; outline-offset:1px; border-radius:4px;}
+  .os-logo{display:block; height:64px; width:auto; margin:8px 0 4px;}
+</style>
+</head>
+<body data-hud="5 клас · Практична · Паспорт пристрою">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 5 клас · Апаратна і програмна складові</div>
+    <h1>🪪 Паспорт мого пристрою</h1>
+    <p>Дізнайся, яка операційна система встановлена на твоєму комп'ютері чи телефоні, знайди її логотип і запиши, які є програми.</p>
+    <div class="meta"><span>⏱ 15 хв</span><span><img src="../../assets/logos/docs.svg" alt="">Google Документи</span><span>💻 📱 Комп'ютер, телефон або планшет</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="paper">
+      <div class="card-title">Паспорт мого пристрою</div>
+      <p><b>Пристрій:</b> смартфон</p>
+      <p><b>Операційна система:</b> Android</p>
+      <p><b>Версія:</b> 14</p>
+      <img class="os-logo" src="../lesson-hardware-software/images/os-android.svg" alt="Логотип Android">
+      <h4>Програми</h4>
+      <p>YouTube — дивлюся відео.</p>
+      <p>Камера — фотографую.</p>
+      <p>Google Classroom — виконую домашні завдання.</p>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи документ</h3>
+        <p>Обери один зі способів:</p>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Документи</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Документи</span>.</li>
+              <li>Назви файл: <b>Паспорт пристрою — Прізвище</b>.</li>
+            </ol>
+          </div>
+        </div>
+        <p>Напиши заголовок <b>Паспорт мого пристрою</b>, а під ним — який це пристрій: комп'ютер, ноутбук, телефон чи планшет.</p>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Знайди операційну систему та її версію</h3>
+        <p>Обери свій пристрій:</p>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">💻 Комп'ютер із Windows</div>
+            <ol>
+              <li>Натисни разом <span class="mono">Win</span> + <span class="mono">Pause</span>.</li>
+              <li>Знайди рядки <b>Випуск</b> і <b>Версія</b>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📱 Телефон чи планшет з Android</div>
+            <ol>
+              <li><span class="menu">Налаштування → Про телефон</span>.</li>
+              <li>Знайди рядок <b>Версія Android</b>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📱 iPhone чи iPad</div>
+            <ol>
+              <li><span class="menu">Параметри → Загальні → Про пристрій</span>.</li>
+              <li>Знайди рядок <b>Версія iOS</b> (на iPad — <b>iPadOS</b>).</li>
+            </ol>
+          </div>
+        </div>
+        <div class="win">
+          <div class="win-title">Параметри<span class="win-ctl">─ ▢ ✕</span></div>
+          <div class="about">
+            <h4>Характеристики Windows</h4>
+            <div class="hl"><span>Випуск</span>Windows 11 Home</div>
+            <div class="hl"><span>Версія</span>24H2</div>
+          </div>
+        </div>
+        <p>Запиши в документ два рядки: <b>Операційна система:</b> … і <b>Версія:</b> …</p>
+        <div class="tip">Не знайшов? Пункти можуть називатися трохи інакше. Пошукай у налаштуваннях слово «Про» або попроси дорослого допомогти.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Додай логотип своєї ОС</h3>
+        <ol>
+          <li>Постав курсор під рядком <b>Версія</b>.</li>
+          <li>Відкрий <span class="menu">Вставлення → Зображення → Пошук в Інтернеті</span>.</li>
+          <li>Праворуч з'явиться пошук. Введи, наприклад, <b>логотип Android</b> чи <b>логотип Windows</b>.</li>
+          <li>Клацни потрібну картинку й натисни <span class="menu">Вставити</span>.</li>
+        </ol>
+        <div class="tip">Обирай справжній логотип, а не будь-яку картинку. Якщо він завеликий — клацни його й потягни за кутик, щоб зменшити.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Запиши програми</h3>
+        <ol>
+          <li>Відкрий список програм: на комп'ютері — кнопка <span class="menu">Пуск</span>, на телефоні — головний екран.</li>
+          <li>Напиши підзаголовок <b>Програми</b>.</li>
+          <li>Запиши <b>5 програм</b>, якими користуєшся: назва — для чого ти її використовуєш.</li>
+        </ol>
+        <div class="tip">Ігри теж програми! Але системні налаштування не рахуються — обери ті, у яких ти щось робиш.</div>
+        <div class="check-val">Перевір себе: у паспорті є пристрій, назва ОС, її версія, логотип і 5 програм із поясненням.</div>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+<footer>Практична робота · «Паспорт мого пристрою» · 5 клас</footer>
+
+<script src="../../assets/practice.js"></script>
+</body>
+</html>
