@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Поняття апаратної і програмної складової комп'ютера. Програмне забезпечення комп'ютера. Поняття операційної системи — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --accent:#2B59C3; --accent-dark:#1E3F8C; --accent-soft:#E6EDFB;
+    --label:#E8590C;
+    --bg:#F5F7FC; --line:#DDE4F3;
+    --hud-bar:linear-gradient(90deg,#2B59C3,#F08C00);
+    --hard:#E8590C; --hard-soft:#FFF0E6;
+  }
+  .block ul{padding-left:22px;}
+  .block li{margin-bottom:5px;}
+
+  /* Крок 1: «залізо» і «програми» */
+  .duo{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:4px 0 16px;}
+  @media (max-width:600px){ .duo{grid-template-columns:1fr;} }
+  .duo-card{display:flex; gap:14px; align-items:center; background:var(--surface); border:2px solid var(--c); border-radius:var(--radius-m); padding:14px 16px;}
+  .duo-card svg{width:80px; height:80px; flex-shrink:0;}
+  .duo-card b{font-family:'Baloo 2',sans-serif; font-size:20px; color:var(--c); display:block; line-height:1.2;}
+  .duo-card p{margin:2px 0 0; font-size:14.5px;}
+  .duo-card .eg{display:block; font-size:13px; color:var(--ink-soft); margin-top:4px;}
+  .sort-chip .ic-img{height:30px; width:auto; margin:-4px 6px -4px 0; vertical-align:middle; mix-blend-mode:multiply;}
+  .sort-chip .ic-app{width:26px; height:26px; margin:-3px 7px -3px 0; vertical-align:middle;}
+  .bucket-title .b-ic{width:26px; height:26px; vertical-align:-6px; margin-right:6px;}
+  .sort-chip .ic{font-size:20px; margin-right:6px; vertical-align:-3px;}
+
+  /* Крок 2: емулятор «Увімкни комп'ютер» — робоче місце */
+  .rig{display:grid; grid-template-columns:92px minmax(0,1fr) 118px; grid-template-areas:"spk pc prn"; gap:14px; align-items:end; max-width:720px; margin:0 auto;}
+  @media (max-width:600px){ .rig{grid-template-columns:1fr 1fr; grid-template-areas:"pc pc" "spk prn"; align-items:end;} .rig .dev{max-width:96px; justify-self:center;} }
+  .rig .spk{grid-area:spk;} .rig .prn{grid-area:prn;} .rig .pc{grid-area:pc;}
+  .pc{min-width:0;}
+  .pc-frame{background:#2A2F3D; border-radius:16px 16px 10px 10px; padding:12px 12px 30px; position:relative; box-shadow:0 6px 0 #1C202B;}
+  .pc-frame::after{content:''; position:absolute; left:50%; bottom:11px; width:8px; height:8px; margin-left:-4px; border-radius:50%; background:#444B5C; transition:background .3s;}
+  .pc.on .pc-frame::after{background:#40C057; box-shadow:0 0 6px #40C057;}
+  .pc-power{position:absolute; right:12px; bottom:4px; width:24px; height:24px; padding:0; border-radius:50%; border:none; cursor:pointer; background:var(--hard); color:#fff; font-size:13px; line-height:24px;}
+  .pc-power.pulse{animation:ring 1.4s ease-out infinite;}
+  @keyframes ring{0%{box-shadow:0 0 0 0 rgba(232,89,12,.7);} 100%{box-shadow:0 0 0 12px rgba(232,89,12,0);}}
+  .pc-power:disabled{background:#5C6378; cursor:default; animation:none;}
+  .pc-screen{aspect-ratio:16/10; background:#0B0D12; border-radius:6px; overflow:hidden; position:relative; color:#C9F2D0; font:14px/1.5 'Courier New',monospace;}
+  .pc-stand{width:80px; height:22px; margin:0 auto; background:#3A4052; clip-path:polygon(25% 0,75% 0,90% 100%,10% 100%);}
+  .pc-base{width:150px; height:9px; margin:0 auto; background:#3A4052; border-radius:6px;}
+  .pc-periph{display:flex; justify-content:center; align-items:center; gap:14px; margin-top:8px;}
+  .pc-periph .kb{width:62%; max-width:300px; height:auto;}
+  .pc-periph .ms{width:26px; height:auto;}
+  .dev{position:relative; text-align:center;}
+  .dev svg{width:100%; height:auto; display:block;}
+  .dev .st{font-size:12px; font-weight:800; line-height:1.25; margin-top:4px; min-height:2.5em; color:#E03131; visibility:hidden;}
+  .rig.os-on .dev .st{visibility:visible;}
+  .dev.ok .st{color:#2F9E44;}
+  .dev.wake svg{animation:wake .6s ease;}
+  @keyframes wake{50%{transform:scale(1.08);}}
+  .fx{position:absolute; left:50%; top:-8px; transform:translate(-50%,0); font-family:'Baloo 2',sans-serif; font-weight:800; font-size:22px; color:#2F9E44; pointer-events:none; animation:fxUp 1.4s ease forwards;}
+  @keyframes fxUp{to{transform:translate(-50%,-34px); opacity:0;}}
+  .led{fill:#FFC93C; animation:led 1s steps(1) infinite;}
+  @keyframes led{50%{fill:#6B5A1E;}}
+  .dev.ok .led{fill:#40C057; animation:none;}
+  .paper-out{transform-box:fill-box; transform-origin:top; transform:scaleY(0); transition:transform 1.1s ease;}
+  .dev.printing .paper-out{transform:scaleY(1);}
+  .cone{transform-box:fill-box; transform-origin:center;}
+  .dev.playing .cone{animation:cone .28s ease-in-out infinite alternate;}
+  @keyframes cone{to{transform:scale(1.12);}}
+  .pc-hint{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:16px; color:var(--ink-soft); text-align:center; margin-top:8px;}
+  .pc-hint:empty{display:none;}
+  .pc-ask{margin-top:4px; text-align:center;}
+  .pc-ask .q{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; margin-bottom:10px;}
+  .pc-ask .choice-row{justify-content:center;}
+  .pc-boot{padding:14px 16px; white-space:pre-wrap;}
+  .pc-boot .err{color:#FF8787; font-weight:700;}
+  .pc-boot .cur{display:inline-block; width:9px; height:16px; background:#C9F2D0; vertical-align:-3px; animation:blink 1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  .pc-install{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; background:linear-gradient(160deg,#1E3F8C,#2B59C3); color:#fff; font-family:'Nunito Sans',sans-serif; font-weight:700;}
+  .pc-install .bar{width:60%; height:12px; background:rgba(255,255,255,.25); border-radius:6px; overflow:hidden;}
+  .pc-install .bar i{display:block; height:100%; width:0; background:#FFC93C; transition:width .15s linear;}
+  .pc-install .spin{width:34px; height:34px; border:4px solid rgba(255,255,255,.3); border-top-color:#fff; border-radius:50%; animation:spin 1s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .desk{position:absolute; inset:0; background:radial-gradient(circle at 75% 30%,#FFD8A8 0 12%,transparent 13%),linear-gradient(180deg,#74C0FC 0%,#A5D8FF 55%,#8CE99A 56%,#51CF66 100%); font-family:'Nunito Sans',sans-serif; color:#1B1B3A;}
+  .desk-ic{position:absolute; width:76px; background:none; border:none; cursor:pointer; padding:4px 2px; border-radius:8px; font:inherit; font-size:11.5px; font-weight:700; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.6); touch-action:none; user-select:none; -webkit-user-select:none; z-index:1;}
+  .desk-ic span{display:block; font-size:28px; line-height:1.15; text-shadow:none;}
+  .desk-ic .tile{width:28px; height:28px; display:block; margin:2px auto 3px;}
+  .win-top .tile{width:15px; height:15px; vertical-align:-3px; margin-right:2px;}
+  .desk-ic:hover{background:rgba(255,255,255,.3);}
+  .desk-ic.drag{background:rgba(255,255,255,.45); cursor:grabbing; z-index:7;}
+  .desk-ic.new{animation:winIn .4s ease;}
+  .desk-task{position:absolute; left:0; right:0; bottom:0; height:28px; background:rgba(20,24,40,.82); display:flex; align-items:center; gap:8px; padding:0 8px; color:#fff; font-size:12px; z-index:2;}
+  .desk-task .start{width:20px; height:20px; border-radius:5px; background:linear-gradient(135deg,#FFC93C,#F08C00);}
+  .desk-task .clock{margin-left:auto; font-weight:700;}
+  .win{position:absolute; left:34%; top:10%; width:58%; height:70%; background:#fff; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,.3); overflow:hidden; animation:winIn .25s ease; z-index:4;}
+  @keyframes winIn{from{transform:scale(.7); opacity:0;}}
+  .win-top{display:flex; align-items:center; justify-content:space-between; background:var(--accent); color:#fff; font-size:12.5px; font-weight:700; padding:4px 6px 4px 10px;}
+  .win-top button{background:#FF6B6B; border:none; color:#fff; width:20px; height:20px; border-radius:5px; cursor:pointer; font-weight:800; line-height:1;}
+  .win-body{height:calc(100% - 28px); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:6px; font-family:'Baloo 2',sans-serif; font-size:22px; font-weight:700;}
+  .win-body small{font-family:'Nunito Sans',sans-serif; font-size:13px; font-weight:600; color:var(--ink-soft); text-align:center; padding:0 10px;}
+  .win-body .mini-btn{font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:700; border:none; background:var(--accent); color:#fff; border-radius:6px; padding:3px 12px; cursor:pointer;}
+  .eq{display:flex; gap:5px; align-items:flex-end; height:46px;}
+  .eq i{width:9px; background:var(--accent); border-radius:3px; animation:eq .7s ease-in-out infinite alternate;}
+  .eq i:nth-child(2){animation-delay:.15s;} .eq i:nth-child(3){animation-delay:.3s;} .eq i:nth-child(4){animation-delay:.45s;} .eq i:nth-child(5){animation-delay:.1s;}
+  @keyframes eq{from{height:8px;} to{height:46px;}}
+  .bounce{animation:bounce .6s ease-in-out infinite alternate; display:inline-block;}
+  @keyframes bounce{to{transform:translateY(-14px);}}
+  @media (max-width:520px){ .pc-screen{font-size:11px;} .pc-boot{padding:8px 10px;} .win{left:20%; width:76%; top:6%; height:76%;} .desk-ic{width:62px; font-size:10px;} .desk-ic span{font-size:22px;} .win-body{font-size:18px;} }
+
+  /* Крок 2: полиця встановлення */
+  .pc-more{margin-top:10px;}
+  .inst-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; text-align:center; margin-bottom:8px; color:var(--ink);}
+  .inst-shelf{display:flex; flex-wrap:wrap; gap:6px; justify-content:center;}
+  .inst-shelf{align-items:flex-end; gap:12px;}
+  .box{position:relative; width:80px; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; transition:opacity .2s, transform .15s; filter:drop-shadow(0 3px 3px rgba(0,0,0,.2));}
+  .box.os{width:98px;}
+  .box:not(.inst-ghost){animation:boxPulse 1.4s ease-in-out infinite;}
+  @keyframes boxPulse{0%,100%{filter:drop-shadow(0 3px 3px rgba(0,0,0,.2));} 50%{filter:drop-shadow(0 0 9px rgba(232,89,12,.85));}}
+  .box.new{animation:winIn .35s ease, boxPulse 1.4s ease-in-out .35s infinite;}
+  .box:hover{transform:translateY(-4px);}
+  .box svg{display:block; width:100%; height:auto;}
+  .box .lbl{position:absolute; left:2.6%; width:88.3%; bottom:3.6%; height:21.8%; display:flex; align-items:center; justify-content:center; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12px; line-height:1.05; color:#1B1B3A; padding:0 2px;}
+  .box.os .lbl{font-size:13px;}
+  .box.drv{width:84px;}
+  .box.drv .lbl{height:29%; font-size:11px; line-height:1;}
+  .box.sel{outline:3px solid var(--accent); outline-offset:4px; border-radius:4px;}
+  .box.done{opacity:.25; cursor:default; transform:none;}
+    .inst-ghost{position:fixed !important; z-index:60; pointer-events:none; margin:0; transform:translate(-50%,-50%) rotate(-6deg) scale(1.08) !important; opacity:.95; animation:none !important;}
+  .pc-screen.drop{outline:4px solid #FFC93C; outline-offset:2px;}
+  .drv-note{margin:18px 0 0;}
+  .inst-win{position:absolute; left:16%; right:16%; top:24%; background:#fff; border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,.3); overflow:hidden; z-index:8; font-family:'Nunito Sans',sans-serif; animation:winIn .25s ease;}
+  .inst-win .win-top{padding:5px 10px;}
+  .inst-win .ib{padding:10px 12px; font-size:13px; font-weight:700; color:var(--ink);}
+  .inst-win .ibar{height:10px; background:var(--accent-soft); border-radius:5px; overflow:hidden; margin-top:8px;}
+  .inst-win .ibar i{display:block; height:100%; width:0; background:var(--accent); transition:width .1s linear;}
+  .toast{position:absolute; right:8px; bottom:36px; max-width:62%; background:rgba(20,24,40,.92); color:#fff; font-family:'Nunito Sans',sans-serif; font-size:12px; font-weight:700; padding:8px 10px; border-radius:8px; z-index:9; animation:winIn .25s ease;}
+
+  /* Крок 4: види прикладних програм */
+  .apps{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:6px 0 18px;}
+  @media (max-width:620px){ .apps{grid-template-columns:1fr 1fr;} }
+  .app-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px; display:flex; gap:10px; align-items:center;}
+  .app-card .em{font-size:32px; flex-shrink:0;}
+  .app-card b{font-family:'Baloo 2',sans-serif; font-size:15.5px; line-height:1.2; display:block; color:var(--accent-dark);}
+  .app-card small{font-size:13px; color:var(--ink-soft); line-height:1.35; display:block;}
+
+  /* Крок 4: знайомі ОС — картки з логотипами */
+  .oses{display:grid; grid-template-columns:repeat(7,1fr); gap:8px; margin:6px 0 16px;}
+  @media (max-width:700px){ .oses{grid-template-columns:repeat(4,1fr);} }
+  @media (max-width:440px){ .oses{grid-template-columns:repeat(2,1fr);} }
+  .os-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 8px 10px; text-align:center; display:flex; flex-direction:column; align-items:center;}
+  .os-card .lg{height:44px; display:flex; align-items:center; justify-content:center; margin-bottom:6px;}
+  .os-card .lg img{height:44px; width:auto; max-width:84px; object-fit:contain;}
+  .os-card b{font-family:'Baloo 2',sans-serif; font-size:15.5px; line-height:1.2; display:block;}
+  .os-card small{font-size:12.5px; color:var(--ink-soft); line-height:1.3; display:block;}
+
+  /* Крок 4: гра «Знайди пару» (за зразком 5/lesson-computer-systems) */
+  .memo-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:10px;}
+  @media (max-width:480px){ .memo-grid{gap:6px;} }
+  .memo-card{perspective:1200px; height:126px; cursor:pointer;}
+  @media (max-width:480px){ .memo-card{height:96px;} }
+  .memo-card .flip-inner{transition:transform .5s cubic-bezier(.4,0,.2,1);}
+  .memo-card.flipped .flip-inner{transform:rotateY(180deg);}
+  .memo-card .flip-face{padding:8px;}
+  .memo-card .flip-front{background:linear-gradient(135deg,var(--accent),var(--accent-dark)); border:none;}
+  .memo-card .flip-front .neuron-mark{width:30px; height:30px;}
+  .memo-card .flip-back{border:2px solid var(--card-c, var(--line)); background:var(--card-c-light, #fff); transform:rotateY(180deg);}
+  .memo-card .flip-back img{height:46px; width:auto; max-width:80%; object-fit:contain;}
+  .memo-card .flip-back .em{font-size:34px; line-height:1.1;}
+  .memo-card .flip-back .nm{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12px; line-height:1.15; margin-top:5px; color:var(--ink); word-break:break-word;}
+  .memo-card.matched{pointer-events:none;}
+  .memo-card.matched .flip-back{box-shadow:inset 0 0 0 3px var(--card-c, #2F9E44);}
+  .memo-card.wrong{animation:cardShake .5s ease;}
+  .memo-card.pop{animation:matchPop .45s ease;}
+  @keyframes cardShake{0%,100%{transform:translateX(0);} 20%{transform:translateX(-6px);} 40%{transform:translateX(6px);} 60%{transform:translateX(-4px);} 80%{transform:translateX(4px);}}
+  @keyframes matchPop{50%{transform:scale(1.08);}}
+</style>
+</head>
+<body data-lesson="lesson5-hardware-software" data-hud="5 клас · Залізо і програми">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Інтернет та інформаційні процеси</div>
+      <h1>Апаратна і програмна складові комп'ютера</h1>
+      <p>Без програм навіть найдорожчий комп'ютер — просто коробка з деталями. Дізнайся, хто ним насправді керує, і сам побудь його «головною програмою».</p>
+      <button class="btn-primary" onclick="document.getElementById('step1').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 160 160" fill="none">
+      <circle cx="80" cy="80" r="64" fill="#E6EDFB"/>
+      <rect x="28" y="40" width="96" height="66" rx="10" fill="#2A2F3D"/>
+      <rect x="36" y="48" width="80" height="50" rx="5" fill="#2B59C3"/>
+      <circle cx="62" cy="68" r="6" fill="#fff"/><circle cx="90" cy="68" r="6" fill="#fff"/>
+      <circle cx="63.5" cy="69" r="3" fill="#1B1B3A"/><circle cx="91.5" cy="69" r="3" fill="#1B1B3A"/>
+      <path d="M66 82 Q76 90 86 82" stroke="#fff" stroke-width="3.5" stroke-linecap="round"/>
+      <rect x="66" y="106" width="20" height="12" fill="#3A4052"/>
+      <rect x="52" y="118" width="48" height="7" rx="3.5" fill="#3A4052"/>
+      <rect x="104" y="18" width="42" height="26" rx="13" fill="#fff" stroke="#E8590C" stroke-width="3"/>
+      <path d="M116 26l-5 5 5 5M134 26l5 5-5 5M127 25l-4 12" stroke="#E8590C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="104" cy="50" r="4" fill="#fff" stroke="#E8590C" stroke-width="2.5"/>
+      <circle cx="22" cy="118" r="5" fill="#FFC93C"/><circle cx="140" cy="100" r="4" fill="#2B59C3"/><circle cx="30" cy="34" r="4" fill="#E8590C"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="step1">
+    <div class="step-label">Крок 1 · Залізо і програми</div>
+    <h2>Що можна потримати в руках?</h2>
+    <p>Комп'ютер складається з двох частин, які одна без одної нічого не варті.</p>
+    <div class="duo">
+      <div class="duo-card" style="--c:#E8590C">
+        <svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="38" fill="#FFF0E6"/><rect x="22" y="22" width="36" height="36" rx="5" fill="#2A2F3D"/><rect x="30" y="30" width="20" height="20" rx="3" fill="#E8590C"/><path d="M28 16v6M36 16v6M44 16v6M52 16v6M28 58v6M36 58v6M44 58v6M52 58v6M16 28h6M16 36h6M16 44h6M16 52h6M58 28h6M58 36h6M58 44h6M58 52h6" stroke="#868E96" stroke-width="3" stroke-linecap="round"/></svg>
+        <div><b>Апаратна складова</b><p>Усі пристрої й деталі. Їх можна торкнутися рукою. Інша назва — «залізо».</p><span class="eg">Монітор, процесор, миша</span></div>
+      </div>
+      <div class="duo-card" style="--c:#2B59C3">
+        <svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="38" fill="#E6EDFB"/><rect x="14" y="20" width="52" height="40" rx="6" fill="#fff" stroke="#2B59C3" stroke-width="3"/><path d="M14 30h52" stroke="#2B59C3" stroke-width="3"/><path d="M30 38l-6 6 6 6M50 38l6 6-6 6M43 36l-6 16" stroke="#2B59C3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <div><b>Програмна складова</b><p>Програми — набори інструкцій, що кажуть «залізу», що робити. Торкнутися їх не можна.</p><span class="eg">Гра, браузер, калькулятор</span></div>
+      </div>
+    </div>
+    <div class="note">💡 Англійською «залізо» — <b>hardware</b> («тверді вироби»), а програми — <b>software</b> («м'які вироби»). Програми «м'які», бо їх легко змінити чи замінити, не відкриваючи корпус.</div>
+    <p class="soft">Розклади: клацни картку, а потім кошик.</p>
+    <div class="exercise">
+      <div class="sort-buckets">
+        <div class="bucket" id="bkHard"><div class="bucket-title"><svg class="b-ic" viewBox="0 0 40 40"><rect x="2" y="5" width="36" height="30" rx="3" fill="#2F9E44"/><path d="M8 12h8v6M32 12h-6M8 28h6v-4M32 28h-8M20 9v4M20 31v-4" stroke="#FFD43B" stroke-width="1.6" fill="none" stroke-linecap="round"/><rect x="14" y="14" width="12" height="12" rx="1.5" fill="#2A2F3D"/><path d="M16 12v2M20 12v2M24 12v2M16 26v2M20 26v2M24 26v2M12 16h2M12 20h2M12 24h2M26 16h2M26 20h2M26 24h2" stroke="#ADB5BD" stroke-width="1.3"/><circle cx="6" cy="9" r="1.4" fill="#C0EB75"/><circle cx="34" cy="31" r="1.4" fill="#C0EB75"/><rect x="28" y="16" width="6" height="3" rx="1" fill="#2A2F3D"/></svg> Апаратне</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkSoft"><div class="bucket-title"><svg class="b-ic" viewBox="0 0 40 40"><rect x="3" y="3" width="16" height="16" fill="#F25022"/><rect x="21" y="3" width="16" height="16" fill="#7FBA00"/><rect x="3" y="21" width="16" height="16" fill="#00A4EF"/><rect x="21" y="21" width="16" height="16" fill="#FFB900"/></svg> Програмне</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="hsPool"></div>
+      <div class="progress-line" id="hsProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Операційна система</div>
+    <h2>Увімкни комп'ютер</h2>
+    <p>Перед тобою новенький комп'ютер просто з магазину. Усі деталі на місці. Спробуй його увімкнути!</p>
+    <div class="exercise" id="pcEx">
+      <div class="rig" id="rig">
+        <div class="dev spk" id="devSpk"><svg viewBox="0 0 80 130"><rect x="12" y="8" width="56" height="116" rx="10" fill="#343A40"/><rect x="12" y="8" width="56" height="116" rx="10" fill="none" stroke="#212529" stroke-width="2"/><circle cx="40" cy="34" r="10" fill="#495057"/><circle cx="40" cy="34" r="4" fill="#212529"/><g class="cone"><circle cx="40" cy="84" r="22" fill="#495057"/><circle cx="40" cy="84" r="14" fill="#343A40"/><circle cx="40" cy="84" r="6" fill="#868E96"/></g></svg><div class="st"></div></div>
+        <div class="pc" id="pc">
+          <div class="pc-frame"><div class="pc-screen" id="pcScreen"></div><button class="pc-power pulse" id="pcPower" title="Кнопка живлення">⏻</button></div>
+          <div class="pc-stand"></div><div class="pc-base"></div>
+          <div class="pc-periph"><svg class="kb" viewBox="0 0 200 44"><rect x="1" y="1" width="198" height="42" rx="7" fill="#495057"/><g fill="#CED4DA"><rect x="8.0" y="7" width="12.5" height="9" rx="2"/><rect x="23.6" y="7" width="12.5" height="9" rx="2"/><rect x="39.2" y="7" width="12.5" height="9" rx="2"/><rect x="54.8" y="7" width="12.5" height="9" rx="2"/><rect x="70.4" y="7" width="12.5" height="9" rx="2"/><rect x="86.0" y="7" width="12.5" height="9" rx="2"/><rect x="101.6" y="7" width="12.5" height="9" rx="2"/><rect x="117.2" y="7" width="12.5" height="9" rx="2"/><rect x="132.8" y="7" width="12.5" height="9" rx="2"/><rect x="148.4" y="7" width="12.5" height="9" rx="2"/><rect x="164.0" y="7" width="12.5" height="9" rx="2"/><rect x="179.6" y="7" width="12.5" height="9" rx="2"/><rect x="8.0" y="19" width="12.5" height="9" rx="2"/><rect x="23.6" y="19" width="12.5" height="9" rx="2"/><rect x="39.2" y="19" width="12.5" height="9" rx="2"/><rect x="54.8" y="19" width="12.5" height="9" rx="2"/><rect x="70.4" y="19" width="12.5" height="9" rx="2"/><rect x="86.0" y="19" width="12.5" height="9" rx="2"/><rect x="101.6" y="19" width="12.5" height="9" rx="2"/><rect x="117.2" y="19" width="12.5" height="9" rx="2"/><rect x="132.8" y="19" width="12.5" height="9" rx="2"/><rect x="148.4" y="19" width="12.5" height="9" rx="2"/><rect x="164.0" y="19" width="12.5" height="9" rx="2"/><rect x="179.6" y="19" width="12.5" height="9" rx="2"/><rect x="50" y="31" width="100" height="8" rx="2"/></g></svg><svg class="ms" viewBox="0 0 30 44"><rect x="2" y="2" width="26" height="40" rx="13" fill="#495057"/><path d="M15 4v14" stroke="#CED4DA" stroke-width="2"/></svg></div>
+        </div>
+        <div class="dev prn" id="devPrn"><svg viewBox="0 0 120 112"><rect x="28" y="4" width="64" height="34" rx="2" fill="#fff" stroke="#CED4DA" stroke-width="2"/><path d="M36 14h40M36 22h48M36 30h30" stroke="#DEE2E6" stroke-width="3"/><rect x="6" y="30" width="108" height="48" rx="10" fill="#868E96"/><rect x="6" y="30" width="108" height="14" rx="7" fill="#ADB5BD"/><rect x="18" y="66" width="84" height="6" rx="3" fill="#343A40"/><rect x="80" y="48" width="12" height="6" rx="2" fill="#495057"/><circle class="led" cx="102" cy="51" r="5.5"/><rect class="paper-out" x="26" y="69" width="68" height="38" fill="#fff" stroke="#CED4DA" stroke-width="1.5"/><path class="paper-out" d="M36 80h32M36 88h44M36 96h22" stroke="#2B59C3" stroke-width="3"/></svg><div class="st"></div></div>
+      </div>
+      <div class="pc-hint" id="pcHint"></div>
+      <div class="pc-more" id="pcMore" hidden>
+        <div class="inst-shelf" id="pcShelf"></div>
+      </div>
+    </div>
+    <div id="osExplain">
+      <p style="margin-top:20px;"><b>Операційна система (ОС)</b> — головна програма комп'ютера. Її встановлюють першою, бо без неї не запуститься жодна інша. Вона:</p>
+      <ul>
+        <li>змушує всі пристрої працювати злагоджено;</li>
+        <li>запускає інші програми й дає їм усе потрібне;</li>
+        <li>показує тобі Робочий стіл, значки й вікна, щоб було зручно керувати комп'ютером.</li>
+      </ul>
+      <p><b>Драйвер</b> — невелика програма, яка «знайомить» операційну систему з певним пристроєм. Без драйвера ОС не знає, як із цим пристроєм працювати.</p>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Прикладні програми</div>
+    <h2>Програма для кожної справи</h2>
+    <p>Операційна система — це <b>системна</b> програма: вона дбає про сам комп'ютер. А програми, що допомагають тобі в конкретних справах, називають <b>прикладними</b>. Ось найпоширеніші:</p>
+    <div class="apps">
+      <div class="app-card"><span class="em">📝</span><div><b>Текстовий редактор</b><small>набрати й оформити текст</small></div></div>
+      <div class="app-card"><span class="em">🎨</span><div><b>Графічний редактор</b><small>малювати, змінювати фото</small></div></div>
+      <div class="app-card"><span class="em">🌐</span><div><b>Браузер</b><small>відкривати сайти в Інтернеті</small></div></div>
+      <div class="app-card"><span class="em">🎧</span><div><b>Програвач</b><small>слухати музику, дивитись відео</small></div></div>
+      <div class="app-card"><span class="em">🗜️</span><div><b>Архіватор</b><small>стиснути файли, щоб займали менше місця</small></div></div>
+      <div class="app-card"><span class="em">🎮</span><div><b>Гра</b><small>розважитись і потренувати кмітливість</small></div></div>
+    </div>
+    <p class="soft">Яка програма знадобиться в кожній ситуації?</p>
+    <div id="appCheck"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Знайомі ОС</div>
+    <h2>Знайомі операційні системи</h2>
+    <p>Операційна система є не лише в комп'ютері, а й у телефоні, годиннику та автомобілі.</p>
+    <div class="oses" id="osCards"></div>
+    <div class="exercise">
+      <div class="memo-grid" id="osMemo"></div>
+      <div class="progress-line" id="osMemoProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Поняття апаратної і програмної складової комп'ютера. Програмне забезпечення комп'ютера. Поняття операційної системи» · 5 клас<br><small>Пінгвін Тукс — Larry Ewing, The GIMP. Логотипи ОС — з Вікісховища.</small></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- КРОК 1: апаратне чи програмне ---------- */
+const ic = e => `<span class="ic">${e}</span>`;
+makeSortBoard('hsPool', { hard:'bkHard', soft:'bkSoft' }, [
+  { text:'Миша', bucket:'hard', icon:ic('🖱️') },
+  { text:'Навушники', bucket:'hard', icon:ic('🎧') },
+  { text:'Процесор', bucket:'hard', icon:ic('🔲') },
+  { text:'Флешка', bucket:'hard', icon:'<img class="ic-img" src="images/flash-drive.jpg" alt="">' },
+  { text:'Сенсорний екран телефона', bucket:'hard', icon:ic('📱') },
+  { text:'Комп\'ютерна гра', bucket:'soft', icon:ic('🎮') },
+  { text:'Браузер', bucket:'soft', icon:ic('🌐') },
+  { text:'Калькулятор у телефоні', bucket:'soft', icon:'<svg class="ic-app" viewBox="0 0 40 40"><rect width="40" height="40" rx="9" fill="#2A2F3D"/><rect x="7" y="6" width="26" height="8" rx="2" fill="#C9F2D0"/><circle cx="11" cy="20" r="3" fill="#868E96"/><circle cx="20" cy="20" r="3" fill="#868E96"/><circle cx="29" cy="20" r="3" fill="#F08C00"/><circle cx="11" cy="28" r="3" fill="#868E96"/><circle cx="20" cy="28" r="3" fill="#868E96"/><circle cx="29" cy="28" r="3" fill="#F08C00"/><rect x="8" y="32.5" width="15" height="4" rx="2" fill="#868E96"/><circle cx="29" cy="34.5" r="2.2" fill="#F08C00"/></svg>' },
+  { text:'Програма для малювання', bucket:'soft', icon:'<svg class="ic-app" viewBox="0 0 40 40"><path d="M20 4C10 4 3 11 3 19.5 3 28 9.5 35 17 35c3 0 3.5-2 2.5-4-1-2.2.3-4 2.8-4H27c5.6 0 10-3.6 10-9C37 10 29.5 4 20 4z" fill="#FFF4E0" stroke="#C99A5B" stroke-width="1.6"/><circle cx="11" cy="18" r="3.3" fill="#E03131"/><circle cx="16" cy="10.5" r="3.3" fill="#FFC93C"/><circle cx="25" cy="10" r="3.3" fill="#2F9E44"/><circle cx="31" cy="16.5" r="3.3" fill="#1C7ED6"/><path d="M38 22 26.5 33.5" stroke="#7048E8" stroke-width="3.4" stroke-linecap="round"/><path d="M26.5 33.5c-1.5-1.5-4-.6-4.3 1.6-.2 1.6-1 2.6-2.4 3 3.4 1 7.6-.5 8-3.3z" fill="#1B1B3A"/></svg>' },
+  { text:'Антивірус', bucket:'soft', icon:ic('🛡️') }
+], 'hsProgress');
+
+/* ---------- КРОК 2: емулятор «Увімкни комп'ютер» ---------- */
+(function(){
+  const pc = document.getElementById('pc');
+  const rig = document.getElementById('rig');
+  const screen = document.getElementById('pcScreen');
+  const power = document.getElementById('pcPower');
+  const hint = document.getElementById('pcHint');
+  const hit = trackTask(document.getElementById('pcEx'), 8, 9);
+  const wait = ms => new Promise(r=>setTimeout(r, ms));
+
+  async function typeLines(lines){
+    const box = document.createElement('div');
+    box.className = 'pc-boot';
+    screen.innerHTML = ''; screen.appendChild(box);
+    for(const l of lines){
+      await wait(l.d || 500);
+      const row = document.createElement('div');
+      row.innerHTML = l.t;
+      if(l.err) row.className = 'err';
+      box.appendChild(row);
+    }
+    const c = document.createElement('span'); c.className = 'cur'; box.appendChild(c);
+  }
+
+  power.addEventListener('click', async ()=>{
+    power.disabled = true;
+    power.classList.remove('pulse');
+    pc.classList.add('on');
+    hint.textContent = '';
+    await typeLines([
+      { t:'Перевіряю пристрої…', d:400 },
+      { t:'  процесор ........ ✓' }, { t:'  пам\'ять ......... ✓' }, { t:'  диск ............ ✓' },
+      { t:'  клавіатура, миша  ✓' },
+      { t:'Шукаю операційну систему…', d:700 },
+      { t:'✗ Операційну систему не знайдено.', d:1300, err:true }
+    ]);
+    hint.textContent = '';
+    addNeurons(1); hit();
+    buildShelf();
+  });
+
+  async function installOS(){
+    hint.textContent = '';
+    screen.innerHTML = '<div class="pc-install"><div class="spin"></div><div id="instTxt">Встановлення операційної системи…</div><div class="bar"><i id="instBar"></i></div></div>';
+    const bar = document.getElementById('instBar'), txt = document.getElementById('instTxt');
+    const phases = ['Копіюю файли…', 'Знайомлюсь із пристроями…', 'Готую Робочий стіл…'];
+    for(let p=0; p<=100; p+=4){
+      bar.style.width = p + '%';
+      txt.textContent = phases[Math.min(2, Math.floor(p/34))] + ' ' + p + '%';
+      await wait(90);
+    }
+    await wait(300);
+    desktop();
+  }
+
+  /* ---- пристрої біля комп'ютера ---- */
+  const DEV = {
+    speakers:{ el:document.getElementById('devSpk'), n:'Колонки', off:'немає звуку', ok:false },
+    printer:{ el:document.getElementById('devPrn'), n:'Принтер', off:'не друкує', ok:false }
+  };
+  function devStatus(k){
+    const d = DEV[k];
+    d.el.classList.toggle('ok', d.ok);
+    d.el.querySelector('.st').textContent = d.ok ? 'працює ✓' : d.off;
+  }
+  function fx(el, t){
+    const x = document.createElement('span'); x.className = 'fx'; x.textContent = t; el.appendChild(x);
+    setTimeout(()=>x.remove(), 1400);
+  }
+
+
+
+  /* ---- значки-плитки офісних програм ---- */
+  const tile = (l, c)=>`<svg class="tile" viewBox="0 0 28 28"><rect width="28" height="28" rx="5" fill="${c}"/><text x="14" y="20" text-anchor="middle" font-size="17" font-weight="800" fill="#fff" font-family="Arial,sans-serif">${l}</text></svg>`;
+  const LINES = n => Array.from({length:n}, (_, i)=>`<i style="display:block; height:4px; margin:5px 0; border-radius:2px; background:#CED4DA; width:${[100,92,96,70,88,60][i % 6]}%"></i>`).join('');
+
+  /* ---- Робочий стіл ---- */
+  const PAINT = '<svg viewBox="0 0 120 80" width="120"><circle cx="96" cy="20" r="12" fill="#FFC93C"/><rect x="30" y="38" width="44" height="34" fill="#E8590C"/><path d="M24 40 L52 16 L80 40Z" fill="#2B59C3"/><rect x="46" y="52" width="12" height="20" fill="#fff"/><path d="M0 74h120" stroke="#51CF66" stroke-width="6"/></svg>';
+  let desk, busy = false, selected = null, installed = 0, slots = 0;
+  function toast(t){
+    desk.querySelector('.toast')?.remove();
+    const el = document.createElement('div'); el.className = 'toast'; el.textContent = t;
+    desk.appendChild(el); setTimeout(()=>el.remove(), 2800);
+  }
+  function closeWin(){
+    desk.querySelector('.win')?.remove();
+    DEV.speakers.el.classList.remove('playing');
+  }
+  const APPS = {
+    calc:   { e:'🧮', n:'Калькулятор', body:()=>'<div>7 × 8 = 56</div>' },
+    player: { e:'🎵', n:'Програвач', body:()=> DEV.speakers.ok
+      ? '<div class="eq"><i></i><i></i><i></i><i></i><i></i></div><div style="font-size:16px">♪ Пісня грає</div>'
+      : '<div>🔇</div><small>Звуку немає: ОС не вміє працювати з колонками. Бракує драйвера.</small>',
+      after:()=>{ if(DEV.speakers.ok){ DEV.speakers.el.classList.add('playing'); fx(DEV.speakers.el, '♪♫'); } } },
+    paint:  { e:'🎨', n:'Малювання', body:()=> PAINT + '<button class="mini-btn">🖨️ Друкувати</button>',
+      after:w=>w.querySelector('.mini-btn').addEventListener('click', ()=>{
+        const p = DEV.printer;
+        if(!p.ok){ toast('⚠️ Принтер не знайдено: бракує драйвера.'); return; }
+        toast('🖨️ Малюнок надруковано!');
+      }) },
+    word:   { e:tile('W', '#185ABD'), n:'Документи', body:()=>`<div style="width:78%; text-align:left; font-size:15px; color:#185ABD">Мій твір</div><div style="width:78%">${LINES(5)}</div>` },
+    excel:  { e:tile('X', '#107C41'), n:'Таблиці', body:()=>'<table style="border-collapse:collapse; font:600 12px Nunito Sans,sans-serif">' + [['', 'A', 'B'], ['1', 'Яблука', '5'], ['2', 'Груші', '3'], ['3', 'Разом', '8']].map((r, i)=>'<tr>' + r.map((c, j)=>`<td style="border:1px solid #CED4DA; padding:2px 8px; ${i === 0 || j === 0 ? 'background:#E9ECEF; color:#868E96' : ''}${i === 3 && j === 2 ? 'background:#D3F9D8; font-weight:800' : ''}">${c}</td>`).join('') + '</tr>').join('') + '</table>' },
+    ppt:    { e:tile('P', '#C43E1C'), n:'Презентації', body:()=>'<div style="width:80%; aspect-ratio:16/9; background:linear-gradient(135deg,#C43E1C,#F08C00); border-radius:6px; color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; font-size:16px; line-height:1.1">Мій клас<small style="color:#fff; font-size:11px">5 клас</small></div>' },
+    game:   { e:'🎮', n:'Гра', body:()=>'<div class="bounce">🐸</div><div style="font-size:16px">Рівень 1</div>' }
+  };
+  function openApp(a){
+    closeWin();
+    const w = document.createElement('div');
+    w.className = 'win';
+    w.innerHTML = `<div class="win-top">${a.e} ${a.n}<button title="Закрити">×</button></div><div class="win-body">${a.body()}</div>`;
+    w.querySelector('.win-top button').addEventListener('click', closeWin);
+    w.addEventListener('click', ev=>ev.stopPropagation());
+    desk.appendChild(w);
+    a.after && a.after(w);
+  }
+  function addIcon(key, isNew){
+    const a = APPS[key];
+    const b = document.createElement('button');
+    b.className = 'desk-ic' + (isNew ? ' new' : '');
+    b.innerHTML = `<span>${a.e}</span>${a.n}`;
+    desk.appendChild(b);
+    // вільне місце: стовпчиками зверху вниз
+    const cellH = b.offsetHeight + 6, cellW = b.offsetWidth + 6;
+    const rows = Math.max(1, Math.floor((desk.clientHeight - 36) / cellH));
+    b.style.left = (6 + Math.floor(slots / rows) * cellW) + 'px';
+    b.style.top = (6 + (slots % rows) * cellH) + 'px';
+    slots++;
+    // перетягування значка по Робочому столу; клік без руху — відкрити
+    b.addEventListener('pointerdown', e=>{
+      if(e.button > 0) return;
+      e.preventDefault(); e.stopPropagation();
+      const sx = e.clientX, sy = e.clientY, ox = b.offsetLeft, oy = b.offsetTop;
+      let moved = false;
+      b.setPointerCapture(e.pointerId);
+      const move = ev=>{
+        const dx = ev.clientX - sx, dy = ev.clientY - sy;
+        if(!moved && Math.hypot(dx, dy) < 5) return;
+        moved = true; b.classList.add('drag');
+        const maxX = desk.clientWidth - b.offsetWidth, maxY = desk.clientHeight - 28 - b.offsetHeight;
+        b.style.left = Math.max(0, Math.min(maxX, ox + dx)) + 'px';
+        b.style.top = Math.max(0, Math.min(maxY, oy + dy)) + 'px';
+      };
+      const up = ()=>{
+        b.removeEventListener('pointermove', move);
+        b.removeEventListener('pointerup', up);
+        b.removeEventListener('pointercancel', up);
+        b.classList.remove('drag');
+        if(moved) return;
+        if(selected) return tryInstall(selected);
+        openApp(a);
+      };
+      b.addEventListener('pointermove', move);
+      b.addEventListener('pointerup', up);
+      b.addEventListener('pointercancel', up);
+    });
+    b.addEventListener('click', ev=>ev.stopPropagation());
+  }
+
+  function desktop(){
+    const now = new Date();
+    screen.innerHTML = `<div class="desk"><div class="desk-task"><span class="start"></span>Пуск<span class="clock">${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}</span></div></div>`;
+    desk = screen.querySelector('.desk');
+    addIcon('calc');
+    rig.classList.add('os-on');
+    devStatus('speakers'); devStatus('printer');
+    hint.textContent = '';
+    ITEMS.filter(it=>!it.os).forEach(it=>addBox(it, true));
+  }
+
+  /* ---- полиця встановлення: коробки з програмами ---- */
+  const LOGO = {
+    os:'<rect x="3" y="3" width="16" height="16" fill="#0078D4"/><rect x="21" y="3" width="16" height="16" fill="#0078D4"/><rect x="3" y="21" width="16" height="16" fill="#0078D4"/><rect x="21" y="21" width="16" height="16" fill="#0078D4"/>',
+    player:'<circle cx="20" cy="20" r="18" fill="#C2255C"/><path d="M16 27V11l12-3v16" stroke="#fff" stroke-width="3" fill="none" stroke-linejoin="round"/><circle cx="13" cy="27" r="4" fill="#fff"/><circle cx="25" cy="24" r="4" fill="#fff"/>',
+    paint:'<path d="M20 4C10 4 3 11 3 19.5 3 28 9.5 35 17 35c3 0 3.5-2 2.5-4-1-2.2.3-4 2.8-4H27c5.6 0 10-3.6 10-9C37 10 29.5 4 20 4z" fill="#FFF4E0" stroke="#C99A5B" stroke-width="1.6"/><circle cx="11" cy="18" r="3.3" fill="#E03131"/><circle cx="16" cy="10.5" r="3.3" fill="#FFC93C"/><circle cx="25" cy="10" r="3.3" fill="#2F9E44"/><circle cx="31" cy="16.5" r="3.3" fill="#1C7ED6"/><path d="M38 22 26.5 33.5" stroke="#7048E8" stroke-width="3.4" stroke-linecap="round"/><path d="M26.5 33.5c-1.5-1.5-4-.6-4.3 1.6-.2 1.6-1 2.6-2.4 3 3.4 1 7.6-.5 8-3.3z" fill="#1B1B3A"/>',
+    game:'<rect x="2" y="11" width="36" height="20" rx="10" fill="#2F9E44"/><path d="M11 17v8M7 21h8" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="27" cy="18" r="2.6" fill="#FFD43B"/><circle cx="32" cy="23.5" r="2.6" fill="#FF6B6B"/>',
+    office:'<rect x="1" y="8" width="14" height="24" rx="2.5" fill="#185ABD"/><rect x="13" y="8" width="14" height="24" rx="2.5" fill="#107C41" stroke="#fff" stroke-width="1.2"/><rect x="25" y="8" width="14" height="24" rx="2.5" fill="#C43E1C" stroke="#fff" stroke-width="1.2"/><g font-family="Arial,sans-serif" font-weight="800" font-size="10" fill="#fff" text-anchor="middle"><text x="7.5" y="24">W</text><text x="20" y="24">X</text><text x="32" y="24">P</text></g>',
+    sound:'<path d="M5 15h7l9-8v26l-9-8H5z" fill="#495057"/><path d="M26 13c3 4 3 10 0 14M31 9c5 6 5 16 0 22" stroke="#E8590C" stroke-width="3" fill="none" stroke-linecap="round"/>',
+    print:'<rect x="11" y="4" width="18" height="12" fill="#fff" stroke="#868E96" stroke-width="2"/><rect x="3" y="14" width="34" height="16" rx="4" fill="#868E96"/><rect x="11" y="24" width="18" height="12" fill="#fff" stroke="#868E96" stroke-width="2"/><circle cx="31" cy="19" r="2.2" fill="#FFC93C"/>'
+  };
+  const ITEMS = [
+    { id:'os', os:true, e:'🪟', n:'Операційна система', l:'Операційна система', c:'#123E7C' },
+    { id:'player', e:'🎵', n:'Програвач', c:'#A61E4D' },
+    { id:'paint', e:'🎨', n:'Малювання', c:'#E67700' },
+    { id:'office', e:'💼', n:'Офісний пакет', l:'Office', c:'#D83B01' },
+    { id:'game', e:'🎮', n:'Гра', c:'#2B8A3E' },
+    { id:'sound', e:'🔊', n:'Драйвер звукової картки', drv:'speakers', c:'#5C6378' },
+    { id:'print', e:'🖨️', n:'Драйвер принтера', drv:'printer', c:'#5C6378' }
+  ];
+  function boxSVG(it){
+    const band = it.drv
+      ? '<rect x="2" y="10" width="68" height="7" fill="#E8590C"/>'
+      : '<rect x="2" y="10" width="68" height="4" fill="#fff" opacity=".35"/>';
+    return `<svg viewBox="0 0 77 110">
+      <polygon points="70,10 75,6 75,104 70,108" fill="${it.c}"/><polygon points="70,10 75,6 75,104 70,108" fill="#000" opacity=".3"/>
+      <polygon points="2,10 7,6 75,6 70,10" fill="${it.c}"/><polygon points="2,10 7,6 75,6 70,10" fill="#fff" opacity=".35"/>
+      <rect x="2" y="10" width="68" height="98" fill="${it.c}"/>
+      <path d="M2 10h68v28C50 30 22 52 2 44z" fill="#fff" opacity=".1"/>
+      ${band}
+      <circle cx="36" cy="${it.drv ? 45 : 49}" r="${it.drv ? 19 : 21}" fill="#fff"/>
+      <svg x="${it.drv ? 21 : 20}" y="${it.drv ? 30 : 33}" width="32" height="32" viewBox="0 0 40 40">${LOGO[it.id]}</svg>
+      <rect x="2" y="${it.drv ? 72 : 80}" width="68" height="${it.drv ? 32 : 24}" fill="#fff" opacity=".94"/>
+    </svg><div class="lbl">${it.l || it.n}</div>`;  // драйвер: вища біла смуга під довшу назву
+  }
+  let shelf;
+  function addBox(it, isNew){
+    const c = document.createElement('div');
+    c.className = 'box' + (it.os ? ' os' : '') + (it.drv ? ' drv' : '') + (isNew ? ' new' : '');
+    c.title = it.n;
+    c.innerHTML = boxSVG(it);
+    it.el = c;
+    enableDrag(c, it);
+    c.addEventListener('dblclick', ()=>{
+      if(it.done) return;
+      if(busy){ hint.textContent = 'Зачекай, поки завершиться встановлення.'; return; }
+      tryInstall(it);
+    });
+    shelf.appendChild(c);
+  }
+  function buildShelf(){
+    shelf = document.getElementById('pcShelf');
+    addBox(ITEMS[0]);
+    document.getElementById('pcMore').hidden = false;
+    screen.addEventListener('click', ()=>{ if(selected) tryInstall(selected); });
+  }
+  function overScreen(x, y){
+    const r = screen.getBoundingClientRect();
+    return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+  }
+  function enableDrag(chip, it){
+    chip.addEventListener('pointerdown', e=>{
+      if(it.done || e.button > 0) return;
+      e.preventDefault();
+      const sx = e.clientX, sy = e.clientY;
+      let ghost = null;
+      const move = ev=>{
+        if(!ghost && Math.hypot(ev.clientX - sx, ev.clientY - sy) > 6){
+          ghost = chip.cloneNode(true);
+          ghost.classList.add('inst-ghost'); ghost.classList.remove('sel', 'new');
+          ghost.style.width = chip.offsetWidth + 'px';
+          chip.style.visibility = 'hidden';
+          document.body.appendChild(ghost);
+        }
+        if(ghost){
+          ghost.style.left = ev.clientX + 'px'; ghost.style.top = ev.clientY + 'px';
+          screen.classList.toggle('drop', overScreen(ev.clientX, ev.clientY));
+        }
+      };
+      const up = ev=>{
+        document.removeEventListener('pointermove', move);
+        document.removeEventListener('pointerup', up);
+        document.removeEventListener('pointercancel', up);
+        screen.classList.remove('drop');
+        if(ghost){
+          ghost.remove();
+          if(overScreen(ev.clientX, ev.clientY) && !busy) tryInstall(it);
+          else {
+            chip.style.visibility = '';
+            if(busy) hint.textContent = 'Зачекай, поки завершиться встановлення.';
+          }
+        } else {
+          // клік-резерв: обрати значок, потім клацнути екран
+          document.querySelectorAll('.box.sel').forEach(c=>c.classList.remove('sel'));
+          selected = (selected === it) ? null : it;
+          if(selected){ chip.classList.add('sel'); hint.textContent = 'Тепер клацни на екран монітора.'; } else hint.textContent = '';
+        }
+      };
+      document.addEventListener('pointermove', move);
+      document.addEventListener('pointerup', up);
+      document.addEventListener('pointercancel', up);
+    });
+  }
+
+  async function tryInstall(it){
+    if(it.done) return;
+    if(busy){ hint.textContent = 'Зачекай, поки завершиться встановлення.'; return; }
+    busy = true; selected = null;
+    it.el.classList.remove('sel');
+    it.done = true; it.el.remove();
+    if(it.os){
+      it.el.remove();
+      addNeurons(1); hit();
+      await installOS();
+      busy = false;
+      return;
+    }
+    hint.textContent = '';
+    const w = document.createElement('div');
+    w.className = 'inst-win';
+    w.innerHTML = `<div class="win-top">${it.e} Встановлення</div><div class="ib"><span class="it">${it.n}</span><div class="ibar"><i></i></div></div>`;
+    desk.appendChild(w);
+    const bar = w.querySelector('.ibar i'), txt = w.querySelector('.it');
+    for(let p = 0; p <= 100; p += 5){
+      bar.style.width = p + '%';
+      txt.textContent = `${it.n} · ${p}%`;
+      await wait(70);
+    }
+    await wait(250);
+    w.remove();
+    if(it.drv){
+      const d = DEV[it.drv];
+      d.ok = true; devStatus(it.drv);
+      d.el.classList.add('wake'); setTimeout(()=>d.el.classList.remove('wake'), 700);
+      toast(`✓ ${d.n}: пристрій готовий до роботи`);
+      if(it.drv === 'speakers') setTimeout(()=>fx(d.el, '♪'), 600);
+      hint.textContent = '';
+    } else {
+      (it.id === 'office' ? ['word', 'excel', 'ppt'] : [it.id]).forEach(k=>addIcon(k, true));
+      hint.textContent = '';
+    }
+    addNeurons(1); hit();
+    installed++;
+    if(installed === ITEMS.length - 1){
+      addNeurons(1);
+      hint.textContent = '';
+    }
+    busy = false;
+  }
+})();
+
+/* ---------- КРОК 4: яка програма знадобиться ---------- */
+makeChoices('appCheck', [
+  { logo:'💌', text:'Хочеш створити листівку бабусі з квітами й сонечком.', opts:['Текстовий редактор', 'Графічний редактор', 'Архіватор'], correct:1 },
+  { logo:'📚', text:'Треба знайти, скільки років Києву.', opts:['Браузер', 'Програвач', 'Гра'], correct:0 },
+  { logo:'📦', text:'Сто фото з канікул не влазять у лист. Треба зробити їх «легшими» й зібрати в один файл.', opts:['Графічний редактор', 'Браузер', 'Архіватор'], correct:2 },
+  { logo:'✍️', text:'Учитель попросив надрукувати твір «Моє літо» гарним шрифтом.', opts:['Текстовий редактор', 'Програвач', 'Архіватор'], correct:0 },
+  { logo:'🎤', text:'Хочеш вивчити слова улюбленої пісні, слухаючи її знову й знову.', opts:['Гра', 'Програвач', 'Графічний редактор'], correct:1 }
+]);
+
+/* ---------- КРОК 4: знайомі ОС + «Знайди пару» ---------- */
+(function(){
+  // логотипи — оригінальні файли з Вікісховища (images/README.md)
+  const OS = [
+    { k:'windows', logo:'os-windows.svg', n:'Windows', where:'більшість комп\'ютерів', dev:'🖥️', dn:'Шкільний комп\'ютер' },
+    { k:'macos', logo:'os-apple.svg', n:'macOS', where:'комп\'ютери Apple', dev:'💻', dn:'Ноутбук MacBook' },
+    { k:'linux', logo:'os-linux.svg', n:'Linux', where:'сервери й комп\'ютери', dev:'🗄️', dn:'Сервер, де живуть сайти' },
+    { k:'android', logo:'os-android.svg', n:'Android', where:'більшість смартфонів', dev:'📱', dn:'Смартфон Samsung', word:true },
+    { k:'ios', logo:'os-ios.svg', n:'iOS', where:'смартфони iPhone', dev:'📲', dn:'iPhone', word:true },
+    { k:'wearos', logo:'os-wearos.svg', n:'Wear OS', where:'розумні годинники', dev:'⌚', dn:'Розумний годинник' },
+    { k:'car', logo:'os-car.svg', n:'Android Auto', where:'екран автомобіля', dev:'🚗', dn:'Автомобіль' }
+  ];
+  const cardsBox = document.getElementById('osCards');
+  OS.forEach(o=>{
+    cardsBox.insertAdjacentHTML('beforeend', `<div class="os-card"><div class="lg"><img src="images/${o.logo}" alt="${o.n}"></div><b>${o.n}</b><small>${o.where}</small></div>`);
+  });
+
+  const NEURON_MARK = `<svg class="neuron-mark" viewBox="0 0 24 24" fill="none">
+    <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/><circle cx="20.3" cy="12" r="1.2" fill="#fff" opacity="0.9"/>
+    <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/><circle cx="16.6" cy="20" r="1.2" fill="#fff" opacity="0.9"/>
+    <line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/><circle cx="7.4" cy="20" r="1.2" fill="#fff" opacity="0.9"/>
+    <line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/><circle cx="3.7" cy="12" r="1.2" fill="#fff" opacity="0.9"/>
+    <line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/><circle cx="7.4" cy="4" r="1.2" fill="#fff" opacity="0.9"/>
+    <line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#fff" stroke-width="1.6" stroke-linecap="round" opacity="0.9"/><circle cx="16.6" cy="4" r="1.2" fill="#fff" opacity="0.9"/>
+    <circle cx="12" cy="12" r="4.4" fill="#fff" opacity="0.95"/><circle cx="12" cy="12" r="1.6" fill="#2B59C3" opacity="0.5"/>
+  </svg>`;
+
+  const grid = document.getElementById('osMemo');
+  const progress = document.getElementById('osMemoProgress');
+  const PAIRS = OS.filter(o=>o.k !== 'macos');   // 6 пар для сітки 4×3
+  const hit = trackTask(grid, PAIRS.length, PAIRS.length + 3);
+  const cards = [];
+  PAIRS.forEach(o=>{
+    cards.push({ key:o.k, type:'os', html:`<img src="images/${o.logo}" alt="">` + (o.word ? '' : `<div class="nm">${o.n}</div>`) });
+    cards.push({ key:o.k, type:'dev', html:`<div class="em">${o.dev}</div><div class="nm">${o.dn}</div>` });
+  });
+  cards.sort(()=>Math.random() - 0.5);
+
+  let firstCard = null, lock = false, matchedCount = 0;
+  const upd = ()=>{ progress.textContent = matchedCount === PAIRS.length ? 'Усі пари знайдено ✓' : `Знайдено пар: ${matchedCount} з ${PAIRS.length}`; };
+  upd();
+  cards.forEach(data=>{
+    const card = document.createElement('div');
+    card.className = 'memo-card';
+    card.innerHTML = `<div class="flip-inner">
+      <div class="flip-face flip-front">${NEURON_MARK}</div>
+      <div class="flip-face flip-back">${data.html}</div>
+    </div>`;
+    card.addEventListener('click', ()=>{
+      if(lock || card.classList.contains('flipped') || card.classList.contains('matched')) return;
+      card.classList.add('flipped');
+      if(!firstCard){ firstCard = card; firstCard._data = data; return; }
+      const secondCard = card;
+      lock = true;
+      const isMatch = data.key === firstCard._data.key && data.type !== firstCard._data.type;
+      if(isMatch){
+        addNeurons(1); hit();
+        matchedCount++; upd();
+        [firstCard, secondCard].forEach(c=>{
+          // колір лише для знайденої пари, щоб він не підказував відповідь
+          c.style.setProperty('--card-c', '#2F9E44'); c.style.setProperty('--card-c-light', '#EBFBEE');
+          c.classList.add('matched', 'pop'); setTimeout(()=>c.classList.remove('pop'), 450); });
+        firstCard = null;
+        lock = false;
+        if(matchedCount === PAIRS.length) addNeurons(3);
+      } else {
+        setTimeout(()=>{
+          [firstCard, secondCard].forEach(c=>c.classList.add('wrong'));
+          setTimeout(()=>{
+            [firstCard, secondCard].forEach(c=>c.classList.remove('flipped', 'wrong'));
+            firstCard = null;
+            lock = false;
+          }, 700);
+        }, 1800);
+      }
+    });
+    grid.appendChild(card);
+  });
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що з цього — апаратна складова комп\'ютера?', opts:['Браузер', 'Принтер', 'Гра'], correct:1, why:'Принтер — пристрій, його можна торкнутися.' },
+  { q:'Що таке програма?', opts:['Набір інструкцій для комп\'ютера', 'Деталь усередині системного блока', 'Кнопка на клавіатурі'], correct:0 },
+  { q:'Що станеться, якщо ввімкнути комп\'ютер без операційної системи?', opts:['Відкриється браузер', 'Він не запустить жодної програми', 'Він сам встановить гру'], correct:1 },
+  { q:'Гра хоче, щоб пролунав постріл гармати. Хто передасть звук колонкам?', opts:['Монітор', 'Операційна система', 'Клавіатура'], correct:1, why:'Програми звертаються до пристроїв через ОС.' },
+  { q:'Яка з цих програм — операційна система?', opts:['Android', 'Калькулятор', 'Браузер'], correct:0 },
+  { q:'Як називають програми для конкретних справ: малювання, музики, ігор?', opts:['Системні', 'Апаратні', 'Прикладні'], correct:2 },
+  { q:'Яку програму встановлюють на новий комп\'ютер першою?', opts:['Гру', 'Операційну систему', 'Браузер'], correct:1, why:'Без ОС не запуститься жодна інша програма.' },
+  { q:'Навіщо потрібен драйвер?', opts:['Щоб ОС уміла працювати з певним пристроєм', 'Щоб комп\'ютер швидше вмикався', 'Щоб прикрасити Робочий стіл'], correct:0 },
+  { q:'Колонки підключено, але Програвач мовчить. Чого, найімовірніше, бракує?', opts:['Нового монітора', 'Драйвера звукової картки', 'Ще однієї гри'], correct:1 },
+  { q:'Що з цього — програмна складова?', opts:['Флешка', 'Миша', 'Антивірус'], correct:2, why:'Антивірус — програма, а флешка й миша — пристрої.' },
+  { q:'Що НЕ є завданням операційної системи?', opts:['Запускати інші програми', 'Показувати Робочий стіл і вікна', 'Друкувати аркуші паперу без принтера'], correct:2 },
+  { q:'Яка операційна система працює в більшості смартфонів?', opts:['Windows', 'Android', 'Linux'], correct:1 },
+  { q:'Де, крім комп\'ютера, теж працює операційна система?', opts:['У розумному годиннику', 'У звичайному олівці', 'У паперовій книжці'], correct:0 }
+], {summary:'Тепер ти знаєш, що комп\'ютер — це «залізо» й програми, а головна з них — операційна система.'});
+</script>
+
+</body>
+</html>
