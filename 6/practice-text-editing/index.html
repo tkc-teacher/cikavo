@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Замітка для шкільної газети — Введення і редагування тексту</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#1F7A68,#B23A48); --accent:#B23A48; --accent-dark:#8A2433; --accent-soft:#FBE9EB; --bg:#FBF7F6; --line:#EEDFE0; }
+  .p-hero p{max-width:none;}
+  .kbd{display:inline-block; font-family:'Roboto',sans-serif; font-weight:500; font-size:.86em; line-height:1.2; padding:1px 6px; border:1px solid #C9BFC1; border-bottom-width:3px; border-radius:6px; background:#fff; white-space:nowrap;}
+
+  /* Сторінка документа: «Що має вийти» і чернетка */
+  .page-wrap{background:#E8EAED; border-radius:var(--radius-m); padding:18px; display:flex; justify-content:center;}
+  .page{width:100%; max-width:560px; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.25); padding:28px 34px; font-family:Arial,sans-serif; color:#202124; font-size:14px; line-height:1.55;}
+  .page > div{margin:0 0 .8em; white-space:pre-wrap;}
+  .page > div:last-child{margin-bottom:0;}
+  .page .own{color:#8A8F98; font-style:italic; border:1.5px dashed #C9BFC1; border-radius:6px; padding:6px 10px;}
+  #sample{-webkit-user-select:none; user-select:none; -webkit-touch-callout:none;}
+  .draft-cap{display:flex; align-items:center; gap:8px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; color:var(--accent-dark); margin:10px 0 6px;}
+  .draft .page{border:2px dashed var(--accent); box-shadow:none; max-width:none;}
+  @media (max-width:520px){ .page{padding:18px 16px;} .page-wrap{padding:10px;} }
+</style>
+</head>
+<body data-hud="6 клас · Практична · Замітка для газети">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 6 клас · Введення і редагування тексту</div>
+    <h1>📝 Замітка для шкільної газети</h1>
+    <p>Учень поспіхом написав замітку про екскурсію й наробив помилок. Стань редактором: виправ її в Google Документах.</p>
+    <div class="meta"><span>⏱ 20–25 хв</span><span><img src="../../assets/logos/docs.svg" alt="">Google Документи</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="page-wrap">
+      <div class="page" id="sample">
+        <div><b>Екскурсія до Музею води</b></div>
+        <div>Минулої п'ятниці учні 6-Б відвідали Музей води, що в самому центрі Києва.</div>
+        <div>Екскурсовод розповіла, що вода з Дніпра спершу потрапляє на станцію, де її очищують. Потім вона мандрує під містом довгими трубами (їх ми теж побачили).</div>
+        <div>Найцікавішим був зал, де можна гратися з водою: запускати мильні бульбашки й крутити водяне колесо. А ще ми подивилися науково-популярний мультфільм про краплинку. 6-Б не хотів іти додому!</div>
+        <div class="own">Твій абзац: 2–3 речення.</div>
+        <div>Наступного разу 6-Б мріє поїхати до планетарію!</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи документ</h3>
+        <p>Обери один зі способів:</p>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Документи</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Документи</span> → <span class="menu">Порожній документ</span>.</li>
+              <li>Клацни «Документ без назви» і назви файл: <b>Замітка — Прізвище</b>.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Скопіюй чернетку в документ</h3>
+        <ol>
+          <li>Виділи мишею весь текст чернетки нижче: від першого слова до останнього.</li>
+          <li>Скопіюй: <span class="kbd">Ctrl</span> + <span class="kbd">C</span>.</li>
+          <li>Клацни в документі й встав без оформлення: <span class="kbd">Ctrl</span> + <span class="kbd">Shift</span> + <span class="kbd">V</span>.</li>
+        </ol>
+        <div class="draft">
+          <div class="draft-cap">✏️ Чернетка (її можна копіювати)</div>
+          <div class="page" id="draft">
+            <div>Екскурсія до Музею води</div>
+            <div>Наступного разу 6-А мріє поїхати до планетарію!</div>
+            <div>Минулої пятниці учні 6-А відвідалі Музей води , що в самому центрі Києва.</div>
+            <div>Екскурсовод розповіла,що вода з Дніпра спершу потрапляє на станцію, де її очищюють. Потім вона мандрує під містом довгими трубами ( їх ми теж побачили ).</div>
+            <div>Найцікавіщим був зал, де можна гратися з водою: запускати мильні бульбашкі й крутити водяне колесо. А ще ми подивилися науково - популярний мультфільм про краплинку. 6-А  не хотів іти додому!</div>
+          </div>
+        </div>
+        <div class="tip">З <b>Shift</b> текст вставиться без кольорів і шрифтів сайту — таким, як у звичайному документі.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Заміни назву класу</h3>
+        <p>Насправді на екскурсії був не 6-А, а 6-Б. Не виправляй уручну:</p>
+        <ol>
+          <li><span class="menu">Редагувати → Знайти й замінити</span> (або <span class="kbd">Ctrl</span> + <span class="kbd">H</span>).</li>
+          <li>Знайти: <b>6-А</b>. Замінити на: <b>6-Б</b>.</li>
+          <li>Натисни <span class="menu">Замінити все</span>.</li>
+        </ol>
+        <div class="check-val">Перевір себе: <span class="kbd">Ctrl</span> + <span class="kbd">F</span> і «6-А» — знаходить 0 разів.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Виправ правопис</h3>
+        <ol>
+          <li><span class="menu">Інструменти → Правопис і граматика → Перевірка правопису й граматики</span>.</li>
+          <li>Для кожного слова з помилкою обери правильний варіант і натисни <span class="menu">Прийняти</span>.</li>
+        </ol>
+        <p>Або клацай правою кнопкою по словах із червоною хвилястою лінією.</p>
+        <div class="tip">Якщо програма підкреслила правильне слово — <b>Ігнорувати</b>.</div>
+        <div class="check-val">Перевір себе: виправлено 5 слів, червоних ліній не лишилося.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Виправ пропуски</h3>
+        <p>Цих помилок програма не підкреслить — шукай очима. Пам'ятай правила:</p>
+        <ul>
+          <li>між словами — один пропуск;</li>
+          <li>перед комою й крапкою пропуску немає, а після коми — є;</li>
+          <li>усередині дужок пропусків немає;</li>
+          <li>дефіс — без пропусків.</li>
+        </ul>
+        <div class="tip">Увімкни недруковані символи: <span class="menu">Вигляд → Показати недруковані символи</span> (або <span class="kbd">Ctrl</span> + <span class="kbd">Shift</span> + <span class="kbd">P</span>). Кожен пропуск стане видно як крапку <b>·</b>, а кінець абзацу — як <b>¶</b>. Так легко помітити зайві пропуски.</div>
+        <div class="check-val">Перевір себе: виправлено 5 місць.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Перенеси абзац у кінець</h3>
+        <p>Речення про планетарій має завершувати замітку.</p>
+        <ol>
+          <li>Тричі клацни в абзаці «Наступного разу…» — він виділиться.</li>
+          <li>Виріж: <span class="kbd">Ctrl</span> + <span class="kbd">X</span>.</li>
+          <li>Клацни в самому кінці тексту, після «…іти додому!», і натисни <span class="kbd">Enter</span>.</li>
+          <li>Встав: <span class="kbd">Ctrl</span> + <span class="kbd">V</span>.</li>
+        </ol>
+        <div class="tip">Утворився зайвий порожній рядок? Прибери його клавішею <b>Backspace</b>.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">7</div>
+      <div>
+        <h3>Допиши свій абзац</h3>
+        <ol>
+          <li>Клацни в кінці абзацу «…іти додому!» і натисни <span class="kbd">Enter</span>.</li>
+          <li>Напиши 2–3 речення: куди хотів би поїхати на екскурсію ти і чому.</li>
+        </ol>
+        <p>Дотримуйся правил введення тексту. Enter натискай лише в кінці абзацу.</p>
+        <div class="check-val">Перевір себе: у замітці 6 абзаців, а останній — про планетарій.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Практична робота · «Правила введення і редагування текстів. Перевірка правопису, пошук та заміна» · 6 клас</footer>
+
+<script src="../../assets/practice.js"></script>
+<script>
+  // Зразок не можна виділити й скопіювати — копіюють лише чернетку
+  const sample = document.getElementById('sample');
+  ['copy', 'cut', 'selectstart', 'contextmenu', 'dragstart'].forEach(t=>sample.addEventListener(t, e=>e.preventDefault()));
+</script>
+</body>
+</html>
