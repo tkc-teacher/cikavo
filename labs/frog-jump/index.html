@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Стрибай, жабко! · Лабораторія</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito+Sans:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F2F8F4; --ink:#1B1B3A; --ink-soft:#4E5F57; --surface:#FFFFFF; --line:#DCE9E0;
+    --teal:#16A3A0; --teal-dark:#0E7C7A; --teal-soft:#E3F7F6;
+    --coral:#FF6B4A; --coral-soft:#FFEFE9; --yellow-soft:#FFF4D6; --green:#2FA84F; --green-dark:#1F7A38; --green-soft:#E4F7E9;
+    --radius-s:10px; --radius-m:16px; --radius-l:26px;
+  }
+  *{box-sizing:border-box;}
+  [hidden]{display:none !important;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; line-height:1.5; -webkit-font-smoothing:antialiased;}
+  h1,h2{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; text-wrap:balance;}
+  button{font:inherit; -webkit-tap-highlight-color:transparent;}
+  .nr{width:1em; height:1em; flex:none; vertical-align:-.15em;}
+
+  .topbar{position:sticky; top:0; z-index:10; background:rgba(242,248,244,.92); backdrop-filter:blur(6px); border-bottom:1px solid var(--line);}
+  .topbar-inner{max-width:900px; margin:0 auto; padding:10px 16px; display:flex; align-items:center; gap:10px;}
+  .back-link{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px; color:var(--teal-dark); text-decoration:none; white-space:nowrap; background:none; border:none; padding:0; cursor:pointer;}
+  .back-link:hover{text-decoration:underline;}
+  .game-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .total{margin-left:auto; display:inline-flex; align-items:center; gap:5px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; background:var(--yellow-soft); border-radius:999px; padding:2px 12px 2px 7px; white-space:nowrap;}
+  .total .nr{font-size:22px;}
+  .total.up{animation:pop .4s ease;}
+
+  /* ---------- Рівні ---------- */
+  .levels{max-width:760px; margin:0 auto; padding:22px 16px 40px;}
+  .levels h1{font-size:clamp(28px, 6vw, 38px); line-height:1.15; margin-bottom:16px; display:flex; align-items:center; gap:10px;}
+  /* Карта-стежка: великий ставок, латаття-рівні змійкою по 3 в ряд */
+  .map{position:relative; width:100%; max-width:520px; margin:0 auto; aspect-ratio:300 / 650; border-radius:var(--radius-l); background:linear-gradient(180deg, #BFE7F6, #86CBE9); box-shadow:inset 0 -8px 0 rgba(0,0,0,.05); overflow:hidden;}
+  .map > svg{position:absolute; inset:0; width:100%; height:100%;}
+  /* Латаття-рівень: приклад завдання замість номера й одна велика прикраса свого ставка */
+  .node{position:absolute; translate:-50% -50%; width:clamp(78px, 22vw, 102px); aspect-ratio:1; border:none; padding:0; background:none; cursor:pointer; -webkit-tap-highlight-color:transparent;}
+  .node .ring{position:absolute; inset:-5px; border-radius:50%; background:var(--w1); box-shadow:0 0 0 5px var(--w2);}   /* суцільне тло: стежка не просвічує біля латаття */
+  .node .leaf{position:absolute; inset:-2px -2px -6px; width:calc(100% + 4px); height:calc(100% + 8px); transition:transform .15s ease;}   /* намальований SVG-листок (leafSVG) */
+  .node .leaf svg{display:block; width:100%; height:100%;}
+  .node .ex{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;}
+  .node .ex b{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:clamp(14px, 4.2vw, 20px); line-height:1.35; letter-spacing:-.01em; white-space:nowrap; color:var(--ink); background:rgba(255,255,255,.93); border:2px solid var(--pad-dark); border-radius:10px; padding:0 6px; box-shadow:0 2px 0 rgba(0,0,0,.12);}   /* приклад — у рамочці на світлому тлі */
+  .node:hover:not(:disabled) .leaf{transform:scale(1.07);}
+  .node:focus-visible{outline:3px solid var(--teal); outline-offset:8px; border-radius:50%;}
+  .node .deco{position:absolute; left:-16px; top:-18px; font-size:clamp(28px, 8vw, 38px); line-height:1; rotate:-10deg; filter:drop-shadow(0 2px 1px rgba(0,0,0,.2)); pointer-events:none;}
+  .node .score{position:absolute; right:-14px; top:-12px; display:inline-flex; align-items:center; gap:1px; background:#fff; border-radius:999px; padding:0 7px 0 3px; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:14px; line-height:1.5; color:var(--ink); white-space:nowrap; box-shadow:0 2px 0 rgba(0,0,0,.12);}
+  .node .score .nr{font-size:17px;}
+  .node:disabled{cursor:default;}   /* заблоковане — просто сіре, непрозоре, щоб стежка не просвічувала */
+  .node:disabled .ring{background:#EEF2F4; box-shadow:0 0 0 5px #DDE4E8;}
+  .node:disabled .ex b{color:#A3ADB3; background:#EEF2F4; border-color:#AAB5BB; box-shadow:none;}
+  .node:disabled .deco{filter:grayscale(1); opacity:.4;}
+  .node.next .ring{animation:glow 1.6s ease-in-out infinite;}
+  .isle-btn{position:absolute; translate:-50% -50%; width:48%; height:13%; border:none; background:none; padding:0; cursor:pointer; border-radius:50%;}
+  .isle-btn:focus-visible{outline:3px solid var(--teal); outline-offset:4px;}
+  .twinkle{transform-box:fill-box; transform-origin:center; animation:twinkle 1.3s ease-in-out infinite;}   /* іскорки біля корони — на карті й в історії */
+  @keyframes twinkle{50%{transform:scale(.4); opacity:.3;}}
+  /* ---------- Історія без слів ---------- */
+  .story{z-index:35; background:rgba(20,30,50,.72);}
+  .stage{position:relative; width:min(100%, 720px); aspect-ratio:400 / 240; border-radius:var(--radius-l); overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,.35);}
+  .stage > svg{display:block; width:100%; height:100%;}
+  .skip{position:absolute; top:16px; right:16px; width:48px; height:48px; border:none; border-radius:50%; background:rgba(255,255,255,.92); cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 3px 0 rgba(0,0,0,.15);}
+  .skip svg{width:24px; height:24px;}
+  #sFrog{transition:transform .5s ease;}
+  #sFrogIn.hop{animation:s-hop .5s ease;}
+  @keyframes s-hop{40%{transform:translateY(-38px);} 80%{transform:translateY(2px);}}
+  .s-pad{opacity:0; transition:opacity .25s ease;}
+  .s-pad.on{opacity:1;}
+  .s-pad.on .s-grow{transform-box:fill-box; transform-origin:center; animation:s-pop .45s ease both;}
+  @keyframes s-pop{from{transform:scale(0);} 70%{transform:scale(1.15);} to{transform:none;}}
+  #sBubble{opacity:0; transition:opacity .35s ease;}
+  #sBubble.on{opacity:1;}
+  #sCrown{transition:transform .7s ease-in-out;}
+  #sCrown.wiggle > svg{transform-box:fill-box; transform-origin:center bottom; animation:wiggle .5s ease 2;}
+  @keyframes wiggle{25%{transform:rotate(-12deg) scale(1.1);} 75%{transform:rotate(12deg) scale(1.1);}}
+  .burst{transform-box:fill-box; transform-origin:center; animation:burst .9s ease-out forwards;}
+  @keyframes burst{from{transform:translate(0,0) scale(.3); opacity:1;} to{transform:translate(var(--bx), var(--by)) scale(1); opacity:0;}}
+  .map-frog{position:absolute; width:clamp(40px, 11vw, 52px); translate:-50% -100%; pointer-events:none; animation:bob 1.8s ease-in-out infinite; z-index:2;}
+  .map-frog svg{display:block; width:100%; height:auto;}
+  @keyframes glow{50%{box-shadow:0 0 0 5px var(--w2), 0 0 0 11px rgba(255,255,255,.7);}}
+  @keyframes bob{50%{transform:translateY(-6px);}}
+  .reset{display:flex; justify-content:flex-start; margin-top:18px;}
+  .reset-btn{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13px; color:#8A9A91; background:none; border:none; padding:4px 2px; cursor:pointer; text-decoration:underline; text-underline-offset:3px;}
+  .reset-btn:hover{color:#C8401F;}
+
+  /* ---------- Ставок: кольори задає тема рівня ---------- */
+  .play{max-width:560px; margin:0 auto; padding:12px 16px 24px; display:flex; flex-direction:column; align-items:center; gap:14px;}
+  .pond-name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; color:var(--ink-soft); margin-bottom:-8px;}
+  .pond{position:relative; width:100%; height:140px; border-radius:var(--radius-l); background:linear-gradient(180deg, var(--w1), var(--w2)); box-shadow:inset 0 -6px 0 rgba(0,0,0,.07); overflow:hidden;}
+  .wave{position:absolute; height:3px; border-radius:3px; background:var(--wave, rgba(255,255,255,.5));}
+  .bank{position:absolute; left:-14px; top:0; bottom:0; width:42px; background:var(--bank); border-radius:0 50% 50% 0 / 0 30% 30% 0;}
+  .shore{position:absolute; right:-14px; top:0; bottom:0; width:42px; background:var(--shore); border-radius:50% 0 0 50% / 30% 0 0 30%;}
+  .decor{position:absolute; translate:-50% -50%; font-size:30px; line-height:1; pointer-events:none;}
+  .art{display:block; width:1em; height:1em; overflow:visible;}
+  .lily{position:absolute; width:clamp(28px, 7.4vw, 40px); translate:-50% -50%;}
+  .lily svg{display:block; width:100%; height:auto;}
+  .lily.done{filter:brightness(1.15) saturate(1.1);}
+  .flag{position:absolute; font-size:26px; translate:-50% -100%;}
+  .flag.crown{font-size:36px;}   /* на ставку останнього рівня замість прапорця — корона */
+  .frog{position:absolute; width:clamp(34px, 9vw, 46px); translate:-50% -72%; transition:left .45s ease, top .45s ease; z-index:2;}
+  .frog.still{transition:none;}
+  .frog svg{display:block; width:100%; height:auto;}
+  .frog-svg{overflow:visible;}   /* корона виходить за межі малюнка жабки */
+  .frog.hop svg{animation:hop .45s ease;}
+  .frog.fast{transition:left .22s ease-out, top .22s ease-in;}
+  .frog.short svg{animation:hop-short .22s ease-out forwards;}
+  .frog.sink svg{animation:sink .18s ease-in forwards;}
+  .frog.rise svg{animation:rise .35s ease-out both;}
+  .frog.win svg{animation:hop .45s ease 3;}
+  .splash{position:absolute; width:20px; height:8px; border:2px solid #fff; border-radius:50%; translate:-50% -50%; animation:ring .7s ease-out forwards; pointer-events:none;}
+  .drop{position:absolute; width:6px; height:6px; border-radius:50%; background:#fff; translate:-50% -50%; animation:drop .6s ease-out forwards; pointer-events:none;}
+  @keyframes hop{40%{transform:translateY(-46px) scale(1.05);} 80%{transform:translateY(2px) scaleY(.9);}}
+  @keyframes hop-short{45%{transform:translateY(-38px);} 100%{transform:translateY(0);}}
+  @keyframes sink{to{transform:translateY(26px) scale(.55); opacity:0;}}
+  @keyframes rise{from{transform:translateY(22px) scale(.7); opacity:0;} 60%{transform:translateY(-6px); opacity:1;} to{transform:none; opacity:1;}}
+  @keyframes ring{to{width:64px; height:22px; opacity:0;}}
+  @keyframes drop{to{transform:translate(var(--dx), -26px); opacity:0;}}
+
+  .task{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:clamp(38px, 11.5vw, 60px); line-height:1; display:flex; align-items:center; gap:.22em; white-space:nowrap; min-height:76px;}
+  .task .op{color:var(--ink-soft); font-weight:700;}
+  .task.bad{animation:shake .35s ease;}
+  .task.enter{animation:task-in .35s ease-out;}
+  .task.leave{animation:task-out .3s ease-in forwards;}
+  @keyframes task-in{from{transform:translateX(60px); opacity:0;}}
+  @keyframes task-out{to{transform:translateX(-60px); opacity:0;}}
+  .box{display:inline-flex; align-items:center; justify-content:center; min-width:1.9em; height:1.25em; padding:0 .15em .06em; border:3px solid var(--teal); border-radius:14px; background:var(--teal-soft);}
+  .box.empty{color:#B9CCC0;}
+  .box.ok{border-color:var(--green); background:var(--green-soft); color:var(--green-dark);}
+  .box.bad{animation:shake .35s ease; border-color:var(--coral); background:var(--coral-soft);}
+
+  .pad{display:grid; grid-template-columns:repeat(3, 1fr); gap:10px; width:min(100%, 340px);}
+  .key{height:clamp(52px, 8vh, 64px); border:none; border-radius:var(--radius-m); background:var(--surface); box-shadow:0 4px 0 var(--line), inset 0 0 0 2px var(--line); font-family:'Baloo 2',sans-serif; font-weight:800; font-size:30px; color:var(--ink); cursor:pointer; touch-action:manipulation; user-select:none; -webkit-user-select:none;}
+  .key:active{transform:translateY(3px); box-shadow:0 1px 0 var(--line), inset 0 0 0 2px var(--line);}
+  /* Кольорові клавіші внизу: «стерти» — світло-блакитна з намальованою біркою, «перевірити» — зелена з галочкою */
+  .key.del,.key.go{display:flex; align-items:center; justify-content:center; color:#fff; transition:filter .2s ease;}
+  .key.del svg,.key.go svg{width:44%; max-width:46px; height:auto; display:block;}
+  .key.del{background:linear-gradient(180deg, #A9DBF7, #7EC4EE); box-shadow:0 4px 0 #4E9FD1;}
+  .key.del:active{box-shadow:0 1px 0 #4E9FD1;}
+  .key.go{background:linear-gradient(180deg, #4CC46B, #2FA84F); box-shadow:0 4px 0 #1F7A38;}
+  .key.go:active{box-shadow:0 1px 0 #1F7A38;}
+  .key.del:hover,.key.go:hover{filter:brightness(1.06);}
+
+  .btn{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; border:none; border-radius:999px; padding:9px 24px; cursor:pointer;}
+  .btn-primary{background:var(--teal); color:#fff;}
+  .btn-primary:hover{background:var(--teal-dark);}
+  .btn-ghost{background:var(--surface); border:1.5px solid var(--line); color:var(--ink-soft);}
+  .btn-ghost:hover{border-color:var(--teal); color:var(--teal-dark);}
+
+  .overlay{position:fixed; inset:0; z-index:30; background:rgba(27,27,58,.45); display:none; align-items:center; justify-content:center; padding:16px;}
+  .overlay.show{display:flex;}
+  .win{width:min(100%, 420px); background:var(--surface); border-radius:var(--radius-l); padding:24px 22px; text-align:center;}
+  .win .big svg{width:90px; height:76px;}
+  .win h2{font-size:28px; line-height:1.2; margin:4px 0 8px;}
+  .win .earned{display:inline-flex; align-items:center; gap:8px; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:34px; line-height:1;}
+  .win .earned .nr{font-size:44px;}
+  .win p{margin:8px 0 0; color:var(--ink-soft); font-weight:700;}
+  .win-actions{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-top:16px;}
+  .confetti{position:fixed; top:-12px; z-index:40; width:10px; height:14px; pointer-events:none; animation:fall linear forwards;}
+  @keyframes fall{to{transform:translateY(105vh) rotate(540deg);}}
+  @keyframes shake{25%{translate:-6px 0;} 75%{translate:6px 0;}}
+  @keyframes pop{50%{transform:scale(1.14);}}
+  @media (prefers-reduced-motion:reduce){ .frog{transition:none;} .frog svg{animation-duration:.01s !important;} }
+</style>
+</head>
+<body>
+
+<div class="topbar"><div class="topbar-inner">
+  <a class="back-link" id="labsLink" href="../index.html">← Лабораторія</a>
+  <button class="back-link" id="levelsBtn" type="button" hidden>← Рівні</button>
+  <span class="game-title">Стрибай, жабко!</span>
+  <span class="total" id="total" title="Нейрончики"></span>
+</div></div>
+
+<main class="levels" id="levels">
+  <h1><span id="logoFrog"></span>Стрибай, жабко!</h1>
+  <div class="map" id="map"></div>
+  <div class="reset"><button class="reset-btn" id="resetBtn" type="button">Скинути прогрес</button></div>
+</main>
+
+<main class="play" id="play" hidden>
+  <div class="pond-name" id="pondName"></div>
+  <div class="pond" id="pond"></div>
+  <div class="task" id="task"></div>
+  <div class="pad" id="pad"></div>
+</main>
+
+<!-- Історія без слів: початок (жабка бачить корону) і фінал (жабка її отримує) -->
+<div class="overlay story" id="story">
+  <div class="stage" id="stage"></div>
+  <button class="skip" id="storySkip" type="button" aria-label="Пропустити" title="Пропустити">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5l8 7-8 7zM12 5l8 7-8 7z" fill="#1B1B3A"/></svg>
+  </button>
+</div>
+
+<!-- Підтвердження скидання -->
+<div class="overlay" id="resetOverlay">
+  <form class="win" role="dialog" aria-labelledby="resetTitle" id="resetForm">
+    <h2 id="resetTitle">Скинути прогрес?</h2>
+    <p id="resetSub"></p>
+    <div class="win-actions">
+      <button class="btn btn-primary" type="submit">Скинути</button>
+      <button class="btn btn-ghost" id="resetCancel" type="button">Скасувати</button>
+    </div>
+  </form>
+</div>
+
+<div class="overlay" id="winOverlay">
+  <div class="win" role="dialog" aria-labelledby="winTitle">
+    <span class="big" id="winFrog"></span>
+    <h2 id="winTitle">Жабка на березі!</h2>
+    <div class="earned" id="winEarned"></div>
+    <p id="winSub"></p>
+    <div class="win-actions">
+      <button class="btn btn-primary" id="winNext" type="button">Наступний ставок →</button>
+      <button class="btn btn-ghost" id="winAgain" type="button">Ще раз</button>
+      <button class="btn btn-ghost" id="winLevels" type="button">Рівні</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ================= Налаштування ================= */
+const JUMPS = 10;                       // латать до берега: прапорець — на десятому місці, падіння відкидає на одне назад
+const MAX_N = 10;                       // нейрончиків за рівень: 10 мінус помилки, але не менше 1
+const STORE_KEY = 'frog-jump-v2';       // { best:{номер рівня: найкраще число нейрончиків}, crown:true — пройдено останній рівень }
+const $ = id => document.getElementById(id);
+const ri = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+const T = n => Math.floor(n / 10), U = n => n % 10;
+const MINUS = '−';
+// Перезапуск CSS-анімації класом (getBoundingClientRect, бо в SVG-елементів немає offsetWidth)
+const replay = (el, cls) => { el.classList.remove(cls); void el.getBoundingClientRect(); el.classList.add(cls); };
+// Одна анімація жабки за раз: стрибок, недоліт, падіння, виринання чи радість
+const frogAnim = cls => { const f = $('frog'); f.classList.remove('hop','short','sink','rise','win'); replay(f, cls); };
+const ex = (a, op, b) => ({ a, op, b, ans: op === '+' ? a + b : a - b });
+const twoDigit = ok => { let a; do{ a = ri(11, 99); }while(!ok(a)); return a; };
+// Відблиски на воді: [x, y, довжина] у координатах SVG
+const wavesSVG = (list, opacity) => list.map(([x, y, w])=>`<path d="M${x} ${y}h${w}" stroke="#fff" stroke-opacity="${opacity}" stroke-width="3" stroke-linecap="round"/>`).join('');
+
+/* ================= Власні малюнки прикрас (замість емодзі), viewBox 40×40 ================= */
+const ART = {
+  crown:'<path d="M5 30L3 11L13 19L20 6L27 19L37 11L35 30Z" fill="#FFC93C" stroke="#E0A400" stroke-width="1.5" stroke-linejoin="round"/><rect x="5" y="29" width="30" height="5" rx="1.5" fill="#F2B90F"/><circle cx="20" cy="22" r="2.6" fill="#E8483B"/><circle cx="11" cy="24" r="2" fill="#5BA8F5"/><circle cx="29" cy="24" r="2" fill="#5CD17A"/><circle cx="3" cy="11" r="2.2" fill="#FFD84D"/><circle cx="20" cy="6" r="2.4" fill="#FFD84D"/><circle cx="37" cy="11" r="2.2" fill="#FFD84D"/>',
+  lotus:'<ellipse cx="20" cy="32" rx="14" ry="4" fill="#3FA34D"/><path d="M20 31C11 30 5 23 6 16C13 17 18 23 20 31Z" fill="#F4A3C4"/><path d="M20 31C29 30 35 23 34 16C27 17 22 23 20 31Z" fill="#F4A3C4"/><path d="M20 31C14 24 14 13 20 6C26 13 26 24 20 31Z" fill="#FF7FAF"/><path d="M20 28C17 23 17 17 20 13C23 17 23 23 20 28Z" fill="#FFC2DA"/>',
+  flower:'<ellipse cx="20" cy="12" rx="5" ry="7" transform="rotate(0 20 20)" fill="#FF9EC4"/><ellipse cx="20" cy="12" rx="5" ry="7" transform="rotate(72 20 20)" fill="#FF9EC4"/><ellipse cx="20" cy="12" rx="5" ry="7" transform="rotate(144 20 20)" fill="#FF9EC4"/><ellipse cx="20" cy="12" rx="5" ry="7" transform="rotate(216 20 20)" fill="#FF9EC4"/><ellipse cx="20" cy="12" rx="5" ry="7" transform="rotate(288 20 20)" fill="#FF9EC4"/><circle cx="20" cy="20" r="5" fill="#FFD84D"/>',
+  daisy:'<ellipse cx="20" cy="11" rx="3.4" ry="7" transform="rotate(0 20 20)" fill="#FFFFFF"/><ellipse cx="20" cy="11" rx="3.4" ry="7" transform="rotate(45 20 20)" fill="#FFFFFF"/><ellipse cx="20" cy="11" rx="3.4" ry="7" transform="rotate(90 20 20)" fill="#FFFFFF"/><ellipse cx="20" cy="11" rx="3.4" ry="7" transform="rotate(135 20 20)" fill="#FFFFFF"/><ellipse cx="20" cy="11" rx="3.4" ry="7" transform="rotate(180 20 20)" fill="#FFFFFF"/><ellipse cx="20" cy="11" rx="3.4" ry="7" transform="rotate(225 20 20)" fill="#FFFFFF"/><ellipse cx="20" cy="11" rx="3.4" ry="7" transform="rotate(270 20 20)" fill="#FFFFFF"/><ellipse cx="20" cy="11" rx="3.4" ry="7" transform="rotate(315 20 20)" fill="#FFFFFF"/><circle cx="20" cy="20" r="5.5" fill="#FFC93C"/>',
+  duck:'<path d="M5 26C5 33 13 36 21 36C30 36 35 31 35 25C29 27 24 26 20 23C15 21 9 21 5 26Z" fill="#FFF6DD"/><path d="M12 27C16 26 20 28 22 31" stroke="#E6D9B5" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="27" cy="15" r="7.5" fill="#FFF6DD"/><path d="M33 15L39 17L33 19Z" fill="#FF9F2E"/><circle cx="29" cy="13" r="1.6" fill="#1B1B3A"/><path d="M3 36H37" stroke="#fff" stroke-opacity=".7" stroke-width="2" stroke-linecap="round"/>',
+  duckling:'<ellipse cx="18" cy="28" rx="13" ry="8" fill="#FFD93B"/><circle cx="25" cy="16" r="7" fill="#FFD93B"/><path d="M31 16L37 18L31 20Z" fill="#FF8A1F"/><circle cx="27" cy="14" r="1.5" fill="#1B1B3A"/><path d="M10 27C13 25 17 26 19 29" stroke="#E8B820" stroke-width="2" fill="none" stroke-linecap="round"/>',
+  mushroom:'<path d="M15 22H25L26 36H14Z" fill="#FFF3DC"/><path d="M4 23C4 12 12 5 20 5C28 5 36 12 36 23Z" fill="#E8483B"/><circle cx="13" cy="15" r="3" fill="#fff"/><circle cx="23" cy="11" r="2.4" fill="#fff"/><circle cx="28" cy="18" r="2.6" fill="#fff"/><circle cx="19" cy="19" r="1.8" fill="#fff"/>',
+  fir:'<rect x="18" y="30" width="4" height="7" rx="1" fill="#8C5A2E"/><path d="M20 3L30 15H25L33 25H27L35 33H5L13 25H7L15 15H10Z" fill="#2E8B57"/><path d="M20 3L30 15H25L33 25H27L35 33H20Z" fill="#257347"/>',
+  leaf:'<path d="M6 34C6 18 18 6 34 6C34 22 22 34 6 34Z" fill="#7CC456"/><path d="M8 32L30 10M14 26L14 19M20 20L21 13M14 26L21 26M20 20L27 20" stroke="#5A9E3A" stroke-width="1.8" stroke-linecap="round"/>',
+  snail:'<path d="M3 33C3 29 7 28 12 28H30C34 28 37 24 37 20L35 18C35 23 32 25 28 25H10C6 25 3 28 3 33Z" fill="#A7B98A"/><path d="M33 19L31 11M36 18L37 10" stroke="#8FA374" stroke-width="2" stroke-linecap="round"/><circle cx="31" cy="10" r="1.8" fill="#1B1B3A"/><circle cx="37" cy="9" r="1.8" fill="#1B1B3A"/><circle cx="18" cy="17" r="11" fill="#E39A4B"/><path d="M18 17m-6 0a6 6 0 1 0 6-6a3.5 3.5 0 1 0 3 3" stroke="#B5682A" stroke-width="2.2" fill="none" stroke-linecap="round"/>',
+  reeds:'<path d="M12 38V12M20 38V6M28 38V14" stroke="#6E8A3A" stroke-width="2.4" stroke-linecap="round"/><rect x="9.5" y="12" width="5" height="11" rx="2.5" fill="#8B5A2B"/><rect x="17.5" y="6" width="5" height="12" rx="2.5" fill="#7A4E25"/><rect x="25.5" y="14" width="5" height="10" rx="2.5" fill="#8B5A2B"/><path d="M20 30C14 26 9 26 5 28M20 32C26 27 31 27 35 29" stroke="#7FA04A" stroke-width="2" fill="none" stroke-linecap="round"/>',
+  ladybug:'<circle cx="20" cy="10" r="6" fill="#2B2B3A"/><ellipse cx="20" cy="23" rx="13" ry="13" fill="#E8483B"/><path d="M20 10V36" stroke="#2B2B3A" stroke-width="2"/><circle cx="13" cy="19" r="2.6" fill="#2B2B3A"/><circle cx="27" cy="19" r="2.6" fill="#2B2B3A"/><circle cx="14" cy="28" r="2.2" fill="#2B2B3A"/><circle cx="26" cy="28" r="2.2" fill="#2B2B3A"/><circle cx="17.5" cy="8.5" r="1.3" fill="#fff"/><circle cx="22.5" cy="8.5" r="1.3" fill="#fff"/>',
+  maple:'<path d="M20 28V38" stroke="#A0522D" stroke-width="2.4" stroke-linecap="round"/><polygon points="20,3 23,12 30,8 28,16 37,17 30,22 33,29 24,27 20,33 16,27 7,29 10,22 3,17 12,16 10,8 17,12" fill="#E8692E"/><path d="M20 30V12M20 22L28 16M20 22L12 16" stroke="#C04E1C" stroke-width="1.5" stroke-linecap="round"/>',
+  oak:'<path d="M20 4C26 6 24 10 29 12C33 15 28 18 31 21C34 25 28 27 28 31C27 35 22 34 20 37C18 34 13 35 12 31C12 27 6 25 9 21C12 18 7 15 11 12C16 10 14 6 20 4Z" fill="#C98A2E"/><path d="M20 8V37M20 18L26 14M20 25L27 22M20 18L14 14M20 25L13 22" stroke="#9A6418" stroke-width="1.5" stroke-linecap="round"/>',
+  moon:'<path d="M26 5A15 15 0 1 0 35 30A12 12 0 1 1 26 5Z" fill="#FFE27A"/><circle cx="15" cy="22" r="2" fill="#F2C94C"/><circle cx="20" cy="30" r="1.5" fill="#F2C94C"/>',
+  star:'<polygon points="20.0,5.0 24.1,15.3 35.2,16.1 26.7,23.2 29.4,33.9 20.0,28.0 10.6,33.9 13.3,23.2 4.8,16.1 15.9,15.3" fill="#FFD84D" stroke="#F2B90F" stroke-width="1.5" stroke-linejoin="round"/>',
+  sparkle:'<polygon points="20.0,3.0 22.8,17.2 37.0,20.0 22.8,22.8 20.0,37.0 17.2,22.8 3.0,20.0 17.2,17.2" fill="#FFFFFF"/><polygon points="32.0,3.0 33.1,7.9 38.0,9.0 33.1,10.1 32.0,15.0 30.9,10.1 26.0,9.0 30.9,7.9" fill="#FFF3A8"/>',
+  firefly:'<circle cx="20" cy="24" r="11" fill="#FFF59D" opacity=".35"/><circle cx="20" cy="24" r="6" fill="#FFF176"/><ellipse cx="20" cy="15" rx="4" ry="5" fill="#4A4A5A"/><ellipse cx="14" cy="14" rx="5" ry="3" fill="#fff" opacity=".7" transform="rotate(-25 14 14)"/><ellipse cx="26" cy="14" rx="5" ry="3" fill="#fff" opacity=".7" transform="rotate(25 26 14)"/>',
+  sun:'<path d="M4 30H36" stroke="#FFF" stroke-opacity=".8" stroke-width="2.4" stroke-linecap="round"/><path d="M8 30A12 12 0 0 1 32 30Z" fill="#FFB347"/><path d="M34.1 24.9L38.8 23.2" stroke="#FFD27A" stroke-width="2.4" stroke-linecap="round"/><path d="M28.6 17.7L31.5 13.6" stroke="#FFD27A" stroke-width="2.4" stroke-linecap="round"/><path d="M20.0 15.0L20.0 10.0" stroke="#FFD27A" stroke-width="2.4" stroke-linecap="round"/><path d="M11.4 17.7L8.5 13.6" stroke="#FFD27A" stroke-width="2.4" stroke-linecap="round"/><path d="M5.9 24.9L1.2 23.2" stroke="#FFD27A" stroke-width="2.4" stroke-linecap="round"/>',
+  bird:'<ellipse cx="18" cy="22" rx="12" ry="10" fill="#5B8DEF"/><circle cx="27" cy="15" r="6.5" fill="#5B8DEF"/><path d="M33 15L39 16L33 18Z" fill="#FFB020"/><circle cx="28.5" cy="13.5" r="1.4" fill="#1B1B3A"/><path d="M10 20C14 15 20 17 21 23C16 25 12 24 10 20Z" fill="#3E6FD6"/><ellipse cx="20" cy="26" rx="7" ry="4" fill="#DCE8FF"/><path d="M6 22L1 19L4 26Z" fill="#3E6FD6"/>',
+  snowflake:'<g stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round"><path d="M20 20L20.0 5.0M20.0 11.0L23.8 7.8M20.0 11.0L16.2 7.8"/><path d="M20 20L33.0 12.5M27.8 15.5L32.5 17.2M27.8 15.5L28.7 10.6"/><path d="M20 20L33.0 27.5M27.8 24.5L28.7 29.4M27.8 24.5L32.5 22.8"/><path d="M20 20L20.0 35.0M20.0 29.0L16.2 32.2M20.0 29.0L23.8 32.2"/><path d="M20 20L7.0 27.5M12.2 24.5L7.5 22.8M12.2 24.5L11.3 29.4"/><path d="M20 20L7.0 12.5M12.2 15.5L11.3 10.6M12.2 15.5L7.5 17.2"/></g><circle cx="20" cy="20" r="3" fill="#BFE3F7"/>',
+  snowman:'<circle cx="20" cy="28" r="10" fill="#fff" stroke="#BFD8EA" stroke-width="1.5"/><circle cx="20" cy="13" r="7" fill="#fff" stroke="#BFD8EA" stroke-width="1.5"/><rect x="13" y="3" width="14" height="3" rx="1" fill="#3A3F58"/><rect x="15.5" y="-2" width="9" height="6" rx="1" fill="#3A3F58"/><path d="M20 14L27 15.5L20 16.5Z" fill="#FF8A1F"/><circle cx="17.5" cy="11.5" r="1.1" fill="#1B1B3A"/><circle cx="22.5" cy="11.5" r="1.1" fill="#1B1B3A"/><path d="M13 19.5H27" stroke="#E8483B" stroke-width="3" stroke-linecap="round"/><circle cx="20" cy="25" r="1.2" fill="#3A3F58"/><circle cx="20" cy="30" r="1.2" fill="#3A3F58"/>',
+  palm:'<path d="M19 38C20 30 21 22 24 14" stroke="#A0703F" stroke-width="3.4" stroke-linecap="round" fill="none"/><path d="M24 14C18 9 10 10 5 15C12 13 18 14 24 14Z" fill="#3BAA5C"/><path d="M24 14C28 7 35 7 38 11C32 10 28 12 24 14Z" fill="#2E9A50"/><path d="M24 14C21 8 21 3 25 1C25 6 25 10 24 14Z" fill="#3BAA5C"/><path d="M24 14C30 14 36 18 37 24C32 19 28 17 24 14Z" fill="#2E9A50"/><path d="M24 14C17 15 12 20 11 25C16 20 20 17 24 14Z" fill="#46B866"/><circle cx="23" cy="16" r="2.2" fill="#7A4E25"/><circle cx="26" cy="16.5" r="2" fill="#8B5A2B"/>',
+  fish:'<path d="M30 20L39 12V28Z" fill="#FF8A3D"/><ellipse cx="18" cy="20" rx="14" ry="10" fill="#FFA14D"/><path d="M16 10.5C15 14 15 26 16 29.5" stroke="#fff" stroke-width="3"/><path d="M23 11.5C22 15 22 25 23 28.5" stroke="#fff" stroke-width="2.4"/><circle cx="9" cy="18" r="2.2" fill="#1B1B3A"/><circle cx="9.6" cy="17.4" r=".7" fill="#fff"/>',
+  shell:'<path d="M20 35L6 16C10 6 30 6 34 16Z" fill="#F7C6B5"/><path d="M20 35L11 10M20 35L20 8M20 35L29 10M20 35L6 16M20 35L34 16" stroke="#E29A84" stroke-width="1.8" stroke-linecap="round"/><path d="M15 35H25" stroke="#E29A84" stroke-width="3" stroke-linecap="round"/>',
+  mountain:'<path d="M1 36L14 12L27 36Z" fill="#8E9AAF"/><path d="M12 36L26 6L39 36Z" fill="#6F7D96"/><path d="M26 6L31 16L28 15L25 18L22 14Z" fill="#fff"/><path d="M14 12L18 20L15 19L12 21L10 19Z" fill="#fff"/>',
+  cloud:'<path d="M9 30C3 30 3 21 9 21C9 14 18 12 21 17C24 11 34 13 33 21C39 21 39 30 33 30Z" fill="#FFFFFF"/><path d="M9 30H33" stroke="#DDE8F5" stroke-width="2" stroke-linecap="round"/>',
+  tulip:'<path d="M20 22V38" stroke="#3E9E55" stroke-width="2.6" stroke-linecap="round"/><path d="M20 34C14 32 10 27 10 21C15 23 19 28 20 34Z" fill="#4CAF50"/><path d="M11 8L15 14L20 6L25 14L29 8C30 18 26 24 20 24C14 24 10 18 11 8Z" fill="#E8483B"/><path d="M20 6L25 14L29 8C30 18 26 24 20 24Z" fill="#C93A2E"/>',
+  butterfly:'<ellipse cx="12" cy="14" rx="9" ry="8" fill="#8E6CEF" transform="rotate(-20 12 14)"/><ellipse cx="28" cy="14" rx="9" ry="8" fill="#8E6CEF" transform="rotate(20 28 14)"/><ellipse cx="13" cy="27" rx="6" ry="6" fill="#5BC0EB"/><ellipse cx="27" cy="27" rx="6" ry="6" fill="#5BC0EB"/><circle cx="11" cy="13" r="2.4" fill="#fff" opacity=".8"/><circle cx="29" cy="13" r="2.4" fill="#fff" opacity=".8"/><rect x="18.5" y="8" width="3" height="25" rx="1.5" fill="#3A3F58"/><path d="M19 8L15 3M21 8L25 3" stroke="#3A3F58" stroke-width="1.5" stroke-linecap="round"/>',
+  rainbow:'<path d="M4 32A16 16 0 0 1 36 32" stroke="#FF6B6B" stroke-width="3.4" fill="none"/><path d="M7 32A13 13 0 0 1 33 32" stroke="#FFC93C" stroke-width="3.4" fill="none"/><path d="M10 32A10 10 0 0 1 30 32" stroke="#5CD17A" stroke-width="3.4" fill="none"/><path d="M13 32A7 7 0 0 1 27 32" stroke="#5BA8F5" stroke-width="3.4" fill="none"/><ellipse cx="7" cy="33" rx="6" ry="4" fill="#fff"/><ellipse cx="33" cy="33" rx="6" ry="4" fill="#fff"/>',
+  flag:'<path d="M8 4V38" stroke="#6B4A2E" stroke-width="3" stroke-linecap="round"/><path d="M9 5H34V23H9Z" fill="#fff" stroke="#3A3F58" stroke-width="1.5"/><rect x="9.00" y="5" width="6.25" height="6" fill="#3A3F58"/><rect x="21.50" y="5" width="6.25" height="6" fill="#3A3F58"/><rect x="15.25" y="11" width="6.25" height="6" fill="#3A3F58"/><rect x="27.75" y="11" width="6.25" height="6" fill="#3A3F58"/><rect x="9.00" y="17" width="6.25" height="6" fill="#3A3F58"/><rect x="21.50" y="17" width="6.25" height="6" fill="#3A3F58"/>'
+};
+const art = name => `<svg class="art" viewBox="0 0 40 40" aria-hidden="true">${ART[name] || ''}</svg>`;
+
+/* ================= Ставки: у кожного рівня свій =================
+   w1/w2 — вода згори й знизу, pad — латаття, bank — лівий берег, shore — правий, decor — що плаває чи росте (назви малюнків з ART). */
+const PONDS = [
+  { name:'Ранковий ставок',  w1:'#A8DDF2', w2:'#6EBFE4', pad:'#3FA34D', padDark:'#2C7A37', bank:'#C9A36B', shore:'#8FD18F', decor:['lotus','flower','duck'], leaf:{ wob:1.2, waves:7 } },
+  { name:'Ставок з качками', w1:'#9ED7E0', w2:'#4FB0BF', pad:'#4CAF50', padDark:'#327A36', bank:'#B9905A', shore:'#7CC47C', decor:['duck','duckling','daisy'], leaf:{ wob:1, waves:5 } },
+  { name:'Лісове озерце',    w1:'#7FB9A0', w2:'#3E8A6E', pad:'#6DBE45', padDark:'#4A8A2C', bank:'#8C6A43', shore:'#2E7D32', decor:['mushroom','fir','leaf'], leaf:{ wob:2.2, waves:9 } },
+  { name:'Болітце',          w1:'#A3B98A', w2:'#6E8A55', pad:'#3D7A2E', padDark:'#2A5520', bank:'#7A5C3A', shore:'#5E7D3A', decor:['snail','reeds','ladybug'], leaf:{ wob:2.4, waves:6, jit:2.5 } },
+  { name:'Осінній ставок',   w1:'#A9C3D6', w2:'#6F93AE', pad:'#C9A227', padDark:'#9A7A14', bank:'#A0703F', shore:'#D98B3A', decor:['maple','oak','maple'], leaf:{ wob:1.6, waves:8, spots:true } },
+  { name:'Нічний ставок',    w1:'#2B3A67', w2:'#16213E', pad:'#2F7D4A', padDark:'#1D5532', bank:'#4A3B2A', shore:'#24452F', decor:['moon','star','firefly'], wave:'rgba(255,255,255,.25)', leaf:{ wob:1, waves:5, dots:'#FFF59D' } },
+  { name:'Захід сонця',      w1:'#FFB38A', w2:'#E66F7A', pad:'#3E9E55', padDark:'#2A6F3B', bank:'#B97A4E', shore:'#6FAF5F', decor:['sun','bird','flower'], leaf:{ wob:1.2, waves:6 } },
+  { name:'Зимове озеро',     w1:'#E3F2FB', w2:'#A9D3EE', pad:'#FFFFFF', padDark:'#B7D4E8', bank:'#E8EEF2', shore:'#F4F8FA', decor:['snowflake','snowman','snowflake'], wave:'rgba(120,170,210,.45)', leaf:{ ice:true } },
+  { name:'Тропічна лагуна',  w1:'#7FE3E0', w2:'#22B5C4', pad:'#2FBF71', padDark:'#1F8A50', bank:'#F2D49B', shore:'#F2D49B', decor:['palm','fish','shell'], leaf:{ wob:3.2, waves:12 } },
+  { name:'Гірське озеро',    w1:'#7AA7D9', w2:'#2F5F9E', pad:'#4F9D5D', padDark:'#336B3E', bank:'#9E9E9E', shore:'#7D8B7A', decor:['mountain','cloud','fir'], leaf:{ wob:1.6, waves:4, jit:1.5 } },
+  { name:'Квітучий сад',     w1:'#F6C9DD', w2:'#E28FB6', pad:'#5DB35D', padDark:'#3F823F', bank:'#C48A6A', shore:'#9BD18B', decor:['tulip','flower','butterfly'], leaf:{ wob:2.6, waves:10, flower:true } },
+  { name:'Чарівне озеро',    w1:'#B9A3F0', w2:'#6C4FC9', pad:'#52C7A0', padDark:'#329072', bank:'#7E64B8', shore:'#9C86D9', decor:['rainbow','sparkle','star'], wave:'rgba(255,255,255,.35)', leaf:{ wob:2, waves:6, dots:'#FFFFFF' } }
+];
+
+/* ================= Рівні: від найпростіших до складніших =================
+   Порядок не міняти — номер рівня є ключем збереженого прогресу. */
+const LEVELS = [
+  // До 10
+  { what:'Додавання до 10', ex:'3 + 4', gen:()=>{ const a = ri(1, 9); return ex(a, '+', ri(1, 10 - a)); } },
+  { what:'Віднімання до 10', ex:`8 ${MINUS} 3`, gen:()=>{ const a = ri(2, 10); return ex(a, '-', ri(1, a - 1)); } },
+  { what:'Додавання й віднімання до 10', ex:`6 ${MINUS} 2`, gen:()=>LEVELS[pick([0, 1])].gen() },
+  // Одиниці: двоцифрове ± одноцифрове без переходу через десяток
+  { what:'Додаємо одиниці', ex:'37 + 2', gen:()=>{ const a = twoDigit(n=>U(n) <= 8); return ex(a, '+', ri(1, 9 - U(a))); } },
+  { what:'Віднімаємо одиниці', ex:`58 ${MINUS} 4`, gen:()=>{ const a = twoDigit(n=>U(n) >= 1); return ex(a, '-', ri(1, U(a))); } },
+  { what:'Додаємо й віднімаємо одиниці', ex:`64 ${MINUS} 3`, gen:()=>LEVELS[pick([3, 4])].gen() },
+  // Десятки
+  { what:'Круглі числа', ex:'30 + 20', gen:()=>{
+      if(Math.random() < .5){ const a = ri(1, 8); return ex(a * 10, '+', 10 * ri(1, 9 - a)); }
+      const a = ri(2, 9); return ex(a * 10, '-', 10 * ri(1, a - 1)); } },
+  { what:'Додаємо й віднімаємо десятки', ex:'37 + 20', gen:()=>{
+      if(Math.random() < .5){ const a = ri(11, 79); return ex(a, '+', 10 * ri(1, 9 - T(a))); }
+      const a = twoDigit(n=>n >= 21 && U(n) > 0); return ex(a, '-', 10 * ri(1, T(a) - 1)); } },
+  { what:'Двоцифрові числа', ex:'34 + 25', gen:()=>{
+      if(Math.random() < .5){ const ta = ri(1, 8), tb = ri(1, 9 - ta), ua = ri(0, 9); return ex(ta * 10 + ua, '+', tb * 10 + ri(0, 9 - ua)); }
+      const ta = ri(2, 9), tb = ri(1, ta - 1), ua = ri(1, 9); return ex(ta * 10 + ua, '-', tb * 10 + ri(0, ua)); } },
+  // Через десяток
+  { what:'Через десяток: додавання', ex:'38 + 5', gen:()=>{ const a = twoDigit(n=>U(n) >= 2 && n <= 89); return ex(a, '+', ri(10 - U(a), 9)); } },
+  { what:'Через десяток: віднімання', ex:`42 ${MINUS} 7`, gen:()=>{ const a = twoDigit(n=>n >= 20 && U(n) <= 8); return ex(a, '-', ri(U(a) + 1, 9)); } },
+  { what:'Двоцифрові через десяток', ex:'47 + 36', gen:()=>{
+      if(Math.random() < .5){ const ta = ri(1, 7), tb = ri(1, 8 - ta), ua = ri(1, 9); return ex(ta * 10 + ua, '+', tb * 10 + ri(10 - ua, 9)); }
+      const ta = ri(2, 9), tb = ri(1, ta - 1), ua = ri(0, 8); return ex(ta * 10 + ua, '-', tb * 10 + ri(ua + 1, 9)); } }
+];
+const LAST = LEVELS.length - 1;   // останній рівень — за нього жабка отримує корону
+const pondVars = p => `--w1:${p.w1}; --w2:${p.w2}; --pad:${p.pad}; --pad-dark:${p.padDark}; --bank:${p.bank}; --shore:${p.shore};${p.wave ? ` --wave:${p.wave};` : ''}`;
+
+/* ================= Нейрончик ================= */
+const NEURON_SVG = `<line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/><line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/><line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/><line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/><line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/><line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/><circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#E0A800" opacity="0.6"/>`;
+const neuron = () => `<svg class="nr" viewBox="0 0 24 24" aria-hidden="true">${NEURON_SVG}</svg>`;
+
+/* ================= Збереження ================= */
+let store = { best:{} };
+try{ const s = JSON.parse(localStorage.getItem(STORE_KEY)); if(s && s.best) store = s; }catch(e){}
+const save = () => { try{ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }catch(e){} };
+const bestOf = i => store.best[i] || 0;
+const unlocked = i => i === 0 || bestOf(i - 1) > 0;
+const totalN = () => LEVELS.reduce((s, _, i)=>s + bestOf(i), 0);
+function renderTotal(){ $('total').innerHTML = `${neuron()}<span>${totalN()}</span>`; }
+
+/* ================= Жабка ================= */
+const FROG_BODY = `
+  <ellipse cx="14" cy="47" rx="11" ry="5" fill="#3D8B3D"/><ellipse cx="50" cy="47" rx="11" ry="5" fill="#3D8B3D"/>
+  <ellipse cx="32" cy="34" rx="24" ry="17" fill="#5CB85C"/>
+  <ellipse cx="32" cy="39" rx="15" ry="9" fill="#BDE5A8"/>
+  <circle cx="19" cy="17" r="9" fill="#5CB85C"/><circle cx="45" cy="17" r="9" fill="#5CB85C"/>
+  <circle cx="19" cy="16" r="5.5" fill="#fff"/><circle cx="45" cy="16" r="5.5" fill="#fff"/>
+  <circle cx="20" cy="17" r="3" fill="#1B1B3A"/><circle cx="44" cy="17" r="3" fill="#1B1B3A"/>
+  <path d="M23 30 Q32 37 41 30" fill="none" stroke="#1F5E1F" stroke-width="2.5" stroke-linecap="round"/>
+  <circle cx="17" cy="29" r="3" fill="#FF9AA2" opacity=".7"/><circle cx="47" cy="29" r="3" fill="#FF9AA2" opacity=".7"/>
+`;
+// Корону жабка отримує, коли пройде останній рівень (store.crown); носить її всюди, доки прогрес не скинуто
+const frogSVG = (crown = store.crown) => `<svg class="frog-svg" viewBox="0 0 64 54" aria-hidden="true">${FROG_BODY}${crown ? `<g transform="translate(19.6 -14) scale(.62)">${ART.crown}</g>` : ''}</svg>`;
+function drawFrogs(){
+  $('logoFrog').innerHTML = frogSVG().replace('<svg', '<svg width="54" height="46"');
+  $('winFrog').innerHTML = frogSVG();
+}
+drawFrogs();
+
+/* ================= Острівець з короною ================= */
+// x, y — середина острівця; withCrown — корона ще чекає на камінці
+function isleSVG(x, y, withCrown){
+  return `<g>
+    <ellipse cx="${x}" cy="${y + 6}" rx="80" ry="30" fill="#F2D49B"/>
+    <ellipse cx="${x}" cy="${y}" rx="70" ry="22" fill="#8FD18F"/>
+    <ellipse cx="${x - 30}" cy="${y - 4}" rx="16" ry="6" fill="#7CC47C"/>
+    <svg x="${x - 74}" y="${y - 52}" width="44" height="44" viewBox="0 0 40 40" overflow="visible">${ART.palm}</svg>
+    <svg x="${x + 34}" y="${y - 14}" width="18" height="18" viewBox="0 0 40 40">${ART.flower}</svg>
+    <rect x="${x + 4}" y="${y - 12}" width="30" height="12" rx="4" fill="#A9B4BD"/>
+    <rect x="${x + 4}" y="${y - 12}" width="30" height="4" rx="2" fill="#C5CDD2"/>
+    ${withCrown ? `<g><svg x="${x + 1}" y="${y - 47}" width="36" height="36" viewBox="0 0 40 40">${ART.crown}</svg>
+      <svg class="twinkle" x="${x - 8}" y="${y - 52}" width="12" height="12" viewBox="0 0 40 40">${ART.sparkle}</svg>
+      <svg class="twinkle" style="animation-delay:.5s" x="${x + 36}" y="${y - 40}" width="10" height="10" viewBox="0 0 40 40">${ART.sparkle}</svg>
+      <svg class="twinkle" style="animation-delay:.9s" x="${x + 24}" y="${y - 60}" width="9" height="9" viewBox="0 0 40 40">${ART.sparkle}</svg></g>` : ''}
+  </g>`;
+}
+
+/* ================= Історія без слів =================
+   intro — жабка бачить корону на острівці, мріє про неї й стрибає лататтям з прикладами;
+   finale — після останнього рівня жабка вистрибує на острівець, і корона злітає їй на голову. */
+const S_PADS = [{ x:50, y:182 }, { x:128, y:160 }, { x:206, y:184 }, { x:280, y:158 }];
+const S_SIGNS = ['3 + 4', '37 + 2', '38 + 5'];
+const S_ISLE = { x:345, y:110 }, S_LAND = { x:322, y:104 };
+let storyTimers = [], storyDone = null;
+function storySVG(kind){
+  const finale = kind === 'finale';
+  const pads = S_PADS.map((p, k)=>`<g class="s-pad${k === 0 || finale ? ' on' : ''}" id="sPad${k}"><g class="s-grow">
+      <svg x="${p.x - 30}" y="${p.y - 28}" width="60" height="62" viewBox="0 0 100 104">${leafSVG(0, { turn:[30, -60, 150, 80][k], seed:k + 3 }).replace(/^<svg[^>]*>|<\/svg>$/g, '')}</svg>
+      ${k ? `<rect x="${p.x - 25}" y="${p.y - 12}" width="50" height="22" rx="7" fill="#fff" stroke="#2C7A37" stroke-width="2"/>
+      <text x="${p.x}" y="${p.y + 5}" text-anchor="middle" font-family="'Baloo 2', sans-serif" font-weight="800" font-size="15" fill="#1B1B3A">${S_SIGNS[k - 1]}</text>` : ''}
+    </g></g>`).join('');
+  const start = finale ? S_PADS[3] : S_PADS[0];
+  return `<svg viewBox="0 0 400 240" aria-hidden="true">
+    <defs><linearGradient id="sWater" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A8DDF2"/><stop offset="1" stop-color="#6EBFE4"/></linearGradient></defs>
+    <rect width="400" height="240" fill="url(#sWater)"/>
+    ${wavesSVG([[30,40,30],[150,30,40],[240,80,26],[90,225,36],[250,225,30],[360,200,24],[20,120,24]], .55)}
+    <g transform="translate(${S_ISLE.x} ${S_ISLE.y}) scale(.7) translate(${-S_ISLE.x} ${-S_ISLE.y})">${isleSVG(S_ISLE.x, S_ISLE.y, false)}</g>
+    <g id="sCrown" style="transform:translate(0px, 0px) scale(1)"><svg x="343" y="76" width="30" height="30" viewBox="0 0 40 40">${ART.crown}</svg></g>
+    <svg class="twinkle" x="334" y="70" width="10" height="10" viewBox="0 0 40 40">${ART.sparkle}</svg>
+    <svg class="twinkle" style="animation-delay:.6s" x="376" y="82" width="9" height="9" viewBox="0 0 40 40">${ART.sparkle}</svg>
+    ${pads}
+    <g id="sBubble">
+      <circle cx="${S_PADS[0].x + 22}" cy="${S_PADS[0].y - 52}" r="4" fill="#fff"/>
+      <circle cx="${S_PADS[0].x + 32}" cy="${S_PADS[0].y - 66}" r="6.5" fill="#fff"/>
+      <ellipse cx="${S_PADS[0].x + 58}" cy="${S_PADS[0].y - 98}" rx="32" ry="24" fill="#fff"/>
+      <svg x="${S_PADS[0].x + 42}" y="${S_PADS[0].y - 116}" width="32" height="32" viewBox="0 0 40 40">${ART.crown}</svg>
+    </g>
+    <g id="sFrog" style="transform:translate(${start.x - 28}px, ${start.y - 40}px)"><g id="sFrogIn">
+      <svg width="56" height="47" viewBox="0 0 64 54" overflow="visible">${FROG_BODY}<g id="sFrogCrown" opacity="0" transform="translate(19.6 -14) scale(.62)">${ART.crown}</g></svg>
+    </g></g>
+    <g id="sBurst"></g>
+  </svg>`;
+}
+const sHop = () => replay($('sFrogIn'), 'hop');
+function sMove(p){ $('sFrog').style.transform = `translate(${p.x - 28}px, ${p.y - 40}px)`; sHop(); }
+function sBurst(x, y){
+  $('sBurst').innerHTML = Array.from({length:10}, (_, k)=>{
+    const a = k / 10 * Math.PI * 2;
+    return `<svg class="burst" style="--bx:${Math.round(Math.cos(a) * 46)}px; --by:${Math.round(Math.sin(a) * 34)}px" x="${x - 6}" y="${y - 6}" width="12" height="12" viewBox="0 0 40 40">${k % 2 ? ART.sparkle : ART.star}</svg>`;
+  }).join('');
+}
+const STORIES = {
+  intro: { length:7000, steps:[
+    [500,  ()=>$('sBubble').classList.add('on')],
+    [1300, ()=>replay($('sCrown'), 'wiggle')],
+    [2200, ()=>$('sBubble').classList.remove('on')],
+    [2500, ()=>$('sPad1').classList.add('on')], [3000, ()=>sMove(S_PADS[1])],
+    [3600, ()=>$('sPad2').classList.add('on')], [4100, ()=>sMove(S_PADS[2])],
+    [4700, ()=>$('sPad3').classList.add('on')], [5200, ()=>sMove(S_PADS[3])],
+    [5900, ()=>replay($('sCrown'), 'wiggle')]
+  ]},
+  finale: { length:5200, steps:[
+    [400,  ()=>sMove(S_LAND)],
+    [1100, ()=>{ $('sCrown').style.transform = 'translate(0px, -26px) scale(1)'; }],
+    // корона опускається на голову жабки: з (343, 76), 30×30 — до місця корони на малюнку жабки (311, 52), 21.7×21.7
+    [1800, ()=>{ $('sCrown').style.transform = 'translate(63.2px, -3.2px) scale(.723)'; }],
+    [2550, ()=>{ $('sCrown').style.opacity = 0; $('sFrogCrown').setAttribute('opacity', 1); sBurst(S_LAND.x, S_LAND.y - 40); sHop(); }],
+    [3150, sHop], [3750, sHop]
+  ]}
+};
+function playStory(kind, done){
+  endStory(false);
+  const st = STORIES[kind];
+  $('stage').innerHTML = storySVG(kind);
+  $('story').classList.add('show');
+  storyDone = done || null;
+  storyTimers = st.steps.map(([t, fn])=>setTimeout(fn, t));
+  storyTimers.push(setTimeout(()=>endStory(true), st.length));
+}
+function endStory(run = true){
+  storyTimers.forEach(clearTimeout); storyTimers = [];
+  $('story').classList.remove('show');
+  const cb = storyDone; storyDone = null;
+  if(run && cb) cb();
+}
+$('storySkip').addEventListener('click', ()=>endStory(true));
+
+/* ================= Екран рівнів: карта-стежка =================
+   12 латать-рівнів змійкою по 3 в ряд (координати у viewBox 300×MAP_H), наприкінці — острівець з короною.
+   На кожному латтаті — приклад рівня й прикраса його ставка. */
+const MAP_H = 650;
+const ISLE = { x:185, y:588 };   // острівець з короною наприкінці стежки
+// Зсув латать угору-вниз у кожному ряду за ходом стежки: перше — на рівні ряду, друге — вище, третє — нижче; стежка ніби в'ється
+const ZIGZAG = LEVELS.map((_, i)=>[0, -20, 20][i % 3]);
+const MAP_POINTS = LEVELS.map((_, i)=>{
+  const row = Math.floor(i / 3), col = i % 3;
+  return { x:[55, 150, 245][row % 2 ? 2 - col : col], y:66 + row * 128 + ZIGZAG[i], row };
+});
+const LEAF_TURN = [20, -40, 145, 200, -115, 65, 250, -70, 160, 35, -150, 100];   // поворот вирізу латаття на карті, градуси
+
+/* ================= Намальовані листки латаття =================
+   leafSVG(рівень, {turn, seed, locked}) — плаский SVG-листок у стилі ставка рівня:
+   виріз до середини, прожилки, тінь знизу; риси ставка — у PONDS[i].leaf:
+   wob/waves — хвиляста кромка, jit — нерівна, spots — плямки, dots — світлячки, flower — квіточка, ice — крижина. */
+function seeded(n){ let h = n * 2654435761 >>> 0; return () => { h = (h + 0x6D2B79F5) >>> 0; let t = h; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function leafSVG(i, { turn = 0, seed = i, locked = false } = {}){
+  const p = PONDS[i], st = p.leaf || {}, rnd = seeded(seed * 31 + 7);
+  const fill = locked ? '#C5CDD2' : (st.ice ? '#FFFFFF' : p.pad);
+  const dark = locked ? '#AAB5BB' : (st.ice ? '#A9CDE6' : p.padDark);
+  const cx = 50, cy = 48, f = n => n.toFixed(1), a0 = (turn - 90) * Math.PI / 180;   // a0 — напрям вирізу
+  let edge;
+  if(st.ice){
+    // Крижина: нерівний багатокутник без вирізу
+    const n = 9, pts = [];
+    for(let k = 0; k < n; k++){ const a = k / n * Math.PI * 2 + rnd() * .3, rr = 38 + rnd() * 9; pts.push(`${f(cx + Math.cos(a) * rr)} ${f(cy + Math.sin(a) * rr)}`); }
+    edge = `M${pts.join(' L')} Z`;
+  }else{
+    const half = .2, N = 60, wob = st.wob ?? 1, waves = st.waves ?? 6, jit = st.jit ?? 0, ph = rnd() * 6;
+    const pts = [];
+    for(let k = 0; k <= N; k++){
+      const a = a0 + half + k / N * (Math.PI * 2 - half * 2);
+      const rr = 44 + wob * Math.sin(a * waves + ph) + (rnd() - .5) * jit;
+      pts.push(`${f(cx + Math.cos(a) * rr)} ${f(cy + Math.sin(a) * rr)}`);
+    }
+    edge = `M${cx} ${cy} L${pts.join(' L')} Z`;
+  }
+  let extra = '';
+  if(st.ice){
+    for(let k = 0; k < 3; k++){ const a = rnd() * 6.3; extra += `<path d="M${f(cx + Math.cos(a) * 6)} ${f(cy + Math.sin(a) * 6)} l${f(Math.cos(a) * 14)} ${f(Math.sin(a) * 14 + 4)} l${f(Math.cos(a + .6) * 10)} ${f(Math.sin(a + .6) * 10)}" stroke="#BFDDF0" stroke-width="2" fill="none" stroke-linecap="round"/>`; }
+    extra += `<ellipse cx="38" cy="34" rx="12" ry="6" fill="#fff" opacity=".9"/>`;
+  }else{
+    // Прожилки від середини до краю, оминаючи виріз
+    for(let k = 1; k <= 7; k++){ const a = a0 + k / 8 * Math.PI * 2; extra += `<path d="M${cx} ${cy} L${f(cx + Math.cos(a) * 36)} ${f(cy + Math.sin(a) * 36)}" stroke="#fff" stroke-opacity="${locked ? .3 : .22}" stroke-width="2.2" stroke-linecap="round"/>`; }
+    extra += `<circle cx="${cx}" cy="${cy}" r="3.5" fill="#fff" opacity=".25"/>`;
+    extra += `<ellipse cx="35" cy="30" rx="11" ry="6" transform="rotate(-30 35 30)" fill="#fff" opacity="${locked ? .2 : .25}"/>`;
+  }
+  if(!locked){
+    if(st.spots) for(let k = 0; k < 4; k++){ const a = rnd() * 6.3, rr = 14 + rnd() * 20; extra += `<circle cx="${f(cx + Math.cos(a) * rr)}" cy="${f(cy + Math.sin(a) * rr)}" r="${f(2.5 + rnd() * 3)}" fill="${p.padDark}" opacity=".55"/>`; }
+    if(st.dots) for(let k = 0; k < 5; k++){ const a = rnd() * 6.3, rr = 10 + rnd() * 26; extra += `<circle cx="${f(cx + Math.cos(a) * rr)}" cy="${f(cy + Math.sin(a) * rr)}" r="${f(1.5 + rnd() * 1.6)}" fill="${st.dots}" opacity=".9"/>`; }
+    if(st.flower){ const a = (turn + 90) * Math.PI / 180, x = cx + Math.cos(a) * 30, y = cy + Math.sin(a) * 30;
+      extra += [0, 72, 144, 216, 288].map(d=>`<ellipse cx="${f(x)}" cy="${f(y - 5)}" rx="3.6" ry="6" transform="rotate(${d} ${f(x)} ${f(y)})" fill="#FF9EC4"/>`).join('') + `<circle cx="${f(x)}" cy="${f(y)}" r="3" fill="#FFD84D"/>`; }
+  }
+  return `<svg viewBox="0 0 100 104" aria-hidden="true"><path d="${edge}" transform="translate(0 5)" fill="${dark}"/><path d="${edge}" fill="${fill}"/>${extra}</svg>`;
+}
+const pct = p => `left:${p.x / 3}%; top:${p.y / MAP_H * 100}%`;
+// Стежка від першого латаття до upto-ї точки маршруту (латаття, а останнім — острівець)
+const ROUTE = [...MAP_POINTS, ISLE];
+function mapPath(upto){
+  return ROUTE.slice(0, upto + 1).reduce((d, p, i)=>{
+    if(!i) return `M${p.x} ${p.y}`;
+    const q = ROUTE[i - 1];
+    if(p.row !== undefined && q.row === p.row) return d + ` Q${(q.x + p.x) / 2} ${(q.y + p.y) / 2 + 16} ${p.x} ${p.y}`;   // у ряду — легка дуга, прогнута вниз
+    const side = q.x > 150 ? 300 : 0;                                                                                   // поворот біля краю ставка
+    return d + ` C${side} ${q.y} ${side} ${p.y} ${p.x} ${p.y}`;
+  }, '');
+}
+function toLevels(){
+  game = null;
+  $('play').hidden = true; $('levels').hidden = false;
+  $('labsLink').hidden = false; $('levelsBtn').hidden = true;
+  $('winOverlay').classList.remove('show');
+  renderTotal();
+  let next = LEVELS.findIndex((_, i)=>unlocked(i) && !bestOf(i));
+  if(next < 0) next = LAST;
+  const pts = MAP_POINTS;
+  $('map').innerHTML = `<svg viewBox="0 0 300 ${MAP_H}" aria-hidden="true">
+      ${wavesSVG([[40,20,30],[200,128,24],[120,258,34],[230,385,26],[250,520,30],[30,630,22],[260,628,26]], .5)}
+      <path d="${mapPath(ROUTE.length - 1)}" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="5" stroke-dasharray="2 11" stroke-linecap="round"/>
+      ${next || store.crown ? `<path d="${mapPath(store.crown ? ROUTE.length - 1 : next)}" fill="none" stroke="#FFC93C" stroke-width="5" stroke-dasharray="2 11" stroke-linecap="round"/>` : ''}
+      ${isleSVG(ISLE.x, ISLE.y, !store.crown)}
+    </svg>`
+    + `<button type="button" class="isle-btn" id="isleBtn" style="${pct(ISLE)}" aria-label="Історія про корону" title="Історія про корону"></button>`
+    + LEVELS.map((l, i)=>{
+      const open = unlocked(i), b = bestOf(i), p = PONDS[i];
+      return `<button type="button" class="node${i === next ? ' next' : ''}" data-i="${i}"${open ? '' : ' disabled'} style="${pct(pts[i])}; ${pondVars(p)}" title="${p.name}: ${l.what}" aria-label="Рівень ${i + 1}: ${l.what}">
+        <span class="ring"></span><span class="leaf">${leafSVG(i, { turn:LEAF_TURN[i], locked:!open })}</span><span class="ex"><b>${l.ex}</b></span>
+        <span class="deco">${art(p.decor[0])}</span>
+        ${b ? `<span class="score">${neuron()}${b}</span>` : ''}
+      </button>`;
+    }).join('')
+    + (()=>{ const f = store.crown ? { x:ISLE.x - 22, y:ISLE.y - 6 } : pts[next];   // з короною жабка живе на острівці
+      return `<span class="map-frog" style="left:${f.x / 3}%; top:calc(${f.y / MAP_H * 100}% - clamp(28px, 8vw, 40px))">${frogSVG()}</span>`; })();
+  $('isleBtn').addEventListener('click', ()=>playStory(store.crown ? 'finale' : 'intro'));
+  $('map').querySelectorAll('.node:not(:disabled)').forEach(b=>b.addEventListener('click', ()=>start(+b.dataset.i)));
+}
+$('levelsBtn').addEventListener('click', toLevels);
+// Скидання — через вікно підтвердження
+$('resetBtn').addEventListener('click', ()=>{
+  if(!totalN()) return;
+  $('resetSub').textContent = `Усі нейрончики${store.crown ? ' і корона' : ''} зникнуть.`;
+  $('resetOverlay').classList.add('show');
+  $('resetCancel').focus();
+});
+$('resetForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  $('resetOverlay').classList.remove('show');
+  store = { best:{}, seen:true }; save(); drawFrogs(); toLevels();
+});
+$('resetCancel').addEventListener('click', ()=>$('resetOverlay').classList.remove('show'));
+
+/* ================= Гра ================= */
+let game = null;
+// Місце на ставку: 0 — лівий берег, JUMPS — прапорець на правому березі; латаття — легкою хвилею
+const spot = i => ({ x: 6 + i * 88 / JUMPS, y: 56 + Math.sin(i * 1.3) * 16 });
+function start(level){
+  game = { level, pos:0, mistakes:0, input:'', tries:0, lock:false, seen:new Set() };
+  $('levels').hidden = true; $('play').hidden = false;
+  $('labsLink').hidden = true; $('levelsBtn').hidden = false;
+  $('winOverlay').classList.remove('show');
+  drawPond();
+  renderPad();
+  nextTask();
+  window.scrollTo(0, 0);
+}
+function drawPond(){
+  const p = PONDS[game.level], pond = $('pond');
+  pond.setAttribute('style', pondVars(p));
+  $('pondName').textContent = p.name;
+  let h = '<span class="bank"></span><span class="shore"></span>';
+  for(let k = 0; k < 7; k++) h += `<span class="wave" style="left:${ri(8, 80)}%; top:${ri(12, 88)}%; width:${ri(18, 40)}px"></span>`;
+  // Прикраси — біля верхнього й нижнього краю, щоб не заступали латаття
+  p.decor.forEach((d, k)=>{ h += `<span class="decor" style="left:${18 + k * 28 + ri(-5, 5)}%; top:${k % 2 ? 86 : 14}%">${art(d)}</span>`; });
+  for(let i = 1; i <= JUMPS; i++){
+    const s = spot(i);
+    h += i === JUMPS
+      ? `<span class="flag${game.level === LAST ? ' crown' : ''}" style="left:${s.x}%; top:${s.y}%">${art(game.level === LAST ? 'crown' : 'flag')}</span>`
+      : `<span class="lily" data-p="${i}" style="left:${s.x}%; top:${s.y}%">${leafSVG(game.level, { turn:ri(0, 359), seed:game.level * 100 + i })}</span>`;
+  }
+  h += `<span class="frog" id="frog">${frogSVG()}</span>`;
+  pond.innerHTML = h;
+  placeFrog(game.pos, true);
+}
+function placeFrog(pos, instant){
+  const s = typeof pos === 'number' ? spot(pos) : pos, f = $('frog');
+  f.classList.toggle('still', !!instant);
+  f.style.left = s.x + '%'; f.style.top = s.y + '%';
+  if(instant){ void f.offsetWidth; f.classList.remove('still'); }
+}
+function markPads(){
+  document.querySelectorAll('.lily').forEach(l=>l.classList.toggle('done', +l.dataset.p < game.pos));
+}
+function nextTask(){
+  // Новий приклад — щоразу інший і з іншою відповіддю, ніж попередній (не можна просто повторити щойно показану відповідь)
+  const prev = game.task;
+  let t, k = 0;
+  do{ t = LEVELS[game.level].gen(); }while((game.seen.has(`${t.a}${t.op}${t.b}`) || (prev && t.ans === prev.ans)) && ++k < 50);
+  if(k >= 50){   // невеликий рівень вичерпано — починаємо коло прикладів наново, але відповідь однаково інша
+    game.seen.clear();
+    do{ t = LEVELS[game.level].gen(); }while(prev && t.ans === prev.ans);
+  }
+  game.seen.add(`${t.a}${t.op}${t.b}`);
+  Object.assign(game, { task:t, input:'', tries:0, lock:false });
+  renderTask();
+  $('task').classList.remove('leave', 'bad');   // інакше «виїзд» (opacity 0, forwards) перебиває появу нового прикладу
+  replay($('task'), 'enter');
+}
+// Після двох помилок: приклад помітно «виїжджає», а замість нього заїжджає новий (відповідь не показуємо)
+function swapTask(){
+  if(!game) return;
+  replay($('task'), 'leave');
+  setTimeout(()=>{ if(game) nextTask(); }, 300);
+}
+// state — '' | 'ok' (правильно) | 'bad' (помилка): підсвічує віконце відповіді
+function renderTask(state){
+  const t = game.task, val = game.input;
+  $('task').innerHTML = `<span>${t.a}</span><span class="op">${t.op === '+' ? '+' : MINUS}</span><span>${t.b}</span><span class="op">=</span>`
+    + `<span class="box${val === '' ? ' empty' : ''}${state ? ' ' + state : ''}">${val === '' ? '?' : val}</span>`;
+}
+const ERASE_ICON = `<svg viewBox="0 0 40 28" aria-hidden="true"><path fill="#fff" d="M13.2 2h21.3A3.5 3.5 0 0 1 38 5.5v17a3.5 3.5 0 0 1-3.5 3.5H13.2a3.5 3.5 0 0 1-2.6-1.2L2.9 16.3a3.5 3.5 0 0 1 0-4.6l7.7-8.5A3.5 3.5 0 0 1 13.2 2Z"/><path fill="#3E8FC4" d="M19.3 8.3a1.6 1.6 0 0 1 2.3 0l2.9 2.9 2.9-2.9a1.6 1.6 0 1 1 2.3 2.3L26.8 13.5l2.9 2.9a1.6 1.6 0 1 1-2.3 2.3l-2.9-2.9-2.9 2.9a1.6 1.6 0 1 1-2.3-2.3l2.9-2.9-2.9-2.9a1.6 1.6 0 0 1 0-2.3Z"/></svg>`;
+const CHECK_ICON = `<svg viewBox="0 0 40 28" aria-hidden="true"><path d="M8 14.5l7.5 7.5L32 5.5" fill="none" stroke="#fff" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+function renderPad(){
+  $('pad').innerHTML = [1,2,3,4,5,6,7,8,9].map(n=>`<button type="button" class="key" data-k="${n}">${n}</button>`).join('')
+    + `<button type="button" class="key del" data-k="del" aria-label="Стерти" title="Стерти">${ERASE_ICON}</button><button type="button" class="key" data-k="0">0</button><button type="button" class="key go" data-k="ok" aria-label="Перевірити" title="Перевірити">${CHECK_ICON}</button>`;   // відповідь перевіряється лише зеленою кнопкою (чи Enter): автоперевірка підказувала б кількість цифр і дозволяла б перебір
+  $('pad').querySelectorAll('[data-k]').forEach(b=>b.addEventListener('click', ()=>press(b.dataset.k)));
+}
+function press(k){
+  if(!game || game.lock) return;
+  if(k === 'ok') return check();
+  if(k === 'del') game.input = game.input.slice(0, -1);
+  else if(game.input.length < 3) game.input = (game.input === '0' ? '' : game.input) + k;
+  renderTask();
+}
+document.addEventListener('keydown', e=>{
+  if(!game || $('play').hidden || document.querySelector('.overlay.show')) return;   // не набирати «під» історією чи вікном
+  if(/^[0-9]$/.test(e.key)) press(e.key);
+  else if(e.key === 'Backspace'){ e.preventDefault(); press('del'); }
+  else if(e.key === 'Enter'){ e.preventDefault(); press('ok'); }
+});
+
+function check(){
+  if(game.input === ''){ replay($('task'), 'bad'); return; }
+  const t = game.task;
+  game.lock = true;
+  if(+game.input === t.ans){
+    chime();
+    renderTask('ok');
+    game.pos++;
+    placeFrog(game.pos); frogAnim('hop');
+    setTimeout(()=>{ markPads(); const s = spot(game.pos); splash(s.x, s.y, true); }, 420);
+    if(game.pos >= JUMPS) setTimeout(finish, 900);
+    else setTimeout(nextTask, 1000);
+    return;
+  }
+  // Помилка: жабка не долітає, падає у воду й вилазить на попереднє латаття
+  game.tries++; game.mistakes++;
+  const from = spot(game.pos), to = spot(Math.min(game.pos + 1, JUMPS));
+  const mid = { x:(from.x + to.x) / 2, y:Math.min(92, Math.max(from.y, to.y) + 14) };
+  const back = Math.max(0, game.pos - 1);
+  renderTask('bad');   // правильну відповідь не показуємо
+  $('frog').classList.add('fast');
+  placeFrog(mid); frogAnim('short');
+  setTimeout(()=>{ plop(); splash(mid.x, mid.y, false); frogAnim('sink'); }, 220);
+  setTimeout(()=>{
+    $('frog').classList.remove('fast');
+    game.pos = back; markPads();
+    placeFrog(back, true); frogAnim('rise');
+  }, 480);
+  if(game.tries === 1){
+    setTimeout(()=>{ if(!game) return; game.input = ''; game.lock = false; renderTask(); }, 850);
+  }else{
+    setTimeout(()=>{ if(game){ game.input = ''; renderTask(); } }, 450);   // хибну відповідь прибираємо ще до заміни
+    setTimeout(swapTask, 1000);   // після падіння — одразу інший приклад
+  }
+}
+function splash(x, y, small){
+  const pond = $('pond');
+  const ring = document.createElement('span');
+  ring.className = 'splash'; ring.style.left = x + '%'; ring.style.top = (y + 4) + '%';
+  pond.appendChild(ring);
+  if(!small) for(let k = 0; k < 6; k++){
+    const d = document.createElement('span');
+    d.className = 'drop'; d.style.left = x + '%'; d.style.top = y + '%';
+    d.style.setProperty('--dx', (k - 2.5) * 9 + 'px');
+    pond.appendChild(d);
+    setTimeout(()=>d.remove(), 700);
+  }
+  setTimeout(()=>ring.remove(), 800);
+}
+
+function finish(){
+  const lvl = game.level, n = Math.max(1, MAX_N - game.mistakes), was = bestOf(lvl);
+  if(n > was){ store.best[lvl] = n; save(); renderTotal(); replay($('total'), 'up'); }
+  const crowned = lvl === LAST, firstCrown = crowned && !store.crown;
+  if(firstCrown){ store.crown = true; save(); }
+  if(crowned){ $('frog').innerHTML = frogSVG(); drawFrogs(); }
+  // Уперше пройдено останній рівень — спершу історія, як жабка отримує корону
+  if(firstCrown){ setTimeout(()=>playStory('finale', ()=>showWin(lvl, n, was, crowned)), 700); return; }
+  showWin(lvl, n, was, crowned);
+}
+function showWin(lvl, n, was, crowned){
+  frogAnim('win');
+  $('winTitle').textContent = crowned ? 'Жабка отримала корону!' : 'Жабка на березі!';
+  $('winEarned').innerHTML = `${neuron()} ${n}`;
+  $('winSub').textContent = game.mistakes === 0 ? 'Без жодного падіння!'
+    : n > was && was ? `Новий рекорд! Падінь: ${game.mistakes}` : `Падінь у воду: ${game.mistakes}`;
+  $('winNext').hidden = lvl >= LAST;
+  $('winOverlay').classList.add('show');
+  confetti();
+}
+$('winNext').addEventListener('click', ()=>start(game.level + 1));
+$('winAgain').addEventListener('click', ()=>start(game.level));
+$('winLevels').addEventListener('click', toLevels);
+
+/* ================= Звук і конфеті ================= */
+let audioCtx = null;
+// Спільний аудіоконтекст: створюється з першим звуком (після дотику дитини)
+function audio(){
+  audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+// «Хлюп»: короткий шум води й «бульк», що швидко падає вниз — без звукових файлів
+function plop(){
+  try{
+    const ac = audio(), t = ac.currentTime;
+    const len = Math.floor(ac.sampleRate * .3), buf = ac.createBuffer(1, len, ac.sampleRate), data = buf.getChannelData(0);
+    for(let i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+    const noise = ac.createBufferSource(), bp = ac.createBiquadFilter(), ng = ac.createGain();
+    noise.buffer = buf; bp.type = 'bandpass'; bp.Q.value = 1.2;
+    bp.frequency.setValueAtTime(1800, t); bp.frequency.exponentialRampToValueAtTime(400, t + .25);
+    ng.gain.setValueAtTime(.35, t);
+    noise.connect(bp).connect(ng).connect(ac.destination); noise.start(t);
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(700, t); o.frequency.exponentialRampToValueAtTime(140, t + .14);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.3, t + .01); g.gain.exponentialRampToValueAtTime(.001, t + .18);
+    o.connect(g).connect(ac.destination); o.start(t); o.stop(t + .2);
+  }catch(e){}
+}
+function chime(){
+  try{
+    const ac = audio(), t0 = ac.currentTime;
+    [784, 1046.5].forEach((f, i)=>{
+      const t = t0 + i * .08, o = ac.createOscillator(), g = ac.createGain();
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.12, t + .015); g.gain.exponentialRampToValueAtTime(.001, t + .35);
+      o.connect(g).connect(ac.destination); o.start(t); o.stop(t + .4);
+    });
+  }catch(e){}
+}
+function confetti(){
+  const colors = ['#5CB85C','#FFC93C','#7CC6E8','#FF6B4A','#16A3A0'];
+  for(let i = 0; i < 40; i++){
+    const c = document.createElement('div');
+    c.className = 'confetti';
+    c.style.left = Math.random() * 100 + 'vw';
+    c.style.background = colors[i % colors.length];
+    c.style.animationDuration = (1.6 + Math.random() * 1.4) + 's';
+    c.style.animationDelay = Math.random() * .4 + 's';
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(), 3600);
+  }
+}
+
+toLevels();
+// Перший запуск — історія про корону
+if(!store.seen && !totalN()) playStory('intro', ()=>{ store.seen = true; save(); });
+</script>
+</body>
+</html>
