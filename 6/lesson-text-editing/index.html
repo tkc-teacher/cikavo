@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Введення і редагування тексту — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в інтерфейсі Google Документів -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  /* Гама «червоний олівець коректора» */
+  :root{
+    --accent:#B23A48; --accent-dark:#8A2433; --accent-soft:#FBE9EB;
+    --label:#1F7A68;
+    --bg:#FBF7F6; --line:#EEDFE0;
+    --hud-bar:linear-gradient(90deg,#1F7A68,#B23A48);
+    /* інтерфейс Google */
+    --g-blue:#0B57D0; --g-ink:#1F1F1F; --g-soft:#444746; --g-line:#DADCE0; --g-bar:#EDF2FA; --g-canvas:#F9FBFD;
+    --g-sel:#ACCEF7; --g-red:#D93025;
+  }
+
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em;}
+  .kbd{display:inline-block; font-family:'Roboto',sans-serif; font-weight:500; font-size:.86em; line-height:1.2; padding:2px 7px; border:1px solid #C9BFC1; border-bottom-width:3px; border-radius:6px; background:#fff; color:var(--ink); white-space:nowrap;}
+
+  /* Спільне: картка завдання й підпис під вправою */
+  .task-card{display:flex; align-items:center; gap:14px; background:var(--accent-soft); border-radius:var(--radius-m); padding:14px 18px; margin-bottom:16px; min-height:64px;}
+  .task-card .tnum{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:13px; color:var(--accent-dark); white-space:nowrap;}
+  .task-card .ttext{font-weight:700; font-size:16px;}
+  .fb{font-size:14px; min-height:1.4em; margin-top:12px;}
+
+  /* Сторінка документа (спрощено) */
+  .page{background:#fff; border:1px solid var(--g-line); border-radius:4px; box-shadow:0 1px 3px rgba(60,64,67,.15); padding:18px 22px; font-family:Arial,sans-serif; font-size:16px; line-height:1.65; color:#202124;}
+  .page p{margin:0 0 6px;}
+  .page p:last-child{margin-bottom:0;}
+
+  /* ---------- Крок 1: клавіші ---------- */
+  .keys-info{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:8px 14px; margin:12px 0 18px; padding:0; list-style:none;}
+  .keys-info li{display:flex; gap:10px; align-items:baseline; font-size:15px;}
+  .keys-info .kbd{flex-shrink:0;}
+  .ky-doc{min-height:92px; white-space:pre-wrap;}
+  .ky-doc .para{display:block;}
+  .ky-doc .tab{display:inline-block; width:2.4em;}
+  .ky-doc .tab.fresh, .ky-doc .fresh{background:#CDEFD6; border-radius:2px;}
+  .caret{display:inline-block; width:2px; height:1.15em; margin:0 -1px; background:#000; vertical-align:-3px; animation:blink 1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  .ky-goal{font-size:13.5px; color:var(--ink-soft); margin:8px 2px 14px;}
+  .ky-goal b{font-family:Arial,sans-serif; font-weight:400; color:var(--ink); background:#fff; border:1px dashed #C9BFC1; border-radius:4px; padding:1px 6px;}
+  .keyboard{display:flex; flex-wrap:wrap; gap:8px;}
+  .key{font-family:'Roboto',sans-serif; font-weight:500; font-size:15px; color:var(--ink); background:linear-gradient(#fff,#F4EFEF); border:1px solid #C9BFC1; border-bottom-width:4px; border-radius:9px; padding:10px 16px; cursor:pointer; min-width:64px;}
+  .key:hover{border-color:var(--accent);}
+  .key:active{transform:translateY(2px); border-bottom-width:2px;}
+  .key.space{min-width:180px;}
+  .key.ok{background:#CDEFD6; border-color:var(--ok);}
+  .key.shake{background:#FDE6E1; border-color:var(--coral); animation:shakeX .35s ease;}
+
+  /* ---------- Недруковані символи ---------- */
+  .np-table{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:10px; margin:14px 0 18px;}
+  .np-item{display:flex; gap:12px; align-items:center; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 14px;}
+  .np-sym{width:44px; height:44px; flex-shrink:0; border-radius:12px; background:var(--accent-soft); color:var(--accent-dark); display:flex; align-items:center; justify-content:center; font-family:Arial,sans-serif; font-weight:700; font-size:24px;}
+  .np-item b{font-family:'Baloo 2',sans-serif; font-size:16px; display:block; line-height:1.2;}
+  .np-item span{font-size:13.5px; color:var(--ink-soft); line-height:1.4;}
+  .np-doc{font-family:Arial,sans-serif; font-size:15.5px; line-height:1.6; background:#fff; border:1px solid var(--g-line); border-radius:4px; padding:10px 14px; margin-bottom:10px; white-space:pre-wrap;}
+  .np-doc i{font-style:normal; color:#7A8FC4;}
+
+  /* ---------- Крок 3: знайди помилки ---------- */
+  .er-bar{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px;}
+  .np-toggle{display:inline-flex; align-items:center; gap:6px; font-family:'Roboto',sans-serif; font-size:13.5px; font-weight:500; color:var(--g-soft); background:#fff; border:1px solid var(--g-line); border-radius:999px; padding:6px 14px 6px 10px; cursor:pointer;}
+  .np-toggle.on{background:#D3E3FD; border-color:#D3E3FD; color:#041E49;}
+  .np-toggle b{font-family:Arial,sans-serif; font-size:16px;}
+  .er-doc{white-space:pre-wrap;}
+  .er-doc .tk{cursor:pointer; border-radius:3px; transition:background .2s;}
+  .er-doc .tk:hover{background:#F6E3E5;}
+  .er-doc .tk.fixed{background:#CDEFD6; cursor:default;}
+  .er-doc .tk.miss{background:#FAD2CF;}
+  .er-doc .sp{position:relative;}
+  .er-doc.show .sp::after{content:'·'; position:absolute; left:50%; top:-.05em; transform:translateX(-50%); color:#7A8FC4; font-weight:700; pointer-events:none;}
+  .er-doc .pil{color:#7A8FC4; display:none;}
+  .er-doc.show .pil{display:inline;}
+
+  /* ---------- Крок 4: виділення ---------- */
+  .sel-doc{user-select:text; -webkit-user-select:text; outline:none; cursor:text;}
+  .sel-doc:focus{border-color:#A8C7FA;}
+  .sel-doc ::selection{background:var(--g-sel);}
+  .sel-doc.good ::selection{background:#A8E6B8;}
+
+  /* ---------- Крок 6: правопис ---------- */
+  .gd-head{display:flex; align-items:center; gap:10px; padding:8px 12px 6px; font-family:'Roboto',sans-serif;}
+  .gd-head img{width:22px; height:30px;}
+  .gd-title{font-size:16px; color:var(--g-ink);}
+  .gd-menu{display:flex; gap:12px; font-size:13px; color:var(--g-ink); white-space:nowrap; overflow:hidden;}
+  .gwin{border:1px solid var(--g-line); border-radius:var(--radius-m); overflow:visible; background:var(--g-canvas); box-shadow:0 2px 10px rgba(0,0,0,.06);}
+  .gwin .page{margin:4px 12px 14px;}
+  .sp-doc{position:relative;}
+  .sw{text-decoration:underline wavy var(--g-red); text-decoration-skip-ink:none; text-underline-offset:3px; cursor:pointer;}
+  .sw.open{background:#FCE8E6;}
+  .sw-done{background:#CDEFD6; border-radius:2px; transition:background 1.2s;}
+  .sp-pop{position:absolute; z-index:5; width:230px; background:#fff; border-radius:8px; padding:6px 0; box-shadow:0 2px 6px 2px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.3); font-family:'Roboto',sans-serif; font-size:14px; color:var(--g-ink);}
+  .sp-pop[hidden]{display:none;}
+  .sp-cap{font-size:12px; color:var(--g-soft); padding:4px 16px 6px;}
+  .sp-it{display:flex; align-items:center; gap:12px; padding:8px 16px; cursor:pointer;}
+  .sp-it:hover{background:#F1F3F4;}
+  .sp-it.sugg{font-weight:700;}
+  .sp-it .ms{color:var(--g-soft); font-size:19px;}
+  .sp-it.shake{background:#FDE6E1; animation:shakeX .35s ease;}
+  .sp-sep{height:1px; background:var(--g-line); margin:5px 0;}
+
+</style>
+</head>
+<body data-lesson="lesson6-text-editing" data-hud="6 клас · Введення і редагування тексту">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Текстові документи</div>
+      <h1>Пишемо без помилок</h1>
+      <p>Як правильно вводити текст, швидко його виправляти й переставляти, а ще — як програма сама допомагає шукати помилки.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: сторінка з хвилястим підкресленням і червоний олівець коректора -->
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="72" r="56" fill="#FBE9EB"/>
+      <rect x="28" y="22" width="68" height="92" rx="6" fill="#fff" stroke="#B23A48" stroke-width="3"/>
+      <rect x="38" y="34" width="48" height="7" rx="3.5" fill="#1F7A68"/>
+      <rect x="38" y="50" width="22" height="4" rx="2" fill="#E3D3D5"/>
+      <rect x="64" y="50" width="22" height="4" rx="2" fill="#E3D3D5"/>
+      <path d="M38 62 q3 -4 6 0 t6 0 t6 0 t6 0" stroke="#D93025" stroke-width="2.4" stroke-linecap="round"/>
+      <rect x="66" y="58" width="20" height="4" rx="2" fill="#E3D3D5"/>
+      <rect x="38" y="72" width="48" height="4" rx="2" fill="#E3D3D5"/>
+      <rect x="38" y="82" width="40" height="4" rx="2" fill="#E3D3D5"/>
+      <rect x="38" y="92" width="30" height="4" rx="2" fill="#E3D3D5"/>
+      <g transform="rotate(38 100 84)">
+        <rect x="92" y="38" width="16" height="64" rx="3" fill="#B23A48"/>
+        <rect x="92" y="38" width="16" height="10" rx="3" fill="#F2A9B2"/>
+        <rect x="92" y="48" width="16" height="5" fill="#C9C1C2"/>
+        <path d="M92 102 L100 120 L108 102 Z" fill="#F6D9B8"/>
+        <path d="M97.5 114 L100 120 L102.5 114 Z" fill="#8A2433"/>
+      </g>
+      <circle cx="40" cy="112" r="13" fill="#1F7A68"/>
+      <path d="M34 112 l4.5 4.5 l8 -9" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Текстові документи</div>
+    <h2>Що ти вже знаєш</h2>
+    <p>Минулого разу ти дізнався, з яких об'єктів складається документ і які в них властивості.</p>
+    <p class="soft">Обери термін, а потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Службові клавіші</div>
+    <h2>Клавіші, які керують текстом</h2>
+    <p>Мигтюча риска на сторінці — це <b>курсор</b>. Нові символи з'являються саме там, де він стоїть. А ці клавіші допомагають виправляти текст:</p>
+    <ul class="keys-info">
+      <li><span class="kbd">⌫ Backspace</span>стирає символ ліворуч від курсора</li>
+      <li><span class="kbd">Delete</span>стирає символ праворуч від курсора</li>
+      <li><span class="kbd">Пропуск</span>ставить проміжок між словами</li>
+      <li><span class="kbd">↵ Enter</span>починає новий абзац</li>
+      <li><span class="kbd">⇥ Tab</span>робить відступ</li>
+      <li><span class="kbd">⇧ Shift</span>разом із літерою дає велику літеру</li>
+    </ul>
+    <div class="note">Коли рядок закінчується, програма сама переносить слово на новий рядок. Тому <b>Enter</b> натискаємо лише тоді, коли закінчився абзац.</div>
+    <p class="soft">Подивись, де стоїть курсор, і натисни потрібну клавішу.</p>
+    <div class="exercise" id="kyEx">
+      <div class="task-card"><span class="tnum" id="kyNum"></span><span class="ttext" id="kyTask"></span></div>
+      <div class="page ky-doc" id="kyDoc"></div>
+      <div class="ky-goal" id="kyGoal"></div>
+      <div class="keyboard" id="kyKeys"></div>
+      <div class="fb" id="kyFb"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Недруковані символи</div>
+    <h2>Невидимі знаки в тексті</h2>
+    <p>Пропуск, Enter і Tab теж вводять у текст символи — тільки їх не видно. Їх називають <b>недрукованими</b>: на папері їх немає, але програма може показати їх значками.</p>
+    <div class="np-table">
+      <div class="np-item"><span class="np-sym" style="color:#7A8FC4">·</span><div><b>Пропуск</b><span>Крапка посередині між словами.</span></div></div>
+      <div class="np-item"><span class="np-sym">¶</span><div><b>Кінець абзацу</b><span>Тут натиснули Enter.</span></div></div>
+      <div class="np-item"><span class="np-sym">→</span><div><b>Табуляція</b><span>Тут натиснули Tab.</span></div></div>
+    </div>
+    <div class="note">Є ще <b>нерозривний пропуск</b>: він не дає розірвати слова між рядками. Його ставлять, наприклад, між ініціалами й прізвищем: Т.&nbsp;Г.&nbsp;Шевченко.</div>
+    <p class="soft">Значки показують, що насправді ввели в документ. Розгадай, що тут відбувається.</p>
+    <div id="npList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Правила введення тексту</div>
+    <h2>Пропуски на своїх місцях</h2>
+    <p>Щоб текст виглядав охайно, пам'ятай кілька правил:</p>
+    <ul>
+      <li>Між словами — <b>лише один</b> пропуск.</li>
+      <li>Перед розділовими знаками <b>. , : ; ! ?</b> пропуску немає, а після них — є.</li>
+      <li>Усередині дужок і лапок пропусків немає: <b>(так)</b>, <b>«так»</b>.</li>
+      <li>Дефіс пишемо без пропусків: <b>синьо-жовтий</b>.</li>
+      <li>Тире — з пропусками з обох боків: <b>Київ — столиця</b>.</li>
+    </ul>
+    <p class="soft">Однокласник набрав текст про кита й наробив помилок. Клацни кожне місце з помилкою — і воно виправиться.</p>
+    <div class="exercise" id="erEx">
+      <div class="er-bar">
+        <span class="progress-line" id="erProgress" style="margin:0"></span>
+        <button class="np-toggle on" id="erToggle" type="button"><b>¶</b>Недруковані символи</button>
+      </div>
+      <div class="page er-doc show" id="erDoc"></div>
+      <div class="fb" id="erFb"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Виділення тексту</div>
+    <h2>Спочатку виділи</h2>
+    <p>Щоб щось зробити з частиною тексту — скопіювати, видалити чи перефарбувати, — її спершу <b>виділяють</b>. Виділений <b>фрагмент</b> підсвічується синім.</p>
+    <ul>
+      <li><b>Слово</b> — двічі клацнути по ньому.</li>
+      <li><b>Абзац</b> — тричі клацнути в ньому.</li>
+      <li><b>Будь-який фрагмент</b> — протягнути мишею з натиснутою лівою кнопкою.</li>
+      <li><b>Увесь текст</b> — натиснути <span class="kbd">Ctrl</span> + <span class="kbd">A</span> (на Mac — <span class="kbd">⌘</span> + <span class="kbd">A</span>).</li>
+    </ul>
+    <p class="soft">Виділи в документі саме те, що просять.</p>
+    <div class="exercise" id="slEx">
+      <div class="task-card"><span class="tnum" id="slNum"></span><span class="ttext" id="slTask"></span></div>
+      <div class="page sel-doc" id="slDoc" tabindex="0">
+        <p>Дракон Іскра жив у печері на високій горі.</p>
+        <p>Щоранку він вилітав погрітися на сонці й рахував хмаринки.</p>
+        <p>Якось Іскра побачив веселку червоного, жовтого й зеленого кольору.</p>
+      </div>
+      <div class="fb" id="slFb"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Копіювати, вирізати, вставити</div>
+    <h2>Переставляємо рядки</h2>
+    <p>Виділений фрагмент можна:</p>
+    <ul>
+      <li><b>скопіювати</b> <span class="kbd">Ctrl</span> + <span class="kbd">C</span> — він лишається на місці, а копія потрапляє в пам'ять;</li>
+      <li><b>вирізати</b> <span class="kbd">Ctrl</span> + <span class="kbd">X</span> — він зникає з тексту й теж потрапляє в пам'ять;</li>
+      <li><b>вставити</b> <span class="kbd">Ctrl</span> + <span class="kbd">V</span> — фрагмент з пам'яті з'являється там, де стоїть курсор.</li>
+    </ul>
+    <p>Ця пам'ять називається <b>буфер обміну</b>. Вставляти з неї можна скільки завгодно разів.</p>
+    <div class="note">Помилився? <span class="kbd">Ctrl</span> + <span class="kbd">Z</span> скасовує останню дію.</div>
+    <p class="soft">Речення «Свято почнеться о 10:00.» стоїть у кінці оголошення, а має бути на початку. Як його перенести?</p>
+    <div class="exercise">
+      <ol class="seq-done" id="cbDone"></ol>
+      <div class="seq-q" id="cbQ"></div>
+      <div class="seq-opts" id="cbOpts"></div>
+      <div class="choice-feedback" id="cbFb"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Перевірка правопису</div>
+    <h2>Червона хвиляста лінія</h2>
+    <p>Google Документи перевіряють слова просто під час набору. Слово з можливою помилкою програма підкреслює <span class="sw" style="cursor:default">червоною хвилястою</span> лінією.</p>
+    <ul>
+      <li>Клацни таке слово (у справжніх Документах — правою кнопкою), і програма запропонує правильні варіанти.</li>
+      <li><b>Ігнорувати</b> — якщо слово правильне, але програма його не знає: ім'я, прізвище, назва.</li>
+      <li><b>Додати в словник</b> — щоб програма запам'ятала таке слово й більше його не підкреслювала.</li>
+    </ul>
+    <p>Перевірити весь документ одразу: <b>Інструменти → Правопис і граматика</b>.</p>
+    <p class="soft">Виправ оголошення: клацни кожне підкреслене слово й обери, що з ним зробити.</p>
+    <div class="exercise" id="spEx">
+      <div class="gwin">
+        <div class="gd-head">
+          <img src="images/docs.svg" alt="">
+          <div>
+            <div class="gd-title">Оголошення про ярмарок</div>
+            <div class="gd-menu"><span>Файл</span><span>Редагувати</span><span>Вигляд</span><span>Вставлення</span><span>Формат</span><span>Інструменти</span></div>
+          </div>
+        </div>
+        <div class="page sp-doc" id="spDoc"></div>
+      </div>
+      <div class="progress-line" id="spProgress"></div>
+      <div class="fb" id="spFb"></div>
+    </div>
+
+<div class="trivia">Програма звіряє кожне слово зі словником, а не зміст. Якщо помилка утворила інше справжнє слово — «Кит муркоче» замість «Кіт муркоче», — програма її не помітить. Тому після перевірки обов'язково перечитай текст сам.</div>
+  </section>
+
+  <section class="block" data-guide>
+    <div class="step-label">Крок 7 · Пошук і заміна</div>
+    <h2>Знайти й замінити</h2>
+    <p>У довгому тексті слово можна не шукати очима:</p>
+    <ul>
+      <li><span class="kbd">Ctrl</span> + <span class="kbd">F</span> — <b>знайти</b>: програма підсвітить усі місця, де трапляється слово.</li>
+      <li><span class="kbd">Ctrl</span> + <span class="kbd">H</span> або <b>Редагувати → Знайти й замінити</b> — ще й <b>замінити</b> його на інше: по одному чи все одразу.</li>
+    </ul>
+    <div class="note">Пошук знаходить і частини слів. Якщо замінити всі «ліс» на «гай», то «лісник» стане «гайник». Тому перед «Замінити все» переглянь знахідки кнопкою «Далі».</div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Правила введення і редагування текстів. Перевірка правопису, пошук та заміна» · 6 клас</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+const flash = (el, cls = 'shake')=>{ el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), 650); };
+const esc = s=>s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Символ', desc:'Одна літера, цифра, розділовий знак чи пропуск' },
+  { name:'Абзац', desc:'Частина тексту від одного натискання Enter до наступного' },
+  { name:'Редагування', desc:'Змінюємо сам текст: додаємо, видаляємо, виправляємо' },
+  { name:'Форматування', desc:'Змінюємо вигляд тексту, а слова лишаються ті самі' },
+  { name:'Поля', desc:'Порожні смуги по краях аркуша' },
+  { name:'Альбомна орієнтація', desc:'Аркуш лежить горизонтально' },
+  { name:'Текстовий процесор', desc:'Програма, що не лише набирає текст, а й оформлює документ' },
+  { name:'Властивість', desc:'Ознака об\'єкта, яку можна змінити: колір, розмір, шрифт' }
+], 'recapProgress');
+
+/* ---------- КРОК 1: КЛАВІШІ ---------- */
+(function(){
+  const KEYS = [['bksp', '⌫ Backspace'], ['del', 'Delete'], ['space', 'Пропуск'], ['enter', '↵ Enter'], ['tab', '⇥ Tab'], ['shift', '⇧ Shift']];
+  const WHAT = {
+    bksp:'Backspace стирає символ ліворуч від курсора.', del:'Delete стирає символ праворуч від курсора.',
+    space:'Пропуск ставить проміжок.', enter:'Enter починає новий абзац.', tab:'Tab робить відступ.',
+    shift:'Shift натискають разом із літерою, щоб вона стала великою.'
+  };
+  const TASKS = [
+    { text:'Привітт усім!', pos:7, key:'bksp', t:'Зайва літера «т» стоїть ліворуч від курсора. Прибери її.' },
+    { text:'Добрий ддень!', pos:7, key:'del', t:'Тепер зайва «д» — праворуч від курсора.' },
+    { text:'Сьогодні сонячно.Завтра буде дощ.', pos:17, key:'space', t:'Між реченнями бракує проміжку.' },
+    { text:'Перший абзац закінчився.Тут починається другий.', pos:24, key:'enter', t:'Друге речення має починатися з нового абзацу.' },
+    { text:'Жила-була мишка Сирничок.', pos:0, key:'tab', t:'Зроби відступ на початку абзацу.' }
+  ];
+  const apply = ({text, pos}, k)=>{
+    if(k === 'bksp') return {text:text.slice(0, pos - 1) + text.slice(pos), pos:pos - 1};
+    if(k === 'del') return {text:text.slice(0, pos) + text.slice(pos + 1), pos};
+    const ch = {space:' ', enter:'\n', tab:'\t'}[k];
+    return {text:text.slice(0, pos) + ch + text.slice(pos), pos:pos + 1, fresh:pos};
+  };
+  const chunk = (s, from)=>[...s].map((c, i)=>{
+    const cls = from + i === fresh ? ' class="fresh"' : '';
+    if(c === '\t') return `<span class="tab${from + i === fresh ? ' fresh' : ''}"></span>`;
+    if(c === '\n') return '</span><span class="para">';
+    return cls ? `<span${cls}>${c === ' ' ? '&nbsp;' : esc(c)}</span>` : esc(c);
+  }).join('');
+  let fresh = -1;
+  const draw = (s, caret = true)=>`<span class="para">${chunk(s.text.slice(0, s.pos), 0)}${caret ? '<span class="caret"></span>' : ''}${chunk(s.text.slice(s.pos), s.pos)}</span>`;
+  const doc = document.getElementById('kyDoc'), keys = document.getElementById('kyKeys'), fb = document.getElementById('kyFb');
+  const num = document.getElementById('kyNum'), task = document.getElementById('kyTask'), goal = document.getElementById('kyGoal');
+  const hit = trackTask(document.getElementById('kyEx'), TASKS.length, TASKS.length + 2);
+  let i = 0, busy = false;
+  const show = ()=>{
+    fresh = -1;
+    if(i >= TASKS.length){
+      num.textContent = '🎉'; task.textContent = 'Усі виправлення зроблено! Ти знаєш головні службові клавіші.';
+      goal.textContent = ''; return;
+    }
+    const tk = TASKS[i];
+    num.textContent = `Завдання ${i + 1} з ${TASKS.length}`;
+    task.textContent = tk.t;
+    doc.innerHTML = draw(tk);
+    const res = apply(tk, tk.key);
+    goal.innerHTML = 'Має вийти: <b>' + esc(res.text).replace('\n', ' ¶ ').replace('\t', '→ ') + '</b>';
+  };
+  KEYS.forEach(([k, label])=>{
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'key' + (k === 'space' ? ' space' : ''); b.textContent = label;
+    b.addEventListener('click', ()=>{
+      if(busy || i >= TASKS.length) return;
+      const tk = TASKS[i];
+      if(k !== tk.key){ flash(b); fb.textContent = '🤔 ' + WHAT[k] + ' А тут потрібно інше.'; return; }
+      const res = apply(tk, k);
+      fresh = res.fresh ?? -1;
+      doc.innerHTML = draw(res);
+      flash(b, 'ok');
+      fb.textContent = '✓ ' + WHAT[k];
+      addNeurons(1); hit();
+      busy = true;
+      setTimeout(()=>{ busy = false; i++; if(i === TASKS.length) addNeurons(2); show(); }, 1100);
+    });
+    keys.appendChild(b);
+  });
+  show();
+})();
+
+/* ---------- КРОК 2: НЕДРУКОВАНІ СИМВОЛИ ---------- */
+const npDoc = s=>`<div class="np-doc">${s.replace(/·/g, '<i>·</i>').replace(/¶/g, '<i>¶</i>').replace(/→/g, '<i>→</i>&emsp;')}</div>`;
+makeChoices('npList', [
+  { pre:npDoc('Мій·кіт·Мурчик·—·рудий.¶Він·любить·спати·на·підвіконні.¶'),
+    text:'Скільки абзаців у цьому тексті?', opts:['1', '2', '4'], correct:1, why:'Кожен значок ¶ — це натиснутий Enter, тобто кінець абзацу.' },
+  { pre:npDoc('Ми····пішли·в·парк.¶'),
+    text:'Що не так у цьому рядку?', opts:['Зайві пропуски між словами', 'Бракує крапки', 'Усе правильно'], correct:0, why:'Між «Ми» і «пішли» аж чотири пропуски, а має бути один.' },
+  { pre:npDoc('Учора·ми·ходили·до¶музею·й·бачили·там¶скелет·динозавра.¶'),
+    text:'Що автор зробив неправильно?', opts:['Поставив забагато крапок', 'Натискав Enter посеред речення', 'Забув пропуски між словами'], correct:1, why:'Це одне речення, а отже — один абзац. Рядки програма переносить сама.' },
+  { pre:npDoc('→Жили-були·дід·та·баба.¶'),
+    text:'Що означає стрілка на початку рядка?', opts:['Тут натиснули Tab — зробили відступ', 'Стрілку надрукують на папері', 'Тут натиснули пропуск'], correct:0, why:'Стрілка → — табуляція. Як і інші недруковані символи, на папері її не видно.' }
+]);
+
+/* ---------- КРОК 3: ЗНАЙДИ ПОМИЛКИ ---------- */
+(function(){
+  // рядок — правильний фрагмент; [як набрано, як треба] — помилка
+  const T = [
+    'Синій ', ['кит-найбільша ', 'кит — найбільша '], 'тварина ', 'на ', ['планеті . ', 'планеті. '],
+    'Його ', 'серце ', 'важить ', 'як ', ['легковик , ', 'легковик, '], 'а ', 'язик ', '— ', 'як ', 'слон! ',
+    'Кити ', 'трапляються ', 'в ', 'усіх ', 'океанах ', ['( і ', '(і '], 'в ', 'холодних, ', 'і ', 'в ', ['теплих ). ', 'теплих). '],
+    ['Малята - кити ', 'Малята-кити '], 'п\'ють ', 'мамине ', ['молоко ,а ', 'молоко, а '], 'дорослі ', 'їдять ', 'крихітних ', 'рачків ', '— ', 'криль. ',
+    'Науковці ', ['кажуть : ', 'кажуть: '], '«Кит ', '— ', ['справжній   ', 'справжній '], 'велетень ', 'морів».'
+  ];
+  const ERR = T.filter(Array.isArray).length;
+  const doc = document.getElementById('erDoc'), fb = document.getElementById('erFb'), prog = document.getElementById('erProgress');
+  const sp = s=>esc(s).replace(/ /g, '<span class="sp"> </span>');
+  doc.innerHTML = T.map((t, i)=>`<span class="tk" data-i="${i}">${sp(Array.isArray(t) ? t[0] : t)}</span>`).join('') + '<span class="pil">¶</span>';
+  const hit = trackTask(doc, ERR, ERR + 2);
+  let found = 0;
+  const upd = ()=>{ prog.textContent = `Виправлено помилок: ${found} з ${ERR}`; };
+  doc.addEventListener('click', e=>{
+    const el = e.target.closest('.tk');
+    if(!el || el.classList.contains('fixed')) return;
+    const t = T[el.dataset.i];
+    if(!Array.isArray(t)){ flash(el, 'miss'); fb.textContent = '🤔 Тут усе правильно. Придивись до пропусків біля розділових знаків.'; return; }
+    el.innerHTML = sp(t[1]); el.classList.add('fixed');
+    found++; upd();
+    fb.textContent = '✓ Було «' + t[0].trim() + '» — стало «' + t[1].trim() + '».';
+    addNeurons(1); hit();
+    if(found === ERR){ addNeurons(2); fb.textContent = '🎉 Усі помилки виправлено! Тепер текст охайний.'; }
+  });
+  document.getElementById('erToggle').addEventListener('click', e=>{
+    e.currentTarget.classList.toggle('on', doc.classList.toggle('show'));
+  });
+  upd();
+})();
+
+/* ---------- КРОК 4: ВИДІЛЕННЯ ---------- */
+(function(){
+  const doc = document.getElementById('slDoc'), fb = document.getElementById('slFb');
+  const num = document.getElementById('slNum'), task = document.getElementById('slTask');
+  const norm = s=>s.replace(/\s+/g, ' ').trim();
+  const P = [...doc.querySelectorAll('p')].map(p=>p.textContent);
+  const TASKS = [
+    { t:'Виділи слово «печері» — двічі клацни по ньому.', want:'печері' },
+    { t:'Виділи другий абзац — тричі клацни в ньому.', want:P[1] },
+    { t:'Виділи кольори веселки: «червоного, жовтого й зеленого» — протягни мишею.', want:'червоного, жовтого й зеленого' },
+    { t:'Виділи весь текст: клацни в документі й натисни Ctrl + A (на Mac ⌘ + A).', want:P.join(' ') }
+  ];
+  const hit = trackTask(document.getElementById('slEx'), TASKS.length, TASKS.length);
+  let i = 0, busy = false;
+  const show = ()=>{
+    if(i >= TASKS.length){ num.textContent = '🎉'; task.textContent = 'Чудово! Тепер ти вмієш виділяти будь-що.'; return; }
+    num.textContent = `Завдання ${i + 1} з ${TASKS.length}`;
+    task.textContent = TASKS[i].t;
+  };
+  const check = ()=>{
+    if(busy || i >= TASKS.length) return;
+    const s = getSelection();
+    if(!s.rangeCount || s.isCollapsed || !doc.contains(s.anchorNode) || !doc.contains(s.focusNode)) return;
+    const got = norm(s.toString());
+    if(!got) return;
+    if(got === norm(TASKS[i].want)){
+      busy = true;
+      doc.classList.add('good');
+      fb.textContent = '✓ Виділено правильно!';
+      addNeurons(1); hit();
+      setTimeout(()=>{ s.removeAllRanges(); doc.classList.remove('good'); busy = false; i++; fb.textContent = ''; show(); }, 1100);
+    } else {
+      fb.textContent = '🤔 Виділено «' + (got.length > 40 ? got.slice(0, 40) + '…' : got) + '». Спробуй ще раз.';
+    }
+  };
+  const later = ()=>setTimeout(check, 30);
+  doc.addEventListener('mouseup', later);
+  doc.addEventListener('touchend', ()=>setTimeout(check, 400));
+  document.addEventListener('selectionchange', ()=>{ if(window.matchMedia('(pointer:coarse)').matches){ clearTimeout(check.t); check.t = setTimeout(check, 700); } });
+  doc.addEventListener('keyup', later);
+  doc.addEventListener('keydown', e=>{
+    if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'a' || (e.ctrlKey || e.metaKey) && e.code === 'KeyA'){
+      e.preventDefault();
+      const r = document.createRange(); r.selectNodeContents(doc);
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      later();
+    }
+  });
+  show();
+})();
+
+/* ---------- КРОК 5: ПЕРЕНЕСТИ РЕЧЕННЯ ---------- */
+makeSequence('cbDone', 'cbQ', 'cbOpts', 'cbFb', [
+  'Виділити речення «Свято почнеться о 10:00.»',
+  'Вирізати його: Ctrl + X',
+  'Клацнути на початку оголошення, щоб поставити туди курсор',
+  'Вставити речення: Ctrl + V'
+], '✓ Речення перенесено! Вирізати + вставити = перемістити.');
+
+/* ---------- КРОК 6: ПРАВОПИС ---------- */
+(function(){
+  const W = [
+    { w:'Приходте', opts:['Приходить', 'Приходьте', 'Прихожте'], ok:'Приходьте' },
+    { w:'бібліотлеки', opts:['бібліотекар', 'біології', 'бібліотеки'], ok:'бібліотеки' },
+    { w:'смачнні', opts:['смачні', 'смачно', 'смачний'], ok:'смачні' },
+    { w:'кнмгу', opts:['кригу', 'книгу', 'кмітливу'], ok:'книгу' },
+    { w:'Кравчишин', opts:['Кравчина', 'Кравчиха'], ok:null }
+  ];
+  const doc = document.getElementById('spDoc'), fb = document.getElementById('spFb'), prog = document.getElementById('spProgress');
+  const sw = k=>`<span class="sw" data-w="${k}">${W[k].w}</span>`;
+  doc.innerHTML = `<p style="text-align:center; font-weight:700; font-size:19px">Благодійний ярмарок</p>
+    <p>Запрошуємо всіх на благодійний ярмарок! ${sw(0)} у хол ${sw(1)} о 10:00. Тут можна скуштувати ${sw(2)} тістечка й знайти ${sw(3)} до душі.</p>
+    <p>Організаторка — Соломія ${sw(4)}.</p>
+    <div class="sp-pop" id="spPop" hidden></div>`;
+  const pop = document.getElementById('spPop');
+  const hit = trackTask(document.getElementById('spEx'), W.length, W.length + 1);
+  let left = W.length, cur = null;
+  const upd = ()=>{ prog.textContent = `Перевірено слів: ${W.length - left} з ${W.length}`; };
+  const close = ()=>{ pop.hidden = true; if(cur) cur.classList.remove('open'); cur = null; };
+  const done = (el, text)=>{
+    el.textContent = text; el.className = 'sw-done';
+    setTimeout(()=>el.classList.remove('sw-done'), 1500);
+    close(); left--; upd();
+    addNeurons(1); hit();
+    if(!left){ addNeurons(1); fb.textContent = '🎉 Оголошення без помилок — можна друкувати!'; }
+  };
+  doc.addEventListener('click', e=>{
+    const el = e.target.closest('.sw');
+    if(el){
+      close();
+      cur = el; el.classList.add('open');
+      const it = W[el.dataset.w];
+      pop.innerHTML = `<div class="sp-cap">Помилка в правописі</div>`
+        + it.opts.map(o=>`<div class="sp-it sugg" data-o="${o}">${o}</div>`).join('')
+        + `<div class="sp-sep"></div><div class="sp-it" data-o="#ignore"><span class="ms">visibility_off</span>Ігнорувати</div>`
+        + `<div class="sp-it" data-o="#dict"><span class="ms">library_add</span>Додати в словник</div>`;
+      const r = el.getBoundingClientRect(), d = doc.getBoundingClientRect();
+      pop.style.left = Math.max(0, Math.min(r.left - d.left, d.width - 236)) + 'px';
+      pop.style.top = (r.bottom - d.top + 6) + 'px';
+      pop.hidden = false;
+      return;
+    }
+    const opt = e.target.closest('.sp-it');
+    if(opt && cur){
+      const it = W[cur.dataset.w], o = opt.dataset.o;
+      if(it.ok === null){
+        if(o[0] === '#'){ fb.textContent = '✓ Прізвище правильне — програма просто його не знала.'; done(cur, it.w); }
+        else { flash(opt); fb.textContent = '🤔 Це справжнє прізвище, його не треба змінювати.'; }
+        return;
+      }
+      if(o === it.ok){ fb.textContent = `✓ «${it.w}» → «${it.ok}».`; done(cur, it.ok); return; }
+      flash(opt);
+      fb.textContent = o[0] === '#' ? '🤔 Тут справді помилка — обери правильне слово.' : '🤔 Це слово не пасує до речення. Прочитай речення ще раз.';
+      return;
+    }
+    if(!e.target.closest('.sp-pop')) close();
+  });
+  upd();
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Яка клавіша стирає символ ліворуч від курсора?', opts:['Delete', 'Backspace', 'Tab'], correct:1 },
+  { q:'Коли потрібно натискати Enter?', opts:['У кінці кожного рядка', 'Коли починаємо новий абзац', 'Між словами'], correct:1, why:'Рядки програма переносить сама.' },
+  { q:'Який рядок набрано правильно?', opts:['Привіт ,друже !', 'Привіт, друже!', 'Привіт ,  друже!'], correct:1, why:'Перед комою й знаком оклику пропуску немає, а після коми — є.' },
+  { q:'Як правильно набрати?', opts:['синьо-жовтий прапор', 'синьо - жовтий прапор', 'синьо -жовтий прапор'], correct:0, why:'Дефіс пишемо без пропусків.' },
+  { q:'Як швидко виділити одне слово?', opts:['Тричі клацнути по ньому', 'Натиснути Ctrl + A', 'Двічі клацнути по ньому'], correct:2 },
+  { q:'Що станеться після Ctrl + X?', opts:['Фрагмент зникне з тексту й потрапить у буфер обміну', 'Фрагмент скопіюється й лишиться на місці', 'Фрагмент видалиться назавжди'], correct:0 },
+  { q:'Що означає червона хвиляста лінія під словом?', opts:['Слово виділене', 'У слові, можливо, помилка', 'Слово скопійоване'], correct:1 },
+  { q:'Чому програма не підкреслить речення «Кит муркоче на дивані»?', opts:['Бо всі слова в ньому справжні', 'Бо речення коротке', 'Бо перевірка вимкнена'], correct:0, why:'Програма перевіряє окремі слова, а не зміст.' },
+  { q:'Яка комбінація відкриває «Знайти й замінити» в Google Документах?', opts:['Ctrl + C', 'Ctrl + H', 'Ctrl + Z'], correct:1 }
+], {summary:'Тепер ти вмієш охайно вводити текст, виділяти й переставляти фрагменти, виправляти помилки й замінювати слова в усьому документі.'});
+</script>
+
+</body>
+</html>
