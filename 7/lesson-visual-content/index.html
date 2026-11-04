@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Пікселі, вектори й ШІ — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --accent:#D9480F; --accent-dark:#A8380B; --accent-soft:#FFEEE4;
+    --bg:#FFF8F3; --line:#F2E1D5;
+    --violet:#5B4BD6; --violet-soft:#ECEAFB;
+    --hud-bar:linear-gradient(90deg,var(--violet),var(--accent),#FFB020);
+  }
+  code.k{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.92em; background:var(--accent-soft); color:var(--accent-dark); padding:1px 6px; border-radius:6px;}
+
+  /* Плитки-поняття */
+  .tiles{display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:14px 0 18px;}
+  .tiles3{grid-template-columns:repeat(3,minmax(0,1fr));}
+  .tiles3 .tile{display:flex; flex-direction:column;}
+  #toolPool{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px;}
+  @media (max-width:520px){ #toolPool{grid-template-columns:repeat(2,minmax(0,1fr));} }
+  #toolPool .sort-chip{display:flex; align-items:center; justify-content:center; text-align:center; height:62px; max-width:none; padding:6px 10px; box-sizing:border-box; font-size:13px; line-height:1.25;}
+  .tiles3 .logos{margin-top:auto; padding-top:14px; gap:6px 10px; flex-wrap:nowrap;}
+  @media (max-width:720px){ .tiles3{grid-template-columns:1fr;} }
+  @media (max-width:520px){ .tiles{grid-template-columns:1fr;} }
+  .tile{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px;}
+  .tile b{display:block; font-family:'Baloo 2',sans-serif; font-size:15px; margin:0 0 2px;}
+  .tile span{font-size:13.5px; color:var(--ink-soft); line-height:1.4; display:block;}
+  .logos{display:flex; flex-wrap:wrap; align-items:flex-end; gap:6px 14px; margin-top:14px; padding:4px 4px 0;}
+  .logos .lg{display:flex; flex-direction:column; align-items:center; gap:4px; font-size:11.5px; font-weight:600; color:var(--ink-soft); line-height:1.2; text-align:center;}
+  .logos .lg img{width:36px; height:36px; object-fit:contain; filter:drop-shadow(0 2px 3px rgba(0,0,0,.15));}
+  .logos .lg-wide img{width:auto; height:30px; margin:5px 0; border-radius:6px;}
+  .logos .lg .word{font:800 18px/40px 'Baloo 2',sans-serif; height:40px; color:var(--ink); font-style:normal;}
+  .logos .lg .word.small{font-size:14px; line-height:1.05; display:flex; align-items:center;}
+  .logos .lg-txt{padding-bottom:18px;}
+  .logos .lg:nth-child(4n+1) > :first-child{transform:rotate(-7deg) translateY(-3px);}
+  .logos .lg:nth-child(4n+2) > :first-child{transform:rotate(5deg) translateY(3px);}
+  .logos .lg:nth-child(4n+3) > :first-child{transform:rotate(-3deg) translateY(-5px);}
+  .logos .lg:nth-child(4n+4) > :first-child{transform:rotate(8deg);}
+
+  /* Крок 1: лупа */
+  .zoom-wrap{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .zoom-panel{margin:0; text-align:center;}
+  .zoom-view{position:relative; aspect-ratio:1; overflow:hidden; border-radius:var(--radius-m); border:2px solid var(--line); background:#fff;}
+  .zoom-view canvas, .zoom-view svg{position:absolute; left:0; top:0; width:100%; height:100%; display:block;}
+  .zoom-view canvas{image-rendering:pixelated;}
+  .zoom-panel figcaption{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; margin-top:6px;}
+  .zoom-panel figcaption span{display:block; font-family:'Nunito Sans',sans-serif; font-weight:600; font-size:12.5px; color:var(--ink-soft);}
+  .zoom-ctrl{display:flex; align-items:center; gap:12px; margin-top:14px;}
+  .zoom-ctrl input{flex:1; accent-color:var(--accent);}
+  .zoom-ctrl b{font-family:'Baloo 2',sans-serif; font-size:17px; min-width:44px; text-align:right;}
+
+  /* Крок 1: приклади растр/вектор */
+  #rvList{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:12px;}
+  #rvList .classify-card{margin:0; padding:12px; display:flex; flex-direction:column;}
+  #rvList .rv-pic{aspect-ratio:16/10; border-radius:var(--radius-s); overflow:hidden; background:#fff; border:1.5px solid var(--line); margin-bottom:10px;}
+  #rvList .rv-pic svg, #rvList .rv-pic img{display:block; width:100%; height:100%; object-fit:cover;}
+  #rvList p.q{font-size:14px; flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  #rvList .choice-btn{flex:1; padding-left:6px; padding-right:6px; text-align:center; justify-content:center;}
+  #rvList .choice-feedback:empty{display:none;}
+  @media (max-width:640px){ #rvList{grid-template-columns:repeat(2,minmax(0,1fr));} #rvList p.q{font-size:13px;} }
+  @media (max-width:400px){ #rvList{grid-template-columns:1fr;} }
+
+  /* Крок 2: розшифруй пікселі */
+  .px-wrap{display:flex; gap:22px; align-items:flex-start; flex-wrap:wrap;}
+  .px-grid{display:flex; flex-direction:column; gap:3px;}
+  .px-row{display:flex; align-items:center; gap:3px;}
+  .px{width:34px; height:34px; border-radius:5px; background:#fff; border:1.5px solid var(--line); cursor:pointer; padding:0; transition:background .15s;}
+  .px.on{background:#1B1B3A; border-color:#1B1B3A;}
+  .px-row.given .px{cursor:default;}
+  .px-row:not(.given):not(.done) .px:not(.on):hover{border-color:var(--accent);}
+  .px.wrong-flash{background:#FDE6E1; border-color:var(--coral); animation:shakeX .35s ease;}
+  .px-code{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:15px; letter-spacing:3px; margin-left:12px; color:var(--ink-soft); white-space:nowrap;}
+  .px-row.given .px-code{opacity:.55;}
+  .px-row.active .px-code{color:var(--accent-dark); font-weight:700;}
+  .px-row.done .px-code{color:#237A3A;}
+  .px-row.done .px-code::after{content:' ✓';}
+  .px-legend{font-size:14px; color:var(--ink-soft);}
+  .px-legend .px-tip{white-space:nowrap;}
+  #rgbQuiz{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-bottom:22px;}
+  #rgbQuiz .classify-card{margin:0; padding:14px 14px;}
+  #rgbQuiz .choice-row{gap:6px; flex-wrap:nowrap;}
+  #rgbQuiz .choice-btn{display:inline-flex; align-items:center; gap:5px; padding:7px 9px; white-space:nowrap;}
+  #rgbQuiz .choice-feedback{display:none;}
+  .sw-o{width:16px; height:16px; border-radius:4px; border:1px solid rgba(0,0,0,.18); flex-shrink:0;}
+  .rgb-q{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:17px; font-weight:700; white-space:nowrap;}
+  @media (max-width:640px){ #rgbQuiz{grid-template-columns:1fr;} }
+  .c-r{color:#D32F2F;} .c-g{color:#2E9E4F;} .c-b{color:#1E63D6;}
+  .rgb-wrap{display:flex; gap:24px; align-items:flex-start; flex-wrap:wrap;}
+  .rgb-ex .px{border-color:transparent;}
+  .rgb-ex .px.sel{outline:3px solid var(--ink); outline-offset:1px; position:relative; z-index:1;}
+  .rgb-panel{flex:1; min-width:240px;}
+  .rgb-look{display:flex; align-items:center; gap:14px; margin-bottom:12px;}
+  .rgb-look figure{margin:0; text-align:center;}
+  .rgb-look svg, .rgb-sw{display:block; width:84px; height:84px; border-radius:10px;}
+  .rgb-sw{border:1.5px solid var(--line); box-sizing:border-box;}
+  .rgb-look figcaption{font-size:12px; color:var(--ink-soft); margin-top:4px; line-height:1.3;}
+  .rgb-arrow{font-size:24px; color:var(--ink-soft);}
+  .rgb-sl{display:flex; align-items:center; gap:10px; margin:6px 0;}
+  .rgb-sl b{font-family:'Baloo 2',sans-serif; font-size:18px; width:16px;}
+  .rgb-sl input{flex:1;}
+  .rgb-sl output{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:15px; width:32px; text-align:right;}
+  .rgb-sl.r b{color:#D32F2F;} .rgb-sl.r input{accent-color:#D32F2F;}
+  .rgb-sl.g b{color:#2E9E4F;} .rgb-sl.g input{accent-color:#2E9E4F;}
+  .rgb-sl.b b{color:#1E63D6;} .rgb-sl.b input{accent-color:#1E63D6;}
+  .rgb-code{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:15px; margin-top:10px; padding:8px 12px; background:var(--bg); border-radius:var(--radius-s); white-space:nowrap;}
+  .res-row{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin:4px 0 14px;}
+  .res-row figure{margin:0; text-align:center;}
+  .res-row canvas, .res-row img{display:block; object-fit:cover; box-sizing:border-box; border:1px solid var(--line); width:100%; aspect-ratio:16/10; border-radius:var(--radius-s); image-rendering:pixelated; background:var(--line);}
+  .res-row figcaption{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; margin-top:4px;}
+  .res-row figcaption span{display:block; font-family:'Nunito Sans',sans-serif; font-weight:600; font-size:12.5px; color:var(--ink-soft);}
+  @media (max-width:640px){ .res-row{grid-template-columns:repeat(2,minmax(0,1fr));} }
+  .px-legend .sw{display:inline-block; width:16px; height:16px; border-radius:4px; vertical-align:-3px; border:1.5px solid var(--line); margin-right:4px;}
+  @media (max-width:520px){ .px{width:28px; height:28px;} .px-code{font-size:13px; letter-spacing:1px; margin-left:8px;} }
+
+  /* Крок 3: вектор */
+  .vec-file{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13.5px; background:#2A2340; color:#F3EEFF; border-radius:var(--radius-s); padding:12px 14px; margin-bottom:10px; line-height:1.6; overflow-x:auto;}
+  .vec-file .c{color:#FFB37D;}
+  .vec-file .n{color:#8FE3C9;}
+  .axis-note{font-size:13.5px; color:var(--ink-soft);}
+  /* Крок 3: векторний редактор */
+  .vd-tools{display:flex; flex-wrap:wrap; gap:10px 18px; align-items:center; margin-bottom:12px;}
+  .vd-group{display:flex; gap:6px; align-items:center;}
+  .vd-group button{font:700 13.5px 'Nunito Sans',sans-serif; color:var(--ink); background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-s); padding:6px 10px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;}
+  .vd-group button svg{width:18px; height:18px;}
+  .vd-group button.on{border-color:var(--accent); background:var(--accent-soft); color:var(--accent-dark);}
+  .vd-group .sw-b{width:26px; height:26px; padding:0; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 1.5px var(--line);}
+  .vd-group .sw-b.on{box-shadow:0 0 0 2.5px var(--ink);}
+  .vd-act button{font-weight:600; color:var(--ink-soft);}
+  .vd-wrap{display:grid; grid-template-columns:minmax(0,300px) minmax(0,1fr); gap:16px; align-items:start;}
+  .vd-canvas svg{display:block; width:100%; height:auto; touch-action:none; cursor:crosshair; user-select:none;}
+  .vd-canvas .ax{font:600 4px 'Nunito Sans',sans-serif; fill:#9A93B5;}
+  .vd-shape{transition:opacity .15s;}
+  .vd-shape{cursor:grab;}
+  .vd-shape:active{cursor:grabbing;}
+  .vd-dim .vd-shape:not(.hl){opacity:.25;}
+  .vd-tabs{display:flex; gap:4px; margin-bottom:6px;}
+  .vd-tabs button{font:700 13px 'Nunito Sans',sans-serif; border:none; background:none; padding:4px 10px; border-radius:999px; color:var(--ink-soft); cursor:pointer;}
+  .vd-tabs button.on{background:#2A2340; color:#fff;}
+  .vd-code .vec-file{min-height:120px; margin:0; font-size:13px; overflow:visible;}
+  .vd-line{padding:2px 6px 2px 20px; text-indent:-14px; margin:0 -6px; border-radius:5px; cursor:default;}
+  .vd-line.hl{background:rgba(255,255,255,.14);}
+  .vd-line.new{animation:vdNew 1s ease;}
+  @keyframes vdNew{from{background:rgba(143,227,201,.45);} to{background:transparent;}}
+  .vd-line .t{color:#C9C2E8;}
+  .vd-empty{color:#9A93B5;}
+  @media (max-width:640px){ .vd-wrap{grid-template-columns:1fr;} .vd-canvas{max-width:340px;} }
+
+  /* Крок 4: формати */
+  .fmt-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  @media (max-width:640px){ .fmt-grid{grid-template-columns:repeat(2,1fr);} }
+  .fmt-grid .flip-card{height:206px;}
+  .fp{position:relative; width:100%; height:100px; border-radius:10px; overflow:hidden; margin-bottom:8px; background:#fff; border:1px solid var(--line);}
+  .fp > img, .fp > svg{display:block; width:100%; height:100%; object-fit:cover;}
+  .fmt-ext{position:absolute; left:6px; top:6px; z-index:2; font:800 12px 'Baloo 2',sans-serif; color:#fff; background:var(--card-c); padding:1px 7px; border-radius:6px; letter-spacing:.3px;}
+  .fp .mag{position:absolute; right:8px; bottom:6px; width:62px; height:62px; border-radius:50%; overflow:hidden; border:3px solid #fff; box-shadow:0 0 0 2px var(--card-c), 0 3px 8px rgba(0,0,0,.25);}
+  .fp .mag img{width:100%; height:100%; image-rendering:pixelated;}
+  .fp.check{background:conic-gradient(#E6E6E6 25%, #fff 0 50%, #E6E6E6 0 75%, #fff 0) 0 0/16px 16px;}
+  .fp .lbl{position:absolute; bottom:5px; font:700 11px 'Nunito Sans',sans-serif; color:#fff; background:rgba(0,0,0,.45); padding:0 6px; border-radius:5px;}
+
+  .flip-front .name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px;}
+  .flip-front .tap{font-size:12px; color:var(--ink-soft); margin-top:2px;}
+  .fmt-grid .flip-back{align-items:flex-start; text-align:left; color:var(--ink);}
+  .flip-back ul{margin:0; padding-left:16px; font-size:13.5px; line-height:1.4;}
+  .flip-back li{margin-bottom:3px;}
+
+  /* Крок 7: як ШІ малює (дифузія) */
+  .ai-logos{margin:0 0 6px;}
+  .diff{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px; margin:12px 0;}
+  .diff-prompt{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:14px; background:#2A2340; color:#F3EEFF; border-radius:var(--radius-s); padding:8px 12px; margin-bottom:12px;}
+  .diff-prompt span{color:#FFB37D;}
+  .diff-row{display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px;}
+  .diff-row figure{margin:0; text-align:center; position:relative;}
+  .diff-row canvas{display:block; width:100%; aspect-ratio:1; border-radius:10px;}
+  .diff-row figcaption{font-size:12px; color:var(--ink-soft); margin-top:5px; line-height:1.3;}
+  .diff-row figcaption b{display:block; font-family:'Baloo 2',sans-serif; font-size:14px; color:var(--ink);}
+  .diff-row figure:not(:last-child)::after{content:'→'; position:absolute; right:-10px; top:calc(50% - 22px); transform:translate(50%,-50%); color:var(--ink-soft); font-size:15px;}
+  @media (max-width:640px){ .diff-row{grid-template-columns:repeat(3,minmax(0,1fr));} .diff-row figure::after{display:none;} }
+
+  /* Крок 7: генератор */
+  .gen-grid{display:grid; grid-template-columns:1fr 330px; gap:18px; align-items:start;}
+  @media (max-width:720px){ .gen-grid{grid-template-columns:1fr;} }
+  .gen-pool{display:grid; grid-template-columns:auto 1fr; gap:6px 10px; align-items:center; margin-bottom:12px;}
+  .gen-pool .gen-lab{margin:0;}
+  .gen-busy{position:absolute; left:8px; bottom:8px; background:rgba(0,0,0,.55); color:#fff; font-size:11px; font-weight:700; border-radius:6px; padding:2px 7px; display:none;}
+  .gen-lab{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13.5px; color:var(--ink-soft); margin-bottom:4px;}
+  .gen-chips{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px;}
+  .gen-chips .gchip{width:100%; padding-left:6px; padding-right:6px; white-space:nowrap;}
+  .gchip{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; padding:6px 12px; border-radius:999px; border:1.5px solid var(--line); background:var(--surface); cursor:pointer; color:var(--ink);}
+  .gchip:hover{border-color:var(--accent);}
+  .gchip.sel{background:var(--violet-soft); border-color:var(--violet); color:#3F33A8;}
+  .gen-prompt{background:#2A2340; color:#F3EEFF; border-radius:var(--radius-s); padding:10px 12px; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13px; margin:12px 0; line-height:1.5;}
+  .gen-prompt span{color:#FFB37D;}
+  .gen-prompt b{font-weight:600;}
+  .gchip[draggable]{cursor:grab;}
+  #genBtn{margin-top:12px; width:100%;}
+  .gen-prompt, .gen-canvas-box{transition:box-shadow .15s;}
+  .gen-prompt.over, .gen-canvas-box.over{box-shadow:0 0 0 3px var(--violet);}
+  .gen-prompt .ph{color:#8C85A8;}
+  .gen-canvas-box{position:relative; border-radius:var(--radius-m); overflow:hidden; background:#EDE9F7; aspect-ratio:320/220;}
+  .gen-canvas-box canvas{display:block; width:100%; height:100%;}
+  .gen-canvas-box .empty{position:absolute; inset:0; display:grid; place-items:center; color:#8C85A8; font-family:'Baloo 2',sans-serif; font-size:15px; text-align:center; padding:20px;}
+  .gen-ai{position:absolute; right:8px; bottom:8px; background:rgba(0,0,0,.55); color:#fff; font-size:11px; font-weight:700; border-radius:6px; padding:2px 7px; display:none;}
+  .gen.shake{animation:shakeX .35s ease;}
+
+  /* Крок 7: знайди ознаки */
+  .scene{width:100%; display:block; border-radius:var(--radius-m); border:2px solid var(--line); background:#CFE8FF; touch-action:manipulation;}
+  .scene .spot{cursor:pointer;}
+  .scene .spot .hit{fill:transparent;}
+  .scene .mark{fill:none; stroke:#1FA97A; stroke-width:4; stroke-dasharray:8 5;}
+  .scene .mark-x{fill:none; stroke:#E5533D; stroke-width:3; opacity:0; transition:opacity .2s;}
+  .scene .spot.miss .mark-x{opacity:1;}
+  .found-list{display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; min-height:34px;}
+  .found-list span{background:var(--ok-soft); color:#237A3A; font-weight:700; font-size:13.5px; padding:5px 12px; border-radius:999px;}
+  .ai-sign{font-size:11px; font-weight:700; fill:#fff;}
+</style>
+</head>
+<body data-lesson="lesson7-visual-content" data-hud="7 клас · Візуальний контент">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · 7 клас · Візуальний контент</div>
+      <h1>Пікселі, вектори й ШІ-художники</h1>
+      <p>Як картинка стає числами, чим растр відрізняється від вектора, який формат файлу обрати й у яких програмах творять зображення. А ще — як генерувати картинки за допомогою ШІ й робити це чесно.</p>
+      <button class="btn-primary" onclick="document.getElementById('step1').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="62" fill="#FFEEE4"/>
+      <g fill="#5B4BD6"><rect x="62.5" y="94.5" width="7" height="7"/><rect x="62.5" y="86.5" width="7" height="7"/><rect x="62.5" y="78.5" width="7" height="7"/><rect x="62.5" y="70.5" width="7" height="7"/><rect x="62.5" y="62.5" width="7" height="7"/><rect x="62.5" y="54.5" width="7" height="7"/><rect x="62.5" y="46.5" width="7" height="7"/><rect x="54.5" y="86.5" width="7" height="7"/><rect x="54.5" y="78.5" width="7" height="7"/><rect x="54.5" y="70.5" width="7" height="7"/><rect x="54.5" y="62.5" width="7" height="7"/><rect x="54.5" y="54.5" width="7" height="7"/><rect x="54.5" y="46.5" width="7" height="7"/><rect x="54.5" y="38.5" width="7" height="7"/><rect x="46.5" y="78.5" width="7" height="7"/><rect x="46.5" y="70.5" width="7" height="7"/><rect x="46.5" y="62.5" width="7" height="7"/><rect x="46.5" y="54.5" width="7" height="7"/><rect x="46.5" y="46.5" width="7" height="7"/><rect x="46.5" y="38.5" width="7" height="7"/><rect x="46.5" y="30.5" width="7" height="7"/><rect x="38.5" y="70.5" width="7" height="7"/><rect x="38.5" y="62.5" width="7" height="7"/><rect x="38.5" y="54.5" width="7" height="7"/><rect x="38.5" y="46.5" width="7" height="7"/><rect x="38.5" y="38.5" width="7" height="7"/><rect x="30.5" y="62.5" width="7" height="7"/><rect x="30.5" y="54.5" width="7" height="7"/><rect x="30.5" y="46.5" width="7" height="7"/><rect x="30.5" y="38.5" width="7" height="7"/></g>
+      <path d="M70.0 52.5 L70.0 52.2 L70.2 51.2 L70.5 49.6 L71.3 47.5 L72.4 45.2 L74.0 42.7 L76.2 40.2 L78.8 37.9 L81.8 36.0 L85.3 34.7 L89.0 33.9 L92.9 33.9 L96.8 34.6 L100.6 36.0 L104.1 38.0 L107.2 40.7 L109.7 43.9 L111.6 47.4 L112.8 51.2 L113.2 55.2 L112.8 59.2 L111.6 63.3 L109.7 67.3 L107.2 71.1 L104.1 74.9 L100.6 78.5 L96.8 82.0 L92.9 85.4 L89.0 88.7 L85.3 91.9 L81.8 95.1 L78.8 98.1 L76.2 100.9 L74.0 103.5 L72.4 105.9 L71.3 108.0 L70.5 109.6 L70.2 110.9 L70.0 111.6 L70.0 111.9 Z" fill="#D9480F"/>
+      <path d="M113 40v26" stroke="#1B1B3A" stroke-width="1.6"/>
+      <circle cx="113" cy="40" r="3" fill="#1B1B3A"/><circle cx="113" cy="66" r="3" fill="#1B1B3A"/>
+      <rect x="109.5" y="49.5" width="7" height="7" fill="#fff" stroke="#1B1B3A" stroke-width="1.6"/>
+      <rect x="75" y="35" width="6" height="6" fill="#fff" stroke="#1B1B3A" stroke-width="1.4"/>
+      <rect x="80.5" y="90.8" width="6" height="6" fill="#fff" stroke="#1B1B3A" stroke-width="1.4"/>
+      <path d="M118 12l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#FFB020"/>
+      <path d="M26 104l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#FFB020"/>
+      <circle cx="104" cy="118" r="4" fill="#5B4BD6" opacity=".5"/><circle cx="20" cy="30" r="3" fill="#D9480F" opacity=".5"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="step1">
+    <div class="step-label">Крок 1 · Растр і вектор</div>
+    <h2>Збільш і подивись зблизька</h2>
+    <p><b>Графічне зображення</b> — це будь-яка картинка: фото, малюнок, схема, іконка. Комп'ютер зберігає зображення двома способами:</p>
+    <ul>
+      <li><b>растрове</b> — картинка складається з крихітних кольорових квадратиків-<b>пікселів</b>;</li>
+      <li><b>векторне</b> — картинка складається з фігур: ліній, кіл, кривих.</li>
+    </ul>
+    <p class="soft">Ось той самий смайлик, збережений двома способами. Посунь повзунок праворуч до кінця.</p>
+    <div class="exercise" id="zoomEx">
+      <div class="zoom-wrap">
+        <figure class="zoom-panel">
+          <div class="zoom-view"><canvas id="zRaster" width="100" height="100"></canvas></div>
+          <figcaption>Растрове<span>сітка пікселів</span></figcaption>
+        </figure>
+        <figure class="zoom-panel">
+          <div class="zoom-view"><svg id="zVector" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" fill="#FFC93C" stroke="#A8380B" stroke-width="3"/>
+            <circle cx="36" cy="40" r="5.5" fill="#3A1D0E"/><circle cx="64" cy="40" r="5.5" fill="#3A1D0E"/>
+            <path d="M29 58Q50 80 71 58" stroke="#3A1D0E" stroke-width="4" stroke-linecap="round" fill="none"/>
+          </svg></div>
+          <figcaption>Векторне<span>набір фігур</span></figcaption>
+        </figure>
+      </div>
+      <div class="zoom-ctrl"><span>🔍</span><input type="range" id="zoomRange" min="1" max="10" step="0.1" value="1" aria-label="Збільшення"><b id="zoomVal">×1</b></div>
+      <div class="progress-line" id="zoomMsg">Збільш обидва зображення в 10 разів.</div>
+    </div>
+    <p>Растр чудово передає фото з мільйонами відтінків, але під час збільшення розсипається на квадратики. Вектор лишається чітким за будь-якого розміру, але не годиться для фото.</p>
+    <p class="soft">Яким способом краще зберегти кожне зображення?</p>
+    <div id="rvList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Растрове кодування</div>
+    <h2>Розшифруй пікселі</h2>
+    <p><b>Кодування графічних даних</b> — запис зображення числами.</p>
+    <p>Растр — це сітка пікселів, і колір кожного записують числом: <code class="k">1</code> — чорний, <code class="k">0</code> — білий.</p>
+    <p class="soft">Розшифруй останні чотири рядки за кодом.</p>
+    <div class="exercise">
+      <div class="px-wrap">
+        <div class="px-grid" id="pxGrid"></div>
+        <div class="px-legend"><p><span class="sw" style="background:#1B1B3A;border-color:#1B1B3A"></span><b>1</b> — чорний піксель<br><span class="sw"></span><b>0</b> — білий піксель</p><p class="px-tip">Клацай клітинки, де в коді стоїть <b>1</b>.</p></div>
+      </div>
+      <div class="progress-line" id="pxMsg">Розшифровано рядків: 0 з 4</div>
+    </div>
+    <p>У кольоровій картинці колір пікселя записують трьома числами від 0 до 255 — скільки в ньому <b class="c-r">червоного</b>, <b class="c-g">зеленого</b> й <b class="c-b">синього</b> світла. Це модель <b>RGB</b>.</p>
+    <p class="soft">Клацни будь-який піксель і посувай повзунки.</p>
+    <div class="exercise rgb-ex">
+      <div class="rgb-wrap">
+        <div class="px-grid" id="pxColor"></div>
+        <div class="rgb-panel">
+          <div class="rgb-look">
+            <figure><svg viewBox="0 0 60 60" id="rgbSub"><rect width="60" height="60" rx="6" fill="#000"/><rect x="6" y="6" width="14" height="48" rx="3"/><rect x="23" y="6" width="14" height="48" rx="3"/><rect x="40" y="6" width="14" height="48" rx="3"/></svg><figcaption>піксель екрана<br>під лупою</figcaption></figure>
+            <span class="rgb-arrow">→</span>
+            <figure><div class="rgb-sw" id="rgbSw"></div><figcaption>такий колір<br>бачить око</figcaption></figure>
+          </div>
+          <label class="rgb-sl r"><b>R</b><input type="range" min="0" max="255" data-c="0" aria-label="Червоний"><output></output></label>
+          <label class="rgb-sl g"><b>G</b><input type="range" min="0" max="255" data-c="1" aria-label="Зелений"><output></output></label>
+          <label class="rgb-sl b"><b>B</b><input type="range" min="0" max="255" data-c="2" aria-label="Синій"><output></output></label>
+          <div class="rgb-code" id="rgbCode"></div>
+        </div>
+      </div>
+    </div>
+    <p class="soft">Який колір дає кожен код?</p>
+    <div id="rgbQuiz"></div>
+    <p><b>Розділення</b> — кількість пікселів у ширину й у висоту, наприклад 1920×1080.</p>
+    <p>Те саме фото з різним розділенням:</p>
+    <div class="res-row" id="resRow"></div>
+    <p>Що більше бітів відводять на піксель, то більше кольорів можна записати:</p>
+    <div class="res-row">
+      <figure><img src="images/sunset-2.png" alt=""><figcaption>1 біт<span>2 кольори: 0 і 1</span></figcaption></figure>
+      <figure><img src="images/sunset-4.png" alt=""><figcaption>2 біти<span>4 кольори</span></figcaption></figure>
+      <figure><img src="images/sunset-16.png" alt=""><figcaption>4 біти<span>16 кольорів</span></figcaption></figure>
+      <figure><img src="images/sunset.jpg" alt=""><figcaption>24 біти<span>16,7 млн кольорів</span></figcaption></figure>
+    </div>
+    <div class="note">Звичайні кольорові фото зберігають по 24 біти на піксель. Тому вони важать багато.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Векторне кодування</div>
+    <h2>Малюємо фігурами</h2>
+    <p>Під час векторного кодування записують не пікселі, а фігури. Для кожної фігури зберігають її вид, координати, розмір і колір.</p>
+    <p class="axis-note">Координати — як у шкільній системі, але точка (0, 0) у лівому верхньому куті, а <i>y</i> росте донизу. Розмір полотна — 100×100.</p>
+    <p class="soft">Обери фігуру й колір і проведи мишею по полотну — праворуч з'явиться її запис. Готову фігуру можна перетягнути.</p>
+    <div class="exercise vd">
+      <div class="vd-tools">
+        <div class="vd-group" id="vdShapes"></div>
+        <div class="vd-group" id="vdColors"></div>
+        <div class="vd-group vd-act"><button type="button" id="vdUndo">↩ Скасувати</button><button type="button" id="vdClear">Очистити</button></div>
+      </div>
+      <div class="vd-wrap">
+        <div class="vd-canvas"><svg id="vdSvg" viewBox="-11 -8 119 116"></svg></div>
+        <div class="vd-code">
+          <div class="vd-tabs"><button type="button" class="on" data-m="desc">Опис</button><button type="button" data-m="svg">SVG-код</button></div>
+          <div class="vec-file" id="vdOut"></div>
+        </div>
+      </div>
+    </div>
+    <div class="note"><b>SVG</b> — справжній векторний формат.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Типи файлів</div>
+    <h2>Знайомся: графічні формати</h2>
+    <p>Формат файлу видно з <b>розширення</b> — частини назви після крапки: <code class="k">kit.jpg</code>, <code class="k">logo.svg</code>. Кожен формат має своє призначення.</p>
+    <p class="soft">Клацни кожну картку, щоб її перевернути.</p>
+    <div class="exercise">
+      <div class="fmt-grid" id="fmtGrid"></div>
+      <div class="progress-line" id="fmtMsg">Переглянуто: 0 з 6</div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Який формат обрати</div>
+    <h2>Збережи як…</h2>
+    <p>Тепер обери формат для кожної ситуації. Пригадай, що вміє кожен.</p>
+    <div id="fmtList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Програмні засоби</div>
+    <h2>Чим створювати візуальний контент</h2>
+    <p><b>Візуальний контент</b> — картинки, постери, іконки, інфографіка, які ми створюємо й публікуємо. Для різних завдань є різні програми:</p>
+    <div class="tiles tiles3">
+      <div class="tile"><b>Растрові редактори</b><span>Малюють і змінюють пікселі: обробка фото, малюнки.</span><div class="logos"><span class="lg lg-txt"><i class="word">Paint</i></span><span class="lg"><img src="images/logos/gimp.svg" alt="">GIMP</span><span class="lg"><img src="images/logos/krita.svg" alt="">Krita</span><span class="lg"><img src="images/logos/photoshop.svg" alt="">Photoshop</span></div></div>
+      <div class="tile"><b>Векторні редактори</b><span>Працюють із фігурами й кривими: логотипи, іконки, схеми.</span><div class="logos"><span class="lg"><img src="images/logos/inkscape.svg" alt="">Inkscape</span><span class="lg"><img src="images/logos/figma.svg" alt="">Figma</span><span class="lg"><img src="images/logos/illustrator.svg" alt="">Illustrator</span></div></div>
+      <div class="tile"><b>Онлайн-конструктори</b><span>Дизайн із готових шаблонів: листівки, постери, інфографіка.</span><div class="logos"><span class="lg lg-wide lg-txt"><img src="images/logos/canva.jpg" alt="Canva"></span></div></div>
+    </div>
+    <p class="soft">Яким засобом найкраще виконати кожне завдання? Клацни завдання, а потім засіб.</p>
+    <div class="exercise">
+      <div class="sort-buckets three">
+        <div class="bucket" id="bkRaster"><div class="bucket-title">Растровий редактор</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkVector"><div class="bucket-title">Векторний редактор</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkCanva"><div class="bucket-title">Онлайн-конструктор</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="toolPool"></div>
+      <div class="progress-line" id="toolProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 7 · Штучний інтелект і зображення</div>
+    <h2>Генерування зображень</h2>
+    <p><b>Генерування зображень</b> — створення нових картинок програмою зі штучним інтелектом. Нейромережа вчилася на мільйонах картинок із підписами, тому «знає», який вигляд мають предмети й стилі.</p>
+    <div class="logos ai-logos"><span class="lg lg-wide lg-txt"><img src="images/logos/canva.jpg" alt="Canva"></span><span class="lg lg-txt"><i class="word small">Microsoft<br>Designer</i></span><span class="lg"><img src="images/logos/firefly.svg" alt="">Adobe Firefly</span></div>
+
+    <h3>Як ШІ малює картинку</h3>
+    <p><b>Промт</b> — текстовий опис того, що треба намалювати.</p>
+    <p>Генератор починає з випадкового «шуму». На кожному кроці нейромережа трохи прибирає шум так, щоб картинка ставала схожою на промт.</p>
+    <div class="diff">
+      <div class="diff-prompt"><span>Промт:</span> кіт у космосі, мультфільм</div>
+      <div class="diff-row" id="diffRow"></div>
+    </div>
+    <div class="note">Справжній генератор робить 20–50 таких кроків. Шум щоразу випадковий, тому той самий промт дає різні картинки.</div>
+
+    <h3>Склади промт</h3>
+    <p>Хороший промт називає героя, місце, стиль і деталі. Багато генераторів краще розуміють англійську, тож промт часто перекладають.</p>
+    <p class="soft">Поекспериментуй: клацай слова чи перетягуй їх на промт, а тоді натисни «Згенерувати».</p>
+    <div class="exercise gen" id="gen">
+      <div class="gen-grid">
+        <div>
+          <div class="gen-pool" id="genPool"></div>
+          <div class="gen-prompt"><span>Промт:</span> <b id="genPromptUa"></b><br><span>Англійською:</span> <b id="genPrompt"></b></div>
+        </div>
+        <div>
+          <div class="gen-canvas-box"><canvas id="genCanvas" width="320" height="220"></canvas><div class="empty" id="genEmpty">Додай у промт героя й натисни «Згенерувати»</div><div class="gen-ai" id="genAi">Створено ШІ</div><div class="gen-busy" id="genBusy">генерую…</div></div>
+          <button class="btn-primary" id="genBtn" type="button">✨ Згенерувати</button>
+        </div>
+      </div>
+    </div>
+    <div class="trivia">Багатьма ШІ-генераторами можна користуватися лише з 13 років, а до 18 — зі згоди батьків.</div>
+
+    <h3>Як розпізнати згенероване</h3>
+    <p>Згенеровані «фото» часто виглядають правдоподібно, але ШІ не розуміє світу — він лише повторює те, що бачив. Тому видають його такі деталі:</p>
+    <ul>
+      <li>дивні руки: зайві чи злиплі пальці;</li>
+      <li>написи-абракадабра на вивісках і плакатах;</li>
+      <li>зайві чи зниклі частини тіла в людей і тварин;</li>
+      <li>світло й тіні, що падають у різні боки.</li>
+    </ul>
+    <p class="soft">Це «фото» згенерував ШІ. Знайди на ньому чотири помилки — клацни на них. Обережно: не кожна деталь підозріла.</p>
+    <div class="exercise" id="spotEx">
+      <svg class="scene" id="scene" viewBox="0 0 480 300">
+        <rect width="480" height="224" fill="#CFE8FF"/>
+        <rect y="220" width="480" height="80" fill="#E3D5BE"/>
+        <rect y="220" width="480" height="4" fill="#CDBB9C"/>
+        <!-- дерево з правильною тінню -->
+        <g fill="#000" opacity=".18"><polygon points="40,221 56,221 106,256 86,262"/><ellipse cx="102" cy="264" rx="30" ry="9"/></g>
+        <rect x="40" y="148" width="16" height="74" rx="3" fill="#7A4B2A"/>
+        <circle cx="48" cy="128" r="40" fill="#4CAF50"/><circle cx="30" cy="140" r="22" fill="#43A047"/><circle cx="68" cy="138" r="24" fill="#43A047"/>
+        <!-- кав'ярня -->
+        <rect x="250" y="70" width="222" height="152" fill="#F2B880"/>
+        <rect x="244" y="62" width="234" height="12" rx="3" fill="#A0522D"/>
+        <rect x="278" y="130" width="74" height="56" fill="#BFE3F5" stroke="#fff" stroke-width="4"/>
+        <path d="M315 130v56M278 158h74" stroke="#fff" stroke-width="3"/>
+        <rect x="385" y="138" width="54" height="84" rx="3" fill="#7A3E1D"/>
+        <circle cx="428" cy="182" r="3" fill="#FFC93C"/>
+        <!-- ознаки та пастки -->
+        <g class="spot" data-spot="sun"><rect class="hit" x="28" y="22" width="60" height="60"/><circle cx="58" cy="52" r="24" fill="#FFC93C"/><circle cx="58" cy="52" r="31" fill="#FFC93C" opacity=".3"/></g>
+        <g class="spot" data-spot="cloud"><rect class="hit" x="110" y="20" width="86" height="48"/><circle cx="136" cy="50" r="15" fill="#fff"/><circle cx="154" cy="40" r="20" fill="#fff"/><circle cx="174" cy="50" r="15" fill="#fff"/><rect x="136" y="44" width="38" height="21" fill="#fff"/></g>
+        <g class="spot" data-spot="bird"><rect class="hit" x="206" y="52" width="44" height="28"/><path d="M214 70q7-9 14 0q7-9 14 0" stroke="#33334A" stroke-width="2.5" fill="none" stroke-linecap="round"/></g>
+        <g class="spot" data-spot="flowers"><rect class="hit" x="278" y="166" width="74" height="36"/><rect x="284" y="186" width="62" height="12" rx="2" fill="#C0583A"/><path d="M293 186v-6M308 186v-8M323 186v-6M338 186v-8" stroke="#3E8E41" stroke-width="2"/><circle cx="293" cy="179" r="5.5" fill="#FF7BAC"/><circle cx="308" cy="176" r="5.5" fill="#FFD23F"/><circle cx="323" cy="179" r="5.5" fill="#FF7BAC"/><circle cx="338" cy="176" r="5.5" fill="#FFD23F"/></g>
+        <g class="spot" data-spot="sign"><rect class="hit" x="262" y="76" width="198" height="46"/><rect x="268" y="82" width="186" height="34" rx="6" fill="#6B3416"/><text x="361" y="106" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="700" font-size="19" fill="#FFE7C2" letter-spacing="1">КВАРЬНЯ ЖУЖЄ</text></g>
+        <g class="spot" data-spot="lamp"><rect class="hit" x="186" y="94" width="58" height="178"/><g fill="#000" opacity=".2"><polygon points="232,221 238,221 202,262 192,260"/><ellipse cx="195" cy="265" rx="10" ry="4"/></g><rect x="232" y="118" width="6" height="104" fill="#3E3E4A"/><rect x="226" y="218" width="18" height="5" rx="2" fill="#3E3E4A"/><circle cx="235" cy="110" r="10" fill="#FFE58A" stroke="#3E3E4A" stroke-width="3"/></g>
+        <g class="spot" data-spot="cat"><rect class="hit" x="294" y="204" width="80" height="56"/><path d="M308 238q-16-4-12-24" stroke="#4A4A4A" stroke-width="5" fill="none" stroke-linecap="round"/><rect x="312" y="242" width="5" height="13" rx="2" fill="#4A4A4A"/><rect x="320" y="242" width="5" height="13" rx="2" fill="#4A4A4A"/><rect x="328" y="242" width="5" height="13" rx="2" fill="#4A4A4A"/><rect x="336" y="242" width="5" height="13" rx="2" fill="#4A4A4A"/><rect x="344" y="242" width="5" height="13" rx="2" fill="#4A4A4A"/><ellipse cx="330" cy="238" rx="24" ry="11" fill="#4A4A4A"/><path d="M349 222l2-11 6 8zM359 219l5-9 2 11z" fill="#4A4A4A"/><circle cx="357" cy="228" r="10" fill="#4A4A4A"/><circle cx="354" cy="226" r="1.8" fill="#C5E86C"/><circle cx="361" cy="226" r="1.8" fill="#C5E86C"/></g>
+        <!-- дівчинка: тінь праворуч, як у дерева -->
+        <g fill="#000" opacity=".18"><polygon points="131,221 150,221 178,247 164,251"/><ellipse cx="174" cy="253" rx="9" ry="4"/></g>
+        <rect x="132" y="196" width="6" height="26" fill="#F5C9A5"/><rect x="143" y="196" width="6" height="26" fill="#F5C9A5"/>
+        <rect x="130" y="219" width="10" height="5" rx="2" fill="#33334A"/><rect x="141" y="219" width="10" height="5" rx="2" fill="#33334A"/>
+        <path d="M134 172L124 194" stroke="#F5C9A5" stroke-width="5" stroke-linecap="round"/>
+        <polygon points="128,200 134,166 147,166 153,200" fill="#5B4BD6"/>
+        <circle cx="154" cy="146" r="5" fill="#5A3416"/>
+        <circle cx="140" cy="152" r="13" fill="#F5C9A5"/>
+        <path d="M127 151a13 13 0 0 1 26 0q-6-7-13-7q-7 0-13 7z" fill="#5A3416"/>
+        <circle cx="136" cy="153" r="1.6" fill="#33334A"/><circle cx="144" cy="153" r="1.6" fill="#33334A"/>
+        <path d="M136 158q4 3 8 0" stroke="#33334A" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+        <g class="spot" data-spot="hand"><rect class="hit" x="150" y="102" width="37" height="40"/><path d="M146 172L166 134" stroke="#F5C9A5" stroke-width="5" stroke-linecap="round"/><g fill="#F5C9A5"><rect x="166.2" y="113" width="3.6" height="12" rx="1.8" transform="rotate(-80 168 127)"/><rect x="166.2" y="113" width="3.6" height="12" rx="1.8" transform="rotate(-48 168 127)"/><rect x="166.2" y="113" width="3.6" height="12" rx="1.8" transform="rotate(-18 168 127)"/><rect x="166.2" y="113" width="3.6" height="12" rx="1.8" transform="rotate(12 168 127)"/><rect x="166.2" y="113" width="3.6" height="12" rx="1.8" transform="rotate(42 168 127)"/><rect x="166.2" y="113" width="3.6" height="12" rx="1.8" transform="rotate(74 168 127)"/></g><circle cx="168" cy="127" r="7" fill="#F5C9A5"/></g>
+        <rect x="402" y="274" width="70" height="18" rx="5" fill="#000" opacity=".45"/><text class="ai-sign" x="437" y="287" text-anchor="middle">ШІ-фото</text>
+      </svg>
+      <div class="found-list" id="foundList"></div>
+      <div class="progress-line" id="spotMsg">Знайдено: 0 з 4</div>
+    </div>
+    <div class="note">Генератори швидко вдосконалюються, і таких помилок стає менше. Тому надійніше шукати джерело: пошук за зображенням (наприклад, <b>Google Об'єктив</b>) покаже, де картинка з'явилася вперше. Деякі сервіси самі додають позначку «Створено ШІ» чи невидимий водяний знак.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 8 · Етика і відповідальність</div>
+    <h2>Чесно чи нечесно?</h2>
+    <p>ШІ — лише інструмент. За картинку відповідає той, хто її створив і поширив. Правила чесного використання:</p>
+    <ul>
+      <li>позначай згенероване: «Зображення створено ШІ»;</li>
+      <li>не видавай згенероване за власний малюнок;</li>
+      <li>не створюй зображень реальних людей без їхньої згоди — і ніколи для того, щоб висміяти;</li>
+      <li>не створюй і не поширюй фейки, які лякають чи вводять в оману;</li>
+      <li>не завантажуй у генератор чужі фото й особисті дані;</li>
+      <li>перевір, чи дозволяє ШІ вчитель або правила конкурсу.</li>
+    </ul>
+    <div class="trivia"><b>Дипфейк</b> — реалістичне підроблене фото чи відео з реальною людиною. Він може зашкодити її репутації, тому створення дипфейків для жарту чи помсти — це кібербулінг.</div>
+    <p class="soft">Оціни, чи чесно вчинив кожен.</p>
+    <div id="ethicsList"></div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Кодування графічних даних. Типи файлів з графічними даними. Програмні засоби створення візуального контенту. Генерування зображень. Етичність і відповідальність» · 7 клас
+  <span class="credits">Фото заходу сонця — Jakub Hałun, Вікісховище, ліцензія CC BY 4.0. Логотип GIMP — Aryeom Han, CC BY-SA 4.0; логотип Krita — KOffice Team, CC BY 2.5.</span>
+</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- КРОК 1: ЛУПА ---------- */
+(function(){
+  const cv = document.getElementById('zRaster');
+  const ctx = cv.getContext('2d');
+  ctx.fillStyle = '#fff'; ctx.fillRect(0,0,100,100);
+  ctx.beginPath(); ctx.arc(50,50,42,0,Math.PI*2); ctx.fillStyle = '#FFC93C'; ctx.fill();
+  ctx.lineWidth = 3; ctx.strokeStyle = '#A8380B'; ctx.stroke();
+  ctx.fillStyle = '#3A1D0E';
+  [[36,40],[64,40]].forEach(([x,y])=>{ ctx.beginPath(); ctx.arc(x,y,5.5,0,Math.PI*2); ctx.fill(); });
+  ctx.beginPath(); ctx.moveTo(29,58); ctx.quadraticCurveTo(50,80,71,58);
+  ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.strokeStyle = '#3A1D0E'; ctx.stroke();
+
+  const els = [cv, document.getElementById('zVector')];
+  const range = document.getElementById('zoomRange');
+  const val = document.getElementById('zoomVal');
+  const msg = document.getElementById('zoomMsg');
+  const hit = trackTask(document.getElementById('zoomEx'), 1, 1);
+  const OX = .66, OY = .62;          // збільшуємо куточок усмішки
+  let done = false;
+  range.addEventListener('input', ()=>{
+    const z = +range.value;
+    val.textContent = '×' + (Math.round(z*10)/10);
+    els.forEach(el=>{
+      el.style.width = el.style.height = (z*100) + '%';
+      el.style.left = (OX*100 - OX*100*z) + '%';
+      el.style.top = (OY*100 - OY*100*z) + '%';
+    });
+    if(z >= 10 && !done){
+      done = true;
+      addNeurons(1); hit();
+      msg.textContent = 'Бачиш? Растр розсипався на квадратики-пікселі, а вектор лишився гладким.';
+    }
+  });
+})();
+
+const RV_LOGO = '<path d="M20 2L36 8V20Q36 33 20 38Q4 33 4 20V8Z" fill="#5B4BD6"/><path d="M10 15Q15 12 20 15Q25 12 30 15V27Q25 24 20 27Q15 24 10 27Z" fill="#fff"/><path d="M20 15V27" stroke="#5B4BD6" stroke-width="1.4"/>';
+const RV_PICS = {
+  logo:`<rect width="160" height="100" fill="#F4F1EC"/>
+    <circle cx="32" cy="50" r="22" fill="#FFEEE4" stroke="#D9480F" stroke-width="3"/><g transform="translate(20 38) scale(.6)">${RV_LOGO}</g>
+    <text x="32" y="88" text-anchor="middle" font-family="Nunito Sans,sans-serif" font-weight="700" font-size="10" fill="#6B6680">3 см</text>
+    <path d="M70 16V82M150 16V82" stroke="#8A6A55" stroke-width="3" stroke-linecap="round"/>
+    <rect x="68" y="20" width="84" height="48" rx="3" fill="#fff" stroke="#D9480F" stroke-width="2"/><g transform="translate(91 23) scale(1.05)">${RV_LOGO}</g>
+    <path d="M72 90H148M72 90l5-3M72 90l5 3M148 90l-5-3M148 90l-5 3" stroke="#6B6680" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+    <text x="110" y="85" text-anchor="middle" font-family="Nunito Sans,sans-serif" font-weight="700" font-size="10" fill="#6B6680">3 м</text>`,
+  screen:`<rect width="160" height="100" fill="#E9E6F5"/>
+    <rect x="12" y="10" width="136" height="80" rx="6" fill="#fff" stroke="#C9C4E0" stroke-width="1.5"/><path d="M12 16a6 6 0 0 1 6-6h124a6 6 0 0 1 6 6v8H12z" fill="#ECEAFB"/>
+    <circle cx="21" cy="17" r="2.5" fill="#FF6159"/><circle cx="29" cy="17" r="2.5" fill="#FFBD2E"/><circle cx="37" cy="17" r="2.5" fill="#28C840"/><rect x="48" y="13" width="80" height="8" rx="4" fill="#fff"/>
+    <rect x="22" y="32" width="44" height="32" rx="3" fill="#BFE3F5"/><path d="M22 64l14-14 10 9 8-6 12 11z" fill="#4CAF50"/><circle cx="56" cy="40" r="4" fill="#FFC93C"/>
+    <g fill="#D8D4EA"><rect x="74" y="32" width="62" height="6" rx="3"/><rect x="74" y="44" width="54" height="5" rx="2.5"/><rect x="74" y="54" width="58" height="5" rx="2.5"/><rect x="22" y="72" width="114" height="5" rx="2.5"/></g>
+    <path d="M108 50l0 20 5-5 4 8 3-1.5-4-8h7z" fill="#1B1B3A" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/>`,
+  font:`<rect width="160" height="100" fill="#fff"/>
+    <text x="10" y="80" font-family="Georgia,'Times New Roman',serif" font-size="76" fill="#1B1B3A">Аа</text>
+    <text x="112" y="62" font-family="Georgia,'Times New Roman',serif" font-size="26" fill="#1B1B3A">Аа</text>
+    <text x="118" y="82" font-family="Georgia,'Times New Roman',serif" font-size="11" fill="#1B1B3A">Аа</text>`,
+  sketch:`<rect width="160" height="100" fill="#E9E6F5"/>
+    <g transform="rotate(-3 80 40)"><rect x="34" y="8" width="92" height="62" fill="#fff" stroke="#D8D4EA"/>
+    <g stroke="#6E6E78" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M52 58V36l18-14 18 14v22z"/><path d="M50 37l20-16 20 16"/><path d="M64 58V46h10v12"/><path d="M78 40h6v6h-6z"/><path d="M44 62h72"/><circle cx="106" cy="22" r="6"/><path d="M106 11v3M106 30v3M95 22h3M114 22h3"/><path d="M100 50q4-6 8 0q4-6 8 0"/></g></g>
+    <rect x="10" y="72" width="140" height="22" rx="5" fill="#B9B6C8"/><rect x="18" y="77" width="124" height="5" rx="2" fill="#8F8BA3"/><rect x="10" y="68" width="140" height="4" rx="2" fill="#7CFFB2" opacity=".9"/><circle cx="138" cy="88" r="2.2" fill="#28C840"/>`,
+  metro:`<rect width="160" height="100" fill="#fff"/>
+    <g stroke-width="5" stroke-linecap="round" fill="none"><path d="M14 50H146" stroke="#E53935"/><path d="M60 10V90" stroke="#1E63D6"/><path d="M22 90L138 14" stroke="#2E9E4F"/></g>
+    <g fill="#fff" stroke="#1B1B3A" stroke-width="1.8"><circle cx="14" cy="50" r="4"/><circle cx="104" cy="50" r="4"/><circle cx="146" cy="50" r="4"/><circle cx="60" cy="10" r="4"/><circle cx="60" cy="90" r="4"/><circle cx="22" cy="90" r="4"/><circle cx="138" cy="14" r="4"/><circle cx="60" cy="50" r="6"/><circle cx="83" cy="50" r="6"/><circle cx="60" cy="65" r="6"/></g>`
+};
+const rvPic = k => `<div class="rv-pic">${k.endsWith('.jpg') ? `<img src="images/${k}" alt="">` : `<svg viewBox="0 0 160 100" role="img">${RV_PICS[k]}</svg>`}</div>`;
+makeClassify('rvList', [
+  { pre:rvPic('sunset.jpg'), text:'Фото заходу сонця', correct:0, why:'Фото має мільйони відтінків — їх передають лише пікселі.' },
+  { pre:rvPic('logo'), text:'Логотип: значок і банер', correct:1, why:'Вектор збільшують без втрати якості.' },
+  { pre:rvPic('screen'), text:'Знімок екрана', correct:0, why:'Екран сам складається з пікселів, тож і його знімок — растр.' },
+  { pre:rvPic('font'), text:'Шрифт різного розміру', correct:1, why:'Літери шрифтів описано кривими — тому вони чіткі за будь-якого розміру.' },
+  { pre:rvPic('sketch'), text:'Відсканований малюнок', correct:0, why:'Сканер, як і фотоапарат, записує картинку по пікселях.' },
+  { pre:rvPic('metro'), text:'Схема метро', correct:1, why:'Лінії й кружечки схеми — це фігури, тобто вектор.' }
+], ['Растрове', 'Векторне']);
+
+/* ---------- КРОК 2: РОЗШИФРУЙ ПІКСЕЛІ ---------- */
+(function(){
+  const CODE = ['00111100','01000010','10100101','10000001','10100101','10011001','01000010','00111100'];
+  const GIVEN = 4;
+  const grid = document.getElementById('pxGrid');
+  const msg = document.getElementById('pxMsg');
+  const hit = trackTask(grid, CODE.length - GIVEN, CODE.length - GIVEN + 2);
+  let solved = 0;
+  CODE.forEach((code, r)=>{
+    const row = document.createElement('div');
+    row.className = 'px-row' + (r < GIVEN ? ' given' : ' active');
+    let need = r < GIVEN ? 0 : [...code].filter(c=>c === '1').length;
+    [...code].forEach(bit=>{
+      const c = document.createElement('button');
+      c.className = 'px' + (r < GIVEN && bit === '1' ? ' on' : '');
+      c.setAttribute('aria-label', 'піксель');
+      if(r >= GIVEN) c.addEventListener('click', ()=>{
+        if(row.classList.contains('done') || c.classList.contains('on')) return;
+        if(bit === '0'){
+          c.classList.add('wrong-flash');
+          setTimeout(()=>c.classList.remove('wrong-flash'), 450);
+          msg.textContent = 'У коді тут 0 — цей піксель лишається білим.';
+          return;
+        }
+        c.classList.add('on');
+        if(--need === 0){
+          row.classList.remove('active'); row.classList.add('done');
+          addNeurons(1); hit(); solved++;
+          msg.textContent = `Розшифровано рядків: ${solved} з ${CODE.length - GIVEN}`;
+          if(solved === CODE.length - GIVEN){
+            addNeurons(2);
+            msg.textContent = 'Готово! 64 числа перетворилися на смайлик — саме так комп\'ютер «читає» растрову картинку. +2';
+          }
+        }
+      });
+      row.appendChild(c);
+    });
+    const s = document.createElement('span');
+    s.className = 'px-code';
+    s.textContent = code;
+    row.appendChild(s);
+    grid.appendChild(row);
+  });
+})();
+
+/* Ілюстрація розділення: те саме фото з різною кількістю пікселів */
+(function(){
+  const row = document.getElementById('resRow');
+  const img = new Image();
+  const SIZES = [[16,10],[40,25],[120,75],[480,300]];
+  const cvs = SIZES.map(([w,h])=>{
+    const f = document.createElement('figure');
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    f.innerHTML = `<figcaption>${w}×${h}<span>${(w*h).toLocaleString('uk-UA')} пікселів</span></figcaption>`;
+    f.prepend(c); row.appendChild(f);
+    return c;
+  });
+  img.onload = ()=> cvs.forEach(c=>c.getContext('2d').drawImage(img, 0, 0, c.width, c.height));
+  img.src = 'images/sunset.jpg';
+})();
+
+/* Ілюстрація: як із трьох світел (RGB) складається колір пікселя */
+(function(){
+  const PAL = [[255,179,122],[255,224,102],[47,94,158],[58,46,92]]; // небо, сонце, море, острів
+  const MAP = ['00000000','00000000','00011000','00111133','22111122','22211222','22211222','22222222'];
+  const grid = document.getElementById('pxColor');
+  const sub = document.querySelectorAll('#rgbSub rect');
+  const sw = document.getElementById('rgbSw'), code = document.getElementById('rgbCode');
+  const sliders = [...document.querySelectorAll('.rgb-sl input')];
+  let selEl = null;
+  const css = c => `rgb(${c.join(',')})`;
+  const cells = [];
+  MAP.forEach(line=>{
+    const row = document.createElement('div'); row.className = 'px-row';
+    [...line].forEach(d=>{
+      const c = document.createElement('button'); c.className = 'px'; c.rgb = [...PAL[d]];
+      c.setAttribute('aria-label', 'піксель');
+      c.addEventListener('click', ()=>select(c));
+      row.appendChild(c); cells.push(c);
+    });
+    grid.appendChild(row);
+  });
+  function paint(){
+    const col = selEl.rgb, [r,g,b] = col;
+    selEl.style.background = css(col);
+    sub[1].setAttribute('fill', `rgb(${r},0,0)`); sub[2].setAttribute('fill', `rgb(0,${g},0)`); sub[3].setAttribute('fill', `rgb(0,0,${b})`);
+    sw.style.background = css(col);
+    sliders.forEach((s,k)=>{ s.value = col[k]; s.nextElementSibling.textContent = col[k]; });
+    code.innerHTML = `Код пікселя: <span class="c-r">${r}</span>, <span class="c-g">${g}</span>, <span class="c-b">${b}</span>`;
+  }
+  function select(c){
+    if(selEl) selEl.classList.remove('sel');
+    selEl = c; c.classList.add('sel'); paint();
+  }
+  sliders.forEach(s=>s.addEventListener('input', ()=>{ selEl.rgb[+s.dataset.c] = +s.value; paint(); }));
+  cells.forEach(c=>c.style.background = css(c.rgb));
+  select(cells[2*8+3]);
+})();
+
+/* Завдання: який колір дає RGB-код */
+(function(){
+  const COL = {
+    'жовтий':'#FFFF00', 'зелений':'#00FF00', 'білий':'#FFFFFF', 'чорний':'#000000',
+    'фіолетовий':'#FF00FF', 'блакитний':'#00FFFF', 'червоний':'#FF0000',
+    'синій':'#0000FF'
+  };
+  const opt = n => `<span class="sw-o" style="background:${COL[n]}"></span>${n}`;
+  const code = (r,g,b) => `<span class="rgb-q"><span class="c-r">${r}</span>, <span class="c-g">${g}</span>, <span class="c-b">${b}</span></span>`;
+  const Q = [
+    [[255,255,0], ['жовтий','зелений','червоний']],
+    [[0,0,0], ['білий','синій','чорний']],
+    [[255,0,255], ['зелений','фіолетовий','синій']],
+    [[255,255,255], ['чорний','білий','жовтий']],
+    [[0,255,255], ['блакитний','жовтий','зелений']],
+    [[255,0,0], ['фіолетовий','синій','червоний']]
+  ];
+  const ANS = ['жовтий','чорний','фіолетовий','білий','блакитний','червоний'];
+  makeChoices('rgbQuiz', Q.map(([c, opts], i)=>({
+    text: code(...c), opts: opts.map(opt), correct: opts.indexOf(ANS[i])
+  })));
+})();
+
+/* ---------- КРОК 3: ВЕКТОР ---------- */
+/* Векторний редактор: малюємо примітиви — праворуч їхній опис і SVG-код */
+(function(){
+  const NS = 'http://www.w3.org/2000/svg';
+  const SHAPES = [
+    { k:'circle', name:'коло', g:'n', icon:'<circle cx="9" cy="9" r="7" fill="currentColor"/>' },
+    { k:'rect', name:'прямокутник', g:'m', icon:'<rect x="2" y="4" width="14" height="10" fill="currentColor"/>' },
+    { k:'tri', name:'трикутник', g:'m', icon:'<polygon points="9,2 16,15 2,15" fill="currentColor"/>' },
+    { k:'line', name:'лінія', g:'f', icon:'<path d="M2 15L16 3" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>' }
+  ];
+  let drag = null;
+  const COLORS = [
+    { svg:'red', css:'#E53935', m:'червоний', f:'червона', n:'червоне' },
+    { svg:'orange', css:'#FB8C00', m:'помаранчевий', f:'помаранчева', n:'помаранчеве' },
+    { svg:'gold', css:'#FFC93C', m:'жовтий', f:'жовта', n:'жовте' },
+    { svg:'green', css:'#2E9E4F', m:'зелений', f:'зелена', n:'зелене' },
+    { svg:'blue', css:'#1E63D6', m:'синій', f:'синя', n:'синє' },
+    { svg:'black', css:'#1B1B3A', m:'чорний', f:'чорна', n:'чорне' }
+  ];
+  const svgEl = document.getElementById('vdSvg'), out = document.getElementById('vdOut');
+  let tool = SHAPES[0], color = COLORS[2], mode = 'desc', list = [], draft = null;
+
+  // Полотно з сіткою й підписами осей
+  let bg = '<rect x="0" y="0" width="100" height="100" fill="#fff" stroke="#D8D4EA" stroke-width=".6"/>';
+  for(let i = 10; i < 100; i += 10) bg += `<path d="M${i} 0V100M0 ${i}H100" stroke="#EEEBF8" stroke-width=".4"/>`;
+  [0,50,100].forEach(v=>{ bg += `<text class="ax" x="${v}" y="-2.5" text-anchor="middle">${v}</text><text class="ax" x="-2" y="${v + 1.4}" text-anchor="end">${v}</text>`; });
+  svgEl.innerHTML = bg + '<g id="vdLayer"></g>';
+  const layer = svgEl.querySelector('#vdLayer');
+
+  const mk = (name, attrs) => { const e = document.createElementNS(NS, name); for(const a in attrs) e.setAttribute(a, attrs[a]); return e; };
+  const clamp = v => Math.max(0, Math.min(100, Math.round(v)));
+  function pt(ev){
+    const p = svgEl.createSVGPoint(); p.x = ev.clientX; p.y = ev.clientY;
+    const q = p.matrixTransform(svgEl.getScreenCTM().inverse());
+    return [clamp(q.x), clamp(q.y)];
+  }
+  function geom(sh){
+    const [x1,y1] = sh.a, [x2,y2] = sh.b;
+    if(sh.t.k === 'circle') return { cx:x1, cy:y1, r:Math.round(Math.hypot(x2 - x1, y2 - y1)) };
+    if(sh.t.k === 'rect') return { x:Math.min(x1,x2), y:Math.min(y1,y2), w:Math.abs(x2 - x1), h:Math.abs(y2 - y1) };
+    if(sh.t.k === 'tri'){ const l = Math.min(x1,x2), r = Math.max(x1,x2), t = Math.min(y1,y2), b = Math.max(y1,y2);
+      return { p:[[Math.round((l + r) / 2), t], [r, b], [l, b]] }; }
+    return { x1, y1, x2, y2 };
+  }
+  const big = sh => { const g = geom(sh);
+    return sh.t.k === 'circle' ? g.r >= 2 : sh.t.k === 'line' ? Math.hypot(g.x2 - g.x1, g.y2 - g.y1) >= 3 : sh.t.k === 'rect' ? g.w >= 2 && g.h >= 2 : g.p[1][0] - g.p[2][0] >= 2 && g.p[1][1] - g.p[0][1] >= 2; };
+  function node(sh){
+    const g = geom(sh), c = sh.c.css;
+    if(sh.t.k === 'circle') return mk('circle', { cx:g.cx, cy:g.cy, r:g.r, fill:c });
+    if(sh.t.k === 'rect') return mk('rect', { x:g.x, y:g.y, width:g.w, height:g.h, fill:c });
+    if(sh.t.k === 'tri') return mk('polygon', { points:g.p.map(q=>q.join(',')).join(' '), fill:c });
+    return mk('line', { x1:g.x1, y1:g.y1, x2:g.x2, y2:g.y2, stroke:c, 'stroke-width':3, 'stroke-linecap':'round' });
+  }
+  const N = v => `<span class="n">${v}</span>`, P = q => `(${N(q[0])}, ${N(q[1])})`;
+  function text(sh){
+    const g = geom(sh), col = sh.c[sh.t.g];
+    if(mode === 'svg'){
+      const A = (k,v) => `${k}=<span class="n">"${v}"</span>`;
+      const t = s => `<span class="t">&lt;</span><span class="c">${s}</span>`;
+      if(sh.t.k === 'circle') return `${t('circle')} ${A('cx',g.cx)} ${A('cy',g.cy)} ${A('r',g.r)} ${A('fill',sh.c.svg)}<span class="t">/&gt;</span>`;
+      if(sh.t.k === 'rect') return `${t('rect')} ${A('x',g.x)} ${A('y',g.y)} ${A('width',g.w)} ${A('height',g.h)} ${A('fill',sh.c.svg)}<span class="t">/&gt;</span>`;
+      if(sh.t.k === 'tri') return `${t('polygon')} ${A('points',g.p.map(q=>q.join(',')).join(' '))} ${A('fill',sh.c.svg)}<span class="t">/&gt;</span>`;
+      return `${t('line')} ${A('x1',g.x1)} ${A('y1',g.y1)} ${A('x2',g.x2)} ${A('y2',g.y2)} ${A('stroke',sh.c.svg)} ${A('stroke-width',3)}<span class="t">/&gt;</span>`;
+    }
+    const nm = `<span class="c">${sh.t.name}</span>: `;
+    if(sh.t.k === 'circle') return `${nm}центр ${P([g.cx,g.cy])}, радіус ${N(g.r)}, ${col}`;
+    if(sh.t.k === 'rect') return `${nm}кут ${P([g.x,g.y])}, ширина ${N(g.w)}, висота ${N(g.h)}, ${col}`;
+    if(sh.t.k === 'tri') return `${nm}вершини ${g.p.map(P).join(', ')}, ${col}`;
+    return `${nm}від ${P([g.x1,g.y1])} до ${P([g.x2,g.y2])}, ${col}`;
+  }
+  function render(fresh){
+    layer.innerHTML = '';
+    const all = draft ? [...list, draft] : list;
+    all.forEach((sh, i)=>{ const e = node(sh); e.classList.add('vd-shape'); e.dataset.i = i; layer.appendChild(e); });
+    if(!all.length){ out.innerHTML = '<span class="vd-empty">Тут з\'явиться запис фігур</span>'; return; }
+    const lines = all.map((sh, i)=>`<div class="vd-line${fresh && i === all.length - 1 ? ' new' : ''}" data-i="${i}">${text(sh)}</div>`);
+    if(mode === 'svg'){ lines.unshift('<div class="vd-line"><span class="t">&lt;</span><span class="c">svg</span> viewBox=<span class="n">"0 0 100 100"</span><span class="t">&gt;</span></div>');
+      lines.push('<div class="vd-line"><span class="t">&lt;/</span><span class="c">svg</span><span class="t">&gt;</span></div>'); }
+    out.innerHTML = lines.join('');
+  }
+  function hl(i){
+    svgEl.classList.toggle('vd-dim', i != null);
+    layer.querySelectorAll('.vd-shape').forEach(e=>e.classList.toggle('hl', e.dataset.i == i));
+    out.querySelectorAll('.vd-line').forEach(e=>e.classList.toggle('hl', e.dataset.i == i));
+  }
+  out.addEventListener('mouseover', e=>{ const l = e.target.closest('.vd-line[data-i]'); hl(l ? l.dataset.i : null); });
+  out.addEventListener('mouseleave', ()=>hl(null));
+  layer.addEventListener('mouseover', e=>{ if(!draft && !drag && e.target.dataset.i) hl(e.target.dataset.i); });
+  layer.addEventListener('mouseout', ()=>{ if(!draft && !drag) hl(null); });
+
+  svgEl.addEventListener('pointerdown', e=>{
+    const p = pt(e);
+    const t = e.target.closest('.vd-shape');
+    if(t && t.dataset.i < list.length){
+      const sh = list[t.dataset.i];
+      drag = { i:t.dataset.i, p, a:[...sh.a], b:[...sh.b] };
+      try{ svgEl.setPointerCapture(e.pointerId); }catch(_){}
+      hl(drag.i); return;
+    }
+    draft = { t:tool, c:color, a:p, b:p };
+    try{ svgEl.setPointerCapture(e.pointerId); }catch(_){}
+    hl(null); render();
+  });
+  svgEl.addEventListener('pointermove', e=>{
+    if(drag){
+      const [x,y] = pt(e), d = drag, sh = list[d.i];
+      // рамка фігури на початку перетягування: фігура не виходить за полотно
+      const g = geom({ ...sh, a:d.a, b:d.b });
+      const box = sh.t.k === 'circle' ? [g.cx - g.r, g.cy - g.r, g.cx + g.r, g.cy + g.r]
+        : [Math.min(d.a[0], d.b[0]), Math.min(d.a[1], d.b[1]), Math.max(d.a[0], d.b[0]), Math.max(d.a[1], d.b[1])];
+      const lim = (v, lo, hi) => lo > hi ? 0 : Math.max(lo, Math.min(hi, v));
+      const dx = lim(x - d.p[0], -box[0], 100 - box[2]);
+      const dy = lim(y - d.p[1], -box[1], 100 - box[3]);
+      sh.a = [d.a[0] + dx, d.a[1] + dy]; sh.b = [d.b[0] + dx, d.b[1] + dy];
+      render(); hl(d.i); return;
+    }
+    if(!draft) return; draft.b = pt(e); render();
+  });
+  const finish = ()=>{ if(drag){ drag = null; hl(null); return; }
+    if(!draft) return; const sh = draft; draft = null;
+    if(big(sh)){ list.push(sh); render(true); } else render(); };
+  svgEl.addEventListener('pointerup', finish);
+  svgEl.addEventListener('pointercancel', finish);
+
+  const shapesEl = document.getElementById('vdShapes'), colorsEl = document.getElementById('vdColors');
+  SHAPES.forEach(t=>{
+    const b = document.createElement('button'); b.type = 'button';
+    b.innerHTML = `<svg viewBox="0 0 18 18">${t.icon}</svg>${t.name[0].toUpperCase() + t.name.slice(1)}`;
+    b.addEventListener('click', ()=>{ tool = t; shapesEl.querySelectorAll('button').forEach(x=>x.classList.toggle('on', x === b)); });
+    if(t === tool) b.classList.add('on');
+    shapesEl.appendChild(b);
+  });
+  COLORS.forEach(c=>{
+    const b = document.createElement('button'); b.type = 'button'; b.className = 'sw-b'; b.style.background = c.css;
+    b.setAttribute('aria-label', c.m); b.title = c.m;
+    b.addEventListener('click', ()=>{ color = c; colorsEl.querySelectorAll('button').forEach(x=>x.classList.toggle('on', x === b)); });
+    if(c === color) b.classList.add('on');
+    colorsEl.appendChild(b);
+  });
+  document.getElementById('vdUndo').addEventListener('click', ()=>{ list.pop(); render(); });
+  document.getElementById('vdClear').addEventListener('click', ()=>{ list = []; render(); });
+  document.querySelectorAll('.vd-tabs button').forEach(b=>b.addEventListener('click', ()=>{
+    mode = b.dataset.m; document.querySelectorAll('.vd-tabs button').forEach(x=>x.classList.toggle('on', x === b)); render();
+  }));
+
+  // Стартовий приклад: сонце над травою
+  list = [
+    { t:SHAPES[1], c:COLORS[3], a:[0,75], b:[100,100] },
+    { t:SHAPES[0], c:COLORS[2], a:[70,28], b:[70,44] }
+  ];
+  render();
+  // блок зараховується, щойно учень намалював власну фігуру
+  const hitDraw = trackTask(document.querySelector('.vd'), 1, 0);
+  let drawn = false;
+  svgEl.addEventListener('pointerup', ()=>{ if(!drawn && list.length > 2){ drawn = true; hitDraw(); } });
+})();
+
+
+/* ---------- КРОК 4: ФОРМАТИ ---------- */
+(function(){
+  const FORMATS = [
+    { ext:'JPEG', file:'jpg', name:'Фото', c:'#E8590C', l:'#FFF0E6', facts:['Растровий, для фото', 'Стискає з втратами: файл малий, якість трохи гірша', 'Без прозорого фону'] },
+    { ext:'PNG', name:'Без втрат і прозорий', c:'#2F9E44', l:'#E9F7EC', facts:['Растровий, стискає без втрат', 'Підтримує прозорий фон', 'Скриншоти, логотипи, малюнки'] },
+    { ext:'GIF', name:'Анімація', c:'#C2255C', l:'#FDEBF2', facts:['Растровий', 'Підтримує анімацію', 'Лише до 256 кольорів: стікери, короткі анімації'] },
+    { ext:'SVG', name:'Вектор для сайтів', c:'#5B4BD6', l:'#ECEAFB', facts:['Векторний', 'Не втрачає якості під час збільшення', 'Іконки, логотипи, схеми на сайтах'] },
+    { ext:'RAW', name:'«Сирі» дані камери', c:'#495057', l:'#EEF0F2', facts:['Необроблені дані з фотоапарата', 'Дуже великі файли', 'Для фотографів: максимум інформації для обробки'] },
+    { ext:'PDF', name:'Документ', c:'#C92A2A', l:'#FDECEC', facts:['Не лише графічний: текст + картинки', 'Має однаковий вигляд на будь-якому пристрої', 'Для документів, щоб надіслати чи надрукувати'] }
+  ];
+  // Ілюстрації форматів на лицьовому боці карток
+  // GIF: три кадри, на яких м'ячик стрибає (статично)
+  const BALLS = [ {x:12, y:24, rx:8, ry:8, sh:4}, {x:23, y:44.5, rx:10, ry:8, sh:10}, {x:34, y:24, rx:8, ry:8, sh:4} ];
+  const frames = BALLS.map((b, i)=>`<g transform="translate(${7 + i * 50} 18)"><rect width="46" height="62" rx="3" fill="#fff" stroke="#E7C3D2"/><path d="M0 52.5H46" stroke="#E7C3D2"/><ellipse cx="${b.x}" cy="52.5" rx="${b.sh}" ry="1.6" fill="#000" opacity=".18"/><ellipse cx="${b.x}" cy="${b.y}" rx="${b.rx}" ry="${b.ry}" fill="#C2255C"/><ellipse cx="${b.x - 3}" cy="${b.y - 3}" rx="2.4" ry="1.8" fill="#fff" opacity=".7"/><text x="23" y="60" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="700" font-size="7.5" fill="#C2255C">кадр ${i + 1}</text></g>`).join('');
+  const FMT_PIC = {
+    JPEG: '<img src="images/sunset.jpg" alt=""><span class="mag"><img src="images/jpeg-zoom.png" alt=""></span>',
+    PNG: '<svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice"><g transform="translate(80 52)"><path d="M0-36l10 20 22 3-16 15 4 22-20-10-20 10 4-22-16-15 22-3z" fill="#2F9E44" stroke="#1E6E2E" stroke-width="2.5" stroke-linejoin="round"/><circle r="8" fill="#fff"/></g></svg>',
+    GIF: `<svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice"><rect width="160" height="100" fill="#FDEBF2"/><path d="M0 14H160M0 86H160" stroke="#E7C3D2" stroke-width="10" stroke-dasharray="5 5"/>${frames}</svg>`,
+    SVG: '<svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice"><rect width="160" height="100" fill="#fff"/><path d="M0 25H160M0 50H160M0 75H160M40 0V100M80 0V100M120 0V100" stroke="#EEEBF8"/><path d="M28 74C50 14 104 14 132 70" stroke="#5B4BD6" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M28 74L46 24M132 70L112 20" stroke="#9A93B5" stroke-width="1.4" stroke-dasharray="3 2"/><circle cx="46" cy="24" r="4" fill="#fff" stroke="#9A93B5" stroke-width="1.6"/><circle cx="112" cy="20" r="4" fill="#fff" stroke="#9A93B5" stroke-width="1.6"/><rect x="23" y="69" width="10" height="10" fill="#fff" stroke="#5B4BD6" stroke-width="2"/><rect x="127" y="65" width="10" height="10" fill="#fff" stroke="#5B4BD6" stroke-width="2"/></svg>',
+    RAW: '<img src="images/raw-edit.jpg" alt=""><span class="lbl" style="left:6px">сирий</span><span class="lbl" style="right:6px">оброблений</span>',
+    PDF: '<svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice"><rect width="160" height="100" fill="#F4F1F1"/><rect x="58" y="12" width="64" height="84" rx="3" fill="#fff" stroke="#E2D6D6" transform="rotate(6 90 54)"/><g transform="rotate(-4 80 54)"><rect x="46" y="10" width="64" height="86" rx="3" fill="#fff" stroke="#D9C9C9"/><rect x="53" y="18" width="38" height="5" rx="2" fill="#C92A2A"/><rect x="53" y="28" width="50" height="3" rx="1.5" fill="#CFC6C6"/><rect x="53" y="34" width="46" height="3" rx="1.5" fill="#CFC6C6"/><rect x="53" y="42" width="24" height="20" rx="2" fill="#BFE3F5"/><path d="M53 62l8-9 6 5 4-3 6 7z" fill="#4CAF50"/><rect x="81" y="44" width="22" height="3" rx="1.5" fill="#CFC6C6"/><rect x="81" y="50" width="20" height="3" rx="1.5" fill="#CFC6C6"/><rect x="81" y="56" width="22" height="3" rx="1.5" fill="#CFC6C6"/><rect x="53" y="68" width="50" height="3" rx="1.5" fill="#CFC6C6"/><rect x="53" y="74" width="44" height="3" rx="1.5" fill="#CFC6C6"/><rect x="53" y="80" width="48" height="3" rx="1.5" fill="#CFC6C6"/></g></svg>'
+  };
+  const grid = document.getElementById('fmtGrid');
+  const msg = document.getElementById('fmtMsg');
+  const hit = trackTask(grid, FORMATS.length, 0);
+  let seen = 0;
+  FORMATS.forEach(f=>{
+    const card = document.createElement('div');
+    card.className = 'flip-card';
+    card.style.setProperty('--card-c', f.c);
+    card.style.setProperty('--card-c-light', f.l);
+    card.innerHTML = `<div class="flip-inner">
+      <div class="flip-face flip-front"><div class="fp${f.ext === 'PNG' ? ' check' : ''}"><span class="fmt-ext">.${f.file || f.ext.toLowerCase()}</span>${FMT_PIC[f.ext]}</div><div class="name">${f.ext} · ${f.name}</div><div class="tap">клацни ↻</div></div>
+      <div class="flip-face flip-back"><ul>${f.facts.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+    </div>`;
+    let first = true;
+    card.addEventListener('click', ()=>{
+      card.classList.toggle('flipped');
+      if(first){ first = false; hit(); msg.textContent = `Переглянуто: ${++seen} з ${FORMATS.length}`; }
+    });
+    grid.appendChild(card);
+  });
+})();
+
+/* ---------- КРОК 5: ОБЕРИ ФОРМАТ ---------- */
+makeChoices('fmtList', [
+  { text:'Фото з екскурсії хочеш надіслати другові, щоб файл був невеликий.', opts:['RAW', 'JPEG', 'SVG'], correct:1, why:'JPEG добре стискає фото — файл легкий.' },
+  { text:'Кумедний рухливий стікер для чату класу.', opts:['PNG', 'PDF', 'GIF'], correct:2, why:'GIF підтримує анімацію.' },
+  { text:'Емблему гуртка треба накласти на фото так, щоб навколо неї не було білого квадрата.', opts:['JPEG', 'PNG', 'RAW'], correct:1, why:'PNG має прозорий фон, а JPEG — ні.' },
+  { text:'Іконки для шкільного сайту: мають бути чіткими і на телефоні, і на величезному екрані.', opts:['SVG', 'GIF', 'JPEG'], correct:0, why:'SVG — векторний формат, він чіткий за будь-якого розміру.' },
+  { text:'Скриншот повідомлення про помилку з дрібним текстом — так, щоб літери не розпливались.', opts:['JPEG', 'PNG', 'GIF'], correct:1, why:'PNG зберігає без втрат, а JPEG розмиває дрібні літери.' },
+  { text:'Фотограф хоче зберегти все, що «побачила» камера, щоб потім ретельно обробити знімок.', opts:['RAW', 'GIF', 'PNG'], correct:0, why:'RAW зберігає необроблені дані з камери.' },
+  { text:'Реферат із картинками, який має однаково виглядати на будь-якому комп\'ютері й під час друку.', opts:['SVG', 'PDF', 'JPEG'], correct:1, why:'PDF має однаковий вигляд на будь-якому пристрої.' }
+]);
+
+/* ---------- КРОК 6: ЯКИМ ЗАСОБОМ ---------- */
+makeSortBoard('toolPool', { raster:'bkRaster', vector:'bkVector', canva:'bkCanva' }, [
+  { text:'Освітлити темне фото з походу', bucket:'raster' },
+  { text:'Прибрати «червоні очі» на знімку', bucket:'raster' },
+  { text:'Обрізати фото для аватарки', bucket:'raster' },
+  { text:'Логотип команди для футболок і банера', bucket:'vector' },
+  { text:'Набір іконок для сайту', bucket:'vector' },
+  { text:'Схема евакуації, яку надрукують великою', bucket:'vector' },
+  { text:'Запрошення на свято за шаблоном', bucket:'canva' },
+  { text:'Інфографіка для проєкту за 10 хвилин', bucket:'canva' },
+  { text:'Листівка до Дня вчителя з готового макета', bucket:'canva' }
+], 'toolProgress');
+
+/* ---------- КРОК 7: ЯК ШІ МАЛЮЄ — від шуму до картинки ---------- */
+(function(){
+  const S = 160;
+  const pic = document.createElement('canvas'); pic.width = pic.height = S;
+  const c = pic.getContext('2d');
+  let seed = 11; const r = ()=>{ seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  const g = c.createLinearGradient(0, 0, 0, S); g.addColorStop(0, '#0B1033'); g.addColorStop(1, '#3B2A7A');
+  c.fillStyle = g; c.fillRect(0, 0, S, S);
+  c.fillStyle = '#fff';
+  for(let i = 0; i < 40; i++){ c.globalAlpha = .4 + r() * .6; c.beginPath(); c.arc(r() * S, r() * S, .6 + r() * 1.3, 0, 7); c.fill(); }
+  c.globalAlpha = 1;
+  c.fillStyle = '#FF9F43'; c.beginPath(); c.arc(126, 32, 16, 0, 7); c.fill();
+  c.strokeStyle = '#FFD8A8'; c.lineWidth = 3; c.beginPath(); c.ellipse(126, 32, 26, 6, -.3, 0, 7); c.stroke();
+  c.fillStyle = '#74C0FC'; c.beginPath(); c.arc(28, 132, 10, 0, 7); c.fill();
+  c.font = '84px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif';
+  c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText('🐱', 80, 88);
+
+  const STEPS = [
+    { a:0,   blur:0,  t:'Крок 1', d:'випадковий шум' },
+    { a:.3,  blur:14, t:'Крок 2', d:'проступають плями кольору' },
+    { a:.55, blur:6,  t:'Крок 3', d:'видно форми' },
+    { a:.8,  blur:2,  t:'Крок 4', d:'з\'являються деталі' },
+    { a:1,   blur:0,  t:'Готово', d:'картинка за промтом' }
+  ];
+  let ns = 5; const nr = ()=>{ ns = (ns * 16807) % 2147483647; return ns / 2147483647; };
+  const noise = new Uint8ClampedArray(S * S * 4).map((_, i)=> i % 4 === 3 ? 255 : nr() * 255);
+  const row = document.getElementById('diffRow');
+  STEPS.forEach(st=>{
+    const cv = document.createElement('canvas'); cv.width = cv.height = S;
+    const x = cv.getContext('2d');
+    x.filter = st.blur ? `blur(${st.blur}px)` : 'none';
+    x.drawImage(pic, 0, 0);
+    x.filter = 'none';
+    const im = x.getImageData(0, 0, S, S), d = im.data;
+    for(let i = 0; i < d.length; i += 4) for(let k = 0; k < 3; k++) d[i + k] = st.a * d[i + k] + (1 - st.a) * noise[i + k];
+    x.putImageData(im, 0, 0);
+    const f = document.createElement('figure');
+    f.appendChild(cv);
+    f.insertAdjacentHTML('beforeend', `<figcaption><b>${st.t}</b>${st.d}</figcaption>`);
+    row.appendChild(f);
+  });
+})();
+
+/* ---------- КРОК 7: ГЕНЕРАТОР ---------- */
+(function(){
+  const OPTS = {
+    who:[{id:'cat', ua:'кіт', en:'a cat', e:'🐱'}, {id:'dog', ua:'собака', en:'a dog', e:'🐶'}, {id:'owl', ua:'сова', en:'an owl', e:'🦉'}],
+    act:[{id:'sleep', ua:'спить', en:'sleeping'}, {id:'jump', ua:'стрибає', en:'jumping'}, {id:'read', ua:'читає', en:'reading a book'}],
+    where:[{id:'space', ua:'у космосі', en:'in outer space'}, {id:'forest', ua:'у лісі', en:'in a forest'}, {id:'city', ua:'у місті', en:'in a city'}],
+    style:[{id:'cartoon', ua:'мультфільм', en:'cartoon style'}, {id:'pixel', ua:'піксель-арт', en:'pixel art'}, {id:'sketch', ua:'олівець', en:'pencil sketch'}],
+    when:[{id:'day', ua:'вдень', en:'in the daytime'}, {id:'night', ua:'вночі', en:'at night'}, {id:'winter', ua:'взимку', en:'in winter'}]
+  };
+  const KEYS = ['who', 'act', 'where', 'when', 'style'];
+  const KLAB = { who:'Хто', act:'Що робить', where:'Де', style:'Стиль', when:'Коли' };
+  const FILTER = { cartoon:'saturate(1.35) contrast(1.08)', pixel:'none', sketch:'grayscale(1) contrast(1.6) brightness(1.15)' };
+
+  const box = document.getElementById('gen');
+  const promptEl = document.getElementById('genPrompt');
+  const cv = document.getElementById('genCanvas');
+  const ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height;
+  let sel = {who:null, act:null, where:null, style:null, when:null};
+
+  const pool = document.getElementById('genPool');
+  const promptUa = document.getElementById('genPromptUa');
+  const find = (k, id) => OPTS[k].find(o=>o.id === id);
+  // Перемикачі: у кожній групі можна обрати одне слово (повторне натискання — прибрати)
+  const chips = {};
+  KEYS.forEach(k=>{
+    pool.insertAdjacentHTML('beforeend', `<div class="gen-lab">${KLAB[k]}</div>`);
+    const row = document.createElement('div'); row.className = 'gen-chips'; pool.appendChild(row);
+    OPTS[k].forEach(o=>{
+      const b = document.createElement('button');
+      b.className = 'gchip'; b.type = 'button'; b.textContent = (o.e ? o.e + ' ' : '') + o.ua;
+      b.addEventListener('click', ()=>{ sel[k] = sel[k] === o.id ? null : o.id; changed(); });
+      b.draggable = true;
+      b.addEventListener('dragstart', e=>{ e.dataTransfer.setData('text/plain', k + ':' + o.id); e.dataTransfer.effectAllowed = 'copy'; });
+      chips[k + ':' + o.id] = b;
+      row.appendChild(b);
+    });
+  });
+
+  // Слово можна й перетягнути — на промт або на картинку
+  [box.querySelector('.gen-prompt'), box.querySelector('.gen-canvas-box')].forEach(zone=>{
+    zone.addEventListener('dragover', e=>{ e.preventDefault(); zone.classList.add('over'); });
+    zone.addEventListener('dragleave', ()=>zone.classList.remove('over'));
+    zone.addEventListener('drop', e=>{
+      e.preventDefault(); zone.classList.remove('over');
+      const [k, id] = e.dataTransfer.getData('text/plain').split(':');
+      if(OPTS[k] && find(k, id)){ sel[k] = id; changed(); }
+    });
+  });
+
+  function changed(){
+    Object.entries(chips).forEach(([key, b])=>{ const [k, id] = key.split(':'); b.classList.toggle('sel', sel[k] === id); });
+    const chosen = KEYS.filter(k=>sel[k]).map(k=>find(k, sel[k]));
+    promptUa.innerHTML = chosen.length ? chosen.map(o=>o.ua).join(', ') : '<span class="ph">—</span>';
+    promptEl.innerHTML = chosen.length ? chosen.map(o=>o.en).join(', ') : '<span class="ph">—</span>';
+  }
+
+  /* --- малювання сцени --- */
+  function rng(seed){ return ()=>{ seed = (seed * 16807) % 2147483647; return seed / 2147483647; }; }
+  function emoji(c, ch, x, y, size){
+    c.font = `${size}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`;
+    c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.fillText(ch, x, y);
+  }
+  function sky(c, top, bottom){ const g = c.createLinearGradient(0,0,0,H); g.addColorStop(0, top); g.addColorStop(1, bottom); c.fillStyle = g; c.fillRect(0,0,W,H); }
+  function stars(c, r, n, maxY){ c.fillStyle = '#fff'; for(let i = 0; i < n; i++){ c.globalAlpha = .4 + r()*.6; c.beginPath(); c.arc(r()*W, r()*maxY, .6 + r()*1.3, 0, 7); c.fill(); } c.globalAlpha = 1; }
+  function moon(c, x, y, bg){ c.fillStyle = '#F8F9FA'; c.beginPath(); c.arc(x, y, 17, 0, 7); c.fill(); c.fillStyle = bg; c.beginPath(); c.arc(x + 8, y - 5, 15, 0, 7); c.fill(); }
+  function scene(){
+    const off = document.createElement('canvas'); off.width = W; off.height = H;
+    const c = off.getContext('2d');
+    const r = rng(7);
+    const night = sel.when === 'night', winter = sel.when === 'winter';
+    if(sel.where === 'space'){
+      sky(c, '#0B1033', '#2A1B5E');
+      stars(c, r, 60, H);
+      c.fillStyle = '#FF9F43'; c.beginPath(); c.arc(262,52,22,0,7); c.fill();
+      c.strokeStyle = '#FFD8A8'; c.lineWidth = 3; c.beginPath(); c.ellipse(262,52,36,8,-.3,0,7); c.stroke();
+      c.fillStyle = winter ? '#E7F5FF' : '#74C0FC'; c.beginPath(); c.arc(48,170,12,0,7); c.fill();
+    } else if(sel.where === 'forest'){
+      if(night){ sky(c, '#0E1A40', '#2B3A6E'); stars(c, r, 30, 120); moon(c, 268, 40, '#122049'); }
+      else if(winter){ sky(c, '#C9D8E6', '#EEF3F8'); }
+      else { sky(c, '#8FD3FF', '#E6F6FF'); c.fillStyle = '#FFE066'; c.beginPath(); c.arc(270,40,20,0,7); c.fill(); }
+      c.fillStyle = winter ? '#F4F7FB' : night ? '#2F5D3A' : '#6DBE5A'; c.fillRect(0,185,W,35);
+      for(let i = 0; i < 9; i++){
+        const x = i*40 + 8, h = 50 + r()*30;
+        c.fillStyle = night ? (i % 2 ? '#1B4D2B' : '#22603A') : (i % 2 ? '#2B8A3E' : '#37B24D');
+        c.beginPath(); c.moveTo(x-20,195); c.lineTo(x,195-h); c.lineTo(x+20,195); c.fill();
+        if(winter){ c.fillStyle = '#fff'; c.beginPath(); c.moveTo(x - 7, 195 - h*.65); c.lineTo(x, 195-h); c.lineTo(x + 7, 195 - h*.65); c.fill(); }
+      }
+    } else if(sel.where === 'city'){
+      if(night){ sky(c, '#141B3D', '#34306A'); stars(c, r, 25, 70); moon(c, 280, 34, '#161D41'); }
+      else if(winter){ sky(c, '#CBD5E1', '#F1F5F9'); }
+      else sky(c, '#FFC078', '#FFF0DC');
+      c.fillStyle = winter ? '#F4F7FB' : '#868E96'; c.fillRect(0,200,W,20);
+      for(let i = 0; i < 8; i++){
+        const x = i*42 - 4, h = 70 + r()*80;
+        c.fillStyle = night ? ['#2C2F4A','#25283F','#33365A'][i % 3] : ['#5C5F80','#495072','#6C6F93'][i % 3]; c.fillRect(x, 200-h, 38, h);
+        if(winter){ c.fillStyle = '#fff'; c.fillRect(x, 200-h, 38, 5); }
+        c.fillStyle = night ? '#FFD43B' : '#FFE066';
+        for(let y = 210-h; y < 190; y += 16) for(let k = 0; k < 2; k++) if(r() > (night ? .2 : .35)) c.fillRect(x + 7 + k*15, y, 8, 9);
+      }
+    } else {
+      if(night) sky(c, '#1E2147', '#3A3D6E'); else sky(c, '#D9D4EE', '#F4F1FB');
+    }
+    // щоразу інший розмір і місце героя — як у справжнього генератора
+    const size = 64 + Math.random() * 56;
+    const hx = size / 2 + 10 + Math.random() * (W - size - 20);
+    const ground = sel.where === 'forest' ? 185 : sel.where === 'city' ? 200 : H - 6;
+    let hy = Math.max(size / 2 + 8, ground - size / 2 - Math.random() * (ground - size - 20));
+    const hero = find('who', sel.who).e;
+    if(sel.act === 'jump'){
+      // високо над землею: тінь на землі й риски руху під героєм
+      hy = Math.max(size / 2 + 6, Math.min(hy, ground - size * 1.25));
+      c.fillStyle = 'rgba(0,0,0,.25)'; c.beginPath(); c.ellipse(hx, ground - 2, size * .32, size * .07, 0, 0, 7); c.fill();
+      c.strokeStyle = 'rgba(255,255,255,.85)'; c.lineWidth = 3; c.lineCap = 'round';
+      [-.22, 0, .22].forEach(d=>{ c.beginPath(); c.moveTo(hx + d * size, hy + size * .55); c.lineTo(hx + d * size, hy + size * .8); c.stroke(); });
+      emoji(c, hero, hx, hy, size);
+    } else if(sel.act === 'sleep'){
+      if(sel.where === 'forest' || sel.where === 'city') hy = ground - size * .4; // спить на землі
+      c.save(); c.translate(hx, hy); c.rotate(-.45); emoji(c, hero, 0, 0, size); c.restore();
+      emoji(c, '💤', hx + size * .5, hy - size * .5, size * .45);
+    } else {
+      emoji(c, hero, hx, hy, size);
+      if(sel.act === 'read') emoji(c, '📖', hx, hy + size * .38, size * .55);
+    }
+    if(winter && sel.where !== 'space'){
+      c.fillStyle = '#fff';
+      for(let i = 0; i < 70; i++){ c.globalAlpha = .6 + r()*.4; c.beginPath(); c.arc(r()*W, r()*H, 1 + r()*2.2, 0, 7); c.fill(); }
+      c.globalAlpha = 1;
+    }
+    if(sel.style === 'pixel'){
+      const small = document.createElement('canvas'); small.width = 64; small.height = 44;
+      small.getContext('2d').drawImage(off, 0, 0, 64, 44);
+      const out = document.createElement('canvas'); out.width = W; out.height = H;
+      const oc = out.getContext('2d'); oc.imageSmoothingEnabled = false; oc.drawImage(small, 0, 0, W, H);
+      return out;
+    }
+    return off;
+  }
+
+  // Картинка перегенеровується щоразу, як змінюється промт
+  let job = 0;
+  function generate(){
+    const my = ++job;
+    const empty = document.getElementById('genEmpty'), ai = document.getElementById('genAi'), bz = document.getElementById('genBusy');
+    ai.style.display = 'none';
+    if(!sel.who){ ctx.clearRect(0, 0, W, H); cv.style.filter = 'none'; empty.style.display = ''; bz.style.display = 'none'; return; }
+    empty.style.display = 'none'; bz.style.display = 'block';
+    cv.style.filter = 'none';
+    const img = scene();
+    const noise = ctx.createImageData(W, H);
+    const STEPS = 10;
+    let k = 0;
+    const tick = ()=>{
+      if(my !== job) return;
+      for(let i = 0; i < noise.data.length; i += 4){
+        noise.data[i] = Math.random()*255; noise.data[i+1] = Math.random()*255; noise.data[i+2] = Math.random()*255; noise.data[i+3] = 255;
+      }
+      ctx.putImageData(noise, 0, 0);
+      ctx.globalAlpha = Math.min(1, (k / STEPS) ** 1.3);
+      ctx.drawImage(img, 0, 0);
+      ctx.globalAlpha = 1;
+      if(++k <= STEPS) setTimeout(tick, 55);
+      else { cv.style.filter = sel.style ? FILTER[sel.style] : 'none'; ai.style.display = 'block'; bz.style.display = 'none'; }
+    };
+    tick();
+  }
+
+  // той самий промт — щоразу інша картинка
+  document.getElementById('genBtn').addEventListener('click', generate);
+
+  // стартовий промт, щоб одразу була картинка
+  sel = {who:'cat', act:null, where:'space', style:'cartoon', when:null};
+  changed(); generate();
+})();
+
+/* ---------- КРОК 7: ЗНАЙДИ ПОМИЛКИ ШІ ---------- */
+(function(){
+  const REAL = {
+    hand:{ label:'✋ Шість пальців', box:[150,102,37,40] },
+    sign:{ label:'🔤 Абракадабра на вивісці', box:[262,76,198,46] },
+    cat:{ label:'🐈 П\'ять лап у кота', box:[294,204,80,56] },
+    lamp:{ label:'💡 Тінь ліхтаря не в той бік', box:[184,94,62,180] }
+  };
+  const DECOY = {
+    sun:'Сонце як сонце. До речі, саме воно підкаже, куди мають падати тіні.',
+    cloud:'Звичайна хмара — тут усе гаразд.',
+    bird:'Пташка намальована природно.',
+    flowers:'Квіти на вікні — нічого дивного.'
+  };
+  const scene = document.getElementById('scene');
+  const list = document.getElementById('foundList');
+  const msg = document.getElementById('spotMsg');
+  const total = Object.keys(REAL).length;
+  const hit = trackTask(scene, total, total + 2);
+  const NS = 'http://www.w3.org/2000/svg';
+  let found = 0;
+  scene.querySelectorAll('.spot').forEach(g=>{
+    const id = g.dataset.spot;
+    const [x, y, w, h] = REAL[id] ? REAL[id].box : [0,0,0,0];
+    if(DECOY[id]){
+      const hr = g.querySelector('.hit');
+      const mx = document.createElementNS(NS, 'path');
+      const cx = +hr.getAttribute('x') + hr.getAttribute('width')/2, cy = +hr.getAttribute('y') + hr.getAttribute('height')/2;
+      mx.setAttribute('d', `M${cx-8} ${cy-8}l16 16M${cx+8} ${cy-8}l-16 16`);
+      mx.setAttribute('class', 'mark-x');
+      g.appendChild(mx);
+    }
+    g.addEventListener('click', ()=>{
+      if(g.classList.contains('found')) return;
+      if(DECOY[id]){
+        g.classList.remove('miss'); void g.getBBox();
+        g.classList.add('miss');
+        setTimeout(()=>g.classList.remove('miss'), 900);
+        msg.textContent = DECOY[id];
+        return;
+      }
+      g.classList.add('found');
+      const m = document.createElementNS(NS, 'rect');
+      m.setAttribute('x', x); m.setAttribute('y', y); m.setAttribute('width', w); m.setAttribute('height', h);
+      m.setAttribute('rx', 12); m.setAttribute('class', 'mark');
+      scene.appendChild(m);
+      const s = document.createElement('span'); s.textContent = REAL[id].label; list.appendChild(s);
+      addNeurons(1); hit(); found++;
+      msg.textContent = `Знайдено: ${found} з ${total}`;
+      if(found === total){ addNeurons(2); msg.textContent = 'Усі чотири помилки знайдено! +2'; }
+    });
+  });
+})();
+
+/* ---------- КРОК 8: ЕТИКА ---------- */
+makeYesNo('ethicsList', [
+  { text:'Олег згенерував фон для презентації й підписав на слайді: «Зображення створено ШІ».', correct:true, why:'Чесно: глядачі знають, звідки картинка.' },
+  { text:'Марта надіслала на конкурс малюнків згенеровану картинку й сказала, що намалювала її сама.', correct:false, why:'Це обман: результат роботи ШІ видано за власну працю.' },
+  { text:'Хтось згенерував «фото», де однокласник нібито падає в калюжу, і виклав його в чат класу.', correct:false, why:'Це дипфейк, створений, щоб висміяти, — тобто кібербулінг.' },
+  { text:'Ліза попросила генератор підказати кілька ідей для постера, а сам постер намалювала власноруч.', correct:true, why:'ШІ допоміг з ідеями, а робота — її власна.' },
+  { text:'Для жарту створили реалістичне «фото» пожежі в школі й розіслали знайомим.', correct:false, why:'Фейк може налякати людей і посіяти паніку.' },
+  { text:'Андрій завантажив у генератор фото друга, щоб зробити з нього «супергероя», і не спитав друга.', correct:false, why:'Фото людини — її особисті дані. Без згоди їх не використовують.' },
+  { text:'Перш ніж додати згенеровану картинку в проєкт, Даня спитав, чи дозволяє це вчитель.', correct:true, why:'Правила використання ШІ в кожному завданні можуть бути різними.' }
+], 'Чесно ✅', 'Нечесно ❌');
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що таке піксель?', opts:['Найменша точка растрового зображення, що має свій колір', 'Фігура у векторному малюнку', 'Тип графічного файлу'], correct:0 },
+  { q:'Яке зображення не втрачає якості під час збільшення?', opts:['Растрове', 'Векторне', 'Будь-яке фото'], correct:1, why:'Вектор — це фігури, які просто перераховують у новому розмірі.' },
+  { q:'Що означає розділення 1920×1080?', opts:['1920 пікселів по горизонталі й 1080 по вертикалі', 'Файл займає 1920 КБ', '1920 кольорів і 1080 відтінків'], correct:0 },
+  { q:'Який формат підтримує анімацію?', opts:['JPEG', 'GIF', 'PDF'], correct:1 },
+  { q:'Потрібна растрова картинка з прозорим фоном. Який формат обрати?', opts:['JPEG', 'RAW', 'PNG'], correct:2 },
+  { q:'Яка програма працює з векторною графікою?', opts:['Paint', 'Inkscape', 'Блокнот'], correct:1 },
+  { q:'Що таке промт?', opts:['Текстовий опис картинки, яку має створити ШІ', 'Формат згенерованих зображень', 'Програма для обробки фото'], correct:0 },
+  { q:'Що часто видає згенероване «фото»?', opts:['Яскраві кольори', 'Великий розмір файлу', 'Дивні руки й написи-абракадабра'], correct:2 },
+  { q:'Як учинити чесно, якщо в презентації є згенерована картинка?', opts:['Підписати, що її створено ШІ', 'Нічого не писати — ніхто не помітить', 'Сказати, що намалював сам'], correct:0 }
+], {summary:'Тепер ти знаєш, як кодують растрові й векторні зображення, умієш обирати формат файлу й інструмент, складати промт і чесно користуватися згенерованим контентом.'});
+</script>
+
+</body>
+</html>
