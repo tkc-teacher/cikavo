@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Обкладинки для зошитів — Генерування зображень</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#5B4BD6,#D9480F,#FFB020); --accent:#D9480F; --accent-dark:#A8380B; --accent-soft:#FFEEE4; --bg:#FFF8F3; --line:#F2E1D5; }
+  /* Формула промту */
+  .formula{display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:8px 0;}
+  .formula span{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; background:#ECEAFB; color:#3F33A8; border:1.5px solid #5B4BD6; border-radius:999px; padding:2px 12px;}
+  .formula i{font-style:normal; color:var(--ink-soft);}
+  .prompt{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:13.5px; line-height:1.5; background:#2A2340; color:#F3EEFF; border-radius:var(--radius-s); padding:9px 13px; margin:8px 0;}
+  .prompt b{color:#FFB37D; font-weight:600;}
+  /* «Що має вийти» — три обкладинки */
+  .covers{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; max-width:560px; margin:0 auto;}
+  .covers figure{margin:0; text-align:center;}
+  .covers svg{display:block; width:100%; height:auto; border-radius:4px 10px 10px 4px; box-shadow:0 4px 12px rgba(0,0,0,.15);}
+  .covers figcaption{font-size:12.5px; color:var(--ink-soft); margin-top:8px;}
+  .covers figcaption b{display:block; font-family:'Baloo 2',sans-serif; font-size:14px; color:var(--ink);}
+  .ticks{list-style:none; padding:0 !important; margin:4px 0 8px;}
+  .ticks li{position:relative; padding-left:28px; margin-bottom:6px;}
+  .ticks li::before{content:'✓'; position:absolute; left:4px; top:0; color:var(--accent); font-weight:800; font-size:17px; line-height:1.4;}
+  .style-cards{display:grid; grid-template-columns:repeat(auto-fill,minmax(118px,1fr)); gap:10px; margin:8px 0 6px;}
+  .style-cards figure{margin:0; background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:8px; text-align:center;}
+  .style-cards svg{display:block; width:100%; aspect-ratio:1; border-radius:8px;}
+  .style-cards figcaption{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px; line-height:1.35; color:var(--ink); margin-top:6px;}
+</style>
+</head>
+<body data-hud="7 клас · Практична · Обкладинки для зошитів">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 7 клас · Генерування зображень</div>
+    <h1>📓 Обкладинки для зошитів</h1>
+    <p>Створи в Gemini обкладинки для зошитів з трьох улюблених предметів — кожну в іншому стилі.</p>
+    <div class="meta"><span>⏱ 25–30 хв</span><span>✨ Gemini</span><span>🎓 Google Classroom</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="covers">
+      <figure>
+        <svg viewBox="0 0 120 160"><defs><linearGradient id="cv1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#A5D8FF"/><stop offset="1" stop-color="#D0BFFF"/></linearGradient></defs>
+          <rect width="120" height="160" fill="url(#cv1)"/><rect width="8" height="160" fill="#000" opacity=".12"/>
+          <g fill="#fff" opacity=".7" font-family="Georgia,serif" font-size="22"><text x="24" y="48">π</text><text x="80" y="40">7</text><text x="62" y="108">∑</text><text x="20" y="128">%</text><text x="86" y="132">√</text></g>
+          <circle cx="60" cy="76" r="20" fill="none" stroke="#5B4BD6" stroke-width="2.5" opacity=".6"/><path d="M40 76h40M60 56v40" stroke="#5B4BD6" stroke-width="2" opacity=".5"/>
+          <rect x="18" y="140" width="84" height="14" rx="3" fill="#fff" opacity=".85"/><text x="60" y="150.5" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="700" font-size="10" fill="#3F33A8">Математика</text></svg>
+        <figcaption><b>Математика</b>акварель</figcaption>
+      </figure>
+      <figure>
+        <svg viewBox="0 0 120 160"><rect width="120" height="160" fill="#1B1B3A"/><rect width="8" height="160" fill="#000" opacity=".25"/>
+          <g fill="#2F9E44"><rect x="40" y="40" width="40" height="30"/></g><rect x="44" y="44" width="32" height="22" fill="#69DB7C"/>
+          <rect x="54" y="70" width="12" height="8" fill="#2F9E44"/><rect x="44" y="78" width="32" height="6" fill="#2F9E44"/>
+          <g fill="#FFD43B"><rect x="20" y="20" width="6" height="6"/><rect x="96" y="28" width="6" height="6"/><rect x="26" y="100" width="6" height="6"/><rect x="90" y="96" width="6" height="6"/></g>
+          <g fill="#74C0FC"><rect x="48" y="50" width="6" height="6"/><rect x="60" y="50" width="12" height="6"/><rect x="48" y="58" width="16" height="4"/></g>
+          <rect x="14" y="140" width="92" height="14" fill="#69DB7C"/><text x="60" y="150.5" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-weight="700" font-size="9" fill="#1B1B3A">ІНФОРМАТИКА</text></svg>
+        <figcaption><b>Інформатика</b>піксель-арт</figcaption>
+      </figure>
+      <figure>
+        <svg viewBox="0 0 120 160"><rect width="120" height="160" fill="#FFF3BF"/><rect width="8" height="160" fill="#000" opacity=".1"/>
+          <circle cx="60" cy="70" r="34" fill="#4DABF7"/><path d="M42 54q10-8 18 2t14-2q8 6 4 14t-14 4-12 10-12-6 2-22z" fill="#51CF66"/><path d="M66 86q8-2 10 6t-8 6z" fill="#51CF66"/>
+          <circle cx="60" cy="70" r="34" fill="none" stroke="#1B1B3A" stroke-width="2.5"/><path d="M60 104v14M48 118h24" stroke="#1B1B3A" stroke-width="3" stroke-linecap="round"/>
+          <rect x="18" y="138" width="84" height="16" rx="8" fill="#E8590C"/><text x="60" y="149.5" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="800" font-size="10" fill="#fff">Географія</text></svg>
+        <figcaption><b>Географія</b>мультфільм</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Відкрий Gemini</h3>
+        <ol>
+          <li>Перейди на <b>gemini.google.com</b>.</li>
+          <li>Перевір, що вгорі праворуч — твій <b>шкільний</b> акаунт.</li>
+          <li>Обери <b>3 улюблені предмети</b>.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Склади промт</h3>
+        <p>Хороший промт для обкладинки відповідає на запитання:</p>
+        <div class="formula"><span>Що зобразити?</span><i>→</i><span>Який напис?</span><i>→</i><span>Які кольори?</span><i>→</i><span>Стиль</span></div>
+        <div class="prompt"><b>Намалюй</b> вертикальну обкладинку для зошита з математики: цифри, циркуль і геометричні фігури, напис «Математика», ніжні блакитні й фіолетові кольори, акварель</div>
+        <div class="tip">Слова «вертикальна обкладинка для зошита» потрібні, щоб картинка вийшла потрібної форми.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Створи три обкладинки</h3>
+        <p>Для кожного предмета — <b>інший стиль</b>. Додай у промт одну з фраз:</p>
+        <div class="style-cards"><figure><svg viewBox="0 0 100 100"><defs><filter id="paper"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="4"/><feColorMatrix values="0 0 0 0 .55  0 0 0 0 .45  0 0 0 0 .35  0 0 0 .07 0"/></filter><filter id="wash1"><feTurbulence baseFrequency=".035" numOctaves="3" seed="7"/><feDisplacementMap in="SourceGraphic" scale="10"/><feGaussianBlur stdDeviation=".6"/></filter><filter id="wash2"><feTurbulence baseFrequency=".05" numOctaves="3" seed="12"/><feDisplacementMap in="SourceGraphic" scale="8"/><feGaussianBlur stdDeviation=".8"/></filter><filter id="edge"><feTurbulence baseFrequency=".06" numOctaves="2" seed="9"/><feDisplacementMap in="SourceGraphic" scale="6"/><feGaussianBlur stdDeviation=".7"/></filter></defs><rect width="100" height="100" fill="#FFFCF5"/><rect width="100" height="100" filter="url(#paper)"/><g filter="url(#wash1)"><path d="M50 30c-8-6-26-6-30 12-4 18 8 38 20 40 4 1 7-2 10-2s6 3 10 2c12-2 24-22 20-40-4-18-22-18-30-12z" fill="#FF6B6B" opacity=".62"/></g><g filter="url(#wash2)"><path d="M48 36c-6-3-20-2-23 10-3 13 5 28 15 31 4 1 6-1 9-1" fill="#E03131" opacity=".45"/><path d="M60 40c8 4 12 14 8 24" stroke="#C2255C" stroke-width="9" fill="none" opacity=".25" stroke-linecap="round"/></g><g filter="url(#edge)"><path d="M50 30c-8-6-26-6-30 12-4 18 8 38 20 40 4 1 7-2 10-2s6 3 10 2c12-2 24-22 20-40-4-18-22-18-30-12z" fill="none" stroke="#C92A2A" stroke-width="1.6" opacity=".55"/></g><g filter="url(#wash2)"><path d="M33 42c-3 6-2 13 1 17" stroke="#FFF5F5" stroke-width="6" fill="none" opacity=".8" stroke-linecap="round"/></g><g filter="url(#wash1)"><path d="M52 28c4-8 12-12 19-10-2 7-9 11-19 10z" fill="#51CF66" opacity=".75"/><path d="M50 31l2-11" stroke="#8D5A3B" stroke-width="2.4" opacity=".7"/></g><g fill="#FA5252" opacity=".35"><circle cx="78" cy="78" r="1.6"/><circle cx="83" cy="72" r=".9"/><circle cx="18" cy="24" r="1.2"/><circle cx="24" cy="18" r=".7"/><circle cx="74" cy="86" r=".8"/></g></svg><figcaption>акварель, ніжні фарби</figcaption></figure><figure><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#E7F5FF"/><rect x="42" y="12" width="8" height="8" fill="#2F9E44"/><rect x="50" y="12" width="8" height="8" fill="#2F9E44"/><rect x="50" y="20" width="8" height="8" fill="#2F9E44"/><rect x="26" y="28" width="8" height="8" fill="#E03131"/><rect x="34" y="28" width="8" height="8" fill="#E03131"/><rect x="42" y="28" width="8" height="8" fill="#E03131"/><rect x="58" y="28" width="8" height="8" fill="#E03131"/><rect x="66" y="28" width="8" height="8" fill="#E03131"/><rect x="18" y="36" width="8" height="8" fill="#E03131"/><rect x="26" y="36" width="8" height="8" fill="#E03131"/><rect x="34" y="36" width="8" height="8" fill="#E03131"/><rect x="42" y="36" width="8" height="8" fill="#E03131"/><rect x="50" y="36" width="8" height="8" fill="#E03131"/><rect x="58" y="36" width="8" height="8" fill="#E03131"/><rect x="66" y="36" width="8" height="8" fill="#E03131"/><rect x="74" y="36" width="8" height="8" fill="#E03131"/><rect x="10" y="44" width="8" height="8" fill="#E03131"/><rect x="18" y="44" width="8" height="8" fill="#E03131"/><rect x="26" y="44" width="8" height="8" fill="#FFC9C9"/><rect x="34" y="44" width="8" height="8" fill="#E03131"/><rect x="42" y="44" width="8" height="8" fill="#E03131"/><rect x="50" y="44" width="8" height="8" fill="#E03131"/><rect x="58" y="44" width="8" height="8" fill="#E03131"/><rect x="66" y="44" width="8" height="8" fill="#E03131"/><rect x="74" y="44" width="8" height="8" fill="#E03131"/><rect x="82" y="44" width="8" height="8" fill="#E03131"/><rect x="10" y="52" width="8" height="8" fill="#E03131"/><rect x="18" y="52" width="8" height="8" fill="#FFC9C9"/><rect x="26" y="52" width="8" height="8" fill="#E03131"/><rect x="34" y="52" width="8" height="8" fill="#E03131"/><rect x="42" y="52" width="8" height="8" fill="#E03131"/><rect x="50" y="52" width="8" height="8" fill="#E03131"/><rect x="58" y="52" width="8" height="8" fill="#E03131"/><rect x="66" y="52" width="8" height="8" fill="#E03131"/><rect x="74" y="52" width="8" height="8" fill="#E03131"/><rect x="82" y="52" width="8" height="8" fill="#E03131"/><rect x="10" y="60" width="8" height="8" fill="#E03131"/><rect x="18" y="60" width="8" height="8" fill="#E03131"/><rect x="26" y="60" width="8" height="8" fill="#E03131"/><rect x="34" y="60" width="8" height="8" fill="#E03131"/><rect x="42" y="60" width="8" height="8" fill="#E03131"/><rect x="50" y="60" width="8" height="8" fill="#E03131"/><rect x="58" y="60" width="8" height="8" fill="#E03131"/><rect x="66" y="60" width="8" height="8" fill="#E03131"/><rect x="74" y="60" width="8" height="8" fill="#E03131"/><rect x="82" y="60" width="8" height="8" fill="#E03131"/><rect x="10" y="68" width="8" height="8" fill="#E03131"/><rect x="18" y="68" width="8" height="8" fill="#E03131"/><rect x="26" y="68" width="8" height="8" fill="#E03131"/><rect x="34" y="68" width="8" height="8" fill="#E03131"/><rect x="42" y="68" width="8" height="8" fill="#E03131"/><rect x="50" y="68" width="8" height="8" fill="#E03131"/><rect x="58" y="68" width="8" height="8" fill="#E03131"/><rect x="66" y="68" width="8" height="8" fill="#E03131"/><rect x="74" y="68" width="8" height="8" fill="#E03131"/><rect x="82" y="68" width="8" height="8" fill="#E03131"/><rect x="18" y="76" width="8" height="8" fill="#E03131"/><rect x="26" y="76" width="8" height="8" fill="#E03131"/><rect x="34" y="76" width="8" height="8" fill="#E03131"/><rect x="42" y="76" width="8" height="8" fill="#E03131"/><rect x="50" y="76" width="8" height="8" fill="#E03131"/><rect x="58" y="76" width="8" height="8" fill="#E03131"/><rect x="66" y="76" width="8" height="8" fill="#E03131"/><rect x="74" y="76" width="8" height="8" fill="#A61E1E"/><rect x="26" y="84" width="8" height="8" fill="#E03131"/><rect x="34" y="84" width="8" height="8" fill="#E03131"/><rect x="42" y="84" width="8" height="8" fill="#A61E1E"/><rect x="50" y="84" width="8" height="8" fill="#A61E1E"/><rect x="58" y="84" width="8" height="8" fill="#E03131"/><rect x="66" y="84" width="8" height="8" fill="#E03131"/></svg><figcaption>піксель-арт, як у старих іграх</figcaption></figure><figure><svg viewBox="0 0 100 100"><rect width="100" height="100" fill="#FFF3BF"/><path d="M50 30c-8-6-26-6-30 12-4 18 8 38 20 40 4 1 7-2 10-2s6 3 10 2c12-2 24-22 20-40-4-18-22-18-30-12z" fill="#FA5252" stroke="#1B1B3A" stroke-width="3.5" stroke-linejoin="round"/><ellipse cx="36" cy="46" rx="5" ry="9" fill="#fff" opacity=".85" transform="rotate(20 36 46)"/><path d="M50 30l2-12" stroke="#1B1B3A" stroke-width="3.5" stroke-linecap="round"/><path d="M53 24c4-8 14-10 20-7-3 7-12 10-20 7z" fill="#51CF66" stroke="#1B1B3A" stroke-width="3" stroke-linejoin="round"/><circle cx="44" cy="58" r="2.5" fill="#1B1B3A"/><circle cx="58" cy="58" r="2.5" fill="#1B1B3A"/><path d="M45 66q6 5 12 0" stroke="#1B1B3A" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg><figcaption>яскравий мультфільм</figcaption></figure><figure><svg viewBox="0 0 100 100"><defs><clipPath id="ap"><path d="M50 30c-8-6-26-6-30 12-4 18 8 38 20 40 4 1 7-2 10-2s6 3 10 2c12-2 24-22 20-40-4-18-22-18-30-12z"/></clipPath><filter id="pc"><feTurbulence baseFrequency=".9" numOctaves="1" seed="2"/><feDisplacementMap in="SourceGraphic" scale="1.6"/></filter></defs><rect width="100" height="100" fill="#fff"/><g filter="url(#pc)"><g clip-path="url(#ap)" stroke-linecap="round"><path d="M-40 100L0 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M-36 100L4 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M-32 100L8 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M-28 100L12 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M-24 100L16 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M-20 100L20 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M-16 100L24 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M-12 100L28 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M-8 100L32 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M-4 100L36 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M0 100L40 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M4 100L44 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M8 100L48 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M12 100L52 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M16 100L56 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M20 100L60 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M24 100L64 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M28 100L68 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M32 100L72 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M36 100L76 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M40 100L80 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M44 100L84 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M48 100L88 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M52 100L92 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M56 100L96 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M60 100L100 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M64 100L104 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M68 100L108 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M72 100L112 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M76 100L116 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M80 100L120 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M84 100L124 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M88 100L128 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M92 100L132 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M96 100L136 20" stroke="#E03131" stroke-width="1.4" opacity=".75"/><path d="M40 100L80 20" stroke="#C92A2A" stroke-width="1.2" opacity=".6"/><path d="M45 100L85 20" stroke="#C92A2A" stroke-width="1.2" opacity=".6"/><path d="M50 100L90 20" stroke="#C92A2A" stroke-width="1.2" opacity=".6"/><path d="M55 100L95 20" stroke="#C92A2A" stroke-width="1.2" opacity=".6"/><path d="M60 100L100 20" stroke="#C92A2A" stroke-width="1.2" opacity=".6"/><path d="M65 100L105 20" stroke="#C92A2A" stroke-width="1.2" opacity=".6"/><path d="M70 100L110 20" stroke="#C92A2A" stroke-width="1.2" opacity=".6"/><path d="M75 100L115 20" stroke="#C92A2A" stroke-width="1.2" opacity=".6"/><path d="M80 100L120 20" stroke="#C92A2A" stroke-width="1.2" opacity=".6"/><path d="M85 100L125 20" stroke="#C92A2A" stroke-width="1.2" opacity=".6"/><path d="M90 100L130 20" stroke="#C92A2A" stroke-width="1.2" opacity=".6"/><path d="M95 100L135 20" stroke="#C92A2A" stroke-width="1.2" opacity=".6"/></g><path d="M50 30c-8-6-26-6-30 12-4 18 8 38 20 40 4 1 7-2 10-2s6 3 10 2c12-2 24-22 20-40-4-18-22-18-30-12z" fill="none" stroke="#A61E1E" stroke-width="1.5"/><path d="M50 30l2-12" stroke="#5C3D2E" stroke-width="2"/><path d="M54 26 l12 -6" stroke="#2F9E44" stroke-width="1.3"/><path d="M57 25 l12 -6" stroke="#2F9E44" stroke-width="1.3"/><path d="M60 24 l12 -6" stroke="#2F9E44" stroke-width="1.3"/><path d="M63 23 l12 -6" stroke="#2F9E44" stroke-width="1.3"/></g></svg><figcaption>малюнок кольоровими олівцями</figcaption></figure><figure><svg viewBox="0 0 100 100"><defs><filter id="sh"><feDropShadow dx="1.5" dy="2" stdDeviation="1.2" flood-opacity=".35"/></filter></defs><rect width="100" height="100" fill="#D3F9D8"/><g filter="url(#sh)"><path d="M50 30c-8-6-27-5-31 12-4 18 8 38 20 40l11-2 11 2c12-2 23-22 19-40-4-17-22-18-30-12z" fill="#F03E3E"/><path d="M36 42c-3 7-2 14 2 19l3-2c-3-5-3-11-1-16z" fill="#FFA8A8"/><path d="M49 30l3-13 4 1-3 12z" fill="#7C4A2D"/><path d="M54 24l17-8 2 4-6 6-13 2z" fill="#37B24D"/></g></svg><figcaption>аплікація з кольорового паперу</figcaption></figure></div>
+        <div class="check-val">Перевір себе: у тебе три обкладинки трьох різних стилів, на кожній — назва предмета.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Знайди помилки ШІ</h3>
+        <ul class="ticks">
+          <li>Усі літери в написі правильні</li>
+          <li>Немає артефактів</li>
+        </ul>
+        <p>Якщо є помилка — попроси Gemini виправити.</p>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Завантаж картинки</h3>
+        <ol>
+          <li>Клацни обкладинку, щоб відкрити її.</li>
+          <li>Натисни <span class="menu">Завантажити</span> (значок ⬇).</li>
+          <li>Так само завантаж дві інші.</li>
+        </ol>
+        <div class="tip">Картинки потраплять у теку «Завантаження» на комп'ютері.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Здай у Classroom</h3>
+        <ol>
+          <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+          <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Файл</span>.</li>
+          <li>Обери три завантажені картинки → <span class="menu">Вставити</span>.</li>
+          <li>Натисни <span class="menu">Здати</span>.</li>
+        </ol>
+        <div class="tip">Не пиши в промтах свого імені й імен однокласників.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Практична робота · «Генерування зображень» · 7 клас</footer>
+
+<script src="../../assets/practice.js"></script>
+</body>
+</html>
