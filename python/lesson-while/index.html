@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Цикл while — Заняття</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<link rel="stylesheet" href="../../assets/python.css">
+<style>
+  :root{
+    --accent:#D2602A; --accent-dark:#9E441A; --accent-soft:#FCECE2;
+    --bg:#FBF6F2; --line:#F0E0D4; --ink-soft:#66554A;
+    --hud-bar:linear-gradient(90deg, #3776AB, #D2602A, #FFD43B);
+  }
+
+  /* Повторюй, поки…: варіанти однакового розміру */
+  #lifePool{display:grid; grid-template-columns:repeat(3, 1fr);}
+  @media (max-width:560px){ #lifePool{grid-template-columns:repeat(2, 1fr);} }
+  #lifePool .match-chip{display:flex; align-items:center; justify-content:center; text-align:center;}
+
+  /* Як працює while: блок-схема з маркером, що бігає по колу */
+  .flow{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:18px 20px; margin-top:16px;}
+  .flow-grid{display:grid; grid-template-columns:minmax(0, 300px) minmax(0, 1fr); gap:20px; align-items:start;}
+  .stepper{display:flex; align-items:center; gap:8px; font-weight:700; font-size:14.5px;}
+  .stepper button{width:32px; height:32px; border-radius:50%; border:1.5px solid var(--line); background:var(--bg); font-family:'Baloo 2',sans-serif; font-size:18px; font-weight:700; line-height:1; color:var(--accent-dark); cursor:pointer;}
+  .stepper button:hover{border-color:var(--accent);}
+  .stepper b{font-family:var(--code-font); font-size:17px; min-width:2ch; text-align:center;}
+  .flow svg{width:100%; height:auto; display:block;}
+  .fl-node{fill:#fff; stroke:#D9C3B4; stroke-width:2; transition:fill .3s, stroke .3s;}
+  .fl-node.on{fill:#FFF6D6; stroke:#E9B92C;}
+  .fl-node.t{fill:#E2F5E6; stroke:#3FAE58;}
+  .fl-node.f{fill:#E9EBF0; stroke:#5A6275;}
+  .fl-txt{font-family:var(--code-font); font-size:12.5px; fill:var(--ink); text-anchor:middle; dominant-baseline:middle;}
+  .fl-txt.s{font-family:'Nunito Sans',sans-serif; font-weight:700; fill:var(--ink-soft);}
+  .fl-line{fill:none; stroke:#C4A898; stroke-width:2;}
+  .fl-loop{fill:none; stroke:var(--accent); stroke-width:2.5; stroke-dasharray:6 4;}
+  .fl-lbl{font-family:var(--code-font); font-size:12px; font-weight:700;}
+  .fl-side{display:flex; flex-direction:column; gap:12px;}
+  .fl-side pre.py-code{margin:0;}
+  .fl-side .ln{display:inline-block; width:100%; border-radius:4px; transition:background .25s;}
+  .fl-side .ln.cur{background:rgba(255,212,59,.25);}
+  .fl-ctrl{display:flex; align-items:center; gap:12px 18px; flex-wrap:wrap;}
+  .fl-ctrl .btn-primary:disabled{opacity:.5; cursor:default;}
+  .fl-row{display:flex; gap:12px; align-items:stretch;}
+  .fl-mem{flex:0 0 auto; min-width:96px; background:var(--accent-soft); border-radius:var(--radius-s); padding:8px 12px; display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .fl-mem .ttl, .fl-out .ttl{display:block; font-size:11px; letter-spacing:.06em; text-transform:uppercase; font-family:'Nunito Sans',sans-serif; font-weight:700;}
+  .fl-mem .ttl{color:var(--accent-dark);}
+  .fl-out{flex:1; background:var(--code-bg); color:var(--code-ink); font-family:var(--code-font); font-size:14px; border-radius:var(--radius-s); padding:10px 14px; min-height:96px; white-space:pre-line;}
+  .fl-out .ttl{color:var(--code-soft); margin-bottom:4px;}
+  .fl-msg{font-size:14px; color:var(--ink-soft); min-height:2.6em;}
+  .fl-msg b{font-family:var(--code-font);}
+  .fl-turn{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; color:var(--accent-dark); background:var(--accent-soft); border-radius:20px; padding:2px 12px;}
+  @media (max-width:640px){ .flow-grid{grid-template-columns:1fr;} .flow svg{max-width:300px; margin:0 auto;} }
+</style>
+</head>
+<body data-lesson="py-while" data-hud="Python Basic · Цикл while">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Python Basic · Заняття 6</div>
+      <h1>Поки умова правдива: цикл while</h1>
+      <p>Навчишся повторювати команди й вчасно зупиняти повторення.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none" aria-hidden="true">
+      <circle cx="70" cy="70" r="60" fill="#FCECE2"/>
+      <path d="M70 26 A44 44 0 1 1 28 58" stroke="#D2602A" stroke-width="10" stroke-linecap="round"/>
+      <path d="M16 54 L30 42 L40 62 Z" fill="#D2602A"/>
+      <text x="70" y="76" text-anchor="middle" font-family="monospace" font-weight="800" font-size="19" fill="#9E441A">while</text>
+      <path d="M48 96 Q58 104 70 96 Q82 88 92 96" stroke="#FFD43B" stroke-width="9" stroke-linecap="round"/>
+      <circle cx="96" cy="98" r="8" fill="#FFD43B"/><circle cx="98" cy="96" r="2" fill="#1B1B3A"/>
+      <path d="M103 101 l6 2" stroke="#E2574C" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Заняття 4–5</div>
+    <h2>Розминка</h2>
+    <p>Згадаймо умови й випадкові числа — без них циклів не буде.</p>
+    <div class="exercise" id="warmup"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Навіщо цикли</div>
+    <h2>Повторюй, поки…</h2>
+    <p><b>Цикл</b> повторює команди. <code>while</code> означає «поки»: повторюй, <b>поки</b> умова правдива.</p>
+    <div class="exercise">
+      <p class="soft">Обери дію, а потім — умову до неї.</p>
+      <div class="match-pool" id="lifePool"></div>
+      <div id="lifeList"></div>
+      <div class="progress-line" id="lifeProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Команда while</div>
+    <h2>Як крутиться цикл</h2>
+    <pre class="py-code">n = 1
+while n &lt;= 3:
+    print(n)
+    n = n + 1
+print("Готово!")</pre>
+    <ul>
+      <li>після умови — двокрапка <code>:</code>;</li>
+      <li>рядки з відступом — <b>тіло циклу</b>;</li>
+      <li>один прохід тіла — <b>ітерація</b>.</li>
+    </ul>
+    <p>Після кожної ітерації Python знову перевіряє умову. Стала <code>False</code> — цикл закінчено.</p>
+    <div class="flow" id="flow">
+      <div class="flow-grid">
+        <svg viewBox="0 0 320 530" aria-label="Блок-схема циклу while">
+          <defs>
+            <marker id="flArr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#C4A898"/></marker>
+            <marker id="flArrL" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#D2602A"/></marker>
+          </defs>
+          <path class="fl-line" d="M160 48 V70" marker-end="url(#flArr)"/>
+          <path class="fl-line" d="M160 110 V140" marker-end="url(#flArr)"/>
+          <path class="fl-line" d="M160 220 V260" marker-end="url(#flArr)"/>
+          <path class="fl-line" d="M160 300 V330" marker-end="url(#flArr)"/>
+          <path class="fl-loop" d="M60 350 H22 V125 H152" marker-end="url(#flArrL)"/>
+          <path class="fl-line" d="M250 180 H298 V400 H160 V420" marker-end="url(#flArr)"/>
+          <path class="fl-line" d="M160 460 V482" marker-end="url(#flArr)"/>
+          <text class="fl-lbl" x="170" y="244" fill="#3FAE58">True</text>
+          <text class="fl-lbl" x="256" y="170" fill="#5A6275">False</text>
+          <text class="fl-lbl" x="16" y="240" fill="#D2602A" transform="rotate(-90 16 240)" text-anchor="middle">ще раз</text>
+          <rect class="fl-node" id="flStart" x="110" y="14" width="100" height="34" rx="17"/><text class="fl-txt s" x="160" y="31">Початок</text>
+          <rect class="fl-node" id="flSet" x="80" y="70" width="160" height="40" rx="6"/><text class="fl-txt" x="160" y="90">n = 1</text>
+          <path class="fl-node" id="flIf" d="M160 140 L250 180 L160 220 L70 180 Z"/><text class="fl-txt" id="flIfTx" x="160" y="180">n &lt;= 3 ?</text>
+          <rect class="fl-node" id="flPrint" x="60" y="260" width="200" height="40" rx="6"/><text class="fl-txt" x="160" y="280">print(n)</text>
+          <rect class="fl-node" id="flInc" x="60" y="330" width="200" height="40" rx="6"/><text class="fl-txt" x="160" y="350">n = n + 1</text>
+          <rect class="fl-node" id="flDone" x="60" y="420" width="200" height="40" rx="6"/><text class="fl-txt" x="160" y="440">print("Готово!")</text>
+          <rect class="fl-node" id="flEnd" x="110" y="482" width="100" height="34" rx="17"/><text class="fl-txt s" x="160" y="499">Кінець</text>
+          <path id="flR1" d="M160 48 V70" fill="none"/>
+          <path id="flR2" d="M160 110 V140" fill="none"/>
+          <path id="flRT" d="M160 220 V260" fill="none"/>
+          <path id="flRT2" d="M160 300 V330" fill="none"/>
+          <path id="flRL" d="M60 350 H22 V125 H160 V140" fill="none"/>
+          <path id="flRF" d="M250 180 H298 V400 H160 V420" fill="none"/>
+          <path id="flR5" d="M160 460 V482" fill="none"/>
+          <circle id="flDot" r="7" cx="160" cy="48" fill="#FFD43B" stroke="#C99A00" stroke-width="2" opacity="0"/>
+        </svg>
+        <div class="fl-side">
+          <div class="fl-ctrl">
+            <div class="stepper">Межа: <button type="button" data-d="-1" aria-label="Менше">−</button><b id="flLim"></b><button type="button" data-d="1" aria-label="Більше">+</button></div>
+            <button class="btn-primary" type="button" id="flRun">▶ Запустити</button>
+            <span class="fl-turn" id="flTurn" hidden></span>
+          </div>
+          <div id="flCode"></div>
+          <div class="fl-msg" id="flMsg">Обери межу й запусти програму.</div>
+          <div class="fl-row">
+            <div class="fl-mem"><span class="ttl">Пам'ять</span><div id="flMem"></div></div>
+            <div class="fl-out" id="flOut"><span class="ttl">Консоль</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note">З межею 0 тіло циклу не виконається жодного разу.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Лічильник</div>
+    <h2>Скільки разів?</h2>
+    <p>Змінна, що рахує ітерації, — <b>лічильник</b>. Кількість ітерацій залежить від:</p>
+    <ul>
+      <li>початкового значення;</li>
+      <li>кроку;</li>
+      <li>умови — особливо <code>&lt;</code> чи <code>&lt;=</code>.</li>
+    </ul>
+    <div class="exercise">
+      <p class="soft">Скільки разів виконається <code>print()</code>?</p>
+      <div id="countList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Задача</div>
+    <h2>Рахуємо п'ятірками</h2>
+    <p>Програма виводить 1…5. Зміни її, щоб виводила 5, 10, 15 … 50.</p>
+    <div id="task1"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Нескінченний цикл</div>
+    <h2>Коли цикл не зупиняється</h2>
+    <p>Якщо умова <b>ніколи</b> не стає <code>False</code>, цикл крутиться вічно — це <b>нескінченний цикл</b>. Причини:</p>
+    <ul>
+      <li>лічильник не змінюється;</li>
+      <li>змінюється не в той бік;</li>
+      <li>рядок зі зміною — без відступу;</li>
+      <li>лічильник «перестрибує» число в умові з <code>!=</code>.</li>
+    </ul>
+    <div class="trivia">Тут програму зупиняє сама сторінка через 8 с. У редакторі — клавіші <b>Ctrl+C</b>.</div>
+    <div class="exercise">
+      <p class="soft">Клацни рядок, через який цикл не закінчиться.</p>
+      <div id="bugList"></div>
+    </div>
+    <p>Запусти нескінченний цикл, а тоді допиши рядок, щоб «Привіт!» вивелось 5 разів.</p>
+    <div id="task2"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · while True і break</div>
+    <h2>Вийти з циклу будь-коли</h2>
+    <p><code>while True:</code> крутиться завжди, а <code>break</code> негайно виходить з циклу. Рядки після <code>break</code> у тілі вже не виконуються.</p>
+    <pre class="py-code">while True:
+    answer = input("Скільки буде 2 + 2? ")
+    if answer == "4":
+        break
+    print("Ні, спробуй ще")
+print("Правильно!")</pre>
+    <div class="note">Зручно, коли невідомо, скільки буде спроб.</div>
+    <div class="exercise">
+      <p class="soft">Що виведе програма?</p>
+      <div id="breakList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 7 · Задача</div>
+    <h2>Секретні двері</h2>
+    <p>Заміни три крапки, щоб пароль <code>python</code> відчиняв двері, а інший — ні.</p>
+    <div id="task3"></div>
+    <div class="note">Перевір: спершу неправильні паролі, потім — правильний.</div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Заняття 6 · «Цикл while» · Гурток Python Basic</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script src="../../assets/python.js"></script>
+<script>
+/* ---------- ПОВТОРЕННЯ: розминка ---------- */
+makeWarmup('warmup', [
+  { pre:pyCode('x = 7\nif x > 5:\n    print("A")\nelse:\n    print("B")'), text:'Що виведе програма?', opts:['A', 'B', 'A і B'], correct:0, why:'7 більше за 5, тож виконується гілка if.' },
+  { pre:pyCode('print(10 % 3 == 1)'), text:'Що виведе програма?', opts:['True', 'False', '1'], correct:0, why:'Остача від ділення 10 на 3 — це 1, а 1 == 1 — правда.' },
+  { pre:pyCode('if x > 3\n    print("Багато")'), text:'Чого бракує в першому рядку?', opts:['Лапок', 'Двокрапки', 'Дужок'], correct:1, why:'Після умови завжди ставлять двокрапку: if x > 3:' },
+  { pre:pyCode('n = 4\nif n % 2 == 0 and n > 5:\n    print("Так")\nelse:\n    print("Ні")'), text:'Що виведе програма?', opts:['Так', 'Ні'], correct:1, why:'4 не більше за 5, а and потребує обох умов.' },
+  { pre:pyCode('t = 20\nif t > 10:\n    print("Тепло")\nelif t > 15:\n    print("Спекотно")'), text:'Що виведе програма?', opts:['Тепло', 'Спекотно', 'Тепло й Спекотно'], correct:0, why:'Виконується лише перша правдива умова.' },
+  { pre:pyCode('print(not True)'), text:'Що виведе програма?', opts:['True', 'False', 'not True'], correct:1, why:'not перевертає значення.' },
+  { pre:pyCode('import random\nx = random.randint(1, 6)'), text:'Які числа можуть потрапити в x?', opts:['Від 0 до 6', 'Від 1 до 6', 'Від 1 до 5'], correct:1, why:'randint(1, 6) вмикає обидві межі — як кубик.' },
+  { pre:pyCode('score = 5\nscore = score + 1\nprint(score)'), text:'Що виведе програма?', opts:['5', '6', 'score + 1'], correct:1, why:'5 + 1 кладемо назад у ту саму змінну.' }
+]);
+
+/* ---------- КРОК 1 ---------- */
+makeMatching('lifePool', 'lifeList', [
+  { name:'Насипаєш цукор у чай', desc:'…поки чай не стане солодким' },
+  { name:'Кидаєш кубик', desc:'…поки не випаде шістка' },
+  { name:'Знову набираєш пароль', desc:'…поки він не підійде' },
+  { name:'Чекаєш на зупинці', desc:'…поки не приїде автобус' },
+  { name:'Граєш рівень знову', desc:'…поки в тебе є життя' },
+  { name:'Миєш посуд', desc:'…поки раковина не порожня' }
+], 'lifeProgress');
+
+/* ---------- КРОК 2: блок-схема while ---------- */
+(function(){
+  const $ = id=>document.getElementById(id);
+  const dot = $('flDot'), out = $('flOut'), msg = $('flMsg'), run = $('flRun'), turn = $('flTurn');
+  const SRC = 'n = 1\nwhile n <= {L}:\n    print(n)\n    n = n + 1\nprint("Готово!")';
+  const NODES = ['flStart', 'flSet', 'flIf', 'flPrint', 'flInc', 'flDone', 'flEnd'];
+  const slow = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let lim = 3, busy = false, speed = 1;
+  const hit = trackTask($('flow'), 1, 0); let seen = false;
+  const wait = ms=>new Promise(ok=>setTimeout(ok, slow ? ms * speed : 0));
+  function move(id){
+    const p = $(id), len = p.getTotalLength(), ms = Math.max(400, len * 7) * speed;
+    const at = k=>{ const pt = p.getPointAtLength(len * k); dot.setAttribute('cx', pt.x); dot.setAttribute('cy', pt.y); };
+    at(0); dot.setAttribute('opacity', 1);
+    return new Promise(done=>{
+      const ok = ()=>{ dot.setAttribute('opacity', 0); done(); };
+      if(!slow){ ok(); return; }
+      const t0 = performance.now();
+      (function frame(t){
+        const k = Math.min(1, (t - t0) / ms), e = k < .5 ? 2*k*k : 1 - (-2*k + 2)**2 / 2;
+        at(e);
+        k < 1 ? requestAnimationFrame(frame) : ok();
+      })(t0);
+    });
+  }
+  const lines = ()=>[...document.querySelectorAll('#flCode .ln')];
+  function cur(n){ lines().forEach((l, i)=>l.classList.toggle('cur', i + 1 === n)); }
+  function light(id, cls = 'on'){ $(id).classList.remove('on', 't', 'f'); if(cls) $(id).classList.add(cls); }
+  function mem(v){ $('flMem').innerHTML = v === null ? '<span class="soft" style="font-size:13px">порожньо</span>' : varBox('n', String(v)); }
+  function reset(){
+    $('flLim').textContent = lim;
+    $('flIfTx').textContent = `n <= ${lim} ?`;
+    $('flCode').innerHTML = pyCode(SRC.replace('{L}', lim));
+    NODES.forEach(id=>light(id, ''));
+    out.innerHTML = '<span class="ttl">Консоль</span>';
+    dot.setAttribute('opacity', 0);
+    turn.hidden = true;
+    mem(null);
+  }
+  const print = t=>out.insertAdjacentHTML('beforeend', t + '\n');
+  async function go(){
+    if(busy) return;
+    busy = true; run.disabled = true; speed = 1;
+    reset();
+    msg.textContent = 'Програма стартує…';
+    light('flStart'); await wait(500);
+    await move('flR1'); light('flStart', ''); light('flSet'); cur(1);
+    let n = 1, k = 0;
+    mem(n);
+    msg.innerHTML = 'Лічильник <b>n</b> починає з 1.'; await wait(900);
+    await move('flR2'); light('flSet', '');
+    while(true){
+      cur(2); light('flIf');
+      msg.innerHTML = `Перевіряємо умову: <b>${n} &lt;= ${lim}</b>?`; await wait(900);
+      const ok = n <= lim;
+      light('flIf', ok ? 't' : 'f');
+      msg.innerHTML = `<b>${n} &lt;= ${lim}</b> — це <b>${ok ? 'True' : 'False'}</b>. ` + (ok ? 'Заходимо в тіло циклу.' : 'Цикл закінчено, йдемо далі.');
+      await wait(1000);
+      if(!ok) break;
+      k++; turn.hidden = false; turn.textContent = `Ітерація ${k}`;
+      await move('flRT'); light('flIf', ''); light('flPrint'); cur(3);
+      print(n); msg.innerHTML = `Виводимо <b>${n}</b>.`; await wait(800);
+      await move('flRT2'); light('flPrint', ''); light('flInc'); cur(4);
+      n++; mem(n);
+      msg.innerHTML = `Збільшуємо лічильник: тепер <b>n = ${n}</b>.`; await wait(900);
+      msg.textContent = 'І знову до умови!';
+      await move('flRL'); light('flInc', '');
+      speed = Math.max(.5, speed * .8);
+    }
+    await move('flRF'); light('flIf', ''); light('flDone'); cur(5);
+    print('Готово!'); await wait(800);
+    await move('flR5'); light('flDone', ''); light('flEnd'); cur(0);
+    msg.innerHTML = k ? `Готово! Тіло циклу виконалось ${k} раз${k === 1 ? '' : k < 5 ? 'и' : 'ів'}, а умову перевірено ${k + 1} раз${k + 1 < 5 ? 'и' : 'ів'}.` : 'Готово! Умова була неправдивою одразу, тож цикл не виконався жодного разу.';
+    busy = false; run.disabled = false;
+    if(!seen){ seen = true; hit(); }
+  }
+  document.querySelectorAll('#flow .stepper button').forEach(b=>b.addEventListener('click', ()=>{
+    if(busy) return;
+    lim = Math.min(5, Math.max(0, lim + +b.dataset.d));
+    reset(); msg.textContent = 'Запусти програму з новою межею.';
+  }));
+  run.addEventListener('click', go);
+  reset();
+})();
+
+/* ---------- КРОК 3 ---------- */
+makeClassify('countList', [
+  { pre:pyCode('n = 1\nwhile n < 4:\n    print(n)\n    n = n + 1'), text:'Скільки разів?', correct:1, why:'1, 2, 3 — а 4 < 4 вже неправда.' },
+  { pre:pyCode('n = 1\nwhile n <= 4:\n    print(n)\n    n = n + 1'), text:'Скільки разів?', correct:2, why:'1, 2, 3, 4 — <= вмикає 4.' },
+  { pre:pyCode('n = 5\nwhile n < 3:\n    print(n)\n    n = n + 1'), text:'Скільки разів?', correct:0, why:'5 < 3 — неправда одразу.' },
+  { pre:pyCode('n = 10\nwhile n > 0:\n    print(n)\n    n = n - 3'), text:'Скільки разів?', correct:2, why:'10, 7, 4, 1.' },
+  { pre:pyCode('n = 2\nwhile n <= 10:\n    print(n)\n    n = n + 2'), text:'Скільки разів?', correct:3, why:'2, 4, 6, 8, 10 — п’ять разів.' },
+  { pre:pyCode('n = 0\nwhile n < 3:\n    print(n)\n    n = n + 1'), text:'Скільки разів?', correct:1, why:'0, 1, 2.' }
+], ['0', '3', '4', '5']);
+
+/* ---------- КРОК 4 ---------- */
+makeCodeTask('task1', {
+  task:'Має вийти 5, 10, 15, 20, 25, 30, 35, 40, 45, 50 — кожне число в окремому рядку.',
+  code:'n = 1\nwhile n <= 5:\n    print(n)\n    n = n + 1',
+  hint:'Лічильник має починати з 5, збільшуватись на 5 і йти до 50 включно.',
+  check:(out, code)=>{
+    if(!/^\s*while\b/m.test(code)) return 'Розв’яжи задачу циклом while — не пиши десять print().';
+    const want = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50].join('\n');
+    const got = out.trim().split('\n').map(s=>s.trimEnd()).join('\n');
+    if(got === want) return true;
+    if(/^5\n10/.test(got)) return 'Початок правильний. Перевір, на якому числі цикл зупиняється.';
+    return 'Ще не те. Подумай: з якого числа починати й на скільки збільшувати лічильник?';
+  }
+});
+
+/* ---------- КРОК 5 ---------- */
+makeFindBug('bugList', [
+  { code:'n = 1\nwhile n <= 5:\n    print(n)\n    n = n - 1', line:4, why:'n зменшується й завжди менше за 5. Треба <code>n = n + 1</code>.' },
+  { code:'n = 1\nwhile n <= 5:\n    print(n)\nn = n + 1', line:4, why:'Без відступу рядок поза циклом, тож n завжди 1.' },
+  { code:'n = 1\nwhile n != 10:\n    print(n)\n    n = n + 2', line:2, why:'1, 3, 5, 7, 9, 11… — 10 пропущено. Краще <code>while n &lt; 10:</code>' },
+  { code:'count = 0\nwhile count < 3:\n    print("Привіт")\n    cont = count + 1', line:4, why:'Опечатка <code>cont</code>: <code>count</code> не змінюється.' }
+]);
+
+makeCodeTask('task2', {
+  code:'n = 1\nwhile n <= 5:\n    print("Привіт!")',
+  expect:'Привіт!\nПривіт!\nПривіт!\nПривіт!\nПривіт!',
+  hint:'Лічильник n ніколи не змінюється. Допиши в тіло циклу, з відступом, рядок n = n + 1',
+  neurons:2
+});
+
+/* ---------- КРОК 6 ---------- */
+makeChoices('breakList', [
+  { pre:pyCode('n = 1\nwhile True:\n    print(n)\n    if n == 3:\n        break\n    n = n + 1\nprint("Кінець")'), text:'Що з’явиться в консолі?', opts:['1 2 3 Кінець', '1 2 Кінець', '1 2 3 4 Кінець'], correct:0, why:'Спершу виводиться 3, потім спрацьовує break.' },
+  { pre:pyCode('while True:\n    print("A")\n    break\n    print("B")\nprint("C")'), text:'Що з’явиться в консолі?', opts:['A B C', 'A C', 'A'], correct:1, why:'print("B") стоїть після break і не виконується.' },
+  { pre:pyCode('n = 10\nwhile n > 0:\n    if n == 7:\n        break\n    print(n)\n    n = n - 1'), text:'Що з’явиться в консолі?', opts:['10 9 8 7', '10 9 8', '7'], correct:1, why:'break стоїть раніше за print(n), тож 7 не виводиться.' }
+]);
+
+/* ---------- КРОК 7 ---------- */
+makeCodeTask('task3', {
+  code:'while True:\n    password = input("Пароль: ")\n    if password == ...:\n        ...\n    print("Неправильно, спробуй ще")\nprint("Двері відчинено!")',
+  hint:'У перших трьох крапках — текст "python" у лапках, а в других — команда break.',
+  neurons:4,
+  check:(out, code)=>{
+    if(/\.\.\./.test(code)) return 'Заміни всі три крапки.';
+    if(!/^\s+break\s*$/m.test(code)) return 'Щоб вийти з циклу, потрібна команда break.';
+    if(!/["']python["']/.test(code)) return 'Пароль — це текст, тож пиши його в лапках: "python".';
+    if(!/Неправильно/.test(code)) return 'Не прибирай рядок з «Неправильно, спробуй ще».';
+    return /Двері відчинено!\s*$/.test(out) || 'Наприкінці має з’явитися «Двері відчинено!». Введи правильний пароль.';
+  }
+});
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Як перекладається слово <code>while</code>?', opts:['якщо', 'поки', 'інакше'], correct:1 },
+  { q:'Скільки разів виконається <code>print()</code>?' + pyCode('n = 0\nwhile n < 4:\n    print("Ура")\n    n = n + 1'), opts:['3', '4', '5'], correct:1, why:'n набуває значень 0, 1, 2, 3 — чотири ітерації.' },
+  { q:'Що виведе програма?' + pyCode('n = 3\nwhile n > 0:\n    print(n)\n    n = n - 1\nprint("Старт!")'), opts:['3 2 1 Старт!', '3 2 1 0 Старт!', 'Старт!'], correct:0, why:'Для n = 0 умова <code>0 &gt; 0</code> — неправда, тож 0 не виводиться.' },
+  { q:'Чому цей цикл нескінченний?' + pyCode('n = 1\nwhile n < 5:\n    print(n)'), opts:['Бракує двокрапки', 'n ніколи не змінюється', 'Умова неправильна'], correct:1 },
+  { q:'Що робить команда <code>break</code>?', opts:['Повертає на початок циклу', 'Негайно виходить з циклу', 'Зупиняє всю програму з помилкою'], correct:1 },
+  { q:'Що виведе програма?' + pyCode('n = 2\nwhile n <= 8:\n    print(n)\n    n = n + 3'), opts:['2 5 8', '2 5', '2 5 8 11'], correct:0, why:'Для 11 умова <code>11 &lt;= 8</code> — неправда.' },
+  { q:'Яке число буде в <code>n</code> після циклу?' + pyCode('n = 1\nwhile n < 10:\n    n = n * 2\nprint(n)'), opts:['8', '10', '16'], correct:2, why:'1, 2, 4, 8, 16 — і <code>16 &lt; 10</code> вже неправда.' },
+  { q:'Який рядок треба дописати в тіло циклу, щоб вивелось 1 2 3?' + pyCode('n = 1\nwhile n <= 3:\n    print(n)'), opts:['<code>n = n + 1</code>', '<code>n = n - 1</code>', '<code>n = 3</code>'], correct:0 },
+  { q:'Скільки разів виведеться «Ура»?' + pyCode('n = 10\nwhile n > 10:\n    print("Ура")\n    n = n - 1'), opts:['0', '1', '10'], correct:0, why:'<code>10 &gt; 10</code> — неправда вже на першій перевірці.' },
+  { q:'Що виведе програма?' + pyCode('n = 0\nwhile True:\n    n = n + 1\n    if n == 4:\n        break\nprint(n)'), opts:['3', '4', '5'], correct:1, why:'Коли n стає 4, спрацьовує break, і після циклу виводиться 4.' },
+  { q:'Де помилка?' + pyCode('n = 1\nwhile n <= 5\n    print(n)\n    n = n + 1'), opts:['Бракує двокрапки після умови', 'Бракує лапок', 'Неправильний відступ'], correct:0 },
+  { q:'Скільки разів виведеться «Привіт»?' + pyCode('n = 1\nwhile n <= 6:\n    print("Привіт")\n    n = n + 2'), opts:['3', '6', '2'], correct:0, why:'n набуває значень 1, 3, 5, а 7 вже більше за 6.' },
+  { q:'Коли тіло циклу не виконається <b>жодного</b> разу?', opts:['Коли умова неправдива вже на першій перевірці', 'Коли в циклі є print()', 'Такого не буває'], correct:0 }
+], {summary:'Тепер ти вмієш писати цикл while з лічильником, уникати нескінченних циклів і виходити з циклу через break.', html:true});
+</script>
+
+</body>
+</html>
