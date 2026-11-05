@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Сортування, фільтрування та зведені таблиці — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в інтерфейсі Google Таблиць -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  /* Гама «лійка й сходинки»: синій + помаранчевий */
+  :root{
+    --pri:#1A5FB4; --pri-dark:#124A8C; --org:#C2570C; --org-dark:#9A4309; --grn:#188038; --grn-dark:#0D652D;
+    --accent:var(--pri); --accent-dark:var(--pri-dark); --accent-soft:#E6EEF9;
+    --label:var(--org);
+    --bg:#F5F8FC; --ink:#14233A; --ink-soft:#56657D; --line:#DCE5F2; --surface:#FFFFFF;
+    --note:var(--grn); --note-soft:#E6F4EA; --note-ink:var(--grn-dark);
+    --sun:var(--org); --sun-soft:#FDF0E6; --sun-ink:var(--org-dark);
+    --hud-bar:linear-gradient(90deg,var(--pri),var(--org));
+  }
+
+  .menu{font-family:'Baloo 2',sans-serif; font-weight:700; color:var(--pri-dark);}
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; background:#EEF2F8; padding:1px 6px; border-radius:5px; font-size:.92em;}
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:18px; line-height:1; display:inline-block; vertical-align:middle; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em;}
+
+  /* Крок 1: дві дії */
+  .duo{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:14px;}
+  @media (max-width:600px){ .duo{grid-template-columns:1fr;} }
+  .duo-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px; text-align:center;}
+  .duo-card svg{width:100%; max-width:230px; height:auto;}
+  .duo-card h3{font-size:17px; margin:6px 0 2px;}
+  .duo-card p{margin:0; font-size:14px; color:var(--ink-soft);}
+
+  /* Крок 1: картки однакового розміру, кожна в один рядок */
+  #kindPool{display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:8px;}
+  #kindPool .sort-chip{max-width:none; white-space:nowrap; text-align:center;}
+  .bucket .sort-chip.placed{white-space:normal;}
+  @media (min-width:640px){ #kindPool{grid-template-columns:repeat(3,1fr);} }
+
+  /* Імітація Google Таблиць */
+  .gs{--g-line:#E1E3E1; --g-blue:#0B57D0; position:relative; font-family:'Roboto',sans-serif; color:#1F1F1F; background:#F9FBFD; border:1px solid #DADCE0; border-radius:10px; font-size:12.5px; user-select:none;}
+  .gs .ms{color:#444746;}
+  .gs-top{display:flex; align-items:center; gap:8px; padding:8px 10px 4px;}
+  .gs-top img{width:15px; height:20px;}
+  .gs-top .name{font-size:14px;}
+  .gs-menu{display:flex; flex-wrap:wrap; gap:2px; padding:0 6px 6px; font-size:13.5px;}
+  .gs-menu span{padding:3px 7px; border-radius:4px; color:#1F1F1F;}
+  .gs-menu .act{cursor:pointer; box-shadow:inset 0 0 0 1.5px #A8C7FA; background:#fff;}
+  .gs-menu .act:hover{background:#E8F0FE;}
+  .gs-menu .open{background:#E1E5EA; box-shadow:none;}
+  .gs-scroll{overflow-x:auto; background:#fff; border-top:1px solid #DADCE0; border-radius:0 0 10px 10px;}
+  .gs-grid{border-collapse:collapse; width:100%; min-width:520px; background:#fff;}
+  .gs-grid th, .gs-grid td{border:1px solid var(--g-line); height:26px; padding:0 6px; white-space:nowrap;}
+  .gs-grid th{background:#F8F9FA; color:#444746; font-weight:500; font-size:11px; text-align:center;}
+  .gs-grid th.rn{width:28px;}
+  .gs-grid th.col{cursor:pointer;}
+  .gs-grid th.col:hover{background:#E8EAED;}
+  .gs-grid th.sel{background:#D3E3FD; color:#0B57D0;}
+  .gs-grid td.sel{background:#E8F0FE;}
+  .gs-grid tr.hdr td{font-weight:700;}
+  .gs-grid tr.hdr th, .gs-grid tr.hdr td{border-bottom:3px solid #C4C7C5;}
+  .gs-grid td.num{text-align:right;}
+  .gs-grid tr.moved td{animation:rowIn .45s ease;}
+  @keyframes rowIn{from{background:#FFF4D6;}}
+  .gs-grid td .fh{display:flex; align-items:center; justify-content:space-between; gap:4px;}
+  .gs-grid .fbtn{border:0; background:none; padding:0; cursor:pointer; display:inline-flex; border-radius:3px;}
+  .gs-grid .fbtn .ms{font-size:16px; color:#188038;}
+  .gs-grid .fbtn.on{background:#CEEAD6;}
+  .gs-grid.filtered th.rn{color:#188038;}
+  .gs.shake{animation:shakeX .35s ease;}
+
+  .dd{position:absolute; z-index:5; background:#fff; border-radius:6px; box-shadow:0 2px 6px rgba(60,64,67,.25), 0 1px 2px rgba(60,64,67,.2); padding:6px 0; min-width:220px; font-size:13px;}
+  .dd .it{display:flex; align-items:center; gap:10px; padding:6px 14px; white-space:nowrap; cursor:pointer;}
+  .data-dd{max-width:calc(100% - 8px);}
+  .data-dd .it{white-space:normal;}
+  .dd .it:hover{background:#E8EAED;}
+  .dd .it.off{color:#9AA0A6; cursor:default;}
+  .dd .it.off:hover{background:none;}
+  .dd .it.off .ms{color:#C4C7C5;}
+  .dd .sep{height:1px; background:#E1E3E1; margin:5px 0;}
+  .dd .it .r{margin-left:auto;}
+  .dd .it.on{background:#E8EAED;}
+  .sub-dd{z-index:6; min-width:0; max-width:calc(100% - 8px);}
+  .sub-dd .it{white-space:normal;}
+  .dd .hint{padding:2px 14px 6px; color:#B3261E; font-size:12px; white-space:normal; max-width:240px;}
+
+  /* Панель фільтра стовпця */
+  .fp{position:absolute; z-index:6; width:250px; background:#fff; border-radius:6px; box-shadow:0 2px 8px rgba(60,64,67,.3); padding:8px 0 10px; font-size:13px;}
+  .fp .it{padding:6px 14px; cursor:pointer;}
+  .fp .it:hover{background:#E8EAED;}
+  .fp .sep{height:1px; background:#E1E3E1; margin:5px 0;}
+  .fp .sec{padding:4px 14px; font-weight:500; display:flex; align-items:center; gap:6px;}
+  .fp .links{padding:2px 14px 4px; display:flex; gap:12px;}
+  .fp .links a{color:#0B57D0; cursor:pointer; text-decoration:underline;}
+  .fp .vals{max-height:150px; overflow:auto; padding:2px 14px;}
+  .fp label{display:flex; align-items:center; gap:8px; padding:3px 0; cursor:pointer;}
+  .fp input[type=checkbox]{accent-color:#188038; width:16px; height:16px;}
+  .fp .cond{padding:4px 14px; display:flex; flex-direction:column; gap:6px;}
+  .fp select, .fp input[type=number]{font:13px 'Roboto',sans-serif; border:1px solid #747775; border-radius:4px; padding:5px 6px; background:#fff;}
+  .fp .btns{display:flex; justify-content:flex-end; gap:8px; padding:8px 14px 0;}
+  .fp .btns button{font:500 13px 'Roboto',sans-serif; border-radius:999px; padding:6px 16px; cursor:pointer; border:1px solid #747775; background:#fff; color:#0B57D0;}
+  .fp .btns .ok{background:#188038; border-color:#188038; color:#fff;}
+
+  /* Завдання емуляторів */
+  .task{display:flex; gap:10px; align-items:flex-start; background:var(--sun-soft); border:1.5px solid #F3C9A5; border-radius:var(--radius-m); padding:10px 14px; margin-bottom:12px; font-weight:700;}
+  .task .tn{flex-shrink:0; font-family:'Nunito Sans',sans-serif; font-weight:800; background:var(--org); color:#fff; border-radius:999px; padding:0 10px; font-size:13px; line-height:24px; white-space:nowrap; word-spacing:2px;}
+  .task.done{background:var(--note-soft); border-color:#A8D5B5;}
+  .task.done .tn{background:var(--grn);}
+  .task > span:not(.tn){flex:1;}
+  .task .next{flex-shrink:0; align-self:center; font-size:14px; padding:6px 14px;}
+  @media (max-width:600px){ .task{flex-wrap:wrap;} .task > span:not(.tn){flex:1 1 calc(100% - 90px);} .task .next{margin-left:auto;} }
+  .emu-fb{min-height:24px; font-size:14px; margin-top:10px;}
+  .emu-fb.err{color:#B3261E;}
+  .emu-fb.ok{color:var(--grn-dark); font-weight:700;}
+  .vis{font-size:12px; color:#5F6368; padding:6px 10px;}
+
+  /* Крок 4: звіт і зведена таблиця */
+  .rep{display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px; margin:14px 0 16px;}
+  .rep svg{height:auto;}
+  .rep .cap{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; text-align:center; color:var(--ink-soft);}
+
+  /* Крок 4: конструктор зведеної таблиці */
+  .pv{display:grid; grid-template-columns:minmax(0,1fr) 250px; gap:0;}
+  @media (max-width:700px){ .pv{grid-template-columns:minmax(0,1fr);} }
+  .pv-res{background:#fff; border-top:1px solid #DADCE0; overflow-x:auto; min-height:220px; border-bottom-left-radius:10px;}
+  .pv-empty{padding:30px 16px; color:#5F6368; text-align:center;}
+  .pv-ed{background:#fff; border-top:1px solid #DADCE0; border-left:1px solid #DADCE0; padding:10px 12px; border-bottom-right-radius:10px;}
+  @media (max-width:700px){ .pv-ed{border-left:0; border-radius:0 0 10px 10px;} .pv-res{border-radius:0;} }
+  .pv-ed h4{margin:0 0 8px; font:500 14px 'Roboto',sans-serif;}
+  .pv-sec{border-top:1px solid #E1E3E1; padding:8px 0; position:relative;}
+  .pv-sec .head{display:flex; align-items:center; justify-content:space-between; font-weight:500;}
+  .pv-add{font:500 12.5px 'Roboto',sans-serif; color:#0B57D0; background:#fff; border:1px solid #C4C7C5; border-radius:999px; padding:3px 12px; cursor:pointer;}
+  .pv-add:hover{background:#E8F0FE;}
+  .pv-chip{display:flex; align-items:center; gap:6px; background:#F1F3F4; border-radius:6px; padding:6px 8px; margin-top:6px; flex-wrap:wrap;}
+  .pv-chip b{font-weight:500; flex:1;}
+  .pv-chip .rm{cursor:pointer; color:#5F6368; border:0; background:none; padding:0; display:inline-flex;}
+  .pv-chip select{font:12px 'Roboto',sans-serif; border:1px solid #C4C7C5; border-radius:4px; padding:2px 4px; background:#fff;}
+  .pv-chip .sm{width:100%; font-size:11.5px; color:#5F6368; display:flex; align-items:center; gap:6px;}
+  .pv-sec .dd{right:0; top:34px; min-width:150px;}
+  .pv-grid{border-collapse:collapse; margin:10px; font-size:12.5px;}
+  .pv-grid th, .pv-grid td{border:1px solid #E1E3E1; padding:4px 10px; white-space:nowrap;}
+  .pv-grid th{background:#E8F0FE; font-weight:500; text-align:left;}
+  .pv-grid td.num{text-align:right;}
+  .pv-grid tr.tot td{font-weight:700; background:#F8F9FA;}
+</style>
+</head>
+<body data-lesson="lesson9-sort-filter-pivot" data-hud="9 клас · Сортування, фільтри, зведені таблиці">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Впорядкування даних</div>
+      <h1>Сортуй, фільтруй, підсумовуй</h1>
+      <p>Таблиця на сотню рядків мовчить, поки ти не поставиш їй запитання. Навчимося впорядковувати записи, відбирати потрібні й складати з них звіт — зведену таблицю в Google Таблицях.</p>
+      <button class="btn-primary" onclick="document.getElementById('start').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: лійка-фільтр, крізь яку проходять лише сині кульки, і сходинки відсортованих стовпчиків -->
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="62" fill="#E6EEF9"/>
+      <circle cx="40" cy="20" r="6" fill="#1A5FB4"/><circle cx="58" cy="14" r="6" fill="#F28C38"/><circle cx="76" cy="22" r="6" fill="#1A5FB4"/><circle cx="94" cy="15" r="6" fill="#F28C38"/>
+      <path d="M26 34h88L80 70v26l-20 10V70z" fill="#fff" stroke="#1A5FB4" stroke-width="4" stroke-linejoin="round"/>
+      <circle cx="56" cy="52" r="3.5" fill="#14233A"/><circle cx="84" cy="52" r="3.5" fill="#14233A"/>
+      <path d="M62 60q8 6 16 0" stroke="#14233A" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="70" cy="114" r="5.5" fill="#1A5FB4"/>
+      <rect x="94" y="104" width="9" height="16" rx="2" fill="#C2570C"/><rect x="106" y="94" width="9" height="26" rx="2" fill="#C2570C"/><rect x="118" y="82" width="9" height="38" rx="2" fill="#C2570C"/>
+      <rect x="14" y="104" width="9" height="16" rx="2" fill="#188038"/><rect x="26" y="96" width="9" height="24" rx="2" fill="#188038" opacity=".7"/><rect x="38" y="108" width="9" height="12" rx="2" fill="#188038" opacity=".45"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="start">
+    <div class="step-label">Крок 1 · Дві різні дії</div>
+    <h2>Сортування чи фільтрація?</h2>
+    <p>Шкільний благодійний ярмарок записує кожен продаж у таблицю. Щоб у ній розібратися, є дві дії:</p>
+    <ul>
+      <li><b>Сортування</b> — записи шикуються в певному порядку: за абеткою, від меншого до більшого чи навпаки. Жоден не зникає.</li>
+      <li><b>Фільтрація</b> — на екрані лишаються лише записи, що відповідають умові. Інші сховані, але не видалені.</li>
+    </ul>
+    <div class="duo">
+      <div class="duo-card">
+        <svg viewBox="0 0 220 90" fill="none">
+          <rect x="10" y="40" width="22" height="40" rx="3" fill="#1A5FB4"/><rect x="40" y="20" width="22" height="60" rx="3" fill="#1A5FB4"/><rect x="70" y="56" width="22" height="24" rx="3" fill="#1A5FB4"/>
+          <path d="M100 50h22m-7-7 7 7-7 7" stroke="#C2570C" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="130" y="56" width="22" height="24" rx="3" fill="#1A5FB4"/><rect x="160" y="40" width="22" height="40" rx="3" fill="#1A5FB4"/><rect x="190" y="20" width="22" height="60" rx="3" fill="#1A5FB4"/>
+        </svg>
+        <h3>Сортування</h3>
+        <p>Ті самі записи, інший порядок.</p>
+      </div>
+      <div class="duo-card">
+        <svg viewBox="0 0 220 90" fill="none">
+          <circle cx="20" cy="30" r="9" fill="#1A5FB4"/><circle cx="44" cy="52" r="9" fill="#F28C38"/><circle cx="66" cy="28" r="9" fill="#1A5FB4"/><circle cx="84" cy="60" r="9" fill="#F28C38"/><circle cx="30" cy="72" r="9" fill="#1A5FB4"/>
+          <path d="M100 50h22m-7-7 7 7-7 7" stroke="#C2570C" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="150" cy="30" r="9" fill="#1A5FB4"/><circle cx="176" cy="30" r="9" fill="#1A5FB4"/><circle cx="202" cy="30" r="9" fill="#1A5FB4"/>
+          <circle cx="163" cy="66" r="9" stroke="#C4C7C5" stroke-width="2" stroke-dasharray="3 3"/><circle cx="189" cy="66" r="9" stroke="#C4C7C5" stroke-width="2" stroke-dasharray="3 3"/>
+        </svg>
+        <h3>Фільтрація</h3>
+        <p>Лише потрібні записи, решта — сховані.</p>
+      </div>
+    </div>
+    <p class="soft">Що потрібно в кожній ситуації? Клацни картку, а потім кошик.</p>
+    <div class="exercise">
+      <div class="sort-buckets three">
+        <div class="bucket" id="bkSort"><div class="bucket-title">Сортування</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkFilter"><div class="bucket-title">Фільтрація</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkBoth"><div class="bucket-title">І те, і те</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="kindPool"></div>
+      <div class="progress-line" id="kindProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Сортування в Google Таблицях</div>
+    <h2>Шикуємо продажі</h2>
+    <p>Щоб відсортувати таблицю, виділи стовпець, за яким шикуватимеш записи, і відкрий меню <span class="menu">Дані → Відсортувати аркуш</span>. У підменю обери порядок:</p>
+    <ul>
+      <li><b>Сортувати аркуш за стовпцем … (від А до Я)</b> — за абеткою; для чисел — від меншого до більшого.</li>
+      <li><b>Сортувати аркуш за стовпцем … (від Я до А)</b> — у зворотному порядку; для чисел — від більшого до меншого.</li>
+    </ul>
+    <div class="note">Рядок 1 з назвами полів має бути закріплений — тоді сортування його не зачепить і він лишиться вгорі.</div>
+    <p class="soft">Виконай завдання: клацни літеру стовпця, а потім — меню «Дані».</p>
+    <div class="exercise">
+      <div class="task" id="sortTask"></div>
+      <div class="gs" id="sortGs"></div>
+      <div class="emu-fb" id="sortFb"></div>
+    </div>
+    <h3 style="margin-top:26px;">Аркуш чи діапазон?</h3>
+    <p>У меню «Дані» є два схожі пункти:</p>
+    <ul>
+      <li><b>Відсортувати аркуш</b> — переставляє всі рядки аркуша цілком. Кожен запис переїжджає разом з усіма своїми полями.</li>
+      <li><b>Відсортувати діапазон</b> — переставляє лише виділені клітинки, а решта аркуша стоїть на місці. Це зручно, коли на аркуші кілька окремих таблиць.</li>
+    </ul>
+    <div class="duo">
+      <div class="duo-card">
+        <svg viewBox="0 0 230 90" fill="none"><rect x="10" y="8" width="26" height="14" rx="3" fill="#1A5FB4"/><rect x="10" y="28" width="26" height="14" rx="3" fill="#F28C38"/><rect x="10" y="48" width="26" height="14" rx="3" fill="#2E9E5B"/><rect x="10" y="68" width="26" height="14" rx="3" fill="#9C6ADE"/><rect x="40" y="8" width="26" height="14" rx="3" fill="#1A5FB4"/><rect x="40" y="28" width="26" height="14" rx="3" fill="#F28C38"/><rect x="40" y="48" width="26" height="14" rx="3" fill="#2E9E5B"/><rect x="40" y="68" width="26" height="14" rx="3" fill="#9C6ADE"/><rect x="70" y="8" width="26" height="14" rx="3" fill="#1A5FB4"/><rect x="70" y="28" width="26" height="14" rx="3" fill="#F28C38"/><rect x="70" y="48" width="26" height="14" rx="3" fill="#2E9E5B"/><rect x="70" y="68" width="26" height="14" rx="3" fill="#9C6ADE"/><path d="M104 45h22m-7-7 7 7-7 7" stroke="#C2570C" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="134" y="8" width="26" height="14" rx="3" fill="#2E9E5B"/><rect x="134" y="28" width="26" height="14" rx="3" fill="#1A5FB4"/><rect x="134" y="48" width="26" height="14" rx="3" fill="#9C6ADE"/><rect x="134" y="68" width="26" height="14" rx="3" fill="#F28C38"/><rect x="164" y="8" width="26" height="14" rx="3" fill="#2E9E5B"/><rect x="164" y="28" width="26" height="14" rx="3" fill="#1A5FB4"/><rect x="164" y="48" width="26" height="14" rx="3" fill="#9C6ADE"/><rect x="164" y="68" width="26" height="14" rx="3" fill="#F28C38"/><rect x="194" y="8" width="26" height="14" rx="3" fill="#2E9E5B"/><rect x="194" y="28" width="26" height="14" rx="3" fill="#1A5FB4"/><rect x="194" y="48" width="26" height="14" rx="3" fill="#9C6ADE"/><rect x="194" y="68" width="26" height="14" rx="3" fill="#F28C38"/></svg>
+        <h3>Відсортувати аркуш</h3>
+        <p>Рядки переїжджають цілими.</p>
+      </div>
+      <div class="duo-card">
+        <svg viewBox="0 0 230 90" fill="none"><rect x="10" y="8" width="26" height="14" rx="3" fill="#1A5FB4"/><rect x="10" y="28" width="26" height="14" rx="3" fill="#F28C38"/><rect x="10" y="48" width="26" height="14" rx="3" fill="#2E9E5B"/><rect x="10" y="68" width="26" height="14" rx="3" fill="#9C6ADE"/><rect x="40" y="8" width="26" height="14" rx="3" fill="#1A5FB4"/><rect x="40" y="28" width="26" height="14" rx="3" fill="#F28C38"/><rect x="40" y="48" width="26" height="14" rx="3" fill="#2E9E5B"/><rect x="40" y="68" width="26" height="14" rx="3" fill="#9C6ADE"/><rect x="70" y="8" width="26" height="14" rx="3" fill="#1A5FB4"/><rect x="70" y="28" width="26" height="14" rx="3" fill="#F28C38"/><rect x="70" y="48" width="26" height="14" rx="3" fill="#2E9E5B"/><rect x="70" y="68" width="26" height="14" rx="3" fill="#9C6ADE"/><rect x="67" y="4" width="32" height="80" rx="4" stroke="#1A73E8" stroke-width="2" stroke-dasharray="4 3"/><path d="M104 45h22m-7-7 7 7-7 7" stroke="#C2570C" stroke-width="3.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="134" y="8" width="26" height="14" rx="3" fill="#1A5FB4"/><rect x="134" y="28" width="26" height="14" rx="3" fill="#F28C38"/><rect x="134" y="48" width="26" height="14" rx="3" fill="#2E9E5B"/><rect x="134" y="68" width="26" height="14" rx="3" fill="#9C6ADE"/><rect x="164" y="8" width="26" height="14" rx="3" fill="#1A5FB4"/><rect x="164" y="28" width="26" height="14" rx="3" fill="#F28C38"/><rect x="164" y="48" width="26" height="14" rx="3" fill="#2E9E5B"/><rect x="164" y="68" width="26" height="14" rx="3" fill="#9C6ADE"/><rect x="194" y="8" width="26" height="14" rx="3" fill="#2E9E5B"/><rect x="194" y="28" width="26" height="14" rx="3" fill="#1A5FB4"/><rect x="194" y="48" width="26" height="14" rx="3" fill="#9C6ADE"/><rect x="194" y="68" width="26" height="14" rx="3" fill="#F28C38"/><rect x="191" y="4" width="32" height="80" rx="4" stroke="#1A73E8" stroke-width="2" stroke-dasharray="4 3"/></svg>
+        <h3>Відсортувати діапазон</h3>
+        <p>Рухаються лише виділені клітинки.</p>
+      </div>
+    </div>
+    <div class="trivia"><b>Обережно — помилка!</b> Якщо виділити лише один стовпець і відсортувати діапазон, переставляться тільки його клітинки. Значення відірвуться від своїх рядків і потраплять до чужих записів — дані в таблиці перемішаються. Тому, сортуючи діапазон, виділяй <b>усі</b> стовпці таблиці.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Фільтр у Google Таблицях</div>
+    <h2>Відбираємо потрібні продажі</h2>
+    <p>Меню <span class="menu">Дані → Створити фільтр</span> додає в кожну назву поля значок <span class="ms" style="color:#188038">filter_list</span>. Клацни його — і обери, як відбирати записи:</p>
+    <ul>
+      <li><b>Фільтрувати за значеннями</b> — ставиш позначки біля потрібних значень зі списку: «5-А», «Напої».</li>
+      <li><b>Фільтрувати за умовою</b> — задаєш правило: «більше ніж 200».</li>
+    </ul>
+    <p>Фільтри можна вмикати в кількох стовпцях одразу — тоді лишаються лише рядки, що підходять під <b>усі</b> умови.</p>
+    <div class="note">Звичайний фільтр у спільній таблиці бачать усі. Щоб не заважати однокласникам, створюють <b>режим фільтра</b>: <span class="menu">Дані → Створити режим фільтра</span>. Його бачиш лише ти.</div>
+    <div class="exercise">
+      <div class="task" id="filtTask"></div>
+      <div class="gs" id="filtGs"></div>
+      <div class="emu-fb" id="filtFb"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Звіт і зведена таблиця</div>
+    <h2>Із сотні рядків — кілька підсумків</h2>
+    <p><b>Звіт</b> — це підсумок даних у вигляді, зручному для читання: його переглядають, друкують, зберігають у PDF. Звіт не редагують — він лише показує дані з таблиць.</p>
+    <p>У Google Таблицях звіт складає <b>зведена таблиця</b>: вона групує записи за полем і рахує для кожної групи підсумок — суму, кількість чи середнє.</p>
+    <div class="rep">
+      <div>
+        <svg viewBox="0 0 120 120" width="120"><g fill="#DCE5F2">
+          <rect x="6" y="4" width="108" height="7" rx="2" fill="#1A5FB4"/>
+          <rect x="6" y="15" width="108" height="6" rx="2"/><rect x="6" y="24" width="108" height="6" rx="2"/><rect x="6" y="33" width="108" height="6" rx="2"/><rect x="6" y="42" width="108" height="6" rx="2"/><rect x="6" y="51" width="108" height="6" rx="2"/><rect x="6" y="60" width="108" height="6" rx="2"/><rect x="6" y="69" width="108" height="6" rx="2"/><rect x="6" y="78" width="108" height="6" rx="2"/><rect x="6" y="87" width="108" height="6" rx="2"/><rect x="6" y="96" width="108" height="6" rx="2"/><rect x="6" y="105" width="108" height="6" rx="2"/>
+        </g></svg>
+        <div class="cap">12 продажів</div>
+      </div>
+      <svg viewBox="0 0 60 30" width="60"><path d="M6 15h44m-10-9 10 9-10 9" stroke="#C2570C" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div>
+        <table class="pv-grid" style="margin:0; background:#fff;">
+          <tr><th>Клас</th><th>SUM — Сума, грн</th></tr>
+          <tr><td>5-А</td><td class="num">510</td></tr><tr><td>6-Б</td><td class="num">500</td></tr><tr><td>7-А</td><td class="num">535</td></tr><tr><td>8-В</td><td class="num">620</td></tr>
+          <tr class="tot"><td>Загальний підсумок</td><td class="num">2165</td></tr>
+        </table>
+        <div class="cap">Скільки зібрав кожен клас</div>
+      </div>
+    </div>
+    <p>Щоб створити зведену таблицю, клацни в таблиці з даними й обери <span class="menu">Вставити → Зведена таблиця</span>. У редакторі є розділи:</p>
+    <ul>
+      <li><b>Рядки</b> — за яким полем групувати записи (кожне значення — окремий рядок звіту).</li>
+      <li><b>Стовпці</b> — друге поле для групування, його значення стають стовпцями.</li>
+      <li><b>Значення</b> — що рахувати: <span class="mono">SUM</span> — суму, <span class="mono">COUNTA</span> — кількість записів, <span class="mono">AVERAGE</span> — середнє.</li>
+    </ul>
+    <div class="exercise">
+      <div class="task" id="pvTask"></div>
+      <div class="gs" id="pvGs">
+        <div class="gs-top"><img src="images/sheets.svg" alt=""><span class="name">Ярмарок · аркуш «Зведена таблиця 1»</span></div>
+        <div class="pv">
+          <div class="pv-res" id="pvRes"></div>
+          <div class="pv-ed" id="pvEd"></div>
+        </div>
+      </div>
+      <div class="emu-fb" id="pvFb2"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Сортування та фільтрація даних. Звіти в базах даних. Подання фільтрів і зведені таблиці в Google Таблицях» · 9 клас</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- СПІЛЬНІ ДАНІ: ПРОДАЖІ ЯРМАРКУ ---------- */
+const FIELDS = ['ID', 'Клас', 'Товар', 'Категорія', 'Кількість', 'Сума, грн'];
+const NUMERIC = [true, false, false, false, true, true];
+const SALES = [
+  [1, '5-А', 'Печиво', 'Випічка', 12, 240],
+  [2, '6-Б', 'Лимонад', 'Напої', 8, 160],
+  [3, '7-А', 'Браслет', 'Вироби', 5, 250],
+  [4, '5-А', 'Какао', 'Напої', 10, 150],
+  [5, '8-В', 'Пиріжки', 'Випічка', 15, 300],
+  [6, '6-Б', 'Листівка', 'Вироби', 9, 90],
+  [7, '7-А', 'Кекси', 'Випічка', 6, 180],
+  [8, '8-В', 'Чай', 'Напої', 14, 140],
+  [9, '5-А', 'Брелок', 'Вироби', 4, 120],
+  [10, '6-Б', 'Пончики', 'Випічка', 10, 250],
+  [11, '7-А', 'Компот', 'Напої', 7, 105],
+  [12, '8-В', 'Магніт', 'Вироби', 6, 180]
+];
+const LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
+const MENU = ['Файл', 'Змінити', 'Вигляд', 'Вставити', 'Формат', 'Дані', 'Інструменти'];
+const cmp = (c, dir)=>(a, b)=>{
+  const r = NUMERIC[c] ? a[c] - b[c] : String(a[c]).localeCompare(String(b[c]), 'uk');
+  return dir === 'desc' ? -r : r;
+};
+function flash(el){ el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); setTimeout(()=>el.classList.remove('shake'), 400); }
+// Спадне меню «Дані» — одразу під своїм пунктом, не за межами макета
+function placeMenu(gs){
+  const dd = gs.querySelector('.data-dd'), m = gs.querySelector('[data-menu]');
+  if(!dd || !m) return;
+  const box = gs.getBoundingClientRect(), r = m.getBoundingClientRect();
+  dd.style.top = (r.bottom - box.top + 2) + 'px';
+  dd.style.left = Math.max(4, Math.min(r.left - box.left, box.width - dd.offsetWidth - 4)) + 'px';
+  // Підменю — праворуч від свого пункту, а якщо не вміщається — під ним
+  const sub = gs.querySelector('.sub-dd'), it = gs.querySelector('[data-sub]');
+  if(!sub || !it) return;
+  const a = it.getBoundingClientRect();
+  let left = a.right - box.left - 6, top = a.top - box.top - 6;
+  if(left + sub.offsetWidth > box.width - 4){ left = Math.max(4, box.width - sub.offsetWidth - 4); top = a.bottom - box.top + 2; }
+  sub.style.left = left + 'px'; sub.style.top = top + 'px';
+}
+// Меню «Дані», як у Google Таблицях; o.sort — підменю «Відсортувати аркуш» доступне, o.sub — воно відкрите, o.L — літера виділеного стовпця
+function dataMenu(o){
+  const off = (icon, t, arrow)=>`<div class="it off"><span class="ms">${icon}</span>${t}${arrow ? '<span class="ms r">arrow_right</span>' : ''}</div>`;
+  let h = `<div class="dd data-dd">`
+    + (o.sort ? `<div class="it${o.sub ? ' on' : ''}" data-sub><span class="ms">sort</span>Відсортувати аркуш<span class="ms r">arrow_right</span></div>` : off('sort', 'Відсортувати аркуш', true))
+    + off('sort', 'Відсортувати діапазон', true) + '<div class="sep"></div>'
+    + (o.filter === undefined ? off('filter_alt', 'Створити фільтр')
+       : o.filter ? `<div class="it" data-toggle><span class="ms">filter_alt_off</span>Вилучити фільтр</div>` : `<div class="it" data-toggle><span class="ms">filter_alt</span>Створити фільтр</div>`)
+    + off('filter_list', 'Створити режим фільтра') + '<div class="sep"></div>'
+    + off('rule', 'Перевірка даних') + '</div>';
+  if(o.sub) h += `<div class="dd sub-dd">` + (o.L
+      ? `<div class="it" data-sort="asc">Сортувати аркуш за стовпцем ${o.L} (від А до Я)</div><div class="it" data-sort="desc">Сортувати аркуш за стовпцем ${o.L} (від Я до А)</div>`
+      : `<div class="it off">Сортувати аркуш за стовпцем…</div><div class="hint">Спершу клацни літеру стовпця вгорі таблиці.</div>`) + '</div>';
+  return h;
+}
+function closeOnOutside(root, isOpen, close){
+  document.addEventListener('pointerdown', e=>{ if(isOpen() && !root.contains(e.target)) close(); });
+  document.addEventListener('keydown', e=>{ if(e.key === 'Escape' && isOpen()) close(); });
+}
+
+/* ---------- КРОК 1: СОРТУВАННЯ ЧИ ФІЛЬТРАЦІЯ ---------- */
+makeSortBoard('kindPool', { s:'bkSort', f:'bkFilter', b:'bkBoth' }, [
+  { text:'Рейтинг класів за сумою', bucket:'s' },
+  { text:'Прізвища учнів за абеткою', bucket:'s' },
+  { text:'Найновіші записи — угорі', bucket:'s' },
+  { text:'Товари від найдешевшого', bucket:'s' },
+  { text:'Лише напої', bucket:'f' },
+  { text:'Лише продажі класу 6-Б', bucket:'f' },
+  { text:'Без товарів, яких продали 0', bucket:'f' },
+  { text:'Лише книжки 2020 року', bucket:'f' },
+  { text:'Три найдешевші з випічки', bucket:'b' },
+  { text:'Учні 9-Б від найвищого балу', bucket:'b' },
+  { text:'Напої від найдорожчого', bucket:'b' },
+  { text:'Учні 7-А за абеткою', bucket:'b' }
+], 'kindProgress');
+
+/* ---------- КРОК 2: ЕМУЛЯТОР СОРТУВАННЯ ---------- */
+(function(){
+  const TASKS = [
+    { text:'Хто продав найдорожче? Упорядкуй продажі за сумою — від найбільшої до найменшої.', col:5, dir:'desc',
+      done:'Угорі — пиріжки 8-В на 300 грн.' },
+    { text:'Склади абетковий список товарів.', col:2, dir:'asc',
+      done:'Першим стоїть «Браслет», останнім — «Чай».' },
+    { text:'Розстав продажі так, щоб записи кожного класу стояли поруч.', col:1, dir:'any',
+      done:'Тепер продажі кожного класу йдуть групою.' }
+  ];
+  const gs = document.getElementById('sortGs');
+  const taskEl = document.getElementById('sortTask');
+  const fb = document.getElementById('sortFb');
+  const hit = trackTask(gs, TASKS.length, TASKS.length + 2);
+  let rows = SALES.slice(), sel = null, menu = false, sub = false, t = 0, moved = false;
+
+  function draw(){
+    const finished = t === TASKS.length;
+    taskEl.className = 'task' + (finished ? ' done' : '');
+    taskEl.innerHTML = finished ? '<span class="tn">✓</span><span>Усі три завдання виконано!</span>'
+      : `<span class="tn">${t + 1} з ${TASKS.length}</span><span>${TASKS[t].text}</span>`;
+    let h = `<div class="gs-top"><img src="images/sheets.svg" alt=""><span class="name">Ярмарок · аркуш «Продажі»</span></div>`
+      + `<div class="gs-menu">${MENU.map(m=>`<span class="${m === 'Дані' ? 'act' + (menu ? ' open' : '') : ''}" ${m === 'Дані' ? 'data-menu' : ''}>${m}</span>`).join('')}</div>`;
+    if(menu) h += dataMenu({ sort:true, sub, L: sel === null ? null : LETTERS[sel] });
+    h += `<div class="gs-scroll"><table class="gs-grid"><tr><th class="rn"></th>${LETTERS.map((l, i)=>`<th class="col${i === sel ? ' sel' : ''}" data-col="${i}">${l}</th>`).join('')}</tr>`
+      + `<tr class="hdr"><th>1</th>${FIELDS.map((f, i)=>`<td class="${i === sel ? 'sel' : ''}">${f}</td>`).join('')}</tr>`
+      + rows.map((r, k)=>`<tr class="${moved ? 'moved' : ''}"><th>${k + 2}</th>${r.map((v, i)=>`<td class="${NUMERIC[i] ? 'num' : ''}${i === sel ? ' sel' : ''}">${v}</td>`).join('')}</tr>`).join('')
+      + `</table></div>`;
+    gs.innerHTML = h;
+    placeMenu(gs);
+    moved = false;
+  }
+  function sortBy(dir){
+    rows.sort(cmp(sel, dir));
+    menu = false; sub = false; moved = true;
+    if(t < TASKS.length){
+      const T = TASKS[t];
+      if(sel === T.col && (T.dir === 'any' || T.dir === dir)){
+        fb.className = 'emu-fb ok'; fb.textContent = 'Правильно ✓ ' + T.done;
+        addNeurons(1); hit(); t++;
+        if(t === TASKS.length) addNeurons(2);
+      } else {
+        fb.className = 'emu-fb err';
+        if(sel !== T.col) fb.textContent = `Таблицю відсортовано за полем «${FIELDS[sel]}». А в завданні потрібне інше поле.`;
+        else fb.textContent = dir === 'asc' ? 'Стовпець правильний, але «від А до Я» ставить угорі найменші значення. Спробуй навпаки.' : 'Стовпець правильний, але порядок навпаки: потрібно «від А до Я».';
+        flash(gs);
+      }
+    }
+    draw();
+  }
+  gs.addEventListener('click', e=>{
+    const c = e.target.closest('[data-col]');
+    if(c){ sel = +c.dataset.col; menu = false; sub = false; draw(); return; }
+    if(e.target.closest('[data-menu]')){ menu = !menu; sub = false; draw(); return; }
+    if(e.target.closest('[data-sub]')){ sub = !sub; draw(); return; }
+    const s = e.target.closest('[data-sort]');
+    if(s){ sortBy(s.dataset.sort); return; }
+    // Клацання будь-де поза меню (по таблиці, порожньому місцю) — меню закривається
+    if(menu && !e.target.closest('.dd')){ menu = false; sub = false; draw(); }
+  });
+  closeOnOutside(gs, ()=>menu, ()=>{ menu = false; sub = false; draw(); });
+  draw();
+})();
+
+/* ---------- КРОК 3: ЕМУЛЯТОР ФІЛЬТРА ---------- */
+(function(){
+  const TASKS = [
+    { text:'Увімкни фільтр: меню «Дані → Створити фільтр».', on:true, done:'У назвах полів з\'явилися значки фільтра.' },
+    { text:'Буфетниця питає, що з випічки вже продано. Покажи лише випічку.', ids:[1, 5, 7, 10], done:'Видно чотири рядки випічки.' },
+    { text:'Тепер зніми фільтр категорії й покажи всі продажі на суму понад 200 грн.', ids:[1, 3, 5, 10], done:'Таких продажів чотири.' },
+    { text:'Покажи вироби, продані на суму понад 100 грн: потрібні фільтри у двох стовпцях.', ids:[3, 9, 12], done:'Лишилися браслет, брелок і магніт.' }
+  ];
+  const gs = document.getElementById('filtGs');
+  const taskEl = document.getElementById('filtTask');
+  const fb = document.getElementById('filtFb');
+  const hit = trackTask(gs, TASKS.length, TASKS.length + 2);
+  const uniq = c=>[...new Set(SALES.map(r=>r[c]))].sort((a, b)=>String(a).localeCompare(String(b), 'uk'));
+  let on = false, menu = false, open = null, t = 0, order = SALES.slice();
+  let filters = {};          // стовпець → {vals:Set} або {op, val}
+  let draft = null;          // те, що учень змінює у відкритій панелі
+
+  const pass = (r, c, f)=>{
+    if(!f) return true;
+    if(f.vals) return f.vals.has(r[c]);
+    if(!f.op || f.val === '' || isNaN(+f.val)) return true;
+    const v = +f.val;
+    return f.op === 'gt' ? r[c] > v : f.op === 'lt' ? r[c] < v : r[c] === v;
+  };
+  const isActive = c=>{
+    const f = filters[c];
+    if(!f) return false;
+    if(f.vals) return f.vals.size < uniq(c).length;
+    return !!f.op && f.val !== '';
+  };
+  const visible = ()=>order.filter(r=>Object.keys(filters).every(c=>pass(r, +c, filters[c])));
+
+  function draw(){
+    const finished = t === TASKS.length;
+    taskEl.className = 'task' + (finished ? ' done' : '');
+    taskEl.innerHTML = finished ? '<span class="tn">✓</span><span>Усі завдання виконано! Фільтр нічого не видалив — зніми позначки, і всі рядки повернуться.</span>'
+      : `<span class="tn">${t + 1} з ${TASKS.length}</span><span>${TASKS[t].text}</span>`;
+    const vis = visible();
+    const anyF = on && Object.keys(filters).some(c=>isActive(+c));
+    let h = `<div class="gs-top"><img src="images/sheets.svg" alt=""><span class="name">Ярмарок · аркуш «Продажі»</span></div>`
+      + `<div class="gs-menu">${MENU.map(m=>`<span class="${m === 'Дані' ? 'act' + (menu ? ' open' : '') : ''}" ${m === 'Дані' ? 'data-menu' : ''}>${m}</span>`).join('')}</div>`;
+    if(menu){
+      h += dataMenu({ filter:on });
+    }
+    h += `<div class="gs-scroll"><table class="gs-grid${anyF ? ' filtered' : ''}"><tr><th class="rn"></th>${LETTERS.map(l=>`<th>${l}</th>`).join('')}</tr>`
+      + `<tr class="hdr"><th>1</th>${FIELDS.map((f, i)=>on
+          ? `<td><div class="fh"><span>${f}</span><button class="fbtn${isActive(i) ? ' on' : ''}" data-fcol="${i}" title="Фільтр"><span class="ms">${isActive(i) ? 'filter_alt' : 'filter_list'}</span></button></div></td>`
+          : `<td>${f}</td>`).join('')}</tr>`
+      + vis.map(r=>`<tr><th>${order.indexOf(r) + 2}</th>${r.map((v, i)=>`<td class="${NUMERIC[i] ? 'num' : ''}">${v}</td>`).join('')}</tr>`).join('')
+      + `</table></div><div class="vis">Видно рядків: ${vis.length} з ${SALES.length}</div>`;
+    gs.innerHTML = h;
+    placeMenu(gs);
+    if(open !== null) drawPanel();
+  }
+
+  function drawPanel(){
+    const c = open, p = document.createElement('div');
+    p.className = 'fp';
+    let h = `<div class="it" data-psort="asc">Сортувати від А до Я</div><div class="it" data-psort="desc">Сортувати від Я до А</div><div class="sep"></div>`;
+    if(NUMERIC[c]){
+      h += `<div class="sec"><span class="ms">arrow_drop_down</span>Фільтрувати за умовою</div><div class="cond">`
+        + `<select data-op><option value="">Немає</option><option value="gt">Більше ніж</option><option value="lt">Менше ніж</option><option value="eq">Дорівнює</option></select>`
+        + `<input type="number" data-val placeholder="Значення або формула"${draft.op ? '' : ' disabled'}></div>`;
+    } else {
+      h += `<div class="sec"><span class="ms">arrow_drop_down</span>Фільтрувати за значеннями</div>`
+        + `<div class="links"><a data-all>Вибрати все</a><a data-none>Очистити</a></div><div class="vals">`
+        + uniq(c).map(v=>`<label><input type="checkbox" data-v="${v}"${draft.vals.has(v) ? ' checked' : ''}>${v}</label>`).join('') + `</div>`;
+    }
+    h += `<div class="btns"><button data-cancel>Скасувати</button><button class="ok" data-ok>OK</button></div>`;
+    p.innerHTML = h;
+    gs.appendChild(p);
+    if(NUMERIC[c]){ p.querySelector('[data-op]').value = draft.op || ''; p.querySelector('[data-val]').value = draft.val ?? ''; }
+    // Панель — під кнопкою фільтра свого стовпця, але не за межами макета
+    const btn = gs.querySelector(`[data-fcol="${c}"]`).getBoundingClientRect(), box = gs.getBoundingClientRect();
+    p.style.top = (btn.bottom - box.top + 4) + 'px';
+    p.style.left = Math.max(4, Math.min(btn.right - box.left - 250, box.width - 254)) + 'px';
+  }
+
+  function openPanel(c){
+    const f = filters[c];
+    draft = NUMERIC[c] ? { op: f?.op || '', val: f?.val ?? '' } : { vals: new Set(f?.vals || uniq(c)) };
+    open = c; menu = false; draw();
+  }
+
+  function check(changed){
+    if(t >= TASKS.length) return;
+    const T = TASKS[t];
+    if(T.on){ if(on) success(T); return; }
+    const ids = visible().map(r=>r[0]).sort((a, b)=>a - b);
+    if(ids.join() === T.ids.join()){ success(T); return; }
+    // Помилка — якщо щойно змінений фільтр сам по собі ховає потрібний рядок
+    if(changed !== undefined){
+      const lost = SALES.filter(r=>T.ids.includes(r[0]) && !pass(r, changed, filters[changed]));
+      if(lost.length){
+        fb.className = 'emu-fb err';
+        fb.textContent = `Фільтр у стовпці «${FIELDS[changed]}» сховав потрібний рядок: ${lost[0][2]} (${lost[0][5]} грн). Зміни його.`;
+        flash(gs);
+        return;
+      }
+      const rw = n=>n % 10 === 1 && n % 100 !== 11 ? 'рядок' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'рядки' : 'рядків';
+      fb.className = 'emu-fb'; fb.textContent = `Видно ${ids.length} ${rw(ids.length)}, а має бути ${T.ids.length}. Додай чи зміни фільтр.`;
+    }
+  }
+  function success(T){
+    fb.className = 'emu-fb ok'; fb.textContent = 'Правильно ✓ ' + T.done;
+    addNeurons(1); hit(); t++;
+    if(t === TASKS.length) addNeurons(2);
+    draw();
+  }
+
+  gs.addEventListener('click', e=>{
+    const x = e.target;
+    if(x.closest('[data-menu]')){ menu = !menu; open = null; draw(); return; }
+    if(x.closest('[data-toggle]')){
+      on = !on; menu = false; filters = {}; open = null;
+      if(!on){ fb.className = 'emu-fb'; fb.textContent = 'Фільтр вилучено — усі рядки знову видно.'; }
+      draw(); check(); return;
+    }
+    const fbtn = x.closest('[data-fcol]');
+    if(fbtn){ const c = +fbtn.dataset.fcol; if(open === c){ open = null; draw(); } else openPanel(c); return; }
+    // Клацання поза меню й панеллю фільтра — закрити їх
+    if(!x.closest('.dd, .fp')){ if(menu || open !== null){ menu = false; open = null; draw(); } return; }
+    if(open === null) return;
+    const ps = x.closest('[data-psort]');
+    if(ps){ order.sort(cmp(open, ps.dataset.psort)); open = null; draw(); return; }
+    if(x.closest('[data-all]')){ draft.vals = new Set(uniq(open)); draw(); return; }
+    if(x.closest('[data-none]')){ draft.vals = new Set(); draw(); return; }
+    if(x.closest('[data-cancel]')){ open = null; draw(); return; }
+    if(x.closest('[data-ok]')){
+      const c = open;
+      if(draft.vals && draft.vals.size === 0){ fb.className = 'emu-fb err'; fb.textContent = 'Не позначено жодного значення — так сховаються всі рядки. Познач хоча б одне.'; flash(gs); return; }
+      filters[c] = draft.vals ? { vals: draft.vals } : { op: draft.op, val: draft.val };
+      open = null; draw(); check(c); return;
+    }
+  });
+  gs.addEventListener('change', e=>{
+    const x = e.target;
+    if(x.matches('[data-v]')){ const v = x.dataset.v; x.checked ? draft.vals.add(v) : draft.vals.delete(v); }
+    if(x.matches('[data-op]')){ draft.op = x.value; const inp = gs.querySelector('[data-val]'); inp.disabled = !x.value; if(x.value) inp.focus(); }
+  });
+  gs.addEventListener('input', e=>{ if(e.target.matches('[data-val]')) draft.val = e.target.value; });
+  gs.addEventListener('keydown', e=>{ if(e.key === 'Enter' && e.target.matches('[data-val]')) gs.querySelector('[data-ok]')?.click(); });
+  closeOnOutside(gs, ()=>menu || open !== null, ()=>{ menu = false; open = null; draw(); });
+  draw();
+})();
+
+/* ---------- КРОК 4: КОНСТРУКТОР ЗВЕДЕНОЇ ТАБЛИЦІ ---------- */
+(function(){
+  const PF = ['Клас', 'Товар', 'Категорія', 'Кількість', 'Сума, грн'];
+  const COL = { 'Клас':1, 'Товар':2, 'Категорія':3, 'Кількість':4, 'Сума, грн':5 };
+  const FNS = { SUM:'SUM', COUNTA:'COUNTA', AVERAGE:'AVERAGE' };
+  const TASKS = [
+    { text:'Звіт «Скільки грошей зібрав кожен клас». У розділ «Рядки» додай поле «Клас», а в розділ «Значення» — поле «Сума, грн».', rows:['Клас'], cols:[], vals:[['Сума, грн', 'SUM']],
+      done:'Найбільше зібрав 8-В — 620 грн.' },
+    { text:'Звіт «Скільки штук товарів кожної категорії продали». Зміни поля: за яким полем групувати записи (Рядки) і яке поле підсумувати (Значення)?', rows:['Категорія'], cols:[], vals:[['Кількість', 'SUM']],
+      done:'Випічки продали найбільше — 43 штуки.' },
+    { text:'Звіт «Хто на чому заробив». Класи — у рядках, категорії — у стовпцях, а всередині — зібрані гроші. Додай поле в розділ «Стовпці».', rows:['Клас'], cols:['Категорія'], vals:[['Сума, грн', 'SUM']],
+      done:'Тепер видно, хто на чому заробив найбільше.' }
+  ];
+  const res = document.getElementById('pvRes');
+  const ed = document.getElementById('pvEd');
+  const gs = document.getElementById('pvGs');
+  const taskEl = document.getElementById('pvTask');
+  const fb = document.getElementById('pvFb2');
+  const hit = trackTask(gs, TASKS.length, TASKS.length + 2);
+  const st = { rows:[], cols:[], vals:[] };
+  let menu = null, t = 0, solved = false;
+
+  const uniq = f=>[...new Set(SALES.map(r=>r[COL[f]]))].sort((a, b)=>String(a).localeCompare(String(b), 'uk'));
+  const fmt = n=>Number.isInteger(n) ? String(n) : n.toFixed(2).replace('.', ',');
+  function agg(rows, [f, fn]){
+    const v = rows.map(r=>r[COL[f]]);
+    if(fn === 'COUNTA') return v.length;
+    if(!v.length) return '';
+    const s = v.reduce((a, b)=>a + b, 0);
+    return fn === 'SUM' ? s : s / v.length;
+  }
+  const canAgg = ([f, fn])=>fn === 'COUNTA' || typeof SALES[0][COL[f]] === 'number';
+
+  function drawRes(){
+    const R = st.rows[0], C = st.cols[0], V = st.vals[0];
+    if(!R && !V){ res.innerHTML = '<div class="pv-empty">Додай поля в редакторі — і тут з\'явиться звіт.</div>'; return; }
+    const val = rows=>V ? (canAgg(V) ? fmt(agg(rows, V)) : V[1] === 'SUM' ? '0' : '#DIV/0!') : '';
+    const vName = V ? `${V[1]} — ${V[0]}` : '';
+    const rKeys = R ? uniq(R) : [null], cKeys = C ? uniq(C) : null;
+    const pick = (rk, ck)=>SALES.filter(r=>(rk === null || r[COL[R]] === rk) && (ck === undefined || r[COL[C]] === ck));
+    let h = '<table class="pv-grid">';
+    if(cKeys){
+      h += `<tr><th>${vName}</th><th colspan="${cKeys.length + 1}">${C}</th></tr>`;
+      h += `<tr><th>${R || ''}</th>${cKeys.map(k=>`<th>${k}</th>`).join('')}<th>Загальний підсумок</th></tr>`;
+    } else h += `<tr>${R ? `<th>${R}</th>` : ''}${V ? `<th>${vName}</th>` : ''}</tr>`;
+    rKeys.forEach(rk=>{
+      h += `<tr>${R ? `<td>${rk}</td>` : ''}`;
+      if(cKeys) h += cKeys.map(ck=>`<td class="num">${val(pick(rk, ck))}</td>`).join('');
+      if(V) h += `<td class="num">${val(pick(rk))}</td>`;
+      h += '</tr>';
+    });
+    if(R && (V || cKeys)) h += `<tr class="tot"><td>Загальний підсумок</td>${cKeys ? cKeys.map(ck=>`<td class="num">${val(pick(null, ck))}</td>`).join('') : ''}${V ? `<td class="num">${val(SALES)}</td>` : ''}</tr>`;
+    res.innerHTML = h + '</table>';
+  }
+
+  function drawEd(){
+    const sec = (key, title)=>{
+      let h = `<div class="pv-sec"><div class="head"><span>${title}</span><button class="pv-add" data-add="${key}">Додати</button></div>`;
+      if(menu === key){
+        const busy = [...st.rows, ...st.cols];
+        h += `<div class="dd">${PF.map(f=>`<div class="it${key !== 'vals' && busy.includes(f) ? ' off' : ''}" data-pick="${f}">${f}</div>`).join('')}</div>`;
+      }
+      if(key === 'vals') st.vals.forEach(([f, fn], i)=>{
+        h += `<div class="pv-chip"><b>${f}</b><button class="rm" data-rm="vals:${i}"><span class="ms">close</span></button>`
+          + `<span class="sm">Підбити підсумки за <select data-fn="${i}">${Object.keys(FNS).map(k=>`<option${k === fn ? ' selected' : ''}>${k}</option>`).join('')}</select></span></div>`;
+      });
+      else st[key].forEach((f, i)=>{ h += `<div class="pv-chip"><b>${f}</b><button class="rm" data-rm="${key}:${i}"><span class="ms">close</span></button></div>`; });
+      return h + '</div>';
+    };
+    ed.innerHTML = '<h4>Редактор зведеної таблиці</h4><div style="font-size:11.5px;color:#5F6368;margin-bottom:6px;">Діапазон даних: Продажі!A1:F13</div>'
+      + sec('rows', 'Рядки') + sec('cols', 'Стовпці') + sec('vals', 'Значення');
+  }
+
+  function draw(){
+    const finished = t === TASKS.length;
+    taskEl.className = 'task' + (finished || solved ? ' done' : '');
+    taskEl.innerHTML = finished ? '<span class="tn">✓</span><span>Усі звіти готові! Можеш і далі експериментувати з полями.</span>'
+      : solved ? `<span class="tn">${t + 1} з ${TASKS.length} ✓</span><span>Правильно! ${TASKS[t].done}</span>`
+        + `<button class="btn-primary next" data-next>${t + 1 < TASKS.length ? 'Наступне завдання →' : 'Завершити ✓'}</button>`
+      : `<span class="tn">${t + 1} з ${TASKS.length}</span><span>${TASKS[t].text}</span>`;
+    drawRes(); drawEd();
+  }
+
+  function wrong(msg){ fb.className = 'emu-fb err'; fb.textContent = msg; flash(gs); }
+  function check(added){
+    if(t >= TASKS.length || solved) return;
+    const T = TASKS[t];
+    const same = st.rows.join() === T.rows.join() && st.cols.join() === T.cols.join()
+      && st.vals.map(v=>v.join(':')).join() === T.vals.map(v=>v.join(':')).join();
+    if(same){
+      fb.className = 'emu-fb'; fb.textContent = '';
+      addNeurons(1); hit(); solved = true;
+      if(t === TASKS.length - 1) addNeurons(2);
+      draw(); return;
+    }
+    if(!added) { fb.className = 'emu-fb'; fb.textContent = ''; return; }
+    const [key, f, fn] = added;
+    if(key === 'fn'){
+      if(fn !== 'SUM') wrong(fn === 'AVERAGE' ? 'AVERAGE рахує середнє, а в завданні потрібен підсумок — загальна сума.' : 'COUNTA рахує кількість записів, а не суму значень.');
+      else { fb.className = 'emu-fb'; fb.textContent = ''; }
+      return;
+    }
+    const need = key === 'vals' ? T.vals.map(v=>v[0]) : T[key];
+    const name = { rows:'Рядки', cols:'Стовпці', vals:'Значення' }[key];
+    if(!need.includes(f)) wrong(`Поле «${f}» у розділі «${name}» для цього завдання не потрібне. Прибери його хрестиком.`);
+    else { fb.className = 'emu-fb'; fb.textContent = ''; }
+  }
+
+  ed.addEventListener('click', e=>{
+    const x = e.target;
+    const add = x.closest('[data-add]');
+    if(add){ menu = menu === add.dataset.add ? null : add.dataset.add; drawEd(); return; }
+    const pk = x.closest('[data-pick]');
+    if(pk && !pk.classList.contains('off')){
+      const key = menu, f = pk.dataset.pick;
+      menu = null;
+      if(key === 'vals'){ st.vals = [[f, 'SUM']]; }
+      else st[key] = [f];          // у макеті по одному полю в розділі
+      draw(); check([key, f]); return;
+    }
+    const rm = x.closest('[data-rm]');
+    if(rm){ const [key, i] = rm.dataset.rm.split(':'); st[key].splice(+i, 1); draw(); check(); return; }
+    if(menu !== null && !x.closest('.dd')){ menu = null; drawEd(); }
+  });
+  taskEl.addEventListener('click', e=>{
+    if(!e.target.closest('[data-next]')) return;
+    t++; solved = false; fb.className = 'emu-fb'; fb.textContent = '';
+    draw();
+  });
+  ed.addEventListener('change', e=>{
+    if(e.target.matches('[data-fn]')){ const i = +e.target.dataset.fn; st.vals[i][1] = e.target.value; draw(); check(['fn', st.vals[i][0], e.target.value]); }
+  });
+  closeOnOutside(ed, ()=>menu !== null, ()=>{ menu = null; drawEd(); });
+  draw();
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що відбувається з таблицею під час сортування?', opts:['Частина записів ховається', 'Записи шикуються в іншому порядку, жоден не зникає', 'Записи, що не підходять, видаляються'], correct:1 },
+  { q:'Що відбувається з рядками, які сховав фільтр?', opts:['Вони видаляються назавжди', 'Вони переносяться на інший аркуш', 'Вони лишаються в таблиці, їх просто не видно'], correct:2 },
+  { q:'Стовпець «Сума» відсортували «від А до Я». Що опиниться вгорі?', opts:['Найменша сума', 'Найбільша сума', 'Сума, що починається на «А»'], correct:0, why:'Для чисел «від А до Я» — від меншого до більшого.' },
+  { q:'Учень виділив лише один стовпець і відсортував тільки його. Що станеться?', opts:['Відсортується вся таблиця', 'Значення відірвуться від своїх рядків — дані перемішаються', 'Нічого не зміниться'], correct:1 },
+  { q:'Як показати лише продажі класу 5-А, на які витратили понад 100 грн?', opts:['Відсортувати таблицю за класом', 'Фільтр «Більше ніж 100» у стовпці «Клас»', 'Фільтр за значенням «5-А» в стовпці «Клас» і фільтр за умовою «Більше ніж 100» в стовпці «Сума»'], correct:2 },
+  { q:'Як відфільтрувати спільну таблицю так, щоб не змінити її вигляд для однокласників?', opts:['Увімкнути звичайний фільтр', 'Створити режим фільтра', 'Скопіювати таблицю в чат'], correct:1 },
+  { q:'Для чого потрібна зведена таблиця?', opts:['Згрупувати записи й порахувати для кожної групи підсумок', 'Ввести нові записи', 'Перевірити правопис у клітинках'], correct:0 },
+  { q:'Звіт «скільки грошей зібрав кожен клас»: куди поставити поля в редакторі зведеної таблиці?', opts:['«Сума» — у Рядки, «Клас» — у Значення', '«Клас» — у Значення з AVERAGE', '«Клас» — у Рядки, «Сума» — у Значення з SUM'], correct:2 },
+  { q:'Яка функція в зведеній таблиці рахує середнє значення?', opts:['SUM', 'AVERAGE', 'COUNTA'], correct:1 }
+], {summary:'Тепер ти вмієш шикувати записи сортуванням, відбирати їх фільтрами й режимами фільтра та складати звіт зведеною таблицею.'});
+</script>
+
+</body>
+</html>
