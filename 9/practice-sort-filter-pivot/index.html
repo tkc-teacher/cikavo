@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Кібертурнір класів — Сортування, фільтри, зведені таблиці</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в меню Google Таблиць -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#1A5FB4,#F28C38); --accent:#1A5FB4; --accent-dark:#13467F; --accent-soft:#E6EEF8; --bg:#F4F7FB; --line:#DCE5F2; }
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:1.15em; line-height:1; display:inline-block; vertical-align:-.2em; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em; margin-right:3px; color:#444746;}
+  .menu{white-space:normal;}
+  .sample td.hd{font-weight:800; background:#E6EEF8;}
+  .sample tr.tot td{font-weight:800; background:#F8F9FA;}
+  .sample td.win{background:#FFF1C2; font-weight:800;}
+  .copy-row{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:10px 0 4px;}
+  .copy-btn{display:inline-flex; align-items:center; gap:6px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; background:var(--accent); color:#fff; border:0; border-radius:999px; padding:8px 18px; cursor:pointer; transition:background .15s ease;}
+  .copy-btn:hover{background:var(--accent-dark);}
+  .copy-btn .ms{color:#fff; margin:0;}
+  .copy-msg{font-size:13.5px; font-weight:700; color:#137333;}
+  .cup{font-size:1.1em;}
+</style>
+</head>
+<body data-hud="9 клас · Практична · Кібертурнір класів">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 9 клас · Сортування, фільтри, зведені таблиці</div>
+    <h1>🎮 Кібертурнір класів</h1>
+    <p>Три класи змагалися в шахах, тетрісі й перегонах. Розберися в результатах: знайди найкращого гравця, відбери потрібні матчі й визнач клас-чемпіон.</p>
+    <div class="meta"><span>⏱ 20–25 хв</span><span><img src="../../assets/logos/sheets.svg" alt="">Google Таблиці</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <p>Зведена таблиця: скільки балів набрав кожен клас у кожній грі.</p>
+    <div class="sheet-wrap">
+      <table class="sample">
+        <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr>
+        <tr><th>1</th><td class="hd">SUM з Бали</td><td class="hd">Гра</td><td></td><td></td><td></td></tr>
+        <tr><th>2</th><td class="hd">Клас</td><td class="hd">Перегони</td><td class="hd">Тетріс</td><td class="hd">Шахи</td><td class="hd">Загальний підсумок</td></tr>
+        <tr><th>3</th><td>9-А</td><td class="r">75</td><td class="r">60</td><td class="r">135</td><td class="r">270</td></tr>
+        <tr><th>4</th><td>9-Б</td><td class="r">85</td><td class="r">165</td><td class="r">65</td><td class="r">315</td></tr>
+        <tr><th>5</th><td>9-В</td><td class="r">135</td><td class="r">100</td><td class="r">90</td><td class="r win"><span class="cup">🏆</span> 325</td></tr>
+        <tr class="tot"><th>6</th><td>Загальний підсумок</td><td class="r">295</td><td class="r">325</td><td class="r">290</td><td class="r">910</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи таблицю</h3>
+        <p>Обери один зі способів:</p>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Таблиці</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Таблиці</span>.</li>
+              <li>Назви файл: <b>Кібертурнір — Прізвище</b>.</li>
+            </ol>
+          </div>
+        </div>
+        <ul>
+          <li>Двічі клацни вкладку аркуша внизу й назви її <b>Матчі</b>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Встав результати турніру</h3>
+        <ol>
+          <li>Натисни кнопку нижче — дані скопіюються.</li>
+          <li>У таблиці клацни клітинку <b>A1</b> і натисни <b>Ctrl+V</b> (на Mac — <b>⌘+V</b>).</li>
+          <li>Виділи рядок 1 і натисни <span class="menu"><span class="ms">format_bold</span>Жирний</span>.</li>
+          <li><span class="menu">Вигляд → <span class="ms">ac_unit</span>Закріпити → 1 рядок</span>.</li>
+        </ol>
+        <div class="copy-row">
+          <button class="copy-btn" id="copyBtn"><span class="ms">content_copy</span>Скопіювати дані</button>
+          <span class="copy-msg" id="copyMsg"></span>
+        </div>
+        <div class="sheet-wrap">
+          <table class="sample" id="dataTable"></table>
+        </div>
+        <div class="check-val">Перевір себе: дані займають A1:E13, кожне значення — у своїй клітинці.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Хто найкращий гравець?</h3>
+        <ol>
+          <li>Клацни літеру стовпця <b>D</b> (Бали).</li>
+          <li><span class="menu">Дані → <span class="ms">sort</span>Відсортувати аркуш → Сортувати аркуш за стовпцем D (від Я до А)</span>.</li>
+        </ol>
+        <div class="check-val">Перевір себе: угорі — Ракета з 9-В, 100 балів. Нікнейми переїхали разом зі своїми балами.</div>
+        <ul>
+          <li>Тепер згрупуй гравців за класами: відсортуй аркуш за стовпцем <b>B</b> (від А до Я).</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Відбери матчі фільтром</h3>
+        <ol>
+          <li>Виділи всю таблицю: <b>A1:E13</b>.</li>
+          <li><span class="menu">Дані → <span class="ms">filter_alt</span>Створити фільтр</span>.</li>
+          <li>Клацни значок <span class="ms" style="color:#188038">filter_list</span> у назві поля <b>Гра</b> → <span class="menu">Фільтрувати за значеннями</span>. Залиш позначку лише біля <b>Шахи</b> → <b>OK</b>.</li>
+        </ol>
+        <div class="check-val">Перевір себе: видно 4 шахові матчі, найбільше балів у Зірки — 90.</div>
+        <ol start="4">
+          <li>Знову відкрий фільтр поля <b>Гра</b> → <b>Вибрати все</b> → <b>OK</b>.</li>
+          <li>У фільтрі поля <b>Бали</b>: <span class="menu">Фільтрувати за умовою → Більше ніж</span>, впиши <b>80</b> → <b>OK</b>.</li>
+        </ol>
+        <div class="check-val">Перевір себе: лишилося 4 гравці — Сова, Вовк, Зірка й Ракета.</div>
+        <ul>
+          <li>Наприкінці <span class="menu">Дані → <span class="ms">filter_alt_off</span>Вилучити фільтр</span> — усі 12 матчів знову на місці.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Який клас — чемпіон?</h3>
+        <ol>
+          <li>Клацни будь-яку клітинку з даними → <span class="menu">Вставити → <span class="ms">pivot_table_chart</span>Зведена таблиця</span>.</li>
+          <li>Обери <b>Новий аркуш</b> і натисни <b>Створити</b>.</li>
+          <li>У редакторі праворуч: <b>Рядки → Додати → Клас</b>.</li>
+          <li><b>Значення → Додати → Бали</b>. У «Підбити підсумки за» має бути <b>SUM</b>.</li>
+        </ol>
+        <div class="check-val">Перевір себе: 9-В — 325 балів, 9-Б — 315, 9-А — 270. Загальний підсумок — 910.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Хто в чому сильний?</h3>
+        <ul>
+          <li>У редакторі: <b>Стовпці → Додати → Гра</b>.</li>
+          <li>Порівняй свою таблицю зі зразком «Що має вийти».</li>
+        </ul>
+        <div class="check-val">Перевір себе: 9-Б набрав у тетрісі 165 балів — більше за всіх, а 9-А найсильніший у шахах — 135.</div>
+        <div class="tip">Зміни в «Підбити підсумки за» SUM на <b>AVERAGE</b> — і побачиш середній бал гравців кожного класу в кожній грі.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>Практична робота · «Сортування та фільтрація даних. Звіти. Зведені таблиці в Google Таблицях» · 9 клас</footer>
+
+<script src="../../assets/practice.js"></script>
+<script>
+// Результати турніру: те саме джерело для таблиці на сторінці й для кнопки «Скопіювати дані»
+const DATA = [
+  ['Нікнейм', 'Клас', 'Гра', 'Бали', 'Час, хв'],
+  ['Блискавка', '9-А', 'Шахи', 80, 12],
+  ['Сова', '9-Б', 'Тетріс', 95, 8],
+  ['Тигр', '9-В', 'Перегони', 70, 6],
+  ['Комета', '9-А', 'Тетріс', 60, 9],
+  ['Вовк', '9-Б', 'Перегони', 85, 7],
+  ['Зірка', '9-В', 'Шахи', 90, 15],
+  ['Панда', '9-А', 'Перегони', 75, 5],
+  ['Кіт', '9-Б', 'Шахи', 65, 11],
+  ['Ракета', '9-В', 'Тетріс', 100, 10],
+  ['Лис', '9-А', 'Шахи', 55, 14],
+  ['Дракон', '9-Б', 'Тетріс', 70, 9],
+  ['Їжак', '9-В', 'Перегони', 65, 8]
+];
+document.getElementById('dataTable').innerHTML =
+  '<tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr>'
+  + DATA.map((r, i)=>`<tr><th>${i + 1}</th>${r.map(v=>`<td class="${i === 0 ? 'hd' : typeof v === 'number' ? 'r' : ''}">${v}</td>`).join('')}</tr>`).join('');
+
+const tsv = DATA.map(r=>r.join('\t')).join('\n');
+const msg = document.getElementById('copyMsg');
+document.getElementById('copyBtn').addEventListener('click', async ()=>{
+  let ok = false;
+  try{ await navigator.clipboard.writeText(tsv); ok = true; }
+  catch(e){
+    // Запасний спосіб для браузерів без доступу до буфера обміну
+    const ta = document.createElement('textarea');
+    ta.value = tsv; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try{ ok = document.execCommand('copy'); }catch(_){}
+    ta.remove();
+  }
+  msg.style.color = ok ? '#137333' : '#B3261E';
+  msg.textContent = ok ? '✓ Скопійовано! Тепер встав у клітинку A1.' : 'Не вдалося скопіювати — виділи таблицю мишею й натисни Ctrl+C.';
+});
+</script>
+</body>
+</html>
