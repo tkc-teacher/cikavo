@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Мій зоопарк — Файли та папки</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#13795B,#F2B705); --accent:#13795B; --accent-dark:#0C5A43; --accent-soft:#E3F4EC; --bg:#F6F8F4; --line:#DCE7DF; }
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; white-space:nowrap; direction:ltr; font-feature-settings:'liga'; overflow:hidden; width:1em;}
+  .ms.fill{font-variation-settings:'FILL' 1;}
+
+  /* Зразок: дерево папок на Google Диску */
+  .paper{background:#fff; border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px; font-family:'Roboto',sans-serif; font-size:14.5px;}
+  .tree, .tree ul{list-style:none; margin:0; padding:0;}
+  .tree ul{padding-left:18px; margin-left:11px; border-left:2px solid #D6DFD9;}
+  .tree li{position:relative; padding:2px 0;}
+  .tree ul > li::before{content:''; position:absolute; left:-18px; top:16px; width:13px; border-top:2px solid #D6DFD9;}
+  .tree ul > li:last-child::after{content:''; position:absolute; left:-20px; top:17px; bottom:0; width:2px; background:#fff;}
+  .nd{display:inline-flex; align-items:center; gap:8px; padding:2px 4px; white-space:nowrap;}
+  .nd .ms{color:#5F6368; font-size:22px;}
+  .nd .ms.img{color:#D93025;}
+  .nd img{width:18px; height:18px;}
+  .nd.root{font-weight:500;}
+  .nd small{color:#5F6368; font-size:12px;}
+  .nd .em{font-size:17px;}
+  @media (max-width:520px){ .nd{white-space:normal;} .tree ul{padding-left:12px; margin-left:8px;} .tree ul > li::before{left:-12px; width:8px;} .tree ul > li:last-child::after{left:-14px;} }
+
+  /* Макети Google: спільне */
+  .g{font-family:'Roboto',sans-serif; font-size:14px; color:#1F1F1F;}
+  .hl{outline:2.5px solid #F2B705; outline-offset:1px; border-radius:6px;}
+
+  /* Меню «Створити» Google Диска */
+  .gd{margin:10px 0 6px; max-width:330px;}
+  .gd-btn{display:inline-flex; align-items:center; gap:10px; background:#fff; border-radius:16px; padding:12px 18px 12px 14px; box-shadow:0 1px 3px rgba(0,0,0,.25); font-weight:500;}
+  .gd-btn .ms{font-size:24px;}
+  .gd-menu{margin-top:8px; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.2); padding:6px 0;}
+  .gd-menu div{display:flex; align-items:center; gap:14px; padding:7px 16px;}
+  .gd-menu .ms{color:#444746;}
+  .gd-menu img{width:20px; height:20px;}
+  .gd-menu hr{border:0; border-top:1px solid #E1E3E1; margin:5px 0;}
+  .gd-menu .on{background:#E3EAF8; outline:2.5px solid #F2B705; outline-offset:-2px;}
+
+  .path{font-family:'Roboto',sans-serif; background:#fff; border:1.5px solid var(--line); border-radius:var(--radius-s); padding:8px 12px; font-size:14px; margin:8px 0 4px;}
+  .path .ms{font-size:16px; color:#5F6368;}
+
+
+  /* Classroom: блок «Ваша робота» */
+  .yw{background:#fff; border:1px solid #DADCE0; border-radius:8px; padding:12px 12px; box-shadow:0 1px 3px rgba(60,64,67,.15);}
+  .yw-head{display:flex; justify-content:space-between; align-items:baseline; gap:8px; flex-wrap:wrap; margin-bottom:10px;}
+  .yw-head b{font-size:15px; font-weight:400; white-space:nowrap;}
+  .yw .gbtn{font-size:13px; white-space:nowrap; padding:7px 6px;}
+  .yw-head span{color:#188038; font-size:12px; font-weight:500;}
+  .att{display:flex; align-items:center; gap:10px; border:1px solid #DADCE0; border-radius:8px; padding:8px 10px; margin-bottom:10px;}
+  .att .ms{color:#5F6368; font-size:26px;}
+  .att div{min-width:0; flex:1;}
+  .att small{display:block; color:#5F6368; font-size:12px;}
+  .att .x{font-size:18px; width:auto;}
+  .gbtn{display:flex; align-items:center; justify-content:center; gap:6px; border:1px solid #DADCE0; border-radius:4px; padding:8px; color:#1967D2; font-weight:500; margin-bottom:8px;}
+  .gbtn.fill{background:#1967D2; color:#fff; border-color:#1967D2;}
+  .yw-menu{background:#fff; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,.2); padding:6px 0; margin:-2px 0 10px;}
+  .yw-menu div{display:flex; align-items:center; gap:12px; padding:7px 14px;}
+  .yw-menu img{width:20px; height:20px;}
+  .yw-menu .ms{color:#5F6368;}
+  .yw-menu .on{background:#E8F0FE; outline:2.5px solid #F2B705; outline-offset:-2px;}
+
+  /* Ілюстрації-послідовності: кадр → стрілка → кадр */
+  .flow{display:flex; align-items:stretch; gap:6px; margin:10px 0 8px;}
+  .fl{flex:1 1 0; min-width:0; display:flex; flex-direction:column;}
+  .fl > :last-child{flex:1;}
+  .fl-n{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13.5px; color:var(--accent-dark); margin-bottom:4px; line-height:1.2;}
+  .fl-arr{display:flex; align-items:center; color:#9AA5AF;}
+  .fl-arr .ms{font-size:22px;}
+  @media (max-width:640px){ .flow{flex-direction:column;} .fl-arr{justify-content:center;} .fl-arr .ms{transform:rotate(90deg);} }
+  /* Вигляд папки на Google Диску */
+  .dv{background:#fff; border:1px solid #DADCE0; border-radius:10px; padding:8px 0 10px; font-size:13px; position:relative; overflow:hidden;}
+  .dv-crumb{display:flex; align-items:center; gap:2px; flex-wrap:wrap; font-size:15px; padding:2px 12px 8px; color:#1F1F1F;}
+  .dv-crumb .ms{font-size:18px; color:#5F6368;}
+  .dv-crumb img{width:18px; height:18px; margin-right:6px;}
+  .dv-crumb b{font-weight:400; padding:0 3px;}
+  .dv-head{font-size:12px; color:#5F6368; font-weight:500; padding:4px 12px; border-bottom:1px solid #E1E3E1;}
+  .dv-row{display:flex; align-items:center; gap:10px; padding:6px 12px; border-bottom:1px solid #F1F3F4;}
+  .dv-row .ms{color:#5F6368;}
+  .dv-row .ms.img{color:#D93025;}
+  .dv-row img{width:18px; height:18px;}
+  .dv-row.on{background:#C2E7FF;}
+  .dv-row .ok{margin-left:auto; color:#0B57D0; font-variation-settings:'FILL' 1;}
+  .dv-empty{color:#80868B; font-size:12px; text-align:center; padding:14px 8px 4px;}
+  .dbl{margin-left:auto; display:inline-flex; align-items:center; gap:1px; background:#F2B705; color:#4A3500; font-weight:700; font-size:11.5px; border-radius:999px; padding:1px 7px 1px 4px;}
+  .dbl .ms{font-size:15px; color:#4A3500;}
+  .dv-foot{display:flex; justify-content:flex-end; padding:10px 12px 0;}
+  .gd-menu.mini{margin:4px 12px 4px; box-shadow:0 2px 8px rgba(0,0,0,.2); font-size:13px;}
+  .gd-menu.mini div{padding:6px 12px; gap:10px;}
+  .dv.has-toast{padding-bottom:48px;}
+  .toast{position:absolute; left:10px; right:10px; bottom:8px; background:#1F1F1F; color:#fff; border-radius:6px; padding:7px 10px; font-size:12px; display:flex; align-items:center; gap:6px;}
+  .toast .ms{font-size:16px; color:#81C995;}
+  .wbtn{display:inline-block; border-radius:999px; padding:5px 14px; font-weight:500; font-size:12.5px;}
+  .wbtn.blue{background:#0B57D0; color:#fff;}
+  /* Вікно вибору файлу (Windows) */
+  .win{background:#fff; border:1px solid #C8CDD3; border-radius:8px; overflow:hidden; font-family:'Segoe UI',system-ui,sans-serif; font-size:12px; box-shadow:0 2px 8px rgba(0,0,0,.12); display:flex; flex-direction:column;}
+  .win-t{display:flex; justify-content:space-between; padding:6px 10px; background:#F3F3F3; font-size:12px;}
+  .win-b{flex:1;}
+  .win-path{display:flex; align-items:center; gap:6px; padding:5px 8px; border-bottom:1px solid #E5E5E5; color:#444;}
+  .win-path .ms{font-size:16px;}
+  .win-files div{display:flex; align-items:center; gap:6px; padding:4px 8px; white-space:nowrap;}
+  .win-files .ms{font-size:16px; color:#5F6368;}
+  .win-files .ms.img{color:#D93025;}
+  .win .on{background:#CCE4F7;}
+  .win-files{padding:4px 0;}
+  .win-f{display:flex; justify-content:flex-end; align-items:center; gap:6px; padding:6px 8px; border-top:1px solid #E5E5E5; background:#F9F9F9;}
+  .win-f .wbtn{border-radius:4px; padding:3px 10px; background:#0067C0; color:#fff;}
+  .win-f .wbtn.ghost{background:#fff; color:#222; border:1px solid #CCC;}
+</style>
+</head>
+<body data-hud="5 клас · Практична · Мій зоопарк">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 5 клас · Файли та папки</div>
+    <h1>🦁 Мій зоопарк</h1>
+    <p>Збудуй зоопарк із папок на Google Диску й покажи його вчителю.</p>
+    <div class="meta"><span>⏱ 25 хв</span><span><img src="../../assets/logos/drive.svg" alt="">Google Диск</span><span><img src="../../assets/logos/classroom.svg" alt="">Google Classroom</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="paper">
+      <ul class="tree">
+        <li><span class="nd root"><img src="../../assets/logos/drive.svg" alt="">Мій диск</span>
+          <ul>
+            <li><span class="nd"><span class="ms fill">folder</span>Зоопарк</span>
+              <ul>
+                <li><span class="nd"><span class="ms fill">folder</span>Савана</span>
+                  <ul>
+                    <li><span class="nd"><span class="ms fill">folder</span>Лев</span>
+                      <ul>
+                        <li><span class="nd"><span class="ms img">image</span>Грім.jpg <small>(ім'я придумуєш сам)</small></span></li>
+                      </ul>
+                    </li>
+                  </ul>
+                </li>
+                <li><span class="nd"><span class="ms fill">folder</span>Океанаріум</span>
+                  <ul>
+                    <li><span class="nd"><span class="ms fill">folder</span>Дельфін <small>(або інша морська тварина)</small></span>
+                      <ul><li><span class="nd"><span class="ms img">image</span>Хвилька.jpg</span></li></ul>
+                    </li>
+                  </ul>
+                </li>
+                <li><span class="nd"><span class="ms fill">folder</span>Тераріум</span>
+                  <ul>
+                    <li><span class="nd"><span class="ms fill">folder</span>Хамелеон <small>(або інший плазун)</small></span>
+                      <ul><li><span class="nd"><span class="ms img">image</span>Веселка.jpg</span></li></ul>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Відкрий ворота зоопарку</h3>
+        <ol>
+          <li>Відкрий <b>Google Диск</b>.</li>
+          <li><span class="menu">Створити → Нова папка</span>, назва — <b>Зоопарк</b>.</li>
+        </ol>
+        <div class="gd g">
+          <div class="gd-btn"><span class="ms">add</span>Створити</div>
+          <div class="gd-menu">
+            <div class="on"><span class="ms">create_new_folder</span>Нова папка</div>
+            <hr>
+            <div><span class="ms">upload_file</span>Завантажити файл</div>
+            <div><span class="ms">drive_folder_upload</span>Завантажити папку</div>
+            <hr>
+            <div><img src="../../assets/logos/docs.svg" alt="">Google Документи</div>
+            <div><img src="../../assets/logos/sheets.svg" alt="">Google Таблиці</div>
+            <div><img src="../../assets/logos/slides.svg" alt="">Google Презентації</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Розплануй зони</h3>
+        <ol>
+          <li>Двічі клацни папку <b>Зоопарк</b>.</li>
+          <li>Створи в ній папки <b>Савана</b>, <b>Океанаріум</b>, <b>Тераріум</b>.</li>
+        </ol>
+        <div class="tip">Нова папка з'являється там, де ти зараз.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Засели мешканців</h3>
+        <p>Двічі клацни зону, щоб зайти в неї.</p>
+        <div class="flow g">
+          <div class="fl"><div class="fl-n">Двічі клацни «Савана»</div>
+            <div class="dv">
+              <div class="dv-crumb">Мій диск <span class="ms">chevron_right</span> Зоопарк</div>
+              <div class="dv-head">Назва</div>
+              <div class="dv-row on"><span class="ms fill">folder</span>Савана<span class="dbl"><span class="ms">ads_click</span>×2</span></div>
+              <div class="dv-row"><span class="ms fill">folder</span>Океанаріум</div>
+              <div class="dv-row"><span class="ms fill">folder</span>Тераріум</div>
+            </div>
+          </div>
+          <div class="fl-arr"><span class="ms">arrow_forward</span></div>
+          <div class="fl"><div class="fl-n">Ти всередині «Савани»</div>
+            <div class="dv">
+              <div class="dv-crumb">Мій диск <span class="ms">chevron_right</span> Зоопарк <span class="ms">chevron_right</span> <b class="hl">Савана</b></div>
+              <div class="dv-head">Назва</div>
+              <div class="dv-row"><span class="ms fill">folder</span>Лев</div>
+              <div class="dv-empty">Тут з'явиться все, що ти створиш</div>
+            </div>
+          </div>
+        </div>
+        <p>Назад — клацни <b>Зоопарк</b> у рядку вгорі. У кожній зоні створи папку тварини:</p>
+        <ul>
+          <li>у <b>Савані</b> — <b>Лев</b>;</li>
+          <li>в <b>Океанаріумі</b> — морська тварина на твій вибір;</li>
+          <li>у <b>Тераріумі</b> — плазун на твій вибір.</li>
+        </ul>
+        <div class="check-val">Перевір себе: 3 зони, у кожній — 1 тварина.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Сфотографуй мешканців</h3>
+        <ol>
+          <li>Знайди фото лева → правою кнопкою → <span class="menu">Зберегти зображення як…</span></li>
+          <li>Придумай левові ім'я й назви ним файл, наприклад <b>Грім</b>.</li>
+          <li>Завантаж його в папку <b>Лев</b>:</li>
+        </ol>
+        <div class="flow g">
+          <div class="fl"><div class="fl-n">1. Створити → Завантажити файл</div>
+            <div class="dv">
+              <div class="dv-crumb">… <span class="ms">chevron_right</span> Савана <span class="ms">chevron_right</span> Лев</div>
+              <div class="gd-menu mini">
+                <div><span class="ms">create_new_folder</span>Нова папка</div>
+                <hr>
+                <div class="on"><span class="ms">upload_file</span>Завантажити файл</div>
+                <div><span class="ms">drive_folder_upload</span>Завантажити папку</div>
+              </div>
+            </div>
+          </div>
+          <div class="fl-arr"><span class="ms">arrow_forward</span></div>
+          <div class="fl"><div class="fl-n">2. Обери фото → Відкрити</div>
+            <div class="win">
+              <div class="win-t">Відкрити<span>✕</span></div>
+              <div class="win-path"><span class="ms">download</span>Завантаження</div>
+              <div class="win-b">
+                <div class="win-files"><div class="on"><span class="ms img">image</span>Грім.jpg</div><div><span class="ms img">image</span>Хвилька.jpg</div><div><span class="ms img">image</span>Веселка.jpg</div></div>
+              </div>
+              <div class="win-f"><span class="wbtn hl">Відкрити</span><span class="wbtn ghost">Скасувати</span></div>
+            </div>
+          </div>
+          <div class="fl-arr"><span class="ms">arrow_forward</span></div>
+          <div class="fl"><div class="fl-n">3. Фото вже у вольєрі</div>
+            <div class="dv has-toast">
+              <div class="dv-crumb">… <span class="ms">chevron_right</span> Савана <span class="ms">chevron_right</span> Лев</div>
+              <div class="dv-head">Назва</div>
+              <div class="dv-row on"><span class="ms img">image</span>Грім.jpg</div>
+              <div class="toast"><span class="ms">check_circle</span>Завантажено 1 файл</div>
+            </div>
+          </div>
+        </div>
+                <p>Так само додай фото й імена двох інших тварин.</p>
+        <div class="tip">Розширення <b>.jpg</b> чи <b>.png</b> показує, що це малюнок.</div>
+        <div class="check-val">Перевір себе: у кожної тварини — фото з її ім'ям.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Запроси вчителя в зоопарк</h3>
+        <p>Прикріпи папку <b>Зоопарк</b> до завдання в Classroom:</p>
+        <div class="flow g">
+          <div class="fl"><div class="fl-n">1. Додати → Google Диск</div>
+            <div class="yw">
+              <div class="yw-head"><b>Ваша робота</b><span>Призначено</span></div>
+              <div class="gbtn"><span class="ms">add</span>Додати або створити</div>
+              <div class="yw-menu">
+                <div class="on"><img src="../../assets/logos/drive.svg" alt="">Google Диск</div>
+                <div><span class="ms">link</span>Посилання</div>
+                <div><span class="ms">attach_file</span>Файл</div>
+              </div>
+            </div>
+          </div>
+          <div class="fl-arr"><span class="ms">arrow_forward</span></div>
+          <div class="fl"><div class="fl-n">2. Зоопарк → Вставити</div>
+            <div class="dv">
+              <div class="dv-crumb"><img src="../../assets/logos/drive.svg" alt="">Мій диск</div>
+              <div class="dv-row on"><span class="ms fill">folder</span>Зоопарк<span class="ms ok">check_circle</span></div>
+              <div class="dv-row"><span class="ms fill">folder</span>Classroom</div>
+              <div class="dv-row"><img src="../../assets/logos/docs.svg" alt="">Мій розклад</div>
+              <div class="dv-foot"><span class="wbtn blue hl">Вставити</span></div>
+            </div>
+          </div>
+          <div class="fl-arr"><span class="ms">arrow_forward</span></div>
+          <div class="fl"><div class="fl-n">3. Здати</div>
+            <div class="yw">
+              <div class="yw-head"><b>Ваша робота</b><span>Призначено</span></div>
+              <div class="att"><span class="ms fill">folder</span><div>Зоопарк<small>Google Диск</small></div><span class="ms x">close</span></div>
+              <div class="gbtn"><span class="ms">add</span>Додати або створити</div>
+              <div class="gbtn fill hl">Здати</div>
+            </div>
+          </div>
+        </div>
+        <div class="check-val">Перевір себе: біля завдання — «Здано».</div>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+<footer>Практична робота · «Мій зоопарк» · 5 клас</footer>
+
+<script src="../../assets/practice.js"></script>
+</body>
+</html>
