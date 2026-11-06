@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Поняття файлу та папки. Розширення файлів, шлях до файлу — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в інтерфейсі Google Диска -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --accent:#13795B; --accent-dark:#0C5A43; --accent-soft:#E3F4EC;
+    --label:#C77C02;
+    --bg:#F6F8F4; --line:#DCE7DF;
+    --hud-bar:linear-gradient(90deg,#13795B,#F2B705);
+    --fold:#FBC02D; --fold-dark:#E39B0B; --fold-soft:#FFF6DC;
+    --g-ink:#1F1F1F; --g-soft:#444746; --g-line:#E1E3E1; --g-blue:#0B57D0;
+  }
+  .block ul{padding-left:22px;}
+  .block li{margin-bottom:5px;}
+  .fi{width:22px; height:26px; vertical-align:-7px; margin-right:6px; flex-shrink:0;}
+  .fname{font-family:'Baloo 2',sans-serif; font-weight:600; white-space:nowrap;}
+  .fname .ext{color:var(--accent);}
+
+  /* Крок 1: де зберігаються файли */
+  .where{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:6px 0 16px;}
+  @media (max-width:560px){ .where{grid-template-columns:1fr;} .where-card svg{max-width:180px;} }
+  .where-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 12px 14px; display:flex; flex-direction:column; align-items:center; text-align:center;}
+  .where-card svg{width:100%; height:auto; margin-bottom:6px;}
+  .where-card b{font-family:'Baloo 2',sans-serif; font-size:17px; color:var(--accent-dark); line-height:1.2;}
+  .where-card span{font-size:13.5px; color:var(--ink-soft);}
+  .where-card .clouds{display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:2px 6px;}
+  .where-card .clouds i{font-style:normal; white-space:nowrap; display:inline-flex; align-items:center; gap:4px;}
+  .where-card .clouds img{width:16px; height:16px;}
+  /* Крок 1: аналогія з життя */
+  .analog{display:grid; grid-template-columns:minmax(0,1fr) 44px minmax(0,1fr); gap:10px 8px; align-items:stretch; margin:6px 0 16px;}
+  .an-h{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; text-align:center; color:var(--label); text-transform:uppercase; letter-spacing:.04em;}
+  .an-side{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 10px 12px; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; text-align:center;}
+  .an-side.comp{background:var(--accent-soft); border-color:#BFE2D1;}
+  .an-art{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100px; width:100%;}
+  .an-art > svg.real{width:100%; max-width:150px; height:auto;}
+  .an-side b{font-family:'Baloo 2',sans-serif; font-size:17px; color:var(--accent-dark); line-height:1.15; margin-top:6px;}
+  .an-side small{font-size:13.5px; color:var(--ink-soft); line-height:1.3;}
+  .an-eq{display:flex; align-items:center; justify-content:center;}
+  .an-eq span{width:36px; height:36px; border-radius:50%; background:var(--fold); color:#5A3E00; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:22px; line-height:1;}
+  .an-file svg{width:54px; height:65px;}
+  .an-fold svg{width:86px; height:72px;}
+  .an-name{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--ink); margin-top:2px;}
+  .an-disk{display:flex; flex-direction:column; align-items:center; gap:4px;}
+  .an-disk > svg{width:76px; height:60px;}
+  .an-disk .row{display:flex; gap:6px;}
+  .an-disk .row svg{width:26px; height:22px;}
+  @media (max-width:520px){ .analog{grid-template-columns:minmax(0,1fr) 30px minmax(0,1fr); gap:8px 4px;} .an-eq span{width:28px; height:28px; font-size:18px;} .an-side b{font-size:15.5px;} .an-side small{font-size:12.5px;} }
+  /* Крок 1: папки на різних пристроях */
+  .os-grid{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:8px 0 6px;}
+  @media (max-width:760px){ .os-grid{grid-template-columns:repeat(2,minmax(0,1fr));} }
+  @media (max-width:440px){ .os-grid{grid-template-columns:1fr;} }
+  .os-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px; display:flex; flex-direction:column; gap:8px;}
+  .os-card .os-art{flex:1; display:flex; align-items:center; justify-content:center; min-height:170px;}
+  .os-cap{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; color:var(--accent-dark); text-align:center; line-height:1.1;}
+  .mk{width:100%; border-radius:8px; overflow:hidden; font-size:11px; line-height:1.2; box-shadow:0 2px 8px rgba(0,0,0,.12);}
+  .mk .ms{font-size:14px;}
+  .mk-files{display:grid; grid-template-columns:repeat(3,1fr); gap:4px; padding:10px 6px;}
+  .mk-files .tile{font-size:10.5px; gap:3px;}
+  .mk-files .tile svg{width:28px; height:34px;}
+  /* Windows */
+  .mk-win{background:#fff; border:1px solid #C8CDD3; font-family:'Segoe UI',system-ui,sans-serif;}
+  .w-bar{display:flex; align-items:center; gap:6px; padding:5px 0 5px 8px; background:#F3F3F3;}
+  .w-bar svg{width:16px; height:13px;}
+  .w-bar span{flex:1;}
+  .w-bar .ms{width:26px; text-align:center; color:#333;}
+  .w-addr{display:flex; align-items:center; gap:3px; padding:4px 6px; background:#F9F9F9; border-bottom:1px solid #E5E5E5; color:#555;}
+  .w-addr b{flex:1; font-weight:400; border:1px solid #DADADA; border-radius:4px; padding:2px 6px; background:#fff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#222;}
+  /* macOS */
+  .mk-mac{background:#fff; border:1px solid #D3D3D6; font-family:-apple-system,'Helvetica Neue',sans-serif;}
+  .m-bar{display:flex; align-items:center; gap:5px; padding:7px 8px; background:#ECECEE; border-bottom:1px solid #D9D9DC;}
+  .m-bar i{width:10px; height:10px; border-radius:50%; background:var(--c);}
+  .m-bar .ms{color:#8A8A8E; margin-left:4px;}
+  .m-bar span{flex:1; text-align:center; font-weight:700; color:#333; margin-right:30px; display:flex; align-items:center; justify-content:center; gap:4px;}
+  .m-bar svg{width:15px; height:12px;}
+  /* Linux */
+  .mk-lin{background:#2B2B2B; color:#EEE; border:1px solid #1A1A1A; font-family:Ubuntu,'Cantarell',system-ui,sans-serif;}
+  .l-bar{display:flex; align-items:center; gap:5px; padding:6px 7px; background:#303030; border-bottom:1px solid #1E1E1E;}
+  .l-bar .ms{color:#CCC;}
+  .l-bar b{flex:1; font-weight:400; background:#454545; border-radius:6px; padding:3px 7px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; align-items:center; gap:4px;}
+  .l-bar .x{width:16px; height:16px; border-radius:50%; background:#E95420; color:#fff; display:flex; align-items:center; justify-content:center;}
+  .l-bar .x .ms{font-size:12px; color:#fff;}
+  .mk-lin .tile span{color:#EEE;}
+  /* Телефон */
+  .mk-phone{width:128px; background:#1E1E1E; border-radius:20px; padding:6px; box-shadow:0 2px 8px rgba(0,0,0,.18);}
+  .ph{background:#fff; border-radius:15px; overflow:hidden; font-family:'Roboto',sans-serif; font-size:10.5px; padding-bottom:8px;}
+  .ph-st{display:flex; justify-content:space-between; padding:5px 10px 2px; font-size:9px; font-weight:700; color:#333;}
+  .ph-st .ms{font-size:11px;}
+  .ph-bar{display:flex; align-items:center; gap:6px; padding:6px 8px 8px; font-size:13px; font-weight:500;}
+  .ph-bar .ms{font-size:16px;}
+  .ph-row{display:flex; align-items:center; gap:7px; padding:5px 8px; border-top:1px solid #EEE;}
+  .ph-row svg{width:17px; height:21px; flex-shrink:0;}
+  .ph-row b{display:block; font-weight:500; font-size:10.5px; white-space:nowrap;}
+  .ph-row small{color:#777; font-size:9px;}
+  /* Google Диск */
+  .mk-drv{background:#fff; border:1px solid #E1E3E1; font-family:'Roboto',sans-serif; color:#1F1F1F;}
+  .d-top{display:flex; align-items:center; gap:6px; padding:6px 8px; background:#F8FAFD; font-size:13px; color:#444746;}
+  .d-top img{width:18px; height:18px;}
+  .d-crumb{display:flex; align-items:center; font-size:13px; padding:8px 10px 6px;}
+  .d-crumb .ms{color:#444746;}
+  .d-row{display:flex; align-items:center; gap:9px; padding:7px 10px; border-top:1px solid #E1E3E1; font-weight:500;}
+  .d-row img{width:15px; height:15px;}
+  .d-row .ms{color:#D93025; font-variation-settings:'FILL' 1;}
+  /* Фотоапарат */
+  .mk-cam{display:flex; gap:8px; align-items:center; background:#2A2D31; border-radius:14px; padding:10px; box-shadow:0 3px 0 #17191C;}
+  .cam-scr{width:150px; height:112px; background:#0B0C0E; border-radius:4px; color:#fff; font-family:system-ui,sans-serif; font-size:10px; padding:5px 6px; display:flex; flex-direction:column; gap:3px;}
+  .cam-h{display:flex; align-items:center; gap:4px; color:#F2B705; font-weight:700; border-bottom:1px solid #333; padding-bottom:3px;}
+  .cam-h .ms{font-size:13px;}
+  .cam-row{display:flex; align-items:center; gap:4px; padding:2px 4px; border-radius:3px;}
+  .cam-row .ms{font-size:12px; color:#AAA;}
+  .cam-row span{margin-left:auto; color:#AAA;}
+  .cam-row.on{background:#F2B705; color:#111;}
+  .cam-row.on .ms, .cam-row.on span{color:#111;}
+  .cam-th{display:flex; gap:3px; margin-top:auto;}
+  .cam-th i{flex:1; height:22px; border-radius:2px; background:var(--g);}
+  .cam-f{font-size:9px; color:#BBB; text-align:center;}
+  .cam-btns{display:flex; flex-direction:column; align-items:center; gap:7px;}
+  .cam-btns i{width:30px; height:30px; border-radius:50%; background:#3E4247; border:3px solid #55595F;}
+  .cam-btns b{width:14px; height:8px; border-radius:3px; background:#55595F;}
+  .tile{display:flex; flex-direction:column; align-items:center; gap:4px; font-size:12px; text-align:center; line-height:1.2; word-break:break-word;}
+  .tile svg{width:38px; height:46px;}
+
+  /* Крок 2: будова імені */
+  .anatomy{display:flex; justify-content:center; align-items:flex-end; gap:4px; margin:14px 0 6px; flex-wrap:wrap;}
+  .an-part{display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .an-part b{font-family:'Baloo 2',sans-serif; font-size:30px; line-height:1; padding:8px 14px; border-radius:12px; border:2.5px solid var(--c); background:var(--cs); color:var(--ink);}
+  .an-part.dot b{padding:8px 2px; font-size:40px; border-color:transparent; background:none;}
+  .anatomy{gap:10px;}
+  .an-part small{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; color:var(--c);}
+  .an-big{width:62px; height:74px; margin-right:12px; align-self:center;}
+  .magic{display:grid; grid-template-columns:auto 1fr; gap:18px; align-items:center;}
+  @media (max-width:560px){ .magic{grid-template-columns:1fr; justify-items:center; text-align:center;} }
+  .magic-file{display:flex; flex-direction:column; align-items:center; gap:6px; min-width:150px;}
+  .magic-file svg{width:96px; height:115px; transition:transform .25s ease;}
+  .magic-file svg.pop{animation:pop .35s ease;}
+  @keyframes pop{ 0%{transform:scale(.8) rotate(-6deg);} 60%{transform:scale(1.08) rotate(3deg);} 100%{transform:scale(1);} }
+  .magic-name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:22px;}
+  .magic-name .ext{color:var(--accent);}
+  .ext-row{display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 10px;}
+  @media (max-width:560px){ .ext-row{justify-content:center;} }
+  .ext-btn{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; border:2px solid var(--line); background:var(--surface); border-radius:999px; padding:6px 16px; cursor:pointer; color:var(--ink);}
+  .ext-btn:hover{border-color:var(--accent);}
+  .ext-btn.on{background:var(--accent); border-color:var(--accent); color:#fff;}
+  .ext-btn.seen:not(.on){border-color:var(--accent); color:var(--accent-dark);}
+  .magic-info{font-size:15px; min-height:3em;}
+  .magic-info b{font-family:'Baloo 2',sans-serif; font-size:18px; display:block; color:var(--accent-dark);}
+  .types{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:16px 0 4px;}
+  @media (max-width:640px){ .types{grid-template-columns:1fr 1fr;} }
+  .type{display:flex; gap:10px; align-items:center; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 12px;}
+  .choice-btn .ti{width:22px; height:26px; vertical-align:-7px; margin-right:7px;}
+  .type svg{width:34px; height:41px; flex-shrink:0;}
+  .type b{font-family:'Baloo 2',sans-serif; font-size:15.5px; display:block; line-height:1.15;}
+  .type span{font-size:13px; color:var(--ink-soft);}
+
+  /* Крок 3: папка в папці */
+  .nest{border:2.5px solid var(--fold-dark); background:var(--fold-soft); border-radius:14px; padding:8px 12px 12px; margin-top:6px;}
+  .nest .nest{background:#fff;}
+  .nest .nest .nest{background:var(--fold-soft);}
+  .nest-h{display:flex; align-items:center; gap:8px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; margin-bottom:4px;}
+  .nest-h svg{width:28px; height:23px;}
+  .nest-files{display:flex; gap:14px; flex-wrap:wrap; padding:4px 2px 0;}
+  .nest-files .tile{width:84px;}
+  .nest-wrap{max-width:520px; margin:8px auto 18px;}
+  /* Крок 3: пісочниця «папка в папці» */
+  .nd-box{margin:8px 0 18px; user-select:none; -webkit-user-select:none;}
+  .nd-desk{background:linear-gradient(160deg,#E9F3EE,#DCEBE3); border:2px solid #BFE2D1; border-radius:var(--radius-m); padding:10px 12px 14px; transition:box-shadow .15s;}
+  .nd-top{display:flex; align-items:center; gap:6px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:var(--accent-dark); margin-bottom:6px;}
+  .nd-top .ms{font-size:20px;}
+  .nd-body{display:flex; flex-wrap:wrap; gap:10px; align-items:flex-start; min-height:56px;}
+  .nd-body > .nest{flex:1 1 200px; margin:0;}
+  .nd-folder .nest-h{cursor:grab; touch-action:none; border-radius:8px; padding:2px 4px; margin:-2px -4px 4px;}
+  .nd-folder .nest-h small{font-family:'Nunito Sans',sans-serif; font-weight:600; font-size:12px; color:var(--ink-soft); margin-left:auto;}
+  .nd-files{display:grid; grid-template-columns:minmax(0,1fr); gap:2px; width:100%;}
+  .nd-files .nd-file{width:auto; flex-direction:row; text-align:left; gap:6px; padding:4px 6px;}
+  .nd-files .nd-file svg{width:22px; height:27px; flex-shrink:0;}
+  .nd-files .nd-sub svg{width:24px; height:20px;}
+  .nd-sub span{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px;}
+  .nd-sub small{margin-left:auto; font-size:12px; color:var(--ink-soft);}
+  .nd-empty{font-size:12.5px; color:var(--ink-soft); border:1.5px dashed #E3C77A; border-radius:10px; padding:10px; flex:1; text-align:center;}
+  .nd-file{width:100px; word-break:normal; overflow-wrap:break-word; padding:6px 2px; border-radius:10px; cursor:grab; touch-action:none; transition:background .15s;}
+  .nd-file svg{width:34px; height:41px;}
+  .nd-file:hover, .nd-folder .nest-h:hover{background:rgba(19,121,91,.08);}
+  .nd-sel{outline:2.5px solid var(--accent); outline-offset:1px; background:rgba(19,121,91,.1) !important;}
+  .nd-over{box-shadow:0 0 0 3px var(--accent), 0 6px 16px rgba(19,121,91,.25);}
+  .nd-lift{z-index:1000; pointer-events:none; transform:rotate(-2deg) scale(1.03); box-shadow:0 12px 28px rgba(0,0,0,.22); opacity:.82;}
+  .nd-file.nd-lift{background:#fff; border-radius:10px;}
+  .nd-hole{border:2px dashed #BFD8CB; border-radius:10px; background:rgba(255,255,255,.35); flex-shrink:0;}
+  .nd-hole.nest{border-radius:14px; border-color:#E3C77A; background:transparent; padding:0; margin:0;}
+  .nd-no{animation:ndNo .35s;}
+  @keyframes ndNo{25%{transform:translateX(-5px)} 75%{transform:translateX(5px)}}
+  .nd-bar{display:flex; align-items:center; gap:10px; margin-top:8px;}
+  .nd-msg{flex:1; font-size:14px; color:var(--ink-soft); min-height:20px;}
+  .nd-msg b{color:var(--ink);}
+  .nd-msg.err{color:#C92A2A;}
+  .nd-reset{display:inline-flex; align-items:center; gap:4px; border:1.5px solid var(--line); background:var(--surface); border-radius:999px; padding:5px 12px; font:600 13px 'Nunito Sans',sans-serif; color:var(--ink-soft); cursor:pointer;}
+  .nd-reset .ms{font-size:17px;}
+  .bucket-title svg{width:26px; height:21px; vertical-align:-4px; margin-right:6px;}
+  .sort-chip .fi{width:18px; height:22px; vertical-align:-5px;}
+
+  /* Крок 4: шлях */
+  .path-anat{display:flex; flex-wrap:wrap; justify-content:center; align-items:flex-start; gap:2px; margin:14px 0 8px;}
+  .pa{display:flex; flex-direction:column; align-items:center; gap:5px;}
+  .pa code{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:19px; padding:5px 10px; border-radius:10px; background:var(--cs); border:2px solid var(--c);}
+  .pa.sl code{background:none; border-color:transparent; padding:5px 2px; color:var(--ink-soft); font-size:22px;}
+  .pa small{font-size:12.5px; font-weight:700; color:var(--c); text-align:center; max-width:110px; line-height:1.2;}
+  .addr{display:grid; grid-template-columns:minmax(0,1fr) 22px minmax(0,1fr) 22px minmax(0,1fr) 22px minmax(0,1fr); grid-template-rows:auto auto; grid-auto-flow:column; gap:10px 4px; margin:10px 0 18px; align-items:center;}
+  .addr-pic{height:100%; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:8px 6px 10px; display:flex; flex-direction:column; align-items:center; text-align:center;}
+  .addr-pic svg{width:100%; max-width:110px; height:auto;}
+  .addr-pic b{font-family:'Baloo 2',sans-serif; font-size:15.5px; line-height:1.15; color:var(--ink); margin-top:4px;}
+  .addr-pic small{font-size:12.5px; color:var(--ink-soft);}
+  .addr-cell{display:flex; flex-direction:column; align-items:center; gap:4px; min-width:0;}
+  .addr-cell > small{font-size:12.5px; font-weight:700; color:var(--c);}
+  .addr-chip{display:flex; align-items:center; gap:6px; padding:6px 10px; border-radius:10px; background:var(--cs); border:2px solid var(--c); font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; max-width:100%;}
+  .addr-chip svg{width:22px; height:22px; flex-shrink:0;}
+  .addr-sep{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:24px; color:var(--ink-soft); text-align:center; align-self:start; padding-top:4px;}
+  .addr-sep.gt{align-self:center; font-size:30px; color:var(--label); padding:0;}
+  @media (max-width:600px){
+    .addr{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr); grid-template-rows:none; grid-auto-flow:row; gap:2px 10px;}
+    .addr-pic{flex-direction:row; gap:8px; text-align:left; padding:6px 8px;}
+    .addr-pic svg{width:64px; flex-shrink:0;}
+    .addr-pic b{margin:0;}
+    .addr-cell{align-items:flex-start;}
+    .addr-cell > small{display:none;}
+    .addr-chip{font-size:14px;}
+    .addr-sep{font-size:20px; line-height:1; padding:0;}
+    .addr-sep.gt{transform:rotate(90deg); font-size:24px;}
+    .addr-sep:not(.gt){text-align:left; padding-left:14px;}
+  }
+  .disks{display:flex; gap:12px; flex-wrap:wrap; margin:10px 0;}
+  .disk{display:flex; align-items:center; gap:10px; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:8px 14px 8px 10px; font-size:14px;}
+  .disk svg{width:38px; height:30px;}
+  .disk b{font-family:'Baloo 2',sans-serif; font-size:18px; color:var(--accent-dark);}
+  .pb{display:grid; grid-template-columns:minmax(0,285px) minmax(0,1fr); gap:20px;}
+  @media (max-width:640px){ .pb{grid-template-columns:1fr;} }
+  .tree, .tree ul{list-style:none; margin:0; padding:0;}
+  .tree ul{padding-left:18px; margin-left:11px; border-left:2px solid #D6DFD9;}
+  .tree li{position:relative; padding:2px 0; margin:0 !important;}
+  .tree ul > li::before{content:''; position:absolute; left:-18px; top:15px; width:13px; border-top:2px solid #D6DFD9;}
+  .tree .nd{display:inline-flex; align-items:center; gap:6px; font-size:14px; padding:2px 6px; border-radius:8px; white-space:nowrap;}
+  .tree .nd svg{width:22px; height:20px; flex-shrink:0;}
+  .tree .nd svg.f{width:17px; height:21px;}
+  .tree .nd.root{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15.5px;}
+  .tree .nd.target{background:#FFE58A; box-shadow:0 0 0 2px var(--fold-dark);}
+  #pbTree .nd.pick{cursor:pointer; transition:background .15s;}
+  #pbTree .nd.pick:hover{background:var(--accent-soft); box-shadow:0 0 0 1.5px var(--accent);}
+  #pbTree .nd.found{background:var(--ok-soft, #DDF5E5); box-shadow:0 0 0 2px var(--ok, #2F9E44); font-weight:700;}
+  #pbTree .nd.shake{animation:ndNo .35s; background:#FDE6E1;}
+  @media (max-width:640px){ .pb > div:first-child{order:2;} }
+  /* Крок 3: «наведи лад» — безлад на Робочому столі, папки в один рядок */
+  /* шпалери в дусі Windows XP: блакитне небо з хмарами й зелений пагорб */
+  .mess{position:relative; overflow:hidden; border-radius:var(--radius-m); padding:10px 12px 0; margin-bottom:14px; border:1px solid #2F6FB8;
+    background:
+      radial-gradient(ellipse 95% 72% at 30% 140%, #3C8A1A 0, #5DAA27 82%, #86CC45 98%, transparent 99%),
+      radial-gradient(ellipse 70% 58% at 95% 136%, #36801A 0, #4E9A22 82%, #6CB833 98%, transparent 99%),
+      radial-gradient(ellipse 16% 7% at 22% 22%, rgba(255,255,255,.95), transparent 70%),
+      radial-gradient(ellipse 12% 6% at 30% 19%, rgba(255,255,255,.9), transparent 70%),
+      radial-gradient(ellipse 20% 7% at 72% 34%, rgba(255,255,255,.85), transparent 70%),
+      radial-gradient(ellipse 12% 5% at 80% 30%, rgba(255,255,255,.8), transparent 70%),
+      radial-gradient(ellipse 14% 5% at 52% 12%, rgba(255,255,255,.7), transparent 70%),
+      linear-gradient(180deg,#2C6FD6 0%,#5A9CEB 45%,#A9D0F7 75%,#CFE6FB 100%);}
+  .mess-top{display:flex; align-items:center; gap:6px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.4);}
+  .mess-top .ms{font-size:20px;}
+  .mess .sort-pool{margin-top:6px; gap:10px 12px; min-height:44px; padding-bottom:46px;}
+  .mess .sort-chip{box-shadow:0 2px 6px rgba(0,0,0,.25);}
+  .chip-gone{visibility:hidden; transform:none !important;}
+  .mess .sort-chip{background:#fff; touch-action:none; cursor:grab;}
+  .mess .sort-chip.chip-lift{z-index:1000; pointer-events:none; transform:rotate(-3deg) scale(1.06); box-shadow:0 10px 24px rgba(0,0,0,.2); border-color:var(--accent);}
+  .chip-hole{border:2px dashed #BFD8CB; border-radius:var(--radius-s);}
+  .sort-buckets .bucket.bk-over{border-color:var(--accent); border-style:solid; background:var(--accent-soft);}
+  .mess .sort-chip:nth-child(4n+1){transform:rotate(-4deg) translateY(3px);}
+  .mess .sort-chip:nth-child(4n+2){transform:rotate(3deg) translateY(-2px);}
+  .mess .sort-chip:nth-child(4n+3){transform:rotate(-1.5deg) translateY(5px);}
+  .mess .sort-chip:nth-child(4n){transform:rotate(5deg);}
+  .mess .sort-chip:hover, .mess .sort-chip.selected{transform:rotate(0) translateY(-2px);}
+  .sort-buckets.three{grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px;}
+  .sort-buckets .bucket-title{display:flex; align-items:center; justify-content:center; gap:6px;}
+  .sort-buckets .bucket-title svg{width:30px; height:25px; flex-shrink:0;}
+  @media (max-width:620px){
+    .sort-buckets.three{grid-template-columns:repeat(3,minmax(0,1fr)); gap:6px;}
+    .sort-buckets .bucket{padding:8px 5px;}
+    .sort-buckets .bucket-title{flex-direction:column; gap:2px; font-size:14px;}
+    .sort-buckets .sort-chip.placed{font-size:11.5px; padding:5px 6px; word-break:break-word;}
+    .sort-buckets .sort-chip .fi{width:16px; height:19px; margin-right:3px; vertical-align:-4px;}
+  }
+  .tree-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px; margin:8px 0 18px;}
+  .tree-card .tree .nd{font-size:15px;}
+  .tree-card .tree .nd.fold{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px;}
+  .tree-card .tree .nd svg{width:26px; height:22px;}
+  .tree-card .tree .nd svg.f{width:19px; height:23px;}
+  .tree-card ul.tree{padding-left:0;}
+  .tree-card .tree ul{padding-left:18px;}
+  .tree-card .tree ul > li::before{top:16px;}
+  /* вертикальна лінія закінчується на останній гілці */
+  .tree-card .tree ul > li:last-child::after{content:''; position:absolute; left:-20px; top:17px; bottom:0; width:2px; background:var(--surface);}
+  .tree > li + li{margin-top:8px !important;}
+  @media (max-width:420px){ .tree .nd{white-space:normal;} .tree ul{padding-left:12px; margin-left:8px;} .tree ul > li::before{left:-12px; width:8px;} }
+  .pb-task{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; margin-bottom:8px;}
+  .pb-task small{display:block; font-size:13.5px; color:var(--ink-soft); font-weight:600;}
+  .path-out{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:19px; background:#1F2A26; color:#fff; border-radius:var(--radius-s); padding:10px 14px; min-height:50px; display:flex; flex-wrap:wrap; align-items:center; gap:2px; word-break:break-all;}
+  .path-out .sl{color:#8FD3B6; padding:0 2px;}
+  .pb-fb{font-size:14px; color:var(--ink-soft); min-height:1.3em; margin-top:8px;}
+  .pb-fb.ok{color:var(--accent-dark); font-weight:700;}
+
+  /* Крок 5: Google Диск */
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em;}
+  .ms.fill{font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;}
+  .drv-task{display:flex; gap:12px; align-items:center; background:var(--accent-soft); border-radius:var(--radius-m); padding:10px 14px; margin-bottom:12px; font-weight:700;}
+  .drv-task span:first-child{font-family:'Baloo 2',sans-serif; background:var(--accent); color:#fff; border-radius:999px; padding:2px 12px; white-space:nowrap; font-size:14px;}
+  .drv{position:relative; border:1px solid var(--g-line); border-radius:var(--radius-m); overflow:hidden; font-family:'Roboto',sans-serif; color:var(--g-ink); background:#F8FAFD; box-shadow:0 2px 10px rgba(0,0,0,.06);}
+  .drv-top{display:flex; align-items:center; gap:8px; padding:10px 14px;}
+  .drv-top img{width:30px; height:30px;}
+  .drv-name{font-size:20px; color:var(--g-soft); width:150px; flex-shrink:0;}
+  .drv-search{flex:1; max-width:420px; display:flex; align-items:center; gap:10px; background:#E9EEF6; border-radius:999px; padding:9px 14px; font-size:14.5px; color:var(--g-soft); white-space:nowrap; overflow:hidden;}
+  .drv-body{display:grid; grid-template-columns:200px minmax(0,1fr); gap:6px; padding:0 10px 12px 6px;}
+  .drv-side{position:relative;}
+  .drv-new{display:inline-flex; align-items:center; gap:12px; font-family:'Roboto',sans-serif; font-weight:500; font-size:14px; color:var(--g-ink); background:#fff; border:none; border-radius:16px; padding:16px 20px 16px 16px; margin:4px 0 14px 4px; box-shadow:0 1px 2px rgba(60,64,67,.3),0 1px 3px 1px rgba(60,64,67,.15); cursor:pointer;}
+  .drv-new .ms{font-size:24px;}
+  .drv-nav{display:flex; align-items:center; gap:14px; padding:6px 14px; border-radius:999px; font-size:14px;}
+  .drv-nav.on{background:#C2E7FF; font-weight:500;}
+  .drv-nav .ms{color:var(--g-soft);}
+  .drv-main{background:#fff; border-radius:16px; padding:12px 16px; min-height:300px;}
+  .crumbs{display:flex; align-items:center; flex-wrap:wrap; gap:2px; font-size:22px; margin-bottom:12px; min-height:40px;}
+  .crumb{padding:4px 10px; border-radius:999px; cursor:pointer;}
+  .crumb:hover{background:#E9EEF6;}
+  .crumb.last{cursor:default;}
+  .crumb.last:hover{background:none;}
+  .crumbs > .ms{color:var(--g-soft); font-size:22px;}
+  .drv-cols{display:grid; grid-template-columns:minmax(0,1fr) 110px; font-size:13px; font-weight:500; color:var(--g-soft); padding:0 8px 8px; border-bottom:1px solid var(--g-line);}
+  .drv-row{display:grid; grid-template-columns:minmax(0,1fr) 110px; align-items:center; padding:9px 8px; border-bottom:1px solid var(--g-line); font-size:14px; cursor:pointer; user-select:none; -webkit-user-select:none;}
+  .drv-row:hover{background:#F2F6FC;}
+  .drv-row.sel{background:#C2E7FF;}
+  .drv-row > span{display:flex; align-items:center; gap:14px; font-weight:500; min-width:0;}
+  .drv-row > span > em{font-style:normal; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .drv-row img{width:20px; height:20px;}
+  .drv-row .ms{color:var(--g-soft); width:20px;}
+  .drv-row .ms.pic{color:#D93025;}
+  .drv-row small{color:var(--g-soft); font-size:13px;}
+  .drv-row.fresh{animation:fresh 1.6s ease;}
+  @keyframes fresh{ 0%,40%{background:#FFF1B8;} 100%{background:transparent;} }
+  .drv-menu{position:absolute; left:4px; top:4px; width:220px; background:#fff; border-radius:4px; padding:8px 0; box-shadow:0 2px 6px 2px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.3); z-index:3;}
+  .drv-menu[hidden], .drv-dlg-wrap[hidden]{display:none;}
+  .drv-it{display:flex; align-items:center; gap:14px; padding:8px 14px; font-size:14px; cursor:pointer;}
+  .drv-it:hover{background:#E9EEF6;}
+  .drv-it img{width:20px; height:20px;}
+  .drv-it .ms{color:var(--g-soft);}
+  .drv-sep{height:1px; background:var(--g-line); margin:6px 0;}
+  .drv-dlg-wrap{position:absolute; inset:0; background:rgba(32,33,36,.4); display:flex; align-items:center; justify-content:center; z-index:5;}
+  .drv-dlg{background:#fff; border-radius:24px; padding:22px 24px 16px; width:min(340px, 90%); box-shadow:0 4px 8px 3px rgba(60,64,67,.15);}
+  .drv-dlg h3{font-family:'Roboto',sans-serif; font-weight:400; font-size:22px; margin:0 0 16px;}
+  .drv-dlg input{width:100%; box-sizing:border-box; font-family:'Roboto',sans-serif; font-size:15px; padding:12px; border:2px solid var(--g-blue); border-radius:4px; outline:none; color:var(--g-ink);}
+  .drv-dlg-btns{display:flex; justify-content:flex-end; gap:6px; margin-top:18px;}
+  .drv-dlg-btns button{font-family:'Roboto',sans-serif; font-weight:500; font-size:14px; color:var(--g-blue); background:none; border:none; border-radius:999px; padding:10px 14px; cursor:pointer;}
+  .drv-dlg-btns button:hover{background:#ECF3FE;}
+  .drv .miss{background:#FAD2CF !important; transition:none;}
+  @media (max-width:640px){
+    .drv-body{grid-template-columns:1fr;}
+    .drv-nav{display:none;}
+    .drv-name{width:auto;}
+    .drv-search span:last-child{display:none;}
+    .crumbs{font-size:17px;}
+    .drv-cols, .drv-row{grid-template-columns:minmax(0,1fr) 70px;}
+  }
+  .drv-fb{font-size:14px; color:var(--ink-soft); min-height:1.3em; margin-top:10px;}
+  .drv-fb.ok{color:var(--accent-dark); font-weight:700;}
+  .vs{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0;}
+  @media (max-width:560px){ .vs{grid-template-columns:1fr;} }
+  .vs div{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 14px; font-size:14.5px;}
+  .vs b{font-family:'Baloo 2',sans-serif; font-size:16px; color:var(--accent-dark); display:block;}
+  .vs code{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px;}
+</style>
+</head>
+<body data-lesson="lesson5-files-folders" data-hud="5 клас · Файли й папки">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Як комп'ютер зберігає дані</div>
+      <h1>Файли, папки і шлях до них</h1>
+      <p>Дізнаєшся, що таке файл, навіщо в нього розширення, як розкладати файли по папках і як записати «адресу» будь-якого файлу.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="58" fill="#E3F4EC"/>
+      <!-- аркуш, що визирає з папки -->
+      <g transform="rotate(-10 84 50)">
+        <path d="M66 22h26l10 10v40H66z" fill="#fff" stroke="#B8C6BE" stroke-width="2"/>
+        <path d="M92 22v10h10" fill="#E9EFEB" stroke="#B8C6BE" stroke-width="2"/>
+        <rect x="72" y="38" width="22" height="3" rx="1.5" fill="#9FB3A8"/>
+        <rect x="72" y="45" width="18" height="3" rx="1.5" fill="#9FB3A8"/>
+        <rect x="64" y="54" width="26" height="11" rx="2" fill="#2B6BE6"/>
+        <text x="77" y="62.5" font-family="Nunito Sans, sans-serif" font-size="8" font-weight="800" fill="#fff" text-anchor="middle">DOCX</text>
+      </g>
+      <!-- папка -->
+      <path d="M24 50a5 5 0 0 1 5-5h22l7 7h53a5 5 0 0 1 5 5v52a5 5 0 0 1-5 5H29a5 5 0 0 1-5-5z" fill="#E39B0B"/>
+      <path d="M22 64a4 4 0 0 1 4-4h88a4 4 0 0 1 4 4l-4 46a5 5 0 0 1-5 5H31a5 5 0 0 1-5-5z" fill="#FBC02D"/>
+      <circle cx="56" cy="84" r="6" fill="#3B2A00"/><circle cx="84" cy="84" r="6" fill="#3B2A00"/>
+      <circle cx="58" cy="82" r="2" fill="#fff"/><circle cx="86" cy="82" r="2" fill="#fff"/>
+      <path d="M60 97q10 8 20 0" stroke="#3B2A00" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="46" cy="95" r="5" fill="#F59E7A" opacity=".6"/><circle cx="94" cy="95" r="5" fill="#F59E7A" opacity=".6"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Апаратне й програмне забезпечення</div>
+    <h2>Що ти вже знаєш</h2>
+    <p>Минулого уроку ти «вмикав» комп'ютер і встановлював програми. Обери термін, а потім клацни пояснення до нього.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" data-guide>
+    <div class="step-label">Крок 1 · Файл</div>
+    <h2>Що таке файл</h2>
+    <p><b>Файл</b> — це дані, які мають ім'я і зберігаються в пам'яті пристрою: на диску комп'ютера, на флешці чи в хмарі — на Google Диску, OneDrive тощо.</p>
+    <div class="where">
+      <div class="where-card"><svg viewBox="0 0 160 110" fill="none" id="whPc">
+        <!-- системний блок -->
+        <rect x="14" y="10" width="50" height="92" rx="5" fill="#3D454D"/>
+        <rect x="20" y="17" width="38" height="9" rx="2" fill="#5C6670"/><rect x="20" y="30" width="38" height="9" rx="2" fill="#5C6670"/>
+        <circle cx="39" cy="56" r="6" fill="#2F3740" stroke="#7D8892" stroke-width="2"/><circle cx="39" cy="56" r="2" fill="#7CE38B"/>
+        <g fill="#2F3740"><rect x="22" y="74" width="34" height="3" rx="1.5"/><rect x="22" y="81" width="34" height="3" rx="1.5"/><rect x="22" y="88" width="34" height="3" rx="1.5"/></g>
+        <!-- кабель -->
+        <path d="M64 86h16" stroke="#9AA5AF" stroke-width="3" stroke-dasharray="4 3"/>
+        <!-- жорсткий диск -->
+        <rect x="80" y="50" width="68" height="52" rx="5" fill="#C9D1D8" stroke="#9AA5AF" stroke-width="2"/>
+        <circle cx="108" cy="76" r="20" fill="#E9EEF2" stroke="#ADB5BD" stroke-width="2"/><circle cx="108" cy="76" r="5" fill="#9AA5AF"/>
+        <path d="M140 94L120 80" stroke="#5C6670" stroke-width="4" stroke-linecap="round"/><circle cx="140" cy="94" r="4" fill="#5C6670"/>
+        <circle cx="86" cy="56" r="2" fill="#9AA5AF"/><circle cx="142" cy="56" r="2" fill="#9AA5AF"/>
+      </svg><b>Диск комп'ютера</b><span>літера C:</span></div>
+      <div class="where-card"><svg viewBox="0 0 160 110" fill="none" id="whUsb">
+        <path d="M80 34v14" stroke="#9AA5AF" stroke-width="2.5" stroke-dasharray="4 4"/><path d="M74 46l6 7 6-7" stroke="#9AA5AF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="26" y="58" width="86" height="36" rx="9" fill="#2B6BE6"/>
+        <rect x="112" y="64" width="26" height="24" rx="3" fill="#ADB5BD"/><rect x="120" y="69" width="7" height="5" fill="#495057"/><rect x="120" y="78" width="7" height="5" fill="#495057"/>
+        <circle cx="42" cy="76" r="5" fill="#9EC5FE"/><rect x="56" y="70" width="44" height="12" rx="3" fill="#1E4FB0"/>
+      </svg><b>Флешка</b><span>можна носити з собою</span></div>
+      <div class="where-card"><svg viewBox="0 0 160 110" fill="none" id="whCloud">
+        <g fill="#DCEBFE"><circle cx="52" cy="66" r="24"/><circle cx="84" cy="50" r="32"/><circle cx="116" cy="68" r="22"/><rect x="36" y="64" width="96" height="26" rx="13"/></g>
+      </svg><b>Хмара</b><span class="clouds"><i><img src="images/drive.svg" alt="">Google Диск</i><i><img src="images/onedrive.svg" alt="">OneDrive</i><i><img src="images/dropbox.svg" alt="">Dropbox</i></span></div>
+    </div>
+    <p>Згадай свої шкільні записи. Файл схожий на аркуш із записами, а <b>папка</b> — на теку, куди ці аркуші складають за темою.</p>
+    <div class="analog" id="analog">
+      <div class="an-h">У житті</div><div></div><div class="an-h">У комп'ютері</div>
+
+      <div class="an-side"><div class="an-art"><svg class="real" viewBox="0 0 120 90" fill="none">
+        <g transform="rotate(-5 60 45)">
+          <rect x="30" y="5" width="58" height="78" rx="2" fill="#fff" stroke="#C9CFD6" stroke-width="1.5"/>
+          <g stroke="#CFE0F5" stroke-width="1"><path d="M31 27h56M31 35h56M31 43h56M31 51h56M31 59h56M31 67h56M31 75h56"/></g>
+          <path d="M40 6v76" stroke="#F4A3A3" stroke-width="1"/>
+          <text x="63" y="20" font-family="'Baloo 2',sans-serif" font-size="10" font-weight="700" fill="#2B4FA0" text-anchor="middle">Задачі</text>
+          <g stroke="#2B4FA0" stroke-width="1.6" stroke-linecap="round" fill="none">
+            <path d="M44 33h6m3 0h4m3 0h10"/><path d="M44 41h9m3 0h5m3 0h14"/><path d="M44 49h5m3 0h12"/><path d="M44 57h8m3 0h4m3 0h9"/>
+          </g>
+        </g>
+        <g transform="rotate(-38 94 70)"><rect x="74" y="66" width="34" height="8" rx="1" fill="#F2B705"/><rect x="70" y="66" width="5" height="8" rx="1.5" fill="#F08C8C"/><rect x="74.5" y="66" width="2.5" height="8" fill="#ADB5BD"/><path d="M108 66l9 4-9 4z" fill="#F1D4A8"/><path d="M114 68.7l3 1.3-3 1.3z" fill="#495057"/></g>
+      </svg></div><b>Аркуш із записами</b><small>має назву, на ньому щось написано</small></div>
+      <div class="an-eq"><span>=</span></div>
+      <div class="an-side comp"><div class="an-art"><div class="an-file" id="anFile"></div><div class="an-name">Задачі.docx</div></div><b>Файл</b><small>має ім'я, у ньому — дані</small></div>
+
+      <div class="an-side"><div class="an-art"><svg class="real" viewBox="0 0 120 90" fill="none">
+        <rect x="18" y="12" width="84" height="68" rx="4" fill="#2F6DB5"/>
+        <rect x="26" y="5" width="56" height="44" fill="#fff" stroke="#C9CFD6" stroke-width="1.2" transform="rotate(-4 54 27)"/>
+        <rect x="38" y="4" width="56" height="44" fill="#FDFCF4" stroke="#C9CFD6" stroke-width="1.2" transform="rotate(3 66 26)"/>
+        <g stroke="#9DB7DB" stroke-width="1.4" stroke-linecap="round"><path d="M46 12h20M46 18h30"/></g>
+        <rect x="14" y="22" width="92" height="62" rx="4" fill="#4A8BD6"/>
+        <rect x="34" y="40" width="52" height="20" rx="3" fill="#fff"/>
+        <text x="60" y="53.5" font-family="'Baloo 2',sans-serif" font-size="9" font-weight="700" fill="#2F6DB5" text-anchor="middle">Математика</text>
+        <g stroke="#1E3F6B" stroke-width="3" stroke-linecap="round"><path d="M96 22l10 10"/><path d="M96 84l10-10"/></g>
+      </svg></div><b>Тека з аркушами</b><small>аркуші з однієї теми разом</small></div>
+      <div class="an-eq"><span>=</span></div>
+      <div class="an-side comp"><div class="an-art"><div class="an-fold" id="anFold"></div><div class="an-name">Математика</div></div><b>Папка</b><small>файли з однієї теми разом</small></div>
+
+      <div class="an-side"><div class="an-art"><svg class="real" viewBox="0 0 120 90" fill="none">
+        <rect x="12" y="4" width="96" height="84" rx="3" fill="#B9834C"/>
+        <rect x="18" y="10" width="84" height="72" fill="#F3E4CC"/>
+        <rect x="18" y="44" width="84" height="5" fill="#B9834C"/>
+        <g>
+          <rect x="24" y="16" width="11" height="28" rx="1.5" fill="#4A8BD6"/><rect x="37" y="16" width="11" height="28" rx="1.5" fill="#3FA06B"/><rect x="50" y="16" width="11" height="28" rx="1.5" fill="#E8590C"/>
+          <rect x="63" y="16" width="11" height="28" rx="1.5" fill="#F2B705" transform="rotate(14 74 44)"/>
+          <rect x="24" y="52" width="11" height="30" rx="1.5" fill="#9C36B5"/><rect x="37" y="52" width="11" height="30" rx="1.5" fill="#D6336C"/><rect x="50" y="52" width="11" height="30" rx="1.5" fill="#2F6DB5"/><rect x="63" y="52" width="11" height="30" rx="1.5" fill="#3FA06B"/><rect x="76" y="52" width="11" height="30" rx="1.5" fill="#E8590C"/>
+        </g>
+        <g fill="#fff" opacity=".9"><rect x="26" y="20" width="7" height="9" rx="1"/><rect x="39" y="20" width="7" height="9" rx="1"/><rect x="52" y="20" width="7" height="9" rx="1"/><rect x="26" y="56" width="7" height="9" rx="1"/><rect x="39" y="56" width="7" height="9" rx="1"/><rect x="52" y="56" width="7" height="9" rx="1"/><rect x="65" y="56" width="7" height="9" rx="1"/><rect x="78" y="56" width="7" height="9" rx="1"/></g>
+        <g fill="#fff" opacity=".9" transform="rotate(14 74 44)"><rect x="65" y="20" width="7" height="9" rx="1"/></g>
+      </svg></div><b>Шафа з теками</b><small>тут зберігаються всі теки</small></div>
+      <div class="an-eq"><span>=</span></div>
+      <div class="an-side comp"><div class="an-art"><div class="an-disk" id="anDisk"></div><div class="an-name">Диск C:</div></div><b>Диск</b><small>тут зберігаються всі папки</small></div>
+    </div>
+    <p>Папки з файлами є на будь-якому пристрої, тільки виглядають по-різному:</p>
+    <div class="os-grid" id="osGrid"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Розширення</div>
+    <h2>Ім'я файлу і розширення</h2>
+    <p>Повна назва файлу має дві частини, між ними — крапка:</p>
+    <div class="anatomy">
+      <svg class="an-big" id="anIcon"></svg>
+      <div class="an-part" style="--c:var(--accent); --cs:var(--accent-soft)"><b>Канікули</b><small>ім'я — придумуєш ти</small></div>
+      <div class="an-part dot" style="--c:var(--ink-soft); --cs:#fff"><b>.</b><small>крапка</small></div>
+      <div class="an-part" style="--c:#E8590C; --cs:#FFF0E6"><b>mp4</b><small>розширення — тип файлу</small></div>
+    </div>
+    <p>За розширенням комп'ютер знає, що всередині файлу і якою програмою його відкрити. Розширення зазвичай має 3–4 літери.</p>
+    <div class="exercise" id="magicEx">
+      <div class="magic">
+        <div class="magic-file"><svg id="magicIcon"></svg><div class="magic-name">Сюрприз<span class="ext" id="magicExt">.?</span></div></div>
+        <div>
+          <p class="soft" style="margin:0">Чарівна крапка: обирай розширення й дивись, як змінюється файл. Спробуй усі п'ять.</p>
+          <div class="ext-row" id="extRow"></div>
+          <div class="magic-info" id="magicInfo"></div>
+        </div>
+      </div>
+      <div class="progress-line" id="magicProgress"></div>
+    </div>
+    <div class="types" id="types"></div>
+    <div class="note">Windows часто ховає розширення й показує лише значок файлу. Але розширення все одно є!</div>
+    <div class="trivia">В імені файлу не можна писати знаки <b>\ / : * ? " &lt; &gt; |</b> — у комп'ютера вони мають спеціальне значення.</div>
+    <p class="soft">Що всередині кожного файлу? Дивись на розширення.</p>
+    <div id="whatInside"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Папки</div>
+    <h2>Папка в папці</h2>
+    <p><b>Папка</b> об'єднує файли за якоюсь ознакою, найчастіше — за темою. У папці можуть лежати і файли, і інші папки.</p>
+    <p class="soft">Перетягни файл чи папку в іншу папку. Можна класти файли в папку, папку в папку — і все разом. Спробуй зібрати: <b>Навчання</b> → <b>5 клас</b> → <b>Інформатика</b> → файли.</p>
+    <div class="nd-box" id="nd">
+      <div class="nd-desk" data-id="root"><div class="nd-top"><span class="ms">desktop_windows</span>Робочий стіл</div><div class="nd-body"></div></div>
+      <div class="nd-bar"><div class="nd-msg" id="ndMsg">Тягни мишею чи пальцем. Або клацни предмет, а потім — папку.</div><button class="nd-reset" id="ndReset"><span class="ms">restart_alt</span>Спочатку</button></div>
+    </div>
+    <p>Так папки утворюють <b>дерево</b>: великі папки «розгалужуються» на менші, а на кінцях гілок — файли.</p>
+    <div class="tree-card"><ul class="tree" id="treePic"></ul></div>
+    <p><b>Завдання: наведи лад!</b> На Робочому столі безлад — файли лежать де попало. Перетягни кожен файл у потрібну папку (або клацни файл, а потім папку). В одній папці можуть бути файли різних типів!</p>
+    <div class="exercise">
+      <div class="mess"><div class="mess-top"><span class="ms">desktop_windows</span>Робочий стіл</div><div class="sort-pool" id="sortPool"></div></div>
+      <div class="sort-buckets three">
+        <div class="bucket" id="bkMath"><div class="bucket-title"></div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkUkr"><div class="bucket-title"></div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkHol"><div class="bucket-title"></div><div class="bucket-items"></div></div>
+      </div>
+      <div class="progress-line" id="sortProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Шлях до файлу</div>
+    <h2>Адреса файлу</h2>
+    <p>Кожен пристрій пам'яті позначено латинською літерою з двокрапкою:</p>
+    <div class="disks" id="disks"></div>
+    <p><b>Шлях до файлу</b> — це його «адреса»: диск, потім усі папки по черзі, від найбільшої до найменшої, і в кінці — сам файл. Між частинами ставлять знак <b>\</b>.</p>
+    <div class="path-anat" id="pathAnat"></div>
+    <p>Шлях схожий на адресу квартири. Листоноша шукає від великого до малого: спершу місто, потім вулицю, будинок і нарешті квартиру. Комп'ютер так само: диск → папки → файл.</p>
+    <div class="addr" id="addr"></div>
+    <div class="exercise" id="pbEx">
+      <div class="pb">
+        <div><ul class="tree" id="pbTree"></ul></div>
+        <div>
+          <div class="pb-task" id="pbTask"></div>
+          <div class="path-out" id="pbOut"></div>
+          <div class="pb-fb" id="pbFb"></div>
+          <button class="btn-next" id="pbNext">Далі →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Google Диск</div>
+    <h2>Файли й папки на Google Диску</h2>
+    <p>Google Диск — це твій диск у хмарі. Там теж є файли й папки, тільки замість «C:» — <b>Мій диск</b>.</p>
+    <div class="vs">
+      <div><b>Шлях у комп'ютері</b><code>C:\Навчання\Інформатика</code></div>
+      <div><b>Шлях на Google Диску — угорі сторінки</b><code>Мій диск › Навчання › Інформатика</code></div>
+    </div>
+    <div class="note">Документи, таблиці й презентації Google на Диску показані без розширення — їх тип видно за значком. А завантажені файли розширення зберігають, наприклад <span class="fname">Скриншот<span class="ext">.png</span></span>.</div>
+    <p class="soft">Виконай завдання на Диску. Папку відкривають подвійним клацанням.</p>
+    <div class="exercise" id="drvEx">
+      <div class="drv-task"><span id="drvNum">Дія 1</span><span id="drvTxt"></span></div>
+      <div class="drv" id="drv"></div>
+      <div class="drv-fb" id="drvFb"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Поняття файлу та папки. Розширення файлів, шлях до файлу» · 5 клас</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- ЗНАЧКИ ФАЙЛІВ І ПАПОК (власні SVG) ---------- */
+const TYPES = {
+  doc:{c:'#2B6BE6', name:'Текст', ext:'txt, docx'},
+  img:{c:'#E8590C', name:'Малюнки й фото', ext:'jpg, png, gif'},
+  snd:{c:'#9C36B5', name:'Звук', ext:'mp3, wav'},
+  vid:{c:'#D6336C', name:'Відео', ext:'mp4, avi'},
+  ppt:{c:'#E67700', name:'Презентації', ext:'pptx'},
+  exe:{c:'#495057', name:'Програми', ext:'exe'}
+};
+const EXT = {txt:'doc', docx:'doc', jpg:'img', png:'img', gif:'img', mp3:'snd', wav:'snd', mp4:'vid', avi:'vid', pptx:'ppt', exe:'exe'};
+const GLYPH = {
+  doc:'<rect x="8" y="10" width="18" height="3" rx="1.5"/><rect x="8" y="16" width="22" height="3" rx="1.5"/><rect x="8" y="22" width="16" height="3" rx="1.5"/>',
+  img:'<circle cx="25" cy="12" r="3.5"/><path d="M6 27l8-10 6 7 4-4 7 7z"/>',
+  snd:'<circle cx="13" cy="24" r="4"/><rect x="15" y="9" width="3" height="16"/><path d="M18 9l9 3v5l-9-3z"/>',
+  vid:'<rect x="6" y="9" width="26" height="18" rx="3" fill-opacity=".25"/><path d="M15 13l9 5-9 5z"/>',
+  ppt:'<rect x="6" y="9" width="26" height="18" rx="2" fill-opacity=".25"/><rect x="11" y="18" width="4" height="6"/><rect x="17" y="14" width="4" height="10"/><rect x="23" y="16" width="4" height="8"/>',
+  exe:'<circle cx="19" cy="18" r="8" fill="none" stroke="CC" stroke-width="4" stroke-dasharray="4 2.3"/><circle cx="19" cy="18" r="3"/>'
+};
+function fileSVG(ext, cls = ''){
+  const t = EXT[ext], c = t ? TYPES[t].c : '#868E96';
+  const glyph = t ? `<g fill="${c}">${GLYPH[t].replaceAll('CC', c)}</g>` : '';
+  return `<svg class="${cls}" viewBox="0 0 40 48" fill="none">
+    <path d="M4 1.5h22l11 11V44a2.5 2.5 0 0 1-2.5 2.5h-30A2.5 2.5 0 0 1 2 44V4a2.5 2.5 0 0 1 2-2.5z" fill="#fff" stroke="#BCC5C0" stroke-width="1.5"/>
+    <path d="M26 1.5V10a2.5 2.5 0 0 0 2.5 2.5H37" fill="#EDF1EE" stroke="#BCC5C0" stroke-width="1.5"/>
+    ${glyph}
+    <rect x="0" y="31" width="${ext.length > 3 ? 32 : 27}" height="12" rx="2.5" fill="${c}"/>
+    <text x="${ext.length > 3 ? 16 : 13.5}" y="40.3" font-family="Nunito Sans, sans-serif" font-size="8.6" font-weight="800" fill="#fff" text-anchor="middle">${ext.toUpperCase()}</text>
+  </svg>`;
+}
+/* значок типу без розширення — для варіантів відповіді, щоб не підказувати */
+const typeIcon = t=>`<svg class="ti" viewBox="0 0 40 48" fill="none">
+    <path d="M4 1.5h22l11 11V44a2.5 2.5 0 0 1-2.5 2.5h-30A2.5 2.5 0 0 1 2 44V4a2.5 2.5 0 0 1 2-2.5z" fill="#fff" stroke="#BCC5C0" stroke-width="2"/>
+    <path d="M26 1.5V10a2.5 2.5 0 0 0 2.5 2.5H37" fill="#EDF1EE" stroke="#BCC5C0" stroke-width="2"/>
+    <g fill="${TYPES[t].c}" transform="translate(0 8)">${GLYPH[t].replaceAll('CC', TYPES[t].c)}</g></svg>`;
+const folderSVG = (cls = '')=>`<svg class="${cls}" viewBox="0 0 48 40" fill="none"><path d="M2 7a3 3 0 0 1 3-3h13l4 4h21a3 3 0 0 1 3 3v24a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3z" fill="#E39B0B"/><path d="M1 15a3 3 0 0 1 3-3h40a3 3 0 0 1 3 3l-1.6 20a3 3 0 0 1-3 3H5.6a3 3 0 0 1-3-3z" fill="#FBC02D"/></svg>`;
+const diskSVG = (kind)=> kind === 'usb'
+  ? `<svg viewBox="0 0 48 38" fill="none"><rect x="4" y="11" width="30" height="16" rx="4" fill="#2B6BE6"/><rect x="34" y="14" width="11" height="10" rx="1.5" fill="#ADB5BD"/><rect x="38" y="16.5" width="3" height="2" fill="#495057"/><rect x="38" y="20" width="3" height="2" fill="#495057"/><circle cx="12" cy="19" r="2.5" fill="#9EC5FE"/></svg>`
+  : `<svg viewBox="0 0 48 38" fill="none"><rect x="3" y="7" width="42" height="24" rx="4" fill="#5C6670"/><rect x="7" y="11" width="34" height="11" rx="2" fill="#7D8892"/><circle cx="38" cy="26.5" r="2" fill="#7CE38B"/><rect x="8" y="25" width="16" height="3" rx="1.5" fill="#3D454D"/></svg>`;
+const split = n=>{ const i = n.lastIndexOf('.'); return i < 0 ? [n, ''] : [n.slice(0, i), n.slice(i + 1)]; };
+const fname = n=>{ const [a, e] = split(n); return `<span class="fname">${a}${e ? `<span class="ext">.${e}</span>` : ''}</span>`; };
+const iconFor = (n, cls)=>{ const e = split(n)[1]; return e ? fileSVG(e, cls) : folderSVG(cls); };
+
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Апаратне забезпечення', desc:'Усі пристрої комп\'ютера, які можна побачити й торкнутися' },
+  { name:'Програмне забезпечення', desc:'Програми, які кажуть комп\'ютеру, що робити' },
+  { name:'Операційна система', desc:'Головна програма: керує комп\'ютером і запускає інші програми' },
+  { name:'Драйвер', desc:'Програма, яка вчить систему працювати з певним пристроєм' },
+  { name:'Прикладна програма', desc:'Програма для конкретної справи: малювати, писати, грати' },
+  { name:'Hardware', desc:'Так англійською називають апаратне забезпечення' },
+  { name:'Software', desc:'Так англійською називають програмне забезпечення' }
+], 'recapProgress');
+
+/* ---------- КРОК 1 ---------- */
+const putFile = (svgId, ext, x, y, w = 24)=>document.getElementById(svgId)
+  .insertAdjacentHTML('beforeend', fileSVG(ext).replace('<svg class=""', `<svg x="${x}" y="${y}" width="${w}" height="${w * 1.2}"`));
+putFile('whPc', 'docx', 82, 18, 20); putFile('whPc', 'jpg', 104, 18, 20); putFile('whPc', 'mp3', 126, 18, 20);
+putFile('whUsb', 'mp4', 66, 2, 26);
+putFile('whCloud', 'pptx', 56, 40, 26); putFile('whCloud', 'png', 90, 44, 26);
+/* аналогія: аркуш = файл, тека = папка, шафа = диск */
+document.getElementById('anFile').innerHTML = fileSVG('docx');
+document.getElementById('anFold').innerHTML = `<svg viewBox="0 0 48 40" fill="none">
+  <path d="M2 7a3 3 0 0 1 3-3h13l4 4h21a3 3 0 0 1 3 3v24a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3z" fill="#E39B0B"/>
+  <rect x="9" y="5" width="18" height="20" rx="1.5" fill="#fff" stroke="#BCC5C0" transform="rotate(-6 18 15)"/>
+  <rect x="20" y="4" width="18" height="20" rx="1.5" fill="#fff" stroke="#BCC5C0" transform="rotate(5 29 14)"/>
+  <g fill="#2B6BE6"><rect x="23" y="8" width="10" height="1.8" rx=".9" transform="rotate(5 29 14)"/><rect x="23" y="11.5" width="12" height="1.8" rx=".9" transform="rotate(5 29 14)"/></g>
+  <path d="M1 15a3 3 0 0 1 3-3h40a3 3 0 0 1 3 3l-1.6 20a3 3 0 0 1-3 3H5.6a3 3 0 0 1-3-3z" fill="#FBC02D"/></svg>`;
+document.getElementById('anDisk').innerHTML = diskSVG('hdd') + `<div class="row">${folderSVG()}${folderSVG()}${folderSVG()}</div>`;
+(function(){
+  const ms = i=>`<span class="ms">${i}</span>`;
+  const FILES = [['Задачі.docx', '24 КБ'], ['Дроби.pptx', '1,2 МБ'], ['Графік.png', '310 КБ']];
+  const tiles = FILES.map(([n])=>`<div class="tile">${fileSVG(split(n)[1])}<span>${n}</span></div>`).join('');
+  const fold = (back, front)=>folderSVG().replace('#E39B0B', back).replace('#FBC02D', front);
+  const thumbs = ['linear-gradient(#7EC8F2 55%,#2E86C1 55%)', 'linear-gradient(#F7A440,#E2557B)', 'linear-gradient(#BFE3A5 40%,#3E8E41 40%)', 'linear-gradient(#FFE08A 50%,#C9A26B 50%)'];
+  const CARDS = [
+    ['Windows', `<div class="mk mk-win">
+      <div class="w-bar">${folderSVG()}<span>Математика</span>${ms('remove')}${ms('crop_square')}${ms('close')}</div>
+      <div class="w-addr">${ms('arrow_back')}${ms('arrow_upward')}<b>› Цей ПК › C: › Математика</b></div>
+      <div class="mk-files">${tiles}</div></div>`],
+    ['macOS', `<div class="mk mk-mac">
+      <div class="m-bar"><i style="--c:#FF5F57"></i><i style="--c:#FEBC2E"></i><i style="--c:#28C840"></i>${ms('chevron_left')}<span>${fold('#4A9FE0', '#78BDF2')}Математика</span></div>
+      <div class="mk-files">${tiles}</div></div>`],
+    ['Linux', `<div class="mk mk-lin">
+      <div class="l-bar">${ms('chevron_left')}<b>${ms('home')}Домівка / Математика</b><span class="x">${ms('close')}</span></div>
+      <div class="mk-files">${tiles}</div></div>`],
+    ['Телефон', `<div class="mk-phone"><div class="ph">
+      <div class="ph-st"><span>9:41</span><span>${ms('signal_cellular_alt')}${ms('battery_full')}</span></div>
+      <div class="ph-bar">${ms('arrow_back')}Математика</div>
+      ${FILES.map(([n, sz])=>`<div class="ph-row">${fileSVG(split(n)[1])}<div><b>${n}</b><small>${sz}</small></div></div>`).join('')}</div></div>`],
+    ['Google Диск', `<div class="mk mk-drv">
+      <div class="d-top"><img src="images/drive.svg" alt="">Диск</div>
+      <div class="d-crumb">Мій диск ${ms('chevron_right')} Математика</div>
+      <div class="d-row"><img src="images/docs.svg" alt="">Задачі</div>
+      <div class="d-row"><img src="images/slides.svg" alt="">Дроби</div>
+      <div class="d-row">${ms('image')}Графік.png</div></div>`],
+    ['Фотоапарат', `<div class="mk-cam"><div class="cam-scr">
+      <div class="cam-h">${ms('folder')}Вибір папки</div>
+      <div class="cam-row">${ms('folder')}100MEDIA<span>128</span></div>
+      <div class="cam-row on">${ms('folder')}101MEDIA<span>4</span></div>
+      <div class="cam-th">${thumbs.map(g=>`<i style="--g:${g}"></i>`).join('')}</div>
+      <div class="cam-f">IMG_0129.JPG</div></div>
+      <div class="cam-btns"><i></i><b></b><b></b></div></div>`]
+  ];
+  document.getElementById('osGrid').innerHTML = CARDS.map(([cap, art])=>`<div class="os-card"><div class="os-art">${art}</div><div class="os-cap">${cap}</div></div>`).join('');
+})();
+
+/* ---------- КРОК 2 ---------- */
+document.getElementById('anIcon').outerHTML = fileSVG('mp4', 'an-big');
+document.getElementById('types').innerHTML = Object.entries(TYPES).map(([k, t])=>
+  `<div class="type">${fileSVG(t.ext.split(',')[0])}<div><b>${t.name}</b><span>${t.ext.split(', ').map(e=>'.' + e).join('  ')}</span></div></div>`).join('');
+
+(function(){
+  const INFO = {
+    docx:['Текстовий документ', 'Відкриється у Word або Google Документах.'],
+    jpg:['Фото чи малюнок', 'Відкриється в програмі для перегляду фото.'],
+    mp3:['Звук: музика чи голос', 'Відкриється в програвачі — можна слухати.'],
+    mp4:['Відео', 'Відкриється у відеопрогравачі — можна дивитись.'],
+    pptx:['Презентація', 'Відкриється в PowerPoint або Google Презентаціях.']
+  };
+  const exts = Object.keys(INFO);
+  const ex = document.getElementById('magicEx'), row = document.getElementById('extRow');
+  const info = document.getElementById('magicInfo'), prog = document.getElementById('magicProgress');
+  const hit = trackTask(ex, exts.length, 0);
+  const seen = new Set();
+  const draw = e=>{
+    const svg = document.getElementById('magicIcon');
+    if(!e){ svg.outerHTML = `<svg id="magicIcon" viewBox="0 0 40 48" fill="none"><path d="M4 1.5h22l11 11V44a2.5 2.5 0 0 1-2.5 2.5h-30A2.5 2.5 0 0 1 2 44V4a2.5 2.5 0 0 1 2-2.5z" fill="#fff" stroke="#BCC5C0" stroke-width="1.5" stroke-dasharray="3 2"/><text x="19.5" y="31" font-family="Baloo 2, sans-serif" font-size="18" font-weight="700" fill="#BCC5C0" text-anchor="middle">?</text></svg>`; return; }
+    svg.outerHTML = fileSVG(e).replace('<svg class=""', '<svg id="magicIcon" class="pop"');
+  };
+  draw(null);
+  prog.textContent = `Спробувано: 0 з ${exts.length}`;
+  exts.forEach(e=>{
+    const b = document.createElement('button');
+    b.className = 'ext-btn'; b.textContent = '.' + e;
+    b.addEventListener('click', ()=>{
+      row.querySelectorAll('.ext-btn').forEach(x=>x.classList.remove('on'));
+      b.classList.add('on', 'seen');
+      document.getElementById('magicExt').textContent = '.' + e;
+      draw(e);
+      info.innerHTML = `<b>${INFO[e][0]}</b>${INFO[e][1]}`;
+      if(!seen.has(e)){
+        seen.add(e); hit();
+        prog.textContent = seen.size === exts.length ? 'Усі розширення спробувано ✓ Ім\'я те саме, а файли зовсім різні!' : `Спробувано: ${seen.size} з ${exts.length}`;
+      }
+    });
+    row.appendChild(b);
+  });
+})();
+
+makeClassify('whatInside', [
+  { text:fname('Казка.docx'), correct:0 },
+  { text:fname('Кіт.jpg'), correct:1 },
+  { text:fname('Дзвіночок.wav'), correct:2 },
+  { text:fname('Мультик.avi'), correct:3 },
+  { text:fname('Гра Змійка.exe'), correct:4, why:'Розширення .exe — це програма: її не переглядають, а запускають.' },
+  { text:fname('Карта скарбів.png'), correct:1 },
+  { text:fname('Шум моря.mp3'), correct:2 },
+  { text:fname('Пісня про осінь.mp3'), correct:2, why:'Хоч у назві «пісня», вирішує розширення .mp3 — це звук.' }
+], ['doc', 'img', 'snd', 'vid', 'exe'].map((t, i)=>typeIcon(t) + ['Текст', 'Малюнок', 'Звук', 'Відео', 'Програма'][i]));
+
+/* ---------- КРОК 3 ---------- */
+/* пісочниця «папка в папці»: файли й папки перетягуються одне в одне, без правильних відповідей */
+(function(){
+  const START = [['f1', 'Навчання'], ['f2', '5 клас'], ['f3', 'Інформатика'],
+    // роботи з інформатики різних типів
+    ['a', 'Кросворд.docx'], ['b', 'Мій ПК.pptx'], ['c', 'Робочий стіл.png'], ['d', 'Аватар.jpg'], ['e', 'Розповідь.mp3'],
+    ['g', 'Огляд ПК.mp4'], ['h', 'Нотатки.txt'], ['i', 'Моя гра.exe'], ['j', 'Анімація.gif'], ['k', 'Сигнали.wav']];
+  let parent = {};
+  const nameOf = Object.fromEntries(START);
+  const isFolder = id=>id[0] === 'f' && id.length === 2;
+  const root = document.querySelector('#nd .nd-desk'), msg = document.getElementById('ndMsg');
+  let selected = null;
+  const kids = p=>START.map(([id])=>id).filter(id=>parent[id] === p);
+  const inside = (id, anc)=>{ for(let p = id; p && p !== 'root'; p = parent[p]) if(p === anc) return true; return false; };
+  const pathOf = id=>{ const a = []; for(let p = parent[id]; p !== 'root'; p = parent[p]) a.unshift(nameOf[p]); return ['Робочий стіл', ...a].join(' › '); };
+  function body(p){
+    const ks = kids(p), fs = ks.filter(isFolder), files = ks.filter(k=>!isFolder(k));
+    const cnt = f=>kids(f).length ? `<small>${kids(f).length}</small>` : '';
+    const tile = f=>`<div class="tile nd-file" data-item="${f}">${fileSVG(split(nameOf[f])[1])}<span>${nameOf[f]}</span></div>`;
+    // на Робочому столі папка відкрита (видно вміст), а вкладена — лише значок і назва
+    if(p === 'root') return fs.map(f=>`<div class="nest nd-folder" data-id="${f}"><div class="nest-h" data-item="${f}">${folderSVG()}${nameOf[f]}${cnt(f)}</div><div class="nd-body">${body(f)}</div></div>`).join('') + files.map(tile).join('');
+    if(!ks.length) return '<div class="nd-empty">порожня</div>';
+    return `<div class="nd-files">${fs.map(f=>`<div class="tile nd-file nd-sub nd-folder" data-item="${f}" data-id="${f}">${folderSVG()}<span>${nameOf[f]}</span>${cnt(f)}</div>`).join('')}${files.map(tile).join('')}</div>`;
+  }
+  function render(){
+    root.querySelector('.nd-body').innerHTML = body('root');
+    if(selected) root.querySelector(`[data-item="${selected}"]`)?.classList.add('nd-sel');
+  }
+  function say(t, err){ msg.innerHTML = t; msg.classList.toggle('err', !!err); }
+  function move(id, target){
+    const box = target === 'root' ? root : root.querySelector(`.nd-folder[data-id="${target}"]`);
+    if(id === target || inside(target, id)){
+      say(`Папку <b>${nameOf[id]}</b> не можна покласти саму в себе.`, true);
+      box.classList.remove('nd-no'); void box.offsetWidth; box.classList.add('nd-no');
+      return;
+    }
+    if(parent[id] === target) return;
+    parent[id] = target;
+    selected = null;
+    render();
+    say(`<b>${nameOf[id]}</b> тепер тут: ${pathOf(id)}`);
+  }
+  function reset(){ parent = Object.fromEntries(START.map(([id])=>[id, 'root'])); selected = null; render(); say('Тягни мишею чи пальцем. Або клацни предмет, а потім — папку.'); }
+  document.getElementById('ndReset').addEventListener('click', reset);
+
+  const targetAt = (x, y)=>{ const el = document.elementFromPoint(x, y); const t = el && el.closest('#nd .nd-folder, #nd .nd-desk'); return t; };
+  let drag = null;
+  root.addEventListener('pointerdown', e=>{
+    if(e.button > 0) return;
+    const it = e.target.closest('[data-item]');
+    if(!it){ // клацання по порожньому місцю папки чи столу, коли щось обрано
+      const t = e.target.closest('.nd-folder, .nd-desk');
+      if(selected && t) move(selected, t.dataset.id);
+      return;
+    }
+    drag = { id:it.dataset.item, el:it, x:e.clientX, y:e.clientY, on:false, ghost:null, over:null };
+    try{ it.setPointerCapture(e.pointerId); }catch(_){}
+  });
+  root.addEventListener('pointermove', e=>{
+    if(!drag) return;
+    if(!drag.on){
+      if(Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 6) return;
+      drag.on = true;
+      // піднімаємо сам предмет (файл чи папку з усім вмістом), а на його місці лишаємо пунктирну «ямку»
+      const obj = isFolder(drag.id) ? drag.el.closest('.nd-folder') : drag.el;
+      const r = obj.getBoundingClientRect();
+      const hole = document.createElement('div');
+      hole.className = 'nd-hole' + (isFolder(drag.id) ? ' nest' : '');
+      Object.assign(hole.style, { width:r.width + "px", height:r.height + "px", flex:"0 0 auto" });
+      obj.before(hole);
+      Object.assign(obj.style, { position:'fixed', left:r.left + 'px', top:r.top + 'px', width:r.width + 'px', margin:0 });
+      obj.classList.add('nd-lift');
+      Object.assign(drag, { obj, dx:drag.x - r.left, dy:drag.y - r.top });
+    }
+    drag.obj.style.left = e.clientX - drag.dx + 'px'; drag.obj.style.top = e.clientY - drag.dy + 'px';
+    const t = targetAt(e.clientX, e.clientY);
+    if(t !== drag.over){ drag.over?.classList.remove('nd-over'); drag.over = t; t?.classList.add('nd-over'); }
+  });
+  const end = e=>{
+    if(!drag) return;
+    const d = drag; drag = null;
+    if(!d.on){ // звичайне клацання
+      const it = d.el;
+      if(selected && selected !== d.id && isFolder(d.id)){ move(selected, d.id); return; }
+      selected = selected === d.id ? null : d.id;
+      render();
+      if(selected) say(`Обрано <b>${nameOf[selected]}</b>. Тепер клацни папку або Робочий стіл.`);
+      return;
+    }
+    d.over?.classList.remove('nd-over');
+    render(); // повертає предмет на місце; якщо кинули в папку — move() перемалює ще раз
+    if(e.type === 'pointerup' && d.over) move(d.id, d.over.dataset.id);
+  };
+  root.addEventListener('pointerup', end);
+  root.addEventListener('pointercancel', end);
+  reset();
+})();
+// дерево папок і файлів (статична ілюстрація)
+(function(){
+  const T = ['Навчання', [
+    ['5 клас', [
+      ['Інформатика', ['Кросворд.docx', 'Мій ПК.pptx', 'Робочий стіл.png', 'Огляд ПК.mp4']],
+      'Нотатки.txt', 'Розповідь.mp3'
+    ]],
+    'Моя гра.exe'
+  ]];
+  const li = n=>Array.isArray(n)
+    ? `<li><span class="nd fold">${folderSVG()}${n[0]}</span><ul>${n[1].map(li).join('')}</ul></li>`
+    : `<li><span class="nd">${fileSVG(split(n)[1], 'f')}${n}</span></li>`;
+  document.getElementById('treePic').innerHTML = li(T);
+})();
+[['bkMath', 'Математика'], ['bkUkr', 'Українська мова'], ['bkHol', 'Канікули']].forEach(([id, n])=>{
+  document.querySelector(`#${id} .bucket-title`).innerHTML = folderSVG() + n;
+});
+const chip = n=>({ text:n, icon:fileSVG(split(n)[1], 'fi') });
+makeSortBoard('sortPool', { m:'bkMath', u:'bkUkr', h:'bkHol' }, [
+  { ...chip('Дроби.pptx'), bucket:'m' },
+  { ...chip('Рівняння.docx'), bucket:'m' },
+  { ...chip('Таблиця множення.png'), bucket:'m' },
+  { ...chip('Розв\'язок задачі.mp4'), bucket:'m' },
+  { ...chip('Твір про осінь.docx'), bucket:'u' },
+  { ...chip('Вірш напам\'ять.mp3'), bucket:'u' },
+  { ...chip('Диктант.txt'), bucket:'u' },
+  { ...chip('Прислів\'я.pptx'), bucket:'u' },
+  { ...chip('Море.jpg'), bucket:'h' },
+  { ...chip('Похід у гори.mp4'), bucket:'h' },
+  { ...chip('Пісні біля багаття.wav'), bucket:'h' },
+  { ...chip('Табір.gif'), bucket:'h' }
+], 'sortProgress');
+/* перетягування файлів у папки: поверх клацань ядра (клацни файл → клацни папку) */
+(function(){
+  const pool = document.getElementById('sortPool');
+  const buckets = ['bkMath', 'bkUkr', 'bkHol'].map(id=>document.getElementById(id));
+  // Робочий стіл не зменшується: на місці розкладеного файлу лишається невидима копія
+  new MutationObserver(ms=>ms.forEach(m=>m.removedNodes.forEach(n=>{
+    if(!n.classList?.contains('sort-chip')) return;
+    const ghost = n.cloneNode(true);
+    ghost.className = 'sort-chip chip-gone'; ghost.removeAttribute('style');
+    pool.insertBefore(ghost, m.nextSibling && m.nextSibling.parentNode === pool ? m.nextSibling : null);
+  }))).observe(pool, { childList:true });
+  let d = null;
+  pool.addEventListener('pointerdown', e=>{
+    const chip = e.target.closest('.sort-chip');
+    if(!chip || chip.classList.contains('placed') || e.button > 0) return;
+    d = { chip, x:e.clientX, y:e.clientY, on:false, over:null };
+    try{ chip.setPointerCapture(e.pointerId); }catch(_){}
+  });
+  pool.addEventListener('pointermove', e=>{
+    if(!d) return;
+    if(!d.on){
+      if(Math.hypot(e.clientX - d.x, e.clientY - d.y) < 6) return;
+      d.on = true;
+      const r = d.chip.getBoundingClientRect();
+      d.hole = document.createElement('div');
+      d.hole.className = 'chip-hole';
+      Object.assign(d.hole.style, { width:r.width + 'px', height:r.height + 'px' });
+      d.chip.before(d.hole);
+      Object.assign(d.chip.style, { position:'fixed', left:r.left + 'px', top:r.top + 'px', width:r.width + 'px', margin:0 });
+      d.chip.classList.add('chip-lift');
+      d.dx = d.x - r.left; d.dy = d.y - r.top;
+    }
+    d.chip.style.left = e.clientX - d.dx + 'px'; d.chip.style.top = e.clientY - d.dy + 'px';
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    const b = el && buckets.find(x=>x.contains(el));
+    if(b !== d.over){ d.over?.classList.remove('bk-over'); d.over = b; b?.classList.add('bk-over'); }
+  });
+  const end = e=>{
+    if(!d) return;
+    const x = d; d = null;
+    if(!x.on) return; // звичайне клацання — працює логіка ядра
+    x.hole.remove(); x.chip.removeAttribute('style'); x.chip.classList.remove('chip-lift');
+    x.over?.classList.remove('bk-over');
+    if(e.type === 'pointerup' && x.over){ x.chip.click(); x.over.click(); }
+  };
+  pool.addEventListener('pointerup', end);
+  pool.addEventListener('pointercancel', end);
+})();
+
+/* ---------- КРОК 4: ШЛЯХ ---------- */
+document.getElementById('disks').innerHTML =
+  `<div class="disk">${diskSVG('hdd')}<div><b>C:</b> — диск комп'ютера</div></div>` +
+  `<div class="disk">${diskSVG('hdd')}<div><b>D:</b> — ще один диск (якщо є)</div></div>` +
+  `<div class="disk">${diskSVG('usb')}<div><b>E:</b> — флешка (наступна вільна літера)</div></div>`;
+document.getElementById('pathAnat').innerHTML = [
+  ['C:', 'диск', '#5C6670', '#EEF0F2'], ['\\'], ['Навчання', 'папка', '#E39B0B', '#FFF6DC'], ['\\'],
+  ['Математика', 'папка в папці', '#E39B0B', '#FFF6DC'], ['\\'], ['Задачі.docx', 'сам файл', '#2B6BE6', '#E7EEFD']
+].map(([t, s, c, cs])=> s ? `<div class="pa" style="--c:${c}; --cs:${cs}"><code>${t}</code><small>${s}</small></div>` : `<div class="pa sl"><code>${t}</code></div>`).join('');
+
+/* асоціація: адреса квартири ↔ шлях до файлу */
+(function(){
+  const PICS = {
+    city:`<svg viewBox="0 0 110 70" fill="none">
+      <rect x="0" y="62" width="110" height="8" rx="2" fill="#DCE7DF"/>
+      <rect x="8" y="30" width="20" height="32" fill="#7FA6D9"/><rect x="30" y="14" width="22" height="48" fill="#4A7CC2"/>
+      <rect x="54" y="24" width="18" height="38" fill="#9DB9E2"/><rect x="74" y="8" width="16" height="54" fill="#3D6AAE"/><path d="M82 0v8" stroke="#3D6AAE" stroke-width="2"/>
+      <rect x="92" y="34" width="14" height="28" fill="#7FA6D9"/>
+      <g fill="#FFE58A"><rect x="34" y="20" width="5" height="5"/><rect x="43" y="20" width="5" height="5"/><rect x="34" y="30" width="5" height="5"/><rect x="43" y="38" width="5" height="5"/><rect x="78" y="14" width="4" height="5"/><rect x="78" y="26" width="4" height="5"/><rect x="84" y="20" width="4" height="5"/><rect x="12" y="36" width="5" height="5"/><rect x="19" y="44" width="5" height="5"/><rect x="58" y="30" width="4" height="4"/><rect x="64" y="40" width="4" height="4"/></g>
+    </svg>`,
+    street:`<svg viewBox="0 0 110 70" fill="none">
+      <path d="M0 60h110v10H0z" fill="#9AA5AF"/><path d="M8 65h14M34 65h14M60 65h14M86 65h14" stroke="#fff" stroke-width="2"/>
+      <rect x="22" y="14" width="3.5" height="46" fill="#5C6670"/>
+      <rect x="10" y="10" width="78" height="22" rx="3" fill="#1E4FB0"/><rect x="13" y="13" width="72" height="16" rx="2" fill="none" stroke="#fff" stroke-width="1.2"/>
+      <text x="49" y="25" font-family="'Baloo 2',sans-serif" font-size="10" font-weight="700" fill="#fff" text-anchor="middle">вул. Шкільна</text>
+      <circle cx="84" cy="48" r="10" fill="#6DB531"/><rect x="82.5" y="52" width="3" height="8" fill="#7A5230"/>
+    </svg>`,
+    house:`<svg viewBox="0 0 110 70" fill="none">
+      <rect x="28" y="6" width="54" height="60" rx="2" fill="#E9D7B9" stroke="#C9B48F" stroke-width="1.5"/>
+      <g fill="#7FB3E6">${[0,1,2,3].map(r=>[0,1,2].map(c=>`<rect x="${34 + c*16}" y="${12 + r*11}" width="10" height="7" rx="1"/>`).join('')).join('')}</g>
+      <rect x="48" y="54" width="14" height="12" fill="#8A5A34"/>
+      <rect x="64" y="55" width="12" height="9" rx="1.5" fill="#1E4FB0"/><text x="70" y="62.5" font-family="'Baloo 2',sans-serif" font-size="8" font-weight="800" fill="#fff" text-anchor="middle">5</text>
+      <rect x="0" y="66" width="110" height="4" fill="#DCE7DF"/>
+    </svg>`,
+    flat:`<svg viewBox="0 0 110 70" fill="none">
+      <rect x="20" y="2" width="70" height="66" fill="#F1ECE4"/>
+      <rect x="36" y="6" width="38" height="60" rx="2" fill="#9C6A3E"/><rect x="40" y="10" width="30" height="24" rx="1.5" fill="#B07D4E"/><rect x="40" y="38" width="30" height="24" rx="1.5" fill="#B07D4E"/>
+      <circle cx="66" cy="38" r="2.5" fill="#F2B705"/>
+      <rect x="47" y="16" width="16" height="11" rx="2" fill="#F2B705"/><text x="55" y="24.8" font-family="'Baloo 2',sans-serif" font-size="9" font-weight="800" fill="#5A3E00" text-anchor="middle">12</text>
+      <rect x="32" y="66" width="46" height="4" rx="1" fill="#C0392B"/>
+    </svg>`
+  };
+  const COLS = [
+    ['city', 'м. Київ', 'місто', `${diskSVG('hdd')}C:`, 'диск', '#5C6670', '#EEF0F2'],
+    ['street', 'вул. Шкільна', 'вулиця', `${folderSVG()}Навчання`, 'папка', '#E39B0B', '#FFF6DC'],
+    ['house', 'буд. 5', 'будинок', `${folderSVG()}Математика`, 'папка в папці', '#E39B0B', '#FFF6DC'],
+    ['flat', 'кв. 12', 'квартира', `${fileSVG('docx')}Задачі.docx`, 'сам файл', '#2B6BE6', '#E7EEFD']
+  ];
+  // два ряди: адреса з «›» між частинами, під нею шлях з «\» між частинами
+  document.getElementById('addr').innerHTML = COLS.map(([pic, name, what, chip, kind, c, cs], i)=>
+    `<div class="addr-pic">${PICS[pic]}<div><b>${name}</b><br><small>${what}</small></div></div>
+     <div class="addr-cell" style="--c:${c}; --cs:${cs}"><div class="addr-chip">${chip}</div><small>${kind}</small></div>` +
+    (i < COLS.length - 1 ? '<div class="addr-sep gt">›</div><div class="addr-sep">\\</div>' : '')).join('');
+})();
+
+/* «Знайди файл за шляхом»: показуємо шлях — учень клацає файл у дереві.
+   Однакові імена в різних папках — пастки: вирішує саме шлях */
+(function(){
+  const TREE = [
+    { n:'C:', label:'Диск', disk:'hdd', kids:[
+      { n:'Навчання', kids:[
+        { n:'Математика', kids:[{ n:'Задачі.docx' }, { n:'Дроби.pptx' }] },
+        { n:'Інформатика', kids:[{ n:'Кросворд.docx' }, { n:'Задачі.docx' }] }
+      ]},
+      { n:'Фото', kids:[{ n:'Канікули', kids:[{ n:'Гори.jpg' }, { n:'Море.jpg' }] }] }
+    ]},
+    { n:'E:', label:'Флешка', disk:'usb', kids:[{ n:'Малюнки', kids:[{ n:'Море.jpg' }, { n:'Дракон.png' }] }] }
+  ];
+  const ROUNDS = [
+    'C:\\Навчання\\Математика\\Задачі.docx',
+    'E:\\Малюнки\\Море.jpg',
+    'C:\\Навчання\\Інформатика\\Задачі.docx',
+    'C:\\Фото\\Канікули\\Море.jpg'
+  ];
+  const render = (nodes, path)=>nodes.map(o=>{
+    const p = path ? path + '\\' + o.n : o.n;
+    const isFile = !o.disk && !o.kids;
+    const ic = o.disk ? diskSVG(o.disk) : iconFor(o.n, isFile ? 'f' : '');
+    const label = o.disk ? `${o.n} <span style="font-weight:600;color:var(--ink-soft)">${o.label}</span>` : o.n;
+    return `<li><span class="nd${o.disk ? ' root' : ''}${isFile ? ' pick' : ''}" ${isFile ? `data-path="${p}"` : ''}>${ic}${label}</span>${o.kids ? `<ul>${render(o.kids, p)}</ul>` : ''}</li>`;
+  }).join('');
+  const tree = document.getElementById('pbTree'), task = document.getElementById('pbTask');
+  const out = document.getElementById('pbOut'), fb = document.getElementById('pbFb'), next = document.getElementById('pbNext');
+  const hit = trackTask(document.getElementById('pbEx'), ROUNDS.length, ROUNDS.length * 2 + 2);
+  const showPath = p=>p.split('\\').map(x=>`<span>${x}</span>`).join('<span class="sl">\\</span>');
+  let r = 0, solved = false;
+  const start = ()=>{
+    solved = false;
+    tree.innerHTML = render(TREE, '');
+    task.innerHTML = `Знайди файл за шляхом<small>Завдання ${r + 1} з ${ROUNDS.length} · клацни файл у дереві</small>`;
+    out.innerHTML = showPath(ROUNDS[r]);
+    fb.textContent = 'Читай шлях зліва направо: диск, потім папки по черзі.'; fb.className = 'pb-fb';
+    next.classList.remove('active'); next.hidden = r === ROUNDS.length - 1;
+  };
+  tree.addEventListener('click', e=>{
+    const el = e.target.closest('.pick');
+    if(!el || solved) return;
+    const p = el.dataset.path;
+    if(p === ROUNDS[r]){
+      solved = true;
+      el.classList.add('found');
+      addNeurons(2); hit();
+      fb.className = 'pb-fb ok';
+      fb.textContent = r === ROUNDS.length - 1 ? 'Правильно ✓ Ти вмієш знаходити файл за шляхом!' : 'Правильно ✓ Саме цей файл лежить за цією адресою.';
+      if(r === ROUNDS.length - 1) addNeurons(2); else next.classList.add('active');
+    } else {
+      el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake');
+      setTimeout(()=>el.classList.remove('shake'), 400);
+      fb.className = 'pb-fb';
+      const pw = p.replaceAll('\\', '\\<wbr>'); // перенос лише після «\»
+      fb.innerHTML = p.split('\\').pop() === ROUNDS[r].split('\\').pop()
+        ? `Ім'я те саме, але це інший файл! Його шлях: <b>${pw}</b>`
+        : `Це файл <b>${pw}</b>. Подивись ще раз на шлях.`;
+    }
+  });
+  next.addEventListener('click', ()=>{ if(r < ROUNDS.length - 1){ r++; start(); } });
+  start();
+})();
+
+/* ---------- КРОК 5: GOOGLE ДИСК ---------- */
+(function(){
+  const ms = (i, cls = '')=>`<span class="ms ${cls}">${i}</span>`;
+  const img = f=>`<img src="images/${f}.svg" alt="">`;
+  const FS = {
+    root:{ name:'Мій диск', items:[
+      { id:'classroom', n:'Classroom', t:'folder', d:'2 вер.' },
+      { id:'study', n:'Навчання', t:'folder', d:'14 жовт.' },
+      { id:'photo', n:'Фото', t:'folder', d:'30 серп.' },
+      { n:'Мій розклад', t:'sheets', d:'1 вер.' }
+    ]},
+    study:{ name:'Навчання', parent:'root', items:[
+      { id:'info', n:'Інформатика', t:'folder', d:'вчора' },
+      { id:'math', n:'Математика', t:'folder', d:'3 лист.' },
+      { n:'Твір про осінь', t:'docs', d:'28 жовт.' }
+    ]},
+    info:{ name:'Інформатика', parent:'study', items:[
+      { n:'Кросворд про файли', t:'docs', d:'вчора' },
+      { n:'Паспорт мого пристрою', t:'slides', d:'4 лист.' },
+      { n:'Скриншот.png', t:'image', d:'4 лист.' }
+    ]}
+  };
+  const STEPS = [
+    { act:'open', id:'study', t:'Відкрий папку «Навчання» — двічі клацни на неї.' },
+    { act:'open', id:'info', t:'Тепер відкрий папку «Інформатика». Подивись, як змінився шлях угорі.' },
+    { act:'new', t:'Створимо папку для малюнків. Натисни «Створити».' },
+    { act:'folder', t:'У меню обери «Нова папка».' },
+    { act:'create', t:'Назви папку «Мої малюнки» і натисни «Створити».' },
+    { act:'crumb', id:'root', t:'Повернись на «Мій диск»: клацни на нього в рядку шляху вгорі.' }
+  ];
+  const drv = document.getElementById('drv'), ex = document.getElementById('drvEx');
+  const num = document.getElementById('drvNum'), txt = document.getElementById('drvTxt'), fb = document.getElementById('drvFb');
+  const hit = trackTask(ex, STEPS.length, STEPS.length);
+  let i = 0, cur = 'root', sel = null, fresh = null;
+
+  const icon = t=> t === 'folder' ? ms('folder', 'fill') : t === 'image' ? ms('image', 'fill pic') : img(t);
+  const trail = id=>{ const a = []; for(let x = id; x; x = FS[x].parent) a.unshift(x); return a; };
+  drv.innerHTML = `
+    <div class="drv-top">${img('drive')}<span class="drv-name">Диск</span><div class="drv-search">${ms('search')}<span>Пошук на Диску</span></div></div>
+    <div class="drv-body">
+      <div class="drv-side">
+        <button class="drv-new" data-act="new">${ms('add')}Створити</button>
+        ${[['home', 'Головна'], ['drive', 'Мій диск', true], ['computer', 'Комп\'ютери'], ['group', 'Відкриті для мене'], ['schedule', 'Нещодавні'], ['star', 'Із зірочкою'], ['delete', 'Кошик']]
+          .map(([ic, n, on])=>`<div class="drv-nav${on ? ' on' : ''}">${ms(ic)}<span>${n}</span></div>`).join('')}
+        <div class="drv-menu" id="drvMenu" hidden>
+          <div class="drv-it" data-act="folder">${ms('create_new_folder')}<span>Нова папка</span></div>
+          <div class="drv-sep"></div>
+          <div class="drv-it" data-act="x">${ms('upload_file')}<span>Завантажити файл</span></div>
+          <div class="drv-it" data-act="x">${ms('drive_folder_upload')}<span>Завантажити папку</span></div>
+          <div class="drv-sep"></div>
+          <div class="drv-it" data-act="x">${img('docs')}<span>Google Документи</span></div>
+          <div class="drv-it" data-act="x">${img('sheets')}<span>Google Таблиці</span></div>
+          <div class="drv-it" data-act="x">${img('slides')}<span>Google Презентації</span></div>
+        </div>
+      </div>
+      <div class="drv-main"><div class="crumbs" id="crumbs"></div><div class="drv-cols"><span>Назва</span><span>Змінено</span></div><div id="drvList"></div></div>
+    </div>
+    <div class="drv-dlg-wrap" id="drvDlg" hidden>
+      <div class="drv-dlg"><h3>Нова папка</h3><input id="drvInput" value="Папка без назви">
+        <div class="drv-dlg-btns"><button data-act="cancel">Скасувати</button><button data-act="create">Створити</button></div></div>
+    </div>`;
+  const menu = drv.querySelector('#drvMenu'), dlg = drv.querySelector('#drvDlg'), input = drv.querySelector('#drvInput');
+
+  const draw = ()=>{
+    const path = trail(cur);
+    drv.querySelector('#crumbs').innerHTML = path.map((id, k)=>(k ? ms('chevron_right') : '') +
+      `<span class="crumb${k === path.length - 1 ? ' last' : ''}" data-act="crumb" data-id="${id}">${FS[id].name}</span>`).join('');
+    drv.querySelector('#drvList').innerHTML = FS[cur].items.map((o, k)=>
+      `<div class="drv-row${sel === k ? ' sel' : ''}${fresh === o ? ' fresh' : ''}" data-act="row" data-k="${k}"><span>${icon(o.t)}<em>${o.n}</em></span><small>${o.d}</small></div>`).join('');
+    fresh = null;
+  };
+  const show = ()=>{
+    if(i >= STEPS.length){
+      num.textContent = '🎉'; txt.textContent = 'Готово! Шлях до твоєї нової папки: Мій диск › Навчання › Інформатика › Мої малюнки.';
+      fb.className = 'drv-fb ok'; fb.textContent = 'Рядок шляху на Google Диску працює як шлях у комп\'ютері — і по ньому можна повертатися назад.';
+      addNeurons(2); return;
+    }
+    num.textContent = `Дія ${i + 1} з ${STEPS.length}`; txt.textContent = STEPS[i].t;
+  };
+  const miss = el=>{ el.classList.remove('miss'); void el.offsetWidth; el.classList.add('miss'); setTimeout(()=>el.classList.remove('miss'), 600); };
+  const good = ()=>{ addNeurons(1); hit(); i++; fb.textContent = ''; fb.className = 'drv-fb'; show(); };
+
+  drv.addEventListener('click', e=>{
+    const el = e.target.closest('[data-act]');
+    if(!el) return;
+    const act = el.dataset.act, step = STEPS[i];
+    if(act === 'cancel'){ dlg.hidden = true; i = STEPS.findIndex(s=>s.act === 'new'); show(); return; }
+    if(act === 'row'){
+      const k = +el.dataset.k, o = FS[cur].items[k];
+      if(sel !== k){ sel = k; draw(); return; }      // перше клацання лише виділяє
+      if(step && step.act === 'open' && o.id === step.id){ cur = o.id; sel = null; draw(); good(); return; }
+      miss(el);
+      fb.textContent = o.t === 'folder' ? 'Це не та папка.' : 'Зараз потрібно відкрити папку, а не файл.';
+      return;
+    }
+    if(!step){ return; }
+    if(act === 'crumb' && el.classList.contains('last')) return;
+    if(act === 'crumb' && step.act === 'crumb' && el.dataset.id === step.id){ cur = 'root'; sel = null; draw(); good(); return; }
+    if(act === step.act && act === 'new'){ menu.hidden = false; good(); return; }
+    if(act === step.act && act === 'folder'){ menu.hidden = true; dlg.hidden = false; input.value = 'Папка без назви'; input.focus(); input.select(); good(); return; }
+    if(act === 'create' && step.act === 'create'){
+      const name = input.value.trim();
+      if(!name || name === 'Папка без назви'){ miss(input); fb.textContent = 'Введи назву папки, наприклад «Мої малюнки».'; return; }
+      dlg.hidden = true;
+      const o = { id:'new', n:name, t:'folder', d:'щойно' };
+      FS.new = { name, parent:'info', items:[] };
+      FS.info.items.unshift(o); fresh = o; draw(); good(); return;
+    }
+    miss(el);
+    if(act === 'x') menu.hidden = true;
+    fb.textContent = 'Не те — прочитай завдання ще раз.';
+  });
+  drv.addEventListener('keydown', e=>{ if(e.key === 'Enter' && e.target === input) drv.querySelector('[data-act="create"]').click(); });
+  draw(); show();
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що таке файл?', opts:['Дані з іменем, що зберігаються в пам\'яті пристрою', 'Пристрій, на який записують дані', 'Значок жовтої папки'], correct:0 },
+  { q:'Яке розширення у файлу «Ялинка.png»?', opts:['Ялинка', 'png', 'Ялинка.png'], correct:1, why:'Розширення стоїть після крапки.' },
+  { q:'Який файл можна послухати?', opts:['Вітання.docx', 'Вітання.mp3', 'Вітання.jpg'], correct:1 },
+  { q:'Що може лежати в папці?', opts:['Лише файли', 'Лише інші папки', 'І файли, і інші папки'], correct:2 },
+  { q:'Файл «Задачі.docx» лежить у папці «Математика», а вона — у папці «Навчання» на диску C:. Який шлях правильний?', opts:['C:\\Математика\\Навчання\\Задачі.docx', 'C:\\Навчання\\Математика\\Задачі.docx', 'Задачі.docx\\Математика\\Навчання\\C:'], correct:1, why:'Від диска — до найбільшої папки, потім до меншої, в кінці файл.' },
+  { q:'Який знак НЕ можна писати в імені файлу?', opts:['?', '-', 'пробіл'], correct:0 },
+  { q:'Де на Google Диску видно, у якій папці ти зараз?', opts:['У рядку шляху вгорі: «Мій диск › …»', 'На кнопці «Створити»', 'Ніде не видно'], correct:0 }
+], {summary:'Тепер ти знаєш, що таке файл і папка, навіщо розширення і як записати шлях до файлу — і на комп\'ютері, і на Google Диску.'});
+</script>
+
+</body>
+</html>
