@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Моделювання. Дослідження та гіпотези — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --pri:#2F7D4F; --pri-dark:#1F5C38; --amber:#D9822B; --amber-dark:#A65E17;
+    --accent:var(--pri); --accent-dark:var(--pri-dark); --accent-soft:#E4F3EA;
+    --label:var(--amber-dark);
+    --bg:#F4F8F5; --ink:#15281D; --ink-soft:#4B6354; --line:#D6E6DB; --surface:#FFFFFF;
+    --hud-bar:linear-gradient(90deg,var(--amber),var(--pri));
+    --cell-line:#D3E1D7; --head-bg:#ECF4EE;
+  }
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; background:var(--head-bg); padding:1px 6px; border-radius:5px; font-size:.92em; white-space:nowrap;}
+
+  /* --- Міні-таблиця в запитаннях --- */
+  .mini{border-collapse:collapse; margin:0 auto 10px; font-size:13px; background:#fff; border:1.5px solid var(--cell-line);}
+  .mini th, .mini td{border:1px solid var(--cell-line); padding:4px 10px; height:28px; white-space:nowrap;}
+  .mini th{background:var(--head-bg); color:var(--ink-soft); font-size:11px; font-weight:700; padding:2px 8px;}
+  .mini td.num{text-align:right;}
+  .fline{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; font-size:14px; text-align:center; margin:6px 0 4px; overflow-wrap:anywhere;}
+
+  /* --- Модель «Поїздка класу» --- */
+  .model{max-width:560px; margin:0 auto 18px;}
+  .model-sheet{width:100%; border-collapse:collapse; table-layout:fixed; background:#fff; border:1.5px solid var(--cell-line); border-radius:var(--radius-s); overflow:hidden; font-size:13.5px;}
+  .model-sheet th, .model-sheet td{border:1px solid var(--cell-line); height:34px; padding:0 8px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .model-sheet th{background:var(--head-bg); color:var(--ink-soft); font-size:11px; font-weight:700; text-align:center;}
+  .model-sheet th.rn{width:30px;}
+  .model-sheet td.v{text-align:right; font-weight:800; font-variant-numeric:tabular-nums;}
+  .model-sheet td.v.inp{background:#FFF6E8; color:var(--amber-dark);}
+  .model-sheet td.f{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px; color:var(--ink-soft);}
+  .model-sheet td.v.pop{animation:cellPop .7s ease;}
+  @keyframes cellPop{0%{background:#C9EBD5;} 100%{background:#fff;}}
+  .model-sheet td.v.inp.pop{animation:none;}
+  .verdict-ok{color:#188038;} .verdict-bad{color:#C5221F;}
+  .sliders{display:grid; gap:12px; margin-top:14px; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px;}
+  .sl label{display:flex; justify-content:space-between; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px; margin-bottom:2px;}
+  .sl label b{color:var(--amber-dark);}
+  .sl input{width:100%; accent-color:var(--amber);}
+  .legend{display:flex; gap:14px; flex-wrap:wrap; font-size:13px; color:var(--ink-soft); margin-top:8px; justify-content:center;}
+  .legend span::before{content:''; display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px; vertical-align:-1px; border:1px solid var(--cell-line);}
+  .legend .l-in::before{background:#FFF6E8;}
+  .legend .l-f::before{background:#fff;}
+  .ideas{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:14px 0;}
+  .idea{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 12px 12px; text-align:center;}
+  .idea svg{width:100%; height:auto; display:block; margin-bottom:8px;}
+  .idea-t{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:18px; color:var(--pri-dark);}
+  .idea p{margin:2px 0 0; font-size:14.5px; white-space:nowrap;}
+  .idea .idea-ex{margin-top:6px; font-size:13.5px; font-style:italic; color:var(--ink-soft);}
+  @media (max-width:620px){ .ideas{grid-template-columns:1fr;} .idea svg{max-width:260px; margin:0 auto 8px;} }
+  #sortPool{display:grid; grid-template-columns:repeat(3,1fr);}
+  #sortPool .sort-chip{max-width:none; text-align:center;}
+  @media (max-width:620px){ #sortPool{grid-template-columns:1fr 1fr;} }
+  @media (max-width:520px){ .model-sheet{font-size:12.5px;} .model-sheet td{padding:0 5px;} .model-sheet td.f{font-size:10.5px;} }
+</style>
+</head>
+<body data-lesson="lesson8-modeling" data-hud="8 клас · Моделювання. Повторення">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Працюємо з числами · Тема 8</div>
+      <h1>Моделювання. Дослідження та гіпотези</h1>
+      <p>Що буде, якщо поїде більше учнів чи подорожчає квиток? Таблиця з формулами відповість ще до того, як це станеться.</p>
+      <button class="btn-primary" onclick="document.getElementById('step1').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="56" fill="#E4F3EA"/>
+      <rect x="26" y="34" width="70" height="60" rx="8" fill="#fff" stroke="#2F7D4F" stroke-width="3"/>
+      <path d="M26 50h70M49 34v60" stroke="#D3E1D7" stroke-width="2"/>
+      <rect x="56" y="70" width="8" height="16" rx="2" fill="#2F7D4F"/>
+      <rect x="68" y="60" width="8" height="26" rx="2" fill="#2F7D4F"/>
+      <rect x="80" y="54" width="8" height="32" rx="2" fill="#D9822B"/>
+      <circle cx="94" cy="88" r="17" fill="#fff" fill-opacity=".6" stroke="#1F5C38" stroke-width="5"/>
+      <path d="M106 100l14 14" stroke="#1F5C38" stroke-width="8" stroke-linecap="round"/>
+      <circle cx="38" cy="58" r="3" fill="#D9822B"/><circle cx="38" cy="70" r="3" fill="#D9822B"/><circle cx="38" cy="82" r="3" fill="#D9822B"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="step1">
+    <div class="step-label">Крок 1 · Модель і гіпотеза</div>
+    <h2>Перевірити, не ризикуючи</h2>
+    <p>Не все можна випробувати насправді, тому спершу будують модель.</p>
+    <div class="ideas">
+      <div class="idea">
+        <svg viewBox="0 0 160 110" aria-hidden="true">
+          <rect width="160" height="110" rx="12" fill="#EAF4FB"/>
+          <path d="M80 92v8M62 102h36" stroke="#8A6A3D" stroke-width="5" stroke-linecap="round"/>
+          <path d="M44 52a36 36 0 0 0 66 22" stroke="#B08A55" stroke-width="4" fill="none" stroke-linecap="round"/>
+          <circle cx="78" cy="50" r="32" fill="#4A90D9"/>
+          <path d="M60 30c8-4 16 2 14 9s-10 6-12 13-8 4-10-2 0-16 8-20z" fill="#5DBB63"/>
+          <path d="M86 40c6-6 18-2 20 6s-4 10-10 8-4 8-10 10-8-6-4-12 0-8 4-12z" fill="#5DBB63"/>
+          <path d="M70 72c4-2 10 0 10 4s-6 4-10 2z" fill="#5DBB63"/>
+          <ellipse cx="66" cy="36" rx="8" ry="5" fill="#fff" opacity=".35"/>
+        </svg>
+        <div class="idea-t">Модель</div>
+        <p>Спрощена копія об'єкта</p>
+        <p class="idea-ex">Глобус — модель Землі</p>
+      </div>
+      <div class="idea">
+        <svg viewBox="0 0 160 110" aria-hidden="true">
+          <rect width="160" height="110" rx="12" fill="#FFF6E3"/>
+          <g stroke="#F2B233" stroke-width="3" stroke-linecap="round"><path d="M128 12v6M128 42v6M110 30h6M140 30h6M115 17l4 4M137 39l4 4M115 43l4-4M137 21l4-4"/></g>
+          <circle cx="128" cy="30" r="9" fill="#FFC93C"/>
+          <path d="M66 82V40" stroke="#3E9B4F" stroke-width="4"/>
+          <path d="M66 64c-10-2-16-8-16-14 8 0 14 6 16 14zM66 56c8-2 14-8 14-14-8 0-13 6-14 14z" fill="#5DBB63"/>
+          <g fill="#F06292"><circle cx="66" cy="28" r="7"/><circle cx="77" cy="35" r="7"/><circle cx="55" cy="35" r="7"/><circle cx="60" cy="46" r="7"/><circle cx="72" cy="46" r="7"/></g>
+          <circle cx="66" cy="38" r="6" fill="#FFC93C"/>
+          <path d="M48 80h36l-5 22H53z" fill="#C8693A"/><rect x="45" y="76" width="42" height="8" rx="3" fill="#D9824F"/>
+          <text x="112" y="88" font-family="Baloo 2,sans-serif" font-weight="800" font-size="26" fill="#A65E17">?</text>
+        </svg>
+        <div class="idea-t">Гіпотеза</div>
+        <p>Припущення для перевірки</p>
+        <p class="idea-ex">«На сонці росте швидше»</p>
+      </div>
+      <div class="idea">
+        <svg viewBox="0 0 160 110" aria-hidden="true">
+          <rect width="160" height="110" rx="12" fill="#EEF1F8"/>
+          <rect x="24" y="8" width="112" height="62" rx="6" fill="#3B4A66"/>
+          <rect x="29" y="13" width="102" height="52" rx="3" fill="#BFD8F2"/>
+          <rect x="29" y="38" width="102" height="27" fill="#8CC78E"/>
+          <path d="M74 38h12l26 27H48z" fill="#7A8699"/>
+          <path d="M80 40v4M80 48v5M80 57v7" stroke="#fff" stroke-width="2"/>
+          <path d="M40 24c0-5 7-7 11-3 2-5 13-5 14 1 6-1 9 4 5 7H43c-3 0-4-3-3-5z" fill="#6E7F9C"/>
+          <g stroke="#4A90D9" stroke-width="2" stroke-linecap="round"><path d="M46 31l-2 4M54 31l-2 4M62 31l-2 4M50 37l-1 3M58 37l-1 3"/></g>
+          <circle cx="114" cy="23" r="6" fill="#FFC93C"/>
+          <rect x="68" y="48" width="24" height="12" rx="3" fill="#E2622B"/>
+          <path d="M71 48l3-5h12l3 5z" fill="#C24E1C"/>
+          <rect x="73" y="44" width="14" height="4" rx="1" fill="#DCEBF7"/>
+          <circle cx="71" cy="54" r="1.8" fill="#FFE08A"/><circle cx="89" cy="54" r="1.8" fill="#FFE08A"/>
+          <rect x="68" y="59" width="5" height="4" rx="1" fill="#2B3445"/><rect x="87" y="59" width="5" height="4" rx="1" fill="#2B3445"/>
+          <path d="M80 70v8M66 80h28" stroke="#3B4A66" stroke-width="4" stroke-linecap="round"/>
+          <g stroke-linecap="round">
+            <path d="M22 97h50" stroke="#C9D2E3" stroke-width="5"/><path d="M22 97h34" stroke="#D9822B" stroke-width="5"/><circle cx="56" cy="97" r="6" fill="#fff" stroke="#D9822B" stroke-width="3"/>
+            <path d="M88 97h50" stroke="#C9D2E3" stroke-width="5"/><path d="M88 97h14" stroke="#2F7D4F" stroke-width="5"/><circle cx="102" cy="97" r="6" fill="#fff" stroke="#2F7D4F" stroke-width="3"/>
+          </g>
+        </svg>
+        <div class="idea-t">Симуляція</div>
+        <p>Запуск моделі з даними</p>
+        <p class="idea-ex">Водіння в дощ на тренажері</p>
+      </div>
+    </div>
+    <div class="note">Найпростіша модель — електронна таблиця з формулами.</div>
+    <p class="soft">Клацни картку, а потім кошик.</p>
+    <div class="exercise">
+      <div class="sort-buckets three">
+        <div class="bucket" id="bkModel"><div class="bucket-title">Модель</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkHyp"><div class="bucket-title">Гіпотеза</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkSim"><div class="bucket-title">Симуляція</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="sortPool"></div>
+      <div class="progress-line" id="sortProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Дослідження</div>
+    <h2>Модель «Поїздка класу»</h2>
+    <p>Клас їде до музею. Автобус коштує 6000 грн на всіх, а квиток до музею кожен купує сам. Таблиця рахує, скільки має здати кожен учень.</p>
+    <p class="soft">Рухай повзунки: жовті комірки — вхідні дані, решту рахують формули. Тоді вирішуй, чи гіпотеза справджується.</p>
+    <div class="exercise">
+      <div class="model">
+        <table class="model-sheet">
+          <colgroup><col style="width:30px"><col style="width:40%"><col style="width:22%"><col></colgroup>
+          <tr><th class="rn"></th><th>A</th><th>B</th><th>Що в комірці B</th></tr>
+          <tr><th class="rn">1</th><td>Учнів</td><td class="v inp" id="cB1"></td><td class="f">число</td></tr>
+          <tr><th class="rn">2</th><td>Квиток до музею, грн</td><td class="v inp" id="cB2"></td><td class="f">число</td></tr>
+          <tr><th class="rn">3</th><td>Автобус, грн</td><td class="v">6000</td><td class="f">число</td></tr>
+          <tr><th class="rn">4</th><td>Автобус на одного</td><td class="v" id="cB4"></td><td class="f">=B3/B1</td></tr>
+          <tr><th class="rn">5</th><td>Здати кожному</td><td class="v" id="cB5"></td><td class="f">=B2+B4</td></tr>
+          <tr><th class="rn">6</th><td>Висновок</td><td class="v" id="cB6"></td><td class="f" title='=IF(B5&gt;500;"Дорого";"Їдемо!")'>=IF(B5&gt;500;"Дорого";"Їдемо!")</td></tr>
+        </table>
+        <div class="legend"><span class="l-in">вхідні дані</span><span class="l-f">формули</span></div>
+        <div class="sliders">
+          <div class="sl"><label>Учнів поїде <b id="lN"></b></label><input type="range" id="sN" min="10" max="30" step="1" value="15"></div>
+          <div class="sl"><label>Квиток до музею <b id="lT"></b></label><input type="range" id="sT" min="100" max="400" step="50" value="200"></div>
+        </div>
+      </div>
+      <div id="hypList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label recap">Повторення · Працюємо з числами</div>
+    <h2>Велика розминка</h2>
+    <p>Тепер — увесь розділ: адреси й типи даних, формули, функції, посилання й діаграми. Запитання йдуть по одному.</p>
+    <div class="exercise" id="warmup"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label recap">Повторення · Інструменти</div>
+    <h2>Що тут знадобиться?</h2>
+    <p class="soft">Для кожного завдання обери інструмент Google Таблиць.</p>
+    <div id="toolList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label recap">Повторення · Помилки</div>
+    <h2>Що пішло не так?</h2>
+    <p class="soft">Обери, що бачить учень, а потім клацни причину.</p>
+    <div class="exercise">
+      <div class="match-pool" id="errPool"></div>
+      <div id="errList"></div>
+      <div class="progress-line" id="errProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer>Урок · «Моделювання. Дослідження та гіпотези» · 8 клас</footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+const $ = id=>document.getElementById(id);
+const m = s=>`<span class="mono">${s}</span>`;
+const pre = (rows, f = '')=>'<table class="mini"><tr><th></th>' + rows[0].map((_, c)=>`<th>${'ABC'[c]}</th>`).join('') + '</tr>'
+  + rows.map((row, r)=>`<tr><th>${r + 1}</th>` + row.map(v=>`<td${typeof v === 'number' ? ' class="num"' : ''}>${v}</td>`).join('') + '</tr>').join('')
+  + '</table>' + (f ? `<div class="fline">${f}</div>` : '');
+
+/* ================= КРОК 1 ================= */
+makeSortBoard('sortPool', { model:'bkModel', hyp:'bkHyp', sim:'bkSim' }, [
+  { text:'Таблиця витрат на свято', bucket:'model' },
+  { text:'Програма прогнозу погоди', bucket:'model' },
+  { text:'«У спеку п\'ють більше води»', bucket:'hyp' },
+  { text:'«Що більше учнів, то дешевше»', bucket:'hyp' },
+  { text:'Міняємо ціну й дивимось на суму', bucket:'sim' },
+  { text:'Віртуальний краш-тест авто', bucket:'sim' },
+  { text:'Макет нового парку', bucket:'model' },
+  { text:'«Після сну тест пишуть краще»', bucket:'hyp' },
+  { text:'Віртуальний затор на мосту', bucket:'sim' }
+], 'sortProgress');
+
+/* ================= КРОК 2: МОДЕЛЬ «ПОЇЗДКА КЛАСУ» ================= */
+(function(){
+  const BUS = 6000;
+  const fmt = v=>Number.isInteger(v) ? String(v) : v.toFixed(2).replace('.', ',');
+  const set = (id, html)=>{
+    const c = $(id);
+    if(c.innerHTML === html) return;
+    c.innerHTML = html;
+    c.classList.remove('pop'); void c.offsetWidth; c.classList.add('pop');
+  };
+  const update = ()=>{
+    const n = +$('sN').value, t = +$('sT').value;
+    const per = BUS / n, total = t + per;
+    $('lN').textContent = n; $('lT').textContent = t + ' грн';
+    set('cB1', String(n)); set('cB2', String(t));
+    set('cB4', fmt(per)); set('cB5', fmt(total));
+    set('cB6', total > 500 ? '<span class="verdict-bad">Дорого</span>' : '<span class="verdict-ok">Їдемо!</span>');
+  };
+  $('sN').addEventListener('input', update);
+  $('sT').addEventListener('input', update);
+  update();
+})();
+
+makeYesNo('hypList', [
+  { text:'Що більше учнів поїде, то менше має здати кожен.', correct:true, why:'Автобус ділиться на всіх: =B3/B1. Більший дільник — менша частка.' },
+], 'Справджується', 'Не справджується');
+
+/* ================= ПОВТОРЕННЯ: РОЗМИНКА ================= */
+makeWarmup('warmup', [
+  { text:'Як записати діапазон від комірки B2 до комірки D5?', opts:[m('B2:D5'), m('B2-D5'), m('B2;D5')], correct:0, why:'Між першою й останньою коміркою — двокрапка.' },
+  { text:`Скільки комірок у діапазоні ${m('A1:D2')}?`, opts:['4', '6', '8'], correct:2, why:'4 стовпчики × 2 рядки.' },
+  { text:'Що таблиця сприйме як число й зможе додати у формулі?', opts:['25', '25 грн', '№25'], correct:0, why:'Будь-які літери чи знаки поруч роблять запис текстом. «грн» додає формат «Валюта».' },
+  { pre:pre([[4], [3]], '=A1+A2*2'), text:'Що покаже формула?', opts:['14', '10', '9'], correct:1, why:'Спершу множення: 3 * 2 = 6, потім 4 + 6.' },
+  { pre:pre([[4], [6], [8]], '=AVERAGE(A1:A3)'), text:'Що покаже формула?', opts:['6', '18', '3'], correct:0, why:'(4 + 6 + 8) / 3 = 6.' },
+  { text:'Яка формула знайде 20% від числа в A1?', opts:[m('=A1*20%'), m('=A1/20'), m('=A1+20%')], correct:0, why:'Відсоток від числа — множення: 20% — це 0,2.' },
+  { text:'Як знайти різницю між найбільшим і найменшим значенням у A1:A10?', opts:[m('=MAX(A1:A10)-MIN(A1:A10)'), m('=SUM(A1:A10)-MIN(A1:A10)'), m('=MAX(A1:A10)-A1')], correct:0 },
+  { pre:pre([['Бал'], [7]], '=IF(A2&gt;=10;"Високий";IF(A2&gt;=7;"Достатній";"Середній"))'), text:'Що покаже формула?', opts:['Високий', 'Достатній', 'Середній'], correct:1, why:'7 не менше за 10 — ні; не менше за 7 — так.' },
+  { pre:pre([['Гурток', 'Бал'], ['ні', 8]], '=OR(A2="так";B2&gt;5)'), text:'Що покаже формула?', opts:['TRUE', 'FALSE'], correct:0, why:'OR достатньо однієї правдивої умови: 8 більше за 5.' },
+  { text:`Формулу ${m('=B2*$E$1')} скопіювали на рядок нижче. Що вийде?`, opts:[m('=B3*$E$1'), m('=B3*$E$2'), m('=B2*$E$1')], correct:0, why:'Відносна B2 зсунулась на B3, а закріплена $E$1 лишилась.' },
+  { text:'Яка діаграма найкраще покаже, як змінювалася температура протягом тижня?', opts:['Лінійна', 'Секторна', 'Стовпчаста'], correct:0, why:'Лінійна показує зміну з часом.' },
+  { text:'Яка діаграма покаже, яку частку класу займає кожен гурток?', opts:['Лінійна', 'Секторна', 'Стовпчаста'], correct:1, why:'Секторна — частини одного цілого.' }
+]);
+
+/* ================= ПОВТОРЕННЯ: ІНСТРУМЕНТИ ================= */
+makeClassify('toolList', [
+  { text:'У стовпчик «Оцінка» не повинні ввести 15 чи «відмінно».', correct:0 },
+  { text:'Порахувати середній бал класу за контрольну.', correct:1 },
+  { text:'Біля кожного учня написати «Склав» або «Не склав» залежно від балу.', correct:2 },
+  { text:'Скопіювати формулу так, щоб курс долара в E1 не зсувався.', correct:3 },
+  { text:'Показати батькам, як змінювалась успішність класу за чверті.', correct:4 }
+], ['Перевірка даних', 'AVERAGE', 'IF', 'Знак $', 'Діаграма']);
+
+/* ================= ПОВТОРЕННЯ: ПОМИЛКИ ================= */
+makeMatching('errPool', 'errList', [
+  { name:'#NAME?', desc:'Назву функції написано з помилкою, наприклад кирилицею' },
+  { name:'#DIV/0!', desc:'Формула ділить на нуль чи на порожню комірку' },
+  { name:'#VALUE!', desc:'Формула намагається помножити текст' },
+  { name:'Число стоїть ліворуч', desc:'Поруч із числом дописали літери, і воно стало текстом' },
+  { name:'Після копіювання вийшов 0', desc:'Забули $, і адреса зсунулась на порожню комірку' }
+], 'errProgress');
+
+/* ================= ФІНАЛЬНИЙ ТЕСТ ================= */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що таке гіпотеза?', opts:['Припущення, яке можна перевірити', 'Таблиця з формулами', 'Остаточний результат дослідження'], correct:0 },
+  { q:'Навіщо майбутні водії тренуються на тренажері-симуляторі?', opts:['Щоб навчитися без ризику', 'Бо справжніх авто замало', 'Щоб не вчити правила'], correct:0 },
+  { q:'Що в моделі-таблиці треба змінити, щоб перевірити гіпотезу?', opts:['Вхідні дані', 'Формули', 'Назви стовпчиків'], correct:0, why:'Формули — правила моделі, вони лишаються. Змінюємо числа на вході.' },
+  { q:'Чому модель у таблиці зручна для досліджень?', opts:['Формули перераховуються самі, щойно змінюються дані', 'Вона завжди точно передбачає майбутнє', 'Їй не потрібні дані'], correct:0 },
+  { q:'У A1 — 12, у A2 — 3. Що покаже =A1/A2+1?', opts:['5', '3', '13'], correct:0, why:'Спершу ділення: 12 / 3 = 4, потім + 1.' },
+  { q:'Що рахує COUNTIF(B2:B30;">=10")?', opts:['Скільки чисел не менші за 10', 'Суму чисел, не менших за 10', 'Чи є хоч одне число від 10'], correct:0 },
+  { q:'Яке посилання не зміниться під час копіювання формули?', opts:['$C$1', 'C1', 'C$1'], correct:0, why:'C$1 закріплює лише рядок, а стовпчик зсуватиметься.' },
+  { q:'Яка діаграма найкраще порівняє кількість учнів у п\'яти гуртках?', opts:['Стовпчаста', 'Лінійна', 'Секторна'], correct:0, why:'Стовпчики зручно порівнювати між собою.' }
+], {summary:'Ти знаєш, як модель у таблиці допомагає перевіряти гіпотези, і повторив усе потрібне перед тематичним оцінюванням.'});
+</script>
+
+</body>
+</html>
