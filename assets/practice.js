@@ -2,6 +2,8 @@
    Без нейрончиків і без посилань назад. */
 (()=>{
   const body = document.body;
+  // спільний футер (© · CC · Про проєкт) — assets/footer.js, підвантажується поруч із цим файлом
+  document.head.appendChild(Object.assign(document.createElement('script'), {src:new URL('footer.js', document.currentScript.src).href}));
   body.insertAdjacentHTML('afterbegin', `
     <div class="hud">
       <div class="hud-bar"><div class="hud-bar-fill"></div></div>

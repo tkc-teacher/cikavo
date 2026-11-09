@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Про проєкт — Цікаво</title>
+<meta name="description" content="Інтерактивні уроки інформатики для самостійного навчання під час тривоги чи після пропуску. Автор — Ткачук Ігор Антонович.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Цікаво">
+<meta property="og:title" content="Про проєкт — інтерактивні уроки інформатики">
+<meta property="og:description" content="Інтерактивні уроки інформатики, гурток Python і Лабораторія ігор.">
+<meta property="og:url" content="https://cikavo.me/about/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add('js');</script>
+<style>
+  :root{
+    --bg:#F7F6FC; --ink:#1B1B3A; --ink-soft:#57557A; --surface:#FFFFFF; --line:#E6E3F5;
+    --purple:#6C5CE7; --purple-dark:#5340c9; --purple-soft:#EFECFD;
+    --teal:#16A3A0; --teal-dark:#0E7C7A; --teal-soft:#E3F7F6;
+    --blue:#3776AB; --blue-soft:#E8F0F8;
+    --yellow:#FFC93C; --yellow-soft:#FFF5D6;
+    --coral:#FF6B4A; --coral-soft:#FFEDE8;
+    --ok:#1FA971;
+    --radius-s:12px; --radius-m:18px; --radius-l:28px;
+    --shadow:0 1px 2px rgba(27,27,58,.04), 0 8px 24px rgba(27,27,58,.06);
+    --shadow-lift:0 2px 4px rgba(27,27,58,.05), 0 18px 40px rgba(83,64,201,.14);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth; scroll-padding-top:76px;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Nunito Sans',sans-serif; font-size:16px; line-height:1.6; -webkit-font-smoothing:antialiased; overflow-x:hidden;}
+  /* переносимо лише тоді, коли текст справді не вміщається */
+  p, li, h1, h2, h3, span, div{text-wrap:wrap;}
+  h1,h2,h3{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink); line-height:1.15;}
+  a{color:var(--purple-dark);}
+  .ico{width:24px; height:24px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0;}
+  .wrap{max-width:1080px; margin:0 auto; padding:0 24px;}
+  @media (max-width:560px){ .wrap{padding:0 16px;} }
+
+  /* ── верхня панель ── */
+  .topbar{position:sticky; top:0; z-index:20; background:rgba(247,246,252,.82); backdrop-filter:saturate(1.6) blur(14px); -webkit-backdrop-filter:saturate(1.6) blur(14px); border-bottom:1px solid transparent; transition:border-color .2s ease;}
+  .topbar.scrolled{border-bottom-color:var(--line);}
+  .topbar .wrap{display:flex; align-items:center; gap:16px; height:60px;}
+  .home{display:inline-flex; align-items:center; gap:6px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:var(--ink); text-decoration:none; white-space:nowrap; padding:6px 12px 6px 8px; border-radius:999px; transition:background .15s ease;}
+  .home:hover{background:var(--purple-soft); color:var(--purple-dark);}
+  .home .ico{width:18px; height:18px;}
+
+  /* ── hero ── */
+  .hero{position:relative; padding:64px 0 56px; isolation:isolate;}
+  .hero::before{content:""; position:absolute; inset:-60px 0 0; z-index:-1; background:
+      radial-gradient(520px 360px at 85% 20%, rgba(108,92,231,.16), transparent 70%),
+      radial-gradient(420px 320px at 70% 85%, rgba(22,163,160,.13), transparent 70%),
+      radial-gradient(360px 260px at 8% 10%, rgba(255,201,60,.16), transparent 70%);}
+  .hero::after{content:""; position:absolute; inset:-60px 0 0; z-index:-1; background-image:radial-gradient(rgba(83,64,201,.13) 1px, transparent 1.2px); background-size:22px 22px; mask-image:radial-gradient(ellipse 70% 80% at 70% 40%, #000 20%, transparent 75%);}
+  
+  .chip{display:inline-flex; align-items:center; gap:8px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; color:var(--purple-dark); background:var(--surface); border:1px solid var(--line); padding:5px 14px 5px 8px; border-radius:999px; box-shadow:var(--shadow);}
+  .chip .dot{width:22px; height:22px; border-radius:50%; background:var(--purple-soft); display:inline-flex; align-items:center; justify-content:center;}
+  .chip .dot .ico{width:14px; height:14px;}
+  .hero h1{font-size:clamp(34px, 5vw, 54px); font-weight:800; letter-spacing:-.01em; margin:18px 0 16px;}
+  .hero h1 .grad{background:linear-gradient(100deg,var(--purple) 0%,var(--teal) 100%); -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .hero .wrap{display:grid; grid-template-columns:1.05fr .95fr; gap:48px; align-items:center;}
+  .lead{font-size:clamp(16.5px, 1.8vw, 19px); color:var(--ink-soft); margin:0 0 28px;}
+  .actions{display:flex; flex-wrap:wrap; gap:12px;}
+  .btn{display:inline-flex; align-items:center; gap:8px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; text-decoration:none; padding:11px 22px; border-radius:999px; transition:transform .15s ease, box-shadow .15s ease, background .15s ease;}
+  .btn .ico{width:18px; height:18px;}
+  .btn-primary{background:var(--purple); color:#fff; box-shadow:0 6px 18px rgba(108,92,231,.32);}
+  .btn-primary:hover{background:var(--purple-dark); transform:translateY(-2px);}
+  .btn-tilt{transform:rotate(3deg);}
+  .btn-tilt:hover{transform:rotate(0deg) translateY(-2px);}
+  .btn-sticker{background:var(--yellow); color:var(--ink); transform:rotate(-4deg); box-shadow:0 6px 16px rgba(230,170,20,.35);}
+  .btn-sticker:hover{background:#FFD45E; transform:rotate(0deg) translateY(-2px);}
+
+  /* макет уроку в hero */
+  .mock{position:relative; justify-self:center; width:100%; max-width:420px;}
+  .mock-card{background:var(--surface); border-radius:var(--radius-l); box-shadow:var(--shadow-lift); border:1px solid var(--line); overflow:hidden; transform:rotate(-1.5deg);}
+  .mock-hud{height:6px; background:var(--purple-soft);}
+  .mock-hud span{display:block; height:100%; width:62%; background:linear-gradient(90deg,var(--purple),var(--teal)); border-radius:0 6px 6px 0;}
+  .mock-body{padding:20px 22px 22px;}
+  .mock-top{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;}
+  .mock-step{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--purple-dark); letter-spacing:.02em;}
+  .mock-neurons{display:inline-flex; align-items:center; gap:5px; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:15px; background:var(--yellow-soft); color:#8A6200; padding:2px 10px 2px 6px; border-radius:999px;}
+  .mock-neurons svg{width:20px; height:20px;}
+  .mock-q{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:19px; line-height:1.3; margin-bottom:14px;}
+  .mock-opts{display:grid; gap:8px;}
+  .mock-opt{display:flex; align-items:center; gap:10px; font-weight:700; font-size:15px; padding:10px 14px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg);}
+  .mock-opt i{width:20px; height:20px; border-radius:50%; border:2px solid var(--line); flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; font-style:normal;}
+  .mock-opt.ok{border-color:var(--ok); background:#E8F8F0; color:#11734B;}
+  .mock-opt.ok i{border-color:var(--ok); background:var(--ok);}
+  .mock-opt.ok i svg{width:12px; height:12px; stroke:#fff; stroke-width:3;}
+  .mock-why{margin-top:12px; font-size:13.5px; color:var(--ink-soft); background:var(--teal-soft); border-radius:var(--radius-s); padding:9px 12px;}
+  .float{position:absolute; display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--line); border-radius:999px; box-shadow:var(--shadow-lift); font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; padding:7px 14px 7px 8px; white-space:nowrap;}
+  .float .badge{width:28px; height:28px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center;}
+  .float .badge .ico{width:16px; height:16px;}
+  .float.f1{top:46%; right:-26px; transform:rotate(3deg);}
+  .float.f1 .badge{background:var(--yellow-soft); color:#8A6200;}
+  .float.f2{bottom:-20px; left:-18px; transform:rotate(-2deg);}
+  .float.f2 .badge{background:var(--teal-soft); color:var(--teal-dark);}
+  @media (prefers-reduced-motion:no-preference){
+    .float.f1{animation:bob 5s ease-in-out infinite;}
+    .float.f2{animation:bob 6s ease-in-out -2s infinite;}
+    @keyframes bob{50%{translate:0 -6px;}}
+  }
+
+  @media (max-width:860px){
+    .hero{padding:40px 0 48px;}
+    .hero .wrap{grid-template-columns:1fr; gap:44px;}
+    .mock{max-width:380px;}
+  }
+  @media (max-width:480px){ .float.f1{right:-6px;} .float.f2{left:-6px;} }
+
+  /* ── секції ── */
+  section.s{padding:56px 0;}
+  .s-head{margin-bottom:28px;}
+  .kicker{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; letter-spacing:.06em; text-transform:uppercase; color:var(--purple); margin-bottom:6px;}
+  .s-head h2{font-size:clamp(28px, 3.6vw, 38px); font-weight:800; letter-spacing:-.01em;}
+  .s-head p{color:var(--ink-soft); font-size:17px; margin:10px 0 0;}
+  section.s.tight{padding-top:0;}
+  @media (max-width:560px){ section.s{padding:40px 0;} section.s.tight{padding-top:0;} }
+
+
+  /* для кого */
+  .grid3{display:grid; grid-template-columns:repeat(3,1fr); gap:16px;}
+  @media (max-width:860px){ .grid3{grid-template-columns:1fr;} }
+  .who{display:flex; gap:14px; align-items:flex-start; padding:20px; border-radius:var(--radius-m); background:linear-gradient(180deg,var(--surface),rgba(255,255,255,.6)); border:1px solid var(--line);}
+  .who .w-ico{width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center; background:var(--c-soft); color:var(--c); flex-shrink:0;}
+  .who b{display:block; font-family:'Baloo 2',sans-serif; font-size:18px; line-height:1.3;}
+  .who span{font-size:15px; color:var(--ink-soft);}
+  .c-purple{--c:var(--purple); --c-soft:var(--purple-soft);}
+  .c-blue{--c:var(--blue); --c-soft:var(--blue-soft);}
+  .c-teal{--c:var(--teal-dark); --c-soft:var(--teal-soft);}
+
+  .c-yellow{--c:#B07D00; --c-soft:var(--yellow-soft);}
+  .c-coral{--c:#D9472A; --c-soft:var(--coral-soft);}
+
+  /* як влаштований урок — кроки-вкладки й сцена з ілюстрацією */
+  .steps{display:grid; grid-template-columns:repeat(4,1fr); gap:12px; position:relative;}
+  .steps::before{content:""; position:absolute; top:41px; left:12%; right:12%; height:2px; background:repeating-linear-gradient(90deg,var(--line) 0 8px,transparent 8px 14px);}
+  .step{position:relative; display:flex; flex-direction:column; align-items:center; justify-content:flex-start; width:100%; text-align:center; padding:14px 10px 16px; border:0; border-radius:var(--radius-m); background:transparent; font:inherit; color:inherit; cursor:pointer; transition:background .2s ease, box-shadow .2s ease;}
+  .step:hover{background:rgba(255,255,255,.7);}
+  .step:focus-visible{outline:2px solid var(--c); outline-offset:2px;}
+  .step .n{position:relative; width:56px; height:56px; margin:0 auto 12px; border-radius:50%; background:var(--surface); border:2px solid var(--c); color:var(--c); display:flex; align-items:center; justify-content:center; box-shadow:0 0 0 6px var(--bg); transition:background .2s ease, color .2s ease, transform .2s ease;}
+  .step .n small{position:absolute; top:-6px; right:-6px; width:22px; height:22px; border-radius:50%; background:var(--c); color:#fff; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:12.5px; line-height:22px; box-shadow:0 0 0 2px var(--bg);}
+  .step .st-t{display:block; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:19px; line-height:1.2; margin-bottom:4px; transition:color .2s ease;}
+  .step .st-p{display:block; font-size:15px; line-height:1.5; color:var(--ink-soft);}
+  .step.on{background:var(--surface); box-shadow:var(--shadow);}
+  .step.on .n{background:var(--c); color:#fff; transform:scale(1.06); box-shadow:0 0 0 6px var(--surface);}
+  .step.on .n small{background:var(--yellow); color:#5A4100; box-shadow:0 0 0 2px var(--surface);}
+  .step.on .st-t{color:var(--c);}
+  @media (max-width:760px){
+    .steps{gap:6px;}
+    .steps::before{top:35px;}
+    .step{padding:10px 4px 12px;}
+    .step .n{width:46px; height:46px; margin-bottom:8px;}
+    .step .n .ico{width:20px; height:20px;}
+    .step .st-t{font-size:14px;}
+    .step .st-p{display:none;}
+  }
+
+  .stage{position:relative; margin-top:14px; min-height:350px; display:flex; flex-direction:column; align-items:center; justify-content:center;}
+  .stage-cap{display:none; text-align:center; font-size:15px; color:var(--ink-soft); margin:0 0 18px;}
+  @media (max-width:760px){ .stage{min-height:0;} .stage-cap{display:block;} }
+  .scene{display:none; width:100%; max-width:460px;}
+  .scene.on{display:block; animation:sceneIn .45s ease both;}
+  @keyframes sceneIn{from{opacity:0; transform:translateY(12px) scale(.98);} to{opacity:1; transform:none;}}
+  .neu{width:22px; height:22px;}
+
+  /* спільне для сцен: картка-аркуш уроку */
+  .sheet{position:relative; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-m); box-shadow:var(--shadow-lift); padding:20px 22px;}
+  .sh-label{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--c);}
+  .sh-h{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:20px; line-height:1.25; margin:2px 0 10px;}
+
+  /* 1 · пояснення */
+  .ex-p{margin:0 0 12px; font-size:15px;}
+  .pw-list{display:grid; gap:8px;}
+  .pw{display:grid; grid-template-columns:1fr auto 78px; align-items:center; gap:12px; padding:8px 12px; border-radius:var(--radius-s); background:var(--bg);}
+  .pw code{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:15px; font-weight:600; color:var(--ink);}
+  .pw-bar{display:inline-flex; gap:4px;}
+  .pw-bar i{width:20px; height:7px; border-radius:4px; background:#E6E3F5;}
+  .pw-l{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; text-align:right;}
+  .pw.weak{--pw:#E5533A;} .pw.mid{--pw:#E0A100;} .pw.strong{--pw:var(--ok);}
+  .pw .pw-l{color:var(--pw);}
+  .pw.weak .pw-bar i:nth-child(1), .pw.mid .pw-bar i:nth-child(-n+2), .pw.strong .pw-bar i{background:var(--pw);}
+  @media (prefers-reduced-motion:no-preference){
+    .scene.on .pw{animation:pwIn .45s ease-out both;}
+    .scene.on .pw.mid{animation-delay:.15s;} .scene.on .pw.strong{animation-delay:.3s;}
+  }
+  @keyframes pwIn{from{opacity:0; transform:translateX(-10px);}}
+
+  /* 2 · вправа */
+  .pool, .bk{display:flex; flex-wrap:wrap; gap:8px;}
+  .pool{margin-bottom:14px; min-height:38px;}
+  .chip2{position:relative; display:inline-flex; align-items:center; gap:6px; white-space:nowrap; font-weight:700; font-size:14px; padding:7px 13px; border-radius:999px; background:var(--surface); border:1.5px solid var(--line);}
+  .chip2.sel{border-color:var(--c); box-shadow:0 0 0 3px var(--c-soft);}
+  .chip2.ok{background:#E8F8F0; border-color:var(--ok); color:#11734B;}
+  .chip2.slot{min-width:118px; border-style:dashed; border-color:var(--c); background:transparent; color:var(--c); justify-content:center;}
+  .buckets{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  .bk{flex-direction:column; align-items:flex-start; padding:12px; border-radius:var(--radius-s); background:var(--bg); border:1.5px solid var(--line); min-height:104px;}
+  .bk.target{border-color:var(--c);}
+  @media (max-width:480px){ .buckets{grid-template-columns:1fr;} .bk{min-height:0;} }
+  .bk-t{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px;}
+  .cursor{position:absolute; width:26px; height:26px; left:52%; top:58%; pointer-events:none; filter:drop-shadow(0 2px 3px rgba(0,0,0,.2));}
+  @media (prefers-reduced-motion:no-preference){
+    .scene.on .chip2.sel{animation:pick 2.4s ease-in-out infinite;}
+    .scene.on .chip2.slot{animation:hint 2.4s ease-in-out infinite;}
+    .scene.on .cursor{animation:tap 2.4s ease-in-out infinite;}
+  }
+  @keyframes pick{0%,100%{transform:none;} 40%,60%{transform:translateY(-3px);}}
+  @keyframes hint{0%,30%,100%{opacity:.45;} 55%,80%{opacity:1;}}
+  @keyframes tap{0%{left:58%; top:30%;} 30%{left:34%; top:24%; transform:scale(1);} 38%{transform:scale(.85);} 46%{transform:scale(1);} 75%{left:22%; top:72%;} 82%{transform:scale(.85);} 90%,100%{left:22%; top:72%; transform:scale(1);}}
+
+  /* 3 · нейрончики */
+  .hud2{display:flex; align-items:center; gap:12px; margin:-6px -6px 16px;}
+  .hud2-bar{flex:1; height:8px; border-radius:999px; background:var(--bg); overflow:hidden;}
+  .hud2-bar span{display:block; height:100%; width:58%; border-radius:999px; background:linear-gradient(90deg,var(--purple),var(--teal));}
+  .hud2-c{display:inline-flex; align-items:center; gap:6px; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:18px; background:var(--yellow-soft); color:#8A6200; padding:3px 12px 3px 7px; border-radius:999px;}
+  .cnt{position:relative; display:inline-block; height:1.2em; overflow:hidden; line-height:1.2;}
+  .cnt i{display:block; font-style:normal;}
+  .opt-ok{position:relative; display:flex; align-items:center; gap:10px; font-weight:700; font-size:15px; padding:11px 14px; border-radius:var(--radius-s); border:1.5px solid var(--ok); background:#E8F8F0; color:#11734B;}
+  .opt-ok .tick{width:20px; height:20px; border-radius:50%; background:var(--ok); display:inline-flex; align-items:center; justify-content:center;}
+  .opt-ok .tick svg{width:12px; height:12px; stroke:#fff; stroke-width:3;}
+  .plus{position:absolute; right:14px; top:50%; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:18px; color:#B07D00; opacity:0;}
+  .fly{position:absolute; width:26px; height:26px; left:70%; top:58%; opacity:0;}
+  .rates{display:flex; flex-wrap:wrap; gap:8px; margin-top:16px;}
+  .rate{display:inline-flex; align-items:center; gap:7px; font-size:13.5px; font-weight:600; background:var(--bg); border-radius:999px; padding:5px 12px 5px 6px;}
+  .rate b{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:13px; color:#8A6200; background:var(--yellow-soft); border-radius:999px; padding:1px 8px;}
+  @media (prefers-reduced-motion:no-preference){
+    .scene.on .fly{animation:fly 2.8s ease-in-out infinite;}
+    .scene.on .plus{animation:plus 2.8s ease-out infinite;}
+    .scene.on .cnt i{animation:count 2.8s ease-in-out infinite;}
+    .scene.on .hud2-bar span{animation:grow 2.8s ease-in-out infinite;}
+  }
+  @media (prefers-reduced-motion:reduce){ .cnt i{transform:translateY(-100%);} }
+  @keyframes fly{0%,8%{left:72%; top:62%; opacity:0; transform:scale(.6);} 15%{opacity:1; transform:scale(1.1);} 55%{left:84%; top:2%; opacity:1; transform:scale(.9);} 62%,100%{left:84%; top:2%; opacity:0; transform:scale(.4);}}
+  @keyframes plus{0%,5%{opacity:0; transform:translateY(-50%);} 15%{opacity:1;} 45%,100%{opacity:0; transform:translateY(-170%);}}
+  @keyframes count{0%,56%{transform:none;} 64%,100%{transform:translateY(-100%);}}
+  @keyframes grow{0%,56%{width:58%;} 70%,100%{width:66%;}}
+
+  /* 4 · підсумок */
+  .fin{text-align:center;}
+  .pile{position:relative; width:130px; height:64px; margin:0 auto 6px;}
+  .pile svg{position:absolute; width:30px; height:30px;}
+  .fin-h{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:22px; margin-bottom:12px;}
+  .donuts{display:flex; justify-content:center; gap:28px; margin-bottom:18px;}
+  .dn{position:relative; width:104px;}
+  .dn svg{width:92px; height:92px; transform:rotate(-90deg);}
+  .dn circle{fill:none; stroke-width:3.4;}
+  .dn .bg{stroke:var(--bg);}
+  .dn .fg{stroke:var(--dc); stroke-linecap:round; stroke-dasharray:var(--p) 100;}
+  .dn b{position:absolute; left:0; right:0; top:30px; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:20px;}
+  .dn span{display:block; font-size:13.5px; font-weight:700; color:var(--ink-soft);}
+  @media (prefers-reduced-motion:no-preference){ .scene.on .dn .fg{animation:draw 1.1s ease-out both .15s;} .scene.on .pile svg{animation:drop .5s ease-out both;} }
+  @keyframes draw{from{stroke-dasharray:0 100;}}
+  @keyframes drop{from{opacity:0; transform:translateY(-26px);}}
+  .share{display:inline-flex; align-items:center; gap:8px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:#fff; background:var(--purple); padding:9px 18px; border-radius:999px; box-shadow:0 6px 16px rgba(108,92,231,.3);}
+  .share .ico{width:17px; height:17px;}
+
+  /* вчителям */
+  .split{display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:center;}
+  @media (max-width:860px){ .split{grid-template-columns:1fr; gap:28px;} }
+  .checks{list-style:none; padding:0; margin:18px 0 0; display:grid; gap:12px;}
+  .checks li{display:flex; gap:12px; align-items:flex-start;}
+  .checks li .ico{width:22px; height:22px; color:var(--teal); margin-top:2px;}
+  .result{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); box-shadow:var(--shadow-lift); padding:22px 24px;}
+  .t-text{margin-bottom:28px;}
+  .t-text .checks{display:flex; flex-wrap:wrap; gap:12px 32px;}
+    .flow{display:grid; grid-template-columns:minmax(0,.8fr) 200px minmax(0,1.3fr); align-items:center; gap:0;}
+  .f-card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); box-shadow:var(--shadow-lift); padding:22px 20px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:10px;}
+  .f-who{display:flex; align-items:center; gap:8px; font-size:15px; font-weight:700; color:var(--ink);}
+  .f-ava{width:52px; height:52px; border-radius:16px; background:var(--yellow-soft); display:flex; align-items:center; justify-content:center; font-size:30px;}
+  .f-who{flex-direction:column; gap:6px;}
+  .flow .f-card, .flow .result{position:relative;}
+  .f-role{position:absolute; top:0; left:50%; transform:translate(-50%,-50%); padding:4px 14px; border-radius:999px; background:var(--purple); color:#fff; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; line-height:1.2; letter-spacing:.02em; white-space:nowrap; box-shadow:0 0 0 4px var(--bg);}
+  .flow .result .f-role{background:var(--teal);}
+  .flow .f-card{padding-top:28px;} .flow .result{padding-top:28px;}
+  .f-done{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:20px; line-height:1.2;}
+  .f-arrow{display:flex; align-items:center; justify-content:center; padding:0 16px;}
+  .f-arrow svg{width:170px; height:80px; overflow:visible; flex-shrink:0;}
+  .f-arrow .curl{stroke-dasharray:7 8;}
+  .f-arrow .head{stroke:var(--teal);}
+  @media (prefers-reduced-motion:no-preference){ .f-arrow .curl{animation:flowDash 1.6s linear infinite;} }
+  @keyframes flowDash{to{stroke-dashoffset:-15;}}
+  .f-arrow path{fill:none; stroke:url(#fGrad); stroke-width:3.5; stroke-linecap:round; stroke-linejoin:round;}
+  @media (max-width:760px){
+    .flow{grid-template-columns:1fr; justify-items:stretch;}
+    .f-arrow{height:170px; padding:0 0 14px;}
+    .f-arrow svg{transform:rotate(90deg); width:130px; height:61px;}
+  }
+  .r-head{display:flex; align-items:center; gap:14px; padding-bottom:16px; border-bottom:1px dashed var(--line); margin-bottom:16px;}
+  .r-mark{width:52px; height:52px; border-radius:16px; background:var(--yellow-soft); display:flex; align-items:center; justify-content:center; font-size:30px;}
+  .r-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; line-height:1.25;}
+  .r-sub{font-size:13.5px; color:var(--ink-soft);}
+  .r-stats{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px;}
+  .r-stat{background:var(--bg); border-radius:var(--radius-s); padding:10px 12px;}
+  .r-stat b{display:block; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:22px; line-height:1.1;}
+  .r-stat span{font-size:12.5px; color:var(--ink-soft);}
+  .r-row{display:grid; grid-template-columns:1fr 110px 40px; align-items:center; gap:10px; font-size:14px; padding:5px 0;}
+  .r-bar{height:8px; border-radius:999px; background:var(--purple-soft); overflow:hidden;}
+  .r-bar span{display:block; height:100%; border-radius:999px; background:linear-gradient(90deg,var(--purple),var(--teal));}
+  .r-row em{font-style:normal; font-weight:700; text-align:right; color:var(--ink-soft);}
+
+  /* авторське право: автор + ліцензія в одній картці */
+  .au{display:grid; grid-template-columns:auto 1fr; gap:16px; align-items:center; padding-bottom:18px; margin-bottom:18px; border-bottom:1px dashed var(--line);}
+  .avatar{width:60px; height:60px; border-radius:18px; background:linear-gradient(135deg,var(--purple) 0%,var(--teal) 100%); color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:23px; letter-spacing:.02em;}
+  .au-name{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:21px; line-height:1.2;}
+  .au-role{font-weight:700; font-size:14.5px; color:var(--purple-dark);}
+  .au-p{margin:4px 0 0; font-size:14.5px; color:var(--ink-soft);}
+  .ai{display:inline-flex; align-items:center; gap:8px; margin-top:10px; padding:5px 12px 5px 8px; border-radius:999px; background:var(--purple-soft); font-size:13.5px; font-weight:600;}
+  .ai .ico{width:16px; height:16px; color:var(--purple);}
+  @media (max-width:520px){ .au{grid-template-columns:1fr; gap:10px;} .ai{border-radius:12px; align-items:flex-start;} }
+  .lic{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); box-shadow:var(--shadow); padding:24px;}
+  @media (max-width:560px){ .lic{padding:22px 18px;} }
+  .lic-top{display:flex; flex-wrap:wrap; align-items:center; gap:12px 20px; margin-bottom:16px;}
+  .cc-big{display:flex; align-items:center; gap:14px; text-decoration:none; color:var(--ink);}
+  .cc-big svg{width:44px; height:44px; color:var(--ink);}
+  .cc-big b{display:block; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:19px; line-height:1.15;}
+  .cc-big span{font-size:14px; color:var(--purple-dark); font-weight:700;}
+  .terms{display:flex; flex-wrap:wrap; gap:8px; margin-left:auto;}
+  .term{display:inline-flex; align-items:center; gap:8px; padding:6px 12px 6px 6px; border-radius:999px; background:var(--bg); font-size:14px; font-weight:600;}
+  .term code{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:13px; background:var(--ink); color:#fff; border-radius:999px; padding:2px 9px;}
+  @media (max-width:760px){ .terms{margin-left:0;} }
+  .rules{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  @media (max-width:640px){ .rules{grid-template-columns:1fr;} }
+  .rule{border-radius:var(--radius-m); padding:14px 16px;}
+  .rule h3{display:flex; align-items:center; gap:8px; font-size:16.5px; margin-bottom:8px;}
+  .rule h3 .ico{width:22px; height:22px;}
+  .rule ul{margin:0; padding-left:20px; font-size:14.5px;}
+  .rule li + li{margin-top:3px;}
+  .rule.yes{background:var(--teal-soft);} .rule.yes h3{color:var(--teal-dark);}
+  .rule.if{background:var(--yellow-soft);} .rule.if h3{color:#8A6200;}
+  .cite{margin-top:16px;}
+  .cite-label{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; margin-bottom:8px;}
+  .cite-box{display:flex; align-items:center; gap:12px; background:var(--bg); border:1.5px dashed #CFCAEB; border-radius:var(--radius-s); padding:10px 10px 10px 16px;}
+  .cite-box span{flex:1; min-width:0; font-size:15px;}
+  .copy-btn{display:inline-flex; align-items:center; gap:6px; flex-shrink:0; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; color:var(--purple-dark); background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:6px 14px 6px 10px; cursor:pointer; transition:border-color .15s ease, color .15s ease;}
+  .copy-btn:hover{border-color:var(--purple);}
+  .copy-btn .ico{width:16px; height:16px;}
+  .copy-btn.done{color:var(--ok); border-color:var(--ok);}
+  @media (max-width:520px){ .cite-box{flex-direction:column; align-items:stretch;} .copy-btn{align-self:flex-start;} }
+
+  /* сторонні матеріали й приватність */
+  .duo{display:grid; grid-template-columns:1.25fr 1fr; gap:16px;}
+  @media (max-width:860px){ .duo{grid-template-columns:1fr;} }
+  .panel{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); box-shadow:var(--shadow); padding:26px;}
+  @media (max-width:560px){ .panel{padding:22px 18px;} }
+  .panel h3{display:flex; align-items:center; gap:12px; font-size:22px; margin-bottom:14px;}
+  .panel h3 .p-ico{width:40px; height:40px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--c-soft); color:var(--c);}
+  .panel > p{margin:0 0 12px; color:var(--ink-soft);}
+  .items{list-style:none; margin:0; padding:0; display:grid; gap:10px;}
+  .items li{padding:12px 14px; border-radius:var(--radius-s); background:var(--bg); font-size:15px;}
+  .items li b{display:block; font-family:'Baloo 2',sans-serif; font-size:16px; line-height:1.3;}
+  .panel .note{margin:14px 0 0; font-size:14.5px; color:var(--ink-soft);}
+
+  /* контакти */
+  .cta{position:relative; overflow:hidden; text-align:center; padding:48px 24px; border-radius:var(--radius-l); background:linear-gradient(135deg,var(--purple-soft) 0%,#E8F7F6 100%); border:1px solid var(--line);}
+  .cta::before{content:""; position:absolute; inset:0; background-image:radial-gradient(rgba(83,64,201,.12) 1px, transparent 1.2px); background-size:20px 20px; mask-image:radial-gradient(ellipse 60% 70% at 50% 50%, transparent 30%, #000 100%);}
+  .cta > *{position:relative;}
+  .cta .m-ico{width:60px; height:60px; margin:0 auto 14px; border-radius:20px; background:var(--surface); color:var(--purple); display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow);}
+  .cta .m-ico .ico{width:30px; height:30px;}
+  .cta h2{font-size:clamp(26px, 3.4vw, 34px); font-weight:800; margin-bottom:8px;}
+  .cta p{color:var(--ink-soft); margin:0 auto 22px;}
+  .cta .btn{font-size:clamp(14.5px, 2.6vw, 17px); max-width:100%; overflow-wrap:anywhere;}
+
+  footer{padding:40px 24px 56px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
+
+  /* поява під час прокрутки */
+  @media (prefers-reduced-motion:no-preference){
+    .js .reveal{opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease;}
+    .js .reveal.in{opacity:1; transform:none;}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar" id="topbar">
+  <div class="wrap">
+    <a class="home" href="../index.html"><svg class="ico" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>На головну</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <span class="chip"><span class="dot"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg></span>Про проєкт</span>
+      <h1>Інтерактивні уроки <span class="grad">інформатики</span></h1>
+      <p class="lead">Уроки, які учень може пройти сам: коротке пояснення, одразу вправа й самоперевірка. Коли немає змоги бути на занятті — під час тривоги чи після пропуску.</p>
+      <div class="actions">
+        <a class="btn btn-primary btn-tilt" href="../index.html">Обрати клас<svg class="ico" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn btn-sticker" href="#how">Як це працює?</a>
+      </div>
+    </div>
+
+    <div class="mock" aria-hidden="true">
+      <div class="mock-card">
+        <div class="mock-hud"><span></span></div>
+        <div class="mock-body">
+          <div class="mock-top">
+            <span class="mock-step">КРОК 2 · МЕРЕЖІ</span>
+            <span class="mock-neurons"><svg viewBox="0 0 24 24"><g stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"><line x1="12" y1="7.8" x2="12" y2="3.7"/><line x1="15.6" y1="9.9" x2="19.1" y2="7.8"/><line x1="15.6" y1="14.1" x2="19.1" y2="16.2"/><line x1="12" y1="16.2" x2="12" y2="20.3"/><line x1="8.4" y1="14.1" x2="4.9" y2="16.2"/><line x1="8.4" y1="9.9" x2="4.9" y2="7.8"/></g><g fill="#FFC93C"><circle cx="12" cy="12" r="4.2"/><circle cx="12" cy="3.7" r="1.2"/><circle cx="19.1" cy="7.8" r="1.2"/><circle cx="19.1" cy="16.2" r="1.2"/><circle cx="12" cy="20.3" r="1.2"/><circle cx="4.9" cy="16.2" r="1.2"/><circle cx="4.9" cy="7.8" r="1.2"/></g></svg>24</span>
+          </div>
+          <div class="mock-q">Яка мережа об'єднує комп'ютери одного класу?</div>
+          <div class="mock-opts">
+            <div class="mock-opt"><i></i>Глобальна</div>
+            <div class="mock-opt ok"><i><svg class="ico" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></i>Локальна</div>
+            <div class="mock-opt"><i></i>Супутникова</div>
+          </div>
+          <div class="mock-why">Так! Локальна мережа — у межах кімнати чи будівлі.</div>
+        </div>
+      </div>
+      <div class="float f1"><span class="badge"><svg class="ico" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></span>1 нейрончик</div>
+      <div class="float f2"><span class="badge"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg></span>Точність 92%</div>
+    </div>
+  </div>
+</section>
+
+<section class="s" id="inside">
+  <div class="wrap">
+    <div class="s-head reveal">
+      <div class="kicker">Що це за сайт?</div>
+      <h2>Усе для навчання інформатики — в одному місці</h2>
+      <p>Кожен урок — одна сторінка, яка працює в браузері на комп'ютері, планшеті чи телефоні, без реєстрації.</p>
+    </div>
+    <div class="grid3">
+      <div class="who c-purple reveal">
+        <span class="w-ico"><svg class="ico" viewBox="0 0 24 24"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2.5 9 2.5 12 0v-5"/></svg></span>
+        <div><b>Учням</b><span>Для самостійного вивчення або повторення матеріалу</span></div>
+      </div>
+      <div class="who c-yellow reveal">
+        <span class="w-ico"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 21l4-5 4 5"/></svg></span>
+        <div><b>Вчителям</b><span>Готовий урок для звичайної, дистанційної чи змішаної форми</span></div>
+      </div>
+      <div class="who c-coral reveal">
+        <span class="w-ico"><svg class="ico" viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></span>
+        <div><b>Батькам</b><span>Зрозуміло, що вивчає дитина</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="s" id="how">
+  <div class="wrap">
+    <div class="s-head reveal">
+      <div class="kicker">Як влаштований урок?</div>
+      <h2>Пояснення — вправа — перевірка</h2>
+    </div>
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <symbol id="neuron" viewBox="0 0 24 24"><g stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"><line x1="12" y1="7.8" x2="12" y2="3.7"/><line x1="15.6" y1="9.9" x2="19.1" y2="7.8"/><line x1="15.6" y1="14.1" x2="19.1" y2="16.2"/><line x1="12" y1="16.2" x2="12" y2="20.3"/><line x1="8.4" y1="14.1" x2="4.9" y2="16.2"/><line x1="8.4" y1="9.9" x2="4.9" y2="7.8"/></g><g fill="#FFC93C"><circle cx="12" cy="12" r="4.2"/><circle cx="12" cy="3.7" r="1.2"/><circle cx="19.1" cy="7.8" r="1.2"/><circle cx="19.1" cy="16.2" r="1.2"/><circle cx="12" cy="20.3" r="1.2"/><circle cx="4.9" cy="16.2" r="1.2"/><circle cx="4.9" cy="7.8" r="1.2"/></g></symbol>
+    </svg>
+    <div class="steps reveal" role="tablist" aria-label="Етапи уроку">
+      <button class="step c-purple on" type="button" role="tab" aria-selected="true" aria-controls="sc1" data-i="0">
+        <span class="n"><svg class="ico" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z"/></svg><small>1</small></span>
+        <span class="st-t">Коротке пояснення</span>
+        <span class="st-p">Урок поділено на кроки, у кожному — одна думка.</span>
+      </button>
+      <button class="step c-teal" type="button" role="tab" aria-selected="false" aria-controls="sc2" data-i="1">
+        <span class="n"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/></svg><small>2</small></span>
+        <span class="st-t">Одразу вправа</span>
+        <span class="st-p">Вона закріплює саме те, що щойно пояснено.</span>
+      </button>
+      <button class="step c-yellow" type="button" role="tab" aria-selected="false" aria-controls="sc3" data-i="2">
+        <span class="n"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.9 2.9M15.5 15.5l2.9 2.9M5.6 18.4l2.9-2.9M15.5 8.5l2.9-2.9"/></svg><small>3</small></span>
+        <span class="st-t">Нейрончики</span>
+        <span class="st-p">Ігрові бали за правильні відповіді.</span>
+      </button>
+      <button class="step c-coral" type="button" role="tab" aria-selected="false" aria-controls="sc4" data-i="3">
+        <span class="n"><svg class="ico" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><small>4</small></span>
+        <span class="st-t">Підсумок</span>
+        <span class="st-p">Коротка перевірка й екран із результатом: скільки пройдено й наскільки точно.</span>
+      </button>
+    </div>
+
+    <div class="stage c-purple reveal" id="stage">
+      <p class="stage-cap" id="stageCap">Урок поділено на кроки, у кожному — одна думка.</p>
+
+      <div class="scene c-purple on" id="sc1" role="tabpanel">
+        <div class="sheet">
+          <div class="sh-label">Крок 1 · Надійний пароль</div>
+          <div class="sh-h">Який пароль важко зламати?</div>
+          <p class="ex-p">Надійний пароль має містити <b>не менше 8 символів</b> і поєднувати великі та малі літери, цифри та символи.</p>
+          <div class="pw-list">
+            <div class="pw weak"><code>12345</code><span class="pw-bar"><i></i><i></i><i></i></span><span class="pw-l">Слабкий</span></div>
+            <div class="pw mid"><code>kotyk2015</code><span class="pw-bar"><i></i><i></i><i></i></span><span class="pw-l">Середній</span></div>
+            <div class="pw strong"><code>Sova!Dim-58</code><span class="pw-bar"><i></i><i></i><i></i></span><span class="pw-l">Надійний</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="scene c-teal" id="sc2" role="tabpanel">
+        <div class="sheet">
+          <div class="sh-label">Вправа</div>
+          <div class="sh-h">Розклади: який це пароль?</div>
+          <div class="pool"><span class="chip2 sel">Kit#Lypa-73</span><span class="chip2">qwerty</span></div>
+          <div class="buckets">
+            <div class="bk target"><div class="bk-t">Надійний</div><span class="chip2 ok"><svg class="ico" style="width:14px;height:14px" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>Rain%Tree-41</span><span class="chip2 slot">сюди</span></div>
+            <div class="bk"><div class="bk-t">Слабкий</div><span class="chip2 ok"><svg class="ico" style="width:14px;height:14px" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg>12345678</span></div>
+          </div>
+          <svg class="cursor" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 3l14 8-6 1.6L10 19z" fill="#fff" stroke="#1B1B3A" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+
+      <div class="scene c-yellow" id="sc3" role="tabpanel">
+        <div class="sheet">
+          <div class="hud2">
+            <div class="hud2-bar"><span></span></div>
+            <span class="hud2-c"><svg class="neu" viewBox="0 0 24 24" aria-hidden="true"><use href="#neuron"/></svg><span class="cnt"><i>24</i><i>25</i></span></span>
+          </div>
+          <div class="sh-h">Який пароль надійніший?</div>
+          <div class="opt-ok"><span class="tick"><svg class="ico" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></span>Kit#Lypa-73<span class="plus">+1</span></div>
+          <svg class="fly" viewBox="0 0 24 24" aria-hidden="true"><use href="#neuron"/></svg>
+          <div class="rates">
+            <span class="rate"><b>+1</b>правильна відповідь</span>
+            <span class="rate"><b>+2–3</b>уся вправа</span>
+            <span class="rate"><b>+2</b>запитання тесту</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="scene c-coral" id="sc4" role="tabpanel">
+        <div class="sheet fin">
+          <div class="pile" aria-hidden="true">
+            <svg viewBox="0 0 24 24" style="left:20px;top:30px;animation-delay:.05s"><use href="#neuron"/></svg>
+            <svg viewBox="0 0 24 24" style="left:48px;top:32px;animation-delay:.15s"><use href="#neuron"/></svg>
+            <svg viewBox="0 0 24 24" style="left:76px;top:30px;animation-delay:.25s"><use href="#neuron"/></svg>
+            <svg viewBox="0 0 24 24" style="left:34px;top:8px;animation-delay:.35s"><use href="#neuron"/></svg>
+            <svg viewBox="0 0 24 24" style="left:62px;top:8px;animation-delay:.45s"><use href="#neuron"/></svg>
+          </div>
+          <div class="fin-h">Урок пройдено!</div>
+          <div class="donuts">
+            <div class="dn" style="--dc:var(--teal)"><svg viewBox="0 0 36 36"><circle class="bg" cx="18" cy="18" r="15.9"/><circle class="fg" cx="18" cy="18" r="15.9" style="--p:100"/></svg><b>100%</b><span>Пройдено</span></div>
+            <div class="dn" style="--dc:var(--purple)"><svg viewBox="0 0 36 36"><circle class="bg" cx="18" cy="18" r="15.9"/><circle class="fg" cx="18" cy="18" r="15.9" style="--p:92"/></svg><b>92%</b><span>Точність</span></div>
+          </div>
+          <span class="share"><svg class="ico" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>Поділитися результатами</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="s" id="teachers">
+  <div class="wrap">
+    <div class="t-text reveal">
+      <div class="kicker">Як перевірити?</div>
+      <h2 style="font-size:clamp(28px,3.6vw,38px); font-weight:800;">Результат — одним посиланням</h2>
+      <p style="color:var(--ink-soft); font-size:17px; margin:10px 0 0;">Надішліть учням посилання на урок, наприклад як матеріал чи завдання в Google Classroom. Учень проходить урок і кнопкою «Поділитися результатами» повертає вам посилання.</p>
+      <ul class="checks">
+        <li><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg><span><b>Без реєстрації</b> — учень просто відкриває урок, а вчитель — надіслане посилання з результатом.</span></li>
+        <li><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg><span>Посилання захищене від випадкових правок контрольною сумою.</span></li>
+      </ul>
+    </div>
+    <div class="flow reveal" aria-hidden="true">
+      <div class="f-card f-student">
+        <span class="f-role">Учень</span>
+        <div class="f-who"><span class="f-ava">🦊</span>Марко</div>
+        <div class="f-done">Урок пройдено!</div>
+        <span class="share"><svg class="ico" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>Поділитися результатами</span>
+      </div>
+      <div class="f-arrow"><svg viewBox="0 -4 170 80"><defs><linearGradient id="fGrad" x1="0" y1="0" x2="170" y2="0" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#6C5CE7"/><stop offset="1" stop-color="#16A3A0"/></linearGradient></defs><path class="curl" d="M6 62 C36 64 66 56 86 42 C102 31 116 16 107 6 C98 -4 72 2 73 21 C74 40 108 47 158 45"/><path class="head" d="M148 36 Q155 41 161 45 Q155 49 148 54"/></svg></div>
+      <div class="result">
+        <span class="f-role">Вчитель</span>
+        <div class="r-head">
+          <div class="r-mark">🦊</div>
+          <div>
+            <div class="r-title">Види комп'ютерних мереж</div>
+            <div class="r-sub">5 клас · Лисичка · 14 хв</div>
+          </div>
+        </div>
+        <div class="r-stats">
+          <div class="r-stat"><b>31</b><span>нейрончик</span></div>
+          <div class="r-stat"><b>5/5</b><span>кроків</span></div>
+          <div class="r-stat"><b>92%</b><span>точність</span></div>
+        </div>
+        <div class="r-row">Повторення<div class="r-bar"><span style="width:100%"></span></div><em>100%</em></div>
+        <div class="r-row">Локальні мережі<div class="r-bar"><span style="width:86%"></span></div><em>86%</em></div>
+        <div class="r-row">Інтернет<div class="r-bar"><span style="width:94%"></span></div><em>94%</em></div>
+        <div class="r-row">Підсумок<div class="r-bar"><span style="width:88%"></span></div><em>88%</em></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="s" id="license">
+  <div class="wrap">
+    <div class="s-head reveal">
+      <div class="kicker">Авторське право</div>
+      <h2>Користуйтесь і діліться</h2>
+    </div>
+    <div class="lic reveal">
+      <div class="au">
+        <div class="avatar" aria-hidden="true">ІТ</div>
+        <div>
+          <div class="au-name">© 2026 Ткачук Ігор Антонович</div>
+          <p class="au-p" style="margin:0;">Вчитель інформатики, Гімназія №131, м.&nbsp;Київ</p>
+          <div class="au-role" style="margin-top:4px;">Автор ідеї та методики</div>
+          <div class="ai"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 15l.7 2 2 .7-2 .7-.7 2-.7-2-2-.7 2-.7z"/></svg>Матеріали створено з використанням інструментів штучного інтелекту.</div>
+        </div>
+      </div>
+      <div class="lic-top">
+        <a class="cc-big" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.uk" target="_blank" rel="license noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.6" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10.5 9.6A3.1 3.1 0 1 0 10.5 14.4M17.5 9.6A3.1 3.1 0 1 0 17.5 14.4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          <span><b>CC BY-NC-SA 4.0</b><span>Офіційний опис ліцензії ↗</span></span>
+        </a>
+        <div class="terms">
+          <span class="term"><code>BY</code>з посиланням на автора</span>
+          <span class="term"><code>NC</code>некомерційно</span>
+          <span class="term"><code>SA</code>на тих самих умовах</span>
+        </div>
+      </div>
+      <div class="rules">
+        <div class="rule yes">
+          <h3><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>Можна</h3>
+          <ul>
+            <li>використовувати уроки на своїх заняттях;</li>
+            <li>копіювати, друкувати й поширювати;</li>
+            <li>змінювати й робити на їх основі власні матеріали.</li>
+          </ul>
+        </div>
+        <div class="rule if">
+          <h3><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/></svg>За умови, що ви</h3>
+          <ul>
+            <li>вказуєте автора й посилання на сайт;</li>
+            <li>не використовуєте матеріали з комерційною метою;</li>
+            <li>поширюєте свої переробки на тих самих умовах.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="cite">
+        <div class="cite-label">Як зазначити авторство</div>
+        <div class="cite-box">
+          <span id="citeText">Ткачук І. А. Інтерактивні уроки інформатики. — https://cikavo.me. — Ліцензія CC BY-NC-SA 4.0.</span>
+          <button class="copy-btn" id="copyBtn" type="button"><svg class="ico" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg><span>Копіювати</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="s tight">
+  <div class="wrap duo">
+    <div class="panel c-purple reveal">
+      <h3><span class="p-ico"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg></span>Сторонні матеріали</h3>
+      <p>Ліцензія сайту не поширюється на чужі матеріали, які використано в уроках:</p>
+      <ul class="items">
+        <li><b>Фотографії</b>Переважно з Вікісховища (Wikimedia Commons), за їхніми вільними ліцензіями. Автори вказані у футері відповідного уроку.</li>
+        <li><b>Логотипи</b>Торговельні марки їхніх власників. Їх показано лише з навчальною метою, щоб учні впізнавали знайомі програми.</li>
+        <li><b>Skulpt</b>Python у браузері для гуртка, ліцензія MIT.</li>
+        <li><b>Шрифти</b>Baloo 2, Nunito Sans і JetBrains Mono — з Google Fonts, ліцензія SIL Open Font License.</li>
+      </ul>
+      <p class="note">Уроки складено за навчальною програмою й календарним планом. Тексти уроків написано заново: вони не повторюють фрагменти підручників.</p>
+    </div>
+    <div class="panel c-teal reveal">
+      <h3><span class="p-ico"><svg class="ico" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></span>Приватність</h3>
+      <ul class="items">
+        <li><b>Без реєстрації</b>Сайт не потребує облікового запису й не збирає персональних даних.</li>
+        <li><b>Результати — у руках учня</b>Вони нікуди не надсилаються самі: їх містить лише посилання, яке учень сам вирішує надіслати вчителеві.</li>
+        <li><b>Прогрес ігор</b>Ігри Лабораторії зберігають прогрес лише в браузері цього пристрою.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="s" id="contact">
+  <div class="wrap">
+    <div class="cta reveal">
+      <div class="m-ico"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div>
+      <h2>Напишіть мені</h2>
+      <p>Знайшли помилку, маєте ідею чи хочете поділитися враженнями?</p>
+      <a class="btn btn-primary" href="mailto:tkachuk.igor@school131.kyiv.ua">tkachuk.igor@school131.kyiv.ua</a>
+    </div>
+  </div>
+</section>
+
+<footer></footer>
+
+<script>
+  // панель: лінія знизу після прокрутки
+  const bar = document.getElementById('topbar');
+  const onScroll = ()=> bar.classList.toggle('scrolled', scrollY > 8);
+  addEventListener('scroll', onScroll, {passive:true}); onScroll();
+
+
+  // поява блоків під час прокрутки
+  const items = document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window){
+    const io = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }), {rootMargin:'0px 0px -8% 0px'});
+    items.forEach((el, i) => { el.style.transitionDelay = (i % 4) * 70 + 'ms'; io.observe(el); });
+  } else items.forEach(el => el.classList.add('in'));
+
+  // «Як влаштований урок?»: натиск на етап змінює ілюстрацію
+  const steps = [...document.querySelectorAll('.step')];
+  const scenes = [...document.querySelectorAll('.scene')];
+  const stage = document.getElementById('stage'), cap = document.getElementById('stageCap');
+  const COLORS = ['c-purple','c-teal','c-yellow','c-coral'];
+  const show = i => {
+    steps.forEach((b, k)=>{ b.classList.toggle('on', k === i); b.setAttribute('aria-selected', k === i); });
+    scenes.forEach((sc, k)=> sc.classList.toggle('on', k === i));
+    stage.classList.remove(...COLORS); stage.classList.add(COLORS[i]);
+    cap.textContent = steps[i].querySelector('.st-p').textContent;
+  };
+  steps.forEach((b, i)=>{
+    b.addEventListener('click', ()=> show(i));
+    b.addEventListener('keydown', e=>{
+      const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if(d){ e.preventDefault(); const n = (i + d + steps.length) % steps.length; show(n); steps[n].focus(); }
+    });
+  });
+
+  // копіювати зразок посилання на автора
+  const btn = document.getElementById('copyBtn');
+  btn.addEventListener('click', async ()=>{
+    const text = document.getElementById('citeText').textContent;
+    try{ await navigator.clipboard.writeText(text); }
+    catch(e){
+      const t = document.createElement('textarea'); t.value = text; document.body.appendChild(t); t.select();
+      try{ document.execCommand('copy'); }catch(_){} t.remove();
+    }
+    btn.classList.add('done'); btn.querySelector('span').textContent = 'Скопійовано';
+    setTimeout(()=>{ btn.classList.remove('done'); btn.querySelector('span').textContent = 'Копіювати'; }, 1800);
+  });
+</script>
+<script src="../assets/footer.js"></script>
+</body>
+</html>

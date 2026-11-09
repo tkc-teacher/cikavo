@@ -22,6 +22,9 @@ const STORAGE_KEY = LESSON_ID + '-neurons';
 const SALT = 'cikavo·131';            // має збігатися з result/index.html
 const SVGNS = 'http://www.w3.org/2000/svg';
 
+// спільний футер (© · CC · Про проєкт) — assets/footer.js, підвантажується поруч із цим файлом
+document.head.appendChild(Object.assign(document.createElement('script'), {src:new URL('footer.js', document.currentScript.src).href}));
+
 // Іконка нейрончика (жовта, як у лічильнику HUD) — розмітка однакова в усіх уроках
 const NEURON_SVG = `
   <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>

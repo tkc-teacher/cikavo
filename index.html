@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Інтерактивні уроки — Оберіть клас</title>
+<meta name="description" content="Інтерактивні уроки інформатики, гурток Python і Лабораторія ігор. Для самостійного навчання під час тривоги чи після пропуску.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Цікаво">
+<meta property="og:title" content="Інтерактивні уроки інформатики">
+<meta property="og:description" content="Інтерактивні уроки інформатики, гурток Python і Лабораторія ігор.">
+<meta property="og:url" content="https://cikavo.me/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
@@ -18,9 +24,9 @@
   h1,h2,.headline{font-family:'Baloo 2',sans-serif; font-weight:700; margin:0; color:var(--ink);}
   .container{max-width:900px; margin:0 auto; padding:0 24px;}
 
-  .hero{padding:56px 24px 36px; text-align:center;}
+  .hero{padding:56px 24px 16px; text-align:center;}
   .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--purple-dark); margin-bottom:10px;}
-  .hero h1{font-size:34px; line-height:1.2; margin-bottom:12px;}
+  .hero h1{font-size:34px; line-height:1.2; margin-top:28px;}
   .hero p{color:var(--ink-soft); font-size:16.5px; max-width:52ch; margin:0 auto;}
 
   .grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; padding:20px 24px 70px; max-width:900px; margin:0 auto;}
@@ -55,24 +61,19 @@
   .lab-card.py-card .lab-go{background:#3776AB;}
 
   footer{padding:20px 24px 56px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
-  footer a{color:var(--purple-dark); font-weight:700; text-decoration:none; border-bottom:1px dashed currentColor;}
-  footer a:hover{color:var(--purple);}
 </style>
 </head>
 <body>
 
 <section class="hero">
   <div class="hero-eyebrow">Інформатика · Інтерактивні уроки</div>
-  <h1>Оберіть клас</h1>
   <p>Уроки для асинхронного навчання: текст, практика й самоперевірка в одному місці.</p>
+  <h1>Оберіть клас</h1>
 </section>
 
 <div class="grid" id="gradesGrid"></div>
 
-<footer>
-  <div>Київ, 2026</div>
-  <div><a href="mailto:tkachuk.igor@school131.kyiv.ua">tkachuk.igor@school131.kyiv.ua</a></div>
-</footer>
+<footer></footer>
 
 <script>
   const grades = [1,2,3,4,5,6,7,8,9,10,11];
@@ -125,5 +126,6 @@
     </a>`);
 </script>
 
+<script src="assets/footer.js"></script>
 </body>
 </html>

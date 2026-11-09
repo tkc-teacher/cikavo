@@ -153,6 +153,8 @@
 
   footer{padding:0 16px 48px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
 
+
+
   @media (max-width:760px){
     .maker{grid-template-columns:minmax(0,1fr); gap:14px; padding-top:0;}
     .tabs{display:flex; overflow-x:auto; scrollbar-width:none;}
@@ -206,7 +208,7 @@
   </section>
 </main>
 
-<footer>Лабораторія · Конструктор аватарів</footer>
+<footer><span class="page-name">Лабораторія · Конструктор аватарів</span></footer>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1232,5 +1234,6 @@ $('shareBtn').addEventListener('click', async ()=>{
 renderTabs(); renderGroups(); renderAvatar();
 </script>
 
+<script src="../../assets/footer.js"></script>
 </body>
 </html>
