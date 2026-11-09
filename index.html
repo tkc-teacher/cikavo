@@ -75,6 +75,16 @@
   /* ── класи ── */
   .grades{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:48px; text-align:left;}
   .g-card{--c:var(--purple); --cs:rgba(108,92,231,.12); position:relative; display:flex; flex-direction:column; align-items:flex-start; padding:20px 20px 18px; min-height:156px; background:radial-gradient(circle 60px at calc(100% - 18px) 10px, var(--cs) 98%, transparent 100%), var(--surface); border:1px solid var(--line); border-radius:var(--radius-l); box-shadow:var(--shadow); color:var(--ink); text-decoration:none; transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;}
+  .balloons{position:absolute; right:48px; top:1px; bottom:1px; width:112px; overflow:hidden; pointer-events:none;}
+  .balloons svg{position:absolute; left:0; top:6px; width:112px; height:358px;}
+  .balloons .bi{transform-box:fill-box; transform-origin:50% 100%;}
+  .balloons svg{transition:transform .3s ease;} a.g-card:hover .balloons svg{transform:translateY(-5px);}
+  @media (prefers-reduced-motion:no-preference){
+    .balloons .bi{animation:sway 3.4s ease-in-out infinite;}
+    .balloons .b2 .bi{animation-delay:-1.1s; animation-duration:3s;} .balloons .b3 .bi{animation-delay:-2.2s; animation-duration:3.8s;}
+    @keyframes sway{0%,100%{transform:rotate(-5deg) translateY(0);} 50%{transform:rotate(5deg) translateY(-3px);}}
+  }
+  @media (max-width:480px){ .balloons{width:74px; right:38px;} .balloons svg{width:74px; height:237px; top:6px;} }
   .g-card .tag{position:absolute; top:-11px; right:-8px; z-index:1; background:var(--yellow); color:var(--ink); font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12px; line-height:1; padding:6px 11px; border-radius:999px; transform:rotate(6deg); box-shadow:0 4px 10px rgba(230,170,20,.3);}
   .g-card .num{position:relative; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:60px; line-height:.9; color:var(--c);}
   .g-card .lbl{position:relative; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; margin-top:4px;}
@@ -172,20 +182,22 @@
 
 <script>
   const grades = [1,2,3,4,5,6,7,8,9,10,11];
-  const active = new Set([5,6,7,8,9]);
+  const active = new Set([1,5,6,7,8,9]);
   // колір картки класу: [основний, м'який]; клас без кольору бере фіолетовий
   const COLORS = {
-    1:['#FF6B4A','rgba(255,107,74,.14)'], 2:['#E39B12','rgba(255,201,60,.22)'], 3:['#16A3A0','rgba(22,163,160,.14)'], 4:['#2D7FDB','rgba(45,127,219,.13)'],
+    1:['#E8458B','rgba(232,69,139,.13)'], 2:['#E39B12','rgba(255,201,60,.22)'], 3:['#16A3A0','rgba(22,163,160,.14)'], 4:['#2D7FDB','rgba(45,127,219,.13)'],
     5:['#FF6B4A','rgba(255,107,74,.14)'], 6:['#E39B12','rgba(255,201,60,.22)'], 7:['#16A3A0','rgba(22,163,160,.14)'], 8:['#2D7FDB','rgba(45,127,219,.13)'],
     9:['#6C5CE7','rgba(108,92,231,.13)'], 10:['#D6457F','rgba(214,69,127,.13)'], 11:['#1FA971','rgba(31,169,113,.14)']
   };
+  // 1 клас — святкові повітряні кульки (як на Перший дзвоник)
+  const BALLOONS = `<span class="balloons" aria-hidden="true"><svg viewBox="0 0 100 320"><defs><radialGradient id="blR" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#FFB199"/><stop offset=".55" stop-color="#FF6B4A"/><stop offset="1" stop-color="#D9412A"/></radialGradient><radialGradient id="blY" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#FFF0B0"/><stop offset=".55" stop-color="#FFC93C"/><stop offset="1" stop-color="#E0A000"/></radialGradient><radialGradient id="blP" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#D9D2FF"/><stop offset=".55" stop-color="#8E7CF0"/><stop offset="1" stop-color="#5B47D6"/></radialGradient></defs><g fill="none" stroke="#B4AFD3" stroke-width="1.1" stroke-linecap="round"><path d="M29.6 64.6 C34 120 43 200 47.5 320"/><path d="M50 51.7 C48 130 50 220 50 320"/><path d="M70.8 64.8 C66 120 57 200 52.5 320"/></g><g class="b b1" transform="translate(24 42) rotate(-14) scale(0.95)"><g class="bi"><path d="M0 -21 C12 -21 17 -10 17 -2 C17 10 7 19 0 21 C-7 19 -17 10 -17 -2 C-17 -10 -12 -21 0 -21 Z" fill="url(#blR)"/><path d="M-2.6 24.5 L0 20.5 L2.6 24.5 Q0 25.6 -2.6 24.5 Z" fill="url(#blR)"/><path d="M-10 -7 C-9.5 -12.5 -6 -16 -1.5 -17" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" opacity=".75"/><circle cx="-11" cy="-1.5" r="1.4" fill="#fff" opacity=".6"/></g></g><g class="b b3" transform="translate(76 44) rotate(14) scale(0.92)"><g class="bi"><path d="M0 -21 C12 -21 17 -10 17 -2 C17 10 7 19 0 21 C-7 19 -17 10 -17 -2 C-17 -10 -12 -21 0 -21 Z" fill="url(#blP)"/><path d="M-2.6 24.5 L0 20.5 L2.6 24.5 Q0 25.6 -2.6 24.5 Z" fill="url(#blP)"/><path d="M-10 -7 C-9.5 -12.5 -6 -16 -1.5 -17" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" opacity=".75"/><circle cx="-11" cy="-1.5" r="1.4" fill="#fff" opacity=".6"/></g></g><g class="b b2" transform="translate(50 26) rotate(0) scale(1.05)"><g class="bi"><path d="M0 -21 C12 -21 17 -10 17 -2 C17 10 7 19 0 21 C-7 19 -17 10 -17 -2 C-17 -10 -12 -21 0 -21 Z" fill="url(#blY)"/><path d="M-2.6 24.5 L0 20.5 L2.6 24.5 Q0 25.6 -2.6 24.5 Z" fill="url(#blY)"/><path d="M-10 -7 C-9.5 -12.5 -6 -16 -1.5 -17" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" opacity=".75"/><circle cx="-11" cy="-1.5" r="1.4" fill="#fff" opacity=".6"/></g></g></svg></span>`;
   const ARROW = '<svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
   const grid = document.getElementById('gradesGrid');
   grades.forEach((n, i) => {
     const [c, cs] = COLORS[n] || ['#6C5CE7','rgba(108,92,231,.13)'];
     const style = `--c:${c}; --cs:${cs}; --i:${3 + i}`;
     grid.insertAdjacentHTML('beforeend', active.has(n)
-      ? `<a class="g-card rise" href="${n}/index.html" style="${style}" aria-label="${n} клас"><span class="tag">Нове</span><span class="num">${n}</span><span class="lbl">клас</span><span class="go">${ARROW}</span></a>`
+      ? `<a class="g-card rise" href="${n}/index.html" style="${style}" aria-label="${n} клас"><span class="tag">Нове</span>${n === 1 ? BALLOONS : ''}<span class="num">${n}</span><span class="lbl">клас</span><span class="go">${ARROW}</span></a>`
       : `<div class="g-card off rise" style="${style}"><span class="num">${n}</span><span class="lbl">клас</span><span class="wip">Матеріали в розробці</span></div>`);
   });
 </script>
