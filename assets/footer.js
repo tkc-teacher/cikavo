@@ -11,7 +11,7 @@
 (()=>{
   const YEAR   = '2026';
   const AUTHOR = 'Ткачук Ігор Антонович';
-  const CITY   = 'Київ';
+  const CITY   = 'м.\u00a0Київ';   // нерозривний пробіл — «м.» не відривається від назви
   const LICENSE_NAME = 'Ліцензія Creative Commons CC BY-NC-SA 4.0';
 
   const CC_SVG = '<svg class="cc" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M10.5 9.6A3.1 3.1 0 1 0 10.5 14.4M17.5 9.6A3.1 3.1 0 1 0 17.5 14.4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>';
