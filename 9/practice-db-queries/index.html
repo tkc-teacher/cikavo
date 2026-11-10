@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Шкільна бібліотека — Запити в базі даних</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в меню Google Таблиць -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#0F766E,#BE185D); --accent:#0F766E; --accent-dark:#0B5852; --accent-soft:#E3F4F2; --bg:#F4F9F8; --line:#D8E8E5; }
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:1.15em; line-height:1; display:inline-block; vertical-align:-.2em; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em; margin-right:3px; color:#444746;}
+  .menu{white-space:normal;}
+  .f{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; font-size:13.5px; background:#EAF3F1; padding:2px 7px; border-radius:5px; word-break:break-all;}
+  .sample td.hd{font-weight:800; background:#E3F4F2;}
+  .sample td.lb{font-weight:800;}
+  .sample td.par{background:#E1E9F7; font-weight:700;}
+  .copy-btn{display:inline-flex; align-items:center; gap:6px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; background:var(--accent); color:#fff; border:0; border-radius:999px; padding:8px 18px; margin:10px 0 4px; cursor:pointer; transition:background .15s ease;}
+  .copy-btn:hover{background:var(--accent-dark);}
+  .copy-btn .ms{color:#fff; margin:0;}
+</style>
+</head>
+<body data-hud="9 клас · Практична · Шкільна бібліотека">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 9 клас · Запити в базі даних</div>
+    <h1>📚 Шкільна бібліотека</h1>
+    <p>Бібліотекарка хоче знати, які книжки читають найчастіше. Постав базі запитання за допомогою запитів у Google Таблицях.</p>
+    <div class="meta"><span>⏱ 15 хв</span><span><img src="../../assets/logos/sheets.svg" alt="">Google Таблиці</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <p>Аркуш «Запит»: вписуєш жанр у клітинку B1 — і бачиш, скільки разів видавали такі книжки, і їхній список.</p>
+    <div class="sheet-wrap">
+      <table class="sample">
+        <tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr>
+        <tr><th>1</th><td class="lb">Жанр</td><td class="par">Пригоди</td><td></td><td></td><td></td></tr>
+        <tr><th>2</th><td class="lb">Видавали разів</td><td class="r">21</td><td></td><td></td><td></td></tr>
+        <tr><th>3</th><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><th>4</th><td class="r">2</td><td>Острів скарбів</td><td>Пригоди</td><td class="r">288</td><td class="r">5</td></tr>
+        <tr><th>5</th><td class="r">5</td><td>Робінзон Крузо</td><td>Пригоди</td><td class="r">320</td><td class="r">3</td></tr>
+        <tr><th>6</th><td class="r">8</td><td>Тореадори з Васюківки</td><td>Пригоди</td><td class="r">400</td><td class="r">11</td></tr>
+        <tr><th>7</th><td class="r">12</td><td>Двадцять тисяч льє під водою</td><td>Пригоди</td><td class="r">448</td><td class="r">2</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи таблицю</h3>
+        <p>Обери один зі способів:</p>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Таблиці</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Таблиці</span>.</li>
+              <li>Назви файл: <b>Бібліотека — Прізвище</b>.</li>
+            </ol>
+          </div>
+        </div>
+        <ul>
+          <li>Двічі клацни вкладку аркуша внизу й назви її <b>Книги</b>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Встав дані</h3>
+        <ol>
+          <li>Натисни кнопку нижче.</li>
+          <li>Клацни клітинку <b>A1</b> і натисни <b>Ctrl+V</b> (на Mac — <b>⌘+V</b>).</li>
+          <li>Виділи рядок 1 і натисни <span class="menu"><span class="ms">format_bold</span>Жирний</span>.</li>
+        </ol>
+        <button class="copy-btn" id="copyBtn" type="button"><span class="ms">content_copy</span>Скопіювати дані</button>
+        <div class="sheet-wrap">
+          <table class="sample" id="dataTable"></table>
+        </div>
+        <div class="check-val">Перевір себе: дані займають A1:E13.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Відбери книжки фентезі</h3>
+        <ol>
+          <li>Натисни <span class="ms">add</span> внизу ліворуч і назви новий аркуш <b>Запит</b>.</li>
+          <li>Клацни клітинку <b>A4</b>, впиши й натисни Enter:<br><span class="f">=FILTER(Книги!A2:E13; Книги!C2:C13="Фентезі")</span></li>
+        </ol>
+        <div class="tip"><b>Книги!</b> перед діапазоном означає, що дані беруться з аркуша «Книги».</div>
+        <div class="check-val">Перевір себе: з'явилось 5 книжок фентезі.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Жанр — у клітинці</h3>
+        <ol>
+          <li>У <b>A1</b> впиши <b>Жанр</b>, а в <b>B1</b> — <b>Пригоди</b>.</li>
+          <li>Двічі клацни <b>A4</b> і заміни у формулі <b>"Фентезі"</b> на <b>B1</b>:<br><span class="f">=FILTER(Книги!A2:E13; Книги!C2:C13=B1)</span></li>
+        </ol>
+        <div class="check-val">Перевір себе: тепер видно 4 книжки пригод. Впиши в B1 «Детектив» — список зміниться сам.</div>
+        <div class="tip">З'явилась помилка #N/A? Перевір, чи немає помилки в назві жанру.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Порахуй, скільки читали</h3>
+        <ol>
+          <li>Поверни в B1 <b>Пригоди</b>.</li>
+          <li>У <b>A2</b> впиши <b>Видавали разів</b>, а в <b>B2</b>:<br><span class="f">=SUM(FILTER(Книги!E2:E13; Книги!C2:C13=B1))</span></li>
+        </ol>
+        <div class="check-val">Перевір себе: пригоди видавали 21 раз.</div>
+        <ul>
+          <li>Впиши в B1 по черзі інші жанри. Який читають найчастіше?</li>
+        </ul>
+        <div class="check-val">Перевір себе: фентезі — 41 раз.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Практична робота · «Поняття запиту в базі даних. Емуляція запитів у Google Таблицях» · 9 клас</span></footer>
+
+<script src="../../assets/practice.js"></script>
+<script>
+// Книги бібліотеки: те саме джерело для таблиці на сторінці й для кнопки «Скопіювати дані»
+const DATA = [
+  ['ID', 'Назва', 'Жанр', 'Сторінок', 'Видавали'],
+  [1, 'Хоббіт', 'Фентезі', 368, 9],
+  [2, 'Острів скарбів', 'Пригоди', 288, 5],
+  [3, 'Собака Баскервілів', 'Детектив', 256, 6],
+  [4, 'Аліса в Країні Див', 'Фентезі', 192, 7],
+  [5, 'Робінзон Крузо', 'Пригоди', 320, 3],
+  [6, 'Вбивство в «Східному експресі»', 'Детектив', 288, 4],
+  [7, 'Гаррі Поттер і філософський камінь', 'Фентезі', 320, 14],
+  [8, 'Тореадори з Васюківки', 'Пригоди', 400, 11],
+  [9, 'Пригоди Шерлока Голмса', 'Детектив', 336, 8],
+  [10, 'Мері Поппінс', 'Фентезі', 224, 5],
+  [11, 'Пітер Пен', 'Фентезі', 208, 6],
+  [12, 'Двадцять тисяч льє під водою', 'Пригоди', 448, 2]
+];
+document.getElementById('dataTable').innerHTML =
+  '<tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr>'
+  + DATA.map((r, i)=>`<tr><th>${i + 1}</th>${r.map(v=>`<td class="${i === 0 ? 'hd' : typeof v === 'number' ? 'r' : ''}">${v}</td>`).join('')}</tr>`).join('');
+
+const tsv = DATA.map(r=>r.join('\t')).join('\n');
+const btn = document.getElementById('copyBtn');
+btn.addEventListener('click', async ()=>{
+  let ok = false;
+  try{ await navigator.clipboard.writeText(tsv); ok = true; }
+  catch(e){
+    // Запасний спосіб для браузерів без доступу до буфера обміну
+    const ta = document.createElement('textarea');
+    ta.value = tsv; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    try{ ok = document.execCommand('copy'); }catch(_){}
+    ta.remove();
+  }
+  if(!ok) return;
+  btn.innerHTML = '<span class="ms">check</span>Скопійовано';
+  setTimeout(()=>{ btn.innerHTML = '<span class="ms">content_copy</span>Скопіювати дані'; }, 1600);
+});
+</script>
+</body>
+</html>

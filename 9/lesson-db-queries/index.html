@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Поняття запиту в базі даних — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в інтерфейсі Google Таблиць -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  /* Гама «притулок»: бірюзовий + малиновий */
+  :root{
+    --pri:#0F766E; --pri-dark:#0B5852; --rsp:#BE185D; --rsp-dark:#9D174D; --grn:#188038; --grn-dark:#0D652D;
+    --accent:var(--pri); --accent-dark:var(--pri-dark); --accent-soft:#E3F4F2;
+    --label:var(--rsp);
+    --bg:#F4F9F8; --ink:#13302D; --ink-soft:#526B68; --line:#D8E8E5; --surface:#FFFFFF;
+    --note:var(--pri); --note-soft:#E3F4F2; --note-ink:var(--pri-dark);
+    --sun:var(--rsp); --sun-soft:#FCEAF2; --sun-ink:var(--rsp-dark);
+    --hud-bar:linear-gradient(90deg,var(--pri),var(--rsp));
+  }
+
+  .menu{font-family:'Baloo 2',sans-serif; font-weight:700; color:var(--pri-dark);}
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; background:#EAF3F1; padding:1px 6px; border-radius:5px; font-size:.9em; white-space:nowrap;}
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:18px; line-height:1; display:inline-block; vertical-align:middle; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em;}
+
+  /* Крок 1: від питання до відповіді */
+  .flow{display:grid; grid-template-columns:1fr auto 1fr auto 1fr; gap:10px; align-items:stretch; margin:16px 0;}
+  @media (max-width:640px){ .flow{grid-template-columns:1fr;} .flow .arr{transform:rotate(90deg); justify-self:center;} }
+  .flow-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px;}
+  .flow-card .t{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--rsp); text-transform:uppercase; letter-spacing:.04em;}
+  .flow-card .b{font-size:14.5px; margin-top:4px;}
+  .flow .arr{align-self:center; color:var(--rsp); font-size:26px; font-weight:800;}
+  .cond-chip{display:inline-block; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px; font-weight:700; background:#EAF3F1; color:var(--pri-dark); border-radius:6px; padding:2px 7px; margin:2px 0;}
+  .mini-res{border-collapse:collapse; font-size:13px; margin-top:4px;}
+  .mini-res td{border:1px solid var(--line); padding:2px 8px;}
+
+  /* Крок 2: типи запитів */
+  .qtypes{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:16px 0;}
+  @media (max-width:600px){ .qtypes{grid-template-columns:1fr;} }
+  .qt{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px; display:grid; grid-template-columns:64px 1fr; gap:4px 14px; align-items:start;}
+  .qt svg{grid-row:1 / span 4; width:64px; height:64px;}
+  .qt > :not(svg){grid-column:2;}
+  .qt h3{margin:0; font-size:17px;}
+  .qt p{margin:0; font-size:14px;}
+  .qt .ex{color:var(--ink-soft); font-style:italic;}
+  .qt .gs-tag{justify-self:start; font-family:'Roboto',sans-serif; font-size:12px; background:#E6F4EA; color:var(--grn-dark); border-radius:999px; padding:2px 10px; margin-top:4px;}
+
+  /* Імітація Google Таблиць */
+  .gs{--g-line:#E1E3E1; position:relative; font-family:'Roboto',sans-serif; color:#1F1F1F; background:#F9FBFD; border:1px solid #DADCE0; border-radius:10px; font-size:12.5px;}
+  .gs .ms{color:#444746;}
+  .gs-top{display:flex; align-items:center; gap:8px; padding:8px 10px 6px;}
+  .gs-top img{width:15px; height:20px;}
+  .gs-top .name{font-size:14px;}
+  .gs-fx{display:flex; align-items:flex-start; gap:8px; background:#fff; border-top:1px solid #DADCE0; padding:5px 10px; min-height:30px;}
+  .gs-fx .addr{flex-shrink:0; width:34px; color:#444746; border-right:1px solid #E1E3E1; line-height:20px;}
+  .gs-fx .fx{flex-shrink:0; font-style:italic; color:#80868B; font-family:serif; font-size:15px; line-height:20px;}
+  .gs-fx .f{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px; line-height:20px; word-break:break-all;}
+  .f .r0{color:#0B57D0;} .f .r1{color:#C5221F;} .f .r2{color:#8430CE;} .f .r3{color:#B06000;}
+  .f .q{color:#188038;}
+  .gs-scroll{overflow-x:auto; background:#fff; border-top:1px solid #DADCE0;}
+  .gs-grid{border-collapse:collapse; width:100%; min-width:480px; background:#fff;}
+  .gs-grid th, .gs-grid td{border:1px solid var(--g-line); height:25px; padding:0 6px; white-space:nowrap;}
+  .gs-grid th{background:#F8F9FA; color:#444746; font-weight:500; font-size:11px; text-align:center;}
+  .gs-grid th.rn{width:26px;}
+  .gs-grid tr.hdr td{font-weight:700;}
+  .gs-grid td.num{text-align:right;}
+  .gs-grid td.cur{box-shadow:inset 0 0 0 2px #0B57D0;}
+  .gs-grid td.err{color:#B3261E; font-weight:700;}
+  .gs-grid td.lbl{font-weight:700; color:#444746;}
+  .gs-grid tr.spill td{animation:rowIn .45s ease;}
+  @keyframes rowIn{from{background:#FFF4D6;}}
+  .gs-grid td.hit{background:#E6F4EA;}
+  .gs-grid td.hit.sumc{background:#CEEAD6; font-weight:700;}
+  .gs-tabs{display:flex; align-items:center; gap:4px; padding:4px 8px; background:#F9FBFD; border-top:1px solid #DADCE0; border-radius:0 0 10px 10px;}
+  .gs-tabs .ms{font-size:18px; padding:0 4px;}
+  .gs-tab{font:500 13px 'Roboto',sans-serif; border:0; background:none; padding:5px 12px; border-radius:6px; cursor:pointer; color:#444746;}
+  .gs-tab:hover{background:#E8EAED;}
+  .gs-tab.on{background:#E1E9F7; color:#0B57D0;}
+  .gs.shake{animation:shakeX .35s ease;}
+  .vis{font-size:12px; color:#5F6368; padding:5px 10px; background:#fff;}
+
+  /* Комірки-параметри (крок 4) */
+  .pcell{font:500 12.5px 'Roboto',sans-serif; border:0; border-radius:999px; padding:3px 24px 3px 10px; cursor:pointer; appearance:none; -webkit-appearance:none;
+    background:#E1E9F7 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0h10L5 6z' fill='%23444746'/%3E%3C/svg%3E") no-repeat right 9px center;}
+  .pcell.b1{box-shadow:0 0 0 2px #C5221F;}
+  .pcell.b2{box-shadow:0 0 0 2px #8430CE;}
+
+  /* Конструктор умов (крок 3) */
+  .qb{background:var(--accent-soft); border:1.5px solid #BFE0DB; border-radius:var(--radius-m); padding:12px 14px; margin-top:12px;}
+  .qb-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; color:var(--pri-dark); margin-bottom:6px;}
+  .qb-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:6px 0;}
+  .qb-tag{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:#fff; background:var(--rsp); border-radius:999px; padding:1px 10px; min-width:64px; text-align:center;}
+  .qb select{font:600 14px 'Nunito Sans',sans-serif; border:1.5px solid #BFE0DB; border-radius:8px; padding:5px 8px; background:#fff; color:var(--ink); cursor:pointer;}
+  .qb .rm{border:0; background:none; color:var(--ink-soft); cursor:pointer; font-size:18px; padding:0 4px;}
+  .qb-btns{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
+  .qb-add{font:700 14px 'Nunito Sans',sans-serif; background:#fff; color:var(--pri-dark); border:1.5px dashed var(--pri); border-radius:999px; padding:7px 14px; cursor:pointer;}
+  .qb-run{font-size:15px; padding:9px 18px;}
+
+  /* Кнопка «Скопіювати дані» в шапці таблиці */
+  .copy-btn{margin-left:auto; display:inline-flex; align-items:center; gap:5px; font:500 13px 'Roboto',sans-serif; background:#fff; color:#0B57D0; border:1px solid #C4C7C5; border-radius:999px; padding:4px 12px; cursor:pointer;}
+  .copy-btn:hover{background:#E8F0FE;}
+  .copy-btn .ms{color:#0B57D0; font-size:16px;}
+  .copy-btn.done{color:#137333; border-color:#A8D5B5; background:#E6F4EA;}
+  .copy-btn.done .ms{color:#137333;}
+
+  /* Завдання емуляторів */
+  .task{display:flex; gap:10px; align-items:flex-start; background:var(--sun-soft); border:1.5px solid #F2BCD3; border-radius:var(--radius-m); padding:10px 14px; margin-bottom:12px; font-weight:700;}
+  .task .tn{flex-shrink:0; font-weight:800; background:var(--rsp); color:#fff; border-radius:999px; padding:0 10px; font-size:13px; line-height:24px; white-space:nowrap; word-spacing:2px;}
+  .task.done{background:#E6F4EA; border-color:#A8D5B5;}
+  .task.done .tn{background:var(--grn);}
+  .emu-fb{min-height:24px; font-size:14px; margin-top:10px;}
+  .emu-fb.err{color:#B3261E;}
+  .emu-fb.ok{color:var(--grn-dark); font-weight:700;}
+
+  /* Крок 4: відвідувачі */
+  .visitor{display:flex; gap:12px; align-items:center; margin-bottom:12px;}
+  .visitor .ava{flex-shrink:0; width:52px; height:52px; border-radius:50%; background:var(--sun-soft); display:grid; place-items:center; font-size:30px;}
+  .visitor .bubble{position:relative; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:9px 14px; font-size:15px;}
+  .visitor .bubble b{display:block; font-family:'Baloo 2',sans-serif; font-size:13px; color:var(--rsp);}
+  .visitor .n{margin-left:auto; flex-shrink:0; font-weight:800; font-size:13px; background:var(--rsp); color:#fff; border-radius:999px; padding:0 10px; line-height:24px;}
+  .visitor.done .ava{background:#E6F4EA;}
+  .visitor.done .n{background:var(--grn);}
+
+  /* Крок 5: пісочниця підсумків */
+  .calc{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:10px;}
+  .calc .lb{font-weight:700; font-size:14px; color:var(--ink-soft);}
+  .seg{display:inline-flex; border:1.5px solid var(--line); border-radius:999px; overflow:hidden; background:#fff;}
+  .seg button{font:700 13px ui-monospace,Menlo,Consolas,monospace; border:0; background:none; padding:6px 11px; cursor:pointer; color:var(--ink);}
+  .seg button + button{border-left:1.5px solid var(--line);}
+  .seg button.on{background:var(--pri); color:#fff;}
+  .seg.txt button{font-family:'Nunito Sans',sans-serif;}
+  .calc-out{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:10px; font-size:15px;}
+  .calc-out .val{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:24px; color:var(--rsp); background:var(--sun-soft); border-radius:10px; padding:0 14px;}
+  .calc-say{font-size:14.5px; color:var(--ink-soft); margin-top:4px;}
+  #fnPool .match-chip, #fnList .desc-slot{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px;}
+
+</style>
+</head>
+<body data-lesson="lesson9-db-queries" data-hud="9 клас · Запити в базі даних">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Впорядкування даних</div>
+      <h1>Запитай базу даних</h1>
+      <p>Притулок «Хвостики» веде базу своїх тварин. Навчимося ставити їй запитання — запити: відбирати записи за умовами, рахувати підсумки й складати перехресні таблиці в Google Таблицях.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: база даних-циліндр, що відповідає на запитання, і відбиток лапки -->
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="62" fill="#E3F4F2"/>
+      <path d="M22 52v50c0 6 15 11 34 11s34-5 34-11V52" fill="#0F766E"/>
+      <ellipse cx="56" cy="52" rx="34" ry="11" fill="#14A394"/>
+      <path d="M22 70c0 6 15 11 34 11s34-5 34-11M22 88c0 6 15 11 34 11s34-5 34-11" stroke="#0B5852" stroke-width="2.5"/>
+      <circle cx="45" cy="76" r="5" fill="#fff"/><circle cx="67" cy="76" r="5" fill="#fff"/>
+      <circle cx="46" cy="77" r="2.5" fill="#13302D"/><circle cx="68" cy="77" r="2.5" fill="#13302D"/>
+      <path d="M50 90q6 5 12 0" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+      <rect x="82" y="12" width="46" height="36" rx="12" fill="#fff" stroke="#BE185D" stroke-width="3"/>
+      <path d="M92 47l-8 12 18-11" fill="#fff" stroke="#BE185D" stroke-width="3" stroke-linejoin="round"/>
+      <rect x="88" y="44" width="16" height="5" fill="#fff"/>
+      <text x="105" y="40" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="800" font-size="28" fill="#BE185D">?</text>
+      <g fill="#BE185D"><ellipse cx="112" cy="104" rx="9" ry="8"/><circle cx="101" cy="92" r="4"/><circle cx="109" cy="87" r="4"/><circle cx="118" cy="88" r="4"/><circle cx="124" cy="96" r="4"/></g>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Сортування, фільтри, зведені таблиці</div>
+    <h2>Що ти вже знаєш</h2>
+    <p class="soft">Обери термін, а потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Що таке запит</div>
+    <h2>Питання, яке розуміє база</h2>
+    <p><b>Запит</b> — це запитання до бази даних, записане за точними правилами: які записи потрібні і що з ними зробити. Відповідь на запит — нова таблиця, її називають <b>вибіркою</b>.</p>
+    <div class="flow">
+      <div class="flow-card"><div class="t">Питання людини</div><div class="b">«Які собаки в притулку ще зовсім малі?»</div></div>
+      <div class="arr">→</div>
+      <div class="flow-card"><div class="t">Запит: умови</div><div class="b"><span class="cond-chip">Вид = «Собака»</span> І <span class="cond-chip">Вік &lt; 2</span></div></div>
+      <div class="arr">→</div>
+      <div class="flow-card"><div class="t">Вибірка</div><div class="b"><table class="mini-res"><tr><td>Бублик</td><td>1</td></tr><tr><td>Плюшка</td><td>1</td></tr></table></div></div>
+    </div>
+    <p>Кілька умов з'єднують словами:</p>
+    <ul>
+      <li><b>І</b> — запис має відповідати <b>усім</b> умовам одразу. Вибірка стає меншою.</li>
+      <li><b>АБО</b> — достатньо, щоб запис відповідав <b>хоча б одній</b> умові. Вибірка стає більшою.</li>
+    </ul>
+    <p class="soft">Перетвори питання на умови запиту.</p>
+    <div id="condList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Види запитів</div>
+    <h2>Чотири види запитів</h2>
+    <p>Розрізняють чотири основні види запитів:</p>
+    <div class="qtypes">
+      <div class="qt">
+        <svg viewBox="0 0 64 64"><rect x="4" y="8" width="40" height="44" rx="5" fill="#E3F4F2"/><rect x="10" y="15" width="28" height="5" rx="2" fill="#0F766E"/><rect x="10" y="25" width="28" height="5" rx="2" fill="#BFE0DB"/><rect x="10" y="35" width="28" height="5" rx="2" fill="#0F766E"/><circle cx="42" cy="40" r="11" fill="#fff" stroke="#BE185D" stroke-width="4"/><path d="M50 48l9 9" stroke="#BE185D" stroke-width="5" stroke-linecap="round"/></svg>
+        <h3>Вибірковий</h3>
+        <p>Показує записи, що відповідають умовам.</p>
+        <p class="ex">«Усі щеплені собаки»</p>
+        <span class="gs-tag">У Google Таблицях: FILTER</span>
+      </div>
+      <div class="qt">
+        <svg viewBox="0 0 64 64"><rect x="4" y="12" width="56" height="40" rx="6" fill="#E3F4F2"/><rect x="10" y="20" width="20" height="8" rx="2" fill="#0F766E"/><rect x="34" y="20" width="20" height="8" rx="4" fill="#fff" stroke="#BE185D" stroke-width="2.5"/><path d="M46 23l3 3 3-3" stroke="#BE185D" stroke-width="2" fill="none"/><rect x="10" y="34" width="44" height="5" rx="2" fill="#BFE0DB"/><rect x="10" y="43" width="44" height="5" rx="2" fill="#BFE0DB"/></svg>
+        <h3>З параметром</h3>
+        <p>Умову вводять під час запуску — і той самий запит дає різні відповіді.</p>
+        <p class="ex">«Покажи тварин виду ___»</p>
+        <span class="gs-tag">У Google Таблицях: FILTER + клітинка-умова</span>
+      </div>
+      <div class="qt">
+        <svg viewBox="0 0 64 64"><rect x="10" y="4" width="44" height="56" rx="7" fill="#0F766E"/><rect x="16" y="10" width="32" height="12" rx="3" fill="#E3F4F2"/><text x="45" y="20" text-anchor="end" font-family="Roboto, sans-serif" font-weight="700" font-size="10" fill="#BE185D">Σ 280</text><g fill="#BFE0DB"><rect x="16" y="28" width="8" height="7" rx="2"/><rect x="28" y="28" width="8" height="7" rx="2"/><rect x="40" y="28" width="8" height="7" rx="2"/><rect x="16" y="39" width="8" height="7" rx="2"/><rect x="28" y="39" width="8" height="7" rx="2"/><rect x="16" y="50" width="8" height="5" rx="2"/><rect x="28" y="50" width="8" height="5" rx="2"/></g><rect x="40" y="39" width="8" height="16" rx="2" fill="#BE185D"/></svg>
+        <h3>На обчислення</h3>
+        <p>Рахує суму, кількість чи середнє для записів, що підходять.</p>
+        <p class="ex">«Скільки корму з'їдають коти за день?»</p>
+        <span class="gs-tag">У Google Таблицях: SUM, AVERAGE, COUNTA від FILTER</span>
+      </div>
+      <div class="qt">
+        <svg viewBox="0 0 64 64"><rect x="4" y="8" width="56" height="48" rx="5" fill="#E3F4F2"/><rect x="4" y="8" width="56" height="12" rx="5" fill="#BFE0DB"/><rect x="4" y="8" width="18" height="48" rx="5" fill="#BFE0DB"/><path d="M22 20v36M41 20v36M4 32h56M4 44h56" stroke="#fff" stroke-width="2"/><rect x="22" y="32" width="19" height="12" fill="#BE185D"/><path d="M13 38h46M31 14v38" stroke="#BE185D" stroke-width="2" stroke-dasharray="3 3"/></svg>
+        <h3>Перехресний</h3>
+        <p>Підсумки в таблиці «рядки × стовпці»: значення одного поля перетинаються зі значеннями іншого.</p>
+        <p class="ex">«Скільки щеплених і нещеплених тварин кожного виду»</p>
+        <span class="gs-tag">У Google Таблицях: зведена таблиця</span>
+      </div>
+    </div>
+    <div class="note">У Google Таблицях запити <b>емулюють</b> — відтворюють формулами й зведеними таблицями.</div>
+    <p class="soft">Який це вид запиту?</p>
+    <div id="typeList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Відбір за умовами</div>
+    <h2>Вибірковий запит: функція FILTER</h2>
+    <p>Функція <span class="mono">FILTER</span> будує вибірку на окремому аркуші: спершу — що показувати, далі через <span class="mono">;</span> — умови (вони з'єднуються як <b>І</b>).</p>
+    <p style="text-align:center;"><span class="mono">=FILTER(Тварини!A2:F15; Тварини!C2:C15="Кіт")</span></p>
+    <p><span class="mono">Тварини!</span> перед діапазоном означає, що дані беруться з аркуша «Тварини».</p>
+    <div class="note">На відміну від фільтра, <span class="mono">FILTER</span> не ховає рядки в самій таблиці, а вибірка оновлюється сама, коли додають нові записи.</div>
+    <p class="soft">Склади умови в конструкторі під таблицею й натисни «Виконати».</p>
+    <div class="exercise">
+      <div class="task" id="fTask"></div>
+      <div class="gs" id="fGs"></div>
+      <div class="qb" id="qb"></div>
+      <div class="emu-fb" id="fFb"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Запит із параметром</div>
+    <h2>Одна формула — багато відповідей</h2>
+    <p>Якщо умову не вписати у формулу, а взяти з клітинки, вийде <b>запит із параметром</b>. Змінюєш значення в клітинці — і вибірка перебудовується сама.</p>
+    <p style="text-align:center;"><span class="mono">=FILTER(Тварини!A2:F15; Тварини!C2:C15=B1; Тварини!D2:D15&lt;=B2)</span></p>
+    <p class="soft">Зміни параметри в клітинках B1 (вид) і B2 (вік до) так, як просить відвідувач, і натисни «Показати відвідувачу».</p>
+    <div class="exercise">
+      <div id="visitor"></div>
+      <div class="gs" id="pGs"></div>
+      <div style="margin-top:12px;"><button class="btn-primary" id="pShow" type="button">Показати відвідувачу</button></div>
+      <div class="emu-fb" id="pFb"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Підсумки</div>
+    <h2>Запит на обчислення</h2>
+    <p>Коли потрібна не вибірка, а одне число, нових функцій не треба. Запит на обчислення = <b>вибірка + знайома функція</b>:</p>
+    <ol>
+      <li><span class="mono">FILTER</span> відбирає потрібні значення — наприклад, лише корм собак;</li>
+      <li><span class="mono">SUM</span>, <span class="mono">AVERAGE</span>, <span class="mono">MAX</span> чи <span class="mono">COUNTA</span> рахує їх, як звичайний діапазон.</li>
+    </ol>
+    <p style="text-align:center;"><span class="mono">=SUM(FILTER(F2:F15; C2:C15="Собака"))</span></p>
+    <div class="note">Щоб просто порахувати записи, підійде й знайома з 8 класу <span class="mono">COUNTIF(C2:C15;"Кіт")</span>.</div>
+    <p class="soft">Спробуй: обери функцію й вид тварини — у таблиці підсвітяться значення, які відбирає FILTER.</p>
+    <div class="exercise">
+      <div class="calc">
+        <span class="lb">Функція</span><span class="seg" id="calcFn"></span>
+        <span class="lb">Вид</span><span class="seg txt" id="calcKind"></span>
+      </div>
+      <div class="gs" id="calcGs"></div>
+      <div class="calc-out"><span class="mono" id="calcF"></span><span>=</span><span class="val" id="calcV"></span></div>
+      <div class="calc-say" id="calcSay"></div>
+    </div>
+    <p class="soft" style="margin-top:22px;">А тепер — обери формулу, а потім питання, на яке вона відповідає.</p>
+    <div class="exercise">
+      <div class="match-pool" id="fnPool"></div>
+      <div id="fnList"></div>
+      <div class="progress-line" id="fnProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Урок · «Поняття запиту в базі даних. Емуляція запитів у Google Таблицях: відбір за умовами, підсумки, зведена таблиця» · 9 клас</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- СПІЛЬНІ ДАНІ: ТВАРИНИ ПРИТУЛКУ ---------- */
+const FIELDS = ['ID', 'Кличка', 'Вид', 'Вік', 'Щеплення', 'Корм, г/день'];
+const NUMERIC = [true, false, false, true, false, true];
+const L = ['A', 'B', 'C', 'D', 'E', 'F'];
+const PETS = [
+  [1, 'Мурчик', 'Кіт', 3, 'Так', 60],
+  [2, 'Рекс', 'Собака', 5, 'Так', 400],
+  [3, 'Сніжка', 'Кролик', 1, 'Ні', 150],
+  [4, 'Багіра', 'Кіт', 7, 'Так', 55],
+  [5, 'Бублик', 'Собака', 1, 'Ні', 300],
+  [6, 'Ласка', 'Собака', 9, 'Так', 350],
+  [7, 'Пухнастик', 'Кролик', 2, 'Так', 160],
+  [8, 'Тигра', 'Кіт', 1, 'Ні', 50],
+  [9, 'Джек', 'Собака', 2, 'Так', 450],
+  [10, 'Ромашка', 'Кролик', 4, 'Так', 140],
+  [11, 'Барсик', 'Кіт', 10, 'Ні', 70],
+  [12, 'Лорд', 'Собака', 6, 'Ні', 500],
+  [13, 'Зефірка', 'Кіт', 2, 'Так', 45],
+  [14, 'Плюшка', 'Собака', 1, 'Так', 250]
+];
+const KINDS = ['Кіт', 'Собака', 'Кролик'];
+const fmt = n=>Number.isInteger(n) ? String(n) : n.toFixed(2).replace(/0+$/, '').replace('.', ',');
+const esc = s=>String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+function flash(el){ el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); setTimeout(()=>el.classList.remove('shake'), 400); }
+const sameIds = (a, b)=>a.length === b.length && a.every((x, i)=>x === b[i]);
+const plural = (n, a, b, c)=>n % 10 === 1 && n % 100 !== 11 ? a : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? b : c;
+
+const COPY_BTN = '<button class="copy-btn" type="button" data-copydata><span class="ms">content_copy</span>Скопіювати дані</button>';
+const gsTop = (name, copy = true)=>`<div class="gs-top"><img src="images/sheets.svg" alt=""><span class="name">Притулок «Хвостики»${name ? ' · ' + name : ''}</span>${copy ? COPY_BTN : ''}</div>`;
+const fxBar = (addr, formula)=>`<div class="gs-fx"><span class="addr">${addr}</span><span class="fx">fx</span><span class="f">${formula}</span></div>`;
+const tabs = (names, on)=>`<div class="gs-tabs"><span class="ms">add</span><span class="ms">menu</span>${names.map(n=>`<button type="button" class="gs-tab${n === on ? ' on' : ''}" data-tab="${n}">${n}</button>`).join('')}</div>`;
+// Рядки аркуша «Тварини» (з номерами рядків), cls(r, i) — додатковий клас клітинки
+function petRows(rows, cls, first = 2, spill = false){
+  return rows.map((r, k)=>`<tr${spill ? ' class="spill"' : ''}><th>${k + first}</th>${r.map((v, i)=>`<td class="${NUMERIC[i] ? 'num' : ''} ${cls ? cls(r, i) : ''}">${v}</td>`).join('')}</tr>`).join('');
+}
+const colHead = ()=>`<tr><th class="rn"></th>${L.map(l=>`<th>${l}</th>`).join('')}</tr>`;
+const hdrRow = (n = 1, cur)=>`<tr class="hdr"><th>${n}</th>${FIELDS.map(f=>`<td>${f}</td>`).join('')}</tr>`;
+const sourceSheet = cls=>`<div class="gs-scroll"><table class="gs-grid">${colHead()}${hdrRow()}${petRows(PETS, cls)}</table></div>`;
+
+/* ---------- КНОПКА «СКОПІЮВАТИ ДАНІ»: таблиця тварин для вставлення в Google Таблиці ---------- */
+(function(){
+  const tsv = [FIELDS, ...PETS].map(r=>r.join('\t')).join('\n');
+  document.addEventListener('click', async e=>{
+    const b = e.target.closest('[data-copydata]');
+    if(!b) return;
+    let ok = false;
+    try{ await navigator.clipboard.writeText(tsv); ok = true; }
+    catch(_){
+      // Запасний спосіб для браузерів без доступу до буфера обміну
+      const ta = document.createElement('textarea');
+      ta.value = tsv; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try{ ok = document.execCommand('copy'); }catch(__){}
+      ta.remove();
+    }
+    if(!ok) return;
+    b.classList.add('done'); b.innerHTML = '<span class="ms">check</span>Скопійовано';
+    setTimeout(()=>{ b.classList.remove('done'); b.innerHTML = '<span class="ms">content_copy</span>Скопіювати дані'; }, 1600);
+  });
+})();
+
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Від А до Я', desc:'Сортування за абеткою, а числа — від меншого до більшого' },
+  { name:'Від Я до А', desc:'Сортування у зворотному порядку: числа — від більшого до меншого' },
+  { name:'Відсортувати аркуш', desc:'Рядки переїжджають цілими, разом з усіма своїми полями' },
+  { name:'Відсортувати діапазон', desc:'Переставляються лише виділені клітинки, решта аркуша стоїть на місці' },
+  { name:'Фільтр', desc:'Лишає на екрані лише записи, що відповідають умові, решту ховає' },
+  { name:'Зведена таблиця', desc:'Групує записи за полем і рахує підсумок для кожної групи' },
+  { name:'COUNTA', desc:'Рахує, скільки записів у групі' }
+], 'recapProgress');
+
+/* ---------- КРОК 1: АРКУШ «ТВАРИНИ» І УМОВИ ---------- */
+makeChoices('condList', [
+  { text:'«Які коти вже дорослі — старші за 2 роки?»',
+    opts:['Вид = «Кіт» І Вік &gt; 2', 'Вид = «Кіт» АБО Вік &gt; 2', 'Вид = «Кіт» І Вік &lt; 2'], correct:0,
+    why:'Обидві умови мають виконуватися разом — тому І. З АБО у вибірку потрапили б і дорослі собаки.' },
+  { text:'«Покажи всіх котів і всіх кроликів — для куточка дрібних тварин»',
+    opts:['Вид = «Кіт» І Вид = «Кролик»', 'Вид = «Кіт» АБО Вид = «Кролик»'], correct:1,
+    hint:'Чи може одна тварина бути водночас котом і кроликом? Яка тоді буде вибірка?',
+    why:'Тварина не може бути одночасно котом і кроликом, тож з І вибірка була б порожня. Потрібно АБО.' },
+  { text:'«Для кого купувати великі пакети корму — хто їсть понад 300 г на день?»',
+    opts:['Корм &lt; 300', 'Корм = 300', 'Корм &gt; 300'], correct:2,
+    why:'«Понад» означає «більше ніж» — знак &gt;. Таких тварин четверо: Рекс, Ласка, Джек і Лорд.' }
+]);
+
+/* ---------- КРОК 2: ВИДИ ЗАПИТІВ ---------- */
+makeClassify('typeList', [
+  { text:'Список кроликів, молодших за 3 роки', correct:0, why:'Відбираємо записи за двома умовами — вибірковий запит.' },
+  { text:'Щоранку волонтер вводить номер свого вольєра й отримує список своїх підопічних', correct:1, why:'Запит той самий, а умова щоразу інша — запит із параметром.' },
+  { text:'Середня вага собак у притулку', correct:2, why:'Відповідь — одне число, обчислене з записів.' },
+  { text:'Скільки котів і собак прилаштували в кожному місяці', correct:3, why:'Перетинаються два поля: вид і місяць.' }
+], ['Вибірковий', 'З параметром', 'На обчислення', 'Перехресний']);
+
+/* ---------- КРОК 3: КОНСТРУКТОР ЗАПИТУ FILTER ---------- */
+(function(){
+  const TASKS = [
+    { text:'Котяча кімната просить список усіх своїх мешканців. Відбери всіх котів.', ids:[1, 4, 8, 11, 13], done:'У вибірці п\'ятеро котів.' },
+    { text:'Родина шукає спокійного улюбленця. Покажи тварин, старших за 5 років.', ids:[4, 6, 11, 12], done:'Багіра, Ласка, Барсик і Лорд.' },
+    { text:'Школа кінологів шукає молодих собак: собаки, молодші за 3 роки. Потрібні дві умови.', ids:[5, 9, 14], done:'Бублик, Джек і Плюшка.' }
+  ];
+  const CF = [2, 3, 4, 5];                              // поля, за якими можна ставити умову
+  const VALS = { 2:KINDS, 4:['Так', 'Ні'], 3:[...Array(13).keys()], 5:[50, 100, 150, 200, 250, 300, 350, 400, 450, 500] };
+  const OPS_T = ['=', '<>'], OPS_N = ['=', '>', '<', '>=', '<='];
+  const OP_SHOW = { '=':'=', '<>':'≠', '>':'>', '<':'<', '>=':'≥', '<=':'≤' };
+  const gs = document.getElementById('fGs'), qb = document.getElementById('qb');
+  const taskEl = document.getElementById('fTask'), fb = document.getElementById('fFb');
+  const hit = trackTask(gs, TASKS.length, TASKS.length + 2);
+  let conds = [{ f:'', op:'=', v:'' }], result = null, sheet = 'Запит', t = 0, spill = false;
+
+  const rng = c=>`Тварини!${L[c]}2:${L[c]}15`;
+  const lit = c=>NUMERIC[c.f] ? c.v : `"${c.v}"`;
+  const ready = c=>c.f !== '' && c.v !== '';
+  function formula(html){
+    const parts = conds.map((c, i)=>{
+      if(!ready(c)) return html ? '<span style="color:#9AA0A6">…</span>' : '…';
+      return html ? `<span class="r${i + 1}">${rng(c.f)}</span>${esc(c.op)}<span class="q">${esc(lit(c))}</span>` : `${rng(c.f)}${c.op}${lit(c)}`;
+    });
+    return html ? `=FILTER(<span class="r0">Тварини!A2:F15</span>; ${parts.join('; ')})` : `=FILTER(Тварини!A2:F15; ${parts.join('; ')})`;
+  }
+  const test = (r, c)=>{
+    const a = r[c.f], v = NUMERIC[c.f] ? +c.v : c.v;
+    return { '=':a === v, '<>':a !== v, '>':a > v, '<':a < v, '>=':a >= v, '<=':a <= v }[c.op];
+  };
+
+  function drawGs(){
+    // Вибірка — на окремому аркуші «Запит»; вкладка «Тварини» показує вихідні дані
+    let h = gsTop(`аркуш «${sheet}»`);
+    if(sheet === 'Тварини'){
+      h += fxBar('A1', 'ID') + sourceSheet();
+    } else {
+      h += fxBar('A2', formula(true)) + `<div class="gs-scroll"><table class="gs-grid">${colHead()}${hdrRow()}`;
+      if(result === null) h += `<tr><th>2</th><td class="cur"></td>${'<td></td>'.repeat(5)}</tr>` + [3, 4].map(n=>`<tr><th>${n}</th>${'<td></td>'.repeat(6)}</tr>`).join('');
+      else if(!result.length) h += `<tr><th>2</th><td class="cur err" title="FILTER не має збігів">#N/A</td>${'<td></td>'.repeat(5)}</tr>`;
+      else h += petRows(result, null, 2, spill).replace('<td class="num ">', '<td class="num cur">');
+      h += `</table></div>`;
+      if(result) h += `<div class="vis">У вибірці ${result.length} ${plural(result.length, 'запис', 'записи', 'записів')} з ${PETS.length}</div>`;
+    }
+    h += tabs(['Тварини', 'Запит'], sheet);
+    gs.innerHTML = h;
+    spill = false;
+  }
+  function drawTask(){
+    const fin = t === TASKS.length;
+    taskEl.className = 'task' + (fin ? ' done' : '');
+    taskEl.innerHTML = fin ? '<span class="tn">✓</span><span>Усі запити складено! Можеш поекспериментувати з іншими умовами.</span>'
+      : `<span class="tn">${t + 1} з ${TASKS.length}</span><span>${TASKS[t].text}</span>`;
+  }
+  function drawQb(){
+    let h = '<div class="qb-title">Конструктор умов</div>';
+    conds.forEach((c, i)=>{
+      const ops = c.f === '' ? OPS_T : NUMERIC[c.f] ? OPS_N : OPS_T;
+      h += `<div class="qb-row"><span class="qb-tag">${i ? 'І' : 'Умова'}</span>`
+        + `<select data-i="${i}" data-k="f"><option value=""${c.f === '' ? ' selected' : ''}>поле…</option>${CF.map(f=>`<option value="${f}"${c.f === f ? ' selected' : ''}>${FIELDS[f]}</option>`).join('')}</select>`
+        + `<select data-i="${i}" data-k="op"${c.f === '' ? ' disabled' : ''}>${ops.map(o=>`<option value="${o}"${c.op === o ? ' selected' : ''}>${OP_SHOW[o]}</option>`).join('')}</select>`
+        + `<select data-i="${i}" data-k="v"${c.f === '' ? ' disabled' : ''}><option value="">значення…</option>${c.f === '' ? '' : VALS[c.f].map(v=>`<option value="${v}"${String(c.v) === String(v) ? ' selected' : ''}>${v}</option>`).join('')}</select>`
+        + (i ? `<button class="rm" type="button" data-rm="${i}" title="Прибрати умову">✕</button>` : '') + '</div>';
+    });
+    h += '<div class="qb-btns">' + (conds.length < 2 ? '<button class="qb-add" type="button" data-add>+ Ще одна умова (І)</button>' : '')
+      + '<button class="btn-primary qb-run" type="button" data-run>↵ Виконати</button></div>';
+    qb.innerHTML = h;
+  }
+  function run(){
+    if(!conds.every(ready)){ fb.className = 'emu-fb err'; fb.textContent = 'Заповни умову повністю: поле, знак і значення.'; return; }
+    result = PETS.filter(r=>conds.every(c=>test(r, c)));
+    sheet = 'Запит'; spill = true; drawGs();
+    if(t >= TASKS.length){ fb.className = 'emu-fb'; fb.textContent = result.length ? `Запит виконано: ${result.length} ${plural(result.length, 'запис', 'записи', 'записів')}.` : 'Жоден запис не підходить — FILTER показує #N/A.'; return; }
+    const T = TASKS[t], ids = result.map(r=>r[0]);
+    if(sameIds(ids, T.ids)){
+      fb.className = 'emu-fb ok'; fb.textContent = 'Правильно ✓ ' + T.done;
+      addNeurons(1); hit(); t++;
+      if(t === TASKS.length) addNeurons(2);
+      drawTask();
+      return;
+    }
+    fb.className = 'emu-fb err';
+    if(!result.length) fb.textContent = 'Жоден запис не відповідає цим умовам — FILTER показує помилку #N/A. Зміни умову.';
+    else {
+      const extra = result.filter(r=>!T.ids.includes(r[0]));
+      fb.textContent = extra.length ? `У вибірку потрапили зайві записи, наприклад ${extra[0][1]} (${extra[0][2].toLowerCase()}, ${extra[0][3]} р.). Перевір умову.`
+        : `Вибірка неповна: ${result.length} з ${T.ids.length} потрібних записів. Може, знак порівняння не той?`;
+    }
+    flash(gs);
+  }
+  qb.addEventListener('change', e=>{
+    const s = e.target.closest('select'); if(!s) return;
+    const c = conds[+s.dataset.i], k = s.dataset.k;
+    if(k === 'f'){ c.f = s.value === '' ? '' : +s.value; c.op = '='; c.v = ''; drawQb(); }
+    else c[k] = s.value;
+    drawGs();
+  });
+  qb.addEventListener('click', e=>{
+    if(e.target.closest('[data-add]')){ conds.push({ f:'', op:'=', v:'' }); drawQb(); drawGs(); }
+    const rm = e.target.closest('[data-rm]');
+    if(rm){ conds.splice(+rm.dataset.rm, 1); drawQb(); drawGs(); }
+    if(e.target.closest('[data-run]')) run();
+  });
+  gs.addEventListener('click', e=>{ const b = e.target.closest('[data-tab]'); if(b){ sheet = b.dataset.tab; drawGs(); } });
+  drawTask(); drawQb(); drawGs();
+})();
+
+/* ---------- КРОК 4: ЗАПИТ ІЗ ПАРАМЕТРОМ ---------- */
+(function(){
+  const VISITORS = [
+    { ava:'👩', name:'Пані Ірина з сином', say:'Нам потрібен молодий пес — не старший за 2 роки.', ids:[5, 9, 14], kind:'Собака', ok:'Бублик, Джек і Плюшка вже виляють хвостами 🐶' },
+    { ava:'👴', name:'Дідусь Степан', say:'Шукаю кота, якому не більше 3 років.', ids:[1, 8, 13], kind:'Кіт', ok:'Мурчик, Тигра й Зефірка чекають на дідуся 🐱' }
+  ];
+  const gs = document.getElementById('pGs'), vis = document.getElementById('visitor');
+  const fb = document.getElementById('pFb'), btn = document.getElementById('pShow');
+  const hit = trackTask(gs, VISITORS.length, VISITORS.length + 2);
+  let kind = 'Кіт', age = 12, t = 0, sheet = 'Підбір';
+  const F = '=FILTER(<span class="r0">Тварини!A2:F15</span>; <span class="r0">Тварини!C2:C15</span>=<span class="r1">B1</span>; <span class="r0">Тварини!D2:D15</span>&lt;=<span class="r2">B2</span>)';
+  const rows = ()=>PETS.filter(r=>r[2] === kind && r[3] <= age);
+
+  function drawVisitor(){
+    if(t === VISITORS.length){
+      vis.innerHTML = `<div class="visitor done"><div class="ava">🏡</div><div class="bubble"><b>Притулок «Хвостики»</b>Усі відвідувачі отримали свої вибірки. Той самий запит — різні відповіді!</div><span class="n">✓</span></div>`;
+      btn.disabled = true; return;
+    }
+    const V = VISITORS[t];
+    vis.innerHTML = `<div class="visitor"><div class="ava">${V.ava}</div><div class="bubble"><b>${V.name}</b>${V.say}</div><span class="n">${t + 1} з ${VISITORS.length}</span></div>`;
+  }
+  function drawGs(re){
+    // Параметри B1, B2 і вибірка з A5 — на окремому аркуші «Підбір»
+    let h = gsTop(`аркуш «${sheet}»`);
+    if(sheet === 'Тварини'){ gs.innerHTML = h + fxBar('A1', 'ID') + sourceSheet() + tabs(['Тварини', 'Підбір'], sheet); return; }
+    const res = rows();
+    h += fxBar('A5', F) + `<div class="gs-scroll"><table class="gs-grid">${colHead()}`
+        + `<tr><th>1</th><td class="lbl">Вид</td><td><select class="pcell b1" data-p="kind">${KINDS.map(k=>`<option${k === kind ? ' selected' : ''}>${k}</option>`).join('')}</select></td>${'<td></td>'.repeat(4)}</tr>`
+        + `<tr><th>2</th><td class="lbl">Вік до</td><td><select class="pcell b2" data-p="age">${[...Array(13).keys()].map(n=>`<option${n === age ? ' selected' : ''}>${n}</option>`).join('')}</select></td>${'<td></td>'.repeat(4)}</tr>`
+        + `<tr><th>3</th>${'<td></td>'.repeat(6)}</tr>${hdrRow(4)}`
+        + (res.length ? petRows(res, null, 5, re).replace('<td class="num ">', '<td class="num cur">') : `<tr><th>5</th><td class="cur err">#N/A</td>${'<td></td>'.repeat(5)}</tr>`)
+        + `</table></div><div class="vis">У вибірці ${res.length} ${plural(res.length, 'запис', 'записи', 'записів')}</div>`
+        + tabs(['Тварини', 'Підбір'], sheet);
+    gs.innerHTML = h;
+  }
+  gs.addEventListener('change', e=>{
+    const s = e.target.closest('[data-p]'); if(!s) return;
+    if(s.dataset.p === 'kind') kind = s.value; else age = +s.value;
+    fb.className = 'emu-fb'; fb.textContent = '';
+    drawGs(true);
+  });
+  gs.addEventListener('click', e=>{ const b = e.target.closest('[data-tab]'); if(b){ sheet = b.dataset.tab; drawGs(); } });
+  btn.addEventListener('click', ()=>{
+    if(t >= VISITORS.length) return;
+    const V = VISITORS[t], ids = rows().map(r=>r[0]);
+    if(sheet !== 'Підбір'){ sheet = 'Підбір'; drawGs(); }
+    if(sameIds(ids, V.ids)){
+      fb.className = 'emu-fb ok'; fb.textContent = 'Правильно ✓ ' + V.ok;
+      addNeurons(1); hit(); t++;
+      if(t === VISITORS.length) addNeurons(2);
+      drawVisitor(); return;
+    }
+    fb.className = 'emu-fb err';
+    if(kind !== V.kind) fb.textContent = 'Відвідувач просив іншу тварину — зміни параметр «Вид» у клітинці B1.';
+    else if(ids.length > V.ids.length) fb.textContent = 'У вибірці є тварини, старші, ніж просили. Зменш «Вік до» в клітинці B2.';
+    else fb.textContent = 'Бракує тварин, які теж підходять. Збільш «Вік до» в клітинці B2.';
+    flash(gs);
+  });
+  drawVisitor(); drawGs();
+})();
+
+/* ---------- КРОК 5: ПІСОЧНИЦЯ ПІДСУМКІВ (без обліку) ---------- */
+(function(){
+  const FNS = {
+    COUNTA:{ f:k=>`=COUNTA(FILTER(B2:B15; C2:C15="${k}"))`, col:1, calc:a=>a.length, say:(k, v)=>`Тварин виду «${k}» — ${v}.` },
+    SUM:{ f:k=>`=SUM(FILTER(F2:F15; C2:C15="${k}"))`, col:5, calc:a=>a.reduce((s, x)=>s + x, 0), say:(k, v)=>`Усі тварини виду «${k}» з'їдають за день ${v} г корму.` },
+    AVERAGE:{ f:k=>`=AVERAGE(FILTER(D2:D15; C2:C15="${k}"))`, col:3, calc:a=>a.reduce((s, x)=>s + x, 0) / a.length, say:(k, v)=>`Середній вік тварин виду «${k}» — ${v} р.` },
+    MAX:{ f:k=>`=MAX(FILTER(D2:D15; C2:C15="${k}"))`, col:3, calc:a=>Math.max(...a), say:(k, v)=>`Найстаршій тварині виду «${k}» — ${v} р.` }
+  };
+  let fn = 'COUNTA', kind = 'Кіт';
+  const fnEl = document.getElementById('calcFn'), kEl = document.getElementById('calcKind');
+  function draw(){
+    fnEl.innerHTML = Object.keys(FNS).map(n=>`<button type="button" class="${n === fn ? 'on' : ''}" data-fn="${n}">${n}</button>`).join('');
+    kEl.innerHTML = KINDS.map(k=>`<button type="button" class="${k === kind ? 'on' : ''}" data-k="${k}">${k}</button>`).join('');
+    const F = FNS[fn], rows = PETS.filter(r=>r[2] === kind);
+    const v = F.calc(rows.map(r=>r[F.col]));
+    document.getElementById('calcGs').innerHTML = gsTop('аркуш «Тварини»') + sourceSheet((r, i)=>r[2] !== kind ? '' : (i === F.col ? 'hit sumc' : i === 2 ? 'hit' : ''));
+    document.getElementById('calcF').textContent = F.f(kind);
+    document.getElementById('calcV').textContent = fmt(v);
+    document.getElementById('calcSay').textContent = F.say(kind, fmt(v));
+  }
+  fnEl.addEventListener('click', e=>{ const b = e.target.closest('[data-fn]'); if(b){ fn = b.dataset.fn; draw(); } });
+  kEl.addEventListener('click', e=>{ const b = e.target.closest('[data-k]'); if(b){ kind = b.dataset.k; draw(); } });
+  draw();
+})();
+
+makeMatching('fnPool', 'fnList', [
+  { name:'=COUNTA(FILTER(B2:B15; C2:C15="Кіт"))', desc:'Скільки в притулку котів?' },
+  { name:'=MAX(FILTER(D2:D15; C2:C15="Кіт"))', desc:'Скільки років найстаршому котові?' },
+  { name:'=SUM(FILTER(F2:F15; C2:C15="Собака"))', desc:'Скільки грамів корму з\'їдають за день усі собаки разом?' },
+  { name:'=AVERAGE(FILTER(F2:F15; C2:C15="Собака"))', desc:'Скільки корму в середньому потрібно одному собаці на день?' }
+], 'fnProgress');
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що таке запит у базі даних?', opts:['Запитання до бази, записане за точними правилами, щоб отримати потрібні дані', 'Таблиця, у яку вводять нові записи', 'Повідомлення адміністраторові бази даних'], correct:0 },
+  { q:'Запит «Вид = «Кіт» І Вид = «Собака»» поверне…', opts:['усіх котів і собак', 'лише котів', 'порожню вибірку'], correct:2, why:'Тварина не може бути водночас котом і собакою. Щоб отримати обидва види, потрібне АБО.' },
+  { q:'Чим функція FILTER відрізняється від звичайного фільтра?', opts:['Вона видаляє зайві рядки з таблиці', 'Вона будує вибірку окремо, а вихідна таблиця не змінюється', 'Вона працює лише з числами'], correct:1 },
+  { q:'Який запит щоразу питає умову — наприклад, «Введіть клас»?', opts:['Перехресний', 'На обчислення', 'З параметром'], correct:2 },
+  { q:'Яка формула знайде середній вік собак?', opts:['=FILTER(D2:D15; C2:C15="Собака")', '=AVERAGE(FILTER(D2:D15; C2:C15="Собака"))', '=SUM(FILTER(D2:D15; C2:C15="Собака"))'], correct:1, why:'FILTER відбирає вік собак, а AVERAGE рахує середнє. Сама FILTER дала б лише список.' },
+  { q:'Як у Google Таблицях емулюють перехресний запит?', opts:['Зведеною таблицею, у якої заповнено Рядки й Стовпці', 'Сортуванням за двома стовпцями', 'Функцією COUNTIF'], correct:0 }
+], {summary:'Тепер ти знаєш, що таке запит, які бувають запити і як відтворити їх у Google Таблицях: FILTER, параметри в клітинках, підсумки SUM чи AVERAGE від вибірки і зведену таблицю.'});
+</script>
+
+</body>
+</html>
