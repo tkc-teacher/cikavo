@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Складові комп'ютера. Миша — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  /* Гама 1 класу — малинова, як картка класу на головній */
+  :root{
+    --accent:#E8458B; --accent-dark:#B8296A; --accent-soft:#FDE8F1;
+    --label:#D6337A; --bg:#FBF7FA; --line:#F0E2EA;
+    --hud-bar:linear-gradient(90deg,#E8458B,#FFC93C);
+  }
+
+  /* Першокласники: більший текст, менше слів */
+  .hero h1{font-size:44px;}
+  .hero p{font-size:23px;}
+  .block h2{font-size:32px;}
+  .block p{font-size:23px; line-height:1.5;}
+  .block p.soft{font-size:21px;}
+  .progress-line{font-size:20px;}
+  .btn-primary{font-size:19px; padding:14px 30px; border-radius:999px;}
+
+  /* 🔊 — читає текст поруч українським голосом браузера; без українського голосу кнопок немає */
+  .say{display:none; vertical-align:middle; width:40px; height:40px; margin:0 10px 0 0; padding:0; border:0; border-radius:50%; background:var(--accent-soft); color:var(--accent-dark); cursor:pointer; flex-shrink:0; transition:background .15s ease, transform .15s ease;}
+  .can-say .say{display:inline-flex; align-items:center; justify-content:center;}
+  .say:hover{background:var(--accent); color:#fff;}
+  .say.talking{background:var(--accent); color:#fff; animation:talk .8s ease-in-out infinite;}
+  @keyframes talk{50%{transform:scale(1.12);}}
+  .say svg{width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round;}
+  .said{display:flex; align-items:flex-start; gap:0;}
+  .said .say{margin-top:-2px;}
+
+  /* картка-завдання з озвученням */
+  .ask{display:flex; align-items:center; justify-content:center; gap:12px; min-height:52px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:30px; color:var(--ink); text-align:center; margin-bottom:12px;}
+  .ask .say{margin:0;}
+  .ask b{color:var(--accent-dark);}
+  .done-msg{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:26px; color:#2F8A47; text-align:center;}
+
+  /* Крок 1 · робоче місце */
+  .desk{display:block; width:100%; max-width:560px; margin:0 auto; overflow:visible;}
+  .part{cursor:pointer;}
+  .part .hl{fill:transparent; stroke:transparent; stroke-width:3; transition:fill .2s ease, stroke .2s ease;}
+  .part:hover .hl{fill:rgba(232,69,139,.08); stroke:rgba(232,69,139,.45); stroke-dasharray:6 5;}
+  .part.found .hl{fill:rgba(63,174,88,.12); stroke:#3FAE58; stroke-dasharray:none;}
+  .part.found{cursor:default;}
+  .part.miss{animation:wob .4s ease;}
+  @keyframes wob{25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
+  .part{transform-box:fill-box;}
+  .tags{display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:10px; min-height:40px;}
+  .tag-ok{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:20px; padding:5px 14px; border-radius:999px; background:var(--ok-soft); color:#256B36; animation:pop .3s ease;}
+  @keyframes pop{from{transform:scale(.6); opacity:0;}}
+
+  /* Крок 2 · частини миші */
+  .mouse-row{display:flex; justify-content:center; padding:34px 0 6px;}
+  .mwrap{position:relative; width:190px;}
+  .big-mouse{width:100%; display:block; overflow:visible;}
+  .mp{cursor:pointer; transition:filter .2s ease;}
+  rect.mp:hover{fill:var(--accent-soft);} g.mp:hover{filter:brightness(1.1);}
+  .mp.lit{filter:none;} rect.mp.lit{fill:#FFE38A;} g.mp.lit rect{fill:#FFC93C;}
+  .mlabel{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:22px; padding:8px 14px; border-radius:14px; background:var(--bg); border:2px dashed var(--line); color:#B5A9B5; min-width:120px; text-align:center; transition:all .25s ease;}
+  .mlabel.on{background:var(--accent-soft); border:2px solid var(--accent); color:var(--accent-dark);}
+  .ml-left, .ml-right{position:absolute; top:37%; transform:translateY(-50%); white-space:nowrap;}
+  .ml-left{right:calc(100% + 18px);} .ml-right{left:calc(100% + 18px);}
+  .ml-wheel{position:absolute; top:4%; right:calc(65% + 4px); transform:translateY(-50%); white-space:nowrap;}
+  .wheel-lead{fill:none; stroke:#C9BFD0; stroke-width:2.5; stroke-dasharray:5 5; stroke-linecap:round; transition:stroke .25s ease;}
+  .wheel-lead.on{stroke:var(--accent);}
+  @media (max-width:600px){
+    .mouse-row{padding:6px 0;}
+    .mwrap{width:100%; display:grid; grid-template-columns:1fr 1fr; gap:10px; justify-items:center;}
+    .big-mouse{grid-column:1 / -1; width:160px; margin-bottom:4px;}
+    .mwrap .mlabel{position:static; transform:none; min-width:0; width:100%; font-size:19px; padding:8px 6px;}
+    .mwrap .ml-wheel{grid-column:1 / -1; width:auto; padding:8px 18px;}
+    .wheel-lead{display:none;}
+  }
+
+  /* Крок 3 · як тримати мишу: фото зверху, пальці натискаються */
+  .photo{position:relative; max-width:340px; margin:0 auto; border-radius:var(--radius-m); overflow:hidden;}
+  .photo img{display:block; width:100%; height:auto;}
+  .fhit{position:absolute; padding:0; border:3px dashed transparent; border-radius:999px; background:transparent; cursor:pointer; transition:border-color .2s ease, background .2s ease;}
+  .fhit:hover{border-color:rgba(232,69,139,.7); background:rgba(232,69,139,.12);}
+  .fhit.ok{border:3px solid #3FAE58; background:rgba(63,174,88,.25); cursor:default;}
+  .fhit.miss{border:3px solid var(--coral); background:rgba(255,107,74,.25); animation:wob .4s ease;}
+  .rules{list-style:none; padding:0; margin:0 0 6px; display:grid; gap:10px;}
+  .block ul.rules{font-size:23px; padding:0;}
+  .rules li{display:flex; align-items:center; gap:12px;}
+
+  /* Крок 4 · кульки */
+  .sky{position:relative; height:380px; overflow:hidden; border-radius:var(--radius-m); background:linear-gradient(180deg,#DDF1FF 0%,#F3FAFF 100%);}
+  .cloud{position:absolute; background:#fff; border-radius:999px; opacity:.9;}
+  .cloud::before,.cloud::after{content:""; position:absolute; background:#fff; border-radius:50%;}
+  .cloud.c1{width:110px; height:34px; left:8%; top:22%;} .cloud.c1::before{width:50px; height:50px; left:16px; top:-24px;} .cloud.c1::after{width:38px; height:38px; left:52px; top:-16px;}
+  .cloud.c2{width:90px; height:28px; right:10%; top:58%;} .cloud.c2::before{width:42px; height:42px; left:14px; top:-20px;} .cloud.c2::after{width:30px; height:30px; left:44px; top:-12px;}
+  .bal{position:absolute; bottom:-130px; width:64px; height:118px; padding:0; border:0; background:none; cursor:pointer; animation:fly var(--t,11s) linear var(--d,0s) infinite;}
+  .sky:not(.go) .bal{animation:none;}
+  .bal svg{width:100%; height:100%; overflow:visible;}
+  .bal .bb{transform-origin:32px 40px; animation:swayB 2.6s ease-in-out infinite;}
+  @keyframes fly{from{transform:translateY(0);} to{transform:translateY(-640px);}}
+  @keyframes swayB{50%{transform:rotate(6deg);}}
+  .bal.popped{pointer-events:none; animation-play-state:paused;}
+  .bal.popped .bb{animation:burst .35s ease-out forwards;}
+  .bal.popped .str{opacity:0; transition:opacity .2s ease;}
+  @keyframes burst{to{transform:scale(1.6); opacity:0;}}
+
+  /* Крок 5 · подарунки */
+  .gifts{display:grid; grid-template-columns:repeat(4,1fr); gap:14px;}
+  @media (max-width:560px){ .gifts{grid-template-columns:repeat(2,1fr);} }
+  .gift{position:relative; aspect-ratio:1; padding:0; border:2px solid var(--line); border-radius:var(--radius-m); background:var(--surface); cursor:pointer; display:flex; align-items:center; justify-content:center; user-select:none; -webkit-user-select:none; touch-action:manipulation;}
+  .gift:hover{border-color:var(--accent);}
+  .gift svg{width:78%; height:78%; overflow:visible;}
+  .gift .lid{transition:transform .45s cubic-bezier(.3,1.5,.5,1); transform-origin:50% 100%; transform-box:fill-box;}
+  .gift.tap .lid{transform:translateY(-6px) rotate(-6deg);}
+  .gift.shake{animation:wob .4s ease;}
+  .gift .toy{position:absolute; font-size:54px; line-height:1; opacity:0; transform:translateY(20px) scale(.4); transition:all .5s cubic-bezier(.3,1.5,.5,1);}
+  .gift.open{border-color:#3FAE58; background:var(--ok-soft); cursor:default;}
+  .gift.open svg{opacity:0; transition:opacity .3s ease;}
+  .gift.open .toy{opacity:1; transform:none;}
+  /* «↻ Почати знову» — як у Лабораторії (memo-alphabet), під вправою праворуч */
+  .block > .restart{display:block; margin:12px 0 0 auto;}
+  .restart{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; border:1.5px solid var(--accent); background:var(--surface); color:var(--accent-dark); border-radius:999px; padding:4px 14px; cursor:pointer; white-space:nowrap;}
+  .restart:hover{background:var(--accent-soft);}
+  .hint2{text-align:center; font-size:21px; color:var(--ink-soft); min-height:1.5em; margin-top:10px;}
+
+  /* Крок 8 · коліщатко: пірнаємо в море */
+  .sea{position:relative; height:360px; overflow-y:auto; overscroll-behavior:contain; border-radius:var(--radius-m); scrollbar-width:thin;}
+  .sea-in{position:relative; height:1640px; background:linear-gradient(180deg,#BFE9FF 0,#BFE9FF 90px,#5CC3EA 92px,#2C8FCB 600px,#1C5E9E 1150px,#123D73 1560px);}
+  .sea-in::after{content:""; position:absolute; left:0; right:0; bottom:0; height:80px; background:#E9C98B; border-radius:50% 50% 0 0 / 30px 30px 0 0;}
+  .sea-it{position:absolute; z-index:1; transform:translate(-50%,-50%); font-size:54px; line-height:1; padding:6px; border:0; background:none; border-radius:50%; cursor:pointer; transition:transform .2s ease;}
+  .sea-it:hover{transform:translate(-50%,-50%) scale(1.12);}
+  .sea-it.found{background:rgba(255,255,255,.55); box-shadow:0 0 0 4px #3FAE58;}
+  .sea-it.miss{animation:seaShake .35s ease 2;}
+  @keyframes seaShake{0%,100%{transform:translate(-50%,-50%);} 25%{transform:translate(calc(-50% - 5px),-50%);} 75%{transform:translate(calc(-50% + 5px),-50%);}}
+  .bubble{position:absolute; border:2px solid rgba(255,255,255,.55); border-radius:50%;}
+  .weed{position:absolute; bottom:40px; width:14px; border-radius:14px 14px 4px 4px; background:#2E9E6A; transform-origin:bottom; animation:weed 3s ease-in-out infinite;}
+  @keyframes weed{50%{transform:rotate(7deg);}}
+  .scroll-hint{position:sticky; top:296px; z-index:2; display:flex; justify-content:center; height:0; pointer-events:none; transition:opacity .4s ease;}
+  .scroll-hint span{display:flex; align-items:center; gap:8px; height:46px; padding:0 16px; border-radius:999px; background:rgba(255,255,255,.92); font-family:'Baloo 2',sans-serif; font-weight:700; font-size:20px; color:var(--accent-dark); box-shadow:0 4px 12px rgba(0,0,0,.12);}
+  .scroll-hint svg{width:22px; height:30px;}
+  .scroll-hint .wh{animation:wheelDown 1.2s ease-in-out infinite;}
+  @keyframes wheelDown{0%{transform:translateY(-3px); opacity:1;} 100%{transform:translateY(4px); opacity:.2;}}
+  .sea.moved .scroll-hint{opacity:0;}
+
+  /* Крок 6 · перетягни сир */
+  .feed{position:relative; display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:center; min-height:260px; touch-action:none;}
+  .plate{display:flex; flex-wrap:wrap; gap:12px; justify-content:center; align-content:center; min-height:220px; border-radius:var(--radius-m); background:var(--bg); border:2px dashed var(--line); padding:14px;}
+  .cheese{width:74px; height:64px; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; transition:transform .15s ease;}
+  .cheese:hover{transform:scale(1.08) rotate(-4deg);}
+  .cheese.drag{position:fixed; z-index:100; cursor:grabbing; transform:scale(1.15) rotate(-6deg); transition:none; pointer-events:none; filter:drop-shadow(0 8px 10px rgba(0,0,0,.18));}
+  .cheese.back{transition:left .3s ease, top .3s ease;}
+  .cheese svg{width:100%; height:100%;}
+  .critter{position:relative; display:flex; flex-direction:column; align-items:center;}
+  .critter svg{width:100%; max-width:230px;}
+  .critter.yum svg{animation:yum .5s ease;}
+  @keyframes yum{30%{transform:scale(1.08) rotate(-3deg);} 60%{transform:scale(.97) rotate(2deg);}}
+  .critter.over svg{filter:drop-shadow(0 0 12px rgba(232,69,139,.5));}
+  .belly{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:22px; color:var(--accent-dark); margin-top:6px;}
+
+  /* Крок 7 · веди стежкою */
+  .trail{display:block; width:100%; height:auto; touch-action:none; user-select:none; -webkit-user-select:none; border-radius:var(--radius-m); background:var(--tr-bg,#EAF7E6);}
+  .trail .road{fill:none; stroke:var(--tr-road,#fff); stroke-width:50; stroke-linecap:round; stroke-linejoin:round;}
+  .trail .edge{fill:none; stroke:var(--tr-edge,#BFE3B4); stroke-width:58; stroke-linecap:round; stroke-linejoin:round;}
+  .trail .mid{fill:none; stroke:var(--tr-edge,#BFE3B4); stroke-width:3; stroke-dasharray:2 14; stroke-linecap:round;}
+  .trail .done{fill:none; stroke:var(--accent); stroke-width:10; stroke-linecap:round; stroke-linejoin:round; opacity:.55;}
+  .trail .who{cursor:grab;}
+  .trail.drag .who{cursor:grabbing;}
+  .trail .ring{fill:none; stroke:var(--accent); stroke-width:4; animation:ring 1.4s ease-out infinite; transform-box:fill-box; transform-origin:center;}
+  .trail.drag .ring,.trail.fin .ring{display:none;}
+  @keyframes ring{from{transform:scale(.7); opacity:.9;} to{transform:scale(1.4); opacity:0;}}
+  .trail .who.miss .body{animation:shakeX .35s ease 2;}
+  .trail.fin .goal{animation:yum .6s ease; transform-box:fill-box; transform-origin:center;}
+  .trail text{dominant-baseline:central; text-anchor:middle; pointer-events:none;}
+
+  /* Підсумковий тест — великі варіанти з картинками */
+  .quiz-q{font-size:26px; display:flex; align-items:center; gap:10px;}
+  .quiz-options{flex-direction:row !important; flex-wrap:wrap;}
+  .quiz-opt{flex:1 1 150px; display:flex; flex-direction:column; align-items:center; gap:6px; text-align:center !important; font-size:21px !important; padding:14px 10px !important;}
+  .quiz-opt svg{width:84px; height:64px;}
+  .quiz-opt .em{font-size:40px; line-height:1;}
+</style>
+</head>
+<body data-lesson="lesson1-mouse" data-hud="1 клас · Комп'ютерна миша">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Знайомство з комп'ютером</div>
+      <h1>Комп'ютерна миша</h1>
+      <p class="said" data-say>Вчимося керувати мишею.</p>
+      <button class="btn-primary" onclick="document.getElementById('s1').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: мишка-комп'ютерна миша з вушками й хвостиком-дротом -->
+    <svg class="mascot" viewBox="0 0 140 140" fill="none" aria-hidden="true">
+      <circle cx="70" cy="74" r="58" fill="#FDE8F1"/>
+      <path d="M70 34 C70 20 84 14 96 18 C110 22 118 12 116 4" stroke="#B8296A" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="46" cy="44" r="15" fill="#E8458B"/><circle cx="46" cy="44" r="8" fill="#FFB3D1"/>
+      <circle cx="94" cy="44" r="15" fill="#E8458B"/><circle cx="94" cy="44" r="8" fill="#FFB3D1"/>
+      <path d="M70 34 C96 34 104 56 104 80 C104 106 90 122 70 122 C50 122 36 106 36 80 C36 56 44 34 70 34 Z" fill="#fff" stroke="#E8458B" stroke-width="4"/>
+      <path d="M70 34 V70 M37 70 H103" stroke="#F3C2D8" stroke-width="3"/>
+      <rect x="66" y="44" width="8" height="16" rx="4" fill="#E8458B"/>
+      <circle cx="58" cy="86" r="4.5" fill="#1B1B3A"/><circle cx="82" cy="86" r="4.5" fill="#1B1B3A"/>
+      <circle cx="59.5" cy="84.5" r="1.4" fill="#fff"/><circle cx="83.5" cy="84.5" r="1.4" fill="#fff"/>
+      <path d="M64 97 Q70 102 76 97" stroke="#1B1B3A" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="51" cy="96" r="5" fill="#FFB3D1" opacity=".7"/><circle cx="89" cy="96" r="5" fill="#FFB3D1" opacity=".7"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="s1">
+    <div class="step-label">Крок 1 · Складові комп'ютера</div>
+    <h2>Частини комп'ютера</h2>
+    <div class="exercise">
+      <div class="ask" id="findAsk"></div>
+      <svg class="desk" id="desk" viewBox="0 0 420 270" aria-label="Робоче місце з комп'ютером"></svg>
+      <div class="tags" id="findTags"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Частини миші</div>
+    <h2>Частини миші</h2>
+    <p class="said" data-say>Натисни на кожну частину.</p>
+    <div class="exercise">
+      <div class="mouse-row">
+        <div class="mwrap">
+          <svg class="big-mouse" id="bigMouse" viewBox="0 -20 200 300" aria-label="Комп'ютерна миша"></svg>
+          <div class="mlabel ml-left" data-for="left">Ліва кнопка</div>
+          <div class="mlabel ml-right" data-for="right">Права кнопка</div>
+          <div class="mlabel ml-wheel" data-for="wheel">Коліщатко</div>
+        </div>
+      </div>
+      <p class="soft" id="partInfo" style="text-align:center; margin:14px 0 0; min-height:1.6em;"></p>
+    </div>
+  </section>
+
+  <section class="block hold">
+    <div class="step-label">Крок 3 · Як тримати мишу</div>
+    <h2>Як тримати мишу</h2>
+    <ul class="rules">
+      <li><span class="said" data-say>Долоня лежить на миші.</span></li>
+      <li><span class="said" data-say>Вказівний палець — на лівій кнопці.</span></li>
+      <li><span class="said" data-say>Середній палець — на правій кнопці.</span></li>
+    </ul>
+        <div class="exercise">
+      <div class="ask" id="holdAsk"></div>
+      <div class="photo" id="holdPhoto"></div>
+      <div class="tags" id="holdTags"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Клацаємо</div>
+    <h2>Лусни кульки!</h2>
+    <p class="said" data-say>Клацни на кульку.</p>
+    <div class="exercise">
+      <div class="sky" id="sky"><span class="cloud c1"></span><span class="cloud c2"></span></div>
+      <div class="progress-line" id="skyProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Двічі клацаємо</div>
+    <h2>Відкрий подарунки</h2>
+    <p class="said" data-say>Клацни двічі: клац-клац!</p>
+    <div class="exercise">
+      <div class="gifts" id="gifts"></div>
+      <div class="hint2" id="giftHint"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Перетягуємо</div>
+    <h2>Нагодуй мишку</h2>
+    <p class="said" data-say>Перетягни сир до мишки.</p>
+    <div class="exercise">
+      <div class="feed">
+        <div class="plate" id="plate"></div>
+        <div class="critter" id="critter"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 7 · Ведемо стежкою</div>
+    <h2>Веди стежкою</h2>
+    <p class="said" data-say>Тримай кнопку і веди стежкою. Не сходь зі стежки!</p>
+    <div class="exercise">
+      <div id="trailBox"></div>
+      <div class="progress-line" id="trailProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 8 · Крутимо коліщатко</div>
+    <h2>Пірнай у море</h2>
+    <p class="said" data-say>Крути коліщатко, щоб пірнути глибше.</p>
+    <div class="exercise">
+      <div class="ask" id="seaAsk"></div>
+      <div class="sea" id="sea"></div>
+      <div class="tags" id="seaTags"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Перевір себе</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Урок · «Складові комп'ютера. Миша. Як правильно тримати мишу?» · 1 клас</span><span class="credits">Фото руки на миші — Cemrecan Yurtman, Pexels.</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- ГОЛОС: 🔊 читає текст українським голосом браузера ----------
+   Кнопки з'являються, лише якщо в системі є український голос (клас .can-say на <body>). */
+const SPEAK_ICON = '<svg viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>';
+let ukVoice = null, sayingBtn = null;
+function pickVoice(){
+  const vs = speechSynthesis.getVoices();
+  ukVoice = vs.find(v=>/^uk/i.test(v.lang)) || null;
+  document.body.classList.toggle('can-say', !!ukVoice);
+}
+if('speechSynthesis' in window){ pickVoice(); speechSynthesis.addEventListener?.('voiceschanged', pickVoice); }
+function say(text, btn){
+  if(!ukVoice) return;
+  speechSynthesis.cancel();
+  sayingBtn?.classList.remove('talking');
+  const u = new SpeechSynthesisUtterance(text);
+  u.voice = ukVoice; u.lang = ukVoice.lang; u.rate = .92;
+  sayingBtn = btn || null;
+  btn?.classList.add('talking');
+  u.onend = u.onerror = ()=>btn?.classList.remove('talking');
+  speechSynthesis.speak(u);
+}
+const sayBtn = text=>`<button class="say" type="button" aria-label="Послухати" data-text="${text.replace(/"/g,'&quot;')}">${SPEAK_ICON}</button>`;
+document.addEventListener('click', e=>{
+  const b = e.target.closest('.say');
+  if(b) say(b.dataset.text, b);
+});
+// Абзаци з data-say отримують 🔊 зліва
+document.querySelectorAll('[data-say]').forEach(el=>{
+  const text = el.textContent.trim();
+  el.innerHTML = sayBtn(text) + `<span>${el.innerHTML}</span>`;
+});
+
+/* ---------- «Почати спочатку» під кожною вправою ----------
+   Повторне проходження нейрончиків не додає: кожен крок рахує свій найкращий результат (best). */
+function addRestart(el, fn){
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'restart'; b.title = 'Почати знову'; b.textContent = '↻ Почати знову';
+  b.addEventListener('click', ()=>{ speechSynthesis?.cancel(); fn(); });
+  el.closest('.exercise').after(b);
+}
+
+/* ---------- МАЛЮНКИ ---------- */
+const MONITOR = `<rect x="2" y="2" width="156" height="104" rx="10" fill="#2B2D42"/><rect x="11" y="11" width="138" height="86" rx="4" fill="#7FD3F7"/>
+  <path d="M11 78 L48 50 L74 70 L100 44 L149 82 V97 H11 Z" fill="#4CB873"/><circle cx="118" cy="32" r="10" fill="#FFC93C"/>
+  <rect x="70" y="106" width="20" height="20" fill="#4A4C63"/><rect x="44" y="124" width="72" height="9" rx="4.5" fill="#2B2D42"/>`;
+const UNIT = `<rect x="2" y="2" width="62" height="140" rx="8" fill="#3B3D56"/><rect x="10" y="14" width="46" height="8" rx="3" fill="#55577A"/>
+  <rect x="10" y="28" width="46" height="8" rx="3" fill="#55577A"/><circle cx="33" cy="70" r="9" fill="#55577A"/><circle cx="33" cy="70" r="4" fill="#5BE37D"/>
+  <g fill="#2B2D42"><rect x="14" y="104" width="38" height="3" rx="1.5"/><rect x="14" y="112" width="38" height="3" rx="1.5"/><rect x="14" y="120" width="38" height="3" rx="1.5"/></g>`;
+const SPEAKER = `<rect x="2" y="2" width="34" height="58" rx="7" fill="#3B3D56"/><circle cx="19" cy="18" r="6" fill="#2B2D42"/><circle cx="19" cy="18" r="2.5" fill="#55577A"/>
+  <circle cx="19" cy="41" r="11" fill="#2B2D42"/><circle cx="19" cy="41" r="4.5" fill="#55577A"/>`;
+function keyboard(w = 176){
+  let k = `<rect x="2" y="2" width="${w}" height="44" rx="7" fill="#3B3D56"/>`;
+  for(let r = 0; r < 3; r++) for(let c = 0; c < 12; c++){
+    const kw = (w - 16) / 12;
+    k += `<rect x="${8 + c * kw + 1}" y="${8 + r * 11}" width="${kw - 2.4}" height="8.4" rx="2" fill="#E8E8F2"/>`;
+  }
+  return k;
+}
+const SMALL_MOUSE = `<path d="M18 2 C30 2 34 12 34 24 C34 38 27 46 18 46 C9 46 2 38 2 24 C2 12 6 2 18 2 Z" fill="#fff" stroke="#3B3D56" stroke-width="2.4"/>
+  <path d="M18 2 V20 M2.5 20 H33.5" stroke="#3B3D56" stroke-width="2"/><rect x="15.5" y="7" width="5" height="9" rx="2.5" fill="#E8458B"/>`;
+// Іконки для тесту
+const ICON = {
+  monitor:`<svg viewBox="0 0 160 136">${MONITOR}</svg>`,
+  keyboard:`<svg viewBox="0 0 180 48">${keyboard()}</svg>`,
+  mouse:`<svg viewBox="0 0 36 48">${SMALL_MOUSE}</svg>`,
+  speaker:`<svg viewBox="0 0 38 62">${SPEAKER}</svg>`
+};
+
+/* ---------- КРОК 1: знайди частину комп'ютера ---------- */
+(function(){
+  const desk = document.getElementById('desk');
+  desk.innerHTML = `
+    <rect x="0" y="232" width="420" height="38" rx="6" fill="#E9C9A6"/><rect x="0" y="232" width="420" height="7" fill="#D9B48C"/>
+    <path d="M346 178 C348 160 340 148 318 146 C300 144 290 150 280 150" fill="none" stroke="#3B3D56" stroke-width="2.4" stroke-linecap="round"/>
+    <g class="part" data-part="unit"><rect class="hl" x="8" y="80" width="78" height="160" rx="12"/><g transform="translate(15 88)">${UNIT}</g></g>
+    <g class="part" data-part="monitor"><rect class="hl" x="124" y="12" width="172" height="150" rx="12"/><g transform="translate(130 20)">${MONITOR}</g></g>
+    <g class="part" data-part="speakers"><rect class="hl" x="92" y="88" width="32" height="70" rx="8"/><rect class="hl" x="296" y="88" width="32" height="70" rx="8"/>
+      <g transform="translate(95 95) scale(.68 .98)">${SPEAKER}</g><g transform="translate(299 95) scale(.68 .98)">${SPEAKER}</g></g>
+    <g class="part" data-part="keyboard"><rect class="hl" x="114" y="172" width="192" height="58" rx="10"/><g transform="translate(120 178)">${keyboard()}</g></g>
+    <g class="part" data-part="mouse"><rect class="hl" x="316" y="168" width="48" height="62" rx="12"/><g transform="translate(322 176)">${SMALL_MOUSE}</g></g>`;
+  const ORDER = [['monitor','монітор'], ['keyboard','клавіатуру'], ['mouse','мишу'], ['unit','системний блок'], ['speakers','колонки']];
+  const NAMES = {monitor:'Монітор', keyboard:'Клавіатура', mouse:'Миша', unit:'Системний блок', speakers:'Колонки'};
+  const ask = document.getElementById('findAsk'), tags = document.getElementById('findTags');
+  const hit = trackTask(desk, ORDER.length, ORDER.length + 2);
+  let k = 0, best = 0;
+  function show(speak){
+    if(k >= ORDER.length){
+      ask.innerHTML = '<span class="done-msg">Молодець! 🎉</span>';
+      if(speak) say('Молодець! Ти знаєш усі частини комп\'ютера.');
+      return;
+    }
+    const t = `Знайди ${ORDER[k][1]}`;
+    ask.innerHTML = sayBtn(t) + `<span>Знайди <b>${ORDER[k][1]}</b></span>`;
+    if(speak) say(t, ask.querySelector('.say'));
+  }
+  desk.querySelectorAll('.part').forEach(p=>p.addEventListener('click', ()=>{
+    if(k >= ORDER.length || p.classList.contains('found')) return;
+    if(p.dataset.part === ORDER[k][0]){
+      p.classList.add('found');
+      tags.insertAdjacentHTML('beforeend', `<span class="tag-ok">✓ ${NAMES[p.dataset.part]}</span>`);
+      if(k >= best){ addNeurons(1); hit(); best = k + 1; if(best === ORDER.length) addNeurons(2); }
+      k++;
+      show(true);
+    } else {
+      p.classList.remove('miss'); void p.getBBox(); p.classList.add('miss');
+      say(`Це ${NAMES[p.dataset.part].toLowerCase()}. Спробуй ще!`);
+      setTimeout(()=>p.classList.remove('miss'), 450);
+    }
+  }));
+  show(false);
+  addRestart(desk, ()=>{ k = 0; tags.innerHTML = ''; desk.querySelectorAll('.part').forEach(p=>p.classList.remove('found', 'miss')); show(false); });
+})();
+
+/* ---------- КРОК 2: частини миші ---------- */
+(function(){
+  const svg = document.getElementById('bigMouse');
+  svg.innerHTML = `
+    <defs>
+      <clipPath id="mBody"><path d="M100 40 C152 40 176 86 176 150 C176 226 144 272 100 272 C56 272 24 226 24 150 C24 86 48 40 100 40 Z"/></clipPath>
+      <linearGradient id="mShell" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E6E4F1"/></linearGradient>
+      <linearGradient id="mBtn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#F3F2F9"/></linearGradient>
+    </defs>
+    <path d="M100 42 C100 22 112 12 128 10 C144 8 152 -2 154 -14" fill="none" stroke="#3B3D56" stroke-width="5" stroke-linecap="round"/>
+    <path d="M100 40 C152 40 176 86 176 150 C176 226 144 272 100 272 C56 272 24 226 24 150 C24 86 48 40 100 40 Z" fill="url(#mShell)"/>
+    <g clip-path="url(#mBody)">
+      <rect class="mp" data-part="left" x="0" y="0" width="98" height="142" fill="url(#mBtn)"/>
+      <rect class="mp" data-part="right" x="102" y="0" width="98" height="142" fill="url(#mBtn)"/>
+      <path d="M0 142 H200" stroke="#3B3D56" stroke-width="3.5"/>
+      <path d="M100 0 V142" stroke="#3B3D56" stroke-width="3.5"/>
+      <ellipse cx="58" cy="190" rx="12" ry="40" fill="#fff" opacity=".55"/>
+    </g>
+    <path class="wheel-lead" d="M66 -4 C80 0 88 24 90 58"/>
+    <rect x="83" y="62" width="34" height="62" rx="17" fill="#3B3D56"/>
+    <g class="mp" data-part="wheel"><rect x="88" y="67" width="24" height="52" rx="12" fill="#E8458B"/>
+      <path d="M93 81 H107 M93 93 H107 M93 105 H107" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".75"/></g>
+    <path d="M100 40 C152 40 176 86 176 150 C176 226 144 272 100 272 C56 272 24 226 24 150 C24 86 48 40 100 40 Z" fill="none" stroke="#3B3D56" stroke-width="5"/>`;
+  const INFO = {
+    left:  ['Ліва кнопка', 'Ліва кнопка — головна.'],
+    right: ['Права кнопка', 'Права кнопка відкриває меню.'],
+    wheel: ['Коліщатко', 'Коліщатко гортає сторінку.']
+  };
+  const info = document.getElementById('partInfo');
+  const hit = trackTask(svg, 3, 3);
+  const seen = new Set();
+  svg.querySelectorAll('.mp').forEach(p=>p.addEventListener('click', ()=>{
+    const id = p.dataset.part;
+    svg.querySelectorAll('.mp').forEach(x=>x.classList.toggle('lit', x === p));
+    document.querySelector(`.mlabel[data-for="${id}"]`).classList.add('on');
+    if(id === 'wheel') svg.querySelector('.wheel-lead').classList.add('on');
+    info.textContent = INFO[id][1];
+    say(INFO[id][1]);
+    if(!seen.has(id)){ seen.add(id); addNeurons(1); hit(); }
+  }));
+  addRestart(svg, ()=>{
+    svg.querySelectorAll('.mp').forEach(x=>x.classList.remove('lit'));
+    document.querySelectorAll('.mlabel').forEach(l=>l.classList.remove('on'));
+    svg.querySelector('.wheel-lead').classList.remove('on');
+    info.textContent = '';
+  });
+})();
+
+/* ---------- КРОК 3: правильно чи ні (makeChoices з малюнком у pre) ---------- */
+(function(){
+  const photo = document.getElementById('holdPhoto'), ask = document.getElementById('holdAsk'), tags = document.getElementById('holdTags');
+  photo.innerHTML = `<img src="images/hand-top.jpg" alt="Права рука на миші, вигляд зверху">` +
+    [['index', 35, 19, 17, 42], ['middle', 58, 15, 17, 45], ['ring', 76, 31, 16, 32], ['thumb', 16, 45, 18, 28]]
+      .map(([f, x, y, w, h])=>`<button class="fhit" data-f="${f}" style="left:${x}%; top:${y}%; width:${w}%; height:${h}%;" aria-label="Палець"></button>`).join('');
+  const ORDER = [['index', 'лівої', 'Вказівний'], ['middle', 'правої', 'Середній']];
+  const hit = trackTask(photo, ORDER.length, ORDER.length + 1);
+  let k = 0, best = 0;
+  function show(speak){
+    if(k >= ORDER.length){ ask.innerHTML = '<span class="done-msg">Молодець! 🎉</span>'; if(speak) say('Молодець!'); return; }
+    const t = `Натисни на палець для ${ORDER[k][1]} кнопки`;
+    ask.innerHTML = sayBtn(t) + `<span>Натисни на палець для <b>${ORDER[k][1]}</b> кнопки</span>`;
+    if(speak) say(t, ask.querySelector('.say'));
+  }
+  photo.querySelectorAll('.fhit').forEach(f=>f.addEventListener('click', ()=>{
+    if(k >= ORDER.length || f.classList.contains('ok')) return;
+    if(f.dataset.f === ORDER[k][0]){
+      f.classList.add('ok');
+      tags.insertAdjacentHTML('beforeend', `<span class="tag-ok">✓ ${ORDER[k][2]} палець — ${ORDER[k][1] === 'лівої' ? 'ліва' : 'права'} кнопка</span>`);
+      if(k >= best){ addNeurons(1); hit(); best = k + 1; if(best === ORDER.length) addNeurons(1); }
+      k++;
+      show(true);
+    } else {
+      f.classList.remove('miss'); void f.offsetWidth; f.classList.add('miss');
+      say('Ні, спробуй ще!');
+      setTimeout(()=>f.classList.remove('miss'), 500);
+    }
+  }));
+  show(false);
+  addRestart(photo, ()=>{ k = 0; tags.innerHTML = ''; photo.querySelectorAll('.fhit').forEach(f=>f.classList.remove('ok', 'miss')); show(false); });
+})();
+
+/* ---------- КРОК 4: лусни кульки (клацання) ---------- */
+(function(){
+  const sky = document.getElementById('sky'), prog = document.getElementById('skyProgress');
+  const COLORS = [['#FF6B4A','#FFB199'], ['#FFC93C','#FFF0B0'], ['#8E7CF0','#D9D2FF'], ['#16A3A0','#9BE6E2'], ['#E8458B','#FFB3D1'], ['#2D9CDB','#A9DBF7'], ['#3FAE58','#B5EBC1'], ['#FF8C2E','#FFD0A6']];
+  const N = 16;                                   // кульок у завданні
+  const hit = trackTask(sky, N, N / 2 + 2);      // нейрончик — за кожні 2 кульки
+  let popped = 0, best = 0;
+  const upd = ()=>{ prog.textContent = popped < N ? `Луснуло кульок: ${popped} з ${N}` : 'Усі кульки луснули! 🎉'; };
+  Array.from({length:N}, (_, i)=>COLORS[i % COLORS.length]).forEach(([c, l], i)=>{
+    const b = document.createElement('button');
+    b.className = 'bal';
+    b.setAttribute('aria-label', 'Кулька');
+    b.style.left = `${3 + ((i * 7) % N) * 5.6}%`;           // 16 доріжок уперемішку
+    b.style.setProperty('--t', `${10 + (i % 3) * 1.6}s`);
+    b.style.setProperty('--d', `${(i - 2) * 0.7}s`);        // спершу 2 кульки, далі з'являються по одній
+    b.innerHTML = `<svg viewBox="0 0 64 118"><defs><radialGradient id="bg${i}" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="${l}"/><stop offset=".6" stop-color="${c}"/><stop offset="1" stop-color="${c}"/></radialGradient></defs>
+      <path class="str" d="M32 78 C26 90 38 98 32 116" fill="none" stroke="#9C97C2" stroke-width="1.4"/>
+      <g class="bb"><path d="M32 6 C50 6 58 22 58 36 C58 56 44 70 32 74 C20 70 6 56 6 36 C6 22 14 6 32 6 Z" fill="url(#bg${i})"/>
+      <path d="M28.5 78 L32 72.5 L35.5 78 Z" fill="${c}"/><path d="M18 26 C19 18 24 14 30 13" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" opacity=".7"/></g></svg>`;
+    b.addEventListener('click', e=>{
+      if(b.classList.contains('popped')) return;
+      b.classList.add('popped');
+      popped++; upd();
+      if(popped > best){ best = popped; if(best % 2 === 0) addNeurons(1); hit(); if(best === N) addNeurons(2); }
+      if(popped === N) say('Молодець! Ти вмієш клацати.');
+    });
+    sky.appendChild(b);
+  });
+  upd();
+  // кульки починають летіти, лише коли учень дійшов до неба
+  new IntersectionObserver((es, io)=>{ if(es[0].isIntersecting){ sky.classList.add('go'); io.disconnect(); } }, {threshold:.4}).observe(sky);
+  addRestart(sky, ()=>{                       // кульки знову вилітають знизу по одній
+    popped = 0; upd();
+    sky.classList.remove('go');
+    sky.querySelectorAll('.bal').forEach(b=>b.classList.remove('popped'));
+    void sky.offsetWidth; sky.classList.add('go');
+  });
+})();
+
+/* ---------- КРОК 5: подарунки (подвійне клацання) ---------- */
+(function(){
+  const box = document.getElementById('gifts'), hint = document.getElementById('giftHint');
+  const GIFTS = [['#E8458B','#FFC93C','⚽'], ['#2D9CDB','#FF6B4A','🚗'], ['#3FAE58','#E8458B','🪀'], ['#8E7CF0','#FFC93C','🎨']];
+  const hit = trackTask(box, GIFTS.length, GIFTS.length + 2);
+  let opened = 0, best = 0;
+  GIFTS.forEach(([c, r, toy])=>{
+    const g = document.createElement('button');
+    g.className = 'gift'; g.type = 'button';
+    g.setAttribute('aria-label', 'Подарунок');
+    g.innerHTML = `<svg viewBox="0 0 100 100"><rect x="14" y="44" width="72" height="50" rx="6" fill="${c}"/><rect x="45" y="44" width="10" height="50" fill="${r}"/>
+      <g class="lid"><rect x="8" y="30" width="84" height="18" rx="5" fill="${c}"/><rect x="8" y="30" width="84" height="18" rx="5" fill="#000" opacity=".08"/><rect x="45" y="30" width="10" height="18" fill="${r}"/>
+      <path d="M50 30 C38 14 22 18 30 28 C34 32 44 31 50 30 C56 31 66 32 70 28 C78 18 62 14 50 30 Z" fill="${r}"/></g></svg><span class="toy">${toy}</span>`;
+    let timer = null;
+    g.addEventListener('click', ()=>{
+      if(g.classList.contains('open')) return;
+      if(timer){                       // друге клацання вчасно — відкриваємо
+        clearTimeout(timer); timer = null;
+        g.classList.remove('tap'); g.classList.add('open');
+        opened++;
+        if(opened > best){ best = opened; addNeurons(1); hit(); if(best === GIFTS.length) addNeurons(2); }
+        hint.textContent = opened < GIFTS.length ? `Відкрито: ${opened} з ${GIFTS.length}` : 'Усі подарунки відкриті! 🎉';
+        if(opened === GIFTS.length) say('Чудово! Ти вмієш двічі клацати.');
+        return;
+      }
+      g.classList.add('tap');
+      timer = setTimeout(()=>{          // друге клацання не прийшло — лише похитали
+        timer = null;
+        g.classList.remove('tap', 'shake'); void g.offsetWidth; g.classList.add('shake');
+        hint.textContent = 'Швидше: клац-клац!';
+        setTimeout(()=>g.classList.remove('shake'), 450);
+      }, 550);
+    });
+    box.appendChild(g);
+  });
+  addRestart(box, ()=>{ opened = 0; hint.textContent = ''; box.querySelectorAll('.gift').forEach(g=>g.classList.remove('open', 'tap', 'shake')); });
+})();
+
+/* ---------- КРОК 8: пірнай у море (коліщатко) ---------- */
+(function(){
+  const sea = document.getElementById('sea'), ask = document.getElementById('seaAsk'), tags = document.getElementById('seaTags');
+  // [емодзі, назва, кого шукати (знахідний відмінок) або null, x %, y px]
+  const ITEMS = [
+    ['⛵','Кораблик','кораблик', 50, 58],
+    ['🐠','Рибка',null, 22, 250], ['🐢','Черепаха','черепаху', 72, 470], ['🐬','Дельфін',null, 30, 640],
+    ['🐳','Кит',null, 74, 800], ['🐙','Восьминіг','восьминога', 30, 980], ['🐡','Риба-їжак',null, 70, 1160],
+    ['🦑','Кальмар',null, 26, 1320], ['🦀','Краб','краба', 64, 1540], ['🐚','Мушля',null, 34, 1560],
+  ];
+  const ORDER = ['🐢','🐙','🦀','⛵'];               // останнім — назад нагору
+  let html = '<div class="sea-in">';
+  for(let i = 0; i < 18; i++){ const r = 8 + (i * 7) % 16; html += `<span class="bubble" style="left:${(i * 37) % 92 + 3}%; top:${140 + i * 80}px; width:${r}px; height:${r}px"></span>`; }
+  [[8,90],[14,130],[46,70],[86,110],[92,80]].forEach(([x,h])=>{ html += `<span class="weed" style="left:${x}%; height:${h}px"></span>`; });
+  html += ITEMS.map(([e, n, , x, y])=>`<button class="sea-it" type="button" data-e="${e}" aria-label="${n}" style="left:${x}%; top:${y}px">${e}</button>`).join('');
+  html += '</div>';
+  sea.innerHTML = `<div class="scroll-hint"><span><svg viewBox="0 0 22 30"><rect x="1.5" y="1.5" width="19" height="27" rx="9.5" fill="none" stroke="currentColor" stroke-width="2.4"/><rect class="wh" x="9" y="6" width="4" height="7" rx="2" fill="currentColor"/></svg>Крути вниз</span></div>` + html;
+  const NAME = Object.fromEntries(ITEMS.map(([e, n, acc])=>[e, acc]));
+  const hit = trackTask(sea, ORDER.length, ORDER.length + 2);
+  let k = 0, best = 0;
+  function show(speak){
+    if(k >= ORDER.length){ ask.innerHTML = '<span class="done-msg">Молодець! 🎉</span>'; if(speak) say('Молодець! Ти вмієш крутити коліщатко.'); return; }
+    const t = k === ORDER.length - 1 ? `Повернись нагору до кораблика` : `Знайди ${NAME[ORDER[k]]}`;
+    ask.innerHTML = sayBtn(t) + `<span>${k === ORDER.length - 1 ? 'Повернись нагору до <b>кораблика</b>' : `Знайди <b>${NAME[ORDER[k]]}</b>`}</span>`;
+    if(speak) say(t, ask.querySelector('.say'));
+  }
+  sea.addEventListener('scroll', ()=>{ if(sea.scrollTop > 30) sea.classList.add('moved'); }, {passive:true});
+  sea.querySelectorAll('.sea-it').forEach(b=>b.addEventListener('click', ()=>{
+    if(k >= ORDER.length || b.classList.contains('found')) return;
+    if(b.dataset.e === ORDER[k]){
+      b.classList.add('found');
+      tags.insertAdjacentHTML('beforeend', `<span class="tag-ok">✓ ${b.getAttribute('aria-label')}</span>`);
+      if(k >= best){ addNeurons(1); hit(); best = k + 1; if(best === ORDER.length) addNeurons(2); }
+      k++; show(true);
+    } else {
+      b.classList.remove('miss'); void b.offsetWidth; b.classList.add('miss');
+      say(`Це ${b.getAttribute('aria-label').toLowerCase()}. Шукай далі!`);
+      setTimeout(()=>b.classList.remove('miss'), 750);
+    }
+  }));
+  show(false);
+  addRestart(sea, ()=>{
+    k = 0; tags.innerHTML = ''; sea.scrollTop = 0; sea.classList.remove('moved');
+    sea.querySelectorAll('.sea-it').forEach(b=>b.classList.remove('found', 'miss')); show(false);
+  });
+})();
+
+/* ---------- КРОК 6: нагодуй мишку (перетягування) ---------- */
+(function(){
+  const plate = document.getElementById('plate'), critter = document.getElementById('critter');
+  critter.innerHTML = `<svg viewBox="0 0 220 190" aria-hidden="true">
+      <path d="M176 150 C206 150 214 120 196 108" fill="none" stroke="#C9A3B5" stroke-width="6" stroke-linecap="round"/>
+      <ellipse cx="110" cy="132" rx="72" ry="50" fill="#C9C3D6"/>
+      <circle cx="58" cy="52" r="30" fill="#C9C3D6"/><circle cx="58" cy="52" r="17" fill="#FFB3D1"/>
+      <circle cx="162" cy="52" r="30" fill="#C9C3D6"/><circle cx="162" cy="52" r="17" fill="#FFB3D1"/>
+      <circle cx="110" cy="92" r="56" fill="#D8D3E3"/>
+      <circle cx="88" cy="84" r="8" fill="#1B1B3A"/><circle cx="132" cy="84" r="8" fill="#1B1B3A"/><circle cx="90.5" cy="81" r="2.6" fill="#fff"/><circle cx="134.5" cy="81" r="2.6" fill="#fff"/>
+      <ellipse cx="110" cy="106" rx="8" ry="6" fill="#E8458B"/>
+      <path class="mouth" d="M96 118 Q110 132 124 118" fill="#B8296A" stroke="#1B1B3A" stroke-width="3" stroke-linecap="round"/>
+      <path d="M60 104 H84 M62 114 L84 110 M160 104 H136 M158 114 L136 110" stroke="#8E87A6" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="74" cy="104" r="7" fill="#FFB3D1" opacity=".6"/><circle cx="146" cy="104" r="7" fill="#FFB3D1" opacity=".6"/></svg>
+    <div class="belly" id="belly"></div>`;
+  const belly = document.getElementById('belly');
+  const N = 4;
+  const hit = trackTask(plate, N, N + 2);
+  let eaten = 0, best = 0;
+  const upd = ()=>{ belly.textContent = eaten < N ? `З'їдено: ${eaten} з ${N}` : 'Мишка нагодована! 🎉'; };
+  const CHEESE = `<svg viewBox="0 0 74 64"><path d="M4 30 L60 8 L70 30 Z" fill="#FFD966"/><path d="M4 30 H70 V56 H4 Z" fill="#FFC93C"/><path d="M4 30 H70" stroke="#E0A800" stroke-width="2"/>
+    <circle cx="20" cy="43" r="5" fill="#E0A800"/><circle cx="44" cy="48" r="4" fill="#E0A800"/><circle cx="58" cy="39" r="3.5" fill="#E0A800"/><circle cx="34" cy="22" r="3" fill="#E0A800" opacity=".8"/></svg>`;
+  function addCheese(){
+    const c = document.createElement('div');
+    c.className = 'cheese';
+    c.innerHTML = CHEESE;
+    c.addEventListener('pointerdown', e=>{
+      e.preventDefault();
+      const r = c.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
+      const ph = document.createElement('div');          // місце-заглушка, щоб тарілка не стрибала
+      ph.style.cssText = `width:${r.width}px; height:${r.height}px;`;
+      c.after(ph);
+      c.classList.add('drag');
+      const move = ev=>{
+        c.style.left = (ev.clientX - dx) + 'px'; c.style.top = (ev.clientY - dy) + 'px';
+        const cr = critter.getBoundingClientRect();
+        critter.classList.toggle('over', ev.clientX > cr.left && ev.clientX < cr.right && ev.clientY > cr.top && ev.clientY < cr.bottom);
+      };
+      move(e);
+      const up = ev=>{
+        removeEventListener('pointermove', move); removeEventListener('pointerup', up); removeEventListener('pointercancel', up);
+        const cr = critter.getBoundingClientRect();
+        const onIt = ev.clientX > cr.left && ev.clientX < cr.right && ev.clientY > cr.top && ev.clientY < cr.bottom;
+        critter.classList.remove('over');
+        if(onIt){
+          c.remove(); ph.remove();
+          critter.classList.remove('yum'); void critter.offsetWidth; critter.classList.add('yum');
+          eaten++; upd();
+          if(eaten > best){ best = eaten; addNeurons(1); hit(); if(best === N) addNeurons(2); }
+          say(eaten < N ? 'Смачно!' : 'Дякую! Ти вмієш перетягувати.');
+        } else {                                           // не донесли — сир повертається на тарілку
+          const pr = ph.getBoundingClientRect();
+          c.classList.add('back');
+          c.style.left = pr.left + 'px'; c.style.top = pr.top + 'px';
+          setTimeout(()=>{ c.classList.remove('drag', 'back'); c.style.left = c.style.top = ''; ph.replaceWith(c); }, 300);
+        }
+      };
+      addEventListener('pointermove', move); addEventListener('pointerup', up); addEventListener('pointercancel', up);
+    });
+    plate.appendChild(c);
+  }
+  for(let i = 0; i < N; i++) addCheese();
+  upd();
+  addRestart(plate, ()=>{ plate.innerHTML = ''; for(let i = 0; i < N; i++) addCheese(); eaten = 0; upd(); });
+})();
+
+/* ---------- КРОК 7: веди стежкою (перетягування по траєкторії) ---------- */
+(function(){
+  const box = document.getElementById('trailBox'), prog = document.getElementById('trailProgress');
+  const LEVELS = [
+    { who:'🐝', goal:'🌻', bg:'#EAF7E6', edge:'#BFE3B4', d:'M50 130 C120 30 200 30 260 130 S400 230 460 130 S530 60 550 70' },
+    { who:'🐞', goal:'🍃', bg:'#FFF4DC', edge:'#F2D49A', d:'M50 60 C110 60 100 200 170 200 C240 200 230 60 300 60 C370 60 360 200 430 200 C500 200 490 70 550 70' },
+    { who:'🦔', goal:'🍎', bg:'#EEF0FF', edge:'#C9CCF2', d:'M50 210 C40 60 150 40 165 130 C180 220 285 220 300 130 C315 40 420 40 435 130 C450 220 560 210 550 60' },
+  ];
+  const N = LEVELS.length, STEPS = 400, TOL = 36, AHEAD = 45;
+  const hit = trackTask(box, N, N + 2);
+  let lv = 0, best = 0, gen = 0;     // gen — щоб «Почати спочатку» скасовувало відкладений перехід
+  const upd = ()=>{ prog.textContent = lv < N ? `Стежка ${lv + 1} з ${N}` : 'Усі стежки пройдено! 🎉'; };
+
+  function build(){
+    const L = LEVELS[lv];
+    box.innerHTML = `<svg class="trail" viewBox="0 0 600 260" style="--tr-bg:${L.bg}; --tr-edge:${L.edge}">
+      <path class="edge" d="${L.d}"/><path class="road" d="${L.d}"/><path class="mid" d="${L.d}"/><path class="done" d="${L.d}"/>
+      <text class="goal" font-size="52">${L.goal}</text>
+      <g class="who"><circle class="ring" r="30"/><g class="body"><circle r="32" fill="transparent"/><text font-size="46">${L.who}</text></g></g></svg>`;
+    const svg = box.querySelector('svg'), path = svg.querySelector('.road'), done = svg.querySelector('.done');
+    const who = svg.querySelector('.who'), goal = svg.querySelector('.goal');
+    const len = path.getTotalLength();
+    const pts = Array.from({length:STEPS + 1}, (_, i)=>path.getPointAtLength(len * i / STEPS));
+    const end = pts[STEPS];
+    goal.setAttribute('x', end.x); goal.setAttribute('y', end.y);
+    done.style.strokeDasharray = len;
+    let cur = 0, dragging = false, finished = false;
+    const place = ()=>{ who.setAttribute('transform', `translate(${pts[cur].x} ${pts[cur].y})`); done.style.strokeDashoffset = len * (1 - cur / STEPS); };
+    place();
+    const toSvg = e=>{ const p = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse()); return p; };
+    const fail = ()=>{
+      dragging = false; svg.classList.remove('drag');
+      who.classList.remove('miss'); void who.getBBox(); who.classList.add('miss');
+      say('Ой! Тримайся стежки.');
+      setTimeout(()=>{ cur = 0; place(); who.classList.remove('miss'); }, 450);
+    };
+    svg.addEventListener('pointerdown', e=>{
+      if(finished) return;
+      const p = toSvg(e);
+      if(Math.hypot(p.x - pts[cur].x, p.y - pts[cur].y) > 42) return;   // беремо лише за звірятко
+      e.preventDefault(); dragging = true; svg.classList.add('drag');
+      svg.setPointerCapture(e.pointerId);
+    });
+    svg.addEventListener('pointermove', e=>{
+      if(!dragging) return;
+      const p = toSvg(e);
+      let best = cur, bd = Infinity;
+      for(let i = Math.max(0, cur - 20); i <= Math.min(STEPS, cur + AHEAD); i++){
+        const d = Math.hypot(p.x - pts[i].x, p.y - pts[i].y);
+        if(d < bd){ bd = d; best = i; }
+      }
+      if(bd > TOL){ fail(); return; }
+      cur = best; place();
+      if(cur >= STEPS - 4){
+        cur = STEPS; place(); finished = true; dragging = false;
+        svg.classList.remove('drag'); svg.classList.add('fin');
+        lv++; upd();
+        if(lv > best){ best = lv; addNeurons(1); hit(); if(best === N) addNeurons(2); }
+        if(lv === N) say('Молодець! Ти вмієш вести мишею.');
+        else { say('Ура!'); const g = gen; setTimeout(()=>{ if(g === gen) build(); }, 1300); }
+      }
+    });
+    const stop = ()=>{ if(dragging){ dragging = false; svg.classList.remove('drag'); } };
+    svg.addEventListener('pointerup', stop); svg.addEventListener('pointercancel', stop);
+  }
+  build(); upd();
+  addRestart(box, ()=>{ gen++; lv = 0; build(); upd(); });
+})();
+
+/* ---------- ПІДСУМОК ---------- */
+const opt = (pic, text)=>`${pic}<span>${text}</span>`;
+makeFinalQuiz('finalQuiz', [
+  { q:'Де миша?', opts:[opt(ICON.monitor,'Монітор'), opt(ICON.mouse,'Миша'), opt(ICON.keyboard,'Клавіатура')], correct:1 },
+  { q:'Що показує картинку?', opts:[opt(ICON.speaker,'Колонка'), opt(ICON.keyboard,'Клавіатура'), opt(ICON.monitor,'Монітор')], correct:2 },
+  { q:'Яким пальцем натискаємо ліву кнопку?', opts:['Великим', 'Вказівним', 'Мізинцем'], correct:1 },
+  { q:'Що робить коліщатко?', opts:[opt('<span class="em">↕️</span>','Гортає сторінку'), opt('<span class="em">🔊</span>','Грає музику'), opt('<span class="em">⌨️</span>','Пише букви')], correct:0 },
+  { q:'Як відкрити подарунок?', opts:['Клацнути один раз', 'Клацнути двічі', 'Не клацати'], correct:1 }
+], {summary:'Ти вмієш клацати, двічі клацати й перетягувати!', html:true});
+// 🔊 біля кожного запитання тесту
+(function(){
+  const q = document.querySelector('#finalQuiz .quiz-q');
+  if(!q) return;
+  new MutationObserver(()=>{
+    if(q.querySelector('.say')) return;
+    const t = q.textContent.trim();
+    q.innerHTML = sayBtn(t) + `<span>${q.innerHTML}</span>`;
+  }).observe(q, {childList:true});
+  q.innerHTML = sayBtn(q.textContent.trim()) + `<span>${q.innerHTML}</span>`;
+})();
+</script>
+
+</body>
+</html>
