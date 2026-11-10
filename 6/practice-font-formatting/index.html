@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Годівничка для пташок — Параметри шрифту</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500&family=Lobster&family=Caveat:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#4338CA,#E8710A,#F9AB00); --accent:#4338CA; --accent-dark:#312E81; --accent-soft:#EEF0FD; --bg:#F7F7FC; --line:#E2E3F3; }
+  .p-hero p{max-width:none;}
+  .ms{font-family:'Material Symbols Outlined'; font-weight:normal; font-style:normal; line-height:1; display:inline-block; -webkit-font-smoothing:antialiased;}
+  .ms.ic{font-size:19px; vertical-align:-5px; color:#444746; background:#EDF2FA; border-radius:4px; padding:1px;}
+  .kbd{display:inline-block; font-family:'Roboto',sans-serif; font-weight:500; font-size:.86em; line-height:1.2; padding:1px 6px; border:1px solid #C5C6DA; border-bottom-width:3px; border-radius:6px; background:#fff; white-space:nowrap;}
+
+  /* Що має вийти: верх аркуша A4; розміри в пунктах — частки ширини аркуша, тож пропорції як у документі */
+  .page-wrap{background:#E8EAED; border-radius:var(--radius-m); padding:18px; display:flex; justify-content:center;}
+  .page-box{width:100%; max-width:620px; container-type:inline-size;}
+  .page{background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.25); padding:8% 10% 6%; font-family:Arial,sans-serif; color:#000; font-size:2.6cqw; line-height:1.4;}
+  .page p{margin:0 0 .35em;}
+  .page .gap{margin-top:1em;}
+  .page .t{font-family:'Lobster',cursive; font-size:2.15em; color:#E8710A; text-align:center; margin-bottom:.1em; line-height:1.2;}
+  .page .st{font-size:.86em; font-style:italic; color:#999; text-align:center; margin-bottom:1.2em;}
+  .page .h{font-weight:700; color:#E8710A;}
+  .page sub, .page sup{font-size:.7em; line-height:0;}
+  .page .warn{font-weight:700; color:#D93025; background:#FFF475;}
+  .page .sign{font-family:'Caveat',cursive; font-weight:500; font-size:1.72em; text-align:right; margin-top:.6em;}
+  .page .small{font-size:.58em; color:#999; margin-top:2.2em;}
+  .spec-wrap{overflow-x:auto; margin:4px 0 12px;}
+  .spec{border-collapse:collapse; width:100%; font-size:14px; background:#fff;}
+  .spec th, .spec td{border:1px solid var(--line); padding:6px 10px; text-align:left; vertical-align:top;}
+  .spec th{background:var(--accent-soft); color:var(--accent-dark); font-family:'Baloo 2',sans-serif; font-size:13px;}
+  .spec td:nth-child(2), .spec td:nth-child(3){white-space:nowrap; font-weight:700;}
+  /* Зразок не можна виділити й скопіювати — текст набирають самі */
+  .page{-webkit-user-select:none; user-select:none; -webkit-touch-callout:none;}
+</style>
+</head>
+<body data-hud="6 клас · Практична · Годівничка для пташок">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 6 клас · Параметри шрифту</div>
+    <h1>🐦 Годівничка для пташок</h1>
+    <p>Набери в Google Документах інструкцію, як зробити годівничку для пташок, і оформи її точнісінько як на зразку: шрифти, розміри, накреслення, кольори та індекси.</p>
+    <div class="meta"><span>⏱ 25–30 хв</span><span><img src="../../assets/logos/docs.svg" alt="">Google Документи</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="page-wrap">
+      <div class="page-box">
+        <div class="page" id="sample">
+          <p class="t">Годівничка для пташок</p>
+          <p class="st">Інструкція № 7 від майстрів 6-Б класу</p>
+          <p class="h">Знадобиться:</p>
+          <p>1 порожній пакет з-під соку</p>
+          <p>насіння соняшнику без солі</p>
+          <p>мисочка з H<sub>2</sub>O для пиття</p>
+          <p><s>солоні горішки</s></p>
+          <p class="h gap">Як зробити:</p>
+          <p>Виріж віконце, насип 10<sup>2</sup> г насіння й повісь на гілку.</p>
+          <p><span class="warn">Ріж ножицями тільки разом із дорослими!</span></p>
+          <p class="sign">Майстер годівничок Остап</p>
+          <p class="small">Підгодовувати пташок починають пізньої осені й не припиняють до весни.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи документ</h3>
+        <p>Обери один зі способів:</p>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Документи</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Документи</span> → <span class="menu">Порожній документ</span>.</li>
+              <li>Клацни «Документ без назви» і назви файл: <b>Годівничка — Прізвище</b>.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Набери текст</h3>
+        <p>Набери текст зі зразка <b>«Що має вийти»</b> — поки без оформлення. Кожен рядок зразка — окремий абзац: наприкінці натисни Enter.</p>
+        <ul>
+          <li>«H2O» і «102» поки набери звичайними цифрами.</li>
+          <li>«солоні горішки» теж набери — закреслимо їх пізніше: солоне пташкам шкодить.</li>
+        </ul>
+        <div class="check-val">Перевір себе: у документі 12 абзаців.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Оформи за специфікацією</h3>
+        <div class="spec-wrap">
+          <table class="spec">
+            <thead><tr><th>Фрагмент</th><th>Шрифт</th><th>Розмір</th><th>Ще</th></tr></thead>
+            <tbody>
+              <tr><td>Годівничка для пташок</td><td>Lobster</td><td>30</td><td>помаранчевий, по центру</td></tr>
+              <tr><td>Інструкція № 7…</td><td>Arial</td><td>12</td><td>курсив, сірий, по центру</td></tr>
+              <tr><td>Знадобиться: / Як зробити:</td><td>Arial</td><td>14</td><td>напівжирний, помаранчевий</td></tr>
+              <tr><td>Решта тексту</td><td>Arial</td><td>14</td><td>—</td></tr>
+              <tr><td>2 у H₂O</td><td></td><td></td><td>підрядковий індекс</td></tr>
+              <tr><td>2 у 10²</td><td></td><td></td><td>надрядковий індекс</td></tr>
+              <tr><td>солоні горішки</td><td></td><td></td><td>закреслений</td></tr>
+              <tr><td>Ріж ножицями тільки разом із дорослими!</td><td>Arial</td><td>14</td><td>напівжирний, червоний, жовтий колір виділення</td></tr>
+              <tr><td>Майстер годівничок Остап</td><td>Caveat</td><td>24</td><td>праворуч</td></tr>
+              <tr><td>Примітка внизу</td><td>Arial</td><td>8</td><td>сірий</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <ul>
+          <li>Почни з усього тексту: <span class="kbd">Ctrl</span> + <span class="kbd">A</span> → розмір <b>14</b>.</li>
+          <li>Другий підзаголовок оформи пензликом <span class="ms ic">format_paint</span>.</li>
+          <li>Індекси: <span class="kbd">Ctrl</span> + <span class="kbd">,</span> — підрядковий, <span class="kbd">Ctrl</span> + <span class="kbd">.</span> — надрядковий. Закреслення — <span class="menu">Формат → Текст</span>.</li>
+        </ul>
+        <div class="tip">Якщо Lobster чи Caveat немає у списку шрифтів, відкрий унизу списку більше шрифтів і знайди потрібний пошуком.</div>
+        <div class="check-val">Перевір себе: у документі рівно три шрифти — Lobster, Arial і Caveat, і все вміщається на одній сторінці.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Практична робота · «Форматування текстових об'єктів. Параметри шрифту» · 6 клас</span></footer>
+
+<script src="../../assets/practice.js"></script>
+<script>
+  // Зразок: без виділення, копіювання й контекстного меню
+  const sample = document.getElementById('sample');
+  ['copy', 'cut', 'selectstart', 'contextmenu', 'dragstart'].forEach(t=>sample.addEventListener(t, e=>e.preventDefault()));
+</script>
+</body>
+</html>
