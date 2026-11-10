@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Форматування символів. Параметри шрифту — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&family=Caveat:wght@500;700&family=Lobster&family=Merriweather:wght@400;700&family=PT+Serif:wght@400;700&family=Montserrat:wght@500;700&family=Pacifico&family=Marck+Script&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в інтерфейсі Google Документів -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  /* Гама «друкарня»: індиго й помаранчевий */
+  :root{
+    --accent:#4338CA; --accent-dark:#312E81; --accent-soft:#EEF0FD;
+    --label:#C2410C;
+    --bg:#F7F7FC; --line:#E2E3F3;
+    --hud-bar:linear-gradient(90deg,#4338CA,#E8710A);
+    /* інтерфейс Google */
+    --g-blue:#0B57D0; --g-ink:#1F1F1F; --g-soft:#444746; --g-line:#DADCE0; --g-bar:#EDF2FA; --g-canvas:#F9FBFD; --g-sel:#ACCEF7;
+  }
+
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em;}
+  .kbd{display:inline-block; font-family:'Roboto',sans-serif; font-weight:500; font-size:.86em; line-height:1.2; padding:2px 7px; border:1px solid #C5C6DA; border-bottom-width:3px; border-radius:6px; background:#fff; color:var(--ink); white-space:nowrap;}
+  .fb{font-size:14px; min-height:1.4em; margin-top:12px;}
+
+  /* Панель інструментів Google Документів */
+  .gd-tools{display:flex; align-items:center; gap:2px; padding:4px 8px; background:var(--g-bar); border-radius:999px; white-space:nowrap; font-family:'Roboto',sans-serif; color:var(--g-ink); overflow-x:auto; scrollbar-width:none;}
+  .gd-tools::-webkit-scrollbar{display:none;}
+  .gd-tools .tl{width:30px; height:30px; border-radius:4px; display:inline-flex; align-items:center; justify-content:center; color:var(--g-soft); flex-shrink:0; position:relative; border:0; background:none; padding:0; font:inherit;}
+  .gd-tools .tl .ms{font-size:20px;}
+  .gd-tools .tl.on{background:#D3E3FD; color:#041E49;}
+  .gd-tools .tl i{position:absolute; left:7px; right:7px; bottom:3px; height:3px; border-radius:1px; background:#000;}
+  .gd-tools .tx{font-size:13.5px; color:var(--g-soft); padding:0 6px; flex-shrink:0;}
+  .gd-tools .sep{width:1px; height:20px; background:#C7C7C7; margin:0 5px; flex-shrink:0;}
+  .gd-tools .size{border:1px solid #747775; border-radius:4px; padding:3px 6px; min-width:30px; text-align:center; color:var(--g-ink);}
+
+  /* ---------- Крок 1: панель з номерами ---------- */
+  .legend-bar{margin:14px 0 10px; padding:10px; background:var(--g-canvas); border:1px solid var(--g-line); border-radius:var(--radius-m);}
+  .nb{display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:var(--label); color:#fff; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12.5px; line-height:1; flex-shrink:0; margin:0 3px;}
+  .legend{display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:6px 16px; list-style:none; padding:0; margin:10px 2px 0;}
+  .legend li{display:flex; align-items:center; gap:8px; font-size:14.5px;}
+  .ba{display:grid; grid-template-columns:1fr auto 1fr; gap:10px; align-items:stretch; margin-bottom:12px;}
+  .ba > .ms{align-self:center; color:var(--ink-soft); font-size:26px;}
+  .ba-card{background:#fff; border:1px solid var(--g-line); border-radius:4px; padding:8px 12px 12px; font-family:Arial,sans-serif; font-size:16px; line-height:1.4; color:#202124; box-shadow:0 1px 3px rgba(60,64,67,.15); display:flex; flex-direction:column;}
+  .ba-card small{display:block; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;}
+  .ba-card span{margin:auto 0;}
+
+  /* ---------- Крок 2: шрифти ---------- */
+  .serif-demo{display:flex; gap:14px; flex-wrap:wrap; margin:14px 0;}
+  .serif-demo figure{flex:1 1 220px; margin:0; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; text-align:center;}
+  .serif-demo svg{width:100%; max-width:220px; height:auto; display:block; margin:0 auto 6px;}
+  .serif-demo figcaption{font-size:14px; color:var(--ink-soft);}
+  .serif-demo figcaption b{color:var(--ink); font-family:'Baloo 2',sans-serif; font-size:16px; display:block;}
+  .ftypes{display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:10px; margin:12px 0 16px;}
+  .ftype{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px;}
+  .ftype .smp{font-size:30px; line-height:1.25; color:var(--accent-dark); display:block; margin-bottom:4px;}
+  .ftype b{font-family:'Baloo 2',sans-serif; font-size:16px; display:block; line-height:1.2;}
+  .ftype span{font-size:13.5px; color:var(--ink-soft);}
+  .font-sort .sort-chip{display:inline-flex; flex-direction:column; align-items:center; gap:2px; font-size:12px; font-weight:600; color:var(--ink-soft); min-width:110px;}
+  .font-sort .sort-chip .smp{font-size:24px; line-height:1.3; color:var(--ink); font-weight:400;}
+  .font-sort .sort-chip.placed .smp{font-size:20px;}
+  .font-sort .bucket-items{align-items:center;}
+
+  /* ---------- Крок 3: розмір і накреслення ---------- */
+  .sizes{display:flex; align-items:flex-end; gap:14px 22px; flex-wrap:wrap; margin:14px 0 6px; padding:14px 16px; background:#fff; border:1px solid var(--g-line); border-radius:var(--radius-m);}
+  .sizes div{display:flex; flex-direction:column; align-items:center; gap:4px;}
+  .sizes span{font-family:Arial,sans-serif; line-height:1; color:#202124;}
+  .sizes small{font-family:'Roboto',sans-serif; font-size:12px; color:var(--ink-soft);}
+  .styles{display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:8px; margin:12px 0 16px;}
+  .styles div{background:#fff; border:1px solid var(--g-line); border-radius:var(--radius-s); padding:8px 12px;}
+  .styles .smp{font-family:Arial,sans-serif; font-size:19px; display:block; color:#202124;}
+  .styles small{font-size:13px; color:var(--ink-soft);}
+  .pre-doc{background:#fff; border:1px solid var(--g-line); border-radius:4px; padding:10px 14px; margin-bottom:10px; font-family:Arial,sans-serif; font-size:16px; line-height:1.55; color:#202124; box-shadow:0 1px 3px rgba(60,64,67,.12);}
+  .choice-btn sub, .choice-btn sup{line-height:0;}
+
+  /* ---------- Крок 4: колір ---------- */
+  .colors-info{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:10px; margin:12px 0 16px;}
+  .colors-info > div{display:flex; gap:12px; align-items:center; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 14px;}
+  .colors-info .ico{position:relative; width:42px; height:42px; flex-shrink:0; border-radius:12px; background:var(--g-bar); display:flex; align-items:center; justify-content:center; color:var(--g-soft);}
+  .colors-info .ico .ms{font-size:24px; margin-top:-4px;}
+  .colors-info .ico i{position:absolute; left:10px; right:10px; bottom:7px; height:4px; border-radius:1px;}
+  .colors-info b{font-family:'Baloo 2',sans-serif; font-size:16px; display:block; line-height:1.2;}
+  .colors-info span{font-size:13.5px; color:var(--ink-soft);}
+  .look{background:#fff; border:1px solid var(--g-line); border-radius:4px; padding:12px 16px; margin-bottom:10px; font-family:Arial,sans-serif; font-size:15px; line-height:1.5; color:#202124; box-shadow:0 1px 3px rgba(60,64,67,.12);}
+  .look p{margin:0 0 4px;}
+  .look p:last-child{margin:0;}
+
+  /* ---------- Крок 5: емулятор Google Документа ---------- */
+  .task-card{display:flex; align-items:center; gap:14px; background:var(--accent-soft); border-radius:var(--radius-m); padding:14px 18px; margin-bottom:16px; min-height:64px;}
+  .task-card .tnum{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:13px; color:var(--accent-dark); white-space:nowrap;}
+  .task-card .ttext{font-weight:700; font-size:16px;}
+  .gdoc{position:relative; border:1px solid var(--g-line); border-radius:var(--radius-m); background:var(--g-canvas); font-family:'Roboto',sans-serif; color:var(--g-ink); box-shadow:0 2px 10px rgba(0,0,0,.06);}
+  .gd-head{display:flex; align-items:center; gap:10px; padding:8px 12px 6px;}
+  .gd-head img{width:22px; height:30px;}
+  .gd-title{font-size:16px; color:var(--g-ink);}
+  .gd-title .ms{font-size:18px; color:var(--g-soft); margin-left:6px;}
+  .gd-menu{display:flex; gap:12px; font-size:13px; color:var(--g-ink); white-space:nowrap; overflow:hidden;}
+  .gdoc .gd-tools{margin:4px 10px 0;}
+  .gdoc .tl, .gdoc .tb-btn{cursor:pointer;}
+  .gdoc .tl:hover, .gdoc .tb-btn:hover{background:#DCE3EE;}
+  .gdoc .tl.on:hover{background:#C2D7FB;}
+  .tb-btn{display:inline-flex; align-items:center; gap:0; height:30px; padding:0 2px 0 8px; border-radius:4px; border:0; background:none; font:inherit; font-size:13.5px; color:var(--g-ink); flex-shrink:0;}
+  .tb-btn.font{min-width:126px; justify-content:space-between;}
+  .tb-btn .ms{font-size:20px; color:var(--g-soft);}
+  .tb-pm{width:26px; height:30px; border:0; background:none; border-radius:4px; font:inherit; font-size:18px; color:var(--g-soft); cursor:pointer; flex-shrink:0;}
+  .tb-pm:hover{background:#DCE3EE;}
+  .tb-size{border:1px solid #747775; border-radius:4px; height:26px; min-width:34px; padding:0 4px; background:#fff; font:inherit; font-size:13.5px; color:var(--g-ink); cursor:pointer; flex-shrink:0;}
+  .gdoc .wrong-flash{background:#FDE6E1 !important; animation:shakeX .35s ease;}
+  .gpop{position:absolute; z-index:6; background:#fff; border-radius:8px; padding:6px 0; box-shadow:0 2px 6px 2px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.3); font-family:'Roboto',sans-serif; font-size:14px; color:var(--g-ink); max-height:300px; overflow:auto;}
+  .gpop[hidden]{display:none;}
+  .gpop .it{display:flex; align-items:center; gap:10px; padding:7px 18px 7px 12px; cursor:pointer; white-space:nowrap;}
+  .gpop .it:hover{background:#F1F3F4;}
+  .gpop .it .ms{font-size:18px; color:var(--g-ink); visibility:hidden;}
+  .gpop .it.cur .ms{visibility:visible;}
+  .gpop .cap{font-size:12px; color:var(--g-soft); padding:4px 12px 6px;}
+  .swatches{display:grid; grid-template-columns:repeat(4,28px); gap:8px; padding:4px 12px 8px;}
+  .sw{width:28px; height:28px; border-radius:50%; border:1px solid rgba(0,0,0,.15); cursor:pointer; position:relative;}
+  .sw:hover{box-shadow:0 0 0 2px #fff,0 0 0 4px #A8C7FA;}
+  .sw.none{background:#fff; overflow:hidden;}
+  .sw.none::after{content:''; position:absolute; left:50%; top:-2px; bottom:-2px; width:2px; background:#D93025; transform:rotate(45deg);}
+  .gpage{background:#fff; margin:12px 12px 14px; border:1px solid var(--g-line); border-radius:4px; box-shadow:0 1px 3px rgba(60,64,67,.15); padding:22px 26px; font-family:Arial,sans-serif; font-size:14.3px; color:#000; line-height:1.6; min-height:240px;}
+  .gpage p{margin:0 0 10px;}
+  .gpage [data-id]{cursor:pointer; border-radius:2px; transition:background .15s;}
+  .gpage [data-id]:hover{box-shadow:0 0 0 1px #A8C7FA;}
+  .gpage [data-id].sel{background:var(--g-sel) !important;}
+  .gpage [data-id].good{background:#CDEFD6 !important; transition:background .3s;}
+  .gpage .t-line{display:block; text-align:center;}
+  .gpage .s-line{display:block; text-align:right;}
+
+  /* ---------- Крок 6: пензлик і гумка ---------- */
+  .tools2{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:10px; margin:12px 0 16px;}
+  .tools2 > div{display:flex; gap:12px; align-items:flex-start; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px;}
+  .tools2 .ico{width:42px; height:42px; flex-shrink:0; border-radius:12px; background:var(--g-bar); display:flex; align-items:center; justify-content:center; color:var(--g-soft);}
+  .tools2 .ico .ms{font-size:24px;}
+  .tools2 b{font-family:'Baloo 2',sans-serif; font-size:16px; display:block; line-height:1.2; margin-bottom:2px;}
+  .tools2 span{font-size:14px; color:var(--ink-soft);}
+
+  @media (max-width:560px){
+    .ba{grid-template-columns:1fr;}
+    .ba > .ms{transform:rotate(90deg); justify-self:center;}
+    .gpage{padding:16px;}
+  }
+</style>
+</head>
+<body data-lesson="lesson6-font-formatting" data-hud="6 клас · Форматування символів">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Текстові документи</div>
+      <h1>Текст у новому вбранні</h1>
+      <p>Як змінити шрифт, розмір, накреслення й колір літер — і зробити документ гарним та легким для читання.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: велика літера «А» із зарубками, крапля фарби й лінійка розмірів -->
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="72" r="56" fill="#EEF0FD"/>
+      <rect x="22" y="24" width="84" height="92" rx="10" fill="#fff" stroke="#4338CA" stroke-width="3"/>
+      <!-- літера А -->
+      <path d="M42 98 L60 40 h8 L86 98" stroke="#312E81" stroke-width="7" stroke-linejoin="round"/>
+      <path d="M50 78 h28" stroke="#312E81" stroke-width="6"/>
+      <!-- зарубки -->
+      <path d="M34 99 h16 M78 99 h16 M54 40 h18" stroke="#E8710A" stroke-width="5" stroke-linecap="round"/>
+      <!-- лінійка розміру -->
+      <path d="M98 40 v58" stroke="#B9BCE6" stroke-width="2"/>
+      <path d="M94 40 h8 M94 98 h8 M96 54.5 h4 M96 69 h4 M96 83.5 h4" stroke="#B9BCE6" stroke-width="2"/>
+      <!-- крапля фарби -->
+      <path d="M112 84 C112 84 124 98 124 106 a12 12 0 0 1 -24 0 C100 98 112 84 112 84 Z" fill="#E8710A"/>
+      <circle cx="107" cy="104" r="3" fill="#fff" opacity=".7"/>
+      <!-- маркер -->
+      <rect x="26" y="108" width="40" height="10" rx="3" fill="#FFF475"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Введення і редагування тексту</div>
+    <h2>Що ти вже знаєш</h2>
+    <p>Минулого разу ти вчився охайно вводити текст, виділяти фрагменти й виправляти помилки.</p>
+    <p class="soft">Обери термін, а потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Форматування символів</div>
+    <h2>Змінюємо вигляд літер</h2>
+    <p><b>Форматування символів</b> — це зміна вигляду літер, цифр і знаків. Слова лишаються ті самі, змінюється лише те, як вони виглядають.</p>
+    <p>Головне правило: <b>спершу виділи</b> фрагмент, а <b>потім обери</b> команду. Команди є:</p>
+    <ul>
+      <li>на панелі інструментів;</li>
+      <li>у меню <b>Формат → Текст</b>;</li>
+      <li>на клавіатурі: <span class="kbd">Ctrl</span> + <span class="kbd">B</span>, <span class="kbd">Ctrl</span> + <span class="kbd">I</span>, <span class="kbd">Ctrl</span> + <span class="kbd">U</span>.</li>
+    </ul>
+    <p>Ось частина панелі інструментів Google Документів, яка змінює символи:</p>
+    <div class="legend-bar">
+      <div class="gd-tools">
+        <b class="nb">1</b><span class="tx" style="color:var(--g-ink)">Arial</span><span class="ms" style="color:var(--g-soft)">arrow_drop_down</span>
+        <span class="sep"></span>
+        <b class="nb">2</b><span class="tx">−</span><span class="tx size">11</span><span class="tx">+</span>
+        <span class="sep"></span>
+        <b class="nb">3</b><span class="tl"><span class="ms">format_bold</span></span><span class="tl"><span class="ms">format_italic</span></span><span class="tl"><span class="ms">format_underlined</span></span>
+        <span class="sep"></span>
+        <b class="nb">4</b><span class="tl"><span class="ms">format_color_text</span><i></i></span><span class="tl"><span class="ms">ink_highlighter</span><i style="background:#FFF475"></i></span>
+      </div>
+      <ul class="legend">
+        <li><b class="nb">1</b><span><b>Шрифт</b> — малюнок літер</span></li>
+        <li><b class="nb">2</b><span><b>Розмір</b> — висота літер</span></li>
+        <li><b class="nb">3</b><span><b>Накреслення</b> — жирність, нахил, підкреслення</span></li>
+        <li><b class="nb">4</b><span><b>Колір</b> — літер і тла під ними</span></li>
+      </ul>
+    </div>
+    <p class="soft">Порівняй «Було» і «Стало». Яку властивість символів змінили?</p>
+    <div id="whatList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Шрифт</div>
+    <h2>У кожного шрифту свій характер</h2>
+    <p><b>Шрифт</b> — набір літер, цифр і знаків, намальованих в одному стилі. У кожного шрифту є назва: Arial, Times New Roman, Roboto…</p>
+    <p>Найперше шрифти розрізняють за <b>зарубками</b> — маленькими рисочками на кінцях ліній літери.</p>
+    <div class="serif-demo">
+      <figure>
+        <svg viewBox="0 0 220 110" aria-hidden="true">
+          <!-- Т із зарубками -->
+          <path d="M28 18 h66 v20 h-6 q-2 -11 -14 -12 h-6 v64 q0 5 9 5 v5 h-38 v-5 q9 0 9 -5 v-64 h-6 q-12 1 -14 12 h-6 z" fill="#312E81"/>
+          <!-- Н із зарубками -->
+          <path d="M116 18 h30 v5 q-7 0 -7 5 v24 h36 v-24 q0 -5 -7 -5 v-5 h30 v5 q-7 0 -7 5 v62 q0 5 7 5 v5 h-30 v-5 q7 0 7 -5 v-30 h-36 v30 q0 5 7 5 v5 h-30 v-5 q7 0 7 -5 v-62 q0 -5 -7 -5 z" fill="#312E81"/>
+          <g stroke="#E8710A" stroke-width="2.5" fill="none">
+            <circle cx="34" cy="32" r="9"/><circle cx="88" cy="32" r="9"/><circle cx="58" cy="96" r="12"/>
+            <circle cx="131" cy="96" r="12"/><circle cx="183" cy="21" r="11"/>
+          </g>
+        </svg>
+        <figcaption><b>Із зарубками</b>Times New Roman, Georgia. Зарубки ведуть око вздовж рядка — зручно читати книжки.</figcaption>
+      </figure>
+      <figure>
+        <svg viewBox="0 0 220 110" aria-hidden="true">
+          <path d="M28 18 h66 v14 h-26 v68 h-14 v-68 h-26 z" fill="#312E81"/>
+          <path d="M120 18 h14 v34 h36 v-34 h14 v82 h-14 v-36 h-36 v36 h-14 z" fill="#312E81"/>
+        </svg>
+        <figcaption><b>Без зарубок</b>Arial, Roboto. Прості рівні лінії — чітко видно на екрані.</figcaption>
+      </figure>
+    </div>
+    <p>А ще є шрифти з особливим характером:</p>
+    <div class="ftypes">
+      <div class="ftype"><span class="smp" style="font-family:'Caveat',cursive; font-weight:700">Привіт!</span><b>Рукописні</b><span>Схожі на почерк. Для листівок і підписів.</span></div>
+      <div class="ftype"><span class="smp" style="font-family:'Lobster',cursive">Свято!</span><b>Декоративні</b><span>Яскраві й незвичні. Лише для коротких заголовків.</span></div>
+      <div class="ftype"><span class="smp" style="font-family:'Courier New',monospace; font-weight:700">ii WW</span><b>Моноширинні</b><span>Усі літери однакової ширини, як у друкарській машинці. Ними пишуть програмний код.</span></div>
+    </div>
+    <div class="trivia">Шрифти малюють художники-дизайнери, тож на шрифт, як і на малюнок, є <b>авторське право</b>. Одні шрифти платні, інші — вільні: наприклад, шрифтами з колекції Google Fonts можна користуватися безкоштовно.</div>
+    <p class="soft">Подивись на літери й розклади шрифти. Клацни картку, а потім — кошик.</p>
+    <div class="exercise font-sort">
+      <div class="sort-buckets three">
+        <div class="bucket" id="bkSerif"><div class="bucket-title">Із зарубками</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkSans"><div class="bucket-title">Без зарубок</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkDeco"><div class="bucket-title">Рукописні й декоративні</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="fontPool"></div>
+      <div class="progress-line" id="fontProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Розмір і накреслення</div>
+    <h2>Більше, жирніше, з нахилом</h2>
+    <p><b>Розмір шрифту</b> вимірюють у <b>пунктах</b> (пт). Один пункт — приблизно третина міліметра. У новому Google Документі текст має розмір 11 пт.</p>
+    <div class="sizes">
+      <div><span style="font-size:11px">Аа</span><small>8 пт</small></div>
+      <div><span style="font-size:15px">Аа</span><small>11 пт</small></div>
+      <div><span style="font-size:19px">Аа</span><small>14 пт</small></div>
+      <div><span style="font-size:24px">Аа</span><small>18 пт</small></div>
+      <div><span style="font-size:32px">Аа</span><small>24 пт</small></div>
+      <div><span style="font-size:48px">Аа</span><small>36 пт</small></div>
+    </div>
+    <p><b>Накреслення</b> — жирність і нахил літер. А ще символи можна підкреслити, закреслити чи підняти вище або опустити нижче рядка:</p>
+    <div class="styles">
+      <div><span class="smp">Звичайний</span><small>як набрали</small></div>
+      <div><span class="smp" style="font-weight:700">Напівжирний</span><small><span class="kbd">Ctrl</span> + <span class="kbd">B</span></small></div>
+      <div><span class="smp" style="font-style:italic">Курсив</span><small><span class="kbd">Ctrl</span> + <span class="kbd">I</span></small></div>
+      <div><span class="smp" style="font-weight:700; font-style:italic">Напівжирний курсив</span><small>обидві разом</small></div>
+      <div><span class="smp" style="text-decoration:underline">Підкреслений</span><small><span class="kbd">Ctrl</span> + <span class="kbd">U</span></small></div>
+      <div><span class="smp" style="text-decoration:line-through">Закреслений</span><small>Формат → Текст</small></div>
+      <div><span class="smp">10<sup>2</sup>, м<sup>2</sup></span><small>надрядковий індекс</small></div>
+      <div><span class="smp">H<sub>2</sub>O</span><small>підрядковий індекс</small></div>
+    </div>
+    <div class="note">Надрядковий і підрядковий індекси є в меню <b>Формат → Текст</b>. У Google Документах їх можна ввімкнути й клавішами: <span class="kbd">Ctrl</span> + <span class="kbd">.</span> і <span class="kbd">Ctrl</span> + <span class="kbd">,</span></div>
+    <p class="soft">Обери правильну відповідь.</p>
+    <div id="styleList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Колір і правила оформлення</div>
+    <h2>Гарно — це коли легко читати</h2>
+    <p>У тексту можна змінити два кольори:</p>
+    <div class="colors-info">
+      <div><span class="ico"><span class="ms">format_color_text</span><i style="background:#D93025"></i></span><div><b>Колір тексту</b><span>Фарбує самі літери.</span></div></div>
+      <div><span class="ico"><span class="ms">ink_highlighter</span><i style="background:#FFF475"></i></span><div><b>Колір виділення</b><span>Фарбує тло під літерами, як маркер.</span></div></div>
+    </div>
+    <p>Кілька правил, щоб документ був гарним:</p>
+    <ul>
+      <li>Не більше <b>двох-трьох шрифтів</b> в одному документі.</li>
+      <li>Основний текст — простим шрифтом, декоративні — лише для коротких заголовків.</li>
+      <li>Текст має добре <b>вирізнятися на тлі</b>: темні літери на світлому тлі чи навпаки.</li>
+      <li>Виділяй лише найважливіше: якщо виділено все, не виділено нічого.</li>
+    </ul>
+    <div class="note">Підкресленим в електронних документах зазвичай позначають <b>посилання</b>. Тому, щоб просто виділити слово, краще обрати напівжирний.</div>
+    <p class="soft">Подивись на кожен фрагмент. Чи вдало його оформили?</p>
+    <div id="lookList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Оформлюємо запрошення</div>
+    <h2>Спробуй у Google Документі</h2>
+    <p>Шостий клас набрав запрошення на свято, але ще не оформив його. Допоможи: клацни фрагмент, щоб <b>виділити</b> його, а тоді обери потрібну команду на панелі інструментів.</p>
+    <div class="exercise" id="invEx">
+      <div class="task-card"><span class="tnum" id="invNum"></span><span class="ttext" id="invTask"></span></div>
+      <div class="gdoc" id="invDoc">
+        <div class="gd-head">
+          <img src="images/docs.svg" alt="">
+          <div>
+            <div class="gd-title">Запрошення на свято<span class="ms">star</span><span class="ms">cloud_done</span></div>
+            <div class="gd-menu"><span>Файл</span><span>Редагувати</span><span>Вигляд</span><span>Вставлення</span><span>Формат</span><span>Інструменти</span></div>
+          </div>
+        </div>
+        <div class="gd-tools" id="invTools"></div>
+        <div class="gpage" id="invPage"></div>
+        <div class="gpop" id="invPop" hidden></div>
+      </div>
+      <div class="fb" id="invFb"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Пензлик і гумка</div>
+    <h2>Копіюємо й очищаємо форматування</h2>
+    <p>Дві кнопки зберігають купу часу:</p>
+    <div class="tools2">
+      <div><span class="ico"><span class="ms">format_paint</span></span><div><b>Пензлик</b><span>Копіює все форматування з одного фрагмента й переносить на інший. У Word така команда зветься «Формат за зразком».</span></div></div>
+      <div><span class="ico"><span class="ms">format_clear</span></span><div><b>Очистити форматування</b><span>Повертає виділеному тексту звичайний вигляд. Меню <b>Формат → Очистити форматування</b> або <span class="kbd">Ctrl</span> + <span class="kbd">\</span></span></div></div>
+    </div>
+    <p class="soft">У тексті одне слово оформлене гарно: червоне, напівжирне й більше за інші. Як оформити так само ще одне слово, не налаштовуючи все заново?</p>
+    <div class="exercise">
+      <ol class="seq-done" id="pnDone"></ol>
+      <div class="seq-q" id="pnQ"></div>
+      <div class="seq-opts" id="pnOpts"></div>
+      <div class="choice-feedback" id="pnFb"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Урок · «Форматування текстових об'єктів. Параметри шрифту» · 6 клас</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+const ms = i=>`<span class="ms">${i}</span>`;
+const flash = (el, cls = 'wrong-flash')=>{ el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), 650); };
+
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Курсор', desc:'Мигтюча риска: тут з\'являються нові символи' },
+  { name:'Backspace', desc:'Стирає символ ліворуч від курсора' },
+  { name:'Недруковані символи', desc:'Знаки, яких не видно на папері: пропуски, кінці абзаців' },
+  { name:'Фрагмент', desc:'Виділена частина тексту' },
+  { name:'Буфер обміну', desc:'Пам\'ять, куди потрапляє скопійоване чи вирізане' },
+  { name:'Ctrl + Z', desc:'Скасовує останню дію' },
+  { name:'Червона хвиляста лінія', desc:'Підказує, що в слові, можливо, помилка' },
+  { name:'Знайти й замінити', desc:'Змінює одне слово на інше в усьому документі' }
+], 'recapProgress');
+
+/* ---------- КРОК 1: ЩО ЗМІНИЛОСЯ ---------- */
+const ba = (was, now)=>`<div class="ba"><div class="ba-card"><small>Було</small><span>${was}</span></div>${ms('arrow_forward')}<div class="ba-card"><small>Стало</small><span>${now}</span></div></div>`;
+const what = (text, style, correct, why)=>({ pre:ba(text, `<span style="${style}">${text}</span>`), text:'Що змінили?', correct, why });
+makeClassify('whatList', [
+  what('Осінній ярмарок', 'font-family:Lobster,cursive; font-size:17px', 0, 'Літери стали іншої форми — це інший шрифт.'),
+  what('Канікули', 'font-size:28px', 1, 'Літери ті самі, тільки більші.'),
+  what('Не запізнюйся!', 'color:#D93025', 3, 'Літери стали червоними.'),
+  what('Мій улюблений вірш', 'font-style:italic', 2, 'Літери нахилилися — це курсив.'),
+  what('Шкільна газета', "font-family:'Merriweather',serif", 0, 'З\'явилися зарубки — це інший шрифт.'),
+  what('Увага!', 'font-weight:700', 2, 'Літери стали жирнішими — це напівжирне накреслення.'),
+  what('Контрольна в понеділок', 'background:#FFF475', 3, 'Під літерами з\'явилося жовте тло, як від маркера. Це колір виділення.'),
+  what('примітка: вхід вільний', 'font-size:11px', 1, 'Літери стали дрібнішими.')
+], ['Шрифт', 'Розмір', 'Накреслення', 'Колір']);
+
+/* ---------- КРОК 2: РОЗКЛАДИ ШРИФТИ ---------- */
+const fchip = (name, css, bucket)=>({ text:name, bucket, icon:`<span class="smp" style="font-family:${css}">Казка</span>` });
+makeSortBoard('fontPool', {serif:'bkSerif', sans:'bkSans', deco:'bkDeco'}, [
+  fchip('Times New Roman', "'Times New Roman',Times,serif", 'serif'),
+  fchip('Georgia', 'Georgia,serif', 'serif'),
+  fchip('Merriweather', "'Merriweather',serif", 'serif'),
+  fchip('PT Serif', "'PT Serif',serif", 'serif'),
+  fchip('Arial', 'Arial,sans-serif', 'sans'),
+  fchip('Roboto', "'Roboto',sans-serif", 'sans'),
+  fchip('Montserrat', "'Montserrat',sans-serif", 'sans'),
+  fchip('Caveat', "'Caveat',cursive; font-weight:700", 'deco'),
+  fchip('Lobster', "'Lobster',cursive", 'deco'),
+  fchip('Pacifico', "'Pacifico',cursive; font-size:20px", 'deco'),
+  fchip('Marck Script', "'Marck Script',cursive", 'deco')
+], 'fontProgress');
+
+/* ---------- КРОК 3: РОЗМІР І НАКРЕСЛЕННЯ ---------- */
+const doc = s=>`<div class="pre-doc">${s}</div>`;
+makeChoices('styleList', [
+  { text:'Як правильно записати формулу води?', opts:['H2O', 'H<sup>2</sup>O', 'H<sub>2</sub>O'], correct:2,
+    why:'Цифру 2 опускають нижче рядка — це підрядковий індекс.' },
+  { pre:doc('Площа нашого класу — 48 квадратних метрів.'), text:'Як коротко записати «квадратних метрів»?', opts:['м2', 'м<sup>2</sup>', 'м<sub>2</sub>'], correct:1,
+    why:'Двійку піднімають над рядком — це надрядковий індекс.' },
+  { pre:doc('Список покупок:<br><s>хліб</s><br><s>молоко</s><br>яблука'), text:'Чому два слова тут закреслені?', opts:['Це помилки, їх треба стерти', 'Ці продукти вже купили', 'Це найважливіші продукти'], correct:1,
+    why:'Закреслення показує, що пункт уже виконано, але його все одно видно.' },
+  { text:'Учень виділив слово й натиснув Ctrl + B. Що сталося?', opts:['Слово стало напівжирним', 'Слово стало курсивом', 'Слово скопіювалося'], correct:0 },
+  { text:'Як зробити слово напівжирним курсивом?', opts:['Двічі натиснути Ctrl + B', 'Натиснути Ctrl + B, а потім Ctrl + I', 'Збільшити розмір шрифту'], correct:1,
+    why:'Накреслення можна поєднувати.' },
+  { text:'Який розмір краще для заголовка, якщо основний текст має 11 пт?', opts:['8 пт', '11 пт', '18 пт'], correct:2,
+    why:'Заголовок має бути помітнішим за текст, тому його роблять більшим.' }
+]);
+
+/* ---------- КРОК 4: ВДАЛО ЧИ НІ ---------- */
+const look = s=>`<div class="look">${s}</div>`;
+makeYesNo('lookList', [
+  { pre:look('<p style="color:#FFE066">Екскурсія до музею відбудеться в суботу. Збираємося о 9:00 біля входу до школи.</p>'),
+    text:'Як тобі таке оформлення?', correct:false, why:'Жовті літери на білому тлі майже не видно.' },
+  { pre:look('<p style="font-family:Lobster,cursive; font-size:24px; color:#1A73E8; text-align:center">Новорічний ранок</p>'),
+    text:'Як тобі таке оформлення?', correct:true, why:'Декоративний шрифт у короткому заголовку — святково й легко читається.' },
+  { pre:look("<p style=\"font-family:Lobster,cursive; font-size:17px\">Учора ми ходили на екскурсію до ботанічного саду. Там ростуть рослини з усього світу: пальми, кактуси, бамбук. Найбільше нам сподобалася оранжерея з тропічними метеликами.</p>"),
+    text:'Як тобі таке оформлення?', correct:false, why:'Довгий текст декоративним шрифтом читати важко. Його краще лишити для заголовка.' },
+  { pre:look('<p>Домашнє завдання: вивчити вірш напам\'ять до <span style="background:#FFF475; font-weight:700">четверга</span>.</p>'),
+    text:'Як тобі таке оформлення?', correct:true, why:'Виділено лише найважливіше — день, до якого треба вивчити вірш.' },
+  { pre:look("<p><span style=\"font-family:Lobster,cursive; color:#D93025\">Наш</span> <span style=\"font-family:'Courier New',monospace; color:#188038\">клас</span> <span style=\"font-family:Caveat,cursive; font-size:21px; color:#9334E6\">їде</span> <span style=\"font-family:Pacifico,cursive; color:#E8710A\">на</span> <span style=\"font-family:'Times New Roman',serif; font-weight:700; color:#1A73E8\">екскурсію</span></p>"),
+    text:'Як тобі таке оформлення?', correct:false, why:'П\'ять шрифтів і п\'ять кольорів в одному рядку — строкато й важко читати.' },
+  { pre:look('<p style="background:#1A3E8C; color:#fff; padding:6px 10px; border-radius:4px; font-weight:700">Увага! Зміни в розкладі на п\'ятницю</p>'),
+    text:'Як тобі таке оформлення?', correct:true, why:'Білі літери добре видно на темно-синьому тлі.' },
+  { pre:look('<p><b><u>Увесь текст цього оголошення виділено напівжирним і підкреслено, щоб ніхто нічого не пропустив і все було дуже-дуже помітно.</u></b></p>'),
+    text:'Як тобі таке оформлення?', correct:false, why:'Коли виділено все, нічого не вирізняється. А підкреслений текст ще й схожий на посилання.' }
+], 'Вдало', 'Невдало');
+
+/* ---------- КРОК 5: ЕМУЛЯТОР ЗАПРОШЕННЯ ---------- */
+(function(){
+  const FONTS = { 'Arial':'Arial,sans-serif', 'Caveat':"'Caveat',cursive", 'Courier New':"'Courier New',monospace", 'Lobster':"'Lobster',cursive",
+    'Merriweather':"'Merriweather',serif", 'Roboto':"'Roboto',sans-serif", 'Times New Roman':"'Times New Roman',serif" };
+  const COLORS = [['#000000', 'чорний'], ['#999999', 'сірий'], ['#D93025', 'червоний'], ['#E8710A', 'помаранчевий'],
+    ['#F9AB00', 'жовтий'], ['#188038', 'зелений'], ['#1A73E8', 'синій'], ['#9334E6', 'фіолетовий']];
+  const HLS = [['none', 'без кольору'], ['#FFF475', 'жовтий'], ['#CCFF90', 'салатовий'], ['#A7FFEB', 'бірюзовий'],
+    ['#F8BBD0', 'рожевий'], ['#D7AEFB', 'бузковий'], ['#FDCFE8', 'світло-рожевий'], ['#AECBFA', 'блакитний']];
+  const SIZES = [8, 9, 10, 11, 12, 14, 18, 24, 30, 36, 48];
+  const OBJ = { title:'заголовок', date:'дату', time:'час', mood:'останнє речення', sign:'підпис' };
+  const PROP = { font:'шрифт', size:'розмір', b:'напівжирне накреслення', i:'курсив', u:'підкреслення', color:'колір тексту', hl:'колір виділення' };
+  const st = {};
+  Object.keys(OBJ).forEach(k=>st[k] = { font:'Arial', size:11, b:false, i:false, u:false, color:'#000000', hl:'none' });
+  const TASKS = [
+    { id:'title', t:'Виділи заголовок і зміни його шрифт на Lobster.', want:{ font:'Lobster' } },
+    { id:'title', t:'Збільш заголовок до 24 пт.', want:{ size:24 } },
+    { id:'title', t:'Зафарбуй літери заголовка в помаранчевий колір.', want:{ color:'#E8710A' } },
+    { id:'date', t:'Зроби дату «у п\'ятницю, 14 листопада» напівжирною.', want:{ b:true } },
+    { id:'time', t:'Познач час «о 12:00» жовтим тлом, наче маркером.', want:{ hl:'#FFF475' } },
+    { id:'mood', t:'Речення «Візьміть із собою гарний настрій!» зроби курсивом.', want:{ i:true } },
+    { id:'sign', t:'Підпис «Ваш 6-Б клас» зроби рукописним шрифтом Caveat розміром 18 пт.', want:{ font:'Caveat', size:18 } }
+  ];
+  const ex = document.getElementById('invEx'), gdoc = document.getElementById('invDoc');
+  const page = document.getElementById('invPage'), tools = document.getElementById('invTools'), pop = document.getElementById('invPop');
+  const num = document.getElementById('invNum'), task = document.getElementById('invTask'), fb = document.getElementById('invFb');
+  page.innerHTML = `<span class="t-line"><span data-id="title">Запрошення на свято осені</span></span>
+    <p style="margin-top:14px">Дорогі друзі! Запрошуємо вас на свято осені, яке відбудеться <span data-id="date">у п'ятницю, 14 листопада,</span> <span data-id="time">о 12:00</span> в актовій залі.</p>
+    <p>На вас чекають пісні, конкурси, ярмарок і смачний чай. <span data-id="mood">Візьміть із собою гарний настрій!</span></p>
+    <span class="s-line"><span data-id="sign">Ваш 6-Б клас</span></span>`;
+  const els = {};
+  page.querySelectorAll('[data-id]').forEach(el=>els[el.dataset.id] = el);
+  let sel = null, i = 0, busy = false;
+  const hit = trackTask(ex, TASKS.length, TASKS.length + 2);
+
+  const render = ()=>{
+    Object.entries(els).forEach(([k, el])=>{
+      const s = st[k];
+      el.style.fontFamily = FONTS[s.font];
+      el.style.fontSize = (s.size * 1.3) + 'px';
+      el.style.fontWeight = s.b ? '700' : '400';
+      el.style.fontStyle = s.i ? 'italic' : 'normal';
+      el.style.textDecoration = s.u ? 'underline' : 'none';
+      el.style.color = s.color;
+      el.style.background = s.hl === 'none' ? '' : s.hl;
+      el.classList.toggle('sel', k === sel);
+    });
+    const s = sel ? st[sel] : { font:'Arial', size:11, b:false, i:false, u:false, color:'#000000', hl:'none' };
+    const tl = (act, icon, on, bar)=>`<button type="button" class="tl${on ? ' on' : ''}" data-act="${act}">${ms(icon)}${bar ? `<i style="background:${bar}"></i>` : ''}</button>`;
+    tools.innerHTML = `<span class="tl">${ms('undo')}</span><span class="tl">${ms('redo')}</span><span class="sep"></span>`
+      + `<span class="tx">Звичайний текст</span><span class="sep"></span>`
+      + `<button type="button" class="tb-btn font" data-act="font" title="Шрифт">${s.font}${ms('arrow_drop_down')}</button><span class="sep"></span>`
+      + `<button type="button" class="tb-pm" data-act="minus" title="Зменшити розмір шрифту">−</button>`
+      + `<button type="button" class="tb-size" data-act="size" title="Розмір шрифту">${s.size}</button>`
+      + `<button type="button" class="tb-pm" data-act="plus" title="Збільшити розмір шрифту">+</button><span class="sep"></span>`
+      + tl('b', 'format_bold', s.b) + tl('i', 'format_italic', s.i) + tl('u', 'format_underlined', s.u)
+      + tl('color', 'format_color_text', false, s.color) + tl('hl', 'ink_highlighter', false, s.hl === 'none' ? 'transparent' : s.hl);
+    tools.querySelector('[data-act="b"]').title = 'Напівжирний (Ctrl+B)';
+    tools.querySelector('[data-act="i"]').title = 'Курсив (Ctrl+I)';
+    tools.querySelector('[data-act="u"]').title = 'Підкреслити (Ctrl+U)';
+    tools.querySelector('[data-act="color"]').title = 'Колір тексту';
+    tools.querySelector('[data-act="hl"]').title = 'Колір виділення';
+  };
+  const show = ()=>{
+    if(i >= TASKS.length){
+      num.textContent = '🎉'; task.textContent = 'Запрошення готове! Тепер воно святкове й легко читається.'; return;
+    }
+    num.textContent = `Завдання ${i + 1} з ${TASKS.length}`;
+    task.textContent = TASKS[i].t;
+  };
+  const closePop = ()=>{ pop.hidden = true; };
+  // Чи можна зараз змінювати властивість prop? Якщо ні — хибна спроба й підказка
+  const guard = (prop, btn)=>{
+    if(busy || i >= TASKS.length) return false;
+    const tk = TASKS[i];
+    let msg = '';
+    if(!sel) msg = 'Спершу виділи фрагмент — клацни по ньому в документі.';
+    else if(sel !== tk.id) msg = `Зараз оформлюємо ${OBJ[tk.id]}. Виділи саме його.`;
+    else if(!(prop in tk.want)) msg = `Ця кнопка змінює ${PROP[prop]}, а в завданні потрібно змінити ${Object.keys(tk.want).map(p=>PROP[p]).join(' і ')}.`;
+    if(!msg) return true;
+    closePop(); flash(btn); fb.textContent = '🤔 ' + msg;
+    return false;
+  };
+  const check = ()=>{
+    const tk = TASKS[i], s = st[tk.id];
+    if(!Object.entries(tk.want).every(([p, v])=>s[p] === v)) return;
+    busy = true;
+    addNeurons(1); hit();
+    fb.textContent = '✓ Готово!';
+    render();
+    const el = els[tk.id]; el.classList.add('good');
+    setTimeout(()=>{
+      el.classList.remove('good'); busy = false; i++;
+      if(TASKS[i]?.id !== sel){ sel = null; render(); }
+      if(i === TASKS.length){ addNeurons(2); fb.textContent = '🎉 Чудова робота! Ти вмієш змінювати шрифт, розмір, накреслення й колір.'; }
+      else fb.textContent = '';
+      show();
+    }, 1100);
+  };
+  // Застосувати значення: хибне значення потрібної властивості теж застосовується, але це помилка
+  const apply = (prop, val, btn)=>{
+    const tk = TASKS[i];
+    st[sel][prop] = val;
+    render();
+    if(prop !== 'size' && val !== tk.want[prop]){
+      flash(tools.querySelector(`[data-act="${prop}"]`) || btn);
+      fb.textContent = prop === 'font' ? `🤔 Це шрифт ${val}. Знайди в списку ${tk.want.font}.`
+        : (prop === 'color' || prop === 'hl') ? '🤔 Не той колір. Наведи на кружечок — з\'явиться його назва.'
+        : '🤔 Подивись уважно на завдання.';
+      return;
+    }
+    if(prop === 'size' && 'size' in tk.want && val !== tk.want.size) fb.textContent = `Розмір ${val} пт. Потрібно ${tk.want.size} пт.`;
+    else if(!Object.entries(tk.want).every(([p, v])=>st[sel][p] === v)) fb.textContent = '👍 Добре, тепер друга частина завдання.';
+    else fb.textContent = '';
+    check();
+  };
+  const openPop = (btn, html)=>{
+    pop.innerHTML = html;
+    pop.hidden = false;
+    const r = btn.getBoundingClientRect(), g = gdoc.getBoundingClientRect();
+    pop.style.top = (r.bottom - g.top + 4) + 'px';
+    pop.style.left = Math.max(4, Math.min(r.left - g.left, g.width - pop.offsetWidth - 4)) + 'px';
+  };
+
+  page.addEventListener('click', e=>{
+    const el = e.target.closest('[data-id]');
+    closePop();
+    if(busy) return;
+    sel = el ? el.dataset.id : null;
+    if(sel && i < TASKS.length && sel !== TASKS[i].id) fb.textContent = '';
+    render();
+  });
+  tools.addEventListener('click', e=>{
+    const btn = e.target.closest('[data-act]');
+    if(!btn) return;
+    e.stopPropagation();
+    const act = btn.dataset.act;
+    if(act === 'font'){
+      if(!guard('font', btn)) return;
+      openPop(btn, Object.entries(FONTS).map(([n, css])=>`<div class="it${st[sel].font === n ? ' cur' : ''}" data-font="${n}">${ms('check')}<span style="font-family:${css}; font-size:15px">${n}</span></div>`).join(''));
+      return;
+    }
+    if(act === 'size'){
+      if(!guard('size', btn)) return;
+      openPop(btn, SIZES.map(n=>`<div class="it${st[sel].size === n ? ' cur' : ''}" data-size="${n}">${ms('check')}${n}</div>`).join(''));
+      return;
+    }
+    if(act === 'minus' || act === 'plus'){
+      if(!guard('size', btn)) return;
+      closePop();
+      apply('size', Math.max(1, Math.min(400, st[sel].size + (act === 'plus' ? 1 : -1))), btn);
+      return;
+    }
+    if(act === 'b' || act === 'i' || act === 'u'){
+      if(!guard(act, btn)) return;
+      closePop();
+      apply(act, !st[sel][act], btn);
+      return;
+    }
+    if(act === 'color' || act === 'hl'){
+      if(!guard(act, btn)) return;
+      const list = act === 'color' ? COLORS : HLS;
+      openPop(btn, `<div class="cap">${act === 'color' ? 'Колір тексту' : 'Колір виділення'}</div><div class="swatches">`
+        + list.map(([c, n])=>`<span class="sw${c === 'none' ? ' none' : ''}" data-${act}="${c}" title="${n}" style="${c === 'none' ? '' : 'background:' + c}"></span>`).join('') + '</div>');
+    }
+  });
+  pop.addEventListener('click', e=>{
+    e.stopPropagation();
+    const it = e.target.closest('[data-font],[data-size],[data-color],[data-hl]');
+    if(!it || !sel) return;
+    closePop();
+    if(it.dataset.font) apply('font', it.dataset.font, it);
+    else if(it.dataset.size) apply('size', +it.dataset.size, it);
+    else if(it.dataset.color) apply('color', it.dataset.color, it);
+    else apply('hl', it.dataset.hl, it);
+  });
+  document.addEventListener('click', e=>{ if(!pop.hidden && !pop.contains(e.target)) closePop(); });
+  render(); show();
+})();
+
+/* ---------- КРОК 6: ПЕНЗЛИК ---------- */
+makeSequence('pnDone', 'pnQ', 'pnOpts', 'pnFb', [
+  'Виділити слово, яке вже гарно оформлене',
+  'Клацнути пензлик на панелі інструментів',
+  'Виділити слово, яке треба оформити так само'
+], '✓ Друге слово стало точнісінько як перше — червоне, напівжирне й велике!');
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що потрібно зробити, перш ніж змінити шрифт слова?', opts:['Виділити слово', 'Скопіювати слово', 'Видалити слово'], correct:0 },
+  { q:'Що таке шрифт?', opts:['Колір літер', 'Набір літер і знаків, намальованих в одному стилі', 'Розмір літер у міліметрах'], correct:1 },
+  { q:'У чому вимірюють розмір шрифту?', opts:['У пунктах (пт)', 'У сантиметрах', 'У літерах'], correct:0 },
+  { q:'Яке накреслення вмикає Ctrl + I?', opts:['Напівжирний', 'Підкреслений', 'Курсив'], correct:2 },
+  { q:'Чим Times New Roman відрізняється від Arial?', opts:['Має зарубки', 'Має лише великі літери', 'Він рукописний'], correct:0 },
+  { q:'Для чого найкраще підійде декоративний шрифт?', opts:['Для довгого оповідання', 'Для короткого заголовка', 'Для таблиці з числами'], correct:1 },
+  { q:'Чим колір виділення відрізняється від кольору тексту?', opts:['Нічим', 'Він фарбує тло під літерами, як маркер', 'Він фарбує лише першу літеру'], correct:1 },
+  { q:'Як записати «десять у квадраті» — 10²?', opts:['Двійку зробити надрядковим індексом', 'Двійку зробити підрядковим індексом', 'Двійку зробити курсивом'], correct:0 },
+  { q:'Що робить пензлик на панелі інструментів?', opts:['Малює картинку', 'Переносить форматування з одного фрагмента на інший', 'Стирає текст'], correct:1 },
+  { q:'Як швидко повернути тексту звичайний вигляд?', opts:['Ctrl + \\', 'Ctrl + B', 'Ctrl + C'], correct:0, why:'Або меню Формат → Очистити форматування.' }
+], {summary:'Тепер ти знаєш, що таке шрифт, розмір і накреслення, вмієш добирати колір і оформлювати документ так, щоб його було легко й приємно читати.'});
+</script>
+
+</body>
+</html>
