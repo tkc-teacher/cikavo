@@ -12,3 +12,4 @@
 | slides.svg | Google Презентації | File:Google_Slides_2020_Logo.svg |
 | classroom.svg | Google Classroom | File:Google_Classroom_Logo.svg |
 | drive.svg | Google Диск | File:Google_Drive_icon_(2020).svg |
+| commons.svg | Вікісховище (Wikimedia Commons) | File:Commons-logo.svg — **не** суспільне надбання: CC BY-SA 3.0, автори Reidab, Grunt, 3247, Pumbaa; торговельна марка Wikimedia Foundation. Сторінка, що його показує, підписує авторів у футері (`.credits`) |

@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Плакат «Червона книга України» — Ліцензії</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#0F7B5F,#3BB98A,#F0B429); --accent:#0F7B5F; --accent-dark:#0A5C47; --accent-soft:#E3F4EE; --bg:#F5FAF8; --line:#DCEBE5; }
+
+  /* Зразок плаката */
+  .poster{display:block; width:100%; height:auto; border-radius:10px; box-shadow:0 6px 20px rgba(11,46,37,.15); background:#fff;}
+
+  /* Галерея фото */
+  .gallery{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:8px 0;}
+  @media (max-width:560px){ .gallery{grid-template-columns:1fr;} }
+  .ph{margin:0; background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-m); overflow:hidden; display:flex; flex-direction:column;}
+  .ph img{display:block; width:100%; aspect-ratio:3/2; object-fit:cover;}
+  .ph figcaption{padding:10px 12px 12px; display:flex; flex-direction:column; flex:1;}
+  .ph figcaption > b{font-family:'Baloo 2',sans-serif; font-size:16px;}
+  .ph dl{display:grid; grid-template-columns:auto 1fr; gap:2px 10px; margin:4px 0 10px; font-size:12.5px;}
+  .ph dt{color:var(--ink-soft);}
+  .ph dd{margin:0; font-weight:700; overflow-wrap:anywhere;}
+  .ph dd a{color:var(--accent-dark);}
+  .lic-badge{display:inline-flex; gap:2px; align-items:center; background:#2B2B2B; color:#fff; border-radius:6px; padding:2px 4px; margin-right:6px; vertical-align:middle;}
+  .lic-badge svg{width:17px; height:17px; display:block;}
+  .ph-btns{display:flex; gap:6px; margin-top:auto;}
+  .copy-btn, .dl-btn{flex:1; text-align:center; font-family:'Nunito Sans',sans-serif; font-weight:800; font-size:13px; border-radius:999px; padding:6px 10px; cursor:pointer; text-decoration:none;}
+  .copy-btn{background:var(--accent); color:#fff; border:0;}
+  .copy-btn:hover{background:var(--accent-dark);}
+  .copy-btn.done{background:#2F9E44;}
+  .dl-btn{background:var(--surface); color:var(--accent-dark); border:1.5px solid var(--line);}
+  /* Конструктор власної ліцензії */
+  .lb{background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px; margin:10px 0;}
+  .lb-tg{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:6px;}
+  @media (max-width:560px){ .lb-tg{grid-template-columns:repeat(2,minmax(0,1fr));} }
+  .lb-tg button{display:flex; flex-direction:column; align-items:center; gap:4px; font-family:'Nunito Sans',sans-serif; font-weight:800; font-size:12.5px; color:var(--ink); background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-s); padding:8px 6px; cursor:pointer;}
+  .lb-tg button small{font-weight:600; color:var(--ink-soft); font-size:11px;}
+  .lb-tg button .i{width:34px; height:34px; border-radius:50%; background:#BFC9C5; color:#fff; display:flex; align-items:center; justify-content:center;}
+  .lb-tg button .i svg{width:30px; height:30px;}
+  .lb-tg button.on{border-color:var(--accent);}
+  .lb-tg button.on .i{background:#2B2B2B;}
+  .lb-tg button:disabled{opacity:.4; cursor:not-allowed;}
+  .lb-tg button.lock{cursor:default;}
+  .lb-out{display:flex; align-items:center; gap:14px; flex-wrap:wrap; margin:12px 0 10px;}
+  .lb-out img{display:block; height:40px;}
+  .lb-out b{display:block; font-family:'Baloo 2',sans-serif; font-size:17px;}
+  .lb-out span{font-size:13.5px; color:var(--ink-soft);}
+  .lb-btns{max-width:420px;}
+  /* Формула підпису */
+  .tasl{display:flex; flex-wrap:wrap; align-items:center; gap:6px; margin:8px 0;}
+  .tasl span{font-size:13.5px; font-weight:800; border-radius:999px; padding:3px 12px;}
+  .tasl i{font-style:normal; color:var(--ink-soft);}
+  .t1{background:#FFE8CC; color:#8A4B08;} .t2{background:#D3F9D8; color:#1E6B2E;} .t3{background:#D0EBFF; color:#1C5A8A;} .t4{background:#E5DBFF; color:#5034A6;}
+  .cap-ex{font-size:13px; background:var(--bg); border:1.5px dashed var(--line); border-radius:var(--radius-s); padding:8px 12px; margin:6px 0;}
+
+  /* Вибір власної ліцензії */
+  .choose{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:6px 0;}
+  @media (max-width:560px){ .choose{grid-template-columns:1fr;} }
+  .choose div{background:var(--bg); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:9px 12px; font-size:14px;}
+  .choose b{display:block; font-family:'Baloo 2',sans-serif; font-size:15px;}
+</style>
+</head>
+<body data-hud="7 клас · Практична · Червона книга України">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 7 клас · Ліцензії на використання</div>
+    <h1>🐾 Плакат «Червона книга України»</h1>
+    <p>Збери плакат про рідкісних тварин лише з тих фото, які автори дозволили брати, правильно підпиши їх і обери ліцензію для свого плаката.</p>
+    <div class="meta"><span>⏱ 30–35 хв</span><span><img src="../../assets/logos/slides.svg" alt="">Google Презентації</span><span><img src="../../assets/logos/commons.svg" alt="">Фото з Вікісховища</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <svg class="poster" viewBox="0 0 640 360" font-family="Nunito Sans,Arial,sans-serif">
+      <rect width="640" height="360" fill="#F4FBF7"/>
+      <rect width="640" height="62" fill="#0F7B5F"/>
+      <text x="320" y="41" text-anchor="middle" font-family="Baloo 2,sans-serif" font-weight="800" font-size="26" fill="#fff">Червона книга України</text>
+      <!-- рись -->
+      <g transform="translate(28 82)">
+        <rect width="180" height="130" rx="6" fill="#D8E9C8"/>
+        <path d="M0 130V96c40-10 80 6 180-8v42z" fill="#9CC48A"/>
+        <path d="M58 104c0-26 18-40 40-40s38 12 38 34v10H58z" fill="#C99A5B"/>
+        <circle cx="96" cy="58" r="24" fill="#D9AE6E"/>
+        <path d="M76 42l-4-22 12 14zM116 42l4-22-12 14z" fill="#C99A5B"/><path d="M72 20v-8M120 20v-8" stroke="#3A2A1A" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="87" cy="56" r="3" fill="#3A2A1A"/><circle cx="105" cy="56" r="3" fill="#3A2A1A"/><path d="M92 66h8l-4 4z" fill="#3A2A1A"/>
+        <path d="M72 70l-10 8M120 70l10 8" stroke="#F4E6CF" stroke-width="5" stroke-linecap="round"/>
+        <g fill="#8A6236"><circle cx="78" cy="94" r="3"/><circle cx="96" cy="88" r="3"/><circle cx="114" cy="96" r="3"/><circle cx="124" cy="86" r="2.5"/></g>
+        <text x="0" y="148" font-size="11" font-weight="800" fill="#1B1B3A">Рись звичайна</text>
+        <text x="0" y="164" font-size="9.5" fill="#514F72">«Portrait of a Carpathian Lynx» —</text>
+        <text x="0" y="177" font-size="9.5" fill="#514F72">Wilfredor, Вікісховище, CC0</text>
+      </g>
+      <!-- лелека -->
+      <g transform="translate(230 82)">
+        <rect width="180" height="130" rx="6" fill="#CFE6F7"/>
+        <path d="M0 130v-24c50-8 120 6 180-4v28z" fill="#8FC7A8"/>
+        <path d="M84 52c22-4 40 10 42 30l-30 6c-12-6-16-22-12-36z" fill="#1B1B3A"/>
+        <path d="M112 80c8 4 10 12 6 16l-16-4z" fill="#fff"/>
+        <path d="M88 54c-4-14 0-28 10-32" stroke="#1B1B3A" stroke-width="7" fill="none" stroke-linecap="round"/>
+        <circle cx="100" cy="22" r="8" fill="#1B1B3A"/><path d="M106 20l24 6-24 2z" fill="#E03131"/>
+        <path d="M100 88l-4 34M112 88l4 34" stroke="#E03131" stroke-width="3"/>
+        <text x="0" y="148" font-size="11" font-weight="800" fill="#1B1B3A">Лелека чорний</text>
+        <text x="0" y="164" font-size="9.5" fill="#514F72">«Cigogne noire DSCF0227» — Musicaline,</text>
+        <text x="0" y="177" font-size="9.5" fill="#514F72">Вікісховище, CC BY-SA 4.0</text>
+      </g>
+      <!-- зубр -->
+      <g transform="translate(432 82)">
+        <rect width="180" height="130" rx="6" fill="#F3E3C7"/>
+        <path d="M0 130v-26c60-6 120 4 180-6v32z" fill="#B9C98A"/>
+        <path d="M40 104c0-30 20-48 56-48 28 0 46 16 46 40v8z" fill="#6B4A2F"/>
+        <path d="M40 92c-6-28 8-46 30-50 14 8 16 30 8 52z" fill="#4E3421"/>
+        <path d="M46 46c-6-6-6-14 0-18M70 42c6-6 8-14 4-18" stroke="#EADBC0" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <circle cx="54" cy="62" r="2.6" fill="#1B1B3A"/>
+        <path d="M60 104v14M84 104v14M116 104v14M134 104v14" stroke="#4E3421" stroke-width="7" stroke-linecap="round"/>
+        <text x="0" y="148" font-size="11" font-weight="800" fill="#1B1B3A">Зубр</text>
+        <text x="0" y="164" font-size="9.5" fill="#514F72">«European bison… Białowieza» —</text>
+        <text x="0" y="177" font-size="9.5" fill="#514F72">Charles J. Sharp, Вікісховище, CC BY-SA 4.0</text>
+      </g>
+      <rect x="0" y="312" width="640" height="48" fill="#E3F4EE"/>
+      <g transform="translate(28 322)">
+        <rect width="132" height="28" rx="6" fill="#2B2B2B"/>
+        <g fill="none" stroke="#fff" stroke-width="1.6"><circle cx="16" cy="14" r="9"/><circle cx="38" cy="14" r="9"/><circle cx="60" cy="14" r="9"/></g>
+        <text x="16" y="17.5" text-anchor="middle" font-size="8" font-weight="900" fill="#fff">cc</text>
+        <circle cx="38" cy="10" r="2" fill="#fff"/><rect x="35.5" y="13" width="5" height="6" rx="1" fill="#fff"/>
+        <path d="M64 15a4 4 0 1 1-1-4" stroke="#fff" stroke-width="1.6" fill="none"/><path d="M61 9l2.5 2-2.5 1.6" stroke="#fff" stroke-width="1.4" fill="none"/><text x="78" y="18.5" font-size="10" font-weight="800" fill="#fff">CC BY-SA</text>
+      </g>
+      <text x="176" y="341" font-size="13" fill="#1B1B3A">Плакат: <tspan font-weight="800">Ім'я Прізвище, 7 клас</tspan> · ліцензія CC BY-SA 4.0</text>
+    </svg>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи презентацію</h3>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Презентації</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Презентації</span>.</li>
+              <li>Назви файл: <b>Червона книга — Прізвище</b>.</li>
+            </ol>
+          </div>
+        </div>
+        <ol>
+          <li>Залиш один слайд, макет <span class="menu">Лише заголовок</span>.</li>
+          <li>Заголовок: <b>Червона книга України</b>.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Обери трьох тварин</h3>
+        <p>Усі вони — з Червоної книги України. Фото взято з Вікісховища: під кожним уже записано назву, автора, джерело й ліцензію.</p>
+        <div class="gallery">
+          <figure class="ph">
+            <img src="images/lynx.jpg" alt="Рись звичайна" loading="lazy">
+            <figcaption>
+              <b>Рись звичайна</b>
+              <dl><dt>Назва</dt><dd>Portrait of a Carpathian Lynx</dd><dt>Автор</dt><dd>Wilfredor</dd><dt>Джерело</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Portrait_of_a_Carpathian_Lynx.jpg" target="_blank" rel="noopener">Вікісховище</a></dd><dt>Ліцензія</dt><dd>CC0</dd></dl>
+              <div class="ph-btns"><button type="button" class="copy-btn" data-src="images/lynx.jpg">📋 Копіювати</button><a class="dl-btn" href="images/lynx.jpg" download="lynx.jpg">⬇ Завантажити</a></div>
+            </figcaption>
+          </figure>
+          <figure class="ph">
+            <img src="images/bison.jpg" alt="Зубр" loading="lazy">
+            <figcaption>
+              <b>Зубр</b>
+              <dl><dt>Назва</dt><dd>European bison (Bison bonasus) male Białowieza</dd><dt>Автор</dt><dd>Charles J. Sharp</dd><dt>Джерело</dt><dd><a href="https://commons.wikimedia.org/wiki/File:European_bison_(Bison_bonasus)_male_Białowieza.jpg" target="_blank" rel="noopener">Вікісховище</a></dd><dt>Ліцензія</dt><dd>CC BY-SA 4.0</dd></dl>
+              <div class="ph-btns"><button type="button" class="copy-btn" data-src="images/bison.jpg">📋 Копіювати</button><a class="dl-btn" href="images/bison.jpg" download="bison.jpg">⬇ Завантажити</a></div>
+            </figcaption>
+          </figure>
+          <figure class="ph">
+            <img src="images/stork.jpg" alt="Лелека чорний" loading="lazy">
+            <figcaption>
+              <b>Лелека чорний</b>
+              <dl><dt>Назва</dt><dd>Cigogne noire DSCF0227</dd><dt>Автор</dt><dd>Musicaline</dd><dt>Джерело</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Cigogne_noire_DSCF0227.jpg" target="_blank" rel="noopener">Вікісховище</a></dd><dt>Ліцензія</dt><dd>CC BY-SA 4.0</dd></dl>
+              <div class="ph-btns"><button type="button" class="copy-btn" data-src="images/stork.jpg">📋 Копіювати</button><a class="dl-btn" href="images/stork.jpg" download="stork.jpg">⬇ Завантажити</a></div>
+            </figcaption>
+          </figure>
+          <figure class="ph">
+            <img src="images/owl.jpg" alt="Пугач" loading="lazy">
+            <figcaption>
+              <b>Пугач</b>
+              <dl><dt>Назва</dt><dd>Eurasian eagle-owl (44088)</dd><dt>Автор</dt><dd>Rhododendrites</dd><dt>Джерело</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Eurasian_eagle-owl_(44088).jpg" target="_blank" rel="noopener">Вікісховище</a></dd><dt>Ліцензія</dt><dd>CC BY-SA 4.0</dd></dl>
+              <div class="ph-btns"><button type="button" class="copy-btn" data-src="images/owl.jpg">📋 Копіювати</button><a class="dl-btn" href="images/owl.jpg" download="owl.jpg">⬇ Завантажити</a></div>
+            </figcaption>
+          </figure>
+          <figure class="ph">
+            <img src="images/otter.jpg" alt="Видра річкова" loading="lazy">
+            <figcaption>
+              <b>Видра річкова</b>
+              <dl><dt>Назва</dt><dd>European otter 01</dd><dt>Автор</dt><dd>Alexander Leisser</dd><dt>Джерело</dt><dd><a href="https://commons.wikimedia.org/wiki/File:European_otter_01.jpg" target="_blank" rel="noopener">Вікісховище</a></dd><dt>Ліцензія</dt><dd>CC BY-SA 4.0</dd></dl>
+              <div class="ph-btns"><button type="button" class="copy-btn" data-src="images/otter.jpg">📋 Копіювати</button><a class="dl-btn" href="images/otter.jpg" download="otter.jpg">⬇ Завантажити</a></div>
+            </figcaption>
+          </figure>
+          <figure class="ph">
+            <img src="images/bear.jpg" alt="Ведмідь бурий" loading="lazy">
+            <figcaption>
+              <b>Ведмідь бурий</b>
+              <dl><dt>Назва</dt><dd>Brown bear (Ursus arctos arctos) running</dd><dt>Автор</dt><dd>Malene Thyssen</dd><dt>Джерело</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Brown_bear_(Ursus_arctos_arctos)_running.jpg" target="_blank" rel="noopener">Вікісховище</a></dd><dt>Ліцензія</dt><dd>CC BY 2.5</dd></dl>
+              <div class="ph-btns"><button type="button" class="copy-btn" data-src="images/bear.jpg">📋 Копіювати</button><a class="dl-btn" href="images/bear.jpg" download="bear.jpg">⬇ Завантажити</a></div>
+            </figcaption>
+          </figure>
+          <figure class="ph">
+            <img src="images/beetle.jpg" alt="Жук-олень" loading="lazy">
+            <figcaption>
+              <b>Жук-олень</b>
+              <dl><dt>Назва</dt><dd>Lucanus cervus male 2008 G1</dd><dt>Автор</dt><dd>George Chernilevsky</dd><dt>Джерело</dt><dd><a href="https://commons.wikimedia.org/wiki/File:Lucanus_cervus_male_2008_G1.jpg" target="_blank" rel="noopener">Вікісховище</a></dd><dt>Ліцензія</dt><dd>Суспільне надбання</dd></dl>
+              <div class="ph-btns"><button type="button" class="copy-btn" data-src="images/beetle.jpg">📋 Копіювати</button><a class="dl-btn" href="images/beetle.jpg" download="beetle.jpg">⬇ Завантажити</a></div>
+            </figcaption>
+          </figure>
+          <figure class="ph">
+            <img src="images/eagle.jpg" alt="Орлан-білохвіст" loading="lazy">
+            <figcaption>
+              <b>Орлан-білохвіст</b>
+              <dl><dt>Назва</dt><dd>White-tailed eagle LGphoto</dd><dt>Автор</dt><dd>LG Nyqvist</dd><dt>Джерело</dt><dd><a href="https://commons.wikimedia.org/wiki/File:White-tailed_eagle_LGphoto.jpg" target="_blank" rel="noopener">Вікісховище</a></dd><dt>Ліцензія</dt><dd>CC BY-SA 4.0</dd></dl>
+              <div class="ph-btns"><button type="button" class="copy-btn" data-src="images/eagle.jpg">📋 Копіювати</button><a class="dl-btn" href="images/eagle.jpg" download="eagle.jpg">⬇ Завантажити</a></div>
+            </figcaption>
+          </figure>
+        </div>
+        <div class="tip">Автори дозволили брати ці фото. Підписуй кожне — навіть CC0 й суспільне надбання, це гарний тон.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Встав фото на слайд</h3>
+        <ol>
+          <li>Під фото натисни <span class="menu">📋 Копіювати</span>.</li>
+          <li>Клацни на слайді й натисни <span class="mono">Ctrl+V</span>.</li>
+          <li>Так само встав ще два фото.</li>
+          <li>Розстав їх у ряд однакового розміру.</li>
+        </ol>
+        <div class="tip">Не копіюється? Натисни <span class="menu">⬇ Завантажити</span>, а в презентації — <span class="menu">Вставлення → Зображення → Завантажити з комп'ютера</span>.</div>
+        <div class="tip">Розмір змінюй за кутовий маркер — так фото не розтягнеться.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Підпиши кожне фото</h3>
+        <ol>
+          <li>Під фото: <span class="menu">Вставлення → Текстове поле</span>.</li>
+          <li>Перший рядок — назва тварини жирним.</li>
+          <li>Другий — підпис за формулою, шрифт 10–11:</li>
+        </ol>
+        <div class="tasl"><span class="t1">«Назва»</span><i>—</i><span class="t2">Автор</span><i>,</i><span class="t3">Джерело</span><i>,</i><span class="t4">Ліцензія</span></div>
+        <div class="cap-ex"><b>Зубр</b><br>«European bison (Bison bonasus) male Białowieza» — Charles J. Sharp, Вікісховище, CC BY-SA 4.0</div>
+        <div class="tip">Усе потрібне для підпису — під фото в галереї. Переписуй точно, як там.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Обери ліцензію для свого плаката</h3>
+        <p>Плакат — теж інформаційний продукт, і його автор — ти. Склади ліцензію, як у конструкторі з уроку:</p>
+        <div class="choose">
+          <div><b>Є фото з BY-SA?</b>Тоді й плакат — <strong>CC BY-SA 4.0</strong>: умови мають бути ті самі.</div>
+          <div><b>Решта — CC BY, CC0 чи суспільне надбання?</b>Обирай будь-яку ліцензію CC — як у конструкторі з уроку.</div>
+        </div>
+        <div class="lb">
+          <div class="lb-tg" id="lbToggles"></div>
+          <div class="lb-out">
+            <div id="lbBadge"></div>
+            <div><b id="lbName"></b><span id="lbMean"></span></div>
+          </div>
+          <div class="ph-btns lb-btns"><button type="button" class="copy-btn" id="lbCopy">📋 Копіювати значок</button><a class="dl-btn" id="lbDl" href="#" download="license.png">⬇ Завантажити значок</a></div>
+        </div>
+        <ol>
+          <li>Увімкни потрібні умови — значок складеться сам.</li>
+          <li>Натисни <span class="menu">📋 Копіювати значок</span> і встав його внизу слайда (<span class="mono">Ctrl+V</span>).</li>
+          <li>Поруч — текстове поле: <b>Плакат: Ім'я Прізвище, 7 клас · ліцензія CC …</b></li>
+        </ol>
+        <div class="check-val">Перевір себе: на плакаті є рядок з твоїм іменем і ліцензією.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Практична робота · «Види інформаційних продуктів. Ліцензії на використання інформаційних продуктів» · 7 клас</span><span class="credits">Фото з Вікісховища: рись — Wilfredor (CC0); зубр — Charles J. Sharp, лелека чорний — Musicaline, пугач — Rhododendrites, видра — Alexander Leisser, орлан — LG Nyqvist (CC BY-SA 4.0); ведмідь — Malene Thyssen (CC BY 2.5); жук-олень — George Chernilevsky (суспільне надбання). Логотип Вікісховища — Reidab, Grunt, 3247, Pumbaa, CC BY-SA 3.0.</span></footer>
+
+<script src="../../assets/practice.js"></script>
+<script>
+/* Значки ліцензій біля тексту ліцензії в галереї (як в уроці) */
+(function(){
+  const I = {
+    cc:'<path d="M10.3 9.6A3 3 0 1 0 10.3 14.4M16.8 9.6A3 3 0 1 0 16.8 14.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    by:'<circle cx="12" cy="7" r="2.1" fill="currentColor"/><path d="M9.2 10.4h5.6v4.4h-1.5V19h-2.6v-4.2H9.2z" fill="currentColor"/>',
+    sa:'<path d="M16.6 13.4A4.8 4.8 0 1 1 15.9 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M13.6 9.6l3.4.3.2-3.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+    zero:'<text x="12" y="16.6" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" font-weight="900" fill="currentColor">0</text>',
+    pd:'<path d="M14.8 9.4A3.6 3.6 0 1 0 14.8 14.6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M5.8 18.2L18.2 5.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'
+  };
+  const svg = k => `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.3" fill="none" stroke="currentColor" stroke-width="1.6"/>${I[k]}</svg>`;
+  document.querySelectorAll('.ph dt').forEach(dt=>{
+    if(dt.textContent !== 'Ліцензія') return;
+    const dd = dt.nextElementSibling, t = dd.textContent.trim();
+    const keys = t === 'CC0' ? ['cc','zero'] : /надбання/.test(t) ? ['pd'] : ['cc', ...t.replace(/^CC\s+/, '').split(' ')[0].toLowerCase().split('-')];
+    dd.innerHTML = `<span class="lic-badge">${keys.map(svg).join('')}</span>${t}`;
+  });
+})();
+</script>
+<script>
+/* Копіювати фото в буфер обміну (на сайті; з file:// браузер не дозволяє — тоді підказка) */
+document.querySelectorAll('.copy-btn').forEach(btn=>{
+  btn.addEventListener('click', async ()=>{
+    const old = '📋 Копіювати';
+    try{
+      const blob = await new Promise((res, rej)=>{
+        const img = new Image();
+        img.onload = ()=>{
+          const c = document.createElement('canvas');
+          c.width = img.naturalWidth; c.height = img.naturalHeight;
+          c.getContext('2d').drawImage(img, 0, 0);
+          c.toBlob(b=>b ? res(b) : rej(), 'image/png');
+        };
+        img.onerror = rej;
+        img.src = btn.dataset.src;
+      });
+      await navigator.clipboard.write([new ClipboardItem({'image/png': blob})]);
+      btn.textContent = '✓ Скопійовано'; btn.classList.add('done');
+    }catch(e){
+      btn.textContent = 'Не вийшло — завантаж ⬇';
+    }
+    setTimeout(()=>{ btn.textContent = old; btn.classList.remove('done'); }, 2200);
+  });
+});
+</script>
+
+<script>
+/* Конструктор власної ліцензії: умови → значок (PNG можна скопіювати чи завантажити) */
+(function(){
+  const I = {
+    cc:'<path d="M10.3 9.6A3 3 0 1 0 10.3 14.4M16.8 9.6A3 3 0 1 0 16.8 14.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    by:'<circle cx="12" cy="7" r="2.1" fill="currentColor"/><path d="M9.2 10.4h5.6v4.4h-1.5V19h-2.6v-4.2H9.2z" fill="currentColor"/>',
+    nc:'<text x="12" y="16.9" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" font-weight="900" fill="currentColor">₴</text><path d="M5.6 18.4L18.4 5.6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+    nd:'<rect x="7" y="9.2" width="10" height="2" rx="1" fill="currentColor"/><rect x="7" y="12.8" width="10" height="2" rx="1" fill="currentColor"/>',
+    sa:'<path d="M16.6 13.4A4.8 4.8 0 1 1 15.9 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M13.6 9.6l3.4.3.2-3.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+  };
+  const C = [
+    {k:'by', name:'Вкажи автора', sub:'завжди'},
+    {k:'nc', name:'Некомерційне', sub:'не заробляти'},
+    {k:'nd', name:'Без змін', sub:'не переробляти'},
+    {k:'sa', name:'Ті самі умови', sub:'переробки так само'}
+  ];
+  const MEAN = {by:'вкажи автора', nc:'не заробляй', nd:'нічого не змінюй', sa:'переробку поширюй на тих самих умовах'};
+  const on = {by:true, nc:false, nd:false, sa:true};
+  const tg = document.getElementById('lbToggles'), btns = {};
+  C.forEach(c=>{
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.innerHTML = `<span class="i"><svg viewBox="0 0 24 24" style="color:#fff">${I[c.k]}</svg></span>${c.name}<small>${c.k.toUpperCase()} · ${c.sub}</small>`;
+    if(c.k === 'by') b.classList.add('lock');
+    b.addEventListener('click', ()=>{ if(c.k === 'by') return; on[c.k] = !on[c.k]; render(); });
+    btns[c.k] = b; tg.appendChild(b);
+  });
+  // Значок як окремий SVG-файл (його ж перетворюємо на PNG)
+  function badgeSVG(keys, label){
+    const W = 12 + (keys.length + 1) * 30 + label.length * 9.2 + 12, H = 40;
+    const circ = (k, x)=>`<g transform="translate(${x} 5) scale(1.25)" color="#fff"><circle cx="12" cy="12" r="10.3" fill="none" stroke="#fff" stroke-width="1.6"/>${I[k]}</g>`;
+    let x = 8, g = circ('cc', x);
+    keys.forEach(k=>{ x += 30; g += circ(k, x); });
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}"><rect width="${W}" height="${H}" rx="7" fill="#2B2B2B"/>${g}<text x="${x + 38}" y="26" font-family="Arial,sans-serif" font-size="15" font-weight="700" fill="#fff">${label}</text></svg>`;
+  }
+  let svgURL = '';
+  function render(){
+    btns.sa.disabled = on.nd; btns.nd.disabled = on.sa;
+    Object.keys(btns).forEach(k=>btns[k].classList.toggle('on', on[k]));
+    const keys = ['by','nc','nd','sa'].filter(k=>on[k]);
+    const label = 'CC ' + keys.join('-').toUpperCase() + ' 4.0';
+    svgURL = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(badgeSVG(keys, label));
+    document.getElementById('lbBadge').innerHTML = `<img src="${svgURL}" alt="${label}">`;
+    document.getElementById('lbName').textContent = label;
+    const m = keys.map(k=>MEAN[k]).join(', ');
+    document.getElementById('lbMean').textContent = m.charAt(0).toUpperCase() + m.slice(1) + '.';
+    toPNG().then(b=>{ const a = document.getElementById('lbDl'); if(a.href.startsWith('blob:')) URL.revokeObjectURL(a.href); a.href = URL.createObjectURL(b); a.download = label.replace(/ /g, '_') + '.png'; }).catch(()=>{});
+  }
+  function toPNG(){
+    return new Promise((res, rej)=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const c = document.createElement('canvas'), k = 3;
+        c.width = img.naturalWidth * k; c.height = img.naturalHeight * k;
+        const x = c.getContext('2d'); x.scale(k, k); x.drawImage(img, 0, 0);
+        c.toBlob(b=>b ? res(b) : rej(), 'image/png');
+      };
+      img.onerror = rej;
+      img.src = svgURL;
+    });
+  }
+  document.getElementById('lbCopy').addEventListener('click', async e=>{
+    const btn = e.currentTarget;
+    try{
+      await navigator.clipboard.write([new ClipboardItem({'image/png': toPNG()})]);
+      btn.textContent = '✓ Скопійовано'; btn.classList.add('done');
+    }catch(err){ btn.textContent = 'Не вийшло — завантаж ⬇'; }
+    setTimeout(()=>{ btn.textContent = '📋 Копіювати значок'; btn.classList.remove('done'); }, 2200);
+  });
+  render();
+})();
+</script>
+</body>
+</html>
