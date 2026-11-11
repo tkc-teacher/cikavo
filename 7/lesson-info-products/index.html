@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Інформаційні продукти й ліцензії — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --accent:#0F7B5F; --accent-dark:#0A5C47; --accent-soft:#E3F4EE;
+    --label:#B4531A;
+    --bg:#F5FAF8; --line:#DCEBE5;
+    --hud-bar:linear-gradient(90deg,#0F7B5F,#3BB98A,#F0B429);
+  }
+
+  /* Плитки форм інформаційних продуктів */
+  .forms{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:14px 0 6px;}
+  @media (max-width:640px){ .forms{grid-template-columns:repeat(2,minmax(0,1fr));} }
+  .form-tile{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); overflow:hidden; display:flex; flex-direction:column;}
+  .form-tile .art{background:var(--g); aspect-ratio:5/3;}
+  .form-tile .art svg{width:100%; height:100%; display:block;}
+  .form-tile .cap{padding:10px 14px 12px;}
+  .form-tile b{display:block; font-family:'Baloo 2',sans-serif; font-size:16px; line-height:1.2;}
+  .form-tile .cap span{display:block; font-size:13px; color:var(--ink-soft); line-height:1.35;}
+  /* легкі анімації в ілюстраціях */
+  @keyframes blink{50%{opacity:0;}}
+  @keyframes wave{0%,100%{transform:scaleY(.45);} 50%{transform:scaleY(1);}}
+  @keyframes progress{from{transform:scaleX(.08);} to{transform:scaleX(1);}}
+  @keyframes floaty{0%,100%{transform:translateY(0);} 50%{transform:translateY(-3px);}}
+  @keyframes grow{0%,100%{transform:scaleY(.6);} 50%{transform:scaleY(1);}}
+  .art .cursor{animation:blink 1s steps(1) infinite;}
+  .art .bar{transform-box:fill-box; transform-origin:center; animation:wave 1.1s ease-in-out infinite;}
+  .art .prog{transform-box:fill-box; transform-origin:left; animation:progress 6s linear infinite;}
+  .art .fl{animation:floaty 3s ease-in-out infinite;}
+  .art .col{transform-box:fill-box; transform-origin:bottom; animation:grow 3s ease-in-out infinite;}
+  @media (prefers-reduced-motion:reduce){ .art *{animation:none !important;} }
+  .exercise + .sub-h{margin-top:30px;}
+  .sub-h{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; margin:22px 0 4px;}
+
+  /* Значки Creative Commons — у стилі справжніх кнопок CC */
+  .cc-badge{display:inline-flex; align-items:center; gap:3px; background:#2B2B2B; color:#fff; border-radius:8px; padding:4px 8px 4px 5px; vertical-align:middle;}
+  .cc-badge svg{width:24px; height:24px; display:block;}
+  .cc-badge .cc-code{white-space:nowrap; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; letter-spacing:.03em; margin-left:5px; line-height:1;}
+  .cc-ic{display:inline-flex; vertical-align:middle;}
+  .cc-ic svg{width:1.4em; height:1.4em;}
+
+  /* Шкала «усі права — деякі — жодних» */
+  .spectrum{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:14px 0 6px;}
+  .sp{border-radius:var(--radius-m); padding:14px 12px 12px; text-align:center; border:1.5px solid var(--line); background:var(--surface);}
+  .sp b{display:block; font-family:'Baloo 2',sans-serif; font-size:15px; line-height:1.2; margin-top:8px;}
+  .sp span{display:block; font-size:12.5px; color:var(--ink-soft); line-height:1.35; margin-top:2px;}
+  .sp-ic{width:46px; height:46px; margin:0 auto; border-radius:50%; display:flex; align-items:center; justify-content:center; font:800 22px/1 'Baloo 2',sans-serif; color:#fff;}
+  .sp-ic svg{width:40px; height:40px;}
+  .sp1{background:#FDECE8; border-color:#F4C7BD;} .sp1 .sp-ic{background:#C2412D;}
+  .sp2{background:var(--accent-soft); border-color:var(--accent); border-width:2px;} .sp2 .sp-ic{background:#2B2B2B;}
+  .sp3{background:#E4F1FA; border-color:#BCD9EE;} .sp3 .sp-ic{background:#1C6EA4; font-size:17px;}
+  .sp-arrow{grid-column:1/-1; display:flex; justify-content:space-between; font-size:12px; font-weight:800; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.05em; position:relative; padding-top:4px;}
+  .sp-arrow::before{content:''; position:absolute; left:96px; right:96px; top:12px; height:3px; border-radius:2px; background:linear-gradient(90deg,#C2412D,var(--accent),#1C6EA4);}
+  @media (max-width:520px){ .spectrum{grid-template-columns:1fr;} .sp-arrow{display:none;} }
+  /* Чотири умови CC */
+  .conds{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:14px 0 6px;}
+  @media (max-width:520px){ .conds{grid-template-columns:1fr;} }
+  .cond{display:flex; gap:12px; align-items:center; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px;}
+  .cond .ic{width:44px; height:44px; border-radius:50%; background:#2B2B2B; color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .cond .ic svg{width:34px; height:34px;}
+  .cond b{display:block; font-family:'Baloo 2',sans-serif; font-size:15.5px;}
+  .cond b small{font-family:'Nunito Sans',sans-serif; font-weight:800; font-size:12px; color:var(--label); margin-left:4px;}
+  .cond span{display:block; font-size:13.5px; color:var(--ink-soft); line-height:1.35;}
+  .choice-btn .cc-ic{margin-right:4px;}
+
+  /* Галерея видів ліцензій */
+  .lic-gallery{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:6px;}
+  @media (max-width:640px){ .lic-gallery{grid-template-columns:repeat(2,minmax(0,1fr));} }
+  .lic-gallery .flip-card{height:190px;}
+  .lic-gallery .flip-front .ic{font-size:34px; margin-bottom:6px;}
+  .cc-round{display:inline-flex; width:40px; height:40px; border-radius:50%; background:#2B2B2B; color:#fff; align-items:center; justify-content:center;}
+  .cc-round svg{width:34px; height:34px;}
+  .lic-gallery .flip-front .name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; line-height:1.15;}
+  .lic-gallery .flip-front .en{font-size:12px; color:var(--ink-soft); margin-top:2px;}
+  .lic-gallery .flip-front .tap{font-size:11.5px; color:var(--ink-soft); margin-top:10px; opacity:.8;}
+  .lic-gallery .flip-back{font-size:13px; line-height:1.38; color:var(--ink); justify-content:center;}
+  .lic-gallery .flip-back b{font-family:'Baloo 2',sans-serif; font-size:14px; margin-bottom:4px;}
+  .lic-gallery .flip-back i{display:block; margin-top:6px; font-style:normal; font-size:12px; color:var(--ink-soft);}
+
+  /* «Впізнай ліцензію»: варіанти 2 рядки по 3, однакові */
+  #licList .choice-row.col{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px;}
+  @media (max-width:520px){ #licList .choice-row.col{grid-template-columns:repeat(2,minmax(0,1fr));} }
+  #licList .choice-row.col .choice-btn{border-radius:var(--radius-s); min-height:44px; display:flex; align-items:center; justify-content:center; text-align:center;}
+  /* «Що порушено»: 4 однакові варіанти в рядок */
+  .lic-of{font-size:13px; font-weight:700; color:var(--ink-soft); margin-bottom:10px; display:flex; align-items:center; gap:8px;}
+  #condList .choice-row.col{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px;}
+  @media (max-width:520px){ #condList .choice-row.col{grid-template-columns:repeat(2,minmax(0,1fr));} }
+  #condList .choice-row.col .choice-btn{border-radius:var(--radius-s); min-height:44px; display:flex; align-items:center; justify-content:center;}
+  /* Варіанти 2×2 однакового розміру */
+  #rightsList .choice-row.col{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px;}
+  @media (max-width:520px){ #rightsList .choice-row.col{grid-template-columns:1fr;} }
+  #rightsList .choice-row.col .choice-btn{border-radius:var(--radius-s); padding:10px 14px; min-height:52px; display:flex; align-items:center;}
+  /* Ілюстрація «знайшов ≠ можна брати» */
+  .find-strip{display:flex; align-items:center; justify-content:center; gap:14px; flex-wrap:wrap; margin:14px 0 4px; padding:16px; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m);}
+  .find-strip .st{display:flex; flex-direction:column; align-items:center; gap:6px; font-size:13px; font-weight:700; color:var(--ink-soft); text-align:center; width:120px;}
+  .find-strip .st svg{width:84px; height:64px;}
+  .find-strip .arrow{font-family:'Baloo 2',sans-serif; font-size:26px; font-weight:800; color:var(--accent);}
+  .find-strip .arrow.no{color:#C2412D;}
+
+  /* Конструктор ліцензії */
+  .builder{display:grid; grid-template-columns:1fr; gap:14px;}
+  .b-task{background:var(--accent-soft); border-radius:var(--radius-m); padding:12px 16px; font-weight:700; font-size:15px; display:flex; gap:12px; align-items:flex-start;}
+  .b-task .who{font-size:30px; line-height:1;}
+  .b-num{font-family:'Baloo 2',sans-serif; font-size:13px; color:var(--accent-dark); font-weight:700; display:block;}
+  .b-toggles{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px;}
+  @media (max-width:520px){ .b-toggles{grid-template-columns:1fr;} }
+  .b-tog{display:flex; align-items:center; gap:10px; text-align:left; font-family:'Nunito Sans',sans-serif; font-size:13.5px; font-weight:700; color:var(--ink); background:var(--bg); border:2px solid var(--line); border-radius:var(--radius-m); padding:8px 12px; cursor:pointer; transition:border-color .15s, background .15s, opacity .15s;}
+  .b-tog .ic{width:34px; height:34px; border-radius:50%; background:#BFC9C5; color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:background .15s;}
+  .b-tog .ic svg{width:26px; height:26px;}
+  .b-tog small{display:block; font-weight:600; color:var(--ink-soft); font-size:12px;}
+  .b-tog.on{border-color:var(--accent); background:var(--surface);}
+  .b-tog.on .ic{background:#2B2B2B;}
+  .b-tog.locked{cursor:default;}
+  .b-tog:disabled{opacity:.45; cursor:not-allowed;}
+  .b-result{display:flex; align-items:center; gap:14px; flex-wrap:wrap;}
+  .b-result .cc-badge{padding:6px 10px 6px 7px; border-radius:10px;}
+  .b-result .cc-badge svg{width:29px; height:29px;}
+  .b-result .cc-badge .cc-code{font-size:16px;}
+  .b-check{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; background:var(--accent); color:#fff; border:0; border-radius:999px; padding:8px 20px; cursor:pointer;}
+  .b-check:hover{background:var(--accent-dark);}
+  .b-check:disabled{opacity:.5; cursor:default;}
+  .b-fb{font-size:14px; color:var(--ink-soft); min-height:1.3em;}
+  .b-fb.ok{color:#256B36; font-weight:700;}
+  .builder.shake .b-toggles{animation:shakeX .35s ease;}
+  .b-done{font-weight:700; color:var(--accent-dark);}
+
+  /* Конструктор підпису */
+  .cb-num{font-family:'Baloo 2',sans-serif; font-size:13px; font-weight:700; color:var(--accent-dark);}
+  .cb-ctx{font-weight:700; font-size:15px; margin:2px 0 12px;}
+  .site{border:1.5px solid var(--line); border-radius:var(--radius-m); overflow:hidden; background:#fff; box-shadow:0 4px 14px rgba(11,46,37,.07);}
+  .site-bar{display:flex; align-items:center; gap:8px; background:#EEF2F1; padding:7px 12px; font-size:12.5px; color:var(--ink-soft);}
+  .site-bar i{width:9px; height:9px; border-radius:50%; background:#C9D3CF; display:inline-block;}
+  .site-bar .url{flex:1; background:#fff; border-radius:999px; padding:3px 12px; font-family:ui-monospace,Menlo,monospace; font-size:12px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .site-head{display:flex; align-items:center; gap:8px; padding:10px 14px; border-bottom:1px solid #EEF2F1; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:var(--sc,#1B1B3A);}
+  .site-head .lg{width:22px; height:22px; border-radius:6px; background:var(--sc); color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px;}
+  .site-body{display:grid; grid-template-columns:220px 1fr; gap:16px; padding:14px;}
+  @media (max-width:560px){ .site-body{grid-template-columns:1fr;} }
+  .site-body svg.media{width:100%; height:auto; border-radius:8px; display:block;}
+  .meta-t{width:100%; border-collapse:collapse; font-size:13.5px;}
+  .meta-t td{padding:5px 6px; border-bottom:1px solid #EEF2F1; vertical-align:middle;}
+  .meta-t td:first-child{color:var(--ink-soft); width:42%;}
+  .meta-t td:last-child{font-weight:700;}
+  .cb-line{margin:16px 0 10px; padding:12px 14px; background:var(--bg); border:1.5px dashed var(--line); border-radius:var(--radius-m); font-size:15px; line-height:2.2;}
+  .cb-line .lbl{font-size:12px; font-weight:800; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.04em; display:block; line-height:1.4; margin-bottom:4px;}
+  .slot{display:inline-block; min-width:90px; padding:2px 10px; border-radius:8px; font-weight:700; text-align:center; line-height:1.6; border:1.5px dashed currentColor; opacity:.75;}
+  .slot.filled{border-style:solid; opacity:1;}
+  .slot.s1{color:#8A4B08; background:#FFF4E5;} .slot.s2{color:#1E6B2E; background:#EBFBEE;}
+  .slot.s3{color:#1C5A8A; background:#E7F5FF;} .slot.s4{color:#5034A6; background:#F3F0FF;}
+  .slot.filled.s1{background:#FFE8CC;} .slot.filled.s2{background:#D3F9D8;} .slot.filled.s3{background:#D0EBFF;} .slot.filled.s4{background:#E5DBFF;}
+  .cb-pool{display:flex; flex-wrap:wrap; gap:8px;}
+  .cb-chip{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; padding:7px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink); cursor:pointer;}
+  .cb-chip:hover{border-color:var(--accent);}
+  .cb-chip.used{visibility:hidden;}
+  .cb-chip.wrong-flash{border-color:var(--coral); background:#FDE6E1; color:#B8412A; animation:shakeX .35s ease;}
+  .cb-chip.off{opacity:.35; text-decoration:line-through; cursor:default;}
+  /* Підпис до фото */
+  .credit-demo{display:grid; grid-template-columns:200px 1fr; gap:16px; align-items:center; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px; margin:14px 0 6px;}
+  @media (max-width:560px){ .credit-demo{grid-template-columns:1fr;} }
+  .credit-demo svg{width:100%; height:auto; border-radius:8px; display:block;}
+  .credit-demo .cap{font-size:13px; color:var(--ink-soft); margin-top:6px;}
+  .tasl{display:flex; flex-wrap:wrap; gap:6px;}
+  .tasl span{font-size:13.5px; font-weight:700; border-radius:999px; padding:5px 12px;}
+  .tasl .t1{background:#FFE8CC; color:#8A4B08;} .tasl .t2{background:#D3F9D8; color:#1E6B2E;}
+  .tasl .t3{background:#D0EBFF; color:#1C5A8A;} .tasl .t4{background:#E5DBFF; color:#5034A6;}
+  .cap mark{background:none; padding:0; font-weight:700;}
+  .cap .m1{color:#8A4B08;} .cap .m2{color:#1E6B2E;} .cap .m3{color:#1C5A8A;} .cap .m4{color:#5034A6;}
+</style>
+</head>
+<body data-lesson="lesson7-info-products" data-hud="7 клас · Інформаційні продукти й ліцензії">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Візуальний контент</div>
+      <h1>Інформаційні продукти й ліцензії</h1>
+      <p>Тексти, фото, пісні й програми хтось створив. Дізнаймося, які бувають інформаційні продукти та як чесно користуватися чужими.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: документ із печаткою-ліцензією CC -->
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="58" fill="#E3F4EE"/>
+      <rect x="34" y="22" width="62" height="82" rx="8" fill="#fff" stroke="#0F7B5F" stroke-width="3"/>
+      <path d="M80 22v14a4 4 0 0 0 4 4h12" fill="#E3F4EE" stroke="#0F7B5F" stroke-width="3" stroke-linejoin="round"/>
+      <rect x="44" y="44" width="40" height="5" rx="2.5" fill="#BFE3D5"/>
+      <rect x="44" y="55" width="32" height="5" rx="2.5" fill="#BFE3D5"/>
+      <rect x="44" y="66" width="36" height="5" rx="2.5" fill="#BFE3D5"/>
+      <rect x="44" y="77" width="22" height="5" rx="2.5" fill="#BFE3D5"/>
+      <path d="M86 98l-6 22 9-5 6 8 4-24z" fill="#F0B429"/>
+      <path d="M100 98l6 22-9-5-6 8-4-24z" fill="#E09A12"/>
+      <circle cx="93" cy="92" r="20" fill="#2B2B2B"/>
+      <circle cx="93" cy="92" r="16" fill="none" stroke="#fff" stroke-width="2.5"/>
+      <path d="M90.5 87.5a5 5 0 1 0 0 9M101.5 87.5a5 5 0 1 0 0 9" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" transform="translate(-4 0)"/>
+      <circle cx="52" cy="112" r="3" fill="#F0B429"/><circle cx="24" cy="60" r="4" fill="#3BB98A"/><circle cx="118" cy="40" r="3" fill="#0F7B5F"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Візуальний контент</div>
+    <h2>Що ти вже знаєш</h2>
+    <p>Минулого уроку ми кодували зображення, обирали формати й генерували картинки за допомогою ШІ.</p>
+    <p class="soft">Обери термін, а потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" data-guide>
+    <div class="step-label">Крок 1 · Інформаційні продукти</div>
+    <h2>Що таке інформаційний продукт</h2>
+    <p><b>Інформаційний продукт</b> — результат роботи з інформацією, створений за допомогою комп'ютера чи іншого цифрового пристрою. Його можна зберегти, змінити й поширити.</p>
+    <p>Інформаційні продукти бувають різних форм:</p>
+    <div class="forms">
+      <div class="form-tile"><div class="art" style="--g:linear-gradient(135deg,#DCEBFF,#EEF4FF)"><svg viewBox="0 0 200 120"><defs><filter id="sh1" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="3" stdDeviation="3.5" flood-color="#0B2E25" flood-opacity=".18"/></filter></defs>
+<g filter="url(#sh1)"><rect x="52" y="12" width="96" height="112" rx="8" fill="#fff"/></g>
+<rect x="64" y="26" width="52" height="7" rx="3.5" fill="#1A73E8"/>
+<rect x="64" y="42" width="72" height="4" rx="2" fill="#C9D6EA"/><rect x="64" y="51" width="66" height="4" rx="2" fill="#C9D6EA"/>
+<rect x="64" y="60" width="70" height="4" rx="2" fill="#C9D6EA"/><rect x="64" y="69" width="40" height="4" rx="2" fill="#C9D6EA"/>
+<rect x="105.5" y="66" width="2" height="10" fill="#1A73E8" class="cursor"/>
+<rect x="64" y="84" width="72" height="4" rx="2" fill="#C9D6EA"/><rect x="64" y="93" width="58" height="4" rx="2" fill="#C9D6EA"/>
+<g class="fl"><rect x="20" y="30" width="34" height="26" rx="8" fill="#1A73E8"/><text x="37" y="48.5" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="14" fill="#fff">Aa</text></g>
+<g class="fl" style="animation-delay:-1.5s"><circle cx="160" cy="88" r="15" fill="#FFC93C"/><path d="M153 88l5 5 9-10" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></g>
+</svg></div><div class="cap"><b>Текст</b><span>реферат, есе, допис</span></div></div>
+      <div class="form-tile"><div class="art" style="--g:linear-gradient(135deg,#FFE3EC,#FFF1E2)"><svg viewBox="0 0 200 120"><defs><filter id="sh2" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="3" stdDeviation="3.5" flood-color="#0B2E25" flood-opacity=".18"/></filter><clipPath id="ph"><rect x="46" y="16" width="108" height="80" rx="8"/></clipPath></defs>
+<g filter="url(#sh2)"><rect x="40" y="10" width="120" height="104" rx="12" fill="#fff"/></g>
+<g clip-path="url(#ph)"><rect x="46" y="16" width="108" height="80" fill="#8FD3FF"/><circle cx="128" cy="36" r="10" fill="#FFD25C"/>
+<path d="M46 80l28-30 22 22 16-14 42 32v6H46z" fill="#3BB98A"/><path d="M46 96l34-22 30 14 18-8 26 16z" fill="#0F7B5F"/></g>
+<circle cx="56" cy="105" r="3.5" fill="#FF6B8B"/><rect x="64" y="103" width="34" height="4" rx="2" fill="#E3E7EE"/>
+<path d="M146 102c-3-3-8 1-4 5l4 4 4-4c4-4-1-8-4-5z" fill="#FF6B8B"/>
+<g class="fl"><rect x="14" y="62" width="34" height="34" rx="9" fill="#7C5CFF" transform="rotate(-10 31 79)"/><path d="M24 86l7-12 7 12z" fill="#fff" transform="rotate(-10 31 79)"/></g>
+<g class="fl" style="animation-delay:-1.2s"><path d="M168 30l4 9 9 4-9 4-4 9-4-9-9-4 9-4z" fill="#FFC93C"/></g>
+</svg></div><div class="cap"><b>Зображення</b><span>малюнок, фото, плакат</span></div></div>
+      <div class="form-tile"><div class="art" style="--g:linear-gradient(135deg,#E9E2FF,#F6F0FF)"><svg viewBox="0 0 200 120"><defs><filter id="sh3" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="3" stdDeviation="3.5" flood-color="#0B2E25" flood-opacity=".18"/></filter><linearGradient id="cv" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7C5CFF"/><stop offset="1" stop-color="#FF6B8B"/></linearGradient></defs>
+<g filter="url(#sh3)"><rect x="18" y="20" width="164" height="80" rx="16" fill="#fff"/></g>
+<rect x="30" y="32" width="56" height="56" rx="12" fill="url(#cv)"/>
+<rect x="52" y="42" width="12" height="22" rx="6" fill="#fff"/><path d="M47 58a11 11 0 0 0 22 0M58 69v8" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+<g fill="#7C5CFF">
+<rect class="bar" x="98" y="40" width="5" height="26" rx="2.5"/><rect class="bar" style="animation-delay:-.2s" x="107" y="36" width="5" height="34" rx="2.5"/>
+<rect class="bar" style="animation-delay:-.5s" x="116" y="42" width="5" height="22" rx="2.5"/><rect class="bar" style="animation-delay:-.7s" x="125" y="34" width="5" height="38" rx="2.5"/>
+<rect class="bar" style="animation-delay:-.3s" x="134" y="40" width="5" height="26" rx="2.5"/><rect class="bar" style="animation-delay:-.9s" x="143" y="44" width="5" height="18" rx="2.5"/>
+<rect class="bar" style="animation-delay:-.6s" x="152" y="38" width="5" height="30" rx="2.5"/><rect class="bar" style="animation-delay:-.1s" x="161" y="42" width="5" height="22" rx="2.5"/></g>
+<rect x="98" y="80" width="70" height="4" rx="2" fill="#E6E0FA"/><rect x="98" y="80" width="30" height="4" rx="2" fill="#7C5CFF"/><circle cx="128" cy="82" r="4.5" fill="#7C5CFF"/>
+</svg></div><div class="cap"><b>Аудіо</b><span>пісня, озвучення, подкаст</span></div></div>
+      <div class="form-tile"><div class="art" style="--g:linear-gradient(135deg,#FFE0DC,#FFF0E8)"><svg viewBox="0 0 200 120"><defs><filter id="sh4" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="3" stdDeviation="3.5" flood-color="#0B2E25" flood-opacity=".18"/></filter><linearGradient id="sc" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2B2D42"/><stop offset="1" stop-color="#4A4E69"/></linearGradient></defs>
+<g filter="url(#sh4)"><rect x="24" y="14" width="152" height="92" rx="12" fill="url(#sc)"/></g>
+<path d="M24 86l40-26 26 16 30-22 56 36v4a12 12 0 0 1-12 12H36a12 12 0 0 1-12-12z" fill="#5C6185" opacity=".6"/>
+<circle cx="100" cy="54" r="20" fill="#FF3B30"/><path d="M94 44l16 10-16 10z" fill="#fff"/>
+<rect x="36" y="92" width="128" height="4" rx="2" fill="#ffffff44"/><rect class="prog" x="36" y="92" width="128" height="4" rx="2" fill="#FF3B30"/>
+<rect x="34" y="22" width="30" height="12" rx="6" fill="#00000055"/><circle cx="41" cy="28" r="3" fill="#FF3B30"/><text x="46" y="31.5" font-family="Arial,sans-serif" font-size="8.5" font-weight="700" fill="#fff">REC</text>
+</svg></div><div class="cap"><b>Відео</b><span>ролик, мультфільм, відеоурок</span></div></div>
+      <div class="form-tile"><div class="art" style="--g:linear-gradient(135deg,#D9F5EA,#EAFBF3)"><svg viewBox="0 0 200 120"><defs><filter id="sh5" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="3" stdDeviation="3.5" flood-color="#0B2E25" flood-opacity=".18"/></filter></defs>
+<g filter="url(#sh5)"><rect x="70" y="6" width="60" height="112" rx="12" fill="#1B1B3A"/></g>
+<rect x="75" y="14" width="50" height="96" rx="7" fill="#F4F7FB"/><rect x="92" y="9" width="16" height="3" rx="1.5" fill="#3A3A5A"/>
+<rect x="81" y="22" width="16" height="16" rx="5" fill="#FF6B8B"/><rect x="103" y="22" width="16" height="16" rx="5" fill="#FFC93C"/>
+<rect x="81" y="44" width="16" height="16" rx="5" fill="#3BB98A"/><rect x="103" y="44" width="16" height="16" rx="5" fill="#1A73E8"/>
+<rect x="81" y="66" width="16" height="16" rx="5" fill="#7C5CFF"/><rect x="103" y="66" width="16" height="16" rx="5" fill="#FF8A3D"/>
+<path d="M86 30h6M89 27v6" stroke="#fff" stroke-width="2" stroke-linecap="round"/><circle cx="111" cy="30" r="3.5" fill="#fff"/>
+<path d="M85 55l4-6 4 6z" fill="#fff"/><rect x="107" y="49" width="8" height="6" rx="1" fill="#fff"/>
+<circle cx="89" cy="74" r="3.5" fill="none" stroke="#fff" stroke-width="2"/><path d="M107 74h8" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/>
+<rect x="92" y="100" width="16" height="3" rx="1.5" fill="#C9D3E0"/>
+<g class="fl"><rect x="18" y="54" width="46" height="28" rx="14" fill="#1B1B3A"/><path d="M30 68h8M34 64v8" stroke="#fff" stroke-width="2.4" stroke-linecap="round"/><circle cx="50" cy="65" r="2.6" fill="#FF6B8B"/><circle cx="55" cy="70" r="2.6" fill="#FFC93C"/></g>
+<g class="fl" style="animation-delay:-1.5s"><rect x="140" y="26" width="44" height="30" rx="8" fill="#fff"/><text x="162" y="45.5" text-anchor="middle" font-family="Menlo,monospace" font-weight="700" font-size="12" fill="#0F7B5F">&lt;/&gt;</text></g>
+</svg></div><div class="cap"><b>Програма</b><span>застосунок, гра, сайт</span></div></div>
+      <div class="form-tile"><div class="art" style="--g:linear-gradient(135deg,#DDF3E4,#F0FAF2)"><svg viewBox="0 0 200 120"><defs><filter id="sh6" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="3" stdDeviation="3.5" flood-color="#0B2E25" flood-opacity=".18"/></filter></defs>
+<g filter="url(#sh6)"><rect x="18" y="14" width="112" height="92" rx="10" fill="#fff"/></g>
+<rect x="18" y="14" width="112" height="16" rx="10" fill="#1E8E3E"/><rect x="18" y="24" width="112" height="6" fill="#1E8E3E"/>
+<g stroke="#E3E8EE" stroke-width="1.2"><path d="M18 45h112M18 60h112M18 75h112M18 90h112M50 30v76M80 30v76M105 30v76"/></g>
+<rect x="80" y="30" width="25" height="76" fill="#1E8E3E" opacity=".1"/>
+<g fill="#C9D6E2"><rect x="24" y="36" width="20" height="4" rx="2"/><rect x="24" y="51" width="16" height="4" rx="2"/><rect x="24" y="66" width="20" height="4" rx="2"/><rect x="24" y="81" width="14" height="4" rx="2"/><rect x="24" y="96" width="18" height="4" rx="2"/>
+<rect x="56" y="36" width="16" height="4" rx="2"/><rect x="56" y="51" width="18" height="4" rx="2"/><rect x="56" y="66" width="12" height="4" rx="2"/><rect x="56" y="81" width="16" height="4" rx="2"/><rect x="56" y="96" width="14" height="4" rx="2"/></g>
+<g fill="#1E8E3E"><rect x="86" y="36" width="12" height="4" rx="2"/><rect x="86" y="51" width="14" height="4" rx="2"/><rect x="86" y="66" width="10" height="4" rx="2"/><rect x="86" y="81" width="14" height="4" rx="2"/><rect x="86" y="96" width="12" height="4" rx="2"/></g>
+<g class="fl" filter="url(#sh6)"><rect x="112" y="40" width="72" height="62" rx="10" fill="#fff"/></g>
+<g class="fl"><rect class="col" x="124" y="66" width="10" height="26" rx="3" fill="#3BB98A"/><rect class="col" style="animation-delay:-.8s" x="140" y="56" width="10" height="36" rx="3" fill="#1E8E3E"/>
+<rect class="col" style="animation-delay:-1.6s" x="156" y="72" width="10" height="20" rx="3" fill="#FFC93C"/>
+<path d="M122 92h50" stroke="#C9D6E2" stroke-width="1.5"/></g>
+</svg></div><div class="cap"><b>Дані</b><span>таблиці, діаграми, бази даних</span></div></div>
+    </div>
+    <div class="note">💡 Часто продукт поєднує кілька форм: у презентації є текст, зображення й навіть відео.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Авторське право</div>
+    <h2>Знайшов — ще не означає «можна брати»</h2>
+    <p>Кожен інформаційний продукт має автора. <b>Авторське право</b> виникає в нього одразу, щойно твір створено, — реєструвати нічого не треба.</p>
+    <p><b>Ліцензія</b> — дозвіл від автора чи власника прав: що можна робити з продуктом і на яких умовах.</p>
+    <div class="find-strip">
+      <div class="st">
+        <svg viewBox="0 0 84 64"><rect x="2" y="4" width="80" height="56" rx="6" fill="#fff" stroke="#9AA9A3" stroke-width="2"/><rect x="2" y="4" width="80" height="12" rx="6" fill="#DCEBE5"/><circle cx="10" cy="10" r="2" fill="#9AA9A3"/><circle cx="17" cy="10" r="2" fill="#9AA9A3"/><rect x="12" y="24" width="26" height="26" rx="3" fill="#BFE3D5"/><path d="M12 46l8-9 6 6 5-4 7 7v4H12z" fill="#0F7B5F"/><circle cx="31" cy="31" r="3" fill="#F0B429"/><rect x="44" y="26" width="28" height="4" rx="2" fill="#DCEBE5"/><rect x="44" y="34" width="22" height="4" rx="2" fill="#DCEBE5"/><rect x="44" y="42" width="26" height="4" rx="2" fill="#DCEBE5"/></svg>
+        Картинка в пошуку
+      </div>
+      <div class="arrow no">✕</div>
+      <div class="st">
+        <svg viewBox="0 0 84 64"><rect x="6" y="6" width="72" height="52" rx="6" fill="#fff" stroke="#9AA9A3" stroke-width="2"/><rect x="14" y="14" width="56" height="6" rx="3" fill="#DCEBE5"/><rect x="30" y="26" width="24" height="24" rx="3" fill="#BFE3D5"/><path d="M30 46l7-8 5 5 4-3 8 7v3H30z" fill="#0F7B5F"/></svg>
+        Одразу в мою роботу
+      </div>
+      <div class="arrow">→</div>
+      <div class="st">
+        <svg viewBox="0 0 84 64"><circle cx="34" cy="30" r="18" fill="#E3F4EE" stroke="#0F7B5F" stroke-width="4"/><path d="M47 43l16 16" stroke="#0F7B5F" stroke-width="6" stroke-linecap="round"/><rect x="25" y="22" width="18" height="4" rx="2" fill="#0F7B5F"/><rect x="25" y="29" width="14" height="4" rx="2" fill="#0F7B5F"/><rect x="25" y="36" width="16" height="4" rx="2" fill="#0F7B5F"/></svg>
+        Спершу читаю ліцензію
+      </div>
+    </div>
+    <div class="trivia">🎮 Купуючи гру чи програму, ти купуєш не саму програму, а <b>ліцензію</b> — право нею користуватися. Тому продавати копії купленої гри не можна.</div>
+    <div id="rightsList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Види ліцензій</div>
+    <h2>Які бувають ліцензії</h2>
+    <p>Ліцензії відрізняються тим, скільки свободи дають користувачеві: від «спершу заплати» до «бери й користуйся».</p>
+    <p class="soft">Переверни кожну картку, щоб дізнатися, що дозволяє ліцензія.</p>
+    <div class="lic-gallery" id="licGallery"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Яка це ліцензія</div>
+    <h2>Впізнай ліцензію за умовами</h2>
+    <p class="soft">Прочитай, що дозволено, і обери вид ліцензії.</p>
+    <div id="licList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Creative Commons</div>
+    <h2>Що таке Creative Commons</h2>
+    <p><b>Creative Commons</b> (CC) — готові безкоштовні ліцензії. Автор ставить значок біля твору, і кожен одразу бачить, що можна, а що ні.</p>
+    <div class="spectrum">
+      <div class="sp sp1"><div class="sp-ic">©</div><b>Усі права захищені</b><span>Користуватися — лише з дозволу автора</span></div>
+      <div class="sp sp2"><div class="sp-ic sp-cc"></div><b>Деякі права захищені</b><span>Користуйся, але на умовах автора</span></div>
+      <div class="sp sp3"><div class="sp-ic">PD</div><b>Суспільне надбання</b><span>Користуйся як завгодно</span></div>
+      <div class="sp-arrow"><span>суворіше</span><span>вільніше</span></div>
+    </div>
+    <p>Ліцензію CC автор складає з чотирьох умов:</p>
+    <div class="conds">
+      <div class="cond"><div class="ic" data-cc="by"></div><div><b>Вкажи автора <small>BY</small></b><span>Користуватися можна, лише підписавши, чий це твір. Є в усіх ліцензіях CC.</span></div></div>
+      <div class="cond"><div class="ic" data-cc="nc"></div><div><b>Некомерційне <small>NC</small></b><span>Не можна заробляти: продавати, використовувати в рекламі.</span></div></div>
+      <div class="cond"><div class="ic" data-cc="nd"></div><div><b>Без змін <small>ND</small></b><span>Поширюй лише як є: не обрізай, не перефарбовуй, не перекладай.</span></div></div>
+      <div class="cond"><div class="ic" data-cc="sa"></div><div><b>На тих самих умовах <small>SA</small></b><span>Свою переробку поширюй під такою самою ліцензією.</span></div></div>
+    </div>
+    <p>Назва ліцензії — перелік її умов: <span class="cc-badge" data-badge="by-nc"></span> — «вкажи автора й не заробляй».</p>
+    <p class="sub-h">Склади ліцензію для автора</p>
+    <p class="soft">Прочитай, чого хоче автор, увімкни потрібні умови й натисни «Перевірити». Умова BY є завжди. ND і SA разом не вмикаються: якщо змінювати не можна, то й переробок немає.</p>
+    <div class="exercise">
+      <div class="builder" id="builder">
+        <div class="b-task" id="bTask"></div>
+        <div class="b-toggles" id="bToggles"></div>
+        <div class="b-result"><span id="bBadge"></span><button class="b-check" id="bCheck">Перевірити</button></div>
+        <div class="b-fb" id="bFb"></div>
+      </div>
+      <div class="progress-line" id="bProgress"></div>
+    </div>
+    <p class="sub-h">Яку умову ліцензії порушено?</p>
+    <p class="soft">Подивись на ліцензію твору й на те, що з ним зробили.</p>
+    <div id="condList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Як підписати чужий твір</div>
+    <h2>Підпис до чужого твору</h2>
+    <p>Беручи твір за ліцензією CC, підпиши його. У гарному підписі чотири частини:</p>
+    <div class="tasl"><span class="t1">Назва</span><span class="t2">Автор</span><span class="t3">Джерело</span><span class="t4">Ліцензія</span></div>
+    <div class="credit-demo">
+      <svg viewBox="0 0 200 130"><rect width="200" height="130" fill="#FCD9A8"/><circle cx="150" cy="42" r="18" fill="#FFF4D6"/><path d="M0 92l38-34 30 22 34-40 46 44 52-30v76H0z" fill="#2F7D5B"/><path d="M0 110l50-24 40 14 50-22 60 18v34H0z" fill="#1F5B41"/></svg>
+      <div>
+        <div class="cap">Так виглядає підпис під фото:</div>
+        <div class="cap" style="font-size:14.5px; color:var(--ink)">
+          <mark class="m1">«Карпати восени»</mark> — <mark class="m2">Олена Коваль</mark>, <mark class="m3">Вікісховище</mark>, <mark class="m4">CC BY 4.0</mark>
+        </div>
+      </div>
+    </div>
+    <p class="sub-h">Конструктор підпису</p>
+    <p class="soft">Роздивись сторінку, де знайдено твір, і клацай потрібні відомості — вони стануть на своє місце в підписі. Зайве не бери.</p>
+    <div class="exercise">
+      <div class="cb" id="cb">
+        <div class="cb-num" id="cbNum"></div>
+        <div class="cb-ctx" id="cbCtx"></div>
+        <div class="site" id="cbSite"></div>
+        <div class="cb-line" id="cbLine"></div>
+        <div class="cb-pool" id="cbPool"></div>
+        <div class="b-fb" id="cbFb"></div>
+      </div>
+      <div class="progress-line" id="cbProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Урок · «Види інформаційних продуктів. Ліцензії на використання інформаційних продуктів» · 7 клас</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- ЗНАЧКИ CREATIVE COMMONS (власні SVG) ---------- */
+const CC_ICONS = {
+  cc:'<path d="M10.3 9.6A3 3 0 1 0 10.3 14.4M16.8 9.6A3 3 0 1 0 16.8 14.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  by:'<circle cx="12" cy="7" r="2.1" fill="currentColor"/><path d="M9.2 10.4h5.6v4.4h-1.5V19h-2.6v-4.2H9.2z" fill="currentColor"/>',
+  nc:'<text x="12" y="16.9" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" font-weight="900" fill="currentColor">₴</text><path d="M5.6 18.4L18.4 5.6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+  nd:'<rect x="7" y="9.2" width="10" height="2" rx="1" fill="currentColor"/><rect x="7" y="12.8" width="10" height="2" rx="1" fill="currentColor"/>',
+  sa:'<path d="M16.6 13.4A4.8 4.8 0 1 1 15.9 9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M13.6 9.6l3.4.3.2-3.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+};
+function ccSVG(k, ring = true){
+  return `<svg viewBox="0 0 24 24">${ring ? '<circle cx="12" cy="12" r="10.3" fill="none" stroke="currentColor" stroke-width="1.6"/>' : ''}${CC_ICONS[k]}</svg>`;
+}
+// Значок ліцензії: badge('by-nc-sa') → [CC][BY][NC][SA] CC BY-NC-SA
+function badge(code){
+  const parts = code.split('-');
+  return `<span class="cc-badge">${ccSVG('cc')}${parts.map(p=>ccSVG(p)).join('')}<span class="cc-code">CC ${code.toUpperCase()}</span></span>`;
+}
+const ic = k => `<span class="cc-ic">${ccSVG(k)}</span>`;
+document.querySelectorAll('[data-cc]').forEach(el=>{ el.innerHTML = ccSVG(el.dataset.cc, false); });
+document.querySelectorAll('[data-badge]').forEach(el=>{ el.outerHTML = badge(el.dataset.badge); });
+document.querySelectorAll('.sp-cc').forEach(el=>{ el.innerHTML = ccSVG('cc', false); });
+
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Растрове зображення', desc:'Складається з пікселів і розмивається, якщо його сильно збільшити' },
+  { name:'Векторне зображення', desc:'Складається з фігур, описаних числами, і не втрачає якості під час збільшення' },
+  { name:'Піксель', desc:'Найменша точка зображення, що має свій колір' },
+  { name:'Роздільна здатність', desc:'Кількість пікселів у зображенні по ширині й висоті, наприклад 1920×1080' },
+  { name:'Глибина кольору', desc:'Скільки бітів відведено на колір одного пікселя' },
+  { name:'RGB', desc:'Колір складається з трьох каналів: червоного, зеленого й синього' },
+  { name:'Промт', desc:'Текстовий опис того, що має намалювати генератор зображень' }
+], 'recapProgress');
+
+/* ---------- КРОК 1 ---------- */
+/* ---------- КРОК 2 ---------- */
+makeChoices('rightsList', [
+  { logo:'🔎', text:'Ти знайшов через пошук класну картинку для презентації на конкурс. Що зробити спершу?',
+    opts:['Одразу вставити: вона ж в інтернеті', 'Перевірити, на яких умовах автор дозволяє нею користуватися', 'Змінити колір, і вона стане твоєю', 'Обрізати краї, щоб ніхто її не впізнав'], correct:1,
+    why:'Відкритий доступ у мережі — не дозвіл. Умови користування задає ліцензія.' },
+  { logo:'🎵', text:'Хто вирішує, як можна використовувати пісню?',
+    opts:['Той, хто перший виклав її в мережу', 'Будь-який слухач', 'Автор або власник прав на неї', 'Сайт, на якому її можна послухати'], correct:2 },
+  { logo:'✏️', text:'Марко намалював комікс на планшеті й поки нікому не показував. Чи має він авторське право на комікс?',
+    opts:['Так, з моменту, коли намалював', 'Лише після реєстрації', 'Ні, поки комікс не опубліковано', 'Лише коли комікс почнуть купувати'], correct:0,
+    why:'Авторське право виникає в момент створення твору.' },
+  { logo:'🎮', text:'Ти купив гру в онлайн-магазині. Що тепер тобі належить?',
+    opts:['Сама гра: її можна копіювати й продавати', 'Авторське право на гру', 'Право змінити гру й видати за свою', 'Ліцензія — право в цю гру грати'], correct:3,
+    why:'Гра й авторське право лишаються в розробників, а ти купуєш дозвіл нею користуватися.' }
+], {col:true});
+
+/* ---------- КРОК 3: ГАЛЕРЕЯ ВИДІВ ЛІЦЕНЗІЙ ---------- */
+const LICENSES = [ /* іконка CC — власний SVG */
+  { icon:'💳', name:'Комерційна', en:'commercial', c:'#C2412D', cl:'#FDECE8',
+    back:'Продукт треба <b>купити</b> або оплачувати підписку. Копіювати й передавати іншим не можна.', ex:'Приклади: Photoshop, Microsoft Office, більшість ігор' },
+  { icon:'🎁', name:'Безкоштовна', en:'freeware', c:'#D97706', cl:'#FFF3E0',
+    back:'Користуватися можна <b>без оплати</b>, але змінювати чи продавати програму — ні.', ex:'Приклади: Discord, Adobe Acrobat Reader' },
+  { icon:'🔓', name:'Відкрита', en:'open source', c:'#0F7B5F', cl:'#E3F4EE',
+    back:'Відкритий <b>вихідний код</b>: будь-хто може його вивчати, змінювати й поширювати.', ex:'Приклади: GIMP, LibreOffice, Firefox' },
+  { icon:'📝', name:'Користувацька', en:'custom license', c:'#5B4BD6', cl:'#ECEAFB',
+    back:'Автор сам пише <b>особливі умови</b> для свого продукту, наприклад «лише для навчання» чи «не для реклами».', ex:'Приклади: фотобанки Unsplash, Pixabay' },
+  { icon:'<span class="cc-round">' + ccSVG('cc', false) + '</span>', name:'Creative Commons', en:'CC', c:'#2B2B2B', cl:'#EEF0EF',
+    back:'Готовий набір умов для фото, музики, текстів і відео. Автор обирає, що <b>дозволяє</b>.', ex:'Приклади: Вікіпедія, Вікісховище' },
+  { icon:'🏛️', name:'Суспільне надбання', en:'public domain', c:'#1C6EA4', cl:'#E4F1FA',
+    back:'Строк авторського права <b>минув</b> (в Україні — 70 років після смерті автора), тож твором може користуватися кожен.', ex:'Приклади: «Кобзар» Шевченка, картини Леонардо да Вінчі' }
+];
+(function(){
+  const grid = document.getElementById('licGallery');
+  const hit = trackTask(grid, LICENSES.length, 0);
+  LICENSES.forEach(l=>{
+    const card = document.createElement('div');
+    card.className = 'flip-card';
+    card.style.setProperty('--card-c', l.c);
+    card.style.setProperty('--card-c-light', l.cl);
+    card.innerHTML = `<div class="flip-inner">
+      <div class="flip-face flip-front"><div class="ic">${l.icon}</div><div class="name">${l.name}</div><div class="en">${l.en}</div><div class="tap">натисни, щоб перевернути</div></div>
+      <div class="flip-face flip-back"><div>${l.back}</div><i>${l.ex}</i></div>
+    </div>`;
+    card.addEventListener('click', ()=>{
+      card.classList.toggle('flipped');
+      if(!card.dataset.seen){ card.dataset.seen = 1; hit(); }
+    });
+    grid.appendChild(card);
+  });
+})();
+
+/* ---------- КРОК 4 ---------- */
+makeChoices('licList', [
+  { logo:'🎨', text:'Щоб малювати в цьому редакторі, щомісяця списують гроші з картки', correct:0 },
+  { logo:'💬', text:'Месенджер завантажується без оплати, але переробляти його заборонено', correct:1 },
+  { logo:'👩‍💻', text:'Програміст із Японії знайшов помилку у фоторедакторі, сам виправив код і поділився новою версією', correct:2,
+    why:'Так можна лише тоді, коли код програми відкритий.' },
+  { logo:'📷', text:'На сайті фотобанку написано: «Фото можна брати безоплатно, але не можна продавати їх без змін»', correct:3,
+    why:'Це власні правила саме цього сайту.' },
+  { logo:'🌍', text:'Під фото у Вікісховищі значок: можна користуватися, якщо вказати автора', correct:4 },
+  { logo:'📜', text:'Вірш Лесі Українки (1871–1913) можна надрукувати у своїй збірці, ні в кого не питаючи', correct:5,
+    why:'Відтоді минуло понад 70 років — вірш став спільним для всіх.' }
+].map(it=>({...it, opts:LICENSES.map(l=>l.name)})), {col:true});
+
+/* ---------- КРОК 5: КОНСТРУКТОР ЛІЦЕНЗІЇ ---------- */
+(function(){
+  const TASKS = [
+    { who:'📸', text:'Фотограф Андрій хоче, щоб його фото брали будь-де, навіть для реклами. Головне — аби вказували його ім\'я.', ans:'by' },
+    { who:'🖍️', text:'Соня намалювала комікс. Ділитися ним можна, а от заробляти на ньому чи щось у ньому переробляти — ні.', ans:'by-nc-nd' },
+    { who:'🎸', text:'Гурт записав мелодію. Дозволяє робити ремікси й навіть продавати їх, але кожен ремікс має бути таким самим вільним для інших.', ans:'by-sa' },
+    { who:'👩‍🏫', text:'Учителька створила уроки. Їх можна доповнювати й переробляти, але не продавати, а свої версії — поширювати на тих самих умовах.', ans:'by-nc-sa',
+      after:'Саме під такою ліцензією — цей сайт! Глянь на логотип CC у футері.' }
+  ];
+  const CONDS = [
+    { k:'by', name:'Вкажи автора', sub:'BY — завжди' },
+    { k:'nc', name:'Некомерційне', sub:'NC — не заробляти' },
+    { k:'nd', name:'Без змін', sub:'ND — не переробляти' },
+    { k:'sa', name:'На тих самих умовах', sub:'SA — переробки так само' }
+  ];
+  const box = document.getElementById('builder');
+  const taskEl = document.getElementById('bTask');
+  const togs = document.getElementById('bToggles');
+  const badgeEl = document.getElementById('bBadge');
+  const check = document.getElementById('bCheck');
+  const fb = document.getElementById('bFb');
+  const progress = document.getElementById('bProgress');
+  const hit = trackTask(box, TASKS.length, TASKS.length * 2 + 2);
+  let cur = 0;
+  const on = {by:true, nc:false, nd:false, sa:false};
+  const btns = {};
+
+  CONDS.forEach(c=>{
+    const b = document.createElement('button');
+    b.className = 'b-tog' + (c.k === 'by' ? ' on locked' : '');
+    b.innerHTML = `<span class="ic">${ccSVG(c.k, false)}</span><span>${c.name}<small>${c.sub}</small></span>`;
+    b.addEventListener('click', ()=>{
+      if(c.k === 'by' || cur >= TASKS.length) return;
+      on[c.k] = !on[c.k];
+      render();
+    });
+    btns[c.k] = b;
+    togs.appendChild(b);
+  });
+  const code = ()=>['by','nc','nd','sa'].filter(k=>on[k]).join('-');
+  function render(){
+    Object.keys(btns).forEach(k=>btns[k].classList.toggle('on', on[k]));
+    btns.sa.disabled = on.nd; btns.nd.disabled = on.sa;
+    badgeEl.innerHTML = badge(code());
+  }
+  function showTask(){
+    const t = TASKS[cur];
+    taskEl.innerHTML = `<span class="who">${t.who}</span><span><span class="b-num">Автор ${cur + 1} з ${TASKS.length}</span>${t.text}</span>`;
+    on.nc = on.nd = on.sa = false;
+    render();
+    progress.textContent = `Складено ліцензій: ${cur} з ${TASKS.length}`;
+  }
+  function hintFor(t){
+    const want = t.ans.split('-'), have = code().split('-');
+    const miss = want.find(k=>!have.includes(k)), extra = have.find(k=>!want.includes(k));
+    const H = {
+      nc:['Автор не хоче, щоб на творі заробляли — бракує умови NC.', 'Автор дозволяє заробляти, тож NC зайва.'],
+      nd:['Автор забороняє переробляти — бракує умови ND.', 'Переробляти можна, тож ND зайва.'],
+      sa:['Переробки мають бути на тих самих умовах — бракує SA.', 'Про те, якими мають бути переробки, автор нічого не просив — SA зайва.']
+    };
+    return miss ? H[miss][0] : H[extra][1];
+  }
+  check.addEventListener('click', ()=>{
+    if(cur >= TASKS.length) return;
+    const t = TASKS[cur];
+    if(code() === t.ans){
+      addNeurons(2); hit();
+      fb.className = 'b-fb ok';
+      fb.textContent = `Правильно ✓ Це ${badgeEl.textContent.trim()}. ${t.after || ''}`;
+      cur++;
+      if(cur === TASKS.length){
+        addNeurons(2);
+        progress.textContent = 'Усі ліцензії складено ✓';
+        check.disabled = true;
+        taskEl.innerHTML = '<span class="who">🎉</span><span class="b-done">Ти склав ліцензії для всіх чотирьох авторів!</span>';
+        Object.values(btns).forEach(b=>b.disabled = true);
+      } else {
+        check.disabled = true;
+        setTimeout(()=>{ check.disabled = false; fb.className = 'b-fb'; fb.textContent = ''; showTask(); }, 2200);
+      }
+    } else {
+      box.classList.add('shake');
+      setTimeout(()=>box.classList.remove('shake'), 400);
+      fb.className = 'b-fb';
+      fb.textContent = hintFor(t);
+    }
+  });
+  showTask();
+})();
+
+/* ---------- КРОК 5: ЩО ПОРУШЕНО ---------- */
+const licOf = code => `<div class="lic-of">Ліцензія твору: ${badge(code)}</div>`;
+const COND_OPTS = [ic('by') + 'BY', ic('nc') + 'NC', ic('nd') + 'ND', ic('sa') + 'SA'];
+makeChoices('condList', [
+  { pre:licOf('by-nc'), text:'Даринка взяла фото для свого блогу й ніде не написала, чиє воно', correct:0,
+    why:'Підпис автора потрібен за будь-якої ліцензії CC.' },
+  { pre:licOf('by-nc-nd'), text:'Максим надрукував чужий малюнок на футболках і продає їх на ярмарку', correct:1 },
+  { pre:licOf('by-nd'), text:'Оля обрізала чужу фотографію, наклала фільтр і виклала нову версію з підписом автора', correct:2 },
+  { pre:licOf('by-sa'), text:'Тимур зробив ремікс пісні, вказав автора й заборонив будь-кому використовувати свій ремікс', correct:3,
+    why:'Переробка мала бути під такою самою вільною ліцензією, як оригінал.' },
+  { pre:licOf('by-nc'), text:'Андрій вставив фото в рекламу піцерії свого тата й підписав автора', correct:1,
+    why:'Реклама допомагає заробляти, тож це комерційне використання.' },
+  { pre:licOf('by-nc-sa'), text:'Соня переклала комікс англійською, вказала автора й виклала безкоштовно з написом «Усі права захищені»', correct:3 }
+].map(it=>({...it, opts:COND_OPTS})), {col:true});
+
+/* ---------- КРОК 6: КОНСТРУКТОР ПІДПИСУ ---------- */
+(function(){
+  const ART = {
+    pc:'<svg class="media" viewBox="0 0 220 150"><rect width="220" height="150" fill="#EAF2FF"/><rect x="30" y="26" width="110" height="72" rx="8" fill="#1B1B3A"/><rect x="37" y="33" width="96" height="58" rx="4" fill="#8FD3FF"/><path d="M37 80l26-20 18 12 16-10 36 22v7H37z" fill="#3BB98A"/><circle cx="112" cy="48" r="7" fill="#FFD25C"/><rect x="76" y="98" width="18" height="12" fill="#3A3A5A"/><rect x="60" y="110" width="50" height="6" rx="3" fill="#3A3A5A"/><rect x="152" y="30" width="42" height="86" rx="6" fill="#3A3A5A"/><rect x="160" y="40" width="26" height="5" rx="2.5" fill="#6E7191"/><rect x="160" y="50" width="26" height="5" rx="2.5" fill="#6E7191"/><circle cx="173" cy="98" r="5" fill="#3BB98A"/><rect x="40" y="124" width="76" height="12" rx="4" fill="#C9D6EA"/><rect x="124" y="122" width="14" height="18" rx="7" fill="#C9D6EA"/></svg>',
+    video:'<svg class="media" viewBox="0 0 220 150"><defs><linearGradient id="dusk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5B4BD6"/><stop offset="1" stop-color="#FF9E7A"/></linearGradient></defs><rect width="220" height="150" fill="url(#dusk)"/><circle cx="160" cy="70" r="14" fill="#FFE3A3"/><path d="M0 92h220v58H0z" fill="#2E5A88"/><path d="M0 98h220" stroke="#FFE3A3" stroke-opacity=".35" stroke-width="2"/><path d="M14 92V70h6v-8h6v8h6v22M46 92V60h10v32M190 92V66h8v26" fill="#2B2D42"/><path d="M60 92q50-40 100 0" fill="none" stroke="#2B2D42" stroke-width="4"/><path d="M60 92h100" stroke="#2B2D42" stroke-width="5"/><g stroke="#2B2D42" stroke-width="1.5"><path d="M75 92v-16M90 92v-26M110 92v-30M130 92v-26M145 92v-16"/></g><circle cx="110" cy="62" r="16" fill="#FF0033"/><path d="M105 54l13 8-13 8z" fill="#fff"/><rect x="0" y="138" width="220" height="12" fill="#00000066"/><rect x="8" y="142" width="204" height="3" rx="1.5" fill="#ffffff55"/><rect x="8" y="142" width="80" height="3" rx="1.5" fill="#FF0033"/><text x="196" y="132" text-anchor="end" font-family="Arial,sans-serif" font-size="9" font-weight="700" fill="#fff">0:45</text></svg>',
+    sound:'<svg class="media" viewBox="0 0 220 150"><rect width="220" height="150" fill="#FFF6E0"/><path d="M14 75h192" stroke="#F0D9A8" stroke-width="2"/><g fill="#F08C00"><rect x="18" y="72.0" width="5" height="6" rx="2.5"/><rect x="26" y="70.0" width="5" height="10" rx="2.5"/><rect x="34" y="64.0" width="5" height="22" rx="2.5"/><rect x="42" y="55.0" width="5" height="40" rx="2.5"/><rect x="50" y="47.0" width="5" height="56" rx="2.5"/><rect x="58" y="51.0" width="5" height="48" rx="2.5"/><rect x="66" y="60.0" width="5" height="30" rx="2.5"/><rect x="74" y="53.0" width="5" height="44" rx="2.5"/><rect x="82" y="45.0" width="5" height="60" rx="2.5"/><rect x="90" y="56.0" width="5" height="38" rx="2.5"/><rect x="98" y="65.0" width="5" height="20" rx="2.5"/><rect x="106" y="61.0" width="5" height="28" rx="2.5"/><rect x="114" y="68.0" width="5" height="14" rx="2.5"/><rect x="122" y="71.0" width="5" height="8" rx="2.5"/><rect x="130" y="72.5" width="5" height="5" rx="2.5"/><rect x="138" y="73.0" width="5" height="4" rx="2.5"/><rect x="146" y="73.5" width="5" height="3" rx="2.5"/><rect x="154" y="74.0" width="5" height="2" rx="2.5"/><rect x="162" y="74.0" width="5" height="2" rx="2.5"/><rect x="170" y="74.0" width="5" height="2" rx="2.5"/></g><g transform="translate(160 28)"><ellipse cx="18" cy="26" rx="18" ry="13" fill="#3BB98A"/><circle cx="8" cy="14" r="7" fill="#3BB98A"/><circle cx="28" cy="14" r="7" fill="#3BB98A"/><circle cx="8" cy="14" r="3.5" fill="#fff"/><circle cx="28" cy="14" r="3.5" fill="#fff"/><circle cx="8.5" cy="14.5" r="2" fill="#1B1B3A"/><circle cx="28.5" cy="14.5" r="2" fill="#1B1B3A"/><path d="M11 28q7 5 14 0" stroke="#1F6B2F" stroke-width="2" fill="none" stroke-linecap="round"/></g><rect x="14" y="118" width="192" height="6" rx="3" fill="#F0D9A8"/><rect x="14" y="118" width="70" height="6" rx="3" fill="#F08C00"/><circle cx="84" cy="121" r="6" fill="#F08C00"/></svg>'
+  };
+  const TASKS = [
+    { ctx:'Для презентації з інформатики тобі потрібна картинка зі складовими комп\'ютера. Сайт тобі порадила вчителька.',
+      site:'Вікіпедія', url:'uk.wikipedia.org/wiki/Персональний_комп\'ютер', sc:'#3A3A3A', lg:'W', art:'pc',
+      meta:[['Назва','Складові комп\'ютера'], ['Автор','Ірина Мельник'], ['Ліцензія','by-sa'], ['Остання зміна','3 дні тому'], ['Формат','SVG']],
+      parts:['«Складові комп\'ютера»', 'Ірина Мельник', 'Вікіпедія', 'CC BY-SA 4.0'],
+      decoys:[['Вчителька інформатики', 'Вчителька порадила сайт, але картинку створила не вона.'], ['3 дні тому', 'Час останньої зміни в підпис не додають.'], ['SVG', 'Формат файлу в підписі не потрібен.']] },
+    { ctx:'Для відеозвіту про екскурсію ти вставляєш короткий ролик про вечірній Київ, знайдений на YouTube.',
+      site:'YouTube', url:'youtube.com/watch?v=kyiv-evening', sc:'#FF0033', lg:'▶', art:'video', ver:'3.0',
+      meta:[['Назва','Вечірній Київ'], ['Автор','Канал «Київ з висоти»'], ['Ліцензія','by'], ['Переглядів','1,2 млн'], ['Тривалість','0:45']],
+      parts:['«Вечірній Київ»', 'Канал «Київ з висоти»', 'YouTube', 'CC BY 3.0'],
+      decoys:[['1,2 млн переглядів', 'Кількість переглядів у підписі не потрібна.'], ['0:45', 'Тривалість ролика в підпис не додають.'], ['Мій телефон', 'На телефоні ролик лише збережено, а взято його з YouTube.']] },
+    { ctx:'У свій проєкт у Scratch ти додаєш звук стрибка жабки з бібліотеки звуків.',
+      site:'Freesound', url:'freesound.org/people/oleh_huk/sounds/frog-jump', sc:'#E8590C', lg:'F', art:'sound',
+      meta:[['Назва','Стрибок жабки'], ['Автор','Олег Гук'], ['Ліцензія','by-nc'], ['Тривалість','0:02'], ['Формат','WAV']],
+      parts:['«Стрибок жабки»', 'Олег Гук', 'Freesound', 'CC BY-NC 4.0'],
+      decoys:[['Scratch', 'У Scratch звук використано, а взято його з Freesound.'], ['0:02', 'Тривалість звуку в підписі не потрібна.'], ['WAV', 'Формат файлу в підпис не додають.']] }
+  ];
+  const LBL = ['Назва', 'Автор', 'Джерело', 'Ліцензія'];
+  const box = document.getElementById('cb');
+  const els = id => document.getElementById(id);
+  const total = TASKS.length * 4;
+  const hit = trackTask(box, total, total + 3);
+  let cur = 0, filled = 0, done = 0;
+
+  function show(){
+    const t = TASKS[cur];
+    filled = 0;
+    els('cbNum').textContent = `Ситуація ${cur + 1} з ${TASKS.length}`;
+    els('cbCtx').textContent = t.ctx;
+    els('cbSite').innerHTML = `<div class="site-bar"><i></i><i></i><i></i><span class="url">${t.url}</span></div>
+      <div class="site-head" style="--sc:${t.sc}"><span class="lg">${t.lg}</span>${t.site}</div>
+      <div class="site-body">${ART[t.art]}<table class="meta-t">${t.meta.map(([k, v])=>`<tr><td>${k}</td><td>${k === 'Ліцензія' ? badge(v) + ' <span style="margin-left:4px">версія ' + (t.ver || '4.0') + '</span>' : v}</td></tr>`).join('')}</table></div>`;
+    els('cbLine').innerHTML = `<span class="lbl">Твій підпис</span>«<span class="slot s1" data-i="0">${LBL[0]}</span>» — <span class="slot s2" data-i="1">${LBL[1]}</span>, <span class="slot s3" data-i="2">${LBL[2]}</span>, <span class="slot s4" data-i="3">${LBL[3]}</span>`;
+    const chips = shuffle([...t.parts.map((x, i)=>({x, i})), ...t.decoys.map(([x, why])=>({x, why}))]);
+    const pool = els('cbPool');
+    pool.innerHTML = '';
+    els('cbFb').className = 'b-fb'; els('cbFb').textContent = '';
+    chips.forEach(c=>{
+      const b = document.createElement('button');
+      b.className = 'cb-chip';
+      b.textContent = c.x;
+      b.addEventListener('click', ()=>{
+        if(b.classList.contains('used') || b.classList.contains('off') || filled === 4) return;
+        if(c.i !== undefined){
+          const slot = els('cbLine').querySelector(`[data-i="${c.i}"]`);
+          slot.textContent = c.i === 0 ? c.x.replace(/[«»]/g, '') : c.x;
+          slot.classList.add('filled');
+          b.classList.add('used');
+          addNeurons(1); hit(); filled++;
+          els('cbFb').className = 'b-fb'; els('cbFb').textContent = `✓ Це ${LBL[c.i].toLowerCase()}.`;
+          if(filled === 4) finishTask();
+        } else {
+          b.classList.remove('wrong-flash'); void b.offsetWidth; b.classList.add('wrong-flash');
+          els('cbFb').className = 'b-fb'; els('cbFb').textContent = c.why;
+          setTimeout(()=>{ b.classList.remove('wrong-flash'); b.classList.add('off'); }, 700);
+        }
+      });
+      pool.appendChild(b);
+    });
+    els('cbProgress').textContent = `Складено підписів: ${done} з ${TASKS.length}`;
+  }
+  function finishTask(){
+    done++; cur++;
+    els('cbFb').className = 'b-fb ok';
+    els('cbFb').textContent = 'Підпис готовий ✓';
+    els('cbProgress').textContent = `Складено підписів: ${done} з ${TASKS.length}`;
+    if(cur < TASKS.length){
+      const next = document.createElement('button');
+      next.className = 'b-check'; next.textContent = 'Наступна ситуація →'; next.style.marginTop = '10px';
+      next.addEventListener('click', show);
+      els('cbPool').innerHTML = ''; els('cbPool').appendChild(next);
+    } else {
+      addNeurons(3);
+      els('cbPool').innerHTML = '';
+      els('cbProgress').textContent = 'Усі підписи складено ✓';
+    }
+  }
+  show();
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що з переліченого — інформаційний продукт?', opts:['Ноутбук', 'Відеоогляд нової книжки', 'Гроза'], correct:1,
+    why:'Ноутбук — пристрій, гроза — явище природи, а відеоогляд хтось створив за допомогою техніки.' },
+  { q:'Коли в автора виникає авторське право на малюнок?', opts:['Одразу після створення', 'Після публікації в інтернеті', 'Після реєстрації в держустанові'], correct:0 },
+  { q:'Що таке ліцензія?', opts:['Ціна продукту', 'Дозвіл від власника прав: що й на яких умовах можна робити з продуктом', 'Назва файлу з продуктом'], correct:1 },
+  { q:'Яка ліцензія дозволяє будь-кому змінювати вихідний код програми?', opts:['Комерційна', 'Безкоштовна', 'Відкрита (open source)'], correct:2,
+    why:'Безкоштовна програма не обов\'язково відкрита: користуватися можна, а змінювати — ні.' },
+  { q:'Що означає умова NC у ліцензії Creative Commons?', opts:['Не можна заробляти на творі', 'Не можна змінювати твір', 'Не треба вказувати автора'], correct:0 },
+  { q:'Фото має ліцензію CC BY-ND. Що можна з ним зробити?', opts:['Обрізати й додати напис', 'Поширити без змін, вказавши автора', 'Видати за своє'], correct:1 },
+  { q:'Яка умова є в усіх ліцензіях Creative Commons?', opts:['SA — на тих самих умовах', 'NC — некомерційне', 'BY — вкажи автора'], correct:2 },
+  { q:'Чому вірші Тараса Шевченка можна друкувати без дозволу?', opts:['Бо вони є в інтернеті', 'Бо вони стали суспільним надбанням', 'Бо автор дозволив'], correct:1,
+    why:'Від смерті автора минуло понад 70 років.' }
+], {summary:'Тепер ти знаєш, які бувають інформаційні продукти, чим відрізняються ліцензії й як читати значки Creative Commons.'});
+</script>
+
+</body>
+</html>
