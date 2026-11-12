@@ -59,8 +59,8 @@
   .ftype b{font-family:'Baloo 2',sans-serif; font-size:16px; display:block; line-height:1.2;}
   .ftype span{font-size:13.5px; color:var(--ink-soft);}
   .font-sort .sort-chip{display:inline-flex; flex-direction:column; align-items:center; gap:2px; font-size:12px; font-weight:600; color:var(--ink-soft); min-width:110px;}
-  .font-sort .sort-chip .smp{font-size:24px; line-height:1.3; color:var(--ink); font-weight:400;}
-  .font-sort .sort-chip.placed .smp{font-size:20px;}
+  .font-sort .sort-chip .smp{font-size:38px; line-height:1.2; color:var(--ink); font-weight:400;}
+  .font-sort .sort-chip.placed .smp{font-size:28px;}
   .font-sort .bucket-items{align-items:center;}
 
   /* ---------- Крок 3: розмір і накреслення ---------- */
@@ -256,7 +256,7 @@
       <div class="ftype"><span class="smp" style="font-family:'Courier New',monospace; font-weight:700">ii WW</span><b>Моноширинні</b><span>Усі літери однакової ширини, як у друкарській машинці. Ними пишуть програмний код.</span></div>
     </div>
     <div class="trivia">Шрифти малюють художники-дизайнери, тож на шрифт, як і на малюнок, є <b>авторське право</b>. Одні шрифти платні, інші — вільні: наприклад, шрифтами з колекції Google Fonts можна користуватися безкоштовно.</div>
-    <p class="soft">Подивись на літери й розклади шрифти. Клацни картку, а потім — кошик.</p>
+    <p class="soft">Подивись на кінці ліній у літерах Т і Н: чи є там рисочки-зарубки? Розклади шрифти: клацни картку, а потім — кошик.</p>
     <div class="exercise font-sort">
       <div class="sort-buckets three">
         <div class="bucket" id="bkSerif"><div class="bucket-title">Із зарубками</div><div class="bucket-items"></div></div>
@@ -319,7 +319,7 @@
   <section class="block">
     <div class="step-label">Крок 5 · Оформлюємо запрошення</div>
     <h2>Спробуй у Google Документі</h2>
-    <p>Шостий клас набрав запрошення на свято, але ще не оформив його. Допоможи: <b>виділи</b> фрагмент — протягни мишею від першої до останньої його літери, не відпускаючи ліву кнопку, — а тоді обери потрібну команду на панелі інструментів.</p>
+    <p>Шостий клас набрав запрошення на свято, але ще не оформив його. Допоможи: <b>виділи</b> фрагмент — протягни мишею від першої до останньої його літери, не відпускаючи ліву кнопку, — а тоді обери потрібну команду на панелі інструментів. Напівжирний, курсив і підкреслення вмикаються ще й клавішами <span class="kbd">Ctrl</span> + <span class="kbd">B</span>, <span class="kbd">I</span>, <span class="kbd">U</span>.</p>
     <div class="exercise" id="invEx">
       <div class="task-card"><span class="tnum" id="invNum"></span><span class="ttext" id="invTask"></span></div>
       <div class="gdoc" id="invDoc">
@@ -397,19 +397,18 @@ makeClassify('whatList', [
 ], ['Шрифт', 'Розмір', 'Накреслення', 'Колір']);
 
 /* ---------- КРОК 2: РОЗКЛАДИ ШРИФТИ ---------- */
-const fchip = (name, css, bucket)=>({ text:name, bucket, icon:`<span class="smp" style="font-family:${css}">Казка</span>` });
+const fchip = (name, css, bucket)=>({ text:name, bucket, icon:`<span class="smp" style="font-family:${css}">ТН</span>` });
 makeSortBoard('fontPool', {serif:'bkSerif', sans:'bkSans', deco:'bkDeco'}, [
   fchip('Times New Roman', "'Times New Roman',Times,serif", 'serif'),
   fchip('Georgia', 'Georgia,serif', 'serif'),
   fchip('Merriweather', "'Merriweather',serif", 'serif'),
-  fchip('PT Serif', "'PT Serif',serif", 'serif'),
   fchip('Arial', 'Arial,sans-serif', 'sans'),
   fchip('Roboto', "'Roboto',sans-serif", 'sans'),
   fchip('Montserrat', "'Montserrat',sans-serif", 'sans'),
   fchip('Caveat', "'Caveat',cursive; font-weight:700", 'deco'),
   fchip('Lobster', "'Lobster',cursive", 'deco'),
-  fchip('Pacifico', "'Pacifico',cursive; font-size:20px", 'deco'),
-  fchip('Marck Script', "'Marck Script',cursive", 'deco')
+  fchip('Pacifico', "'Pacifico',cursive; font-size:30px", 'deco'),
+
 ], 'fontProgress');
 
 /* ---------- КРОК 3: РОЗМІР І НАКРЕСЛЕННЯ ---------- */
@@ -452,7 +451,7 @@ makeYesNo('lookList', [
   const FONTS = { 'Arial':'Arial,sans-serif', 'Caveat':"'Caveat',cursive", 'Courier New':"'Courier New',monospace", 'Lobster':"'Lobster',cursive",
     'Merriweather':"'Merriweather',serif", 'Roboto':"'Roboto',sans-serif", 'Times New Roman':"'Times New Roman',serif" };
   const COLORS = [['#000000', 'чорний'], ['#999999', 'сірий'], ['#D93025', 'червоний'], ['#E8710A', 'помаранчевий'],
-    ['#F9AB00', 'жовтий'], ['#188038', 'зелений'], ['#1A73E8', 'синій'], ['#9334E6', 'фіолетовий']];
+    ['#8D5524', 'коричневий'], ['#188038', 'зелений'], ['#1A73E8', 'синій'], ['#9334E6', 'фіолетовий']];
   const HLS = [['none', 'без кольору'], ['#FFF475', 'жовтий'], ['#CCFF90', 'салатовий'], ['#A7FFEB', 'бірюзовий'],
     ['#F8BBD0', 'рожевий'], ['#D7AEFB', 'бузковий'], ['#FDCFE8', 'світло-рожевий'], ['#AECBFA', 'блакитний']];
   const SIZES = [8, 9, 10, 11, 12, 14, 18, 24, 30, 36, 48];
@@ -473,7 +472,7 @@ makeYesNo('lookList', [
   const page = document.getElementById('invPage'), tools = document.getElementById('invTools'), pop = document.getElementById('invPop');
   const num = document.getElementById('invNum'), task = document.getElementById('invTask'), fb = document.getElementById('invFb');
   page.innerHTML = `<span class="t-line"><span data-id="title">Запрошення на свято осені</span></span>
-    <p style="margin-top:14px">Дорогі друзі! Запрошуємо вас на свято осені, яке відбудеться <span data-id="date">у п'ятницю, 14 листопада,</span> <span data-id="time">о 12:00</span> в актовій залі.</p>
+    <p style="margin-top:14px">Дорогі друзі! Запрошуємо вас на свято осені, яке відбудеться <span data-id="date">у п'ятницю, 14 листопада</span>, <span data-id="time">о 12:00</span> в актовій залі.</p>
     <p>На вас чекають пісні, конкурси, ярмарок і смачний чай. <span data-id="mood">Візьміть із собою гарний настрій!</span></p>
     <span class="s-line"><span data-id="sign">Ваш 6-Б клас</span></span>`;
   const els = {};
@@ -589,12 +588,26 @@ makeYesNo('lookList', [
       if(ir.compareBoundaryPoints(Range.START_TO_START, er) < 0) ir.setStart(er.startContainer, er.startOffset);
       if(ir.compareBoundaryPoints(Range.END_TO_END, er) > 0) ir.setEnd(er.endContainer, er.endOffset);
       const got = norm(ir.toString());
-      if(got) touched.push({ k, full: got === norm(el.textContent), len: got.length });
+      if(!got) return;
+      // Межі виділення всередині фрагмента — у символах його тексту
+      const pre = document.createRange(); pre.setStart(er.startContainer, er.startOffset); pre.setEnd(ir.startContainer, ir.startOffset);
+      const a = pre.toString().length, b = a + ir.toString().length;
+      const words = [...el.textContent.matchAll(/[^\s,]+/g)];
+      const w0 = words[0], wn = words[words.length - 1];
+      // Повністю — якщо зачеплено перше й останнє слово або пропущено не більше літери з краю
+      const t = el.textContent;
+      const full = (a < w0.index + w0[0].length || norm(t.slice(0, a)).length <= 1)
+        && (b > wn.index || norm(t.slice(b)).length <= 1);
+      touched.push({ k, full, len: got.length });
     });
+    // Зайве: зачеплені літери поза фрагментами й «крихти» (1 літера) сусідніх фрагментів
+    const main = touched.filter(t=>t.len > 1);
+    const crumbs = touched.filter(t=>t.len <= 1).length;
     const inside = touched.reduce((a, t)=>a + t.len, 0);
-    const extra = norm(r.toString()).length - inside;
-    if(touched.length === 1 && touched[0].full && extra === 0) return { id:touched[0].k };
-    if(touched.length === 1 && !touched[0].full && extra === 0) return { part:touched[0].k };
+    const extra = norm(r.toString()).length - inside + crumbs;
+    if(main.length === 1 && main[0].full && extra <= 1) return { id:main[0].k };
+    if(main.length === 1 && !main[0].full && extra <= 1) return { part:main[0].k };
+    if(!main.length && touched.length === 1 && extra <= 1) return { part:touched[0].k };
     return { more:true };
   };
   let last = null;
@@ -617,10 +630,28 @@ makeYesNo('lookList', [
     else if(last.more) fb.textContent = `🤔 Виділено зайвий текст. Виділи лише ${OBJ[tk.id]}.`;
     else if(last.id && last.id !== tk.id) fb.textContent = `🤔 Зараз оформлюємо ${OBJ[tk.id]}. Виділи саме його.`;
     else if(last.id) fb.textContent = '';
+    // Виділення «прилипає» до всього фрагмента, як до цілих слів у Google Документах
+    if(last.id){
+      const r = document.createRange(); r.selectNodeContents(els[last.id]);
+      const s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    }
   }, 0);
   page.addEventListener('mouseup', explain);
   page.addEventListener('touchend', explain);
   page.addEventListener('mousedown', closePop);
+  // Ctrl+B / Ctrl+I / Ctrl+U (і ⌘ на Mac) — коли курсор чи виділення в документі
+  document.addEventListener('keydown', e=>{
+    if(!(e.ctrlKey || e.metaKey) || e.altKey || e.shiftKey) return;
+    const act = { KeyB:'b', KeyI:'i', KeyU:'u' }[e.code];
+    if(!act) return;
+    const s = getSelection();
+    if(!sel && !(s && s.rangeCount && page.contains(s.anchorNode))) return;
+    e.preventDefault();
+    const btn = tools.querySelector(`[data-act="${act}"]`);
+    if(!guard(act, btn)) return;
+    closePop();
+    apply(act, !st[sel][act], btn);
+  });
   // Натиск на панель чи список не знімає виділення в документі
   [tools, pop].forEach(el=>el.addEventListener('mousedown', e=>e.preventDefault()));
   tools.addEventListener('click', e=>{
