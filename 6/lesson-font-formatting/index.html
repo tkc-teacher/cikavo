@@ -122,8 +122,9 @@
   .sw.none::after{content:''; position:absolute; left:50%; top:-2px; bottom:-2px; width:2px; background:#D93025; transform:rotate(45deg);}
   .gpage{background:#fff; margin:12px 12px 14px; border:1px solid var(--g-line); border-radius:4px; box-shadow:0 1px 3px rgba(60,64,67,.15); padding:22px 26px; font-family:Arial,sans-serif; font-size:14.3px; color:#000; line-height:1.6; min-height:240px;}
   .gpage p{margin:0 0 10px;}
-  .gpage [data-id]{cursor:pointer; border-radius:2px; transition:background .15s;}
-  .gpage [data-id]:hover{box-shadow:0 0 0 1px #A8C7FA;}
+  .gpage{cursor:text; user-select:text; -webkit-user-select:text;}
+  .gpage ::selection{background:var(--g-sel);}
+  .gpage [data-id]{transition:background .15s;}
   .gpage [data-id].sel{background:var(--g-sel) !important;}
   .gpage [data-id].good{background:#CDEFD6 !important; transition:background .3s;}
   .gpage .t-line{display:block; text-align:center;}
@@ -318,7 +319,7 @@
   <section class="block">
     <div class="step-label">Крок 5 · Оформлюємо запрошення</div>
     <h2>Спробуй у Google Документі</h2>
-    <p>Шостий клас набрав запрошення на свято, але ще не оформив його. Допоможи: клацни фрагмент, щоб <b>виділити</b> його, а тоді обери потрібну команду на панелі інструментів.</p>
+    <p>Шостий клас набрав запрошення на свято, але ще не оформив його. Допоможи: <b>виділи</b> фрагмент — протягни мишею від першої до останньої його літери, не відпускаючи ліву кнопку, — а тоді обери потрібну команду на панелі інструментів.</p>
     <div class="exercise" id="invEx">
       <div class="task-card"><span class="tnum" id="invNum"></span><span class="ttext" id="invTask"></span></div>
       <div class="gdoc" id="invDoc">
@@ -521,7 +522,7 @@ makeYesNo('lookList', [
     if(busy || i >= TASKS.length) return false;
     const tk = TASKS[i];
     let msg = '';
-    if(!sel) msg = 'Спершу виділи фрагмент — клацни по ньому в документі.';
+    if(!sel) msg = 'Спершу виділи фрагмент: протягни по ньому мишею з натиснутою лівою кнопкою.';
     else if(sel !== tk.id) msg = `Зараз оформлюємо ${OBJ[tk.id]}. Виділи саме його.`;
     else if(!(prop in tk.want)) msg = `Ця кнопка змінює ${PROP[prop]}, а в завданні потрібно змінити ${Object.keys(tk.want).map(p=>PROP[p]).join(' і ')}.`;
     if(!msg) return true;
@@ -538,7 +539,7 @@ makeYesNo('lookList', [
     const el = els[tk.id]; el.classList.add('good');
     setTimeout(()=>{
       el.classList.remove('good'); busy = false; i++;
-      if(TASKS[i]?.id !== sel){ sel = null; render(); }
+      if(TASKS[i]?.id !== sel){ sel = null; clearNative(); render(); }
       if(i === TASKS.length){ addNeurons(2); fb.textContent = '🎉 Чудова робота! Ти вмієш змінювати шрифт, розмір, накреслення й колір.'; }
       else fb.textContent = '';
       show();
@@ -569,14 +570,59 @@ makeYesNo('lookList', [
     pop.style.left = Math.max(4, Math.min(r.left - g.left, g.width - pop.offsetWidth - 4)) + 'px';
   };
 
-  page.addEventListener('click', e=>{
-    const el = e.target.closest('[data-id]');
-    closePop();
+  /* Справжнє виділення: учень протягує мишею (чи довгий натиск на сенсорному екрані).
+     Фрагмент вважається виділеним, лише якщо виділено його весь і нічого зайвого
+     (пробіли й розділові знаки на краях не рахуються). Одне клацання лише ставить курсор. */
+  const norm = t=>t.replace(/[\s,.!?:;«»"'’]/g, '');
+  const clearNative = ()=>{ const s = getSelection(); if(s && s.rangeCount && page.contains(s.anchorNode)) s.removeAllRanges(); };
+  const readSel = ()=>{
+    const s = getSelection();
+    if(!s || !s.rangeCount) return { out:true };
+    const r = s.getRangeAt(0);
+    if(!page.contains(r.commonAncestorContainer)) return { out:true };
+    if(r.collapsed || !norm(r.toString())) return { caret:true };
+    const touched = [];
+    Object.entries(els).forEach(([k, el])=>{
+      if(!r.intersectsNode(el)) return;
+      const er = document.createRange(); er.selectNodeContents(el);
+      const ir = r.cloneRange();
+      if(ir.compareBoundaryPoints(Range.START_TO_START, er) < 0) ir.setStart(er.startContainer, er.startOffset);
+      if(ir.compareBoundaryPoints(Range.END_TO_END, er) > 0) ir.setEnd(er.endContainer, er.endOffset);
+      const got = norm(ir.toString());
+      if(got) touched.push({ k, full: got === norm(el.textContent), len: got.length });
+    });
+    const inside = touched.reduce((a, t)=>a + t.len, 0);
+    const extra = norm(r.toString()).length - inside;
+    if(touched.length === 1 && touched[0].full && extra === 0) return { id:touched[0].k };
+    if(touched.length === 1 && !touched[0].full && extra === 0) return { part:touched[0].k };
+    return { more:true };
+  };
+  let last = null;
+  const onSel = ()=>{
     if(busy) return;
-    sel = el ? el.dataset.id : null;
-    if(sel && i < TASKS.length && sel !== TASKS[i].id) fb.textContent = '';
-    render();
-  });
+    const res = readSel();
+    if(res.out) return;          // клацання на панелі чи поза документом не знімає виділення
+    last = res;
+    const was = sel;
+    sel = res.id || null;
+    if(sel !== was){ closePop(); render(); }
+  };
+  document.addEventListener('selectionchange', onSel);
+  // Підказка — коли учень відпустив кнопку миші чи палець
+  const explain = ()=>setTimeout(()=>{
+    if(busy || i >= TASKS.length || !last) return;
+    const tk = TASKS[i];
+    if(last.caret) fb.textContent = '🤔 Клацання лише ставить курсор. Щоб виділити, протягни мишею по тексту, не відпускаючи кнопку.';
+    else if(last.part) fb.textContent = '🤔 Виділено лише частину. Протягни від першої до останньої літери.';
+    else if(last.more) fb.textContent = `🤔 Виділено зайвий текст. Виділи лише ${OBJ[tk.id]}.`;
+    else if(last.id && last.id !== tk.id) fb.textContent = `🤔 Зараз оформлюємо ${OBJ[tk.id]}. Виділи саме його.`;
+    else if(last.id) fb.textContent = '';
+  }, 0);
+  page.addEventListener('mouseup', explain);
+  page.addEventListener('touchend', explain);
+  page.addEventListener('mousedown', closePop);
+  // Натиск на панель чи список не знімає виділення в документі
+  [tools, pop].forEach(el=>el.addEventListener('mousedown', e=>e.preventDefault()));
   tools.addEventListener('click', e=>{
     const btn = e.target.closest('[data-act]');
     if(!btn) return;
