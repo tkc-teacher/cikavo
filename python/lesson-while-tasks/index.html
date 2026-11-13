@@ -82,10 +82,13 @@
   @keyframes dgIn{from{transform:translateY(-24px); opacity:0}}
   .dg-run{margin-top:14px;}
   .dg-run:disabled{opacity:.5; cursor:default;}
-  .note.change{margin:0 0 14px;}
-  .note.change[hidden]{display:none;}
-  .note.change.pop{animation:chPop .5s ease-out;}
-  @keyframes chPop{0%{opacity:0; transform:translateY(-8px)} 60%{transform:scale(1.02)} 100%{opacity:1; transform:none}}
+  /* Завдання з двох дій: запусти — зміни */
+  .todo{display:flex; flex-direction:column; gap:8px; margin:14px 0 12px;}
+  .todo-row{ border-radius:var(--radius-m); padding:11px 14px; border:1.5px solid;}
+  .todo-row.run{background:#E8F6EC; border-color:#BFE3C9;}
+  .todo-row.edit{background:#FFF6DB; border-color:#F2DC93;}
+  .todo-row b{font-family:'Baloo 2',sans-serif; font-size:16.5px;}
+  .run b{color:#1E6B33;} .edit b{color:#8A6100;}
 </style>
 </head>
 <body data-lesson="py-while-tasks" data-hud="Python Basic · Задачі на while">
@@ -248,9 +251,11 @@ while n &lt;= 10:
       <li>після циклу — «Доступ дозволено!».</li>
     </ul>
     <div class="note">PIN порівнюємо як текст, у лапках: <code>input()</code> повертає текст, а PIN може починатися з нуля.</div>
-    <p>Запусти програму: введи кілька неправильних кодів, а потім 2580.</p>
+    <div class="todo">
+      <div class="todo-row run"><div><b>Запусти.</b> Введи кілька неправильних кодів, а потім 2580.</div></div>
+      <div class="todo-row edit"><div><b>Зміни програму.</b> Нехай вона рахує спроби й наприкінці пише, наприклад, <code>Доступ дозволено! Спроб: 3</code>. Запусти й перевір.</div></div>
+    </div>
     <div id="pinTask"></div>
-    <div class="note change">✏️ <b>Тепер зміни програму:</b> нехай вона рахує спроби й наприкінці пише, наприклад, <code>Доступ дозволено! Спроб: 3</code>.</div>
   </section>
 
   <section class="block">
@@ -258,9 +263,11 @@ while n &lt;= 10:
     <h2>Програма з меню</h2>
     <p>Меню — це <code>while True</code>: показати пункти, спитати вибір, виконати. Пункт «Вихід» робить <code>break</code>.</p>
     <div class="note"><code>choice</code> лишається текстом: порівнюємо з <code>"1"</code> у лапках. Тоді й літера замість цифри не зламає програму.</div>
-    <p>Запусти меню котика й спробуй кожен пункт, неіснуючий пункт і <code>0</code>.</p>
+    <div class="todo">
+      <div class="todo-row run"><div><b>Запусти.</b> Спробуй кожен пункт меню, неіснуючий пункт і <code>0</code>.</div></div>
+      <div class="todo-row edit"><div><b>Зміни програму.</b> Додай пункт <b>3 — пограти</b>, щоб котик відповідав «Котик ганяє м’ячик!». Не забудь дописати його в рядок меню.</div></div>
+    </div>
     <div id="menuTask"></div>
-    <div class="note change">✏️ <b>Тепер зміни програму:</b> додай пункт <b>3 — пограти</b>, щоб котик відповідав «Котик ганяє м’ячик!». Не забудь дописати його в рядок меню.</div>
   </section>
 
   <section class="block" data-guide>
@@ -476,27 +483,10 @@ makeCodeTask('skipTask', {
   reset();
 })();
 
-/* «Тепер зміни програму» з'являється над редактором лише тоді, коли учень запустив готову програму й виконав дії.
-   Поки цього не сталося, check пише підказку сам і повертає null — це не хибна спроба. */
-function changeNote(id){
-  const box = document.getElementById(id), note = box.nextElementSibling;
-  box.prepend(note);
-  note.hidden = true;
-  const say = html=>{ const fb = box.querySelector(':scope > .choice-feedback'); fb.className = 'choice-feedback tip'; fb.innerHTML = html; };
-  return {
-    shown:()=>!note.hidden,
-    say,
-    show(){
-      note.hidden = false;
-      note.classList.add('pop');
-      say('Програма працює ✓ Тепер зміни її — завдання з’явилося над програмою.');
-      note.scrollIntoView({behavior:'smooth', block:'nearest'});
-    }
-  };
-}
+/* Запуск ще не зміненої програми — це перша дія завдання, а не хибна спроба: check сам пише підказку й повертає null */
+const tip = (id, html)=>{ const fb = document.querySelector(`#${id} > .choice-feedback`); fb.className = 'choice-feedback tip'; fb.innerHTML = html; };
 
 /* ---------- КРОК 4: PIN-код ---------- */
-const pinNote = changeNote('pinTask');
 makeCodeTask('pinTask', {
   code:'correct = "2580"\npin_code = input("Введи PIN: ")\nwhile pin_code != correct:\n    print("Неправильний PIN")\n    pin_code = input("Введи PIN: ")\nprint("Доступ дозволено!")',
   hint:'Перед циклом: tries = 1. У тілі циклу: tries = tries + 1. А наприкінці: print(f"Доступ дозволено! Спроб: {tries}")',
@@ -504,32 +494,27 @@ makeCodeTask('pinTask', {
   check:(out, code)=>{
     const m = out.match(/Спроб: (\d+)/);
     const tries = (out.match(/Неправильний PIN/g) || []).length + 1;
-    if(!pinNote.shown()){
-      if(m){ pinNote.show(); }
-      else if(tries === 1){ pinNote.say('Запусти ще раз: спершу введи неправильний PIN, а потім 2580.'); return null; }
-      else { pinNote.show(); return null; }
+    if(!m){
+      tip('pinTask', tries === 1 ? 'Програма працює ✓ Спробуй і з помилками: спершу неправильний PIN, потім 2580.' : 'Програма працює ✓ Тепер зміни її: додай лічильник спроб.');
+      return null;
     }
-    if(!m) return 'Додай лічильник спроб: наприкінці має з’явитися «Доступ дозволено! Спроб: …».';
     if(tries === 1) return 'Перевір лічильник із помилками: спершу введи неправильний PIN, а потім 2580.';
     return +m[1] === tries || `Спроб було ${tries}, а програма пише ${m[1]}. Перевір, з якого числа починає лічильник і де він збільшується.`;
   }
 });
 
 /* ---------- КРОК 5: меню ---------- */
-const menuNote = changeNote('menuTask');
 makeCodeTask('menuTask', {
   code:'while True:\n    print("1 — погладити, 2 — нагодувати, 0 — вихід")\n    choice = input("Твій вибір: ")\n    if choice == "1":\n        print("Мур-мур!")\n    elif choice == "2":\n        print("Ням-ням!")\n    elif choice == "0":\n        break\n    else:\n        print("Котик не розуміє")\nprint("Бувай!")',
   hint:'Перед elif choice == "0": додай elif choice == "3": і під ним, з відступом, print("Котик ганяє м’ячик!"). А в першому print — «3 — пограти».',
   neurons:4,
   check:(out, code)=>{
     const added = /choice\s*==\s*["']3["']/.test(code);
-    if(!menuNote.shown()){
+    if(!added){
       const miss = [['Мур-мур!', '1'], ['Ням-ням!', '2'], ['Котик не розуміє', 'неіснуючий пункт, напр. 7']].filter(([t])=>!out.includes(t)).map(([, k])=>k);
-      if(added) menuNote.show();
-      else if(miss.length){ menuNote.say(`Запусти ще раз і спробуй: ${miss.join(', ')} — а тоді 0.`); return null; }
-      else { menuNote.show(); return null; }
+      tip('menuTask', miss.length ? `Програма працює ✓ Спробуй ще: ${miss.join(', ')}.` : 'Програма працює ✓ Тепер зміни її: додай пункт 3.');
+      return null;
     }
-    if(!added) return 'Додай пункт 3: <code>elif choice == "3":</code>';
     if(!/3\s*—|3\s*-/.test(code.split('\n').find(l=>/print\(\s*["']1/.test(l)) || '')) return 'Допиши «3 — пограти» в рядок меню, щоб користувач знав про новий пункт.';
     if(!/ганяє/.test(out)) return 'Запусти програму й обери пункт 3.';
     return /Бувай!\s*$/.test(out) || 'Наприкінці вийди з меню через 0.';
