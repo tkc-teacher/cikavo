@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Задачі на цикл while — Заняття</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<link rel="stylesheet" href="../../assets/python.css">
+<style>
+  :root{
+    --accent:#1E8C7E; --accent-dark:#13665B; --accent-soft:#E2F4F1;
+    --bg:#F3F9F8; --line:#D6ECE8; --ink-soft:#4A6461;
+    --hud-bar:linear-gradient(90deg, #3776AB, #1E8C7E, #FFD43B);
+  }
+
+  /* Картки з кодом поруч: break і continue, різні підходи */
+  .ways{display:grid; grid-template-columns:repeat(auto-fit, minmax(230px, 1fr)); gap:14px; margin:16px 0;}
+  .way{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:14px 16px; display:flex; flex-direction:column;}
+  .way-tag{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:var(--accent-dark); line-height:1.3;}
+  .way-tag small{display:block; font-family:'Nunito Sans',sans-serif; font-weight:600; font-size:13.5px; color:var(--ink-soft);}
+  .way pre.py-code{margin:10px 0; font-size:13.5px; padding:12px 14px; flex:1;}
+  .way-out{font-size:14px; color:var(--ink-soft);}
+  .way-out b{font-family:var(--code-font); font-size:13.5px; color:var(--ink); background:var(--accent-soft); padding:1px 7px; border-radius:6px;}
+
+  /* break і continue: дві програми, що виконуються поруч */
+  .bc{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:18px 20px; margin:16px 0;}
+  .bc-grid{display:grid; grid-template-columns:1fr 1fr; gap:18px;}
+  @media (max-width:640px){ .bc-grid{grid-template-columns:1fr;} .bc{padding:14px;} }
+  .bc-grid{grid-template-rows:repeat(6, auto); row-gap:10px;}
+  .bc-panel{display:grid; grid-row:span 6; grid-template-rows:subgrid; row-gap:10px; min-width:0; align-items:start;}
+  @media (max-width:640px){ .bc-panel + .bc-panel{margin-top:18px;} }
+  .bc-run{justify-self:start; padding:8px 18px; font-size:15px;}
+  @media (max-width:640px){ .bc-it{font-size:12px;} .bc-it small{font-size:10px;} }
+  .bc-run:disabled{opacity:.5; cursor:default;}
+  .bc-code pre.py-code{margin:0; font-size:13.5px; padding:12px 14px;}
+  .bc-code .ln{display:inline-block; width:100%; border-radius:4px; transition:background .25s;}
+  .bc-code .ln.cur{background:rgba(255,212,59,.28);}
+  .bc-code .ln.jump{background:rgba(54,200,180,.35);}
+  .bc-iters{display:grid; grid-template-columns:repeat(5, minmax(0, 1fr)); gap:6px; width:100%;}
+  .bc-it{min-width:0; overflow:hidden; text-align:center; border:2px solid var(--line); border-radius:10px; padding:5px 2px 4px; font-family:var(--code-font); font-size:13px; font-weight:600; color:var(--ink-soft); background:var(--bg); transition:background .25s, border-color .25s, transform .2s;}
+  .bc-it small{display:block; font-family:'Nunito Sans',sans-serif; font-size:11px; font-weight:700; min-height:1.3em; line-height:1.3; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .bc-it.on{border-color:var(--accent); transform:translateY(-3px);}
+  .bc-it.ok{background:#E3F6E8; border-color:#3FAE58; color:#1E6B33;}
+  .bc-it.skip{background:#FFF1DC; border-color:#E8963A; color:#9A5A12;}
+  .bc-it.stop{background:#FDE5E2; border-color:#E0574C; color:#A3271D;}
+  .bc-it.none{border-style:dashed; opacity:.45;}
+  .bc-msg{font-size:14px; color:var(--ink-soft); min-height:2.9em;}
+  .bc-msg b{font-family:var(--code-font); font-size:13px;}
+  .bc-out{background:var(--code-bg); color:var(--code-ink); font-family:var(--code-font); font-size:14px; border-radius:var(--radius-s); padding:8px 14px; height:146px; box-sizing:border-box; line-height:1.5; white-space:pre-line;}
+  .bc-out::before{content:'Консоль'; display:block; font-family:'Nunito Sans',sans-serif; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--code-soft); margin-bottom:2px;}
+  .bc-legend{display:flex; flex-wrap:wrap; gap:6px 16px; margin-top:16px; font-size:13px; color:var(--ink-soft);}
+  .bc-dot{display:inline-block; width:12px; height:12px; border-radius:4px; border:2px solid; margin-right:5px; vertical-align:-1px;}
+  .bc-dot.ok{background:#E3F6E8; border-color:#3FAE58;} .bc-dot.skip{background:#FFF1DC; border-color:#E8963A;}
+  .bc-dot.stop{background:#FDE5E2; border-color:#E0574C;} .bc-dot.none{border-style:dashed; border-color:#B9C4C2;}
+  /* Цифри числа: анімація ділення на 10 */
+  .dg{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:18px 20px; margin:16px 0;}
+  .dg-grid{display:grid; grid-template-columns:minmax(0, 1fr) minmax(0, 1fr); gap:18px; align-items:start;}
+  @media (max-width:640px){ .dg-grid{grid-template-columns:1fr;} .dg{padding:14px;} }
+  .dg-code pre.py-code{margin:0; font-size:14px;}
+  .dg-code .ln{display:inline-block; width:100%; border-radius:4px; transition:background .25s;}
+  .dg-code .ln.cur{background:rgba(255,212,59,.28);}
+  .dg-side{display:flex; flex-direction:column; gap:12px; min-width:0;}
+  .dg-pick{font-size:14px; font-weight:700; color:var(--ink-soft); display:flex; flex-wrap:wrap; align-items:center; gap:6px;}
+  .dg-nums button{font-family:var(--code-font); font-size:14px; font-weight:600; border:1.5px solid var(--line); background:var(--bg); color:var(--ink); border-radius:8px; padding:3px 10px; cursor:pointer; margin-right:4px;}
+  .dg-nums button.on{border-color:var(--accent); background:var(--accent-soft); color:var(--accent-dark);}
+  .dg-nums button:disabled{cursor:default;}
+  .dg-box{position:relative; border:2px solid #E8963A; background:#FFF6EA; border-radius:12px; padding:22px 12px 12px; min-height:84px; display:flex; align-items:center;}
+  .dg-name{position:absolute; top:-11px; left:12px; background:#E8963A; color:#fff; font-family:var(--code-font); font-weight:700; font-size:13px; padding:1px 10px; border-radius:6px;}
+  .dg-num{display:flex; gap:6px;}
+  .dg-tile{width:44px; height:52px; border-radius:10px; background:#fff; border:2px solid #F0C48E; display:grid; place-items:center; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:30px; color:#9A5A12; transition:transform .45s, opacity .45s, width .45s, margin .45s, background .25s, border-color .25s;}
+  .dg-tile.pick{background:#FFD43B; border-color:#C99A00; color:#1B1B3A; transform:translateY(-6px);}
+  .dg-tile.gone{transform:translateY(30px) scale(.4); opacity:0; width:0; margin-left:-6px; border-width:0;}
+  .dg-msg{font-size:14.5px; color:var(--ink-soft); min-height:2.9em;}
+  .dg-msg b{font-family:var(--code-font); font-size:14px; color:var(--ink);}
+  .dg-out{background:var(--code-bg); border-radius:var(--radius-s); padding:8px 14px 12px; min-height:92px;}
+  .dg-out::before{content:'Консоль'; display:block; align-self:stretch; font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--code-soft); margin-bottom:6px;}
+  .dg-out{margin-top:16px; display:flex; flex-direction:column; align-items:flex-start; gap:5px;}
+  .dg-out .dg-tile{width:30px; height:32px; font-size:20px; border-radius:7px; background:#2C3347; border-color:#FFD43B; color:#FFD43B; animation:dgIn .45s ease-out;}
+  @keyframes dgIn{from{transform:translateY(-24px); opacity:0}}
+  .dg-run{margin-top:14px;}
+  .dg-run:disabled{opacity:.5; cursor:default;}
+  .note.change{margin:0 0 14px;}
+  .note.change[hidden]{display:none;}
+  .note.change.pop{animation:chPop .5s ease-out;}
+  @keyframes chPop{0%{opacity:0; transform:translateY(-8px)} 60%{transform:scale(1.02)} 100%{opacity:1; transform:none}}
+</style>
+</head>
+<body data-lesson="py-while-tasks" data-hud="Python Basic · Задачі на while">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Python Basic · Заняття 7 · Практикум</div>
+      <h1>Задачі на цикл while</h1>
+      <p>Пригадаєш усе, що вивчив за шість занять, познайомишся з <code>continue</code> і розбереш кілька задач — кожну можна розв'язати по-різному.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none" aria-hidden="true">
+      <circle cx="70" cy="70" r="60" fill="#E2F4F1"/>
+      <path d="M70 22 A48 48 0 1 1 24 58" stroke="#1E8C7E" stroke-width="10" stroke-linecap="round"/>
+      <path d="M10 54 L26 40 L36 62 Z" fill="#1E8C7E"/>
+      <rect x="38" y="50" width="64" height="44" rx="9" fill="#1F2433"/>
+      <path d="M52 62 L64 72 L52 82 Z" fill="#FFD43B"/>
+      <path d="M64 62 L76 72 L64 82 Z" fill="#FFD43B"/>
+      <rect x="79" y="62" width="5" height="20" rx="1.5" fill="#FFD43B"/>
+      <circle cx="104" cy="104" r="13" fill="#E0574C"/>
+      <rect x="98" y="98" width="12" height="12" rx="2" fill="#fff"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Заняття 1–6</div>
+    <h2>Велика розминка</h2>
+    <p>Десять запитань про все вивчене: вивід, змінні, арифметику, умови, <code>random</code> і цикл <code>while</code>. «Виконай» кожну програму в голові.</p>
+    <div class="exercise" id="warmup"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label recap">Повторення · Помилки</div>
+    <h2>Знайди помилку</h2>
+    <p>Чотири програми — і в кожній одна типова помилка з попередніх занять.</p>
+    <div class="exercise">
+      <div id="bugList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label recap">Повторення · Усе разом</div>
+    <h2>Допиши програму</h2>
+    <p>Змінні, арифметика, f-рядки, умови й цикли — у двох коротких програмах. Заміни три крапки чи доповни код.</p>
+    <h3>Цукерки порівну</h3>
+    <p>23 цукерки ділять порівну між 5 дітьми. Скільки отримає кожен і скільки лишиться?</p>
+    <div id="candyTask"></div>
+    <h3>Таблиця множення</h3>
+    <p>Зараз програма виводить лише 1, 2, 3.</p>
+    <div id="tableTask"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Команда continue</div>
+    <h2>break і continue</h2>
+    <p>Обидві команди спрацьовують посеред тіла циклу, але по-різному:</p>
+    <ul>
+      <li><code>break</code> — «перерва»: цикл закінчується зовсім, Python іде до рядка після циклу;</li>
+      <li><code>continue</code> — «продовжуй»: решта тіла пропускається, і Python одразу повертається до умови.</li>
+    </ul>
+    <p>Запусти кожну програму й порівняй, що станеться з ітерацією <code>n = 3</code> і тими, що після неї.</p>
+    <div class="bc" id="bcDemo">
+      <div class="bc-grid">
+        <div class="bc-panel" data-mode="break">
+          <div class="way-tag">break<small>вийти з циклу зовсім</small></div>
+          <div class="bc-code"></div>
+          <button class="btn-primary bc-run" type="button">▶ Запустити</button>
+          <div class="bc-iters"></div>
+          <div class="bc-msg">&nbsp;</div>
+          <div class="bc-out"></div>
+        </div>
+        <div class="bc-panel" data-mode="continue">
+          <div class="way-tag">continue<small>пропустити цю ітерацію</small></div>
+          <div class="bc-code"></div>
+          <button class="btn-primary bc-run" type="button">▶ Запустити</button>
+          <div class="bc-iters"></div>
+          <div class="bc-msg">&nbsp;</div>
+          <div class="bc-out"></div>
+        </div>
+      </div>
+      <div class="bc-legend">
+        <span><i class="bc-dot ok"></i>виконано, є вивід</span>
+        <span><i class="bc-dot skip"></i>continue: print пропущено</span>
+        <span><i class="bc-dot stop"></i>break: вихід з циклу</span>
+        <span><i class="bc-dot none"></i>ітерації не було</span>
+      </div>
+    </div>
+    <div class="trivia">Лічильник змінюй <b>до</b> <code>continue</code>. Інакше <code>continue</code> пропустить і його — цикл стане нескінченним.</div>
+    <h3>Ліфт без 13-го поверху</h3>
+    <p>У деяких будинках немає 13-го поверху. Допиши програму, щоб ліфт його пропускав.</p>
+    <div id="liftTask"></div>
+    <h3>Перше число, що ділиться на 7</h3>
+    <p>Програма перебирає числа після 50. Щойно знайде число, що ділиться на 7, — виводить його й зупиняється.</p>
+    <div id="sevenTask"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Розбір · Одна задача — два підходи</div>
+    <h2>Парні числа</h2>
+    <p>Задача: вивести парні числа від 2 до 10. Обидві програми дають <b>2 4 6 8 10</b>.</p>
+    <div class="ways">
+      <div class="way">
+        <div class="way-tag">Підхід А<small>одразу крок 2</small></div>
+        <pre class="py-code">n = 2
+while n &lt;= 10:
+    print(n)
+    n = n + 2</pre>
+        <div class="way-out">Найкоротший: зайвих чисел немає.</div>
+      </div>
+      <div class="way">
+        <div class="way-tag">Підхід Б<small>перебір і фільтр if</small></div>
+        <pre class="py-code">n = 1
+while n &lt;= 10:
+    if n % 2 == 0:
+        print(n)
+    n = n + 1</pre>
+        <div class="way-out">Перебирає все, виводить лише потрібне.</div>
+      </div>
+    </div>
+    <div class="note">Підхід А годиться, коли числа йдуть з рівним кроком. Б — коли правило складніше: «не ділиться на 3», «закінчується на 7».</div>
+    <p>Тепер сам: виведи числа від 1 до 20, <b>крім</b> тих, що діляться на 3. Пропускай їх через <code>continue</code>.</p>
+    <div id="skipTask"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Розбір · Цифри числа</div>
+    <h2>Розкладаємо число на цифри</h2>
+    <p>Задача: розкласти 432 на цифри. Допоможуть знайомі <code>%</code> і <code>//</code>:</p>
+    <ul>
+      <li><code>432 % 10</code> → <code>2</code> — остання цифра;</li>
+      <li><code>432 // 10</code> → <code>43</code> — число без останньої цифри.</li>
+    </ul>
+    <p>Ділимо на 10, <b>поки число &gt; 9</b>, тобто поки в ньому більше однієї цифри. Цифра, що лишилась, — перша цифра числа: її виводимо вже після циклу. Запусти й подивись.</p>
+    <div class="note">Цифри виходять з кінця: 2, 3, 4.</div>
+    <div class="dg" id="digitDemo">
+      <div class="dg-grid">
+        <div class="dg-code"></div>
+        <div class="dg-side">
+          <div class="dg-pick">Число: <span class="dg-nums"></span></div>
+          <div class="dg-box"><span class="dg-name">n</span><div class="dg-num"></div></div>
+          <div class="dg-msg">&nbsp;</div>
+        </div>
+      </div>
+      <div class="dg-out"></div>
+      <button class="btn-primary dg-run" type="button">▶ Запустити</button>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Розбір · Перевірка введення</div>
+    <h2>PIN-код</h2>
+    <p>Телефон просить PIN-код і питає знову, <b>поки</b> введений код не збігається з правильним. План програми:</p>
+    <ul>
+      <li>спитати PIN один раз — ще до циклу;</li>
+      <li>поки <code>pin_code != correct</code> — сказати «Неправильний PIN» і спитати ще раз;</li>
+      <li>після циклу — «Доступ дозволено!».</li>
+    </ul>
+    <div class="note">PIN порівнюємо як текст, у лапках: <code>input()</code> повертає текст, а PIN може починатися з нуля.</div>
+    <p>Запусти програму: введи кілька неправильних кодів, а потім 2580.</p>
+    <div id="pinTask"></div>
+    <div class="note change">✏️ <b>Тепер зміни програму:</b> нехай вона рахує спроби й наприкінці пише, наприклад, <code>Доступ дозволено! Спроб: 3</code>.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Розбір · Меню</div>
+    <h2>Програма з меню</h2>
+    <p>Меню — це <code>while True</code>: показати пункти, спитати вибір, виконати. Пункт «Вихід» робить <code>break</code>.</p>
+    <div class="note"><code>choice</code> лишається текстом: порівнюємо з <code>"1"</code> у лапках. Тоді й літера замість цифри не зламає програму.</div>
+    <p>Запусти меню котика й спробуй кожен пункт, неіснуючий пункт і <code>0</code>.</p>
+    <div id="menuTask"></div>
+    <div class="note change">✏️ <b>Тепер зміни програму:</b> додай пункт <b>3 — пограти</b>, щоб котик відповідав «Котик ганяє м’ячик!». Не забудь дописати його в рядок меню.</div>
+  </section>
+
+  <section class="block" data-guide>
+    <div class="step-label">Для охочих · Вгадай число</div>
+    <h2>Гра «Вгадай число»</h2>
+    <div class="note">Необов'язкове завдання: можна одразу перейти до перевірки нижче.</div>
+    <p>Комп'ютер загадує число від 1 до 20, а ти вгадуєш. Програма підказує «Більше!» чи «Менше!» і рахує спроби. Заміни три крапки й зіграй.</p>
+    <div id="guessTask"></div>
+    <div class="trivia">Секрет: щоразу називай середину того, що лишилось (10, потім 5 чи 15…). Так число від 1 до 20 завжди вгадується за 5 спроб.</div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Заняття 7 · «Задачі на цикл while» · Гурток Python Basic</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script src="../../assets/python.js"></script>
+<script>
+/* ---------- ПОВТОРЕННЯ: велика розминка ---------- */
+makeWarmup('warmup', [
+  { pre:pyCode('print("2" + "3")'), text:'Що виведе програма?', opts:['5', '23', 'Помилку'], correct:1, why:'У лапках — текст, а + для тексту склеює.' },
+  { pre:pyCode('x = input("Число: ")\nprint(x * 2)'), text:'Користувач ввів 4. Що виведе програма?', opts:['8', '44', 'Помилку'], correct:1, why:'input() повертає текст "4", а текст * 2 — це "44".' },
+  { pre:pyCode('name = "Ліна"\nprint(f"Привіт, {name}!")'), text:'Що виведе програма?', opts:['Привіт, name!', 'Привіт, Ліна!', 'Привіт, {name}!'], correct:1, why:'У f-рядку {name} замінюється значенням змінної.' },
+  { pre:pyCode('print(7 // 2)\nprint(7 % 2)'), text:'Що виведе програма?', opts:['3 і 1', '3.5 і 1', '3 і 0'], correct:0, why:'7 = 2 · 3 + 1: ціла частина 3, остача 1.' },
+  { pre:pyCode('a = 5\na = a * 2\na = a - 3\nprint(a)'), text:'Що виведе програма?', opts:['5', '7', '10'], correct:1, why:'5 · 2 = 10, а 10 − 3 = 7.' },
+  { pre:pyCode('age = 12\nif age >= 13:\n    print("A")\nelif age >= 10:\n    print("B")\nelse:\n    print("C")'), text:'Що виведе програма?', opts:['A', 'B', 'C'], correct:1, why:'12 >= 13 — ні, 12 >= 10 — так.' },
+  { pre:pyCode('print(5 > 3 and 2 > 4)'), text:'Що виведе програма?', opts:['True', 'False'], correct:1, why:'and потребує обох умов, а 2 > 4 — неправда.' },
+  { pre:pyCode('import random\nx = random.randint(1, 3)'), text:'Які числа можуть потрапити в x?', opts:['0, 1, 2', '1, 2', '1, 2, 3'], correct:2, why:'randint вмикає обидві межі.' },
+  { pre:pyCode('n = 5\nwhile n > 0:\n    print(n)\n    n = n - 2'), text:'Що виведе програма?', opts:['5 3 1', '5 3 1 -1', '5 4 3 2 1'], correct:0, why:'Після 1 буде −1, а −1 > 0 — неправда.' },
+  { pre:pyCode('n = 0\nwhile True:\n    n = n + 2\n    if n > 5:\n        break\nprint(n)'), text:'Що виведе програма?', opts:['4', '5', '6'], correct:2, why:'2, 4, 6 — і 6 > 5, тож break.' }
+]);
+
+/* ---------- ПОВТОРЕННЯ: помилки ---------- */
+makeFindBug('bugList', [
+  { code:'age = int(input("Вік: "))\nnext = age + 1\nprint("Через рік: " + next)', line:3, why:'Текст і число не склеюються. Краще <code>print(f"Через рік: {next}")</code>.' },
+  { code:'x = 10\nif x > 5\n    print("Велике")', line:2, why:'Після умови бракує двокрапки.' },
+  { code:'score = 7\nif score = 7:\n    print("Супер")', line:2, why:'Для порівняння потрібно <code>==</code>, а <code>=</code> — це присвоєння.' },
+  { code:'n = 3\nwhile n > 0:\n    print(n)\n    n = n + 1', line:4, why:'n росте й ніколи не стане 0 — нескінченний цикл. Треба <code>n = n - 1</code>.' }
+]);
+
+makeCodeTask('candyTask', {
+  code:'candies = 23\nkids = 5\neach = ...\nleft = ...\nprint(f"Кожному: {each}")\nprint(f"Лишиться: {left}")',
+  expect:'Кожному: 4\nЛишиться: 3',
+  hint:'Ціла частина від ділення — candies // kids, остача — candies % kids.',
+  neurons:2,
+  check:(out, code)=>{
+    if(/\.\.\./.test(code)) return 'Заміни обидві трійки крапок.';
+    return /\/\//.test(code) && /%/.test(code) || 'Порахуй через змінні candies і kids: тут знадобляться <code>//</code> і <code>%</code>.';
+  }
+});
+
+makeCodeTask('tableTask', {
+  task:'Виведи таблицю множення на 7 — від <code>7 x 1 = 7</code> до <code>7 x 10 = 70</code>.',
+  code:'n = 7\ni = 1\nwhile i <= 3:\n    print(i)\n    i = i + 1',
+  expect:[1,2,3,4,5,6,7,8,9,10].map(i=>`7 x ${i} = ${7 * i}`).join('\n'),
+  hint:'Межа — 10, а в print — f-рядок: print(f"{n} x {i} = {n * i}")'
+});
+
+/* ---------- КРОК 1: continue ---------- */
+(function(){
+  const box = document.getElementById('bcDemo');
+  const slow = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const wait = ms=>new Promise(ok=>setTimeout(ok, slow ? ms : 0));
+  const hit = trackTask(box, 2, 0);
+  const panels = [...box.querySelectorAll('.bc-panel')].map(el=>({
+    el, mode:el.dataset.mode,
+    run:el.querySelector('.bc-run'), seen:false, code:el.querySelector('.bc-code'), iters:el.querySelector('.bc-iters'), msg:el.querySelector('.bc-msg'), out:el.querySelector('.bc-out')
+  }));
+  function reset(p){
+    p.code.innerHTML = pyCode(`n = 0\nwhile n < 5:\n    n = n + 1\n    if n == 3:\n        ${p.mode}\n    print(n)\nprint("Кінець")`);
+    p.iters.innerHTML = [1, 2, 3, 4, 5].map(n=>`<div class="bc-it">n = ${n}<small></small></div>`).join('');
+    p.out.textContent = '';
+    p.msg.innerHTML = '&nbsp;';
+  }
+  async function play(p){
+    const lines = [...p.code.querySelectorAll('.ln')], its = [...p.iters.children];
+    const cur = (k, cls = 'cur')=>lines.forEach((l, i)=>{ l.classList.remove('cur', 'jump'); if(i + 1 === k) l.classList.add(cls); });
+    const say = h=>{ p.msg.innerHTML = h; };
+    const mark = (it, cls, cap)=>{ it.classList.remove('on'); it.classList.add(cls); it.querySelector('small').textContent = cap; };
+    let n = 0;
+    cur(1); say('Лічильник <b>n = 0</b>.'); await wait(700);
+    while(true){
+      cur(2); say(`Умова <b>${n} &lt; 5</b> — ${n < 5 ? 'True, заходимо в тіло.' : 'False, цикл закінчено.'}`); await wait(800);
+      if(n >= 5) break;
+      n++;
+      const it = its[n - 1];
+      cur(3); it.classList.add('on'); say(`Ітерація з <b>n = ${n}</b>.`); await wait(650);
+      cur(4); say(`<b>${n} == 3</b> — ${n === 3 ? 'True!' : 'False, ідемо далі.'}`); await wait(650);
+      if(n === 3){
+        cur(5);
+        if(p.mode === 'break'){
+          mark(it, 'stop', 'break');
+          say('<b>break</b>: цикл закінчено зовсім!'); await wait(1000);
+          its.slice(n).forEach(x=>mark(x, 'none', 'не було'));
+          cur(7, 'jump'); say('Стрибаємо одразу за цикл.'); await wait(900);
+          break;
+        }
+        mark(it, 'skip', 'пропуск');
+        say('<b>continue</b>: print(n) пропущено.'); await wait(1000);
+        cur(2, 'jump'); say('Повертаємось до умови.'); await wait(800);
+        continue;
+      }
+      cur(6); p.out.textContent += n + '\n'; mark(it, 'ok', 'print'); say(`Виводимо <b>${n}</b>.`); await wait(650);
+    }
+    cur(7); p.out.textContent += 'Кінець'; await wait(500);
+    cur(0);
+    say(p.mode === 'break' ? 'Виведено 1 2 — після break ітерацій 4 і 5 не було.' : 'Виведено 1 2 4 5 — пропущено лише 3.');
+  }
+  panels.forEach(p=>{
+    reset(p);
+    p.run.addEventListener('click', async ()=>{
+      p.run.disabled = true;
+      reset(p);
+      await play(p);
+      p.run.disabled = false; p.run.textContent = '↺ Ще раз';
+      if(!p.seen){ p.seen = true; hit(); }
+    });
+  });
+})();
+
+makeCodeTask('liftTask', {
+  code:'floor = 9\nwhile floor < 16:\n    floor = floor + 1\n    if floor == 13:\n        ...\n    print(f"Поверх {floor}")',
+  expect:[10, 11, 12, 14, 15, 16].map(f=>`Поверх ${f}`).join('\n'),
+  hint:'Замість трьох крапок — continue: тоді print для 13 не виконається.',
+  neurons:2,
+  check:(out, code)=>/^\s+continue\s*$/m.test(code) || 'Пропусти 13-й поверх командою continue.'
+});
+
+makeCodeTask('sevenTask', {
+  code:'n = 50\nwhile True:\n    n = n + 1\n    if ...:\n        print(f"Знайдено: {n}")\n        ...',
+  expect:'Знайдено: 56',
+  hint:'Число ділиться на 7, коли остача 0: n % 7 == 0. А другі крапки — break.',
+  neurons:2,
+  check:(out, code)=>{
+    if(/\.\.\./.test(code)) return 'Заміни обидві трійки крапок.';
+    if(!/%\s*7/.test(code)) return 'Перевір подільність на 7 через остачу: <code>n % 7 == 0</code>.';
+    return /^\s+break\s*$/m.test(code) || 'Після знахідки треба вийти з циклу — break.';
+  }
+});
+
+/* ---------- КРОК 2: два підходи ---------- */
+makeCodeTask('skipTask', {
+  code:'n = 0\nwhile n < 20:\n    n = n + 1\n    print(n)',
+  expect:'1\n2\n4\n5\n7\n8\n10\n11\n13\n14\n16\n17\n19\n20',
+  hint:'Перед print(n) додай: if n % 3 == 0: і під ним, з відступом, continue',
+  check:(out, code)=>{
+    return /^\s+continue\s*$/m.test(code) || 'Розв’яжи задачу через continue.';
+  }
+});
+
+/* ---------- КРОК 3: цифри числа ---------- */
+(function(){
+  const box = document.getElementById('digitDemo');
+  const q = c=>box.querySelector(c);
+  const code = q('.dg-code'), num = q('.dg-num'), msg = q('.dg-msg'), out = q('.dg-out'), run = q('.dg-run'), nums = q('.dg-nums');
+  const slow = !matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const wait = ms=>new Promise(ok=>setTimeout(ok, slow ? ms : 0));
+  const hit = trackTask(box, 1, 0); let seen = false;
+  let N = 432;
+  const tile = d=>`<span class="dg-tile">${d}</span>`;
+  function reset(){
+    code.innerHTML = pyCode(`n = ${N}\nwhile n > 9:\n    print(n % 10)\n    n = n // 10\nprint(n)`);
+    num.innerHTML = String(N).split('').map(tile).join('');
+    out.innerHTML = '';
+    msg.innerHTML = 'Натисни «Запустити».';
+    nums.querySelectorAll('button').forEach(b=>b.classList.toggle('on', +b.textContent === N));
+  }
+  const cur = k=>code.querySelectorAll('.ln').forEach((l, i)=>l.classList.toggle('cur', i + 1 === k));
+  [432, 5807, 61].forEach(v=>{
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = v;
+    b.addEventListener('click', ()=>{ N = v; run.textContent = '▶ Запустити'; reset(); });
+    nums.appendChild(b);
+  });
+  run.addEventListener('click', async ()=>{
+    run.disabled = true; nums.querySelectorAll('button').forEach(b=>b.disabled = true);
+    reset();
+    let n = N;
+    cur(1); msg.innerHTML = `У коробці <b>n</b> — число <b>${n}</b>.`; await wait(1000);
+    while(true){
+      cur(2);
+      msg.innerHTML = n > 9 ? `<b>${n} &gt; 9</b> — True: цифр більше однієї, ділимо далі.` : `<b>${n} &gt; 9</b> — False: лишилась одна цифра, цикл закінчено.`;
+      await wait(1300);
+      if(n <= 9) break;
+      const last = num.lastElementChild;
+      cur(3); last.classList.add('pick');
+      msg.innerHTML = `<b>${n} % 10</b> = <b>${n % 10}</b> — остання цифра. Виводимо її.`;
+      await wait(900);
+      out.insertAdjacentHTML('beforeend', tile(n % 10));
+      await wait(900);
+      cur(4); last.classList.add('gone');
+      msg.innerHTML = `<b>${n} // 10</b> = <b>${Math.floor(n / 10)}</b> — відкидаємо останню цифру.`;
+      n = Math.floor(n / 10);
+      await wait(600); last.remove(); await wait(900);
+    }
+    cur(5); num.lastElementChild.classList.add('pick');
+    msg.innerHTML = `Після циклу виводимо <b>${n}</b> — першу цифру числа.`;
+    await wait(800);
+    out.insertAdjacentHTML('beforeend', tile(n));
+    await wait(1000);
+    cur(0);
+    msg.innerHTML = `Готово! Цифри числа ${N} вийшли з кінця.`;
+    run.disabled = false; run.textContent = '↺ Ще раз';
+    nums.querySelectorAll('button').forEach(b=>b.disabled = false);
+    if(!seen){ seen = true; hit(); }
+  });
+  reset();
+})();
+
+/* «Тепер зміни програму» з'являється над редактором лише тоді, коли учень запустив готову програму й виконав дії.
+   Поки цього не сталося, check пише підказку сам і повертає null — це не хибна спроба. */
+function changeNote(id){
+  const box = document.getElementById(id), note = box.nextElementSibling;
+  box.prepend(note);
+  note.hidden = true;
+  const say = html=>{ const fb = box.querySelector(':scope > .choice-feedback'); fb.className = 'choice-feedback tip'; fb.innerHTML = html; };
+  return {
+    shown:()=>!note.hidden,
+    say,
+    show(){
+      note.hidden = false;
+      note.classList.add('pop');
+      say('Програма працює ✓ Тепер зміни її — завдання з’явилося над програмою.');
+      note.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+  };
+}
+
+/* ---------- КРОК 4: PIN-код ---------- */
+const pinNote = changeNote('pinTask');
+makeCodeTask('pinTask', {
+  code:'correct = "2580"\npin_code = input("Введи PIN: ")\nwhile pin_code != correct:\n    print("Неправильний PIN")\n    pin_code = input("Введи PIN: ")\nprint("Доступ дозволено!")',
+  hint:'Перед циклом: tries = 1. У тілі циклу: tries = tries + 1. А наприкінці: print(f"Доступ дозволено! Спроб: {tries}")',
+  neurons:4,
+  check:(out, code)=>{
+    const m = out.match(/Спроб: (\d+)/);
+    const tries = (out.match(/Неправильний PIN/g) || []).length + 1;
+    if(!pinNote.shown()){
+      if(m){ pinNote.show(); }
+      else if(tries === 1){ pinNote.say('Запусти ще раз: спершу введи неправильний PIN, а потім 2580.'); return null; }
+      else { pinNote.show(); return null; }
+    }
+    if(!m) return 'Додай лічильник спроб: наприкінці має з’явитися «Доступ дозволено! Спроб: …».';
+    if(tries === 1) return 'Перевір лічильник із помилками: спершу введи неправильний PIN, а потім 2580.';
+    return +m[1] === tries || `Спроб було ${tries}, а програма пише ${m[1]}. Перевір, з якого числа починає лічильник і де він збільшується.`;
+  }
+});
+
+/* ---------- КРОК 5: меню ---------- */
+const menuNote = changeNote('menuTask');
+makeCodeTask('menuTask', {
+  code:'while True:\n    print("1 — погладити, 2 — нагодувати, 0 — вихід")\n    choice = input("Твій вибір: ")\n    if choice == "1":\n        print("Мур-мур!")\n    elif choice == "2":\n        print("Ням-ням!")\n    elif choice == "0":\n        break\n    else:\n        print("Котик не розуміє")\nprint("Бувай!")',
+  hint:'Перед elif choice == "0": додай elif choice == "3": і під ним, з відступом, print("Котик ганяє м’ячик!"). А в першому print — «3 — пограти».',
+  neurons:4,
+  check:(out, code)=>{
+    const added = /choice\s*==\s*["']3["']/.test(code);
+    if(!menuNote.shown()){
+      const miss = [['Мур-мур!', '1'], ['Ням-ням!', '2'], ['Котик не розуміє', 'неіснуючий пункт, напр. 7']].filter(([t])=>!out.includes(t)).map(([, k])=>k);
+      if(added) menuNote.show();
+      else if(miss.length){ menuNote.say(`Запусти ще раз і спробуй: ${miss.join(', ')} — а тоді 0.`); return null; }
+      else { menuNote.show(); return null; }
+    }
+    if(!added) return 'Додай пункт 3: <code>elif choice == "3":</code>';
+    if(!/3\s*—|3\s*-/.test(code.split('\n').find(l=>/print\(\s*["']1/.test(l)) || '')) return 'Допиши «3 — пограти» в рядок меню, щоб користувач знав про новий пункт.';
+    if(!/ганяє/.test(out)) return 'Запусти програму й обери пункт 3.';
+    return /Бувай!\s*$/.test(out) || 'Наприкінці вийди з меню через 0.';
+  }
+});
+
+/* ---------- ДЛЯ ОХОЧИХ: вгадай число (без нейрончиків, блок data-guide) ---------- */
+makeCodeTask('guessTask', {
+  code:'import random\nsecret = random.randint(1, 20)\ntries = 0\nwhile True:\n    guess = int(input("Твоє число: "))\n    tries = tries + 1\n    if guess == secret:\n        ...\n    elif guess < secret:\n        print("Більше!")\n    else:\n        print(...)\nprint(f"Вгадав! Спроб: {tries}")',
+  hint:'Перші три крапки — break, другі — текст "Менше!" у лапках.',
+  neurons:0,
+  check:(out, code)=>{
+    if(/\.\.\./.test(code)) return 'Заміни обидві трійки крапок.';
+    if(!/^\s+break\s*$/m.test(code)) return 'Коли число вгадано, треба вийти з циклу — break.';
+    if(!/Менше/.test(code)) return 'Якщо число завелике, програма має підказати «Менше!».';
+    return /Вгадав! Спроб: \d+/.test(out) || 'Зіграй до кінця — вгадай число.';
+  }
+});
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що робить <code>continue</code>?', opts:['Виходить з циклу', 'Пропускає решту тіла й переходить до перевірки умови', 'Зупиняє програму'], correct:1 },
+  { q:'Що виведе програма?' + pyCode('n = 0\nwhile n < 4:\n    n = n + 1\n    if n == 2:\n        continue\n    print(n)'), opts:['1 3 4', '1', '1 2 3 4'], correct:0, why:'Пропущено лише 2.' },
+  { q:'А якщо замість <code>continue</code> написати <code>break</code>?', opts:['1 3 4', '1', 'Нічого'], correct:1, why:'На 2 цикл закінчується зовсім, а 1 уже виведено.' },
+  { q:'Чому цей цикл ніколи не закінчиться?' + pyCode('n = 0\nwhile n < 5:\n    if n == 3:\n        continue\n    n = n + 1'), opts:['Бракує print()', 'При n = 3 continue пропускає збільшення n', 'Умова завжди хибна'], correct:1 },
+  { q:'Скільки буде <code>538 // 10</code>?', opts:['8', '53', '53.8'], correct:1, why:'// відкидає останню цифру.' },
+  { q:'Що виведе програма?' + pyCode('s = 0\nn = 1\nwhile n <= 4:\n    s = s + n\n    n = n + 1\nprint(s)'), opts:['4', '10', '5'], correct:1, why:'1 + 2 + 3 + 4 = 10: у s щоразу додається n.' },
+  { q:'Коли закінчиться цей цикл?' + pyCode('pin_code = input()\nwhile pin_code != "2580":\n    pin_code = input()'), opts:['Коли введуть 2580', 'Після трьох спроб', 'Ніколи'], correct:0, why:'Цикл крутиться, поки PIN <b>не</b> збігається.' },
+  { q:'У меню на <code>while True</code> пункт «Вихід» має…', opts:['виконати <code>break</code>', 'виконати <code>continue</code>', 'нічого не робити'], correct:0 },
+], {summary:'Тепер ти вмієш пропускати ітерації через continue, розбирати число на цифри, перевіряти введення, рахувати спроби й будувати меню.', html:true});
+</script>
+
+</body>
+</html>

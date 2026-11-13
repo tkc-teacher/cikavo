@@ -330,14 +330,16 @@ function makeCodeTask(id, {task = '', code = '', expect, check, hint = '', neuro
     onRun({out, error}){
       let verdict;
       if(error) verdict = error.message === 'STOP' ? null : 'Виправ помилку й запусти ще раз.';
-      else if(expect !== undefined) verdict = norm(out) === norm(expect) || 'Програма працює, але вивід не збігається з тим, що має вийти. Порівняй уважно, кожен символ.';
-      else verdict = check ? check(out, ed.get()) : true;
+      else {
+        verdict = check ? check(out, ed.get()) : true;   // разом з expect check перевіряє лише будову коду (напр. «через continue»)
+        if(verdict === true && expect !== undefined && norm(out) !== norm(expect)) verdict = 'Програма працює, але вивід не збігається з тим, що має вийти. Порівняй уважно, кожен символ.';
+      }
       if(verdict === null) return;
       if(verdict === true){
         fb.className = 'choice-feedback ok';
-        fb.innerHTML = solved ? 'Знову правильно ✓' : `Правильно ✓ +${neurons}`;
+        fb.innerHTML = solved ? 'Знову правильно ✓' : neurons ? `Правильно ✓ +${neurons}` : 'Правильно ✓';
         box.classList.add('solved');
-        if(!solved){ solved = true; addNeurons(neurons); hit(); }
+        if(!solved){ solved = true; if(neurons) addNeurons(neurons); hit(); }
       } else {
         fb.className = 'choice-feedback';
         fb.innerHTML = verdict || 'Ще не те. Перечитай умову.';
