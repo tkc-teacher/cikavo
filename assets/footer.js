@@ -1,4 +1,4 @@
-/* Спільний футер сайту: рядок «© рік автор, місто · логотип CC · Про проєкт».
+/* Спільний футер сайту: рядок «© рік автор · місто · логотип CC · Про проєкт».
    Єдине місце, де лежать текст, логотип і стилі цього рядка — змінювати лише тут.
 
    Як підключити:
@@ -10,7 +10,7 @@
    тож працюють на будь-якій глибині теки й з file://. */
 (()=>{
   const YEAR   = '2026';
-  const AUTHOR = 'Ткачук Ігор Антонович';
+  const AUTHOR = 'Ткачук\u00a0І.\u00a0А.';   // нерозривні пробіли — ініціали не відриваються від прізвища
   const CITY   = 'м.\u00a0Київ';   // нерозривний пробіл — «м.» не відривається від назви
   const LICENSE_NAME = 'Ліцензія Creative Commons CC BY-NC-SA 4.0';
 
@@ -41,7 +41,7 @@ footer .copy a.about-link:hover span{color:var(--surface,#fff);}`;
     const lic = onAbout ? '#license' : about.href + '#license';
     const name = f.querySelector('.page-name');   // назва сторінки — першим рядком, © під нею
     (name || f).insertAdjacentHTML(name ? 'afterend' : 'afterbegin',
-      `<span class="copy">© ${YEAR} ${AUTHOR}, ${CITY} · ` +
+      `<span class="copy">© ${YEAR} ${AUTHOR} · ${CITY} · ` +
       `<a class="cc-link" href="${lic}" rel="license" title="${LICENSE_NAME}" aria-label="${LICENSE_NAME}">${CC_SVG}</a>` +
       (onAbout ? '' : ` · <a class="about-link" href="${about.href}"><span>Про проєкт</span></a>`) +
       `</span>`);
