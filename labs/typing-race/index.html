@@ -266,21 +266,22 @@
   .hk-ico kbd{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12.5px; line-height:1.3; min-width:20px; padding:0 5px; text-align:center; color:var(--ink);
     border:1.5px solid rgba(27,27,58,.16); border-bottom-width:2.5px; border-radius:6px; background:var(--f-thumb);}
   .sym-ico{display:inline-flex; gap:5px; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:1.15em; line-height:1;}
-  .train-lead{font-size:15px; color:var(--ink); margin:0 0 12px;}
-  .train-lead + .train-lead{margin-top:-6px;}
-  .hands{display:block; width:100%; max-width:560px; margin:4px auto 0; user-select:none;}
-  .hands .f{cursor:pointer; transition:transform .15s ease;}
-  .hands .f path, .hands .f rect{stroke:#B9B5D0; stroke-width:1.5;}
-  .hands .f.sel path, .hands .f.sel rect{stroke:var(--ink); stroke-width:2.6;}
-  .hands .f.sel{transform:translateY(-4px);}
-  .hands text{font-family:'Baloo 2',sans-serif; font-weight:800; pointer-events:none; fill:var(--ink);}
+  .train-rule{text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; line-height:1.7; color:var(--ink); margin:0 0 12px;}
+  .rule-space{display:inline-block; min-width:120px; padding:0 14px; margin-left:2px; border-radius:8px; background:var(--f-thumb); border:1.5px solid rgba(27,27,58,.16); border-bottom-width:3px; font-size:15px; line-height:26px; color:var(--ink-soft); vertical-align:1px;}   /* «пробілі» — сіра клавіша пробілу */
+  .train-rule b{font-weight:800; letter-spacing:.06em;}
+  .kb-hands{position:relative;}
+  .kb.train{--k:min(58px, calc((100vw - 170px) / 14.5));}   /* у тренуванні клавіатура більша: найширший — ряд цифр (13 клавіш + відступ) */
+  .kb-hands .kb{margin-top:6px;}
+  .hands{position:absolute; inset:0; width:100%; height:100%; overflow:visible; pointer-events:none; user-select:none;}
+  .hands .fr{fill-opacity:.3; stroke-width:2; pointer-events:all; cursor:pointer; transition:fill-opacity .1s ease, stroke-width .1s ease, transform .08s ease-out;}
+  .hands .fr.sel{fill-opacity:.45; stroke-width:3;}
+  .card-gain .nico{width:20px; height:20px; vertical-align:-4px;}
+  .card-gain{position:absolute; top:6px; right:8px; font-family:'Baloo 2',sans-serif; font-weight:800; color:#B98500; animation:gainUp 1.2s ease forwards; pointer-events:none;}
+  @keyframes gainUp{from{transform:translateY(6px); opacity:0;} 20%{transform:none; opacity:1;} 75%{opacity:1;} to{transform:translateY(-10px); opacity:0;}}
   .kb.train .key.home::before{content:""; position:absolute; top:5px; right:5px; width:7px; height:7px; border-radius:50%; background:var(--ink); opacity:.45;}
-  .kb.train .key.dim{opacity:.22;}
-  .kb.train .key.lit{background:var(--ink); color:#fff; border-color:var(--ink); transform:translateY(-2px); box-shadow:0 0 0 3px var(--yellow);}
-  .kb.train .key.lit .up{color:rgba(255,255,255,.7);}
-  .train-say{min-height:34px; margin:12px 0 0; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; color:var(--ink);}
-  .train-say .dot{display:inline-block; width:14px; height:14px; border-radius:50%; vertical-align:-1px; margin:0 6px 0 2px; border:1.5px solid rgba(27,27,58,.25);}
-  .train-tools{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:10px;}
+  .kb.train .key.zone{box-shadow:inset 0 0 0 2px var(--fi);}   /* клавіші активного пальця — обвідка його кольору, інші не бліднуть */
+  /* натиснута клавіша — своїм кольором, лише «вдавлена» й з м'якою жовтою обвідкою */
+  .kb.train .key.lit{transform:translateY(2px); border-bottom-width:1.5px; border-color:rgba(27,27,58,.5); box-shadow:inset 0 0 0 2px var(--fi), 0 0 0 3px rgba(255,201,60,.9); filter:brightness(.94) saturate(1.3);}
   kbd.kc{display:inline-block; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14.5px; line-height:1.35; min-width:26px; padding:0 7px; text-align:center;
     border:1.5px solid rgba(27,27,58,.16); border-bottom-width:3px; border-radius:7px; background:var(--f-thumb); color:var(--ink);}
   .hk-grid, .sym-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(215px, 1fr)); gap:10px;}
@@ -288,21 +289,33 @@
   .hk, .sym{position:relative; border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 12px; background:var(--surface); transition:background .2s ease, border-color .2s ease;}
   .hk .keys{display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin-bottom:6px; font-weight:700; color:var(--ink-soft);}
   .hk b{display:block; font-family:'Baloo 2',sans-serif; font-size:16px; line-height:1.2;}
-  .hk small, .sym small{display:block; font-size:13px; color:var(--ink-soft); line-height:1.3;}
+  .hk small{display:block; font-size:13px; color:var(--ink-soft); line-height:1.3;}
   .hk .only{display:inline-block; margin-top:6px; font-size:11.5px; font-weight:700; color:var(--ink-soft); background:var(--bg); border-radius:999px; padding:1px 8px;}
   .hk.done, .sym.done{border-color:var(--teal); background:#E3F7F6;}
-  .hk.done::after, .sym.done::after{content:"✓"; position:absolute; top:-8px; right:-6px; width:20px; height:20px; border-radius:50%; background:var(--teal); color:#fff; font-size:12px; font-weight:800; line-height:20px; text-align:center;}
+  .hk-group{font-family:'Baloo 2',sans-serif; font-size:18px; font-weight:800; color:var(--ink); margin:18px 0 8px;}
+  .hk-group:first-child{margin-top:0;}
+  .hk{display:flex; flex-direction:column;}
+  .ticks{display:flex; gap:5px; margin-top:auto; padding-top:8px;}
+  .sym .ticks{grid-column:1 / -1;}
+  .ticks i{width:20px; height:20px; border-radius:50%; background:#E4E1F5; color:#fff; font-style:normal; font-size:12px; font-weight:800; line-height:20px; text-align:center; transition:background .15s ease, transform .15s ease;}
+  .ticks i.on{background:#3FC46B;}
   .hk.flash, .sym.flash{animation:flashCard .6s ease;}
   @keyframes flashCard{30%{transform:scale(1.04); box-shadow:0 0 0 4px var(--yellow);}}
-  .train-count{font-family:'Baloo 2',sans-serif; font-weight:700; color:var(--teal-dark); margin:12px 0 0;}
   .sym{display:grid; grid-template-columns:76px 1fr; gap:12px; align-items:center;}
   .sym .left{text-align:center;}
   .sym .ch{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:36px; line-height:1; background:var(--bg); border-radius:var(--radius-s); padding:6px 0 2px;}
   .sym .name{display:block; margin-top:4px; font-size:11.5px; line-height:1.15; color:var(--ink-soft);}
-  .sym .how{font-size:13.5px; line-height:1.55;}
-  .sym .how .no{color:#B9B6CC;}
-  .train-note{background:#FFF4D6; color:#6B4D00; border-radius:var(--radius-m); padding:10px 14px; font-size:14px; margin:0 0 12px;}
-  .train-note b{color:var(--ink);}
+  .sym .how{display:flex; align-items:center; flex-wrap:wrap; gap:4px;}
+  .sym .plus{font-weight:800; color:var(--ink-soft);}
+  .mini-row{display:inline-flex; gap:3px;}
+  .mk{position:relative; display:inline-flex; align-items:center; justify-content:center; width:36px; height:34px; border-radius:7px; background:var(--f-thumb);
+    border:1.5px solid rgba(27,27,58,.14); border-bottom-width:3px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; color:#A9A6BF;}
+  .mk .up{position:absolute; top:0; left:4px; font-size:10px;}
+  .mk .alt{position:absolute; bottom:0; right:4px; font-size:9.5px; opacity:.75;}
+  .mk.wide{width:auto; padding:0 9px; font-size:13px;}
+  .mk.on{background:#FFE9A8; border-color:#D9A21B; color:var(--ink);}
+  .mk.on .up, .mk.on .alt{color:var(--ink-soft);}
+  .mk.on .up.need{color:#D9480F; font-size:13px; font-weight:800; top:-2px;}
 
   /* ---------- Профіль ---------- */
   .player-btn{display:inline-flex; align-items:center; gap:6px;}
@@ -2076,8 +2089,6 @@ function renderSetup(){
 
 /* ================= Тренування: пальці, гарячі клавіші, символи ================= */
 const IS_MAC = /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent);
-const FINGER_NAME = ['лівий мізинець','лівий безіменний','лівий середній','лівий вказівний',
-                     'правий вказівний','правий середній','правий безіменний','правий мізинець'];
 // Повна клавіатура для тренування: ряд цифр із символами (Shift) і літерні ряди; e.code — фізичне місце клавіші
 const TRAIN_NUM = {
   uk:[["'",'₴'],['1','!'],['2','"'],['3','№'],['4',';'],['5','%'],['6',':'],['7','?'],['8','*'],['9','('],['0',')'],['-','_'],['=','+']],
@@ -2093,169 +2104,257 @@ const CODES = [
 const HOME_COLS = [0,1,2,3,6,7,8,9];   // клавіші середнього ряду під пальцями: ФІВА ОЛДЖ / ASDF JKL;
 
 const mod = e => IS_MAC ? e.metaKey : e.ctrlKey;
-const HOTKEYS = [
-  { k:['Ctrl','C'], m:['⌘','C'], t:'Копіювати', d:'виділене — у буфер обміну', test:e=>mod(e) && !e.shiftKey && e.code==='KeyC' },
-  { k:['Ctrl','V'], m:['⌘','V'], t:'Вставити', d:'те, що в буфері обміну', test:e=>mod(e) && !e.shiftKey && e.code==='KeyV' },
-  { k:['Ctrl','X'], m:['⌘','X'], t:'Вирізати', d:'забрати виділене й покласти в буфер', test:e=>mod(e) && e.code==='KeyX' },
-  { k:['Ctrl','Z'], m:['⌘','Z'], t:'Скасувати', d:'останню дію — рятує від помилок', test:e=>mod(e) && !e.shiftKey && e.code==='KeyZ' },
-  { k:['Ctrl','Y'], m:['⌘','Shift','Z'], t:'Повернути', d:'скасовану дію', test:e=>mod(e) && (e.code==='KeyY' || e.shiftKey && e.code==='KeyZ') },
-  { k:['Ctrl','A'], m:['⌘','A'], t:'Виділити все', d:'увесь текст чи всі файли', test:e=>mod(e) && e.code==='KeyA' },
-  { k:['Ctrl','S'], m:['⌘','S'], t:'Зберегти', d:'документ чи малюнок', test:e=>mod(e) && e.code==='KeyS' },
-  { k:['Ctrl','F'], m:['⌘','F'], t:'Знайти', d:'слово на сторінці чи в документі', test:e=>mod(e) && e.code==='KeyF' },
-  { k:['Ctrl','P'], m:['⌘','P'], t:'Друкувати', d:'відкрити вікно друку', test:e=>mod(e) && e.code==='KeyP' },
-  { k:['Ctrl','B / I / U'], m:['⌘','B / I / U'], t:'Жирний, курсив, підкреслений', d:'для виділеного тексту', test:e=>mod(e) && ['KeyB','KeyI','KeyU'].includes(e.code) },
-  { k:['Ctrl','Backspace'], m:['⌥','Backspace'], t:'Стерти слово', d:'ціле слово ліворуч від курсора', test:e=>(IS_MAC ? e.altKey : e.ctrlKey) && e.code==='Backspace' },
-  { k:['Shift','← →'], m:['Shift','← →'], t:'Виділити текст', d:'по одній літері, без миші', test:e=>e.shiftKey && !mod(e) && ['ArrowLeft','ArrowRight'].includes(e.code) },
-  { k:['Home / End'], m:['⌘','← / →'], t:'На початок чи кінець рядка', d:'швидко перейти курсором', test:e=>['Home','End'].includes(e.code) || IS_MAC && e.metaKey && ['ArrowLeft','ArrowRight'].includes(e.code) },
-  { k:['Ctrl','+ / −'], m:['⌘','+ / −'], t:'Збільшити чи зменшити', d:'сторінку; Ctrl + 0 — як було', md:'сторінку; ⌘ + 0 — як було', test:e=>mod(e) && ['Equal','Minus','NumpadAdd','NumpadSubtract'].includes(e.code) },
-  { k:['Alt','Shift'], m:['Ctrl','Пробіл'], t:'Змінити мову', d:'українська ⇄ англійська; ще буває Win + Пробіл', md:'українська ⇄ англійська', test:null },
-  { k:['Alt','Tab'], m:['⌘','Tab'], t:'Інше вікно', d:'перемкнутися між програмами', test:null },
-  { k:['Win','Shift','S'], m:['⌘','Shift','4'], t:'Знімок екрана', d:'вибрати частину й зберегти', test:null }
+// Гарячі клавіші за категоріями. id — ключ прогресу (profile.trained.hk), не міняти.
+// test: null — «лише запам'ятай»: браузер чи система перехоплюють ці комбінації, сторінка їх не бачить (Ctrl+T, Ctrl+W, Alt+Tab…)
+const wordKey = e => IS_MAC ? e.altKey : e.ctrlKey;   // перехід по словах: Ctrl на Windows, ⌥ на Mac
+const arrowLR = e => ['ArrowLeft','ArrowRight'].includes(e.code);
+const HK_GROUPS = [
+  { t:'Текст', items:[
+    { id:'copy',  k:['Ctrl','C'], m:['⌘','C'], t:'Копіювати', d:'виділене — у буфер обміну', test:e=>mod(e) && !e.shiftKey && e.code==='KeyC' },
+    { id:'paste', k:['Ctrl','V'], m:['⌘','V'], t:'Вставити', d:'те, що в буфері обміну', test:e=>mod(e) && !e.shiftKey && e.code==='KeyV' },
+    { id:'cut',   k:['Ctrl','X'], m:['⌘','X'], t:'Вирізати', d:'забрати виділене й покласти в буфер', test:e=>mod(e) && e.code==='KeyX' },
+    { id:'plain', k:['Ctrl','Shift','V'], m:['⌘','Shift','V'], t:'Вставити без оформлення', d:'лише текст — без чужих шрифтів і кольорів', test:e=>mod(e) && e.shiftKey && e.code==='KeyV' },
+    { id:'undo',  k:['Ctrl','Z'], m:['⌘','Z'], t:'Скасувати', d:'останню дію — рятує від помилок', test:e=>mod(e) && !e.shiftKey && e.code==='KeyZ' },
+    { id:'redo',  k:['Ctrl','Y'], m:['⌘','Shift','Z'], t:'Повернути', d:'скасовану дію', test:e=>mod(e) && (e.code==='KeyY' || e.shiftKey && e.code==='KeyZ') },
+    { id:'all',   k:['Ctrl','A'], m:['⌘','A'], t:'Виділити все', d:'увесь текст чи всі файли', test:e=>mod(e) && e.code==='KeyA' },
+    { id:'bold',  k:['Ctrl','B'], m:['⌘','B'], t:'Жирний', d:'виділений текст стає товстішим', test:e=>mod(e) && e.code==='KeyB' },
+    { id:'ital',  k:['Ctrl','I'], m:['⌘','I'], t:'Курсив', d:'виділений текст стає похилим', test:e=>mod(e) && e.code==='KeyI' },
+    { id:'under', k:['Ctrl','U'], m:['⌘','U'], t:'Підкреслений', d:'лінія під виділеним текстом', test:e=>mod(e) && e.code==='KeyU' },
+    { id:'link',  k:['Ctrl','K'], m:['⌘','K'], t:'Вставити посилання', d:'на виділений текст у документі', test:e=>mod(e) && e.code==='KeyK' }
+  ]},
+  { t:'Курсор і виділення', items:[
+    { id:'word',   k:['Ctrl','← / →'], m:['⌥','← / →'], t:'Через ціле слово', d:'курсор стрибає по словах', test:e=>wordKey(e) && !e.shiftKey && arrowLR(e) },
+    { id:'sel',    k:['Shift','← →'], m:['Shift','← →'], t:'Виділити текст', d:'по одній літері, без миші', test:e=>e.shiftKey && !mod(e) && !e.altKey && !e.ctrlKey && arrowLR(e) },
+    { id:'selw',   k:['Ctrl','Shift','← →'], m:['⌥','Shift','← →'], t:'Виділити слово', d:'одразу ціле слово', test:e=>wordKey(e) && e.shiftKey && arrowLR(e) },
+    { id:'line',   k:['Home / End'], m:['⌘','← / →'], t:'На початок чи кінець рядка', d:'швидко перейти курсором', test:e=>!e.shiftKey && (['Home','End'].includes(e.code) && !e.ctrlKey || IS_MAC && e.metaKey && arrowLR(e)) },
+    { id:'doc',    k:['Ctrl','Home / End'], m:['⌘','↑ / ↓'], t:'На початок чи кінець документа', d:'одразу на першу чи останню сторінку', test:e=>IS_MAC ? e.metaKey && ['ArrowUp','ArrowDown'].includes(e.code) : e.ctrlKey && ['Home','End'].includes(e.code) },
+    { id:'delw',   k:['Ctrl','Backspace'], m:['⌥','Backspace'], t:'Стерти слово', d:'ціле слово ліворуч від курсора', test:e=>wordKey(e) && e.code==='Backspace' }
+  ]},
+  { t:'Документи й файли', items:[
+    { id:'save',  k:['Ctrl','S'], m:['⌘','S'], t:'Зберегти', d:'документ чи малюнок', test:e=>mod(e) && e.code==='KeyS' },
+    { id:'print', k:['Ctrl','P'], m:['⌘','P'], t:'Друкувати', d:'відкрити вікно друку', test:e=>mod(e) && e.code==='KeyP' },
+    { id:'find',  k:['Ctrl','F'], m:['⌘','F'], t:'Знайти', d:'слово на сторінці чи в документі', test:e=>mod(e) && e.code==='KeyF' },
+    { id:'open',  k:['Ctrl','O'], m:['⌘','O'], t:'Відкрити', d:'файл з комп\'ютера', test:e=>mod(e) && e.code==='KeyO' },
+    { id:'new',   k:['Ctrl','N'], m:['⌘','N'], t:'Створити новий', d:'документ чи вікно', test:null },
+    { id:'tab',   k:['Tab'], m:['Tab'], t:'До наступного поля', d:'у формі; Shift + Tab — назад', test:e=>e.code==='Tab' && !mod(e) && !e.altKey },
+    { id:'esc',   k:['Esc'], m:['Esc'], t:'Скасувати чи закрити', d:'меню, вікно, повний екран', test:e=>e.code==='Escape' }
+  ]},
+  { t:'Браузер', items:[
+    { id:'reload', k:['F5'], m:['⌘','R'], t:'Оновити сторінку', d:'ще працює Ctrl + R', md:'завантажити сторінку знову', test:e=>e.code==='F5' || mod(e) && !e.shiftKey && e.code==='KeyR' },
+    { id:'addr',   k:['Ctrl','L'], m:['⌘','L'], t:'До адресного рядка', d:'щоб одразу ввести адресу', test:e=>mod(e) && e.code==='KeyL' },
+    { id:'mark',   k:['Ctrl','D'], m:['⌘','D'], t:'У закладки', d:'зберегти сторінку', test:e=>mod(e) && e.code==='KeyD' },
+    { id:'zoom',   k:['Ctrl','+ / −'], m:['⌘','+ / −'], t:'Збільшити чи зменшити', d:'сторінку; Ctrl + 0 — як було', md:'сторінку; ⌘ + 0 — як було', test:e=>mod(e) && ['Equal','Minus','Digit0','NumpadAdd','NumpadSubtract','Numpad0'].includes(e.code) },
+    { id:'ntab',   k:['Ctrl','T'], m:['⌘','T'], t:'Нова вкладка', d:'порожня вкладка браузера', test:null },
+    { id:'ctab',   k:['Ctrl','W'], m:['⌘','W'], t:'Закрити вкладку', d:'ту, що відкрита зараз', test:null },
+    { id:'rtab',   k:['Ctrl','Shift','T'], m:['⌘','Shift','T'], t:'Повернути вкладку', d:'випадково закриту', test:null },
+    { id:'stab',   k:['Ctrl','Tab'], m:['Ctrl','Tab'], t:'Наступна вкладка', d:'перемкнутися між вкладками', test:null }
+  ]},
+  { t:'Вікна й система', items:[
+    { id:'lang',  k:['Alt','Shift'], m:['Ctrl','Пробіл'], t:'Змінити мову', d:'українська ⇄ англійська; ще буває Win + Пробіл', md:'українська ⇄ англійська', test:null },
+    { id:'win',   k:['Alt','Tab'], m:['⌘','Tab'], t:'Інше вікно', d:'перемкнутися між програмами', test:null },
+    { id:'shot',  k:['Win','Shift','S'], m:['⌘','Shift','4'], t:'Знімок екрана', d:'вибрати частину й зберегти', test:null },
+    { id:'desk',  k:['Win','D'], m:['Fn','F11'], t:'Показати робочий стіл', d:'сховати всі вікна', test:null },
+    { id:'files', k:['Win','E'], m:['⌘','Пробіл'], t:'Знайти файли', d:'відкрити Провідник', md:'пошук Spotlight', test:null },
+    { id:'close', k:['Alt','F4'], m:['⌘','Q'], t:'Закрити програму', d:'вікно, яке зараз відкрите', md:'програму, яка зараз відкрита', test:null },
+    { id:'lock',  k:['Win','L'], m:['Ctrl','⌘','Q'], t:'Заблокувати комп\'ютер', d:'коли відходиш від нього', test:null }
+  ]}
 ];
-// Символи: як набрати в українській і англійській розкладці (null — у цій розкладці немає)
-const SH = '<kbd class="kc">Shift</kbd> + ';
+const HOTKEYS = HK_GROUPS.flatMap(g=>g.items);
+const TICKS = 3;   // гарячі клавіші й символи: скільки разів натиснути, щоб картка стала зеленою (+1 нейрончик)
 const K = s => `<kbd class="kc">${s}</kbd>`;
+// Символи. Як набрати — рахується з розкладок (TRAIN_NUM + LAYOUTS): на картці — потрібна клавіша серед сусідніх, з Shift, якщо треба.
+// Символів, яких у розкладці немає (@ в українській, № в англійській), там не показуємо.
 const SYMBOLS = [
-  { c:'.', name:'крапка',   uk:`клавіша після ${K('Ю')}`,        en:`клавіша ${K('Ю')}` },
-  { c:',', name:'кома',     uk:`${SH}клавіша після ${K('Ю')}`,   en:`клавіша ${K('Б')}` },
-  { c:'!', name:'знак оклику', uk:SH + K('1'),                   en:SH + K('1') },
-  { c:'?', name:'знак питання', uk:SH + K('7'),                  en:`${SH}клавіша після ${K('Ю')}` },
-  { c:"'", name:'апостроф', uk:`клавіша ${K('`')} під Esc`,      en:`клавіша ${K('Є')}`, alt:['’','ʼ'] },
-  { c:'"', name:'лапки',    uk:SH + K('2'),                      en:SH + K('Є') },
-  { c:'@', name:'«собачка»', uk:null,                            en:SH + K('2') },
-  { c:':', name:'двокрапка', uk:SH + K('6'),                     en:SH + K('Ж') },
-  { c:';', name:'крапка з комою', uk:SH + K('4'),                en:`клавіша ${K('Ж')}` },
-  { c:'(', name:'дужка',    uk:SH + K('9'),                      en:SH + K('9') },
-  { c:')', name:'дужка',    uk:SH + K('0'),                      en:SH + K('0') },
-  { c:'-', name:'дефіс',    uk:`клавіша після ${K('0')}`,        en:`клавіша після ${K('0')}` },
-  { c:'_', name:'підкреслення', uk:`${SH}клавіша після ${K('0')}`, en:`${SH}клавіша після ${K('0')}` },
-  { c:'№', name:'номер',    uk:SH + K('3'),                      en:null },
-  { c:'#', name:'решітка',  uk:null,                             en:SH + K('3') },
-  { c:'%', name:'відсоток', uk:SH + K('5'),                      en:SH + K('5') },
-  { c:'+', name:'плюс',     uk:`${SH}${K('=')}`,                 en:`${SH}${K('=')}` },
-  { c:'=', name:'дорівнює', uk:`клавіша ${K('=')} після ${K('-')}`, en:`клавіша ${K('=')} після ${K('-')}` }
+  { c:'.', name:'крапка' }, { c:',', name:'кома' }, { c:'!', name:'знак оклику' }, { c:'?', name:'знак питання' },
+  { c:':', name:'двокрапка' }, { c:';', name:'крапка з комою' }, { c:'-', name:'дефіс' }, { c:'"', name:'лапки' },
+  { c:"'", name:'апостроф', alt:['’','ʼ'] }, { c:'(', name:'дужка' }, { c:')', name:'дужка' }, { c:'№', name:'номер' },
+  { c:'+', name:'плюс' }, { c:'=', name:'дорівнює' }, { c:'*', name:'зірочка (множення)' }, { c:'/', name:'скісна риска (ділення)' },
+  { c:'%', name:'відсоток' }, { c:'<', name:'менше' }, { c:'>', name:'більше' }, { c:'_', name:'підкреслення' },
+  { c:'@', name:'«собачка»' }, { c:'#', name:'решітка' }, { c:'&', name:'амперсанд («і»)' }, { c:'₴', name:'гривня' },
+  { c:'$', name:'долар' }, { c:'[', name:'квадратна дужка' }, { c:']', name:'квадратна дужка' }, { c:'{', name:'фігурна дужка' },
+  { c:'}', name:'фігурна дужка' }, { c:'\\', name:'зворотна скісна риска' }, { c:'|', name:'вертикальна риска' }, { c:'^', name:'«дашок»' },
+  { c:'~', name:'тильда' }, { c:'`', name:'зворотний апостроф' }
 ];
-// Значки розділів: літери середнього ряду кольорами своїх пальців, клавіші «копіювати / вставити», різнокольорові ! @ ? № "
-const FINGER_INK = ['#FF5D9E','#E8A33D','#16A3A0','#6C5CE7','#6C5CE7','#16A3A0','#E8A33D','#FF5D9E'];
-function homeIcon(lang){
-  const home = LAYOUTS[lang][1].map(k=>Array.isArray(k) ? k[0] : k);
-  const part = cols => cols.map(c=>`<span style="color:${FINGER_INK[HOME_COLS.indexOf(c)]}">${home[c].toUpperCase()}</span>`).join('');
-  return `<span class="home-ico">${part([0,1,2,3])} ${part([6,7,8,9])}</span>`;
+// Клавіша \ | є лише в англійській розкладці тут: в українських розкладках Windows і Mac на ній різні знаки (ґ, \, /), тож її не показуємо
+const EXTRA_KEY = { en:[1, ['\\','|']] };
+function kbRows(lang){
+  const rows = [TRAIN_NUM[lang], ...LAYOUTS[lang]].map(row=>row.map(k=>Array.isArray(k) ? k : [k, k.toUpperCase()]));
+  if(EXTRA_KEY[lang]) rows[EXTRA_KEY[lang][0]].push(EXTRA_KEY[lang][1]);
+  return rows;
 }
-const trainParts = () => [ {id:'fingers', html:homeIcon(settings.lang)}, {id:'hotkeys', html:`<span class="hk-ico" title="Гарячі клавіші"><kbd>${IS_MAC ? '⌘' : 'Ctrl'}</kbd>+<kbd>C</kbd>/<kbd>${IS_MAC ? '⌘' : 'Ctrl'}</kbd>+<kbd>V</kbd></span>`}, {id:'symbols', html:`<span class="sym-ico" title="Символи">${[['!','#FF6B4A'],['@','#16A3A0'],['?','#6C5CE7'],['№','#E8A33D'],['&quot;','#FF5D9E']].map(([c, col])=>`<span style="color:${col}">${c}</span>`).join('')}</span>`} ];
-let trainPart = 'fingers', trainSel = null, trainDemo = 0;
-const trainTried = { hotkeys:new Set(), symbols:new Set() };
+function symPlace(c, lang){
+  const rows = kbRows(lang);
+  for(let r = 0; r < rows.length; r++) for(let col = 0; col < rows[r].length; col++){
+    const [lo, up] = rows[r][col];
+    if(lo === c) return { r, col, shift:false };
+    if(up === c && !/\p{L}/u.test(lo)) return { r, col, shift:true };   // у літер верхній знак — та сама літера
+  }
+  return null;
+}
+// Міні-клавіші: потрібна підсвічена, по одній сусідній з кожного боку; у куточку — літера іншої розкладки, як на справжній клавіатурі;
+// якщо потрібен верхній знак (з Shift), він на підсвіченій клавіші виділений кольором
+function symHow(c, lang){
+  const p = symPlace(c, lang); if(!p) return '';
+  const rows = kbRows(lang), other = kbRows(lang === 'uk' ? 'en' : 'uk'), row = rows[p.r];
+  const from = Math.max(0, Math.min(p.col - 1, row.length - 3));
+  const cap = (col, on) => {
+    const [lo, up] = row[col], letter = /\p{L}/u.test(lo), [olo] = other[p.r][col] || [''];
+    const corner = /\p{L}/u.test(olo) && olo !== lo ? `<span class="alt">${esc(olo.toUpperCase())}</span>` : '';
+    return `<span class="mk${on ? ' on' : ''}">${letter ? '' : `<span class="up${on && p.shift ? ' need' : ''}">${esc(up)}</span>`}${esc(letter ? up : lo)}${corner}</span>`;
+  };
+  let keys = '';
+  for(let col = from; col < from + 3 && col < row.length; col++) keys += cap(col, col === p.col);
+  return `${p.shift ? '<span class="mk wide on">Shift</span><span class="plus">+</span>' : ''}<span class="mini-row">${keys}</span>`;
+}
+// Кольори пальців (насиченіші за пастельні --f-*): нігті-прямокутники, обвідка зони пальця, літери середнього ряду
+const FINGER_INK = ['#FF5D9E','#E8A33D','#16A3A0','#6C5CE7','#6C5CE7','#16A3A0','#E8A33D','#FF5D9E'];
+const THUMB_INK = '#9C98B8';
+// Літери середнього ряду лівої (0–3) чи правої (6–9) руки кольорами своїх пальців: ФІВА / ОЛДЖ, ASDF / JKL;
+function homeLetters(lang, cols, tag = 'span'){
+  const home = LAYOUTS[lang][1].map(k=>Array.isArray(k) ? k[0] : k);
+  return cols.map(c=>`<${tag} style="color:${FINGER_INK[HOME_COLS.indexOf(c)]}">${home[c].toUpperCase()}</${tag}>`).join('');
+}
+const LEFT_HOME = [0,1,2,3], RIGHT_HOME = [6,7,8,9];
+// Значки розділів: літери середнього ряду, клавіші «копіювати / вставити», різнокольорові ! @ ? № "
+const cmdKey = IS_MAC ? '⌘' : 'Ctrl';
+const trainParts = () => [
+  { id:'fingers', html:`<span class="home-ico">${homeLetters(settings.lang, LEFT_HOME)} ${homeLetters(settings.lang, RIGHT_HOME)}</span>` },
+  { id:'hotkeys', html:`<span class="hk-ico" title="Гарячі клавіші"><kbd>${cmdKey}</kbd>+<kbd>C</kbd>/<kbd>${cmdKey}</kbd>+<kbd>V</kbd></span>` },
+  { id:'symbols', html:`<span class="sym-ico" title="Символи">${[['!','#FF6B4A'],['@','#16A3A0'],['?','#6C5CE7'],['№','#E8A33D'],['&quot;','#FF5D9E']].map(([c, col])=>`<span style="color:${col}">${c}</span>`).join('')}</span>` }
+];
+let trainPart = 'fingers', trainSel = null;
 const trainBody = document.getElementById('trainBody');
 
-// Руки: пальці кольору своїх клавіш, на кінчиках — літера, на якій палець лежить
-function handsSVG(lang){
-  const home = LAYOUTS[lang][1];
-  // поворот — у внутрішній групі: CSS-зсув вибраного пальця (.sel) замінив би атрибут transform
-  const pill = (f, x, y, h, label, rot = 0) => `<g class="f${trainSel === f ? ' sel' : ''}" data-f="${f}"><g transform="rotate(${rot} ${x} ${y + h})">
-      <rect x="${x - 13}" y="${y}" width="26" height="${h + 14}" rx="13" fill="var(${f < 0 ? '--f-thumb' : FINGER_VAR[f]})"/>
-      <text x="${x}" y="${y + 20}" font-size="15" text-anchor="middle">${label}</text></g></g>`;
-  const hand = (side) => {
-    const L = side === 'L', cx = L ? 140 : 380, dir = L ? 1 : -1;
-    const fingers = L ? [0,1,2,3] : [7,6,5,4];
-    const H = [52, 66, 74, 64], X = [-54, -26, 2, 30];
-    let s = '';
-    s += pill(L ? -1 : -2, cx + 34 * dir, 88, 44, "", L ? 108 : -108);   // великий палець — нахилений до пробілу
-    // в англійській під правим мізинцем — «;» (у LAYOUTS це пара символів)
-    fingers.forEach((f, i)=>{ const x = cx + X[i] * dir; const k = L ? home[i] : home[[9, 8, 7, 6][i]], lbl = Array.isArray(k) ? k[0] : k; s += pill(f, x, 104 - H[i], H[i], lbl.toUpperCase()); });
-    return s;
-  };
-  return `<svg class="hands" viewBox="0 0 520 170" aria-label="Руки на клавіатурі">${hand('L')}${hand('R')}
-    <text x="260" y="166" font-size="14" text-anchor="middle" fill="var(--ink-soft)">великі пальці — на пробілі</text></svg>`;
+// Пальці поверх клавіатури — символічно, заокругленими прямокутниками кольорів пальців (без долонь):
+// кінчик на клавіші середнього ряду, великі — на пробілі. Будуються після вставлення клавіатури, бо координати беруться з розміщення клавіш.
+const HOME_CODES = ['KeyA','KeyS','KeyD','KeyF','KeyJ','KeyK','KeyL','Semicolon'];   // палець 0–7 → клавіша, на якій він лежить
+let handsW = 0;   // ширина, для якої намальовано пальці: перемальовуємо, лише коли вона справді змінилась
+function drawHands(){
+  const wrap = document.getElementById('kbHands'), svg = document.getElementById('handsSvg');
+  if(!wrap || !svg || !wrap.offsetWidth) return;
+  const k = wrap.querySelector('.key[data-code="KeyA"]').offsetWidth;
+  const wr = wrap.getBoundingClientRect();
+  const at = code => { const r = wrap.querySelector(`.key[data-code="${code}"]`).getBoundingClientRect(); return { x:r.left - wr.left + r.width / 2, y:r.top - wr.top + r.height / 2 }; };
+  const LEN = 1.45, W = .62;   // усі пальці однакові — як вказівний на А (у клавішах)
+  const pill = (f, x, y, w, h, ink) => `<rect class="fr" data-f="${f}" x="${x}" y="${y}" width="${w}" height="${h}" rx="${Math.min(w, h) / 2}" fill="${ink}" stroke="${ink}"/>`;
+  let html = '';
+  HOME_CODES.forEach((code, f)=>{
+    const c = at(code), w = W * k;
+    html += pill(f, c.x - w / 2, c.y - k * .1, w, LEN * k, FINGER_INK[f]);
+  });
+  const sp = at('Space'), tw = k * 1.3, th = k * .55;
+  html += pill(-1, sp.x - k * 1.5 - tw / 2, sp.y - th / 2, tw, th, THUMB_INK);
+  html += pill(-2, sp.x + k * 1.5 - tw / 2, sp.y - th / 2, tw, th, THUMB_INK);
+  handsW = wrap.offsetWidth;
+  svg.setAttribute('viewBox', `0 0 ${wr.width} ${wr.height}`);
+  svg.innerHTML = html;
+  svg.querySelectorAll('.fr').forEach(h=>h.addEventListener('click', ()=>{
+    const f = +h.dataset.f; selectFinger(trainSel === f || f < 0 && trainSel < 0 ? null : f);
+  }));
+  selectFinger(trainSel);
 }
+addEventListener('resize', ()=>{ const w = document.getElementById('kbHands')?.offsetWidth; if(w && w !== handsW && trainPart === 'fingers' && !document.getElementById('paneTrain').hidden) drawHands(); });
 function trainKeyboard(lang){
   const rows = [TRAIN_NUM[lang], ...LAYOUTS[lang]];
   let html = '';
   rows.forEach((row, r)=>{
     let rowHTML = '';
-    if(r === 3) rowHTML += `<div class="key wide" data-code="ShiftLeft" data-f="0" style="--fc:var(--f-pinky)">Shift</div>`;
+    if(r === 3) rowHTML += `<div class="key wide" data-code="ShiftLeft" data-f="0" style="--fc:var(--f-pinky); --fi:${FINGER_INK[0]}">Shift</div>`;
     row.forEach((k, col)=>{
       const [lo, up] = Array.isArray(k) ? k : [k, k.toUpperCase()];
       const letter = /\p{L}/u.test(lo);
       const f = r === 0 ? TRAIN_NUM_FINGER[col] : COL_FINGER[col];
       const cls = [r === 2 && HOME_COLS.includes(col) ? 'home' : '', BUMPS[lang].includes(lo) ? 'bump' : ''].join(' ');
-      rowHTML += `<div class="key ${cls}" data-code="${CODES[r][col]}" data-f="${f}" style="--fc:var(${FINGER_VAR[f]})">${letter ? '' : `<span class="up">${up}</span>`}${letter ? up : lo}</div>`;
+      rowHTML += `<div class="key ${cls}" data-code="${CODES[r][col]}" data-f="${f}" style="--fc:var(${FINGER_VAR[f]}); --fi:${FINGER_INK[f]}">${letter ? '' : `<span class="up">${up}</span>`}${letter ? up : lo}</div>`;
     });
-    if(r === 3) rowHTML += `<div class="key wide" data-code="ShiftRight" data-f="7" style="--fc:var(--f-pinky)">Shift</div>`;
+    if(r === 3) rowHTML += `<div class="key wide" data-code="ShiftRight" data-f="7" style="--fc:var(--f-pinky); --fi:${FINGER_INK[7]}">Shift</div>`;
     html += `<div class="kb-row r${r === 0 ? 'n' : r - 1}">${rowHTML}</div>`;
   });
-  html += `<div class="kb-row"><div class="key space" data-code="Space" data-f="-1">пробіл</div></div>`;
+  html += `<div class="kb-row"><div class="key space" data-code="Space" data-f="-1" style="--fi:${THUMB_INK}">пробіл</div></div>`;
   return `<div class="kb train" id="trainKb">${html}</div>`;
 }
-const fingerDot = f => `<span class="dot" style="background:var(${f < 0 ? '--f-thumb' : FINGER_VAR[f]})"></span>`;
 function selectFinger(f){
   trainSel = f;
-  trainBody.querySelectorAll('.hands .f').forEach(g=>g.classList.toggle('sel', f !== null && (+g.dataset.f === f || f < 0 && +g.dataset.f < 0)));
-  trainBody.querySelectorAll('#trainKb .key').forEach(k=>k.classList.toggle('dim', f !== null && (f < 0 ? +k.dataset.f >= 0 : +k.dataset.f !== f)));
-  const say = document.getElementById('trainSay');
-  if(say) say.innerHTML = f === null ? 'Натисни будь-яку клавішу чи клацни на палець'
-    : f < 0 ? `${fingerDot(-1)}Великі пальці натискають пробіл`
-    : `${fingerDot(f)}${FINGER_NAME[f][0].toUpperCase() + FINGER_NAME[f].slice(1)}: ${[...trainBody.querySelectorAll(`#trainKb .key[data-f="${f}"]`)].map(k=>k.lastChild.textContent).join(' ')}`;
+  trainBody.querySelectorAll('.hands [data-f]').forEach(g=>g.classList.toggle('sel', f !== null && (+g.dataset.f === f || f < 0 && +g.dataset.f < 0)));
+  trainBody.querySelectorAll('#trainKb .key').forEach(k=>k.classList.toggle('zone', f !== null && (f < 0 ? +k.dataset.f < 0 : +k.dataset.f === f)));
 }
-function stopDemo(){ clearInterval(trainDemo); trainDemo = 0; const b = document.getElementById('demoBtn'); if(b) b.textContent = '▶ Показати всі пальці по черзі'; }
+// Затиснуті клавіші: палець, що мав натиснути клавішу, стоїть на ній, поки її тримають (Shift + літера — два пальці разом),
+// а відпустили — повертається на своє місце
+const held = new Map();   // e.code → клавіша, у порядку натискання
+function pressKey(key){
+  held.delete(key.dataset.code);
+  held.set(key.dataset.code, key);
+  key.classList.add('lit');
+  showHeld();
+}
+function releaseKey(code){
+  const key = held.get(code);
+  if(!key) return;
+  held.delete(code);
+  setTimeout(()=>{ if(!held.has(code)) key.classList.remove('lit'); showHeld(); }, 120);   // коротке натискання теж видно
+}
+function showHeld(){
+  if(!held.size){
+    trainBody.querySelectorAll('.hands .fr').forEach(r=>r.style.transform = '');
+    trainBody.querySelectorAll('.hands .sel, #trainKb .zone').forEach(el=>el.classList.remove('sel', 'zone'));
+    if(trainSel !== null) selectFinger(trainSel);
+    return;
+  }
+  const at = new Map();   // палець → клавіша, яку він тримає (остання)
+  held.forEach(k=>at.set(+k.dataset.f, k));
+  trainBody.querySelectorAll('.hands .fr').forEach(r=>{
+    const f = +r.dataset.f, k = at.get(f), on = at.has(f) || f < 0 && at.has(-1);
+    r.classList.toggle('sel', on);
+    if(!k || f < 0){ r.style.transform = ''; return; }
+    const home = trainBody.querySelector(`#trainKb .key[data-code="${HOME_CODES[f]}"]`).getBoundingClientRect(), to = k.getBoundingClientRect();
+    r.style.transform = `translate(${to.left + to.width / 2 - home.left - home.width / 2}px, ${to.top + to.height / 2 - home.top - home.height / 2}px)`;
+  });
+  trainBody.querySelectorAll('#trainKb .key').forEach(k=>k.classList.toggle('zone', at.has(+k.dataset.f)));
+}
+addEventListener('blur', ()=>{ held.forEach((k, code)=>releaseKey(code)); });
 function renderTrain(){
-  const trainLang = settings.lang;
-  stopDemo();
+  held.clear();
+  const lang = settings.lang;   // розкладка — за прапорцем у ряду вкладок
   seg(document.getElementById('trainNav'), trainParts(), trainPart, id=>{ trainPart = id; renderTrain(); });
   if(trainPart === 'fingers'){
-    const home = LAYOUTS[trainLang][1].map(k=>Array.isArray(k) ? k[0] : k);
     trainBody.innerHTML = `
-      <p class="train-lead">Пальці лежать на середньому ряду: ліва рука — <b>${home.slice(0,4).join(' ').toUpperCase()}</b>, права — <b>${home.slice(6,10).join(' ').toUpperCase()}</b>.
-        Вказівні — на <b>${BUMPS[trainLang].join('</b> і <b>').toUpperCase()}</b>: там горбики, їх можна знайти наосліп. Кожен палець натискає лише клавіші свого кольору й повертається на місце.</p>
-      ${handsSVG(trainLang)}${trainKeyboard(trainLang)}
-      <div class="train-say" id="trainSay"></div>
-      <div class="train-tools"><button type="button" class="btn btn-ghost btn-small" id="demoBtn"></button></div>`;
-    trainBody.querySelectorAll('.hands .f').forEach(g=>g.addEventListener('click', ()=>{ stopDemo(); const f = +g.dataset.f; selectFinger(trainSel === f || f < 0 && trainSel < 0 ? null : f); }));
-    document.getElementById('demoBtn').addEventListener('click', ()=>{
-      if(trainDemo){ stopDemo(); selectFinger(null); return; }
-      const order = [0,1,2,3,4,5,6,7,-1]; let i = 0;
-      selectFinger(order[0]);
-      trainDemo = setInterval(()=>{ i++; if(i >= order.length){ stopDemo(); selectFinger(null); } else selectFinger(order[i]); }, 1600);
-      document.getElementById('demoBtn').textContent = '⏸ Зупинити';
-    });
-    stopDemo();
-    selectFinger(trainSel);
+      <p class="train-rule">Початкове положення пальців — ${homeLetters(lang, LEFT_HOME, 'b')} і ${homeLetters(lang, RIGHT_HOME, 'b')},<br>великі — на <span class="rule-space">пробілі</span></p>
+      <div class="kb-hands" id="kbHands">${trainKeyboard(lang)}<svg class="hands" id="handsSvg" aria-label="Пальці на клавіатурі"></svg></div>`;
+    drawHands();
   } else if(trainPart === 'hotkeys'){
     const keys = h => (IS_MAC ? h.m : h.k).map(K).join(' + ');
-    trainBody.innerHTML = `
-      <p class="train-lead">Гарячі клавіші роблять те саме, що й меню, але швидше. Затисни першу клавішу й, не відпускаючи, натисни другу.</p>
-      <p class="train-lead">Спробуй на своїй клавіатурі — картка засвітиться.</p>
-      <div class="hk-grid">${HOTKEYS.map((h, i)=>`<div class="hk${trainTried.hotkeys.has(i) ? ' done' : ''}" data-i="${i}">
-        <div class="keys">${keys(h)}</div><b>${h.t}</b><small>${IS_MAC && h.md || h.d}</small>${h.test ? '' : '<span class="only">🧠 лише запам\'ятай</span>'}</div>`).join('')}</div>
-      <p class="train-count" id="trainCount"></p>`;
+    const card = h => { const n = tickCount('hk', h.id);
+      return `<div class="hk${n >= TICKS ? ' done' : ''}" data-id="${h.id}">
+        <div class="keys">${keys(h)}</div><b>${h.t}</b><small>${IS_MAC && h.md || h.d}</small>${h.test ? ticksHTML(n) : '<span class="only">лише запам\'ятай</span>'}</div>`; };
+    trainBody.innerHTML = HK_GROUPS.map(g=>`<h3 class="hk-group">${g.t}</h3><div class="hk-grid">${g.items.map(card).join('')}</div>`).join('');
   } else {
-    const how = (flag, v) => `<div>${flag} ${v ?? '<span class="no">немає — перемкни мову</span>'}</div>`;
-    trainBody.innerHTML = `
-      <div class="train-note">Зверху на клавіші — символ, який дає <b>Shift</b>. У кожної мови свої місця для знаків, тож спершу подивись, яка розкладка ввімкнена.
-        Пробіл ставимо <b>після</b> розділового знака, а не перед ним: «Привіт, друже!»</div>
-      <p class="train-lead">Набери символ на своїй клавіатурі — картка засвітиться.</p>
-      <div class="sym-grid">${SYMBOLS.map((s, i)=>`<div class="sym${trainTried.symbols.has(i) ? ' done' : ''}" data-i="${i}">
-        <div class="left"><div class="ch">${esc(s.c)}</div><span class="name">${s.name}</span></div><div class="how">${how('🇺🇦', s.uk)}${how('🇬🇧', s.en)}</div></div>`).join('')}</div>
-      <p class="train-count" id="trainCount"></p>`;
+    // символів, яких у розкладці немає (@ в українській, № в англійській), не показуємо
+    trainBody.innerHTML = `<div class="sym-grid">${SYMBOLS.filter(s=>symPlace(s.c, lang)).map(s=>{ const n = tickCount('sym', s.c);
+      return `<div class="sym${n >= TICKS ? ' done' : ''}" data-id="${esc(s.c)}">
+        <div class="left"><div class="ch">${esc(s.c)}</div><span class="name">${s.name}</span></div><div class="how">${symHow(s.c, lang)}</div>${ticksHTML(n)}</div>`; }).join('')}</div>`;
   }
-  renderTrainCount();
 }
-function renderTrainCount(){
-  const el = document.getElementById('trainCount');
-  if(!el) return;
-  el.textContent = trainPart === 'hotkeys'
-    ? `Спробувано: ${trainTried.hotkeys.size} з ${HOTKEYS.filter(h=>h.test).length}`
-    : `Набрано: ${trainTried.symbols.size} з ${SYMBOLS.length}`;
-}
-function hitCard(kind, i){
-  trainTried[kind].add(i);
-  const card = trainBody.querySelector(`.${kind === 'hotkeys' ? 'hk' : 'sym'}[data-i="${i}"]`);
+function earn(n){ profile.neurons += n; saveStore(); renderHUD(true); }
+// Гарячі клавіші й символи: 3 сірі галочки, кожне натискання фарбує наступну в зелений;
+// після третьої картка зелена й +1 нейрончик (один раз). Прогрес — profile.trained.hk / .sym за id (символ — сам знак)
+const tickCount = (kind, id) => (((profile.trained ||= {})[kind] ||= {})[id]) || 0;
+const ticksHTML = n => `<span class="ticks">${Array.from({ length:TICKS }, (_, j)=>`<i class="${j < n ? 'on' : ''}">✓</i>`).join('')}</span>`;
+function hitTick(kind, id){
+  const was = tickCount(kind, id), n = Math.min(TICKS, was + 1), fresh = n > was;
+  profile.trained[kind][id] = n;
+  if(fresh && n === TICKS) earn(1); else saveStore();
+  const card = [...trainBody.querySelectorAll(`.${kind}[data-id]`)].find(c=>c.dataset.id === id);
   if(!card) return;
-  card.classList.add('done');
+  card.querySelector('.ticks').outerHTML = ticksHTML(n);
+  if(fresh && n === TICKS){
+    card.classList.add('done');
+    const g = document.createElement('span'); g.className = 'card-gain'; g.innerHTML = `${NEURON}+1`; card.appendChild(g); setTimeout(()=>g.remove(), 1200);
+  }
   card.classList.remove('flash'); void card.offsetWidth; card.classList.add('flash');
   card.scrollIntoView({ block:'nearest', behavior:'smooth' });
-  tone(660, .08, 'triangle', .05);
-  renderTrainCount();
+  tone(n === TICKS ? 880 : 520 + n * 80, .08, 'triangle', .05);
 }
+document.addEventListener('keyup', e=>{ if(held.has(e.code)) releaseKey(e.code); });
 document.addEventListener('keydown', e=>{
   const pane = document.getElementById('paneTrain');
   if(pane.hidden || setupEl.hidden || race || document.querySelector('.overlay.show') || e.target.closest?.('input, textarea')) return;
@@ -2264,22 +2363,18 @@ document.addEventListener('keydown', e=>{
     const key = trainBody.querySelector(`#trainKb .key[data-code="${e.code}"]`);
     if(!key) return;
     e.preventDefault();
-    stopDemo();
-    selectFinger(+key.dataset.f);
-    trainBody.querySelectorAll('#trainKb .lit').forEach(k=>k.classList.remove('lit'));
-    key.classList.add('lit');
-    setTimeout(()=>key.classList.remove('lit'), 500);
+    if(!e.repeat) pressKey(key);
   } else if(trainPart === 'hotkeys'){
-    const i = HOTKEYS.findIndex(h=>h.test && h.test(e));
-    if(i < 0) return;
+    const h = HOTKEYS.find(h=>h.test && h.test(e));
+    if(!h) return;
     e.preventDefault();
-    hitCard('hotkeys', i);
+    if(!e.repeat) hitTick('hk', h.id);
   } else {
     if(e.ctrlKey || e.metaKey) return;
-    const i = SYMBOLS.findIndex(s=>s.c === e.key || s.alt?.includes(e.key));
-    if(i < 0) return;
+    const sym = SYMBOLS.find(s=>s.c === e.key || s.alt?.includes(e.key));
+    if(!sym) return;
     e.preventDefault();
-    hitCard('symbols', i);
+    if(!e.repeat) hitTick('sym', sym.c);
   }
 });
 
