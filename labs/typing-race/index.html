@@ -33,8 +33,10 @@
   .top-btn{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; border:1.5px solid var(--teal); background:var(--surface); color:var(--teal-dark); border-radius:999px; padding:4px 14px; cursor:pointer; white-space:nowrap;}
   .top-btn:hover{background:#E3F7F6;}
   a.top-btn{text-decoration:none;}
+  .help-btn{flex:none; box-sizing:border-box; width:33px; height:33px; border-radius:50%; border:1.5px solid var(--line); background:var(--surface); color:var(--ink-soft); display:inline-flex; align-items:center; justify-content:center; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:19px; line-height:1; text-decoration:none; margin-left:auto;}
+  .help-btn:hover{border-color:var(--teal); color:var(--teal-dark);}
   @media (max-width:380px){ .topbar-inner{gap:6px; padding:10px 12px;} .back-link{font-size:13px;} .top-btn{padding:3px 9px;} }
-  @media (max-width:640px){ .game-title{display:none;} .top-btn .long{display:none;} .top-btn{padding:4px 11px;} .topbar-inner{gap:8px;} }
+  @media (max-width:640px){ .game-title{display:none;} .top-btn .long, .player-btn .long{display:none;} .top-btn{padding:4px 11px;} .topbar-inner{gap:8px;} }
 
   main{padding:16px 0 40px;}
 
@@ -318,7 +320,14 @@
   .mk.on .up.need{color:#D9480F; font-size:13px; font-weight:800; top:-2px;}
 
   /* ---------- Профіль ---------- */
-  .player-btn{display:inline-flex; align-items:center; gap:6px;}
+  .player-btn{display:inline-flex; align-items:center; gap:7px; max-width:260px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:3px 4px 3px 8px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:var(--ink); cursor:pointer; white-space:nowrap;}
+  .player-btn:hover{border-color:var(--teal);}
+  .pb-name{min-width:0; overflow:hidden; text-overflow:ellipsis;}
+  .pb-neurons{display:flex; align-items:center; gap:5px; flex:none; padding:0 8px 0 2px;}
+  .pb-neurons::before{content:''; width:1.5px; height:14px; border-radius:1px; background:var(--line); margin-right:4px;}
+  .pb-neurons svg{width:24px; height:24px; transition:transform .4s ease;}
+  .player-btn:hover .pb-neurons svg{transform:rotate(60deg);}
+  @media (prefers-reduced-motion:reduce){ .pb-neurons svg{transition:none;} }
   .pb-car{display:inline-block; width:34px; flex-shrink:0;}
   .pb-car svg{display:block; width:100%; height:auto; overflow:visible;}
   .win.prof{position:relative; text-align:left; max-width:480px;}
@@ -343,7 +352,7 @@
   .link-btn.danger{color:#C2410C;}
 
   /* ---------- Перегляд за посиланням (лише читання) ---------- */
-  body.ro .neuron-counter, body.ro #playerBtn{display:none;}
+  body.ro #playerBtn{display:none;}
   .ach-head{display:flex; align-items:center; gap:20px; flex-wrap:wrap;}
   .ach-head .prof-avatar{margin:0; flex-shrink:0;}
   .ach-head h2{font-size:28px; line-height:1.15;}
@@ -358,7 +367,6 @@
   .medal-item.got small{color:var(--ink);}
 
   /* ---------- Гравці й поширення ---------- */
-  .player-btn{max-width:200px; overflow:hidden; text-overflow:ellipsis;}
   .pick.locked .car-prev svg{filter:brightness(0) opacity(.16);}
   .pick.locked .label{color:var(--ink-soft);}
   .pick.static{cursor:default;}
@@ -391,8 +399,6 @@
   .typer{position:absolute; left:0; top:0; width:1px; height:1px; opacity:0; border:0; padding:0; font-size:16px;}
 
   /* ---------- Нейрончики ---------- */
-  .neuron-counter{display:flex; align-items:center; gap:6px; margin-left:auto; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:3px 12px 3px 4px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; white-space:nowrap;}
-  .neuron-counter svg{width:24px; height:24px;}
   #neuronCount{display:inline-block; min-width:1.4em; transition:transform .25s ease;}
   #neuronCount.pop{transform:scale(1.35);}
   .nico{display:inline-block; width:1.15em; height:1.15em; vertical-align:-.22em;}
@@ -541,7 +547,9 @@
 <div class="topbar"><div class="topbar-inner">
   <a class="back-link" href="../index.html">← Лабораторія</a>
   <span class="game-title">Клавіатурні перегони</span>
-  <div class="neuron-counter" title="Нейрончики — твій досвід. За них відкриваються траси й автівки.">
+  <a class="help-btn" href="guide/index.html" title="Як грати" aria-label="Як грати">?</a>
+  <button class="player-btn" id="playerBtn" title="Профіль гравця"><span class="pb-car" id="playerCar"></span><span class="long pb-name" id="playerName">Гравець</span>
+   <span class="pb-neurons" title="Нейрончики — твій досвід. За них відкриваються траси й автівки.">
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/>
       <line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/>
@@ -552,9 +560,7 @@
       <circle cx="12" cy="12" r="4.4" fill="#FFC93C"/><circle cx="12" cy="12" r="1.6" fill="#E0A800" opacity="0.6"/>
     </svg>
     <span id="neuronCount">0</span>
-  </div>
-  <a class="top-btn" href="guide/index.html" title="Інструкція: змагання й посилання на результати">❓<span class="long"> Як грати</span></a>
-  <button class="top-btn player-btn" id="playerBtn" title="Профіль гравця"><span class="pb-car" id="playerCar"></span><span class="long" id="playerName">Гравець</span></button>
+   </span></button>
 </div></div>
 
 <main class="container">
@@ -794,8 +800,8 @@ function abcPool(lang){
   const src = [ABC_WORDS[lang], ...Object.values(TEXTS[lang]).flat()].join(' ').toLowerCase();
   return abcLexicon[lang] = [...new Set(src.split(/[^\p{L}]+/u).filter(w=>w.length >= 2 && w.length <= 7))];
 }
-// Текст етапу: дві розминки з новими літерами, далі справжні слова з новими літерами, повторення й вигадані «слова»-склади
-function makeAbcText(lang, k){
+// Текст етапу: розминки з новими літерами (first), далі (next) справжні слова з новими літерами, повторення й вигадані «слова»-склади
+function abcUnits(lang, k){
   const all = abcLetters(lang, k), fresh = ABC_STAGES[lang][k];
   const pick = s => s[Math.floor(Math.random() * s.length)];
   const fake = (len, newShare) => {
@@ -811,9 +817,17 @@ function makeAbcText(lang, k){
   const withNew = words.filter(w=>[...w].some(c=>fresh.includes(c)));
   const old = words.filter(w=>!withNew.includes(w));
   const warm = [...fresh].map(c=>c + c + (fresh.replace(c, '') || c));   // «аао», «оов» тощо
-  const rest = [...withNew.slice(0, 4), ...old.slice(0, k ? 1 : 0)];
-  while(rest.length < 6) rest.push(fake(2 + Math.floor(Math.random() * 3), .5));
-  return [...warm, ...shuffle(rest)].join(' ');
+  // у кожному «мішку» — до 4 справжніх слів з новими літерами, слово для повторення й вигадані склади до 6
+  let rest = [];
+  const next = ()=>{
+    if(!rest.length){
+      rest = [...shuffle(withNew.slice()).slice(0, 4), ...shuffle(old.slice()).slice(0, k ? 1 : 0)];
+      while(rest.length < 6) rest.push(fake(2 + Math.floor(Math.random() * 3), .5));
+      shuffle(rest);
+    }
+    return rest.pop();
+  };
+  return { first:warm, next };
 }
 
 const COLORS = ['#FF6B4A','#16A3A0','#2D9CDB','#FF5D9E','#6C5CE7','#FFC93C'];
@@ -1578,8 +1592,8 @@ const UNLOCKS = [
   { kind:'track', id:'arctic',  at:420 },
   { kind:'track', id:'ocean',   at:500 },
   { kind:'car',   id:'sport',   at:560 },
-  { kind:'car',   id:'rocket',  at:650 },
   { kind:'car',   id:'speedboat', at:600 },
+  { kind:'car',   id:'rocket',  at:650 },
   { kind:'car',   id:'submarine', at:700 },
   { kind:'car',   id:'f1',      at:750 },    // болід і його автодром — разом
   { kind:'track', id:'circuit', at:750 },
@@ -1588,7 +1602,11 @@ const UNLOCKS = [
 const unlockAt = (kind, id) => UNLOCKS.find(u=>u.kind===kind && u.id===id).at;
 const isOpen = (kind, id, n = profile.neurons) => n >= unlockAt(kind, id);
 
-// Нейрончики за заїзд: складність траси + швидкість, помножені на точність, + бонус за перемогу
+// Нейрончики за заїзд: складність траси + швидкість, помножені на точність, + бонус за перемогу.
+// У вільному заїзді бонус за перемогу залежить від суперника: швидший транспорт — швидший суперник — більший бонус
+// (суперник 50 зн/хв — бонус дорівнює складності траси), щоб не вигравати легко на Трикі на складних трасах.
+// На дитячих трасах і в змаганнях бонус — складність траси.
+const WIN_CPM = 50;
 function neuronsFor(r){
   const t = TRACKS[trackIdx(r.track)], base = t.base;
   // Парк розваг: м'якша оцінка точності, а очки за швидкість — не більше 2, щоб старші не заробляли тут на коротких текстах
@@ -1596,7 +1614,7 @@ function neuronsFor(r){
   const mult = r.errors === 0 ? 1.5 : r.acc >= 95 ? 1.2 : r.acc >= 90 ? 1
              : t.kids ? (r.acc >= 80 ? 1 : r.acc >= 65 ? 0.8 : 0.5)
              : r.acc >= 80 ? 0.6 : 0.3;
-  const win = r.won ? base : 0;
+  const win = !r.won ? 0 : t.kids || r.comp ? base : Math.max(1, Math.round(base * r.cpm / WIN_CPM));
   return { base, speedPts, mult, win, total: Math.round((base + speedPts) * mult) + win };
 }
 const NEURON = `<svg class="nico" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -1655,6 +1673,20 @@ BADGES.propeller = `<circle cx="20" cy="20" r="16.5" fill="#FFC93C" ${OUT}/>
 BADGES.saturn = `<circle cx="20" cy="20" r="11" fill="#E9A15A" ${OUT}/><path d="M10 17 Q20 14 30 17 M10.5 23.5 Q20 26 29.5 23.5" stroke="#C97B3C" stroke-width="2" fill="none"/>
     <ellipse cx="20" cy="20" rx="18" ry="5" fill="none" stroke="#F5D48A" stroke-width="2.6" transform="rotate(-15 20 20)"/>
     <path d="M33 5 L34 8 L37 9 L34 10 L33 13 L32 10 L29 9 L32 8 Z" fill="#FFC93C"/>`;
+// Водні змагання
+BADGES.duck = `<path d="M2 31 Q8 27 14 31 T26 31 T38 31 V37 H2 Z" fill="#2D9CDB" ${OUT}/>
+    <path d="M9 24 Q9 17 16 18 L21 19 Q21 11 27 10.5 Q33 10.5 33 16.5 Q33 20 30 21.5 Q34 25 30 29.5 Q24 33 15 31.5 Q9 30 9 24 Z" fill="#FFC93C" ${OUT}/>
+    <path d="M32.5 14.5 L38 15.5 L32.8 18 Z" fill="#FF6B4A"/><circle cx="28" cy="14.6" r="1.6" fill="#1B1B3A"/>
+    <path d="M14 23 Q19 21 23 25 Q18 27.5 14 23 Z" fill="#E8A33D"/>`;
+BADGES.sail = `<path d="M3 33 Q11 30 20 33 T37 33 V37 H3 Z" fill="#2D9CDB" ${OUT}/>
+    <path d="M6 27 H34 L30 33 H10 Z" fill="#E8453C" ${OUT}/><rect x="19" y="3.5" width="2" height="24" fill="#6E6C8A"/>
+    <path d="M18.5 5 V24.5 H5 Z" fill="#fff" ${OUT}/><path d="M21.5 7 L34 24.5 H21.5 Z" fill="#FFC93C" ${OUT}/>`;
+BADGES.wave = `<path d="M3 35 Q3 19 16 9 Q27 2 35 9 Q38 13 34 16 Q30 11 25 13 Q19 16 22 22 Q24 26 30 25 Q36 25 37 21 V35 Z" fill="#16A3A0" ${OUT}/>
+    <path d="M27 13.5 Q21 15.5 22 21 Q16 17 21 12 Q25 9 30 10.5 Q32 11.3 33 13 Q30 11.5 27 13.5 Z" fill="#fff"/>
+    <circle cx="8" cy="10" r="2" fill="#fff" stroke="#2D9CDB" stroke-width="1.2"/><circle cx="12.5" cy="5" r="1.4" fill="#fff" stroke="#2D9CDB" stroke-width="1.2"/>`;
+BADGES.anchor = `<circle cx="20" cy="20" r="16.5" fill="#1F5F99" ${OUT}/>
+    <g fill="none" stroke="#FFC93C" stroke-width="2.8" stroke-linecap="round"><circle cx="20" cy="9.5" r="3"/><path d="M20 12.5 V31 M14 17 H26 M9.5 23 Q11 31 20 31 Q29 31 30.5 23"/></g>
+    <path d="M7 24.5 L9.5 21 L12 24.5 Z M28 24.5 L30.5 21 L33 24.5 Z" fill="#FFC93C"/>`;
 const badgeHTML = (id, title='') => BADGES[id] ? `<span class="badge-ico"${title ? ` title="${esc(title)}"` : ''}><svg viewBox="-2 -2 44 44" aria-hidden="true">${BADGES[id]}</svg></span>` : '';
 
 /* ================= Змагання ================= */
@@ -1708,7 +1740,20 @@ const COMPS = [
     stages:[['clouds','uk','long'],['space','uk'],['space','en'],['space','uk']] },
   { id:'biplanes', name:'Кубок біпланів', badge:'propeller', cpm:45, minAcc:88, cars:['biplane'], lvl:4, bonus:20, before:'airshow',
     desc:'Старі добрі біплани змагаються над хмарами й морем. Лише для біпланів.',
-    stages:[['clouds','uk'],['clouds','en'],['sea','uk'],['sea','en']] }
+    stages:[['clouds','uk'],['clouds','en'],['sea','uk'],['sea','en']] },
+  // Водні змагання — лише для човнів
+  { id:'lakecup', name:'Кубок озера', badge:'duck', cpm:40, minAcc:87, cars:null, lvl:3, bonus:15,
+    desc:'Перша регата для човнів: три заїзди тихим озером. Підійде будь-який човен.',
+    stages:[['lake','uk'],['lake','uk'],['lake','uk']] },
+  { id:'regatta', name:'Вітрильна регата', badge:'sail', cpm:60, minAcc:90, cars:['sailboat'], lvl:5, bonus:25,
+    desc:'Лише для вітрильників: з озера — повз кораблі в порту. Чотири етапи двома мовами.',
+    stages:[['lake','uk'],['port','uk'],['port','en'],['port','uk']] },
+  { id:'sprint', name:'Морський спринт', badge:'wave', cpm:100, minAcc:92, cars:['jetski','speedboat'], lvl:8, bonus:40,
+    desc:'Скутери й катери мчать хвилями між островами. Тут потрібні швидкі й точні пальці.',
+    stages:[['port','en'],['tropics','uk'],['tropics','en'],['tropics','uk']] },
+  { id:'deepsea', name:'Глибоководна експедиція', badge:'anchor', cpm:125, minAcc:94, cars:['submarine'], lvl:10, bonus:50,
+    desc:'Тільки для субмарин: від островів — у глибини океану до китів.',
+    stages:[['tropics','uk','long'],['ocean','uk'],['ocean','en'],['ocean','uk']] }
 ];
 // Порядок у списку: змагання з first — на початку, з before — перед указаним; показаний номер — місце в списку, а в посиланні — номер у COMPS
 const COMP_VIEW = [...COMPS.filter(c=>c.first), ...COMPS.filter(c=>!c.first && !c.before)];
@@ -1766,7 +1811,8 @@ function loadPlayer(name){
   renderPlayerBtn();
   renderHUD();
 }
-const earnedBadges = p => COMPS.filter(c=>p.comps[c.id]).map(c=>c.badge);
+const compLvl = c => c.lvl || COMPS.indexOf(c) + 1;
+const earnedBadges = p => COMPS.filter(c=>p.comps[c.id]).sort((a, b)=>compLvl(a) - compLvl(b)).map(c=>c.badge);
 const bestKey = (lang, track) => `${lang}-${track}`;
 
 const neuronEl = document.getElementById('neuronCount');
@@ -2164,15 +2210,21 @@ const TICKS = 3;   // гарячі клавіші й символи: скіль�
 const K = s => `<kbd class="kc">${s}</kbd>`;
 // Символи. Як набрати — рахується з розкладок (TRAIN_NUM + LAYOUTS): на картці — потрібна клавіша серед сусідніх, з Shift, якщо треба.
 // Символів, яких у розкладці немає (@ в українській, № в англійській), там не показуємо.
+// Порядок — групами: розділові знаки, дужки, математичні, інші. Прогрес — за самим знаком, тож порядок можна міняти
 const SYMBOLS = [
+  // розділові знаки
   { c:'.', name:'крапка' }, { c:',', name:'кома' }, { c:'!', name:'знак оклику' }, { c:'?', name:'знак питання' },
   { c:':', name:'двокрапка' }, { c:';', name:'крапка з комою' }, { c:'-', name:'дефіс' }, { c:'"', name:'лапки' },
-  { c:"'", name:'апостроф', alt:['’','ʼ'] }, { c:'(', name:'дужка' }, { c:')', name:'дужка' }, { c:'№', name:'номер' },
+  { c:"'", name:'апостроф', alt:['’','ʼ'] },
+  // дужки
+  { c:'(', name:'дужка' }, { c:')', name:'дужка' }, { c:'[', name:'квадратна дужка' }, { c:']', name:'квадратна дужка' },
+  { c:'{', name:'фігурна дужка' }, { c:'}', name:'фігурна дужка' },
+  // математичні
   { c:'+', name:'плюс' }, { c:'=', name:'дорівнює' }, { c:'*', name:'зірочка (множення)' }, { c:'/', name:'скісна риска (ділення)' },
-  { c:'%', name:'відсоток' }, { c:'<', name:'менше' }, { c:'>', name:'більше' }, { c:'_', name:'підкреслення' },
-  { c:'@', name:'«собачка»' }, { c:'#', name:'решітка' }, { c:'&', name:'амперсанд («і»)' }, { c:'₴', name:'гривня' },
-  { c:'$', name:'долар' }, { c:'[', name:'квадратна дужка' }, { c:']', name:'квадратна дужка' }, { c:'{', name:'фігурна дужка' },
-  { c:'}', name:'фігурна дужка' }, { c:'\\', name:'зворотна скісна риска' }, { c:'|', name:'вертикальна риска' }, { c:'^', name:'«дашок»' },
+  { c:'%', name:'відсоток' }, { c:'<', name:'менше' }, { c:'>', name:'більше' }, { c:'^', name:'«дашок»' },
+  // інші
+  { c:'@', name:'«собачка»' }, { c:'#', name:'решітка' }, { c:'№', name:'номер' }, { c:'&', name:'амперсанд («і»)' },
+  { c:'$', name:'долар' }, { c:'_', name:'підкреслення' }, { c:'\\', name:'зворотна скісна риска' }, { c:'|', name:'вертикальна риска' },
   { c:'~', name:'тильда' }, { c:'`', name:'зворотний апостроф' }
 ];
 // Клавіша \ | є лише в англійській розкладці тут: в українських розкладках Windows і Mac на ній різні знаки (ґ, \, /), тож її не показуємо
@@ -2334,7 +2386,13 @@ function renderTrain(){
         <div class="left"><div class="ch">${esc(s.c)}</div><span class="name">${s.name}</span></div><div class="how">${symHow(s.c, lang)}</div>${ticksHTML(n)}</div>`; }).join('')}</div>`;
   }
 }
-function earn(n){ profile.neurons += n; saveStore(); renderHUD(true); }
+// Нейрончики поза заїздом (картки тренування): якщо відкрилось нове — коротке повідомлення
+function earn(n){
+  const before = profile.neurons;
+  profile.neurons += n; saveStore(); renderHUD(true);
+  const opened = UNLOCKS.filter(u=>u.at > before && u.at <= profile.neurons);
+  if(opened.length) showToast('🔓 Відкрито: ' + opened.map(u=>u.kind === 'car' ? CARS[u.id].name : 'траса «' + TRACKS[trackIdx(u.id)].name + '»').join(', '));
+}
 // Гарячі клавіші й символи: 3 сірі галочки, кожне натискання фарбує наступну в зелений;
 // після третьої картка зелена й +1 нейрончик (один раз). Прогрес — profile.trained.hk / .sym за id (символ — сам знак)
 const tickCount = (kind, id) => (((profile.trained ||= {})[kind] ||= {})[id]) || 0;
@@ -2673,21 +2731,42 @@ function shuffle(a){
 }
 
 
+// Текст заїзду заповнює рядки поля на всю ширину: слова (чи речення) додаються, доки вміщаються в TEXT_LINES рядків,
+// а наприкінці добираються коротші, щоб останній рядок теж був повний. Кількість рядків — за рівнем, ширина — справжня ширина поля.
+// На вузькому екрані (телефон) рядки короткі — тоді рядків більше, доки текст не досягне TEXT_MIN знаків (як було до заповнення рядків).
+const TEXT_LINES = { abc:1, tiny:1, home:2, words:2, sentences:2, long:3, punct:3 };
+const TEXT_MIN = { abc:28, tiny:20, home:40, words:45, sentences:70, long:110, punct:110 };
+// Мішок: перемішані елементи по одному, без повторів, доки не скінчились (тоді — нове перемішування)
+function bag(items){
+  let rest = [];
+  return ()=>{ if(!rest.length) rest = shuffle(items.slice()); return rest.pop(); };
+}
 function makeText(lang, level, stage){
-  if(level === 'abc') return makeAbcText(lang, stage);
-  const src = TEXTS[lang][level === 'long' ? 'sentences' : level];
-  const n = { tiny:5, home:8, words:7, sentences:2, long:3, punct:3 }[level];
-  return shuffle(src.slice()).slice(0, n).join(' ');
+  const units = level === 'abc' ? abcUnits(lang, stage) : { first:[], next:bag(TEXTS[lang][level === 'long' ? 'sentences' : level]) };
+  let lines = TEXT_LINES[level] || 2;
+  const linesOf = parts=>{ race.text = parts.join(' '); renderText(); return new Set([...textBox.querySelectorAll('.word')].map(w=>w.offsetTop)).size; };
+  let parts = units.first.length ? units.first.slice() : [units.next()];
+  for(let fails = 0, guard = 0; guard < 300; guard++){
+    if(fails >= 8){
+      if(parts.join(' ').length >= (TEXT_MIN[level] || 0)) break;
+      lines++; fails = 0;   // тексту замало — ще один рядок
+    }
+    const cand = [...parts, units.next()];
+    if(linesOf(cand) <= lines) parts = cand; else fails++;
+  }
+  return parts.join(' ');
 }
 
 function renderText(){
   textBox.querySelectorAll('.word, .ch.sp').forEach(e=>e.remove());
   spans = [];
   const mk = (c, cls)=>{ const s = document.createElement('span'); s.className = cls; s.textContent = c; spans.push(s); return s; };
+  let w = null;
   race.text.split(/( )/).forEach(part=>{
     if(!part) return;
-    if(part === ' '){ textBox.appendChild(mk(' ', 'ch sp')); return; }
-    const w = document.createElement('span');
+    // пробіл — усередині попереднього слова, щоб не переносився на початок рядка
+    if(part === ' '){ (w || textBox).appendChild(mk(' ', 'ch sp')); return; }
+    w = document.createElement('span');
     w.className = 'word';
     for(const c of part) w.appendChild(mk(c, 'ch'));
     textBox.appendChild(w);
@@ -2701,7 +2780,7 @@ function startRace(opts){
   cancelAnimationFrame(rafId);
   const level = opts.level || TRACK_LEVEL[opts.track];
   race = {
-    text: makeText(opts.lang, level, opts.stage), stage:opts.stage, track:opts.track, lang:opts.lang, level, model:opts.model, comp:opts.comp || null,
+    text:'', stage:opts.stage, track:opts.track, lang:opts.lang, level, model:opts.model, comp:opts.comp || null,
     pos:0, errors:0, missed:false, phase:'countdown', startT:0, lastKeyT:0,
     botCpm:opts.cpm, botChars:0, seed:Math.random()*10, lastFrame:0
   };
@@ -2711,6 +2790,7 @@ function startRace(opts){
   raceEl.hidden = false;
   applyTrack(opts.track);
   raceEl.classList.toggle('kids', !!TRACKS[trackIdx(opts.track)].kids);
+  race.text = makeText(opts.lang, level, opts.stage);   // після показу поля: текст підбирається під його ширину
   buildKeyboard();
   drawCars(opts.model, opts.lang);
   setP(carMe, 0); setP(carBot, 0);
@@ -2858,7 +2938,7 @@ function finish(){
   if(won) profile.wins++;
 
   // Нейрончики
-  const nb = neuronsFor({ track:race.track, speed, errors:race.errors, acc, won });
+  const nb = neuronsFor({ track:race.track, speed, errors:race.errors, acc, won, cpm:race.botCpm, comp:!!race.comp });
   let gain = nb.total;
   const parts = [`траса +${nb.base}`, `швидкість +${nb.speedPts}`, `точність ×${nb.mult}`];
   if(nb.win) parts.push(`перемога +${nb.win}`);
@@ -2876,10 +2956,14 @@ function finish(){
       run.stage++;
       if(run.stage >= n){
         const result = { medal:medalOf(run.results, c), s:run.results, day:today(), m:race.model };
-        const bonus = MEDAL_BONUS[result.medal] + (c.bonus ?? COMPS.indexOf(c) * 5);
-        gain += bonus;
-        parts.push(`медаль +${bonus}`);
+        // Бонус — лише за першу медаль змагання (плюс бонус змагання) або за кращу, ніж будь-коли була (різниця);
+        // повторна участь з тією ж чи гіршою медаллю дає тільки нейрончики заїздів
         const prev = profile.comps[c.id];
+        const top = (profile.topMedal ||= {})[c.id] || prev?.medal;
+        const bonus = Math.max(0, MEDAL_BONUS[result.medal] - (top ? MEDAL_BONUS[top] : 0)) + (prev ? 0 : c.bonus ?? COMPS.indexOf(c) * 5);
+        if(!top || MEDAL_RANK[result.medal] > MEDAL_RANK[top]) profile.topMedal[c.id] = result.medal;
+        gain += bonus;
+        if(bonus) parts.push(`медаль +${bonus}`);
         const firstBadge = !prev;
         profile.comps[c.id] = result;   // повторна участь просто перезаписує результат
         delete profile.runs[c.id];

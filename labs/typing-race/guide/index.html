@@ -81,7 +81,7 @@
   .mini-track .lane{height:38px; position:relative;}
   .mini-track .lane + .lane{border-top:2px dashed rgba(255,255,255,.55);}
   .mini-track .finish{position:absolute; top:0; bottom:0; right:10px; width:10px; background:repeating-conic-gradient(#1B1B3A 0 25%, #fff 0 50%) 0 0/10px 10px;}
-  .mini-track .car{position:absolute; top:50%; transform:translateY(-50%); font-size:24px; line-height:1;}
+  .mini-track .car{position:absolute; top:50%; transform:translateY(-50%) scaleX(-1); font-size:24px; line-height:1;}
   .mini-track .go{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;}
   .mini-track .go span{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; background:var(--teal); color:#fff; border-radius:999px; padding:5px 16px; box-shadow:0 3px 0 var(--teal-dark), 0 8px 18px rgba(27,27,58,.3);}
   .ride{animation:ride 3.2s ease-in-out infinite;}
@@ -136,7 +136,7 @@
   <header class="hero">
     <div class="eyebrow">Клавіатурні перегони · Інструкція</div>
     <h1>Як пройти змагання й надіслати результат</h1>
-    <p>Сім кроків — від посилання на змагання до твоєї медалі.</p>
+    <p>Сім кроків — від посилання на змагання до твоєї медалі. Для розминки є вкладки «Тренування» й «Вільний заїзд».</p>
   </header>
 
   <ol class="steps">
@@ -155,14 +155,14 @@
       <span class="num">2</span>
       <div>
         <h2>Введи ім'я, якщо гра попросить</h2>
-        <p>Придумай ім'я гравця й натисни <span class="ui primary">Почати</span>. Уже грав? Просто обери себе у списку.</p>
+        <p>Напиши ім'я та прізвище й натисни <span class="ui primary">Почати</span>. Уже грав на цьому пристрої? Просто обери себе у списку.</p>
       </div>
       <div class="pic" aria-hidden="true">
         <div class="dlg">
           <div class="wave">👋</div>
           <div class="cap">Привіт! Як тебе звати?</div>
-          <div class="chips"><span>Блискавка</span><span>Турбо</span></div>
-          <div class="field"><span class="in">Супер Гонщик</span><span class="ui primary">Почати</span></div>
+          <div class="chips"><span>Оля К.</span><span>Максим П.</span></div>
+          <div class="field"><span class="in">Іра Мельник</span><span class="ui primary">Почати</span></div>
         </div>
       </div>
     </li>
@@ -172,7 +172,7 @@
       <span class="num">3</span>
       <div>
         <h2>Натисни «На старт!»</h2>
-        <p>Гра одразу відкриє змагання з посилання. Тисни <span class="ui primary">🚦 На старт!</span> над трасою.</p>
+        <p>Гра одразу відкриє змагання з посилання в окремій вкладці. Тисни <span class="ui primary">🚦 На старт!</span> на трасі.</p>
       </div>
       <div class="pic" aria-hidden="true">
         <div class="mini-track">
@@ -180,7 +180,7 @@
           <div class="road">
             <div class="finish"></div>
             <div class="lane"><span class="car" style="left:6px">🚙</span></div>
-            <div class="lane"><span class="car" style="left:6px">🤖</span></div>
+            <div class="lane"><span class="car" style="left:6px">🏎️</span></div>
             <div class="go"><span>🚦 На старт!</span></div>
           </div>
           <div class="sky" style="height:12px; background:#E4F3D8"></div>
@@ -192,8 +192,8 @@
     <li class="step">
       <span class="num">4</span>
       <div>
-        <h2>Друкуй і обжени робота</h2>
-        <p>Натискай жовту літеру. Етап зараховано, якщо ти фінішуєш першим і робиш мало помилок.</p>
+        <h2>Друкуй і обжени суперника</h2>
+        <p>Натискай жовту літеру — клавіатура внизу підкаже, де вона. Етап зараховано, якщо ти фінішуєш раніше за суперника й робиш мало помилок.</p>
         <p>Не вийшло — тисни <span class="ui">↻ Ще раз</span>.</p>
       </div>
       <div class="pic" aria-hidden="true">
@@ -201,7 +201,7 @@
           <div class="road">
             <div class="finish"></div>
             <div class="lane"><span class="car ride">🚙</span></div>
-            <div class="lane"><span class="car ride bot">🤖</span></div>
+            <div class="lane"><span class="car ride bot">🏎️</span></div>
           </div>
         </div>
         <div class="typing"><span class="ok">мама мила </span><span class="cur">р</span>аму</div>
@@ -214,7 +214,7 @@
       <span class="num">5</span>
       <div>
         <h2>Пройди всі етапи</h2>
-        <p>Після кожного етапу тисни <span class="ui">▶ Далі</span>. Коли пройдеш останній, отримаєш медаль.</p>
+        <p>Після кожного етапу тисни <span class="ui">▶ Далі</span>. Коли пройдеш останній, отримаєш медаль і нейрончики — за них відкриваються нові траси й транспорт.</p>
       </div>
       <div class="pic" aria-hidden="true">
         <div class="stages">
