@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Цифрові пристрої і проблеми — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  /* Гама уроку: «майстерня» — помаранчево-бурштинова */
+  :root{
+    --accent:#D9480F; --accent-dark:#A63206; --accent-soft:#FFEDE2;
+    --bg:#FFF8F2; --line:#F3DED0; --ink:#2A1A12; --ink-soft:#6A5246;
+    --hud-bar:linear-gradient(90deg,#D9480F,#F59F00);
+  }
+  .bad-c{color:#C2410C;}
+
+  /* ---------- КРОК 1: РОБОЧЕ МІСЦЕ ---------- */
+  .face-box{display:flex; align-items:center; justify-content:center; gap:14px; margin-bottom:16px;}
+  .face{width:84px; height:84px; flex-shrink:0;}
+  .face *{transition:all .35s ease;}
+  .face-cap{width:250px; flex-shrink:0; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; color:var(--accent-dark); line-height:1.2;}
+  .face-cap small{display:block; font-family:'Nunito Sans',sans-serif; font-weight:600; font-size:13px; color:var(--ink-soft);}
+  .ctrls{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+  @media (max-width:600px){ .ctrls{grid-template-columns:1fr;} }
+  .ctrl{display:flex; flex-direction:column; border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; background:var(--surface); transition:border-color .2s, background .2s;}
+  .ctrl.ok{border-color:var(--ok); background:var(--ok-soft);}
+  .c-head{display:flex; justify-content:space-between; align-items:center; gap:8px; min-height:26px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px;}
+  .c-head output{font-weight:700; color:var(--accent-dark);}
+  .c-body{display:flex; align-items:center; gap:10px; min-height:40px; margin-top:6px;}
+  .c-msg{font-size:13px; line-height:1.35; color:var(--ink-soft); margin-top:auto; padding-top:6px;}
+  .ctrl.ok .c-msg{color:#256B36;}
+  /* повзунок із кольоровими зонами: зелена — добре, помаранчева — погано */
+  .rng{flex:1;}
+  .ctrl input[type=range]{-webkit-appearance:none; appearance:none; display:block; width:100%; height:24px; margin:0; background:none; cursor:pointer;}
+  .ctrl input[type=range]::-webkit-slider-runnable-track{height:10px; border-radius:5px; background:linear-gradient(90deg,#FFA94D 0,#FFD8A8 var(--a),#51CF66 var(--a),#51CF66 var(--b),#FFD8A8 var(--b),#FFA94D 100%);}
+  .ctrl input[type=range]::-moz-range-track{height:10px; border-radius:5px; background:linear-gradient(90deg,#FFA94D 0,#FFD8A8 var(--a),#51CF66 var(--a),#51CF66 var(--b),#FFD8A8 var(--b),#FFA94D 100%);}
+  .ctrl input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:22px; height:22px; margin-top:-6px; border-radius:50%; background:#fff; border:3px solid var(--accent); box-shadow:0 1px 4px rgba(0,0,0,.25);}
+  .ctrl input[type=range]::-moz-range-thumb{width:16px; height:16px; border-radius:50%; background:#fff; border:3px solid var(--accent); box-shadow:0 1px 4px rgba(0,0,0,.25);}
+  .ctrl.ok input[type=range]::-webkit-slider-thumb{border-color:#2F9E44;}
+  .ctrl.ok input[type=range]::-moz-range-thumb{border-color:#2F9E44;}
+  .marks{display:grid; margin-top:3px; font-size:11.5px; font-weight:700; color:#C2410C; line-height:1.2;}
+  .marks span{text-align:center;}
+  .marks span:first-child{text-align:left;}
+  .marks span:last-child{text-align:right;}
+  .marks .g{color:#2B8A3E;}
+  .seg{display:flex; gap:6px; flex:1;}
+  .seg button{flex:1; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13px; padding:6px 8px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer;}
+  .seg button.on{background:var(--accent); border-color:var(--accent); color:#fff;}
+  /* мініекран частоти оновлення: м'ячик котиться, кадри оновлюються з різною частотою */
+  /* м'ячик частоти оновлення: стрибає, кадри оновлюються з різною частотою */
+  .hz-ball{position:relative; width:34px; height:70px; margin:-36px 0 -6px; flex-shrink:0;}
+  .hz-ball svg{position:absolute; left:7px; bottom:3px; width:20px; height:20px; transform-origin:50% 100%; will-change:transform;}
+  .hz-ball i{position:absolute; left:8px; bottom:0; width:18px; height:4px; border-radius:50%; background:rgba(0,0,0,.18);}
+  .clock-note{display:flex; align-items:center; gap:10px; padding-top:8px; padding-bottom:8px;}
+  .clock-note svg{width:30px; height:30px; flex-shrink:0;}
+  .clock-note b{font-family:'Baloo 2',sans-serif; font-size:15px;}
+  /* ---------- КРОК 2: ПЕРСОНАЛІЗАЦІЯ (емулятор Windows 11) ---------- */
+  .patient{display:grid; grid-template-columns:48px 1fr; gap:10px; align-items:start; margin-bottom:14px;}
+  .patient .ava{width:48px; height:48px; border-radius:50%; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; font-size:26px;}
+  .patient .say{background:var(--bg); border-radius:4px 16px 16px 16px; padding:8px 12px; font-size:14.5px; line-height:1.45; transition:background .25s;}
+  .patient .say b{display:block; font-family:'Baloo 2',sans-serif; font-size:14px; color:var(--accent-dark);}
+  .patient .say.ok{display:flex; align-items:center; gap:12px; background:var(--ok-soft); color:#21603A;}
+  .patient .say.ok b{color:#21603A;}
+  .patient .say.ok .t{flex:1;}
+  #pz .say{min-height:62px; display:flex; flex-direction:column; justify-content:center;}
+  #pz .say.ok{flex-direction:row;}
+  .patient .say .btn-next{margin:0; flex-shrink:0; background:#2F9E44; border-color:#2F9E44; color:#fff;}
+  .patient .say .btn-next:hover{background:#2B8A3E;}
+  .pz-msg{min-height:1.4em; margin-top:8px; font-size:13px; line-height:1.4; color:var(--ink-soft);}
+
+  .w11{--pc:#0067C0; position:relative; height:360px; border-radius:12px; overflow:hidden; user-select:none; -webkit-user-select:none; font-family:'Segoe UI Variable Text','Segoe UI',system-ui,-apple-system,sans-serif; font-size:12.5px; color:#1b1b1b; background:#000;}
+  .w11 button{font:inherit; color:inherit;}
+  .w-wall{position:absolute; inset:0;}
+  .w-wall svg{width:100%; height:100%; display:block;}
+  .w-icons{position:absolute; top:8px; left:6px; bottom:56px; display:flex; flex-direction:column; flex-wrap:wrap; align-content:flex-start; gap:2px;}
+  .w-ico{display:flex; flex-direction:column; align-items:center; width:var(--w); padding:4px 2px; border-radius:4px; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.7); font-size:var(--f); line-height:1.15; text-align:center;}
+  .w-ico svg{width:var(--s); height:var(--s); filter:drop-shadow(0 1px 2px rgba(0,0,0,.3)); transition:width .2s, height .2s;}
+  .w11.s .w-ico{--s:20px; --w:58px; --f:10px;}
+  .w11.m .w-ico{--s:34px; --w:72px; --f:11.5px;}
+  .w11.l .w-ico{--s:54px; --w:88px; --f:13px;}
+  /* панель завдань */
+  .w-bar{position:absolute; left:0; right:0; bottom:0; height:46px; display:flex; align-items:center; justify-content:center; background:rgba(243,243,243,.85); backdrop-filter:blur(20px) saturate(1.4); border-top:1px solid rgba(0,0,0,.06); transition:background .3s;}
+  .w-mid{display:flex; gap:4px;}
+  .w-tb{position:relative; width:38px; height:38px; border-radius:5px; display:flex; align-items:center; justify-content:center;}
+  .w-tb svg{width:22px; height:22px;}
+  .w-tb.run::after{content:''; position:absolute; bottom:2px; left:50%; width:6px; height:3px; margin-left:-3px; border-radius:2px; background:#8A8A8A;}
+  .w-tb.act{background:rgba(255,255,255,.6);}
+  .w-tb.act::after{width:14px; margin-left:-7px; background:var(--pc);}
+  .w-tray{position:absolute; right:10px; top:0; bottom:0; display:flex; align-items:center; gap:10px; font-size:11px; text-align:right; line-height:1.3;}
+  .w11.tint .w-bar{background:color-mix(in srgb, var(--pc) 62%, #000);}
+  .w11.tint .w-tray{color:#fff;}
+  .w11.tint .w-tb.act{background:rgba(255,255,255,.18);}
+  /* контекстне меню Windows 11 */
+  .w-ctx{position:absolute; z-index:6; min-width:210px; background:rgba(249,249,249,.97); border:1px solid rgba(0,0,0,.1); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,.22); padding:4px; animation:ctxIn .12s ease;}
+  @keyframes ctxIn{from{opacity:0; transform:translateY(-4px);}}
+  .w-ctx button{display:flex; align-items:center; gap:10px; width:100%; border:none; background:none; padding:6px 10px; border-radius:4px; text-align:left; cursor:pointer;}
+  .w-ctx button svg{width:16px; height:16px; flex-shrink:0;}
+  .w-ctx button .ar{margin-left:auto; color:#666;}
+  .w-ctx button .dot{margin-left:auto; width:6px; height:6px; border-radius:50%; background:#1b1b1b;}
+  .w-ctx button:hover, .w-ctx button.open{background:rgba(0,0,0,.05);}
+  .w-ctx hr{border:none; border-top:1px solid rgba(0,0,0,.08); margin:4px 2px;}
+  .w-sub{position:absolute; left:calc(100% + 4px); min-width:170px;}
+  /* вікно «Параметри» */
+  .w-win{position:absolute; z-index:5; left:50%; top:10px; transform:translateX(-50%); width:min(600px, 96%); height:292px; background:#F3F3F3; border:1px solid rgba(0,0,0,.12); border-radius:8px; overflow:hidden; box-shadow:0 12px 32px rgba(0,0,0,.3); display:flex; flex-direction:column; animation:winIn .18s ease;}
+  @keyframes winIn{from{opacity:0; transform:translate(-50%,10px) scale(.98);}}
+  .w-tt{display:flex; align-items:center; gap:8px; height:30px; padding-left:12px; font-size:12px; flex-shrink:0;}
+  .w-tt svg{width:14px; height:14px;}
+  .w-tt .ctl{margin-left:auto; display:flex; height:100%;}
+  .w-tt .ctl span, .w-tt .ctl button{width:40px; display:flex; align-items:center; justify-content:center; border:none; background:none; font-size:12px; color:#333;}
+  .w-tt .ctl button{cursor:pointer;}
+  .w-tt .ctl button:hover{background:#C42B1C; color:#fff;}
+  .w-set{display:grid; grid-template-columns:178px 1fr; flex:1; min-height:0;}
+  .w-nav{padding:2px 6px 8px; overflow:hidden;}
+  .w-user{display:flex; align-items:center; gap:8px; padding:2px 4px 6px; white-space:nowrap;}
+  .w-user i{width:30px; height:30px; border-radius:50%; background:#C7D8EE; color:#2E4C73; display:flex; align-items:center; justify-content:center; font-style:normal; font-weight:600;}
+  .w-user small{display:block; color:#666; font-size:10px;}
+  .w-find{background:#fff; border:1px solid #E1E1E1; border-bottom-color:#8A8A8A; border-radius:4px; padding:4px 8px; color:#777; font-size:11.5px; margin-bottom:6px;}
+  .w-nav button{position:relative; display:flex; align-items:center; gap:8px; width:100%; border:none; background:none; text-align:left; padding:5px 8px; border-radius:4px; cursor:pointer; white-space:nowrap;}
+  .w-nav button svg{width:15px; height:15px; flex-shrink:0;}
+  .w-nav button:hover{background:rgba(0,0,0,.04);}
+  .w-nav button.on{background:rgba(0,0,0,.06);}
+  .w-nav button.on::before{content:''; position:absolute; left:0; top:8px; bottom:8px; width:3px; border-radius:2px; background:var(--pc);}
+  .w-main{padding:4px 14px 12px 8px; overflow:auto;}
+  .w-crumb{font-family:'Segoe UI Variable Display','Segoe UI',system-ui,sans-serif; font-size:21px; font-weight:600; margin:0 0 10px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;}
+  .w-crumb button{border:none; background:none; padding:0; font-weight:600; color:#5A5A5A; cursor:pointer;}
+  .w-crumb button:hover{color:#1b1b1b;}
+  .w-crumb .sep{color:#8A8A8A; font-size:15px;}
+  .w-card{display:flex; align-items:center; gap:12px; width:100%; background:#FBFBFB; border:1px solid #E5E5E5; border-radius:6px; padding:10px 12px; margin-bottom:3px; text-align:left;}
+  button.w-card{cursor:pointer;}
+  button.w-card:hover{background:#F6F6F6;}
+  .w-card svg{width:20px; height:20px; flex-shrink:0;}
+  .w-card b{display:block; font-weight:400; font-size:13px;}
+  .w-card small{display:block; color:#666; font-size:11px;}
+  .w-card .ar{margin-left:auto; color:#666;}
+  .w-card .r{margin-left:auto;}
+  .w-pick{display:flex; align-items:center; gap:8px; flex-shrink:0;}
+  .w-prev{display:flex; gap:12px; align-items:center; margin-bottom:10px;}
+  .w-prev .mini{position:relative; width:150px; aspect-ratio:16/10; border-radius:6px; overflow:hidden; border:3px solid #1b1b1b; flex-shrink:0;}
+  .w-prev .mini svg{width:100%; height:100%; display:block;}
+  .w-prev .mini i{position:absolute; left:28%; top:22%; width:44%; height:46%; background:#fff; border-radius:3px; box-shadow:0 2px 6px rgba(0,0,0,.3);}
+  .w-prev .mini i::before{content:''; position:absolute; left:6px; top:6px; width:40%; height:4px; border-radius:2px; background:var(--pc);}
+  .w-thumbs{display:grid; grid-template-columns:repeat(3,1fr); gap:6px; margin-top:6px;}
+  .w-thumbs button{border:2px solid transparent; border-radius:6px; padding:0; overflow:hidden; cursor:pointer; background:none; aspect-ratio:16/10;}
+  .w-thumbs button svg{width:100%; height:100%; display:block;}
+  .w-thumbs button.on{border-color:var(--pc);}
+  .w-sw{display:grid; grid-template-columns:repeat(8,1fr); gap:5px; margin-top:6px;}
+  .w-sw button{aspect-ratio:1; border-radius:4px; border:2px solid transparent; cursor:pointer; box-shadow:inset 0 0 0 1px rgba(0,0,0,.08); padding:0;}
+  .w-sw button.on{border-color:#1b1b1b; box-shadow:inset 0 0 0 2px #fff;}
+  .w-sel{border:1px solid #D0D0D0; border-bottom-color:#8A8A8A; border-radius:4px; background:#fff; padding:4px 6px; font:inherit;}
+  .w-btn{border:1px solid var(--pc); background:var(--pc); color:#fff !important; border-radius:4px; padding:5px 14px; cursor:pointer;}
+  .w-btn:hover{filter:brightness(1.1);}
+  .w-bright{display:flex; align-items:center; gap:8px; width:120px;}
+  .w-bright i{flex:1; height:4px; border-radius:2px; background:linear-gradient(90deg,var(--pc) 70%,#C8C8C8 70%);}
+  .w-note{font-size:11.5px; color:#666; margin:8px 2px 0;}
+  .wrong-flash{animation:shakeX .35s ease; outline:2px solid var(--coral) !important; outline-offset:1px;}
+  @media (max-width:640px){ .w-set{grid-template-columns:1fr;} .w-nav{display:none;} .w-main{padding-left:12px;} .w-prev .mini{width:110px;} }
+  /* контрастна тема «Нічне небо» */
+  /* контрастні теми: Водний, Пустельний, Сутінки, Нічне небо — кожна своїми кольорами */
+  .w11.t1{--hb:#202020; --hf:#FFFFFF; --hl:#75E9FC; --hs:#8EE3F0; --hst:#202020;}
+  .w11.t2{--hb:#FFFAEF; --hf:#3D3D3D; --hl:#1C5E75; --hs:#903909; --hst:#FFF5E3;}
+  .w11.t3{--hb:#2D3236; --hf:#B6F6F0; --hl:#70EBDE; --hs:#A6E9F1; --hst:#2D3236;}
+  .w11.t4{--hb:#000000; --hf:#FFFFFF; --hl:#FFFF00; --hs:#1AEBFF; --hst:#000000;}
+  .w11.hc{background:var(--hb);}
+  .w11.hc .w-wall{display:none;}
+  .w11.hc .w-ico{color:var(--hl); text-shadow:none; font-weight:700;}
+  .w11.hc .w-ico svg{filter:none;}
+  .w11.hc .w-ico svg *{stroke:var(--hf) !important; fill:var(--hb) !important;}
+  .w11.hc .w-bar{background:var(--hb); border-top:2px solid var(--hf); backdrop-filter:none;}
+  .w11.hc .w-tray{color:var(--hf);}
+  .w11.hc .w-win, .w11.hc .w-ctx, .w11.hc .w-card, .w11.hc .w-find, .w11.hc .w-sel{background:var(--hb); color:var(--hf); border-color:var(--hf);}
+  .w11.hc .w-crumb button, .w11.hc .w-card small, .w11.hc .w-note, .w11.hc .w-user small{color:var(--hl);}
+  .w11.hc .w-tt .ctl span, .w11.hc .w-tt .ctl button{color:var(--hf);}
+  .w11.hc .w-nav button.on{background:var(--hs); color:var(--hst);}
+  .w11.hc .w-ctx svg, .w11.hc .w-nav svg, .w11.hc .w-card svg{stroke:var(--hf);}
+  .w11.hc .w-tb svg[stroke]{stroke:var(--hf);}
+  .w11.hc .w-btn{background:var(--hs); border-color:var(--hs); color:var(--hst) !important;}
+
+  /* ---------- КРОК 3: ПІДКЛЮЧЕННЯ ПРИСТРОЇВ (Windows 11) ---------- */
+  .bt-lab{display:grid; grid-template-columns:1fr 160px; gap:12px; align-items:stretch;}
+  @media (max-width:640px){ .bt-lab{grid-template-columns:1fr;} }
+  .bt-desk{background:linear-gradient(150deg,#1C4E9E 0%,#3F7BD6 55%,#8AB8EE 100%);}
+  .bt-dev{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; text-align:center; background:var(--surface); border:1.5px solid var(--line); border-radius:12px; padding:12px;}
+  .bt-dev svg{width:96px; height:96px;}
+  .bt-dev b{font-family:'Baloo 2',sans-serif; font-size:15px; line-height:1.2;}
+  .bt-dev small{font-size:12px; color:var(--ink-soft); min-height:2.6em; line-height:1.3;}
+  .bt-dev .led{transition:fill .2s;}
+  .bt-dev.pairing .led{animation:ledBlink .6s steps(2) infinite;}
+  @keyframes ledBlink{0%{fill:#339AF0;} 100%{fill:#D0EBFF;}}
+  .bt-dev button{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12.5px; padding:6px 10px; border-radius:999px; border:1.5px solid var(--line); background:var(--bg); color:var(--ink); cursor:pointer;}
+  .bt-dev button:hover:not(:disabled){border-color:var(--accent);}
+  .bt-dev button:disabled{opacity:.5; cursor:default;}
+  .w-start{position:absolute; z-index:6; left:50%; bottom:54px; transform:translateX(-50%); width:min(360px, 92%); background:rgba(243,243,243,.97); border:1px solid rgba(0,0,0,.1); border-radius:8px; box-shadow:0 10px 30px rgba(0,0,0,.25); padding:14px; animation:ctxIn .15s ease;}
+  .w-start .srch{background:#fff; border:1px solid #E1E1E1; border-bottom-color:#8A8A8A; border-radius:16px; padding:5px 12px; color:#777; margin-bottom:12px;}
+  .w-start .lbl{font-weight:600; margin:0 4px 6px;}
+  .w-apps{display:grid; grid-template-columns:repeat(4,1fr); gap:4px;}
+  .w-apps button{display:flex; flex-direction:column; align-items:center; gap:4px; border:none; background:none; border-radius:6px; padding:8px 2px; cursor:pointer; font-size:11px;}
+  .w-apps button:hover{background:rgba(0,0,0,.05);}
+  .w-apps svg{width:28px; height:28px;}
+  .w-tog{position:relative; width:40px; height:20px; border-radius:99px; border:1px solid #5A5A5A; background:#fff; cursor:pointer; padding:0; flex-shrink:0;}
+  .w-tog::after{content:''; position:absolute; left:3px; top:3px; width:12px; height:12px; border-radius:50%; background:#5A5A5A; transition:left .15s;}
+  .w-tog.on{background:var(--pc); border-color:var(--pc);}
+  .w-tog.on::after{left:23px; background:#fff;}
+  .w-tg{display:flex; align-items:center; gap:8px; margin-left:auto; font-size:12px;}
+  .w-hero{display:flex; align-items:center; gap:14px; background:#FBFBFB; border:1px solid #E5E5E5; border-radius:6px; padding:10px 12px; margin-bottom:3px;}
+  .w-hero svg{width:44px; height:44px;}
+  .w-add{margin-left:auto; white-space:nowrap; border:1px solid #D0D0D0; background:#fff; border-radius:4px; padding:5px 12px; cursor:pointer;}
+  .w-add:hover{background:#F6F6F6;}
+  .w-devs{display:grid; grid-template-columns:repeat(3,1fr); gap:3px; margin-bottom:3px;}
+  .w-devs .w-card{flex-direction:column; align-items:flex-start; gap:2px; padding:8px 10px;}
+  .w-dlg{position:absolute; z-index:8; left:50%; top:46%; transform:translate(-50%,-50%); width:min(340px, 90%); background:#F9F9F9; border:1px solid rgba(0,0,0,.12); border-radius:8px; box-shadow:0 14px 40px rgba(0,0,0,.35); padding:16px;}
+  .w-dlg h5{margin:0 0 4px; font-size:16px; font-weight:600;}
+  .w-dlg p{margin:0 0 10px; font-size:12px; color:#555; line-height:1.4;}
+  .w-dlg .w-card{margin-bottom:4px;}
+  .w-dlg .foot{display:flex; justify-content:flex-end; margin-top:10px;}
+  .w-spin{display:inline-block; width:12px; height:12px; border:2px solid #C8C8C8; border-top-color:var(--pc); border-radius:50%; animation:spin .8s linear infinite; vertical-align:-2px; margin-right:6px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .w-dim{position:absolute; inset:0; z-index:7; background:rgba(0,0,0,.25);}
+  .w-guide{outline:2.5px solid #F59F00 !important; outline-offset:2px; animation:guidePulse 1.2s ease infinite;}
+  @keyframes guidePulse{50%{box-shadow:0 0 0 6px rgba(245,159,0,.35);}}
+  /* кнопка ✕ біля краю вікна: рамку малюємо всередині, бо вікно обрізає все, що виходить за межі */
+  .tm-tt .ctl button.w-guide, .w-tt .ctl button.w-guide{outline-offset:-3px; animation:guideIn 1.2s ease infinite;}
+  @keyframes guideIn{50%{background:rgba(245,159,0,.3);}}
+
+  /* ---------- КРОК 4: ВІДНОВЛЕННЯ СИСТЕМИ (Windows 11) ---------- */
+  .rs-desk{height:380px; background:linear-gradient(150deg,#1C4E9E 0%,#3F7BD6 55%,#8AB8EE 100%);}
+  .w-start .srch.on{color:#1b1b1b; border-bottom:2px solid var(--pc);}
+  .w-res{display:flex; align-items:center; gap:10px; width:100%; border:none; background:#E9EEF6; border-radius:6px; padding:8px 10px; text-align:left; cursor:pointer;}
+  .w-res svg{width:26px; height:26px; flex-shrink:0;}
+  .w-res small{display:block; color:#666; font-size:11px;}
+  .cl-dlg{position:absolute; z-index:6; left:50%; top:8px; transform:translateX(-50%); width:min(440px, 96%); background:#fff; border:1px solid rgba(0,0,0,.18); border-radius:8px; box-shadow:0 12px 32px rgba(0,0,0,.3); overflow:hidden; font-size:12px;}
+  .cl-dlg.top{z-index:7; top:30px;}
+  .cl-tt{display:flex; align-items:center; gap:7px; padding:6px 10px; font-size:12px;}
+  .cl-tt svg{width:14px; height:14px;}
+  .cl-tt .x{margin-left:auto; color:#555;}
+  .cl-tabs{display:flex; gap:2px; padding:0 10px; border-bottom:1px solid #D9D9D9; font-size:11px; overflow:hidden;}
+  .cl-tabs span{padding:4px 7px; border:1px solid transparent; border-bottom:none; border-radius:4px 4px 0 0; color:#555; white-space:nowrap;}
+  .cl-tabs span.on{border-color:#D9D9D9; background:#fff; color:#1b1b1b; margin-bottom:-1px;}
+  .cl-body{padding:10px 12px; background:#F9F9F9;}
+  .cl-dlg p{margin:0 0 8px; font-size:12px; line-height:1.4; color:#333;}
+  .cl-dlg .cl-row p{margin:0;}
+  .cl-group{border:1px solid #D9D9D9; border-radius:4px; padding:8px 10px; margin-bottom:8px; background:#fff;}
+  .cl-group b{display:block; font-weight:600; margin-bottom:4px;}
+  .cl-row{display:flex; align-items:center; gap:10px;}
+  .cl-row p{flex:1; margin:0;}
+  .cl-btn{border:1px solid #CCCCCC; background:#FDFDFD; border-radius:4px; padding:4px 12px; cursor:pointer; white-space:nowrap;}
+  .cl-btn:hover{background:#F0F6FC; border-color:#0067C0;}
+  .cl-btn.def{border-color:#0067C0; box-shadow:inset 0 0 0 1px #0067C0;}
+  .cl-btn:disabled{color:#A0A0A0; cursor:default; background:#FDFDFD; border-color:#DDD; box-shadow:none;}
+  .cl-foot{display:flex; justify-content:flex-end; gap:6px; padding:8px 12px; background:#F0F0F0; border-top:1px solid #E1E1E1;}
+  .cl-wiz{display:grid; grid-template-columns:70px 1fr; gap:12px;}
+  .cl-wiz .side{background:linear-gradient(180deg,#1E5AA8,#6FA8E8); border-radius:4px; display:flex; align-items:flex-start; justify-content:center; padding-top:10px;}
+  .cl-wiz .side svg{width:40px; height:40px;}
+  .cl-wiz h6{margin:0 0 6px; font-size:13.5px; font-weight:600; color:#1E3F7A;}
+  .cl-table{width:100%; border-collapse:collapse; background:#fff; border:1px solid #D9D9D9;}
+  .cl-table th{font-weight:400; color:#555; text-align:left; padding:3px 6px; border-bottom:1px solid #D9D9D9;}
+  .cl-table td{padding:4px 6px; cursor:pointer;}
+  .cl-table tr.sel td{background:#CCE4F7;}
+  .cl-table tbody tr:hover td{background:#E5F1FB;}
+  .cl-table tbody tr.sel:hover td{background:#CCE4F7;}
+  .rs-boot{position:absolute; inset:0; z-index:9; background:#0B5CAD; color:#fff; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; font-size:14px; text-align:center; padding:20px;}
+  /* під емулятором: сіра інструкція, під нею — маленька кнопка «Почати спочатку» */
+  .rs-foot{display:flex; flex-direction:column; align-items:flex-start; gap:6px; margin-top:8px;}
+  .rs-foot .pz-msg{margin-top:0;}
+  .rs-again{flex-shrink:0; font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:12.5px; padding:4px 12px; border-radius:999px; border:1.5px solid var(--line); background:var(--surface); color:var(--ink-soft); cursor:pointer;}
+  .rs-again:hover:not(:disabled){border-color:var(--accent); color:var(--accent-dark);}
+  .rs-again:disabled{opacity:.45; cursor:default;}
+  .rs-boot .w-spin{width:26px; height:26px; border-width:3px; border-color:rgba(255,255,255,.35); border-top-color:#fff; margin:0;}
+  .rp-ill{display:block; width:100%; height:auto; margin:6px 0 4px;}
+  .rp-ill text{font-family:'Nunito Sans',sans-serif;}
+  .rp-ill .t{font-family:'Baloo 2',sans-serif; font-weight:700;}
+  .w-dico{position:absolute; top:8px; left:6px; display:flex; flex-direction:column; gap:4px; z-index:1;}
+  .w-dico div{display:flex; flex-direction:column; align-items:center; width:76px; padding:4px 2px; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.7); font-size:11px; line-height:1.15; text-align:center;}
+  .w-dico svg{width:34px; height:34px; filter:drop-shadow(0 1px 2px rgba(0,0,0,.3));}
+  .w-pmenu{position:absolute; z-index:6; left:50%; bottom:50px; transform:translateX(-50%); min-width:190px; background:rgba(249,249,249,.97); border:1px solid rgba(0,0,0,.1); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,.22); padding:4px; font-size:12px;}
+  .w-pmenu div, .w-pmenu button{display:block; width:100%; border:none; background:none; text-align:left; padding:5px 10px; border-radius:4px; color:#1b1b1b; font:inherit;}
+  .w-pmenu button{cursor:pointer;}
+  .w-pmenu button:hover{background:rgba(0,0,0,.05);}
+  .w-pmenu hr{border:none; border-top:1px solid rgba(0,0,0,.08); margin:3px 2px;}
+  .tm{position:absolute; z-index:6; left:50%; top:8px; transform:translateX(-50%); width:min(500px, 96%); background:#F3F3F3; border:1px solid rgba(0,0,0,.15); border-radius:8px; box-shadow:0 12px 32px rgba(0,0,0,.3); overflow:hidden; font-size:12px;}
+  .tm-tt{display:flex; align-items:center; gap:7px; height:30px; padding-left:10px;}
+  .tm-tt svg{width:14px; height:14px;}
+  .tm-tt .ctl{margin-left:auto; display:flex; height:100%;}
+  .tm-tt .ctl span, .tm-tt .ctl button{width:38px; display:flex; align-items:center; justify-content:center; border:none; background:none; font-size:12px; color:#333;}
+  .tm-tt .ctl button{cursor:pointer;}
+  .tm-tt .ctl button:hover{background:#C42B1C; color:#fff;}
+  .tm-in{display:grid; grid-template-columns:38px 1fr;}
+  .tm-side{display:flex; flex-direction:column; align-items:center; gap:10px; padding-top:8px;}
+  .tm-side i{width:16px; height:3px; border-radius:2px; background:#BDBDBD;}
+  .tm-side i.on{height:14px; width:4px; background:#0067C0; align-self:flex-start; margin-left:4px;}
+  .tm-main{background:#fff; border-top-left-radius:6px; border:1px solid #E5E5E5; border-right:none; border-bottom:none;}
+  .tm-main h6{margin:0; padding:8px 10px 4px; font-size:14px; font-weight:600;}
+  .tm-g{display:grid; grid-template-columns:1fr 64px 76px 54px; align-items:center;}
+  .tm-g>*{padding:4px 8px;}
+  .tm-g .n{text-align:right;}
+  .tm-hd{border-bottom:1px solid #E5E5E5; color:#555; font-size:11px;}
+  .tm-hd b{display:block; font-size:14px; font-weight:600; color:#1b1b1b;}
+  .tm-sec{padding:6px 8px 2px; font-weight:600; font-size:11.5px;}
+  .tm-row{width:100%; border:none; background:none; font:inherit; color:inherit; text-align:left; padding:0; cursor:pointer;}
+  .tm-row:hover>span:first-child{background:#F0F6FC;}
+  .tm-row.sel{outline:1.5px solid #0067C0; outline-offset:-1.5px; background:#E5F1FB;}
+  .tm-row>span:first-child{display:flex; align-items:center; gap:6px;}
+  .tm-row svg{width:14px; height:14px; flex-shrink:0;}
+  .h1{background:#FFF8DC;} .h2{background:#FFEFB5;} .h3{background:#FFC58A;} .h4{background:#F4896B; color:#fff; font-weight:600;}
+
+  /* ---------- КРОК 5: ГАЛЕРЕЯ ПРИЧИН ---------- */
+  .causes{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-top:12px;}
+  @media (max-width:760px){ .causes{grid-template-columns:repeat(3,1fr);} }
+  @media (max-width:480px){ .causes{grid-template-columns:repeat(2,1fr);} }
+  .causes .flip-card{height:196px;}
+  .causes .flip-front .em{line-height:0; margin-bottom:10px;}
+  .causes .flip-front .em svg{width:56px; height:56px; filter:drop-shadow(0 4px 8px rgba(0,0,0,.12));}
+  .causes .flip-front b{font-family:'Baloo 2',sans-serif; font-size:15.5px; line-height:1.2;}
+  .causes .flip-front small{font-size:11.5px; color:var(--ink-soft); margin-top:6px;}
+  .causes .flip-back{font-size:12px; line-height:1.35; padding:10px 9px; justify-content:flex-start; text-align:left; align-items:flex-start; overflow-wrap:break-word;}
+  .causes .flip-back b{font-family:'Baloo 2',sans-serif; font-size:13.5px; color:var(--accent-dark);}
+  .causes .flip-back p{margin:2px 0 8px; font-size:13px; line-height:1.35;}
+  .causes .flip-card.seen .flip-front{border-color:var(--accent);}
+  #causeQuiz .choice-btn{font-size:13px; padding:7px 12px;}
+
+  /* ---------- КРОК 6: ЧИ ПОТЯГНЕ? ---------- */
+  .spec{display:grid; grid-template-columns:1fr 1fr; gap:6px 18px; background:#fff; border:1px solid #E3E3E3; border-radius:8px; padding:10px 14px; font-family:'Segoe UI',system-ui,-apple-system,sans-serif; font-size:13px; color:#1b1b1b; box-shadow:0 4px 14px rgba(60,30,10,.08);}
+  .spec .hd{grid-column:1/-1; display:flex; align-items:center; gap:8px; font-weight:600; font-size:14px; border-bottom:1px solid #EEE; padding-bottom:6px; margin-bottom:2px;}
+  .spec span{color:#666; display:block; font-size:12px;}
+  @media (max-width:520px){ .spec{grid-template-columns:1fr;} }
+  .shop{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:14px;}
+  @media (max-width:760px){ .shop{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:480px){ .shop{grid-template-columns:1fr;} }
+  .app{border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px; background:var(--surface); display:flex; flex-direction:column; transition:border-color .2s, background .2s;}
+  .app.done-ok{border-color:var(--ok); background:var(--ok-soft);}
+  .app.done-no{border-color:#E8A08A; background:#FFF5F1;}
+  .app-logo{height:42px; display:flex; align-items:center; margin-bottom:6px;}
+  .app-logo img{max-height:42px; max-width:100%; object-fit:contain;}
+  .app-h{margin-bottom:8px;}
+  .app-h b{display:block; font-family:'Baloo 2',sans-serif; font-size:15.5px; line-height:1.15;}
+  .app-h small{display:block; font-size:11.5px; color:var(--ink-soft);}
+  .req{display:flex; justify-content:space-between; gap:8px; width:100%; font:inherit; font-size:13px; text-align:left; border:1.5px dashed transparent; background:var(--bg); border-radius:8px; padding:5px 9px; margin-bottom:4px; cursor:pointer; color:var(--ink);}
+  .req:hover{border-color:var(--accent);}
+  .req span{color:var(--ink-soft);}
+  .req b{white-space:nowrap;}
+  .req.miss{animation:shakeX .35s ease; border-color:var(--coral); border-style:solid;}
+  .req.found{border:1.5px solid #E03131; background:#FFE3E3; cursor:default;}
+  .req.found b{color:#C92A2A;}
+  .req:disabled{cursor:default;}
+  .req:disabled:hover{border-color:transparent;}
+  .req.found:disabled:hover{border-color:#E03131;}
+  /* кнопка «Інсталювати»: синя, як у Windows; не підходить — червоний знак оклику */
+  .inst{margin-top:6px; display:flex; align-items:center; justify-content:center; gap:8px; font-family:'Segoe UI',system-ui,-apple-system,sans-serif; font-weight:600; font-size:13.5px; border-radius:6px; border:1px solid #0067C0; background:#0067C0; color:#fff; padding:7px 10px; cursor:pointer;}
+  .inst:hover:not(:disabled){background:#0058A6;}
+  .inst:disabled{cursor:default;}
+  .inst.ok{background:#2F9E44; border-color:#2F9E44;}
+  .inst.no{background:#F1F3F5; border-color:#DEE2E6; color:#868E96;}
+  .inst .warn{width:20px; height:20px; border-radius:50%; background:#E03131; color:#fff; font-weight:800; font-size:13px; line-height:20px; text-align:center;}
+  .inst.bad{animation:shakeX .35s ease;}
+  .app .verdict{font-size:12.5px; line-height:1.35; margin-top:6px; min-height:1em;}
+  .app.done-ok .verdict{color:#256B36;} .app.done-no .verdict{color:#9A3412;}
+</style>
+</head>
+<body data-lesson="lesson7m-device-problems" data-hud="7 клас · Цифрові пристрої і проблеми">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Цифрова безпека · Урок 11</div>
+      <h1>Майстерня цифрових пристроїв</h1>
+      <p>Налаштуємо екран, під'єднаємо навушники, повернемо систему в минуле й з'ясуємо, чому програми збоять.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: усміхнений монітор із гайковим ключем і щитом -->
+    <svg class="mascot" viewBox="0 0 160 160" fill="none" aria-hidden="true">
+      <circle cx="80" cy="82" r="66" fill="#FFEDE2"/>
+      <rect x="30" y="38" width="96" height="68" rx="10" fill="#A63206"/>
+      <rect x="37" y="45" width="82" height="54" rx="5" fill="#FFF8F2"/>
+      <circle cx="64" cy="66" r="5" fill="#2A1A12"/><circle cx="92" cy="66" r="5" fill="#2A1A12"/>
+      <path d="M64 80 Q78 92 92 80" stroke="#2A1A12" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="56" cy="80" r="4" fill="#FFC9A8"/><circle cx="100" cy="80" r="4" fill="#FFC9A8"/>
+      <rect x="70" y="106" width="16" height="12" fill="#D9480F"/>
+      <rect x="54" y="117" width="48" height="7" rx="3.5" fill="#D9480F"/>
+      <path d="M116 112 L140 88" stroke="#868E96" stroke-width="7" stroke-linecap="round"/>
+      <path d="M134 78 a10 10 0 1 0 14 14 l-6 -2 -2 -6 z" fill="#868E96"/>
+      <path d="M22 26 L40 20 L58 26 V42 Q58 58 40 66 Q22 58 22 42 Z" fill="#F59F00"/>
+      <path d="M31 42 L38 49 L50 35" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Засоби діагностики</div>
+    <h2>Аптечка цифрового лікаря</h2>
+    <p class="soft">Обери назву, а потім клацни пояснення, яке їй відповідає.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" id="step1">
+    <div class="step-label">Крок 1 · Бережемо очі</div>
+    <h2>Робоче місце без утоми</h2>
+    <p>Очі втомлюються, якщо екран налаштовано погано.</p>
+    <p class="soft">Зроби всі параметри зеленими, щоб смайлик усміхнувся.</p>
+    <div class="exercise" id="eyeLab">
+      <div class="face-box">
+        <svg class="face" viewBox="0 0 100 100" aria-hidden="true">
+          <circle id="fHead" cx="50" cy="50" r="46" fill="#FFE8A3" stroke="#E8A33D" stroke-width="3"/>
+          <path id="fBrowL" d="M26 30 L40 34" stroke="#5C3A21" stroke-width="3.5" stroke-linecap="round"/>
+          <path id="fBrowR" d="M74 30 L60 34" stroke="#5C3A21" stroke-width="3.5" stroke-linecap="round"/>
+          <path id="fEyeL" d="M28 45 Q34 45 40 45" stroke="#2A1A12" stroke-width="5" stroke-linecap="round" fill="none"/>
+          <path id="fEyeR" d="M60 45 Q66 45 72 45" stroke="#2A1A12" stroke-width="5" stroke-linecap="round" fill="none"/>
+          <circle id="fCheekL" cx="27" cy="62" r="6" fill="#FF9E80" opacity="0"/>
+          <circle id="fCheekR" cx="73" cy="62" r="6" fill="#FF9E80" opacity="0"/>
+          <path id="fMouth" d="M34 74 Q50 64 66 74" stroke="#2A1A12" stroke-width="5" stroke-linecap="round" fill="none"/>
+        </svg>
+        <div class="face-cap" id="faceCap"></div>
+      </div>
+      <div class="ctrls" id="ctrls">
+        <div class="ctrl" data-k="light">
+          <div class="c-head">💡 Світло в кімнаті</div>
+          <div class="c-body"><div class="seg"><button data-v="0" class="on">Вимкнене</button><button data-v="1">Увімкнене</button></div></div>
+          <div class="c-msg"></div>
+        </div>
+        <div class="ctrl" data-k="bright">
+          <div class="c-head">☀️ Яскравість екрана <output>100%</output></div>
+          <div class="c-body"><div class="rng"><input type="range" min="0" max="100" step="1" value="100" aria-label="Яскравість екрана" style="--a:35%; --b:75%"><div class="marks" style="grid-template-columns:35fr 40fr 25fr"><span>темно</span><span class="g">добре</span><span>сліпить</span></div></div></div>
+          <div class="c-msg"></div>
+        </div>
+        <div class="ctrl" data-k="dist">
+          <div class="c-head">📏 Відстань до екрана <output>30 см</output></div>
+          <div class="c-body"><div class="rng"><input type="range" min="25" max="100" step="1" value="30" aria-label="Відстань до екрана" style="--a:33.33%; --b:66.67%"><div class="marks" style="grid-template-columns:1fr 1fr 1fr"><span>близько</span><span class="g">добре</span><span>далеко</span></div></div></div>
+          <div class="c-msg"></div>
+        </div>
+        <div class="ctrl" data-k="hz">
+          <div class="c-head">🔄 Частота оновлення</div>
+          <div class="c-body"><div class="seg"><button data-v="30" class="on">30 Гц</button><button data-v="60">60 Гц</button><button data-v="144">144 Гц</button></div><div class="hz-ball"><i id="hzShadow"></i><svg viewBox="0 0 30 30" aria-hidden="true"><g id="hzBall"><circle cx="15" cy="15" r="13" fill="#fff" stroke="#212529" stroke-width="1.5"/><path d="M15 9 L20 12.5 L18 18.5 H12 L10 12.5 Z" fill="#212529"/><path d="M15 9 V3 M20 12.5 L26 10 M18 18.5 L22 24 M12 18.5 L8 24 M10 12.5 L4 10" stroke="#212529" stroke-width="1.3"/></g></svg></div></div>
+          <div class="c-msg"></div>
+        </div>
+      </div>
+    </div>
+    <div class="note clock-note">
+      <svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="23" fill="#fff" stroke="#16A3A0" stroke-width="4"/><g stroke="#0B5F5D" stroke-width="2" stroke-linecap="round"><path d="M26 6 V9 M46 26 H43 M26 46 V43 M6 26 H9"/></g><path d="M26 26 V15" stroke="#0B5F5D" stroke-width="3.5" stroke-linecap="round"/><path d="M26 26 L35 19" stroke="#16A3A0" stroke-width="2.5" stroke-linecap="round"/><circle cx="26" cy="26" r="3" fill="#0B5F5D"/></svg>
+      <b>Не забувай про перерви!</b>
+    </div>
+  </section>
+
+  <section class="block" id="step2">
+    <div class="step-label">Крок 2 · Персоналізація</div>
+    <h2>Комп'ютер під себе</h2>
+    <p>У контекстному меню Робочого столу:</p>
+    <ul>
+      <li><b>Вигляд</b> — розмір значків;</li>
+      <li><b>Персоналізація</b> — фон, кольори, <b>контрастні теми</b> (для слабкого зору).</li>
+    </ul>
+    <p class="soft">Клацни <b>правою кнопкою</b> на Робочому столі (на телефоні — торкнись) і зроби, що просить клієнт.</p>
+    <div class="exercise" id="pz">
+      <div class="patient"><div class="ava" id="pzAva"></div><div class="say" id="pzSay"></div></div>
+      <div class="w11 s" id="pzDesk"></div>
+      <div class="rs-foot"><div class="pz-msg" id="pzMsg"></div><button class="rs-again" id="pzAgain" disabled>↻ Почати спочатку</button></div>
+    </div>
+  </section>
+
+  <section class="block" id="step3">
+    <div class="step-label">Крок 3 · Підключаємо пристрої</div>
+    <h2>Чому комп'ютер не бачить навушників?</h2>
+    <p>Зазвичай система сама знаходить пристрій. Якщо ні — <b>Пуск › Параметри › Bluetooth і пристрої</b>.</p>
+    <div class="exercise" id="bt">
+      <div class="patient"><div class="ava" id="btAva"></div><div class="say" id="btSay"></div></div>
+      <div class="bt-lab">
+        <div class="w11 bt-desk" id="btDesk"></div>
+        <div class="bt-dev" id="btDev"></div>
+      </div>
+      <div class="rs-foot"><div class="pz-msg" id="btMsg"></div><button class="rs-again" id="btAgain" disabled>↻ Почати спочатку</button></div>
+    </div>
+  </section>
+
+  <section class="block" id="step4">
+    <div class="step-label">Крок 4 · Відновлення системи</div>
+    <h2>Машина часу для комп'ютера</h2>
+    <p>Комп'ютер зависає після нової програми? Поверни його до <b>точки відновлення</b> — стану, коли все працювало. Точки є, лише якщо <b>адміністратор</b> увімкнув захист системи.</p>
+    <svg class="rp-ill" viewBox="0 0 640 230" aria-label="Точка відновлення: повернення системи до середи">
+      <defs><marker id="rpA" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#D9480F"/></marker>
+        <marker id="rpT" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0 L10 5 L0 10 Z" fill="#ADB5BD"/></marker></defs>
+      <!-- шкала часу -->
+      <path d="M30 170 H612" stroke="#ADB5BD" stroke-width="3" marker-end="url(#rpT)"/>
+      <g font-size="13" fill="#6A5246" text-anchor="middle"><text x="90" y="192">Пн</text><text x="200" y="192">Вт</text><text x="310" y="192" class="t" fill="#2F9E44">Ср</text><text x="420" y="192">Чт</text><text x="530" y="192">Пт</text></g>
+      <g fill="#ADB5BD"><circle cx="90" cy="170" r="5"/><circle cx="200" cy="170" r="5"/><circle cx="420" cy="170" r="5"/><circle cx="530" cy="170" r="5"/></g>
+      <!-- точка відновлення: «знімок» здорового комп'ютера -->
+      <circle cx="310" cy="170" r="9" fill="#2F9E44" stroke="#fff" stroke-width="3"/>
+      <rect x="250" y="76" width="120" height="80" rx="8" fill="#EBFBEE" stroke="#2F9E44" stroke-width="2.5" stroke-dasharray="6 4"/>
+      <rect x="282" y="90" width="56" height="38" rx="4" fill="#343A40"/><rect x="286" y="94" width="48" height="30" rx="2" fill="#B2F2BB"/>
+      <circle cx="303" cy="104" r="2.4" fill="#2B8A3E"/><circle cx="317" cy="104" r="2.4" fill="#2B8A3E"/><path d="M302 112 Q310 118 318 112" stroke="#2B8A3E" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      <path d="M302 128 H318 M310 128 V134" stroke="#343A40" stroke-width="3"/><path d="M300 136 H320" stroke="#343A40" stroke-width="3" stroke-linecap="round"/>
+      <text x="310" y="149" text-anchor="middle" font-size="10" fill="#2B8A3E" font-weight="700">знімок системи</text>
+      <text x="310" y="214" text-anchor="middle" class="t" font-size="14" fill="#2B8A3E">Точка відновлення</text>
+      <!-- п'ятниця: зависання -->
+      <rect x="500" y="90" width="56" height="38" rx="4" fill="#343A40"/><rect x="504" y="94" width="48" height="30" rx="2" fill="#FFC9C9"/>
+      <path d="M516 101 L522 107 M522 101 L516 107 M534 101 L540 107 M540 101 L534 107" stroke="#C92A2A" stroke-width="2.2" stroke-linecap="round"/><path d="M520 117 Q528 112 536 117" stroke="#C92A2A" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+      <path d="M520 128 H536 M528 128 V134" stroke="#343A40" stroke-width="3"/><path d="M518 136 H538" stroke="#343A40" stroke-width="3" stroke-linecap="round"/>
+      <text x="528" y="82" text-anchor="middle" font-size="11.5" fill="#C92A2A">зависає</text>
+      <!-- стрілка «назад у минуле» -->
+      <path d="M528 70 C505 34 360 34 326 70" stroke="#D9480F" stroke-width="3.5" fill="none" stroke-dasharray="2 0" marker-end="url(#rpA)"/>
+      <text x="426" y="22" text-anchor="middle" class="t" font-size="15" fill="#D9480F">Відновлення системи</text>
+    </svg>
+    <div class="exercise" id="rs">
+      <div class="patient"><div class="ava">👦</div><div class="say" id="rsSay"></div></div>
+      <div class="w11 rs-desk" id="rsDesk"></div>
+      <div class="rs-foot"><div class="pz-msg" id="rsMsg"></div><button class="rs-again" id="rsAgain" disabled>↻ Почати спочатку</button></div>
+    </div>
+  </section>
+
+  <section class="block" id="step5">
+    <div class="step-label">Крок 5 · Чому збоїть програма</div>
+    <h2>П'ять причин збоїв</h2>
+    <p>Програма вилітає чи зависає? Переверни картки з п'ятьма причинами.</p>
+    <div class="causes" id="causes"></div>
+    <p class="soft" style="margin-top:20px">Постав «діагноз».</p>
+    <div id="causeQuiz"></div>
+  </section>
+
+  <section class="block" id="step6">
+    <div class="step-label">Крок 6 · Сумісність</div>
+    <h2>Чи потягне мій комп'ютер?</h2>
+    <p>Перед встановленням порівняй <b>системні вимоги</b> програми з комп'ютером. ОС і пам'ять — у «Цей ПК» › <b>Властивості</b>.</p>
+    <p class="soft">Клацни вимогу, яку ноутбук <b>не виконує</b>. Якщо все підходить — натисни «Інсталювати».</p>
+    <div class="exercise">
+      <div class="spec">
+        <div class="hd">💻 Ноутбук Оксани · Властивості</div>
+        <div><span>Операційна система</span>Windows 10</div>
+        <div><span>Оперативна пам'ять</span>8 ГБ</div>
+        <div><span>Вільно на диску C:</span>12,4 ГБ з 119 ГБ</div>
+        <div><span>Інтернет</span>15 Мбіт/с</div>
+      </div>
+      <div class="shop" id="shop"></div>
+      <div class="progress-line" id="shopProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Урок · «Цифрові пристрої і проблеми» · 7 клас</span><span class="credits">Логотип Krita — KOffice Team, CC BY 2.5, Вікісховище</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Диспетчер завдань', desc:'Показує, яка програма навантажує процесор і пам\'ять' },
+  { name:'Диспетчер пристроїв', desc:'Список усіх пристроїв; жовтий трикутник — проблема' },
+  { name:'Драйвер', desc:'Програма, яка вчить комп\'ютер працювати з пристроєм' },
+  { name:'Кошик', desc:'Видалені файли займають тут місце, доки його не очистять' },
+  { name:'Тест швидкості', desc:'Перевіряє, чи не мережа винна в тому, що відео зависає' }
+], 'recapProgress');
+
+/* ---------- КРОК 1: РОБОЧЕ МІСЦЕ ---------- */
+(function(){
+  const S = { light:false, bright:100, dist:30, hz:30 };
+  const P = {
+    light:{ ok:s=>s.light, bad:()=>'У темряві яскравий екран утомлює.', good:'Світло ✓' },
+    bright:{ ok:s=>s.bright >= 35 && s.bright <= 75, bad:s=>s.bright > 75 ? 'Сліпить.' : 'Затемно.', good:'Саме так ✓' },
+    dist:{ ok:s=>s.dist >= 50 && s.dist <= 75, bad:s=>s.dist < 50 ? 'Надто близько.' : 'Задалеко.', good:'На витягнуту руку ✓' },
+    hz:{ ok:s=>s.hz >= 60, bad:()=>'Рух смикається.', good:'Плавно ✓' }
+  };
+  const KEYS = Object.keys(P);
+  const hit = trackTask(document.getElementById('eyeLab'), KEYS.length, KEYS.length + 2);
+  const got = new Set();
+  let bonus = false;
+  const $ = id=>document.getElementById(id);
+  // вираз обличчя для 0…4 правильних параметрів
+  const FACES = [
+    { brow:['M26 34 L40 29', 'M74 34 L60 29'], eye:['M28 46 Q34 44 40 46', 'M60 46 Q66 44 72 46'], mouth:'M34 76 Q50 62 66 76', head:'#FFE0A3', cheek:0, cap:'Очам погано', sub:'Жодного правильного параметра' },
+    { brow:['M26 32 L40 30', 'M74 32 L60 30'], eye:['M30 45 Q34 41 38 45', 'M62 45 Q66 41 70 45'], mouth:'M36 73 Q50 66 64 73', head:'#FFE4A3', cheek:0, cap:'Трохи краще', sub:'Правильно: 1 з 4' },
+    { brow:['M26 30 L40 30', 'M74 30 L60 30'], eye:['M31 45 Q34 40 37 45', 'M63 45 Q66 40 69 45'], mouth:'M36 71 Q50 71 64 71', head:'#FFE8A3', cheek:0, cap:'Уже непогано', sub:'Правильно: 2 з 4' },
+    { brow:['M26 29 L40 28', 'M74 29 L60 28'], eye:['M31 45 Q34 40 37 45', 'M63 45 Q66 40 69 45'], mouth:'M34 68 Q50 78 66 68', head:'#FFDF6E', cheek:.5, cap:'Майже зручно', sub:'Правильно: 3 з 4' },
+    { brow:['M26 28 L40 25', 'M74 28 L60 25'], eye:['M28 47 Q34 38 40 47', 'M60 47 Q66 38 72 47'], mouth:'M30 64 Q50 88 70 64', head:'#FFD43B', cheek:.85, cap:'Очам зручно! 😊', sub:'Усе налаштовано правильно' }
+  ];
+
+  function render(){
+    let n = 0;
+    KEYS.forEach(k=>{
+      const ok = P[k].ok(S);
+      const box = document.querySelector(`.ctrl[data-k="${k}"]`);
+      box.classList.toggle('ok', ok);
+      box.querySelector('.c-msg').textContent = ok ? P[k].good : P[k].bad(S);
+      if(ok){
+        n++;
+        if(!got.has(k)){ got.add(k); addNeurons(1); hit(); }
+      }
+    });
+    const f = FACES[n];
+    $('fBrowL').setAttribute('d', f.brow[0]); $('fBrowR').setAttribute('d', f.brow[1]);
+    $('fEyeL').setAttribute('d', f.eye[0]); $('fEyeR').setAttribute('d', f.eye[1]);
+    $('fMouth').setAttribute('d', f.mouth);
+    $('fHead').setAttribute('fill', f.head);
+    $('fCheekL').setAttribute('opacity', f.cheek); $('fCheekR').setAttribute('opacity', f.cheek);
+    $('faceCap').innerHTML = `${f.cap}<small>${f.sub}</small>`;
+    if(n === KEYS.length && !bonus){ bonus = true; addNeurons(2); }
+  }
+
+  document.querySelectorAll('#ctrls .ctrl').forEach(box=>{
+    const k = box.dataset.k;
+    const range = box.querySelector('input');
+    if(range){
+      const out = box.querySelector('output');
+      range.addEventListener('input', ()=>{
+        S[k] = +range.value;
+        out.textContent = S[k] + (k === 'dist' ? ' см' : '%');
+        render();
+      });
+    }
+    box.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click', ()=>{
+      box.querySelectorAll('.seg button').forEach(x=>x.classList.toggle('on', x === b));
+      const v = +b.dataset.v;
+      S[k] = (k === 'hz') ? v : !!v;
+      render();
+    }));
+  });
+  // м'ячик стрибає: позиція оновлюється лише раз на «кадр» — що нижча частота, то помітніші ривки
+  // (частоти навмисно перебільшено: 30 Гц → 6 кадрів/с, 60 Гц → 15, 144 Гц → кожен кадр браузера)
+  const ball = $('hzBall').parentNode, shadow = $('hzShadow'), JUMP = 44, PERIOD = 900;
+  let shown = -1;
+  (function loop(t){
+    const fps = S.hz === 30 ? 6 : S.hz === 60 ? 15 : 0;
+    const tt = fps ? Math.floor(t / 1000 * fps) / fps * 1000 : t;
+    if(tt !== shown){
+      shown = tt;
+      const p = (tt % PERIOD) / PERIOD, h = 4 * p * (1 - p);   // 0 — на землі, 1 — найвище
+      const squash = h < .1 ? 'scale(1.22,.78)' : '';            // торкнувся землі — трохи сплющується
+      ball.style.transform = `translateY(${-h * JUMP}px) ${squash}`;
+      shadow.style.transform = `scaleX(${1 - h * .45})`;
+      shadow.style.opacity = 1 - h * .5;
+    }
+    requestAnimationFrame(loop);
+  })(0);
+  render();
+})();
+
+/* ---------- КРОК 2: ПЕРСОНАЛІЗАЦІЯ (емулятор Windows 11) ---------- */
+(function(){
+  const WALLS = {
+    bloom:{ name:'Квітка', svg:`<svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="wb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#A9C8F5"/><stop offset="1" stop-color="#E6EEFA"/></linearGradient><linearGradient id="wp" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2F6FE0"/><stop offset="1" stop-color="#0B3C9B"/></linearGradient></defs><rect width="160" height="100" fill="url(#wb)"/><g transform="translate(92 56)" fill="url(#wp)"><path d="M0 0 C-30 -8 -34 -40 -8 -46 C10 -40 10 -14 0 0Z" opacity=".95"/><path d="M0 0 C-6 -30 18 -50 36 -32 C38 -12 18 -2 0 0Z" opacity=".85"/><path d="M0 0 C24 -10 48 6 38 28 C20 34 6 18 0 0Z" opacity=".75"/><path d="M0 0 C18 18 8 44 -14 40 C-24 24 -12 8 0 0Z" opacity=".85"/><path d="M0 0 C-14 20 -42 20 -46 0 C-36 -16 -14 -12 0 0Z" opacity=".7"/></g></svg>` },
+    sea:{ name:'Море', svg:`<svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="ws" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFB86B"/><stop offset="1" stop-color="#FFE3B3"/></linearGradient></defs><rect width="160" height="58" fill="url(#ws)"/><circle cx="112" cy="50" r="15" fill="#FF8A3D"/><rect y="56" width="160" height="44" fill="#1C7ED6"/><path d="M0 66 Q10 62 20 66 T40 66 T60 66 T80 66 T100 66 T120 66 T140 66 T160 66 M0 80 Q10 76 20 80 T40 80 T60 80 T80 80 T100 80 T120 80 T140 80 T160 80" stroke="#74C0FC" stroke-width="2" fill="none"/><path d="M98 59 H126" stroke="#FFD8A8" stroke-width="2"/></svg>` },
+    mount:{ name:'Гори', svg:`<svg viewBox="0 0 160 100" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="wm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7AA7E8"/><stop offset="1" stop-color="#E7D5F5"/></linearGradient></defs><rect width="160" height="100" fill="url(#wm)"/><path d="M0 100 L46 38 L72 66 L104 24 L160 100 Z" fill="#5B6B9A"/><path d="M104 24 L116 40 L108 38 L100 44 L96 36 Z M46 38 L54 49 L46 47 L40 52 Z" fill="#fff"/><path d="M0 100 L30 72 L60 92 L96 66 L140 96 L160 84 V100 Z" fill="#3F4C77"/></svg>` }
+  };
+  const BASE = '#0067C0';
+  const COLORS = [['#0067C0','синій'],['#C42B1C','червоний'],['#CA5010','помаранчевий'],['#FFB900','жовтий'],['#107C10','зелений'],['#038387','бірюзовий'],['#8764B8','фіолетовий'],['#E3008C','рожевий']];
+  const ICONS = [
+    ['Цей ПК', '<svg viewBox="0 0 40 40"><rect x="4" y="7" width="32" height="21" rx="2" fill="#5AA9E6" stroke="#1C5D99" stroke-width="2"/><path d="M14 34 H26 M20 28 V34" stroke="#1C5D99" stroke-width="3" stroke-linecap="round"/></svg>'],
+    ['Кошик', '<svg viewBox="0 0 40 40"><path d="M9 11 H31 L28 35 H12 Z" fill="#DDE6F0" stroke="#5F7A99" stroke-width="2"/><path d="M15 16 L16 30 M20 16 V30 M25 16 L24 30" stroke="#5F7A99" stroke-width="1.6"/><path d="M7 11 H33" stroke="#5F7A99" stroke-width="2.5" stroke-linecap="round"/></svg>'],
+    ['Документи', '<svg viewBox="0 0 40 40"><path d="M4 10 H15 L18 13 H36 V33 H4 Z" fill="#F7C948" stroke="#B7851F" stroke-width="2"/><rect x="4" y="16" width="32" height="17" fill="#FFD966" stroke="#B7851F" stroke-width="2"/></svg>'],
+    ['Браузер', '<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="#E7F5FF" stroke="#1971C2" stroke-width="2.5"/><path d="M5 20 H35 M20 5 Q11 20 20 35 Q29 20 20 5" stroke="#1971C2" stroke-width="2" fill="none"/></svg>'],
+    ['Фото', '<svg viewBox="0 0 40 40"><rect x="5" y="8" width="30" height="24" rx="3" fill="#fff" stroke="#7048E8" stroke-width="2"/><path d="M8 29 L17 19 L24 26 L28 22 L33 29 Z" fill="#9775FA"/><circle cx="27" cy="15" r="3" fill="#FAB005"/></svg>']
+  ];
+  // дрібні значки в стилі Fluent (лінійні) для меню й навігації
+  const I = (d, c = '#1b1b1b')=>`<svg viewBox="0 0 16 16" fill="none" stroke="${c}" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  const GL = {
+    view:I('<rect x="2" y="2" width="5" height="5" rx="1"/><rect x="9" y="2" width="5" height="5" rx="1"/><rect x="2" y="9" width="5" height="5" rx="1"/><rect x="9" y="9" width="5" height="5" rx="1"/>'),
+    sort:I('<path d="M5 2 V14 M2.5 11.5 L5 14 L7.5 11.5 M11 14 V2 M8.5 4.5 L11 2 L13.5 4.5"/>'),
+    refresh:I('<path d="M13 8 A5 5 0 1 1 11.5 4.5 M13 2 V5 H10"/>'),
+    add:I('<circle cx="8" cy="8" r="6"/><path d="M8 5 V11 M5 8 H11"/>'),
+    disp:I('<rect x="2" y="3" width="12" height="8" rx="1"/><path d="M6 14 H10 M8 11 V14"/>'),
+    pers:I('<path d="M3 13 C3 9 7 9 7 6 L10 9 C7 9 7 13 3 13Z"/><path d="M8 5 L12 1.5 L14.5 4 L11 8"/>'),
+    more:I('<rect x="2" y="2" width="12" height="12" rx="2"/><path d="M5 6 H11 M5 9 H11"/>'),
+    sys:I('<rect x="2" y="3" width="12" height="8" rx="1"/><path d="M6 14 H10"/>', '#0067C0'),
+    bt:I('<path d="M5 5 L11 11 L8 14 V2 L11 5 L5 11"/>', '#0078D4'),
+    net:I('<path d="M2 6 Q8 1 14 6 M4.5 8.5 Q8 5.5 11.5 8.5 M7 11 Q8 10 9 11"/><circle cx="8" cy="13" r=".6"/>', '#5B5FC7'),
+    persC:I('<path d="M3 13 C3 9 7 9 7 6 L10 9 C7 9 7 13 3 13Z"/><path d="M8 5 L12 1.5 L14.5 4 L11 8"/>', '#CA5010'),
+    apps:I('<rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/>', '#69797E'),
+    acc:I('<circle cx="8" cy="5.5" r="3"/><path d="M2.5 14 C3 10.5 13 10.5 13.5 14"/>', '#107C10'),
+    pic:I('<rect x="2" y="3" width="12" height="10" rx="1"/><path d="M3 12 L7 8 L10 11 L11.5 9.5 L13 11"/><circle cx="10.5" cy="6" r="1"/>'),
+    pal:I('<path d="M8 2 A6 6 0 1 0 8 14 C9.5 14 9.5 12 8.5 11 C7.5 10 8.5 8.5 10 8.5 H12 A2 2 0 0 0 14 6.5 C14 4 11.5 2 8 2Z"/><circle cx="5" cy="8" r=".8"/><circle cx="6" cy="5" r=".8"/><circle cx="9.5" cy="4.5" r=".8"/>'),
+    hc:I('<circle cx="8" cy="8" r="6"/><path d="M8 2 A6 6 0 0 1 8 14 Z" fill="#1b1b1b"/>')
+  };
+  const START = c=>`<svg viewBox="0 0 22 22"><defs><linearGradient id="st" x1="0" y1="0" x2="1" y2="1"><stop offset="0" style="stop-color:${c}; stop-opacity:.7"/><stop offset="1" style="stop-color:${c}"/></linearGradient></defs><rect x="1" y="1" width="9.5" height="9.5" rx="1" fill="url(#st)"/><rect x="11.5" y="1" width="9.5" height="9.5" rx="1" fill="url(#st)"/><rect x="1" y="11.5" width="9.5" height="9.5" rx="1" fill="url(#st)"/><rect x="11.5" y="11.5" width="9.5" height="9.5" rx="1" fill="url(#st)"/></svg>`;
+  const TB = [
+    '<svg viewBox="0 0 22 22" fill="none" stroke="#1b1b1b" stroke-width="1.6"><circle cx="9.5" cy="9.5" r="6"/><path d="M14 14 L19 19" stroke-linecap="round"/></svg>',
+    '<svg viewBox="0 0 22 22"><path d="M2 5 H9 L11 7 H20 V18 H2 Z" fill="#FFB900"/><path d="M2 9 H20 V18 H2 Z" fill="#FFD75E"/></svg>',
+    '<svg viewBox="0 0 22 22"><circle cx="11" cy="11" r="9" fill="#1FA2E8"/><path d="M4 13 Q8 5 15 8 Q19 10 17 14 Q14 11 10 13 Q9 17 14 18 Q6 19 4 13Z" fill="#7DDB4E"/></svg>',
+    '<svg viewBox="0 0 22 22" fill="none" stroke="#5A5A5A" stroke-width="1.8"><circle cx="11" cy="11" r="3"/><path d="M11 2 V5 M11 17 V20 M2 11 H5 M17 11 H20 M4.6 4.6 L6.8 6.8 M15.2 15.2 L17.4 17.4 M4.6 17.4 L6.8 15.2 M15.2 6.8 L17.4 4.6"/></svg>'
+  ];
+  const CLIENTS = [
+    { ava:'👵', g:1, name:'Бабуся Ніна', say:'Значки такі крихітні — не влучаю в них мишкою!', ok:a=>a.k === 'size' && a.v === 'l',
+      hint:'Подивись у пункті «Вигляд».', done:'Великі значки легше влучити.' },
+    { ava:'👦', name:'Тимко', say:'Скучив за літом! Хочу на екрані хвилі й захід сонця.', ok:a=>a.k === 'wall' && a.v === 'sea',
+      hint:'Подивись у Персоналізації.', done:'Фон змінено.' },
+    { ava:'👴', name:'Дідусь Петро', say:'Зір слабкий: літери зливаються з картинкою позаду.', ok:a=>a.k === 'hc' && a.v,
+      hint:'Текст має різко відрізнятися від тла.', done:'Чорне тло й яскравий текст читати легше.' },
+    { ava:'👧', g:1, name:'Соломія', say:'Люблю бузок! Хочу кнопки й панель унизу такого кольору.', ok:a=>a.k === 'color' && a.v === '#8764B8',
+      hint:'Потрібен колір бузку.', done:'Колір елементів — фіолетовий.' }
+  ];
+
+  const $ = id=>document.getElementById(id);
+  const root = $('pz'), desk = $('pzDesk'), msg = $('pzMsg');
+  const HINT = 'Підказка: клацни правою кнопкою на вільному місці Робочого столу.';
+  const hit = trackTask(root, CLIENTS.length, CLIENTS.length + 2);
+  let idx = 0, solved = false, S, ctx = null, win = null, bonus = false;
+  const got = new Set();
+
+  desk.innerHTML = `<div class="w-wall" id="pzWall"></div><div class="w-icons" id="pzIcons"></div>
+    <div class="w-bar"><div class="w-mid" id="pzMid"></div><div class="w-tray"><span>ᐱ</span><span>🔊</span><span>14:35<br>15.11.2026</span></div></div>`;
+
+  function reset(){
+    S = { size:'s', wall:'bloom', hc:0, color:BASE, sort:false, page:'pers' };
+    closeAll();
+    apply();
+  }
+  function apply(){
+    desk.className = 'w11 ' + S.size + (S.hc ? ' hc t' + S.hc : '') + (S.color !== BASE ? ' tint' : '');
+    desk.style.setProperty('--pc', S.color);
+    $('pzWall').innerHTML = WALLS[S.wall].svg;
+    const list = S.sort ? [...ICONS].sort((a, b)=>a[0].localeCompare(b[0], 'uk')) : ICONS;
+    $('pzIcons').innerHTML = list.map(([n, svg])=>`<div class="w-ico">${svg}<span>${n}</span></div>`).join('');
+    $('pzMid').innerHTML = `<span class="w-tb">${START(S.hc ? 'var(--hl)' : S.color === BASE ? '#0078D4' : '#fff')}</span>`
+      + TB.map((t, i)=>`<span class="w-tb${i === 1 ? ' run' : ''}${i === 3 && win ? ' run act' : ''}">${t}</span>`).join('');
+    if(win) renderWin();
+  }
+  function closeAll(){ ctx?.remove(); ctx = null; win?.remove(); win = null; }
+  function closeCtx(){ ctx?.remove(); ctx = null; }
+
+  function act(a, el){
+    if(solved) return;
+    const c = CLIENTS[idx];
+    if(c.ok(a)){
+      solved = true;
+      if(!got.has(idx)){ got.add(idx); addNeurons(1); hit(); }   // кожен клієнт зараховується один раз
+      msg.textContent = HINT;
+      const last = idx === CLIENTS.length - 1;
+      const say = $('pzSay');
+      say.className = 'say ok';
+      if(last){
+        if(!bonus && got.size === CLIENTS.length){ bonus = true; addNeurons(2); }
+        say.innerHTML = `<span class="t"><b>Готово!</b>${c.name} ${c.g ? 'задоволена' : 'задоволений'}. ${c.done}</span>`;
+        return;
+      }
+      say.innerHTML = `<span class="t"><b>${c.name} ${c.g ? 'задоволена' : 'задоволений'}!</b>${c.done}</span><button class="btn-next active" id="pzNext">Далі →</button>`;
+      $('pzNext').addEventListener('click', ()=>{ idx++; openClient(); });
+    } else {
+      el.classList.remove('wrong-flash'); void el.offsetWidth;
+      el.classList.add('wrong-flash');
+      setTimeout(()=>el.classList.remove('wrong-flash'), 600);
+      msg.textContent = 'Не те. ' + c.hint;
+    }
+  }
+
+  /* контекстне меню Робочого столу */
+  function openCtx(x, y){
+    closeCtx();
+    $('pzAgain').disabled = false;
+    ctx = document.createElement('div');
+    ctx.className = 'w-ctx';
+    ctx.innerHTML = `
+      <button data-sub="view">${GL.view}Вигляд<span class="ar">›</span></button>
+      <button data-sub="sort">${GL.sort}Сортувати за<span class="ar">›</span></button>
+      <button data-a="close">${GL.refresh}Оновити</button>
+      <hr>
+      <button data-sub="new">${GL.add}Створити<span class="ar">›</span></button>
+      <hr>
+      <button data-a="display">${GL.disp}Параметри дисплея</button>
+      <button data-a="pers">${GL.pers}Персоналізація</button>
+      <hr>
+      <button data-a="close">${GL.more}Показати більше параметрів</button>`;
+    desk.appendChild(ctx);
+    const r = desk.getBoundingClientRect(), w = ctx.offsetWidth, h = ctx.offsetHeight;
+    const left = Math.max(4, Math.min(x, r.width - w - 4)), top = Math.max(4, Math.min(y, r.height - h - 50));
+    ctx.style.left = left + 'px'; ctx.style.top = top + 'px';
+    const toLeft = left + w + 170 > r.width;
+    ctx.querySelectorAll('[data-sub]').forEach(b=>{
+      const show = ()=>openSub(b, b.dataset.sub, toLeft);
+      b.addEventListener('click', e=>{ e.stopPropagation(); show(); });
+      b.addEventListener('mouseenter', show);
+    });
+    ctx.querySelectorAll('[data-a]').forEach(b=>{
+      b.addEventListener('mouseenter', ()=>{ ctx.querySelector('.w-sub')?.remove(); ctx.querySelectorAll('.open').forEach(x=>x.classList.remove('open')); });
+      b.addEventListener('click', e=>{
+        e.stopPropagation(); closeCtx();
+        if(b.dataset.a === 'display') openWin('display');
+        if(b.dataset.a === 'pers') openWin('pers');
+      });
+    });
+  }
+  function openSub(btn, kind, toLeft){
+    ctx.querySelector('.w-sub')?.remove();
+    ctx.querySelectorAll('.open').forEach(x=>x.classList.remove('open'));
+    btn.classList.add('open');
+    const sub = document.createElement('div');
+    sub.className = 'w-ctx w-sub';
+    const ITEMS = {
+      view:[['l','Великі значки'],['m','Середні значки'],['s','Дрібні значки']],
+      sort:[['name','Ім\'я'],['size','Розмір'],['date','Дата змінення']],
+      new:[['folder','Папка'],['link','Ярлик'],['txt','Текстовий документ']]
+    }[kind];
+    sub.innerHTML = ITEMS.map(([v, t])=>`<button data-v="${v}">${t}${kind === 'view' && S.size === v ? '<span class="dot"></span>' : ''}</button>`).join('');
+    sub.style.top = btn.offsetTop - 5 + 'px';
+    if(toLeft){ sub.style.left = 'auto'; sub.style.right = 'calc(100% + 4px)'; }
+    ctx.appendChild(sub);
+    sub.querySelectorAll('button').forEach(b=>b.addEventListener('click', e=>{
+      e.stopPropagation();
+      if(kind === 'view'){
+        if(S.size === b.dataset.v){ closeCtx(); return; }
+        S.size = b.dataset.v; apply();
+        act({ k:'size', v:S.size }, b);
+      } else if(kind === 'sort'){
+        S.sort = true; apply();
+        act({ k:'sort' }, b);
+      }
+      setTimeout(closeCtx, 250);
+    }));
+  }
+
+  /* вікно «Параметри» */
+  function openWin(page){
+    S.page = page;
+    if(!win){
+      win = document.createElement('div');
+      win.className = 'w-win';
+      desk.appendChild(win);
+      win.addEventListener('click', e=>{ e.stopPropagation(); closeCtx(); });
+      win.addEventListener('contextmenu', e=>{ e.preventDefault(); e.stopPropagation(); });
+    }
+    apply();
+  }
+  const card = (ico, t, sub, attr = '', right = '<span class="ar">›</span>')=>
+    `<${attr ? 'button' : 'div'} class="w-card" ${attr}>${ico}<span><b>${t}</b><small>${sub}</small></span>${right}</${attr ? 'button' : 'div'}>`;
+  function renderWin(){
+    const p = S.page, inPers = p !== 'display';
+    const NAV = [['sys', 'Система', 'display'], ['bt', 'Bluetooth і пристрої'], ['net', 'Мережа й Інтернет'], ['persC', 'Персоналізація', 'pers'], ['apps', 'Програми'], ['acc', 'Облікові записи']];
+    const nav = NAV.map(([g, t, go])=>`<button ${go ? `data-go="${go}"` : ''} class="${(go === 'display' && !inPers) || (go === 'pers' && inPers) ? 'on' : ''}">${GL[g]}${t}</button>`).join('');
+    const crumb = (...parts)=>`<div class="w-crumb">${parts.map((x, i)=>i < parts.length - 1 ? `<button data-go="${x[1]}">${x[0]}</button><span class="sep">›</span>` : `<span>${x[0]}</span>`).join('')}</div>`;
+    let main = '';
+    if(p === 'display'){
+      main = crumb(['Система'], ['Дисплей'])
+        + card(GL.disp, 'Яскравість', 'Яскравість вбудованого дисплея', '', '<span class="r w-bright"><i></i></span>')
+        + card(GL.view, 'Масштаб', 'Розмір тексту й елементів', '', '<span class="r">100% (рекомендовано)</span>')
+        + card(GL.disp, 'Роздільна здатність', 'Кількість пікселів на екрані', '', '<span class="r">1920 × 1080</span>')
+        + '<p class="w-note">Клієнт просить про інше.</p>';
+    } else if(p === 'pers'){
+      main = crumb(['Персоналізація'])
+        + `<div class="w-prev"><span class="mini">${WALLS[S.wall].svg}<i></i></span></div>`
+        + card(GL.pic, 'Фон', 'Фонове зображення, колір, слайд-шоу', 'data-go="wall"')
+        + card(GL.pal, 'Кольори', 'Колір елементів, прозорість, тема', 'data-go="color"')
+        + card(GL.hc, 'Контрастні теми', 'Колірні теми для слабкого зору, світлочутливість', 'data-go="hc"');
+    } else if(p === 'wall'){
+      main = crumb(['Персоналізація', 'pers'], ['Фон'])
+        + `<div class="w-prev"><span class="mini">${WALLS[S.wall].svg}<i></i></span></div>`
+        + `<div class="w-card" style="display:block"><b>Останні зображення</b><div class="w-thumbs">${Object.entries(WALLS).map(([k, w])=>`<button data-wall="${k}" class="${S.wall === k ? 'on' : ''}" aria-label="${w.name}" title="${w.name}">${w.svg}</button>`).join('')}</div></div>`;
+    } else if(p === 'color'){
+      main = crumb(['Персоналізація', 'pers'], ['Кольори'])
+        + `<div class="w-card" style="display:block"><b>Колір елементів</b><small>Кнопки, позначки й панель завдань</small><div class="w-sw">${COLORS.map(([c, n])=>`<button data-color="${c}" title="${n}" aria-label="${n}" class="${S.color === c ? 'on' : ''}" style="background:${c}"></button>`).join('')}</div></div>`;
+    } else if(p === 'hc'){
+      main = crumb(['Персоналізація', 'pers'], ['Контрастні теми'])
+        + card(GL.hc, 'Контрастні теми', 'Кольори з високою контрастністю', '',
+          `<span class="r w-pick"><select class="w-sel" id="hcSel">${['Немає', 'Водний', 'Пустельний', 'Сутінки', 'Нічне небо'].map((t, i)=>`<option value="${i}" ${S.hc === i ? 'selected' : ''}>${t}</option>`).join('')}</select> <button class="w-btn" id="hcApply">Застосувати</button></span>`);
+    }
+    win.innerHTML = `<div class="w-tt">${GL.persC}Параметри<span class="ctl"><span>─</span><span>▢</span><button aria-label="Закрити">✕</button></span></div>
+      <div class="w-set"><nav class="w-nav"><div class="w-user"><i>О</i><span>Оксана<small>Локальний обліковий запис</small></span></div><div class="w-find">Знайти параметр</div>${nav}</nav><div class="w-main">${main}</div></div>`;
+    win.querySelector('.ctl button').addEventListener('click', e=>{ e.stopPropagation(); win.remove(); win = null; apply(); });
+    win.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click', ()=>{ S.page = b.dataset.go; renderWin(); }));
+    win.querySelectorAll('[data-wall]').forEach(b=>b.addEventListener('click', ()=>{
+      if(S.wall === b.dataset.wall) return;
+      S.wall = b.dataset.wall; apply();
+      act({ k:'wall', v:S.wall }, win.querySelector(`[data-wall="${S.wall}"]`));
+    }));
+    win.querySelectorAll('[data-color]').forEach(b=>b.addEventListener('click', ()=>{
+      if(S.color === b.dataset.color) return;
+      S.color = b.dataset.color; apply();
+      act({ k:'color', v:S.color }, win.querySelector(`[data-color="${S.color}"]`));
+    }));
+    win.querySelector('#hcApply')?.addEventListener('click', ()=>{
+      const t = +win.querySelector('#hcSel').value;
+      if(t === S.hc) return;
+      S.hc = t; apply();
+      act({ k:'hc', v:t }, win.querySelector('#hcApply'));
+    });
+  }
+
+  desk.addEventListener('contextmenu', e=>{
+    e.preventDefault();
+    const r = desk.getBoundingClientRect();
+    openCtx(e.clientX - r.left, e.clientY - r.top);
+  });
+  desk.addEventListener('click', e=>{
+    if(ctx){ closeCtx(); return; }
+    if(win || e.target.closest('.w-bar')) return;
+    const r = desk.getBoundingClientRect();
+    openCtx(e.clientX - r.left, e.clientY - r.top);
+  });
+
+  function openClient(){
+    const c = CLIENTS[idx];
+    solved = false;
+    $('pzAva').textContent = c.ava;
+    $('pzSay').className = 'say';
+    $('pzSay').innerHTML = `<b>${c.name} · клієнт ${idx + 1} з ${CLIENTS.length}</b>${c.say}`;
+    msg.textContent = HINT;
+    reset();
+  }
+  $('pzAgain').addEventListener('click', ()=>{ idx = 0; openClient(); $('pzAgain').disabled = true; });
+  openClient();
+})();
+
+/* ---------- КРОК 3: ПІДКЛЮЧЕННЯ ПРИСТРОЇВ (Windows 11) ----------
+   Завдання 1 — з покроковими підказками (потрібна кнопка підсвічена), завдання 2 — самостійно. */
+(function(){
+  const HEADPHONES = '<svg viewBox="0 0 96 96"><path d="M18 58 V46 A30 30 0 0 1 78 46 V58" fill="none" stroke="#343A40" stroke-width="7" stroke-linecap="round"/><rect x="10" y="52" width="20" height="30" rx="8" fill="#495057"/><rect x="66" y="52" width="20" height="30" rx="8" fill="#495057"/><circle class="led" cx="76" cy="60" r="3.2" fill="#ADB5BD"/></svg>';
+  const MOUSE = '<svg viewBox="0 0 96 96"><rect x="26" y="12" width="44" height="72" rx="22" fill="#E9ECEF" stroke="#495057" stroke-width="3"/><path d="M48 12 V38 M26 38 H70" stroke="#495057" stroke-width="2.5"/><rect x="45" y="20" width="6" height="11" rx="3" fill="#868E96"/><circle class="led" cx="48" cy="66" r="3.2" fill="#ADB5BD"/></svg>';
+  const TASKS = [
+    { ava:'🎧', title:'Завдання 1 з 2 · з підказками', say:'Під\'єднай бездротові навушники.', name:'Навушники Sound Pro', short:'Навушники', pic:HEADPHONES,
+      btn:'Затиснути кнопку живлення', guide:true },
+    { ava:'🖱️', title:'Завдання 2 з 2 · самостійно', say:'Тепер сам під\'єднай бездротову мишу.', name:'Миша Bluetooth M3', short:'Миша', pic:MOUSE,
+      btn:'Затиснути кнопку сполучення', guide:false }
+  ];
+  const DECOYS = ['Телефон Андрія', 'Колонка BoomBox'];
+  const GUIDE = [
+    ['start', 'Натисни кнопку «Пуск» на панелі завдань.'],
+    ['app-set', 'Відкрий «Параметри».'],
+    ['nav-bt', 'Обери розділ «Bluetooth і пристрої».'],
+    ['toggle', 'Увімкни Bluetooth.'],
+    ['add', 'Натисни «Додати пристрій».'],
+    ['opt-bt', 'Обери «Bluetooth».'],
+    ['pair', 'Увімкни на навушниках режим сполучення — кнопка праворуч.'],
+    ['dev', 'Клацни навушники в списку.'],
+    ['ready', 'Натисни «Готово».']
+  ];
+  const I = (d, c = '#1b1b1b')=>`<svg viewBox="0 0 16 16" fill="none" stroke="${c}" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  const GL = {
+    sys:I('<rect x="2" y="3" width="12" height="8" rx="1"/><path d="M6 14 H10"/>', '#0067C0'),
+    bt:I('<path d="M5 5 L11 11 L8 14 V2 L11 5 L5 11"/>', '#0078D4'),
+    net:I('<path d="M2 6 Q8 1 14 6 M4.5 8.5 Q8 5.5 11.5 8.5 M7 11 Q8 10 9 11"/>', '#5B5FC7'),
+    pers:I('<path d="M3 13 C3 9 7 9 7 6 L10 9 C7 9 7 13 3 13Z"/><path d="M8 5 L12 1.5 L14.5 4 L11 8"/>', '#CA5010'),
+    apps:I('<rect x="2" y="2" width="5" height="5"/><rect x="9" y="2" width="5" height="5"/><rect x="2" y="9" width="5" height="5"/><rect x="9" y="9" width="5" height="5"/>', '#69797E'),
+    disp:I('<rect x="2" y="3" width="12" height="8" rx="1"/><path d="M6 14 H10 M8 11 V14"/>'),
+    snd:I('<path d="M3 6 H5 L8 3 V13 L5 10 H3 Z M10.5 5.5 Q12.5 8 10.5 10.5"/>'),
+    bell:I('<path d="M4 11 V7 A4 4 0 0 1 12 7 V11 L13 12 H3 Z M7 14 H9"/>'),
+    dev:I('<rect x="2" y="4" width="8" height="8" rx="1"/><rect x="11" y="6" width="3" height="6" rx="1"/>'),
+    prn:I('<rect x="4" y="2" width="8" height="4"/><rect x="2" y="6" width="12" height="6" rx="1"/><rect x="4" y="10" width="8" height="4"/>'),
+    mouse:I('<rect x="5" y="2" width="6" height="12" rx="3"/><path d="M8 2 V6"/>'),
+    kbd:I('<rect x="1.5" y="4" width="13" height="8" rx="1"/><path d="M4 7 H5 M7 7 H8 M10 7 H11 M5 10 H11"/>'),
+    head:I('<path d="M3 10 V8 A5 5 0 0 1 13 8 V10"/><rect x="2" y="9" width="3" height="4" rx="1"/><rect x="11" y="9" width="3" height="4" rx="1"/>'),
+    other:I('<rect x="2" y="3" width="12" height="9" rx="1"/><path d="M6 14 H10"/>'),
+    plus:I('<circle cx="8" cy="8" r="6"/><path d="M8 5 V11 M5 8 H11"/>')
+  };
+  const APPS = [
+    ['app-x', 'Браузер', '<svg viewBox="0 0 22 22"><circle cx="11" cy="11" r="9" fill="#1FA2E8"/><path d="M4 13 Q8 5 15 8 Q19 10 17 14 Q14 11 10 13 Q9 17 14 18 Q6 19 4 13Z" fill="#7DDB4E"/></svg>'],
+    ['app-x', 'Провідник', '<svg viewBox="0 0 22 22"><path d="M2 5 H9 L11 7 H20 V18 H2 Z" fill="#FFB900"/><path d="M2 9 H20 V18 H2 Z" fill="#FFD75E"/></svg>'],
+    ['app-set', 'Параметри', '<svg viewBox="0 0 22 22" fill="none" stroke="#5A5A5A" stroke-width="1.8"><circle cx="11" cy="11" r="3"/><path d="M11 2 V5 M11 17 V20 M2 11 H5 M17 11 H20 M4.6 4.6 L6.8 6.8 M15.2 15.2 L17.4 17.4 M4.6 17.4 L6.8 15.2 M15.2 6.8 L17.4 4.6"/></svg>'],
+    ['app-x', 'Калькулятор', '<svg viewBox="0 0 22 22"><rect x="4" y="2" width="14" height="18" rx="2" fill="#5A5A5A"/><rect x="6" y="4" width="10" height="4" fill="#C8E6C9"/><g fill="#fff"><circle cx="8" cy="12" r="1.2"/><circle cx="11" cy="12" r="1.2"/><circle cx="14" cy="12" r="1.2"/><circle cx="8" cy="16" r="1.2"/><circle cx="11" cy="16" r="1.2"/><circle cx="14" cy="16" r="1.2"/></g></svg>'],
+    ['app-x', 'Фото', '<svg viewBox="0 0 22 22"><rect x="2" y="4" width="18" height="14" rx="2" fill="#0078D4"/><path d="M4 16 L9 10 L13 14 L15 12 L18 16 Z" fill="#9CD3FF"/></svg>'],
+    ['app-x', 'Пошта', '<svg viewBox="0 0 22 22"><rect x="2" y="5" width="18" height="12" rx="2" fill="#0F6CBD"/><path d="M3 6 L11 12 L19 6" stroke="#fff" stroke-width="1.5" fill="none"/></svg>'],
+    ['app-x', 'Блокнот', '<svg viewBox="0 0 22 22"><rect x="4" y="2" width="14" height="18" rx="2" fill="#E3F2FD" stroke="#1E88E5"/><path d="M7 7 H15 M7 10 H15 M7 13 H12" stroke="#1E88E5"/></svg>'],
+    ['app-x', 'Годинник', '<svg viewBox="0 0 22 22"><circle cx="11" cy="11" r="9" fill="#fff" stroke="#5A5A5A" stroke-width="2"/><path d="M11 6 V11 L14 13" stroke="#0078D4" stroke-width="2" stroke-linecap="round" fill="none"/></svg>']
+  ];
+  const START_ICO = '<svg viewBox="0 0 22 22"><rect x="1" y="1" width="9.5" height="9.5" rx="1" fill="#0078D4"/><rect x="11.5" y="1" width="9.5" height="9.5" rx="1" fill="#0078D4"/><rect x="1" y="11.5" width="9.5" height="9.5" rx="1" fill="#0078D4"/><rect x="11.5" y="11.5" width="9.5" height="9.5" rx="1" fill="#0078D4"/></svg>';
+  const GEAR = APPS[2][2];
+
+  const $ = id=>document.getElementById(id);
+  const root = $('bt'), desk = $('btDesk'), devBox = $('btDev'), msg = $('btMsg');
+  const hit = trackTask(root, TASKS.length, 4);
+  let ti = 0, S, g = 0;
+  const got = new Set();
+  const paired = [];
+
+  function reset(){
+    S = { start:false, win:false, page:'sys', bt:false, dlg:null, pair:false, solved:false };
+    g = 0;
+  }
+  const T = ()=>TASKS[ti];
+  const hint = ()=>{ msg.textContent = T().guide ? `Крок ${g + 1} з ${GUIDE.length}: ${GUIDE[g][1]}` : 'Підказка: почни з кнопки «Пуск».'; };
+
+  // чи дозволена дія: у завданні з підказками — лише та, на яку вказує підказка
+  function allowed(id){
+    if(!T().guide) return true;
+    if(GUIDE[g][0] === id){ g++; return true; }
+    msg.textContent = `Не поспішай. ${GUIDE[g][1]}`;
+    return false;
+  }
+  function wrong(el, text){
+    if(T().guide){ hint(); return; }
+    el.classList.remove('wrong-flash'); void el.offsetWidth;
+    el.classList.add('wrong-flash');
+    setTimeout(()=>el.classList.remove('wrong-flash'), 600);
+    msg.textContent = 'Не те. ' + text;
+  }
+
+  function render(){
+    const t = T();
+    let h = '';
+    if(S.win){
+      const nav = [['sys', 'Система', 'nav-sys'], ['bt', 'Bluetooth і пристрої', 'nav-bt'], ['net', 'Мережа й Інтернет', 'nav-x'], ['pers', 'Персоналізація', 'nav-x'], ['apps', 'Програми', 'nav-x']]
+        .map(([k, n, id])=>`<button data-x="${id}" class="${S.page === k ? 'on' : ''}">${GL[k]}${n}</button>`).join('');
+      let main;
+      if(S.page === 'sys'){
+        const c = (ico, a, b)=>`<div class="w-card">${GL[ico]}<span><b>${a}</b><small>${b}</small></span><span class="ar">›</span></div>`;
+        main = `<div class="w-crumb">Система</div>${c('disp', 'Дисплей', 'Монітори, яскравість, нічне світло')}${c('snd', 'Звук', 'Гучність, вихід, вхід')}${c('bell', 'Сповіщення', 'Сповіщення від програм і системи')}`;
+      } else {
+        const devs = [['mouse', 'Миша USB'], ['kbd', 'Клавіатура']].concat(paired.map(n=>[n.startsWith('Миша') ? 'mouse' : 'head', n]))
+          .map(([ico, n])=>`<div class="w-card">${GL[ico]}<b>${n}</b><small>Під'єднано</small></div>`).join('');
+        main = `<div class="w-crumb">Bluetooth і пристрої</div>
+          <div class="w-hero">${GL.dev.replace('<svg', '<svg style="width:40px;height:40px"')}<span><b>Пристрої</b><small style="display:block;color:#666">Миші, навушники</small></span><button class="w-add" data-x="add">${GL.plus.replace('<svg', '<svg style="width:12px;height:12px;vertical-align:-1px"')} Додати пристрій</button></div>
+          <div class="w-card">${GL.bt}<span><b>Bluetooth</b><small>${S.bt ? 'Можна виявити як «Ноутбук-Оксани»' : 'Вимкнуто'}</small></span><span class="w-tg">${S.bt ? 'Увімкнуто' : 'Вимкнуто'}<button class="w-tog${S.bt ? ' on' : ''}" data-x="toggle" aria-label="Bluetooth"></button></span></div>
+          <div class="w-devs">${devs}</div>
+          <button class="w-card" data-x="row-x">${GL.dev}<span><b>Пристрої</b><small>Миша, клавіатура, ручка, звук, дисплеї</small></span><span class="ar">›</span></button>
+          <button class="w-card" data-x="row-x">${GL.prn}<span><b>Принтери та сканери</b><small>Параметри, усунення неполадок</small></span><span class="ar">›</span></button>`;
+      }
+      h += `<div class="w-win"><div class="w-tt">${GEAR.replace('<svg', '<svg style="width:14px;height:14px"')}Параметри<span class="ctl"><span>─</span><span>▢</span><button data-x="close" aria-label="Закрити">✕</button></span></div>
+        <div class="w-set"><nav class="w-nav"><div class="w-user"><i>О</i><span>Оксана<small>Локальний обліковий запис</small></span></div><div class="w-find">Знайти параметр</div>${nav}</nav><div class="w-main">${main}</div></div></div>`;
+    }
+    if(S.start){
+      h += `<div class="w-start"><div class="srch">🔍 Введіть тут текст для пошуку</div><div class="lbl">Закріплені</div><div class="w-apps">${APPS.map(([id, n, svg])=>`<button data-x="${id}">${svg}${n}</button>`).join('')}</div></div>`;
+    }
+    if(S.dlg){
+      let d;
+      if(S.dlg === 'type'){
+        d = `<h5>Додати пристрій</h5><p>Виберіть тип пристрою, який потрібно додати.</p>
+          <button class="w-card" data-x="opt-bt">${GL.bt}<span><b>Bluetooth</b><small>Миші, клавіатури, ручки, навушники й колонки</small></span></button>
+          <button class="w-card" data-x="opt-x">${GL.disp}<span><b>Бездротовий дисплей або док-станція</b><small>Бездротові монітори, телевізори</small></span></button>
+          <button class="w-card" data-x="opt-x">${GL.other}<span><b>Усе інше</b><small>Ігрові контролери, DLNA тощо</small></span></button>`;
+      } else if(S.dlg === 'list'){
+        const list = S.pair ? [DECOYS[0], t.name, DECOYS[1]] : DECOYS;
+        d = `<h5>Додати пристрій</h5><p>Переконайтеся, що пристрій увімкнено й доступний для виявлення. Виберіть його нижче.</p>
+          ${list.map(n=>`<button class="w-card" data-x="${n === t.name ? 'dev' : 'dev-x'}">${GL[n === t.name ? (t.short === 'Миша' ? 'mouse' : 'head') : 'other']}<b>${n}</b></button>`).join('')}
+          ${S.pair ? '' : '<p style="margin-top:8px"><span class="w-spin"></span>Пошук пристроїв…</p>'}`;
+      } else if(S.dlg === 'conn'){
+        d = `<h5>Додати пристрій</h5><p><span class="w-spin"></span>Під'єднання: ${t.name}…</p>`;
+      } else {
+        d = `<h5>Ваш пристрій готовий до використання!</h5><p>${t.name} — під'єднано.</p><div class="foot"><button class="w-btn" data-x="ready">Готово</button></div>`;
+      }
+      h += `<div class="w-dim"></div><div class="w-dlg">${d}</div>`;
+    }
+    h += `<div class="w-bar"><div class="w-mid"><button class="w-tb${S.start ? ' act' : ''}" data-x="start" style="border:none;background:${S.start ? 'rgba(255,255,255,.6)' : 'none'};cursor:pointer">${START_ICO}</button><span class="w-tb">${APPS[1][2]}</span><span class="w-tb">${APPS[0][2]}</span><span class="w-tb${S.win ? ' run act' : ''}">${GEAR}</span></div><div class="w-tray"><span>ᐱ</span><span>🔊</span><span>14:35<br>15.11.2026</span></div></div>`;
+    desk.innerHTML = h;
+    devBox.className = 'bt-dev' + (S.pair ? ' pairing' : '');
+    devBox.innerHTML = `${t.pic}<b>${t.short}</b><small>${S.pair ? (paired.includes(t.name) ? 'Під\'єднано ✓' : 'Режим сполучення: індикатор блимає') : 'Увімкнено, але не сполучено'}</small><button data-x="pair" ${S.pair ? 'disabled' : ''}>${t.btn}</button>`;
+    // підсвітка потрібної кнопки в завданні з підказками
+    if(t.guide && !S.solved && g < GUIDE.length){
+      const el = root.querySelector(`[data-x="${GUIDE[g][0]}"]`);
+      el?.classList.add('w-guide');
+    }
+  }
+
+  function onClick(e){
+    const el = e.target.closest('[data-x]');
+    if(S.solved) return;
+    if(!el){
+      if(S.start && !e.target.closest('.w-start')){ S.start = false; render(); }
+      return;
+    }
+    const x = el.dataset.x, t = T();
+    $('btAgain').disabled = false;
+    if(x === 'close'){ S.win = false; S.page = 'sys'; render(); return; }
+    if(x === 'start'){ if(!allowed(x)) return; S.start = !S.start; render(); }
+    else if(x === 'app-set'){ if(!allowed(x)) return; S.start = false; S.win = true; render(); }
+    else if(x === 'app-x') wrong(el, 'Потрібні «Параметри» — значок шестерні.');
+    else if(x === 'nav-bt'){ if(!allowed(x)) return; S.page = 'bt'; render(); }
+    else if(x === 'nav-sys'){ if(t.guide) return hint(); S.page = 'sys'; render(); }
+    else if(x === 'nav-x') wrong(el, 'Пристрої — у розділі «Bluetooth і пристрої».');
+    else if(x === 'toggle'){
+      if(t.guide){ if(!allowed(x)) return; }
+      S.bt = !S.bt; render();
+    }
+    else if(x === 'row-x') wrong(el, 'Новий пристрій додають кнопкою «Додати пристрій».');
+    else if(x === 'add'){ if(!allowed(x)) return; S.dlg = 'type'; render(); }
+    else if(x === 'opt-bt'){
+      if(!S.bt) return wrong(el, 'Спершу ввімкни Bluetooth. Закрий вікно — клацни поза ним.');
+      if(!allowed(x)) return;
+      S.dlg = 'list'; render();
+    }
+    else if(x === 'opt-x') wrong(el, 'Навушники й миші під\'єднуються через Bluetooth.');
+    else if(x === 'pair'){
+      if(t.guide){ if(!allowed(x)) return; }
+      S.pair = true; render();
+    }
+    else if(x === 'dev-x') wrong(el, 'Це чужий пристрій.');
+    else if(x === 'dev'){
+      if(!allowed(x)) return;
+      S.dlg = 'conn'; render();
+      setTimeout(()=>{ S.dlg = 'ready'; render(); }, 900);
+    }
+    else if(x === 'ready'){
+      if(!allowed(x)) return;
+      S.dlg = null; paired.push(t.name); solve();
+    }
+    if(t.guide && !S.solved && g < GUIDE.length) hint();
+    else if(!t.guide && !S.solved && !el.classList.contains('wrong-flash')) msg.textContent = '';
+  }
+  // клацання поза діалогом «Додати пристрій» закриває його (крім під'єднання)
+  desk.addEventListener('click', e=>{
+    if(e.target.classList.contains('w-dim') && S.dlg !== 'conn' && S.dlg !== 'ready' && !T().guide){ S.dlg = null; render(); return; }
+    onClick(e);
+  });
+  devBox.addEventListener('click', onClick);
+
+  function solve(){
+    S.solved = true;
+    render();
+    if(!got.has(ti)){ got.add(ti); addNeurons(T().guide ? 1 : 3); hit(); }
+    const say = $('btSay');
+    say.className = 'say ok';
+    msg.textContent = '';
+    if(ti === TASKS.length - 1){
+      say.innerHTML = `<span class="t"><b>Готово!</b>${T().short} під'єднано. Наступного разу комп'ютер знайде її сам.</span>`;
+    } else {
+      say.innerHTML = `<span class="t"><b>Навушники під'єднано!</b>Тепер спробуй без підказок.</span><button class="btn-next active" id="btNext">Спробувати</button>`;
+      $('btNext').addEventListener('click', ()=>{ ti++; openTask(); });
+    }
+  }
+  function openTask(){
+    const t = T();
+    reset();
+    $('btAva').textContent = t.ava;
+    $('btSay').className = 'say';
+    $('btSay').innerHTML = `<b>${t.title}</b>${t.say}`;
+    render(); hint();
+  }
+  $('btAgain').addEventListener('click', ()=>{ ti = 0; paired.length = 0; openTask(); $('btAgain').disabled = true; });
+  openTask();
+})();
+
+/* ---------- КРОК 4: ВІДНОВЛЕННЯ СИСТЕМИ (Windows 11, покроково) ----------
+   Спершу Диспетчер завдань показує винуватця, потім — відновлення до точки від середи. */
+(function(){
+  const GUIDE = [
+    ['startR', 'Клацни «Пуск» правою кнопкою миші.'],
+    ['tm', 'Обери «Диспетчер завдань».'],
+    ['proc', 'Знайди програму, яка найбільше навантажує процесор (стовпчик ЦП), і клацни її.'],
+    ['tmclose', 'Винуватця знайдено! Його встановили в четвер. Закрий Диспетчер завдань.'],
+    ['start', 'Тепер натисни «Пуск» лівою кнопкою.'],
+    ['search', 'Клацни поле пошуку — введемо «точка відновлення».'],
+    ['result', 'Відкрий «Створити точку відновлення».'],
+    ['restore', 'Натисни «Відновити систему…».'],
+    ['next1', 'Натисни «Далі».'],
+    ['point', 'Обери точку від середи, 12.11 — останню, коли все працювало.'],
+    ['next2', 'Натисни «Далі».'],
+    ['finish', 'Перевір точку й натисни «Готово».']
+  ];
+  const SAY = '<b>Андрій</b>Комп\'ютер страшенно гальмує! У середу все було добре. Що сталося?';
+  const POINTS = [['12.11.2026 19:40', 'Точка перед встановленням програми', 'Вручну'], ['10.11.2026 08:15', 'Оновлення Windows', 'Оновлення']];
+  const START_ICO = '<svg viewBox="0 0 22 22"><rect x="1" y="1" width="9.5" height="9.5" rx="1" fill="#0078D4"/><rect x="11.5" y="1" width="9.5" height="9.5" rx="1" fill="#0078D4"/><rect x="1" y="11.5" width="9.5" height="9.5" rx="1" fill="#0078D4"/><rect x="11.5" y="11.5" width="9.5" height="9.5" rx="1" fill="#0078D4"/></svg>';
+  const SHIELD = '<svg viewBox="0 0 26 26"><path d="M13 2 L23 6 V12 Q23 20 13 24 Q3 20 3 12 V6 Z" fill="#2B88D8"/><path d="M8 13 A5 5 0 1 0 10 9 M8 7 V10 H11" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>';
+  const PC = '<svg viewBox="0 0 16 16"><rect x="1.5" y="2.5" width="13" height="9" rx="1" fill="#5AA9E6" stroke="#1C5D99"/><path d="M5 14 H11" stroke="#1C5D99" stroke-width="1.5"/></svg>';
+  const CLOCK = '<svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="15" fill="#fff"/><path d="M20 10 V20 L27 24" stroke="#1E5AA8" stroke-width="3" stroke-linecap="round" fill="none"/></svg>';
+  const ROCKET = '<svg viewBox="0 0 40 40"><rect x="2" y="2" width="36" height="36" rx="9" fill="#7048E8"/><path d="M20 7 Q29 14 27 28 L13 28 Q11 14 20 7Z" fill="#fff"/><path d="M14 28 L9 35 L16 31 M26 28 L31 35 L24 31" fill="#FFD43B" stroke="#FFD43B" stroke-width="2" stroke-linejoin="round"/><circle cx="20" cy="18" r="3" fill="#7048E8"/></svg>';
+  const TM_ICO = '<svg viewBox="0 0 16 16"><rect x="1" y="2" width="14" height="12" rx="2" fill="#0F6CBD"/><path d="M3 10 L6 7 L8 9 L11 5 L13 7" stroke="#fff" stroke-width="1.4" fill="none" stroke-linecap="round"/></svg>';
+  const BIN = '<svg viewBox="0 0 40 40"><path d="M9 11 H31 L28 35 H12 Z" fill="#DDE6F0" stroke="#5F7A99" stroke-width="2"/><path d="M15 16 L16 30 M20 16 V30 M25 16 L24 30" stroke="#5F7A99" stroke-width="1.6"/><path d="M7 11 H33" stroke="#5F7A99" stroke-width="2.5" stroke-linecap="round"/></svg>';
+  const DOC = '<svg viewBox="0 0 40 40"><path d="M9 4 H25 L32 11 V36 H9 Z" fill="#fff" stroke="#1971C2" stroke-width="2"/><path d="M14 17 H27 M14 23 H27 M14 29 H23" stroke="#1971C2" stroke-width="2"/></svg>';
+  const SMALL = s=>s.replace('<svg', '<svg style="width:14px;height:14px"');
+  // процеси: [назва, ЦП %, пам'ять МБ, диск МБ/с, значок, ключ]
+  const APPS = [['Браузер', 3, 410, 0.1, '🌐'], ['Провідник', 1, 74, 0, '📁'], ['Супер Прискорювач ПК', 94, 2140, 12.4, ROCKET, 'proc'], ['Текстовий редактор', 1, 118, 0, '📝']];
+  const BG = [['Служба Windows', 0, 46, 0, '⚙️'], ['Антивірус', 1, 92, 0.2, '🛡️']];
+
+  const $ = id=>document.getElementById(id);
+  const root = $('rs'), desk = $('rsDesk'), msg = $('rsMsg');
+  const hit = trackTask(root, GUIDE.length, 2);
+  let g = 0, S, best = 0, finished = false, token = 0;
+  const reset = ()=>{ S = { pm:false, tm:false, sel:false, start:false, typed:false, props:false, wiz:0, point:false, boot:0 }; g = 0; };
+  const hint = ()=>{ msg.textContent = `Крок ${g + 1} з ${GUIDE.length}: ${GUIDE[g][1]}`; };
+  const heat = v=>v >= 60 ? 'h4' : v >= 25 ? 'h3' : v >= 6 ? 'h2' : 'h1';
+  const ico = i=>i.startsWith('<svg') ? i : `<span style="font-size:12px;width:14px;text-align:center">${i}</span>`;
+
+  function tmRows(list){
+    return list.map(([n, c, m, d, i, k])=>`<button class="tm-row tm-g${k && S.sel ? ' sel' : ''}" data-x="${k || 'proc-x'}"><span>${ico(i)}${n}</span><span class="n ${heat(c)}">${c}%</span><span class="n ${heat(m / 25)}">${m.toLocaleString('uk-UA')} МБ</span><span class="n ${heat(d * 5)}">${String(d).replace('.', ',')}</span></button>`).join('');
+  }
+
+  function render(){
+    let h = '';
+    const restored = S.boot > 0;
+    h += `<div class="w-dico"><div>${BIN}Кошик</div><div>${DOC}Реферат</div>${restored ? '' : `<div>${ROCKET}Супер Прискорювач ПК</div>`}</div>`;
+    if(S.tm){
+      h += `<div class="tm"><div class="tm-tt">${TM_ICO}Диспетчер завдань<span class="ctl"><span>─</span><span>▢</span><button data-x="tmclose" aria-label="Закрити">✕</button></span></div>
+        <div class="tm-in"><div class="tm-side"><i class="on"></i><i></i><i></i><i></i><i></i></div><div class="tm-main"><h6>Процеси</h6>
+        <div class="tm-g tm-hd"><span>Ім'я</span><span class="n"><b>99%</b>ЦП</span><span class="n"><b>91%</b>Пам'ять</span><span class="n"><b>64%</b>Диск</span></div>
+        <div class="tm-sec">Програми (4)</div>${tmRows(APPS)}<div class="tm-sec">Фонові процеси (2)</div>${tmRows(BG)}</div></div></div>`;
+    }
+    if(S.props){
+      h += `<div class="cl-dlg"><div class="cl-tt">${PC}Властивості системи<span class="x">✕</span></div>
+        <div class="cl-tabs"><span>Ім'я комп'ютера</span><span>Устаткування</span><span>Додатково</span><span class="on">Захист системи</span><span>Віддалене використання</span></div>
+        <div class="cl-body">
+          <div class="cl-group"><b>Відновлення системи</b><div class="cl-row"><p>Можна скасувати зміни в системі, повернувши комп'ютер до попередньої точки відновлення.</p><button class="cl-btn" data-x="restore">Відновити систему…</button></div></div>
+          <div class="cl-group"><b>Параметри захисту</b><table class="cl-table"><thead><tr><th>Доступні диски</th><th>Захист</th></tr></thead><tbody><tr><td style="cursor:default">Локальний диск (C:) (Система)</td><td style="cursor:default">Увімкнуто</td></tr></tbody></table></div>
+        </div></div>`;
+    }
+    if(S.wiz){
+      let body, foot;
+      if(S.wiz === 1){
+        body = `<h6>Відновлення системних файлів і параметрів</h6><p>Відновлення системи може усунути проблеми, через які комп'ютер працює повільно або перестає відповідати.</p><p>Документи, фото й інші особисті дані не змінюються. Програми, встановлені після точки, буде видалено.</p>`;
+        foot = `<button class="cl-btn" disabled>&lt; Назад</button><button class="cl-btn def" data-x="next1">Далі &gt;</button><button class="cl-btn">Скасувати</button>`;
+      } else if(S.wiz === 2){
+        body = `<h6>Виберіть точку відновлення</h6><table class="cl-table"><thead><tr><th>Дата й час</th><th>Опис</th><th>Тип</th></tr></thead><tbody>${POINTS.map((p, i)=>`<tr data-x="${i === 0 ? 'point' : 'point-x'}" class="${i === 0 && S.point ? 'sel' : ''}"><td>${p[0]}</td><td>${p[1]}</td><td>${p[2]}</td></tr>`).join('')}</tbody></table>`;
+        foot = `<button class="cl-btn" data-x="back">&lt; Назад</button><button class="cl-btn def" data-x="next2" ${S.point ? '' : 'disabled'}>Далі &gt;</button><button class="cl-btn">Скасувати</button>`;
+      } else {
+        body = `<h6>Підтвердьте точку відновлення</h6><p><b>Час:</b> ${POINTS[0][0]}<br><b>Опис:</b> ${POINTS[0][1]}<br><b>Диски:</b> Локальний диск (C:)</p><p>Буде видалено: <b>Супер Прискорювач ПК</b></p>`;
+        foot = `<button class="cl-btn" data-x="back">&lt; Назад</button><button class="cl-btn def" data-x="finish">Готово</button><button class="cl-btn">Скасувати</button>`;
+      }
+      h += `<div class="cl-dlg top"><div class="cl-tt">${SMALL(SHIELD)}Відновлення системи<span class="x">✕</span></div><div class="cl-body"><div class="cl-wiz"><div class="side">${CLOCK}</div><div>${body}</div></div></div><div class="cl-foot">${foot}</div></div>`;
+    }
+    if(S.pm){
+      h += `<div class="w-pmenu"><div>Програми та функції</div><div>Мобільність</div><div>Перегляд подій</div><div>Система</div><div>Диспетчер пристроїв</div><button data-x="tm">Диспетчер завдань</button><div>Параметри</div><div>Провідник</div><hr><div>Завершення роботи</div></div>`;
+    }
+    if(S.start){
+      h += `<div class="w-start"><div class="srch${S.typed ? ' on' : ''}" data-x="search">🔍 ${S.typed ? 'точка відновлення' : 'Введіть тут текст для пошуку'}</div>`
+        + (S.typed ? `<div class="lbl">Найкраща відповідність</div><button class="w-res" data-x="result">${SHIELD}<span>Створити точку відновлення<small>Панель керування</small></span></button>`
+                   : `<div class="lbl">Закріплені</div><p style="margin:4px;color:#666">Браузер · Провідник · Параметри · Калькулятор…</p>`) + '</div>';
+    }
+    if(S.boot === 1) h += '<div class="rs-boot"><span class="w-spin"></span>Зачекайте, доки відновлюються файли й параметри Windows…</div>';
+    if(S.boot === 2) h += `<div class="cl-dlg top" style="top:70px"><div class="cl-tt">${SMALL(SHIELD)}Відновлення системи<button class="x" data-x="okclose" aria-label="Закрити" style="border:none;background:none;cursor:pointer;font:inherit">✕</button></div><div class="cl-body"><p><b>Відновлення системи завершено успішно.</b></p><p>Систему повернуто до стану на ${POINTS[0][0]}. Документи не змінено.</p></div><div class="cl-foot"><button class="cl-btn def" data-x="okclose">Закрити</button></div></div>`;
+    const sKey = g < 4 ? 'startR' : 'start';
+    h += `<div class="w-bar"><div class="w-mid"><span class="w-tb${S.start || S.pm ? ' act' : ''}" data-x="${sKey}" style="cursor:pointer">${START_ICO}</span>${S.tm ? `<span class="w-tb run act">${TM_ICO.replace('<svg', '<svg style="width:20px;height:20px"')}</span>` : ''}</div><div class="w-tray"><span>ᐱ</span><span>🔊</span><span>14:35<br>15.11.2026</span></div></div>`;
+    desk.innerHTML = h;
+    if(g < GUIDE.length && !S.boot) desk.querySelector(`[data-x="${GUIDE[g][0]}"]`)?.classList.add('w-guide');
+  }
+
+  function step(x){
+    if(g >= GUIDE.length || x !== GUIDE[g][0]){ msg.textContent = `Не поспішай. ${GUIDE[g]?.[1] || ''}`; return false; }
+    g++;
+    if(g > best){ best = g; hit(); }      // кожен крок рахується один раз, навіть якщо почали спочатку
+    $('rsAgain').disabled = false;
+    return true;
+  }
+  desk.addEventListener('contextmenu', e=>{
+    e.preventDefault();
+    const el = e.target.closest('[data-x]');
+    if(el?.dataset.x === 'startR' && step('startR')){ S.pm = true; render(); hint(); }
+  });
+  desk.addEventListener('click', e=>{
+    const el = e.target.closest('[data-x]');
+    if(!el) return;
+    const x = el.dataset.x;
+    if(x === 'okclose' && S.boot === 2){ S.boot = 3; render(); return; }   // вікно «завершено» можна закрити
+    if(S.boot) return;
+    if(x === 'back'){ S.wiz--; render(); return; }
+    if(!step(x)) return;
+    if(x === 'startR') S.pm = true;        // на сенсорному екрані — звичайний дотик
+    if(x === 'tm'){ S.pm = false; S.tm = true; }
+    if(x === 'proc') S.sel = true;
+    if(x === 'tmclose') S.tm = false;
+    if(x === 'start') S.start = true;
+    if(x === 'search') S.typed = true;
+    if(x === 'result'){ S.start = false; S.props = true; }
+    if(x === 'restore') S.wiz = 1;
+    if(x === 'next1') S.wiz = 2;
+    if(x === 'point') S.point = true;
+    if(x === 'next2') S.wiz = 3;
+    if(x === 'finish'){
+      S.wiz = 0; S.props = false; S.boot = 1;
+      msg.textContent = '';
+      render();
+      const my = ++token;
+      setTimeout(()=>{ if(my !== token) return; S.boot = 2; render(); done(); }, 1800);
+      return;
+    }
+    render(); hint();
+  });
+
+  function done(){
+    if(!finished){ finished = true; addNeurons(2); }
+    const say = $('rsSay');
+    say.className = 'say ok';
+    say.innerHTML = '<span class="t"><b>Готово!</b>Прискорювач зник разом із зависаннями, а реферат Андрія на місці.</span>';
+  }
+  function start(){
+    token++;
+    $('rsSay').className = 'say';
+    $('rsSay').innerHTML = SAY;
+    $('rsAgain').disabled = true;
+    reset(); render(); hint();
+  }
+  $('rsAgain').addEventListener('click', start);
+  start();
+})();
+
+/* ---------- КРОК 5: ПРИЧИНИ ЗБОЇВ ---------- */
+(function(){
+  const CAUSES = [
+    { em:'<svg viewBox="0 0 56 56"><defs><linearGradient id="gFF8A65" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF8A65"/><stop offset="1" stop-color="#E8590C"/></linearGradient></defs><rect width="56" height="56" rx="16" fill="url(#gFF8A65)"/><rect x="11" y="13" width="22" height="17" rx="3.5" fill="#fff" opacity=".55"/><rect x="23" y="24" width="22" height="17" rx="3.5" fill="#fff"/><path d="M23 28.5 H45" stroke="#E8590C" stroke-width="2"/><path d="M31 9 L26 19 H31 L27 28" stroke="#FFE066" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>', name:'Конфлікт програм', sign:'Дві програми заважають одна одній.', fix:'Онови обидві.' },
+    { em:'<svg viewBox="0 0 56 56"><defs><linearGradient id="gFFD43B" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFD43B"/><stop offset="1" stop-color="#F08C00"/></linearGradient></defs><rect width="56" height="56" rx="16" fill="url(#gFFD43B)"/><rect x="10" y="19" width="32" height="18" rx="4" fill="none" stroke="#fff" stroke-width="3"/><rect x="42" y="24" width="4" height="8" rx="1.5" fill="#fff"/><rect x="14" y="23" width="7" height="10" rx="2" fill="#E03131"/></svg>', name:'Бракує ресурсів', sign:'Мало пам\'яті чи повільний інтернет.', fix:'Закрий зайве, перевір мережу.' },
+    { em:'<svg viewBox="0 0 56 56"><defs><linearGradient id="g74C0FC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#74C0FC"/><stop offset="1" stop-color="#1C7ED6"/></linearGradient></defs><rect width="56" height="56" rx="16" fill="url(#g74C0FC)"/><rect x="10" y="13" width="28" height="24" rx="4" fill="#fff"/><path d="M10 19 H38" stroke="#1C7ED6" stroke-width="2"/><circle cx="14" cy="16" r="1.2" fill="#1C7ED6"/><circle cx="18" cy="16" r="1.2" fill="#1C7ED6"/><circle cx="40" cy="38" r="9" fill="#E03131" stroke="#fff" stroke-width="2.5"/><path d="M36.5 34.5 L43.5 41.5 M43.5 34.5 L36.5 41.5" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>', name:'Несумісність з ОС', sign:'Програма не для твоєї системи.', fix:'Перевір вимоги.' },
+    { em:'<svg viewBox="0 0 56 56"><defs><linearGradient id="g8CE99A" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8CE99A"/><stop offset="1" stop-color="#2F9E44"/></linearGradient></defs><rect width="56" height="56" rx="16" fill="url(#g8CE99A)"/><g stroke="#fff" stroke-width="3" stroke-linecap="round"><path d="M28 11 V16 M28 40 V45 M11 28 H16 M40 28 H45 M16 16 L19.5 19.5 M36.5 36.5 L40 40 M40 16 L36.5 19.5 M19.5 36.5 L16 40"/></g><g fill="#fff"><circle cx="28" cy="10" r="2.6"/><circle cx="28" cy="46" r="2.6"/><circle cx="10" cy="28" r="2.6"/><circle cx="46" cy="28" r="2.6"/></g><circle cx="28" cy="28" r="11" fill="#fff"/><g fill="#2F9E44"><circle cx="24.5" cy="25" r="2.4"/><circle cx="31" cy="30.5" r="2"/><circle cx="26" cy="32" r="1.4"/></g></svg>', name:'Віруси', sign:'Шкідливі програми псують роботу.', fix:'Перевір антивірусом.' },
+    { em:'<svg viewBox="0 0 56 56"><defs><linearGradient id="gB197FC" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#B197FC"/><stop offset="1" stop-color="#7048E8"/></linearGradient></defs><rect width="56" height="56" rx="16" fill="url(#gB197FC)"/><rect x="15" y="15" width="22" height="22" rx="4" fill="#fff"/><g stroke="#fff" stroke-width="2.6" stroke-linecap="round"><path d="M20 10 V15 M26 10 V15 M32 10 V15 M20 37 V42 M26 37 V42 M32 37 V42 M10 21 H15 M10 27 H15 M10 33 H15"/></g><circle cx="38" cy="38" r="9" fill="#FFD43B" stroke="#fff" stroke-width="2.5"/><path d="M38 33 V38 M38 41.5 V42" stroke="#7048E8" stroke-width="2.6" stroke-linecap="round"/><path d="M21 26 H31 M21 30 H27" stroke="#7048E8" stroke-width="2.2" stroke-linecap="round"/></svg>', name:'Драйвери', sign:'Драйвер застарів чи зіпсувався.', fix:'Онови драйвер у Диспетчері пристроїв.' }
+  ];
+  const grid = document.getElementById('causes');
+  const hit = trackTask(grid, CAUSES.length, 0);
+  CAUSES.forEach(c=>{
+    const card = document.createElement('div');
+    card.className = 'flip-card';
+    card.setAttribute('role', 'button'); card.tabIndex = 0;
+    card.innerHTML = `<div class="flip-inner"><div class="flip-face flip-front"><div class="em">${c.em}</div><b>${c.name}</b><small>клацни, щоб перевернути</small></div>
+      <div class="flip-face flip-back"><b>Ознака</b><p>${c.sign}</p><b>Що робити</b><p>${c.fix}</p></div></div>`;
+    const flip = ()=>{
+      card.classList.toggle('flipped');
+      if(!card.classList.contains('seen')){ card.classList.add('seen'); hit(); }
+    };
+    card.addEventListener('click', flip);
+    card.addEventListener('keydown', e=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); flip(); } });
+    grid.appendChild(card);
+  });
+})();
+
+makeClassify('causeQuiz', [
+  { text:'Після встановлення другого відеоредактора перший вилітає, коли обидва відкриті.', correct:0 },
+  { text:'Відкрито 30 вкладок, гру й відеоредактор — усе «застигає».', correct:1 },
+  { text:'«Програма працює лише на Windows 11», а в тебе Windows 10.', correct:2 },
+  { text:'Після гри з дивного сайту браузер сам відкриває рекламу.', correct:3 },
+  { text:'Біля нової вебкамери в Диспетчері пристроїв — жовтий трикутник.', correct:4 },
+  { text:'Онлайн-гра «викидає», а сайти ледве вантажаться.', correct:1 }
+], ['Конфлікт програм', 'Бракує ресурсів', 'Несумісність з ОС', 'Віруси', 'Драйвери']);
+
+/* ---------- КРОК 6: ЧИ ПОТЯГНЕ? ----------
+   Справжні програми; вимоги спрощено й округлено. bad — індекс вимоги, яку ноутбук не виконує (−1 — усе підходить) */
+(function(){
+  const APPS = [
+    { logo:'krita.svg', name:'Krita', kind:'графічний редактор', req:[['ОС','Windows 8.1 і новіша'],['Пам\'ять','4 ГБ'],['Місце','1 ГБ'],['Інтернет','не потрібен']], bad:-1,
+      ok:'Встановлено! Усе підходить.' },
+    { logo:'flight-simulator.png', name:'Microsoft Flight Simulator', kind:'гра-симулятор', req:[['ОС','Windows 10 і новіша'],['Пам\'ять','8 ГБ'],['Місце','150 ГБ'],['Інтернет','для завантаження']], bad:2,
+      ok:'Грі потрібно 150 ГБ, а вільно лише 12,4 ГБ.' },
+    { logo:'final-cut-pro.png', name:'Final Cut Pro', kind:'відеоредактор', req:[['ОС','лише macOS'],['Пам\'ять','8 ГБ'],['Місце','6 ГБ'],['Інтернет','для завантаження']], bad:0,
+      ok:'Програма працює лише на комп\'ютерах Apple з macOS.' },
+    { logo:'davinci-resolve.svg', name:'DaVinci Resolve', kind:'відеоредактор', req:[['ОС','Windows 10 і новіша'],['Пам\'ять','16 ГБ'],['Місце','8 ГБ'],['Інтернет','не потрібен']], bad:1,
+      ok:'Потрібно 16 ГБ оперативної пам\'яті, а в ноутбуці 8 ГБ.' },
+    { logo:'geforce-now.svg', name:'GeForce NOW', kind:'хмарні ігри', req:[['ОС','Windows 10 і новіша'],['Пам\'ять','4 ГБ'],['Місце','1 ГБ'],['Інтернет','від 25 Мбіт/с']], bad:3,
+      ok:'Ігри йдуть через інтернет, а 15 Мбіт/с замало.' },
+    { logo:'minecraft.svg', name:'Minecraft', kind:'гра', req:[['ОС','Windows 10 і новіша'],['Пам\'ять','4 ГБ'],['Місце','1 ГБ'],['Інтернет','для входу']], bad:-1,
+      ok:'Встановлено! Усе підходить.' }
+  ];
+  const shop = document.getElementById('shop');
+  const progress = document.getElementById('shopProgress');
+  const hit = trackTask(shop, APPS.length, APPS.length + 2);
+  let solved = 0;
+  const count = ()=>{
+    solved++;
+    progress.textContent = solved === APPS.length ? 'Усі програми перевірено ✓' : `Перевірено: ${solved} з ${APPS.length}`;
+    if(solved === APPS.length) addNeurons(2);
+  };
+  APPS.forEach(a=>{
+    const card = document.createElement('div');
+    card.className = 'app';
+    card.innerHTML = `<div class="app-logo"><img src="images/${a.logo}" alt="${a.name}"></div><div class="app-h"><b>${a.name}</b><small>${a.kind}</small></div>`
+      + a.req.map(([k, v], i)=>`<button class="req" data-i="${i}"><span>${k}</span><b>${v}</b></button>`).join('')
+      + `<button class="inst">Інсталювати</button><div class="verdict"></div>`;
+    const inst = card.querySelector('.inst');
+    const verdict = card.querySelector('.verdict');
+    // не підходить: червоний «!» на кнопці й підсвічена вимога
+    const block = ()=>{
+      card.querySelector(`.req[data-i="${a.bad}"]`).classList.add('found');
+      inst.classList.add('no');
+      inst.innerHTML = '<span class="warn">!</span>Інсталювати';
+    };
+    const close = text=>{
+      card.querySelectorAll('button').forEach(b=>b.disabled = true);
+      card.classList.add(a.bad < 0 ? 'done-ok' : 'done-no');
+      verdict.textContent = text;
+      hit(); count();
+    };
+    card.querySelectorAll('.req').forEach(b=>b.addEventListener('click', ()=>{
+      if(+b.dataset.i === a.bad){ block(); addNeurons(1); close(a.ok); return; }
+      b.classList.remove('miss'); void b.offsetWidth;
+      b.classList.add('miss');
+      setTimeout(()=>b.classList.remove('miss'), 500);
+      verdict.textContent = 'Це ноутбук виконує.';
+    }));
+    inst.addEventListener('click', ()=>{
+      if(a.bad < 0){ inst.classList.add('ok'); inst.textContent = '✓ Встановлено'; addNeurons(1); close(a.ok); return; }
+      // спробували встановити те, що не підійде: помилка, і показуємо, що саме не так
+      inst.classList.add('bad');
+      block();
+      close('Не встановиться! ' + a.ok);
+    });
+    shop.appendChild(card);
+  });
+  progress.textContent = `Перевірено: 0 з ${APPS.length}`;
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Яка відстань від очей до монітора найзручніша?', opts:['Приблизно на витягнуту руку', 'Якомога ближче — так краще видно', 'Відстань не впливає на очі'], correct:0, why:'Це приблизно 50–70 см.' },
+  { q:'Що означає вища частота оновлення екрана?', opts:['Екран стає яскравішим', 'Зображення змінюється плавніше', 'Комп\'ютер рідше оновлює Windows'], correct:1, why:'Частота оновлення — скільки разів за секунду змінюється картинка.' },
+  { q:'Як швидко зробити значки на Робочому столі більшими?', opts:['Диспетчер завдань', 'Очистити Кошик', 'Контекстне меню Робочого столу › Вигляд'], correct:2 },
+  { q:'Кому найбільше допоможуть контрастні теми?', opts:['Людям зі слабким зором', 'Тим, хто хоче швидший інтернет', 'Тим, у кого мало місця на диску'], correct:0 },
+  { q:'Комп\'ютер сам не знайшов бездротову мишу. Куди зазирнути?', opts:['Персоналізація › Фон', 'Налаштування › Пристрої › Bluetooth та інші пристрої', 'Кошик'], correct:1 },
+  { q:'Після відновлення системи до точки відновлення…', opts:['зникнуть усі фото й документи', 'комп\'ютер отримає новішу Windows', 'програми, встановлені після неї, зникнуть, а документи залишаться'], correct:2 },
+  { q:'Хто може ввімкнути захист системи, щоб з\'явились точки відновлення?', opts:['Будь-який гість', 'Користувач із правами адміністратора', 'Лише сайт виробника'], correct:1 },
+  { q:'Де дізнатися обсяг оперативної пам\'яті комп\'ютера?', opts:['Правий клік на «Цей ПК» › Властивості', 'Персоналізація › Кольори', 'Тест швидкості інтернету'], correct:0, why:'Там само видно й тип операційної системи.' }
+], {summary:'Тепер ти вмієш налаштувати комп\'ютер, під\'єднати пристрій і з\'ясувати, чому програма збоїть.'});
+</script>
+
+</body>
+</html>
