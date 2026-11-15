@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Змінні та команди. Типи даних — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<link rel="stylesheet" href="../../assets/python.css">
+<style>
+  :root{
+    --accent:#1F7A8C; --accent-dark:#155866; --accent-soft:#E3F2F5;
+    --label:#B07A00;
+    --bg:#F3F8F9; --line:#DAE7EA; --ink-soft:#4C5E66;
+    --sun:#FFD43B; --sun-soft:#FFF7D6; --sun-ink:#6B5300;
+    --hud-bar:linear-gradient(90deg, #1F7A8C, #FFD43B);
+  }
+
+  /* --- Клітинка таблиці і змінна --- */
+  .cell-vs{display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:14px; margin:16px 0 8px;}
+  .cv-card{background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:14px; display:flex; flex-direction:column; align-items:center; gap:10px; height:100%;}
+  .cv-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:var(--ink-soft);}
+  .cv-eq{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:26px; color:var(--accent);}
+  .sheet{border-collapse:collapse; font-family:Roboto, Arial, sans-serif; font-size:14px;}
+  .sheet td, .sheet th{border:1px solid #E1E3E6; height:28px; min-width:64px; padding:0 8px; text-align:left;}
+  .sheet th{background:#F8F9FA; color:#5F6368; font-weight:500; text-align:center; min-width:28px;}
+  .sheet .sel{outline:2px solid #1A73E8; outline-offset:-2px; text-align:right;}
+  .sheet .addr{background:#D3E3FD; color:#0B57D0;}
+  .cv-note{font-size:14px; color:var(--ink-soft); text-align:center;}
+  @media (max-width:620px){ .cell-vs{grid-template-columns:1fr;} .cv-eq{transform:rotate(90deg); justify-self:center;} }
+
+  .rect-ill{display:block; width:100%; max-width:260px; height:auto; margin:6px auto 4px;}
+
+  #trace1 .tr-boxes, #trace2 .tr-boxes{margin-bottom:0;}
+  .tr-console{margin-top:14px;}
+
+  /* --- Службові слова --- */
+  .kw-list{display:grid; grid-template-columns:repeat(7, 1fr); gap:8px; margin:10px 0 14px;}
+  .kw-list code{text-align:center;}
+  @media (max-width:560px){ .kw-list{display:flex; flex-wrap:wrap;} }
+  .kw-list code{font-size:15px; padding:4px 10px; border-radius:8px; background:#1F2433; color:#C792EA;}
+
+  /* --- Значення в кошиках типів --- */
+  .sort-chip{font-family:var(--code-font); font-weight:600;}
+  #typesPool{display:grid; grid-template-columns:repeat(6, 1fr);}
+  #typesPool .sort-chip{max-width:none; text-align:center;}
+  @media (max-width:620px){ #typesPool{grid-template-columns:repeat(3, 1fr);} }
+
+  /* --- Операції: вираз над запитанням --- */
+  .expr{font-family:var(--code-font); font-size:20px; font-weight:600; background:var(--code-bg); color:var(--code-ink); border-radius:var(--radius-s); padding:8px 14px; display:inline-block;}
+
+  /* --- Таблиця «тип ↔ операції» --- */
+  .ops{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:14px 0;}
+  .op-card{background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:12px 14px;}
+  .op-card h3{margin:0 0 8px; font-family:'Baloo 2',sans-serif; font-size:17px; color:var(--accent-dark);}
+  .op-card pre.py-code{margin:0; font-size:14.5px;}
+  @media (max-width:620px){ .ops{grid-template-columns:1fr;} }
+</style>
+</head>
+<body data-lesson="lesson8-variables-types" data-hud="8 клас · Змінні та типи даних">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Розділ «Програмування»</div>
+      <h1>Змінні та команди. Типи даних</h1>
+      <p>Як програма запам'ятовує числа й текст, чому <code>"5" + "5"</code> — це не 10 і як перетворити відповідь користувача на число.</p>
+      <button class="btn-primary" onclick="document.getElementById('start').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none" aria-hidden="true">
+      <circle cx="70" cy="70" r="60" fill="#E3F2F5"/>
+      <!-- полиця -->
+      <rect x="16" y="104" width="108" height="7" rx="3.5" fill="#155866"/>
+      <!-- int -->
+      <path d="M18 66 H52 L50 72 H20 Z" fill="#E8743B"/>
+      <rect x="21" y="72" width="28" height="32" rx="4" fill="#FDEFE6" stroke="#E8743B" stroke-width="3"/>
+      <text x="35" y="93" text-anchor="middle" font-family="monospace" font-weight="700" font-size="13" fill="#1B1B3A">42</text>
+      <!-- float -->
+      <path d="M53 52 H87 L85 58 H55 Z" fill="#8E5BD8"/>
+      <rect x="56" y="58" width="28" height="46" rx="4" fill="#F1EAFB" stroke="#8E5BD8" stroke-width="3"/>
+      <text x="70" y="86" text-anchor="middle" font-family="monospace" font-weight="700" font-size="11" fill="#1B1B3A">3.5</text>
+      <!-- str -->
+      <path d="M88 70 H124 L122 76 H90 Z" fill="#2E9E5B"/>
+      <rect x="91" y="76" width="30" height="28" rx="4" fill="#E4F5EA" stroke="#2E9E5B" stroke-width="3"/>
+      <text x="106" y="95" text-anchor="middle" font-family="monospace" font-weight="700" font-size="10" fill="#1B1B3A">"Hi"</text>
+      <!-- bool-лампочка -->
+      <circle cx="70" cy="30" r="12" fill="#FFD43B"/>
+      <rect x="64" y="40" width="12" height="7" rx="2" fill="#155866"/>
+      <path d="M70 12 V8 M54 18 L51 15 M86 18 L89 15" stroke="#FFD43B" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block">
+    <div class="step-label">Повторення · Що таке програма</div>
+    <h2>Згадаймо минулий урок</h2>
+    <p>Ти вже знаєш, як процесор розуміє програми і хто перекладає для нього код.</p>
+    <div class="exercise">
+      <p class="soft">Клацни термін, а потім — його пояснення.</p>
+      <div class="match-pool" id="repPool"></div>
+      <div id="repList"></div>
+      <div class="progress-line" id="repProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" id="start">
+    <div class="step-label">Крок 1 · Змінна</div>
+    <h2>Змінна — контейнер для даних</h2>
+    <p><b>Змінна</b> — іменоване місце в пам'яті, де програма зберігає дані. У змінної є <b>назва</b> і <b>значення</b>.</p>
+    <p>Це схоже на клітинку Google Таблиць: там значення шукають за адресою, а в програмі — за назвою.</p>
+    <div class="cell-vs">
+      <div class="cv-card">
+        <div class="cv-title">Google Таблиці</div>
+        <table class="sheet" aria-hidden="true">
+          <tr><th></th><th>A</th><th class="addr">B</th></tr>
+          <tr><th class="addr">1</th><td>Ціна</td><td class="sel">25</td></tr>
+        </table>
+        <div class="cv-note">адреса <b>B1</b>, значення <b>25</b></div>
+      </div>
+      <div class="cv-eq">≈</div>
+      <div class="cv-card">
+        <div class="cv-title">Python</div>
+        <div id="cvBox"></div>
+        <div class="cv-note">назва <b>price</b>, значення <b>25</b></div>
+      </div>
+    </div>
+    <p>Значення кладуть у змінну командою <b>присвоєння</b> — знаком <code>=</code>.</p>
+    <p>Порахуймо периметр прямокутника: <b>P = 2 · (a + b)</b>. Сторони й результат зберігатимемо у змінних.</p>
+    <svg class="rect-ill" viewBox="0 0 260 130" aria-hidden="true">
+      <rect x="40" y="18" width="170" height="90" rx="3" fill="#E3F2F5" stroke="#1F7A8C" stroke-width="4"/>
+      <text x="125" y="12" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="14" font-weight="600" fill="#E8743B">a = 5</text>
+      <text x="218" y="68" font-family="JetBrains Mono, monospace" font-size="14" font-weight="600" fill="#E8743B">b = 3</text>
+      <text x="125" y="70" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="15" font-weight="600" fill="#155866">P = ?</text>
+    </svg>
+    <p class="soft">Виконуй програму рядок за рядком і стеж за пам'яттю.</p>
+    <div id="trace1"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Назви змінних</div>
+    <h2>Як назвати змінну</h2>
+    <p>Добра назва підказує, що зберігає змінна. Правила Python:</p>
+    <ul>
+      <li>латинські літери, цифри й знак <code>_</code>;</li>
+      <li>назва не починається з цифри;</li>
+      <li>без пробілів і дефісів — замість них <code>_</code>;</li>
+      <li>великі й малі літери різні: <code>score</code> і <code>Score</code> — дві різні змінні.</li>
+    </ul>
+    <p>Не можна брати <b>службові слова</b> — Python уже використовує їх як команди:</p>
+    <div class="kw-list"><code>if</code><code>else</code><code>while</code><code>for</code><code>True</code><code>False</code><code>None</code><code>and</code><code>or</code><code>not</code><code>import</code><code>break</code><code>return</code></div>
+    <div class="exercise">
+      <p class="soft">Чи можна так назвати змінну?</p>
+      <div class="yn-grid" id="namesList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Типи даних</div>
+    <h2>Чотири основні типи</h2>
+    <p><b>Тип даних</b> визначає, які значення може мати змінна і що з ними можна робити. Python визначає тип сам — за тим, як записано значення.</p>
+    <div class="var-gallery" id="gallery"></div>
+    <ul>
+      <li>дробову частину відокремлюють <b>крапкою</b>, не комою: <code>3.5</code>;</li>
+      <li>текст беруть в однакові лапки — подвійні <code>"…"</code> або одинарні <code>'…'</code>;</li>
+      <li><code>True</code> і <code>False</code> пишуть з великої літери й без лапок.</li>
+    </ul>
+    <div class="trivia"><code>7</code> і <code>"7"</code> — різні значення: перше — число, друге — текст, що складається з цифри.</div>
+    <div class="exercise">
+      <p class="soft">Клацни значення, а потім — його тип.</p>
+      <div class="sort-buckets">
+        <div class="bucket" id="bkInt"><div class="bucket-title">int — ціле</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkFloat"><div class="bucket-title">float — дійсне</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkStr"><div class="bucket-title">str — рядок</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkBool"><div class="bucket-title">bool — логічне</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="typesPool"></div>
+      <div class="progress-line" id="typesProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Команди print() і type()</div>
+    <h2>Виводимо значення і дізнаємось тип</h2>
+    <ul>
+      <li><code>print()</code> виводить у консоль значення. Кілька значень пишуть через кому — у консолі між ними з'явиться пробіл.</li>
+      <li><code>type()</code> повідомляє тип значення чи змінної.</li>
+    </ul>
+<pre class="py-code">
+price = 25
+print("Ціна:", price, "грн")    # Ціна: 25 грн
+print(type(price))               # &lt;class 'int'&gt;
+</pre>
+    <div class="exercise">
+      <p class="soft">Що виведе програма?</p>
+      <div id="printList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Операції і типи</div>
+    <h2>Що можна робити з різними типами</h2>
+    <p>Той самий знак працює по-різному залежно від типу даних.</p>
+    <div class="ops">
+      <div class="op-card">
+        <h3>Числа: int і float</h3>
+<pre class="py-code">
+print(7 + 2)    # 9
+print(7 / 2)    # 3.5
+print(2 * 3)    # 6
+</pre>
+      </div>
+      <div class="op-card">
+        <h3>Рядки: str</h3>
+<pre class="py-code">
+print("7" + "2")    # 72
+print("ха" * 3)     # хахаха
+print("7" + 2)      # помилка!
+</pre>
+      </div>
+    </div>
+    <ul>
+      <li><code>+</code> для рядків <b>склеює</b> їх, а не додає;</li>
+      <li><code>*</code> для рядка й цілого числа <b>повторює</b> рядок;</li>
+      <li>рядок і число скласти не можна — Python зупиниться з помилкою.</li>
+    </ul>
+    <div class="exercise">
+      <p class="soft">Що вийде: число, рядок чи помилка?</p>
+      <div id="opsList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Команда input()</div>
+    <h2>Введення і перетворення типів</h2>
+    <p><code>input()</code> показує запитання й чекає відповіді користувача. Відповідь — <b>завжди рядок</b>, навіть якщо ввели цифри.</p>
+    <p>Щоб рахувати, рядок перетворюють на число:</p>
+    <ul>
+      <li><code>int("12")</code> → <code>12</code> — ціле число;</li>
+      <li><code>float("2.5")</code> → <code>2.5</code> — дійсне число;</li>
+      <li><code>str(12)</code> → <code>"12"</code> — навпаки, число на рядок.</li>
+    </ul>
+    <div id="trace2"></div>
+    <div id="task1"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 7 · Знайди помилку</div>
+    <h2>Налагодження</h2>
+    <p>Кожна з програм зупиниться з помилкою. Знайди рядок, через який це станеться.</p>
+    <div id="bugList"></div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Урок · «Змінні та команди. Типи даних» · 8 клас</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script src="../../assets/python.js"></script>
+<script>
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('repPool', 'repList', [
+  { name:'Програма', desc:'Список команд, які пристрій виконує по черзі' },
+  { name:'Hardware', desc:'Апаратна частина: процесор, пам’ять, клавіатура' },
+  { name:'Software', desc:'Програми, які встановлюють і запускають на пристрої' },
+  { name:'Firmware', desc:'Програма, вбудована в мікросхему пристрою' },
+  { name:'Машинний код', desc:'Нулі й одиниці, які процесор виконує без перекладу' },
+  { name:'Мова асемблера', desc:'Низькорівнева мова: одна команда — одна команда процесора' },
+  { name:'Високорівнева мова', desc:'Мова, близька до людської, — наприклад, Python' },
+  { name:'Транслятор', desc:'Програма, що перекладає код у машинний' },
+  { name:'Компілятор', desc:'Перекладає всю програму у файл, який потім запускають' },
+  { name:'Інтерпретатор', desc:'Перекладає й одразу виконує програму рядок за рядком' }
+], 'repProgress');
+
+/* ---------- КРОК 1 ---------- */
+document.getElementById('cvBox').innerHTML = varBox('price', '25');
+
+makeTrace('trace1', {
+  code:'a = 5\nb = 3\np = 2 * (a + b)\nprint("Периметр:", p)\na = 10\np = 2 * (a + b)\nprint("Периметр:", p)',
+  steps:[
+    { line:1, set:{ a:'5' } },
+    { line:2, set:{ b:'3' } },
+    { line:3, set:{ p:'16' } },
+    { line:4, out:'Периметр: 16' },
+    { line:5, set:{ a:'10' } },
+    { line:6, set:{ p:'26' } },
+    { line:7, out:'Периметр: 26' }
+  ]
+});
+// Консоль — окремо від пам'яті, на всю ширину під кодом (кроки 1 і 6)
+function splitConsole(id){
+  const box = document.getElementById(id), side = box.querySelector('.tr-side');
+  const titles = side.querySelectorAll('.tr-title'), out = side.querySelector('.tr-out');
+  const con = document.createElement('div');
+  con.className = 'tr-side tr-console';
+  con.append(titles[1], out);
+  box.querySelector('.trace').after(con);
+}
+splitConsole('trace1');
+
+/* ---------- КРОК 2 ---------- */
+makeYesNo('namesList', [
+  { text:'<code>total_price</code>', correct:true },
+  { text:'<code>total price</code>', correct:false, why:'Пробіл не можна — краще total_price.' },
+  { text:'<code>1st_place</code>', correct:false, why:'Назва не може починатися з цифри.' },
+  { text:'<code>place1</code>', correct:true, why:'Цифра не на початку — можна.' },
+  { text:'<code>max-speed</code>', correct:false, why:'Дефіс Python сприйме як мінус: max мінус speed.' },
+  { text:'<code>True</code>', correct:false, why:'Це службове слово — логічне значення «істина».' },
+  { text:'<code>is_winner</code>', correct:true },
+  { text:'<code>while</code>', correct:false, why:'Службове слово: з нього починається цикл.' }
+], 'Можна', 'Не можна');
+
+/* ---------- КРОК 3 ---------- */
+document.getElementById('gallery').innerHTML = [
+  ['age', '14', 'int', 'ціле число'],
+  ['height', '1.65', 'float', 'дійсне число, через крапку'],
+  ['city', '"Київ"', 'str', 'рядок — текст у лапках'],
+  ['is_ready', 'True', 'bool', 'логічне: True або False']
+].map(([n, v, t, d])=>`<figure>${varBox(n, v)}<figcaption><b>${t}</b>${d}</figcaption></figure>`).join('');
+
+makeSortBoard('typesPool', { i:'bkInt', f:'bkFloat', s:'bkStr', b:'bkBool' }, [
+  { text:'42', bucket:'i' },
+  { text:'-7', bucket:'i' },
+  { text:'0', bucket:'i' },
+  { text:'3.14', bucket:'f' },
+  { text:'-0.5', bucket:'f' },
+  { text:'2.0', bucket:'f' },
+  { text:'"42"', bucket:'s' },
+  { text:"'Київ'", bucket:'s' },
+  { text:'"True"', bucket:'s' },
+  { text:'True', bucket:'b' },
+  { text:'False', bucket:'b' },
+  { text:'"3.14"', bucket:'s' }
+], 'typesProgress');
+
+/* ---------- КРОК 4 ---------- */
+makeChoices('printList', [
+  { pre:pyCode('name = "Оля"\nprint("Привіт,", name)'), text:'Що з’явиться в консолі?', opts:['Привіт, name', 'Привіт, Оля', 'Привіт,Оля'], correct:1, why:'name без лапок — це змінна, тож виводиться її значення; кома в print додає пробіл.' },
+  { pre:pyCode('a = 3\nb = 4\nprint("a + b")'), text:'А тут?', opts:['7', 'a + b', '3 + 4'], correct:1, why:'У лапках — рядок, його виводять як є, нічого не рахуючи.' },
+  { pre:pyCode('a = 3\nb = 4\nprint("Сума:", a + b)'), text:'А тепер?', opts:['Сума: 7', 'Сума: a + b', 'Сума: 34'], correct:0 },
+  { pre:pyCode('t = 36.6\nprint(type(t))'), text:'Що виведе програма?', opts:["&lt;class 'int'&gt;", "&lt;class 'float'&gt;", "&lt;class 'str'&gt;"], correct:1, why:'Число з крапкою — float.' },
+  { pre:pyCode('code = "2026"\nprint(type(code))'), text:'А тут?', opts:["&lt;class 'int'&gt;", "&lt;class 'str'&gt;", "&lt;class 'bool'&gt;"], correct:1, why:'Цифри в лапках — це рядок.' }
+]);
+
+/* ---------- КРОК 5 ---------- */
+makeClassify('opsList', [
+  { text:'<span class="expr">10 + 5</span>', correct:0, why:'Вийде число 15.' },
+  { text:'<span class="expr">"10" + "5"</span>', correct:1, why:'Рядки склеюються: вийде "105".' },
+  { text:'<span class="expr">"10" + 5</span>', correct:2, why:'Рядок і число не складаються.' },
+  { text:'<span class="expr">"ой" * 3</span>', correct:1, why:'Рядок повторюється тричі: "ойойой".' },
+  { text:'<span class="expr">7 / 2</span>', correct:0, why:'Вийде дійсне число 3.5.' },
+  { text:'<span class="expr">int("10") + 5</span>', correct:0, why:'Спершу рядок "10" став числом 10, тож 10 + 5 = 15.' }
+], ['Число', 'Рядок', 'Помилка']);
+
+/* ---------- КРОК 6 ---------- */
+makeTrace('trace2', {
+  code:'age = input("Скільки тобі років? ")\nprint(age + "1")\nage = int(age)\nprint(age + 1)',
+  steps:[
+    { line:1, set:{ age:'"14"' }, out:'Скільки тобі років? 14', ask:{ q:'Користувач ввів 14. Що потрапить у змінну <code>age</code>?', opts:['число 14', 'рядок "14"'], correct:1, why:'input() завжди повертає рядок.' } },
+    { line:2, out:'141', ask:{ q:'Що виведе рядок 2?', opts:['15', '141', 'Помилка'], correct:1, why:'Обидва значення — рядки, тож вони склеюються.' } },
+    { line:3, set:{ age:'14' }, ask:{ q:'Що зробить <code>int(age)</code>?', opts:['Виведе 14 на екран', 'Перетворить рядок "14" на число 14', 'Видалить змінну age'], correct:1 } },
+    { line:4, out:'15' }
+  ]
+});
+splitConsole('trace2');
+
+makeCodeTask('task1', {
+  task:'Програма має порахувати вартість квитків, але виводить дивне. Запусти її, введи ціну й кількість, а потім виправ за допомогою <code>int()</code> чи <code>float()</code>.',
+  code:'price = input("Ціна квитка, грн: ")\ncount = input("Скільки квитків? ")\nprint("Разом:", price * count, "грн")',
+  file:'tickets.py',
+  hint:'Перетвори відповіді на числа одразу: price = float(input("Ціна квитка, грн: ")) і count = int(input("Скільки квитків? ")).',
+  check:(out, code)=>{
+    if(!/(int|float)\s*\(/.test(code)) return 'Рядок не можна помножити на рядок. Перетвори відповіді на числа: int() чи float().';
+    if(!/Разом:/.test(out)) return 'Програма має вивести рядок «Разом: …».';
+    return true;
+  }
+});
+
+/* ---------- КРОК 7 ---------- */
+makeFindBug('bugList', [
+  { code:'name = "Тарас"\nprint("Привіт,", Name)', line:2, why:'Змінна називається name з малої літери, а Name — це вже інша назва, якої немає.' },
+  { code:'score = 12\nbonus = "3"\ntotal = score + bonus\nprint(total)', line:3, why:'bonus — рядок "3", а рядок із числом не додаються. Треба bonus = 3 без лапок.' },
+  { code:'width = 4\nheight = 2,5\narea = width * height\nprint("Площа:", area)', line:2, why:'Дробову частину відокремлюють крапкою: 2.5. З комою вийде зовсім не число.' },
+  { code:'city = "Львів\nprint(city)', line:1, why:'Рядок відкрили лапками, але не закрили.' }
+]);
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що таке змінна?', opts:['Команда, що виводить текст у консоль', 'Іменоване місце в пам’яті для зберігання даних', 'Число, яке не можна змінити'], correct:1 },
+  { q:'Що виведе програма?' + pyCode('x = 4\nx = x * 2\nprint(x)'), opts:['4', '8', 'x * 2'], correct:1, why:'Спершу обчислюється права частина: 4 * 2 = 8.' },
+  { q:'Яка назва змінної правильна?', opts:['<code>my-score</code>', '<code>2score</code>', '<code>my_score</code>'], correct:2, why:'Дефіс сприймається як мінус, а з цифри назва починатися не може.' },
+  { q:'Якого типу значення <code>"3.5"</code>?', opts:['float', 'str', 'int'], correct:1, why:'Значення в лапках — рядок.' },
+  { q:'Якого типу значення <code>False</code>?', opts:['bool', 'str', 'int'], correct:0 },
+  { q:'Що виведе <code>print("4" + "4")</code>?', opts:['8', '44', 'Помилка'], correct:1, why:'Рядки склеюються.' },
+  { q:'Користувач ввів 5. Що станеться?' + pyCode('n = input("Число: ")\nprint(n + 1)'), opts:['Виведе 6', 'Виведе 51', 'Помилка: рядок і число не додаються'], correct:2, why:'input() повертає рядок "5", а до рядка не можна додати число.' },
+  { q:'Яка команда перетворить рядок <code>"2.5"</code> на число?', opts:['<code>int("2.5")</code>', '<code>float("2.5")</code>', '<code>str("2.5")</code>'], correct:1, why:'Число з дробовою частиною — float.' }
+], {summary:'Тепер ти знаєш, що таке змінна, як її назвати, які є типи даних і як перетворити відповідь користувача на число.', html:true});
+</script>
+
+</body>
+</html>
