@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Чи потягне мій комп'ютер? — Цифрові пристрої і проблеми</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#D9480F,#F59F00); --accent:#D9480F; --accent-dark:#A63206; --accent-soft:#FFEDE2; --bg:#FFF8F2; --line:#F3DED0; --ink:#2A1A12; --ink-soft:#6A5246; }
+  .sample td{white-space:normal;}
+  .sample td.b{font-weight:800; background:var(--accent-soft);}
+  .sample td.ok{color:#21603A; font-weight:700;}
+  .sample td.no{color:#C92A2A; font-weight:700;}
+  .paper{background:#fff; border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px;}
+  .paper-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; margin-bottom:6px;}
+  /* Ілюстрації: вікна Windows 11, системний шрифт */
+  .win{margin:10px 0 6px; max-width:520px; background:#fff; border:1px solid #D5D8E2; border-radius:8px; overflow:hidden; box-shadow:0 3px 10px rgba(60,30,10,.12); font-family:'Segoe UI',system-ui,-apple-system,sans-serif; color:#1b1b1b; font-size:12.5px; line-height:1.3;}
+  .win-title{display:flex; align-items:center; gap:7px; padding:6px 10px; background:#F3F3F3; font-size:12px;}
+  .win-ctl{margin-left:auto; color:#555; letter-spacing:9px; font-size:11px;}
+  .win-body{padding:10px 12px;}
+  .win-body h4{margin:0 0 6px; font-size:13.5px; font-weight:600;}
+  .kv{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:10px; padding:3px 5px; border-radius:4px;}
+  .kv span{color:#555;}
+  .hl{outline:2.5px solid #D9480F; outline-offset:1px; border-radius:4px;}
+  .req-ex{border:1px solid #D9D9D9; border-radius:6px; padding:8px 10px; background:#FAFAFA;}
+  .req-ex b{display:block; margin-bottom:4px;}
+  .req-ex div{display:grid; grid-template-columns:140px 1fr; gap:8px; padding:2px 0;}
+  .req-ex div span{color:#555;}
+</style>
+</head>
+<body data-hud="7 клас · Практична · Чи потягне мій комп'ютер?">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 7 клас · Цифрові пристрої і проблеми</div>
+    <h1>🖥️ Чи потягне мій комп'ютер?</h1>
+    <p>Обери три програми, які хочеш мати, знайди їхні системні вимоги й з'ясуй, чи вони запрацюють на твоєму комп'ютері.</p>
+    <div class="meta"><span>⏱ 20–25 хв</span><span><img src="../../assets/logos/docs.svg" alt="">Google Документи</span><span>💻 Комп'ютер із Windows</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="paper">
+      <div class="paper-title">Чи потягне мій комп'ютер?</div>
+      <div class="sheet-wrap">
+        <table class="sample">
+          <tr><td class="b"></td><td class="b">Мій комп'ютер</td><td class="b">Krita</td><td class="b">Minecraft</td><td class="b">DaVinci Resolve</td></tr>
+          <tr><td class="b">ОС</td><td>Windows 11</td><td>Windows 10 і новіша</td><td>Windows 10 і новіша</td><td>Windows 10 і новіша</td></tr>
+          <tr><td class="b">Пам'ять</td><td>8 ГБ</td><td>4 ГБ</td><td>4 ГБ</td><td>16 ГБ</td></tr>
+          <tr><td class="b">Місце</td><td>54 ГБ вільно</td><td>1 ГБ</td><td>1 ГБ</td><td>8 ГБ</td></tr>
+          <tr><td class="b">Висновок</td><td></td><td class="ok">✅ Потягне</td><td class="ok">✅ Потягне</td><td class="no">❌ Бракує пам'яті</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи документ</h3>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Документи</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Документи</span>.</li>
+              <li>Назви файл: <b>Чи потягне — Прізвище</b>.</li>
+            </ol>
+          </div>
+        </div>
+        <ol>
+          <li>Напиши заголовок: <b>Чи потягне мій комп'ютер?</b></li>
+          <li>Встав таблицю: <span class="menu">Вставлення → Таблиця</span>, розмір <b>5 × 5</b>.</li>
+          <li>Заповни перший стовпчик: <b>ОС, Пам'ять, Місце, Висновок</b>.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Запиши свій комп'ютер</h3>
+        <ol>
+          <li>Відкрий <span class="menu">Пуск → Параметри → Система → Про систему</span>.</li>
+          <li>Перенеси у стовпчик «Мій комп'ютер» <b>Випуск</b> і <b>Установлену оперативну пам'ять</b>.</li>
+          <li>Відкрий Провідник (<span class="mono">Win</span> + <span class="mono">E</span>) → <span class="menu">Цей ПК</span> і запиши, скільки вільно на диску C:.</li>
+        </ol>
+        <div class="win">
+          <div class="win-title">Параметри<span class="win-ctl">─ ▢ ✕</span></div>
+          <div class="win-body">
+            <h4>Характеристики пристрою</h4>
+            <div class="kv hl"><span>Установлена оперативна пам'ять</span>8,00 ГБ</div>
+            <div class="kv"><span>Тип системи</span>64-розрядна операційна система</div>
+            <h4 style="margin-top:10px">Характеристики Windows</h4>
+            <div class="kv hl"><span>Випуск</span>Windows 11 Home</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Обери три програми</h3>
+        <p>Одну гру, одну для творчості й одну для навчання. Наприклад:</p>
+        <ul>
+          <li>ігри — Minecraft, Roblox, Fortnite;</li>
+          <li>творчість — Krita, GIMP, Blender, DaVinci Resolve, Audacity;</li>
+          <li>навчання — LibreOffice, Scratch, GeoGebra.</li>
+        </ul>
+        <p>Впиши назви в перший рядок таблиці.</p>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Знайди системні вимоги</h3>
+        <ol>
+          <li>У пошуку введи: <span class="mono">назва програми системні вимоги</span>.</li>
+          <li>Відкривай <b>офіційний сайт</b> програми, а не сайти з завантаженнями.</li>
+          <li>Шукай блок <b>Мінімальні вимоги</b> (англійською — <i>Minimum requirements</i>).</li>
+          <li>Перенеси в таблицю ОС, пам'ять (RAM) і місце на диску (Storage).</li>
+        </ol>
+        <div class="req-ex">
+          <b>Мінімальні системні вимоги</b>
+          <div><span>ОС</span>Windows 10 (64-bit)</div>
+          <div><span>Пам'ять (RAM)</span>4 GB</div>
+          <div><span>Місце (Storage)</span>1 GB</div>
+        </div>
+        <div class="tip">Вимог немає на сайті? Онлайн-ігри й вебсервіси часто працюють у браузері. Тоді напиши в стовпчику: <b>працює в браузері</b>.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Постав висновок</h3>
+        <ol>
+          <li>Порівняй кожну вимогу зі стовпчиком «Мій комп'ютер».</li>
+          <li>Усе виконується — пиши <b>✅ Потягне</b>.</li>
+          <li>Хоч одна вимога вища — пиши <b>❌</b> і що саме не так: ОС, пам'ять чи місце.</li>
+        </ol>
+        <div class="check-val">Перевір себе: якщо програмі треба 16 ГБ пам'яті, а в тебе 8 ГБ, — це ❌, навіть коли все інше підходить.</div>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+<footer><span class="page-name">Практична робота · «Чи потягне мій комп'ютер?» · 7 клас</span></footer>
+<script src="../../assets/practice.js"></script>
+</body>
+</html>
