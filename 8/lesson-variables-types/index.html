@@ -389,7 +389,7 @@ makeCodeTask('task1', {
 makeFindBug('bugList', [
   { code:'name = "Тарас"\nprint("Привіт,", Name)', line:2, why:'Змінна називається name з малої літери, а Name — це вже інша назва, якої немає.' },
   { code:'score = 12\nbonus = "3"\ntotal = score + bonus\nprint(total)', line:3, why:'bonus — рядок "3", а рядок із числом не додаються. Треба bonus = 3 без лапок.' },
-  { code:'width = 4\nheight = 2,5\narea = width * height\nprint("Площа:", area)', line:2, why:'Дробову частину відокремлюють крапкою: 2.5. З комою вийде зовсім не число.' },
+  { code:'width = 4\nheight = "2"\nprint("Периметр:", 2 * (width + height))', line:2, why:'"2" у лапках — це рядок, а рядок і число не додаються. Треба height = 2.' },
   { code:'city = "Львів\nprint(city)', line:1, why:'Рядок відкрили лапками, але не закрили.' }
 ]);
 

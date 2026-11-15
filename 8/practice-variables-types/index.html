@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Змінні та типи даних — Практична робота</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<link rel="stylesheet" href="../../assets/python.css">
+<style>
+  :root{
+    --accent:#1F7A8C; --accent-dark:#155866; --accent-soft:#E3F2F5;
+    --label:#B07A00;
+    --bg:#F3F8F9; --line:#DAE7EA; --ink-soft:#4C5E66;
+    --sun:#FFD43B; --sun-soft:#FFF7D6; --sun-ink:#6B5300;
+    --hud-bar:linear-gradient(90deg, #1F7A8C, #FFD43B);
+  }
+  .goal{background:var(--sun-soft); border-radius:var(--radius-m); padding:10px 14px; margin:10px 0 4px; font-size:15px;}
+  .goal ul{margin:0; padding-left:20px;}
+</style>
+</head>
+<body data-lesson="practice8-variables-types" data-hud="8 клас · Практична: Змінні та типи даних">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Практична робота · 8 клас · Змінні та типи даних</div>
+      <h1>Змінні та типи даних</h1>
+      <p>Шість коротких завдань на Python і підсумковий тест. Виконай усі й надішли вчителеві посилання з результатами.</p>
+      <button class="btn-primary" onclick="document.getElementById('start').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none" aria-hidden="true">
+      <circle cx="70" cy="70" r="60" fill="#E3F2F5"/>
+      <rect x="26" y="34" width="88" height="72" rx="10" fill="#1F2433"/>
+      <circle cx="38" cy="45" r="3" fill="#FF6B4A"/><circle cx="48" cy="45" r="3" fill="#FFC93C"/><circle cx="58" cy="45" r="3" fill="#3FAE58"/>
+      <rect x="36" y="58" width="30" height="6" rx="3" fill="#82AAFF"/><rect x="70" y="58" width="22" height="6" rx="3" fill="#C3E88D"/>
+      <rect x="36" y="72" width="22" height="6" rx="3" fill="#82AAFF"/><rect x="62" y="72" width="14" height="6" rx="3" fill="#F78C6C"/>
+      <rect x="36" y="86" width="40" height="6" rx="3" fill="#C792EA"/>
+      <circle cx="104" cy="100" r="18" fill="#3FAE58"/><path d="M96 100 l6 6 11 -12" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="start">
+    <div class="step-label">Завдання 1 · Типи даних</div>
+    <h2>Анкета</h2>
+    <div class="goal">
+      <ul>
+        <li>у <code>name</code> впиши своє ім'я;</li>
+        <li>у <code>age</code> введи свій вік цілим числом, наприклад <code>13</code>;</li>
+        <li>у <code>height</code> введи свій зріст у метрах, наприклад <code>1.62</code>;</li>
+        <li>у <code>is_student</code> заміни <code>False</code> на <code>True</code>;</li>
+        <li>натисни «▶ Запустити».</li>
+      </ul>
+    </div>
+    <div id="t1"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Завдання 2 · Обчислення</div>
+    <h2>Периметр і площа</h2>
+    <div class="goal">
+      <ul>
+        <li>допиши рядок <code>s = a * b</code> — площа прямокутника;</li>
+        <li>допиши рядок <code>print("Площа:", s)</code>;</li>
+        <li>натисни «▶ Запустити».</li>
+      </ul>
+    </div>
+    <div id="t2"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Завдання 3 · Рядок × число</div>
+    <h2>Індикатор заряду</h2>
+    <div class="goal">
+      <ul>
+        <li>у <code>charge</code> заміни <code>3</code> на <code>8</code>;</li>
+        <li>у рядку 3 після <code>full * charge</code> допиши <code>+ "░" * 2</code>;</li>
+        <li>натисни «▶ Запустити».</li>
+      </ul>
+    </div>
+    <div id="t3"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Завдання 4 · Ділення й int()</div>
+    <h2>Повний оберт</h2>
+    <div class="goal">
+      <ul>
+        <li>у <code>step</code> заміни <code>30</code> на <code>45</code>;</li>
+        <li>у рядку 2 візьми <code>360 / step</code> у <code>int( )</code>: <code>steps = int(360 / step)</code>;</li>
+        <li>натисни «▶ Запустити».</li>
+      </ul>
+    </div>
+    <div id="t4"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Завдання 5 · Введення</div>
+    <h2>Середня швидкість</h2>
+    <div class="goal">
+      <ul>
+        <li>у рядку 1 візьми <code>input(…)</code> у <code>float( )</code>: <code>distance = float(input("Відстань, км: "))</code>;</li>
+        <li>так само зміни рядок 2 для <code>time</code>;</li>
+        <li>натисни «▶ Запустити» й введи <code>150</code> і <code>2.5</code>.</li>
+      </ul>
+    </div>
+    <div id="t5"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Завдання 6 · Знайди помилку</div>
+    <h2>Де помилка?</h2>
+    <div class="goal">
+      <ul>
+        <li>у кожній програмі клацни рядок, через який вона зупиниться.</li>
+      </ul>
+    </div>
+    <div id="t6"></div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Підсумковий тест</h2>
+    <p>Після тесту натисни «Поділитися результатами» й надішли посилання вчителеві.</p>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Практична робота · «Змінні та типи даних» · 8 клас</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script src="../../assets/python.js"></script>
+<script>
+/* ---------- ЗАВДАННЯ 1 ---------- */
+makeCodeTask('t1', {
+  file:'form.py',
+  code:'name = ""\nage = 0\nheight = 0.0\nis_student = False\nprint(name, age, height, is_student)',
+  hint:'Наприклад: name = "Олена", age = 13, height = 1.62, is_student = True.',
+  check:(out, code)=>{
+    const name = (code.match(/^\s*name\s*=\s*(["'])(.*?)\1\s*$/m) || [])[2];
+    if(name === undefined) return 'Ім\'я — рядок, його пишуть у лапках.';
+    if(!name.trim()) return 'Впиши своє ім\'я.';
+    const v = k=>(code.match(new RegExp('^\\s*' + k + '\\s*=\\s*(\\S+)\\s*$', 'm')) || [])[1] || '';
+    if(!/^[1-9]\d*$/.test(v('age'))) return 'Вік — ціле число без крапки, наприклад 13.';
+    if(!/^\d+\.\d+$/.test(v('height')) || +v('height') === 0) return 'Зріст — число з крапкою, наприклад 1.62.';
+    if(v('is_student') !== 'True') return 'У is_student встанови True — з великої літери й без лапок.';
+    return true;
+  }
+});
+
+/* ---------- ЗАВДАННЯ 2 ---------- */
+makeCodeTask('t2', {
+  file:'rectangle.py',
+  code:'a = 7\nb = 4\np = 2 * (a + b)\nprint("Периметр:", p)\n',
+  expect:'Периметр: 22\nПлоща: 28',
+  hint:'s = a * b і print("Площа:", s).',
+  check:(out, code)=>/^\s*s\s*=\s*a\s*\*\s*b\s*$/m.test(code) || 'Площу обчисли через змінні: s = a * b.'
+});
+
+/* ---------- ЗАВДАННЯ 3 ---------- */
+makeCodeTask('t3', {
+  file:'battery.py',
+  code:'full = "█"\ncharge = 3\nprint("Заряд:", full * charge)',
+  expect:'Заряд: ████████░░',
+  hint:'Рядок 2: charge = 8. Рядок 3: print("Заряд:", full * charge + "░" * 2)'
+});
+
+/* ---------- ЗАВДАННЯ 4 ---------- */
+makeCodeTask('t4', {
+  file:'turn.py',
+  code:'step = 30\nsteps = 360 / step\nprint("Поворотів по", step, "градусів:", steps)',
+  expect:'Поворотів по 45 градусів: 8',
+  hint:'step = 45 і steps = int(360 / step).',
+  check:(out, code)=>/int\s*\(\s*360\s*\/\s*step\s*\)/.test(code) || 'Перетвори результат ділення на ціле: steps = int(360 / step).'
+});
+
+/* ---------- ЗАВДАННЯ 5 ---------- */
+makeCodeTask('t5', {
+  file:'speed.py',
+  code:'distance = input("Відстань, км: ")\ntime = input("Час, год: ")\nspeed = distance / time\nprint("Швидкість:", speed, "км/год")',
+  hint:'Рядок 1: distance = float(input("Відстань, км: ")). Рядок 2: time = float(input("Час, год: ")).',
+  check:(out, code)=>{
+    if((code.match(/float\s*\(\s*input/g) || []).length < 2) return 'Перетвори обидві відповіді на числа: float(input(...)).';
+    if(!/Швидкість:\s*[\d.]+\s*км\/год/.test(out)) return 'Програма має вивести «Швидкість: … км/год».';
+    return true;
+  }
+});
+
+/* ---------- ЗАВДАННЯ 6 ---------- */
+makeFindBug('t6', [
+  { code:'city = "Київ"\nprint("Місто:", City)', line:2, why:'Змінна називається city з малої літери. City — інша назва, якої немає.' },
+  { code:'distance = "12"\ntime = 3\nprint(distance / time)', line:1, why:'"12" у лапках — це рядок, а рядок не ділиться на число. Треба distance = 12.' },
+  { code:'score = 80\nprint("Бали: " + score)', line:2, why:'Рядок і число не склеюються. Можна так: print("Бали:", score).' },
+  { code:'angle = 90\n2nd_angle = 180\nprint(angle + 2nd_angle)', line:2, why:'Назва змінної не може починатися з цифри: angle2.' }
+]);
+
+/* ---------- ПІДСУМКОВИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що виведе програма?' + pyCode('height = 1.6\nprint(type(height))'), opts:["&lt;class 'int'&gt;", "&lt;class 'float'&gt;", "&lt;class 'str'&gt;"], correct:1, why:'Число з крапкою — float.' },
+  { q:'Якого типу значення <code>"False"</code>?', opts:['bool', 'str', 'int'], correct:1, why:'Лапки роблять його рядком.' },
+  { q:'Що виведе <code>print("=" * 4)</code>?', opts:['<code>=4</code>', '<code>====</code>', 'Помилка'], correct:1, why:'Рядок, помножений на ціле число, повторюється.' },
+  { q:'Що виведе <code>print(360 / 45)</code>?', opts:['<code>8</code>', '<code>8.0</code>', '<code>45</code>'], correct:1, why:'Ділення / завжди дає дійсне число.' },
+  { q:'Що виведе <code>print(int(360 / 45))</code>?', opts:['<code>8</code>', '<code>8.0</code>', 'Помилка'], correct:0, why:'int() перетворює 8.0 на ціле 8.' },
+  { q:'Користувач ввів 3. Що виведе програма?' + pyCode('n = input()\nprint(n * 2)'), opts:['<code>6</code>', '<code>33</code>', 'Помилка'], correct:1, why:'input() повертає рядок "3", а рядок × 2 — це повторення.' },
+  { q:'Яка назва змінної правильна?', opts:['<code>my-score</code>', '<code>my_score</code>', '<code>1score</code>'], correct:1, why:'Дефіс сприймається як мінус, а з цифри назва починатися не може.' },
+  { q:'Що виведе програма?' + pyCode('a = 5\nb = 3\na = a + b\nprint(a, b)'), opts:['<code>5 3</code>', '<code>8 3</code>', '<code>8 8</code>'], correct:1, why:'Змінилось лише a: 5 + 3 = 8.' }
+], {summary:'Ти записав значення різних типів, порахував площу, намалював індикатор рядками, перетворив введення на числа й знайшов помилки в програмах.', html:true});
+</script>
+
+</body>
+</html>
