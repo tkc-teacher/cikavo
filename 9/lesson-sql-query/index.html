@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Мова SQL. Функція QUERY — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в інтерфейсі Google Таблиць -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  /* Гама «мова запитів»: індиго + помаранчевий */
+  :root{
+    --pri:#4338CA; --pri-dark:#3730A3; --org:#C2410C; --org-dark:#9A3412; --grn:#188038; --grn-dark:#0D652D;
+    --accent:var(--pri); --accent-dark:var(--pri-dark); --accent-soft:#EAE9FB;
+    --label:var(--org);
+    --bg:#F6F6FC; --ink:#1C1A3D; --ink-soft:#5A5878; --line:#E0DFF2; --surface:#FFFFFF;
+    --note:var(--pri); --note-soft:#EAE9FB; --note-ink:var(--pri-dark);
+    --sun:var(--org); --sun-soft:#FDEFE6; --sun-ink:var(--org-dark);
+    --hud-bar:linear-gradient(90deg,var(--pri),#F59E0B);
+    /* кольори частин запиту — однакові в SQL і в QUERY */
+    --k1:#2563EB; --k2:#9333EA; --k3:#DB2777; --k4:#D97706;
+  }
+
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; background:#ECEBF8; padding:1px 6px; border-radius:5px; font-size:.9em; white-space:nowrap;}
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:18px; line-height:1; display:inline-block; vertical-align:middle; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em;}
+  .k1{color:var(--k1);} .k2{color:var(--k2);} .k3{color:var(--k3);} .k4{color:var(--k4);}
+
+  /* Крок 1: запит SQL з перекладом */
+  .sql-demo{display:grid; grid-template-columns:minmax(0,1.25fr) auto minmax(0,1fr); gap:14px; align-items:center; margin:16px 0;}
+  @media (max-width:680px){ .sql-demo{grid-template-columns:1fr;} .sql-demo .arr{transform:rotate(90deg); justify-self:center;} }
+  .sql-code{background:#1E1B3A; border-radius:var(--radius-m); padding:14px 16px; color:#E8E6FF;}
+  .sql-line{display:grid; grid-template-columns:auto 1fr; gap:2px 12px; padding:6px 0; border-bottom:1px dashed #3A3666;}
+  .sql-line:last-child{border-bottom:0;}
+  .sql-line code{font:600 15px ui-monospace,Menlo,Consolas,monospace; white-space:nowrap; display:flex; align-items:center; gap:8px; flex-wrap:wrap;}
+  .sql-line code b{font-weight:800;}
+  .sql-line .k1{color:#7DB3FF;} .sql-line .k2{color:#D3A6FF;} .sql-line .k3{color:#FF8FC4;} .sql-line .k4{color:#FFC163;}
+  .sql-line .tr{grid-column:1 / -1; font-size:13px; color:#B9B6DA;}
+  .sql-line .tr b{color:#fff; font-family:'Baloo 2',sans-serif; letter-spacing:.03em;}
+  .sql-demo .arr{color:var(--org); font-size:28px; font-weight:800;}
+  .sql-demo{align-items:start;} .sql-demo .arr{align-self:center;}
+  .sql-line select{font:700 15px ui-monospace,Menlo,Consolas,monospace; background:#2C2853; border:1.5px dashed #5B5694; border-radius:7px; padding:2px 6px; cursor:pointer; max-width:100%;}
+  .sql-line select:hover{border-color:#A9A4E8;}
+  .sql-line select option{background:#2C2853; color:#E8E6FF;}
+  .sql-line.off b{opacity:.35; text-decoration:line-through;}
+  .res-scroll{overflow-x:auto;}
+  .res-n{font-size:13px; color:var(--ink-soft); margin-top:6px;}
+  .mini-res.fresh td{animation:resIn .4s ease;}
+  @keyframes resIn{from{background:#FFF1D6;}}
+  .res-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 12px;}
+  .res-card .t{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:var(--org); text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px;}
+  .mini-res{border-collapse:collapse; font-size:14px; width:100%;}
+  .mini-res th, .mini-res td{border:1px solid var(--line); padding:3px 9px; text-align:left;}
+  .mini-res th{background:var(--accent-soft); font-weight:700;}
+  .mini-res td.num{text-align:right;}
+  .db-row{display:flex; gap:8px; flex-wrap:wrap; margin:10px 0;}
+  .db-chip{font:700 13px 'Nunito Sans',sans-serif; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:3px 12px;}
+  code.q{font:700 14px ui-monospace,Menlo,Consolas,monospace; background:#ECEBF8; color:var(--ink); padding:2px 8px; border-radius:6px;}
+  .choice-btn code.q{background:transparent; padding:0;}
+  /* Крок 1: запит до вгаданої частини включно */
+  .sql-after{margin-top:10px; background:#1E1B3A; border-radius:var(--radius-s); padding:10px 14px; font:600 14.5px/1.7 ui-monospace,Menlo,Consolas,monospace; color:#E8E6FF; white-space:pre-wrap; animation:rowIn2 .4s ease;}
+  .sql-after b{font-weight:800;}
+  .sql-after .k1{color:#7DB3FF;} .sql-after .k2{color:#D3A6FF;} .sql-after .k3{color:#FF8FC4;} .sql-after .k4{color:#FFC163;}
+  .sql-after mark{background:#FFC163; color:#1E1B3A; border-radius:4px; padding:1px 4px;}
+  @keyframes rowIn2{from{opacity:0; transform:translateY(-4px);}}
+
+  /* Крок 2: SQL ↔ QUERY */
+  .map{display:grid; grid-template-columns:minmax(0,1fr) 34px minmax(0,1fr); gap:6px 10px; align-items:center; margin:14px 0;}
+  .map .h{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft);}
+  .map .c{font:600 14px ui-monospace,Menlo,Consolas,monospace; background:var(--surface); border:1.5px solid var(--line); border-left-width:5px; border-radius:10px; padding:7px 10px; overflow-wrap:anywhere;}
+  .map .c b{font-weight:800;}
+  .map .c.m1{border-left-color:var(--k1);} .map .c.m2{border-left-color:var(--k2);} .map .c.m3{border-left-color:var(--k3);} .map .c.m4{border-left-color:var(--k4);}
+  .map .c small{display:block; font:600 12px 'Nunito Sans',sans-serif; color:var(--ink-soft); margin-top:2px;}
+  .map .a{text-align:center; color:var(--ink-soft); font-size:20px; font-weight:800;}
+  .formula-big{font:700 15px ui-monospace,Menlo,Consolas,monospace; background:#fff; border:1.5px solid #DADCE0; border-radius:10px; padding:10px 14px; overflow-wrap:anywhere; margin:10px 0;}
+  .formula-big .r0{color:#0B57D0;} .formula-big .str{color:#188038;}
+  .formula-big .str b{font-weight:800;}
+
+  /* Імітація Google Таблиць */
+  .gs{--g-line:#E1E3E1; position:relative; font-family:'Roboto',sans-serif; color:#1F1F1F; background:#F9FBFD; border:1px solid #DADCE0; border-radius:10px; font-size:12.5px;}
+  .gs .ms{color:#444746;}
+  .gs-top{display:flex; align-items:center; gap:8px; padding:8px 10px 6px;}
+  .gs-top img{width:15px; height:20px;}
+  .gs-top .name{font-size:14px;}
+  .gs-fx{display:flex; align-items:flex-start; gap:8px; background:#fff; border-top:1px solid #DADCE0; padding:5px 10px; min-height:30px;}
+  .gs-fx .addr{flex-shrink:0; width:34px; color:#444746; border-right:1px solid #E1E3E1; line-height:20px;}
+  .gs-fx .fx{flex-shrink:0; font-style:italic; color:#80868B; font-family:serif; font-size:15px; line-height:20px;}
+  .gs-fx .f{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px; line-height:20px; overflow-wrap:anywhere;}
+  .f .r0{color:#0B57D0;} .f .str{color:#188038;} .f .str b{font-weight:800;} .f .ph{color:#9AA0A6;}
+  .gs-scroll{overflow-x:auto; background:#fff; border-top:1px solid #DADCE0;}
+  .gs-grid{border-collapse:collapse; width:100%; min-width:480px; background:#fff;}
+  .gs-grid th, .gs-grid td{border:1px solid var(--g-line); height:25px; padding:0 6px; white-space:nowrap;}
+  .gs-grid th{background:#F8F9FA; color:#444746; font-weight:500; font-size:11px; text-align:center;}
+  .gs-grid th.rn{width:26px;}
+  .gs-grid tr.hdr td{font-weight:700;}
+  .gs-grid td.num{text-align:right;}
+  .gs-grid td.cur{box-shadow:inset 0 0 0 2px #0B57D0;}
+  .gs-grid td.err{color:#B3261E; font-weight:700;}
+  .gs-grid tr.spill td{animation:rowIn .45s ease;}
+  @keyframes rowIn{from{background:#FFF4D6;}}
+  .gs-tabs{display:flex; align-items:center; gap:4px; padding:4px 8px; background:#F9FBFD; border-top:1px solid #DADCE0; border-radius:0 0 10px 10px;}
+  .gs-tabs .ms{font-size:18px; padding:0 4px;}
+  .gs-tab{font:500 13px 'Roboto',sans-serif; border:0; background:none; padding:5px 12px; border-radius:6px; cursor:pointer; color:#444746;}
+  .gs-tab:hover{background:#E8EAED;}
+  .gs-tab.on{background:#E1E9F7; color:#0B57D0;}
+  .gs.shake{animation:shakeX .35s ease;}
+  .vis{font-size:12px; color:#5F6368; padding:5px 10px; background:#fff;}
+  .err-tip{font-size:12.5px; color:#B3261E; background:#FCE8E6; padding:6px 10px;}
+
+  /* Завдання емуляторів */
+  .task{display:flex; gap:10px; align-items:flex-start; background:var(--sun-soft); border:1.5px solid #F6C9AE; border-radius:var(--radius-m); padding:10px 14px; margin-bottom:12px; font-weight:700;}
+  .task .tn{flex-shrink:0; font-weight:800; background:var(--org); color:#fff; border-radius:999px; padding:0 10px; font-size:13px; line-height:24px; white-space:nowrap; word-spacing:2px;}
+  .task.done{background:#E6F4EA; border-color:#A8D5B5;}
+  .task.done .tn{background:var(--grn);}
+  .emu-fb{min-height:24px; font-size:14px; margin-top:10px;}
+  .emu-fb.err{color:#B3261E;}
+  .emu-fb.ok{color:var(--grn-dark); font-weight:700;}
+
+  /* Крок 3: конструктор запиту */
+  .qb{background:var(--accent-soft); border:1.5px solid #CFCCF2; border-radius:var(--radius-m); padding:12px 14px; margin-top:12px;}
+  .qb-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:8px 0;}
+  .qb-tag{font:800 13px ui-monospace,Menlo,Consolas,monospace; color:#fff; border-radius:999px; padding:3px 10px; min-width:76px; text-align:center;}
+  .qb-tag.t1{background:var(--k1);} .qb-tag.t3{background:var(--k3);} .qb-tag.t4{background:var(--k4);}
+  .qb select{font:600 14px 'Nunito Sans',sans-serif; border:1.5px solid #CFCCF2; border-radius:8px; padding:5px 8px; background:#fff; color:var(--ink); cursor:pointer;}
+  .qb select.join{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:800; color:var(--k3);}
+  .qb .rm{border:0; background:none; color:var(--ink-soft); cursor:pointer; font-size:18px; padding:0 4px;}
+  .colchip{display:inline-flex; flex-direction:column; align-items:center; min-width:52px; font:800 15px ui-monospace,Menlo,Consolas,monospace; background:#fff; color:var(--ink); border:1.5px solid #CFCCF2; border-radius:10px; padding:3px 8px; cursor:pointer;}
+  .colchip small{font:600 11px 'Nunito Sans',sans-serif; color:var(--ink-soft);}
+  .colchip.on{background:var(--k1); border-color:var(--k1); color:#fff;}
+  .colchip.on small{color:#DCE7FF;}
+  .colchip .ord{font:700 10px 'Nunito Sans',sans-serif; line-height:1;}
+  .qb-btns{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
+  .qb-add{font:700 14px 'Nunito Sans',sans-serif; background:#fff; color:var(--pri-dark); border:1.5px dashed var(--pri); border-radius:999px; padding:7px 14px; cursor:pointer;}
+  .qb-run{font-size:15px; padding:9px 18px;}
+
+  /* Крок 5: плитки */
+  .tiles{background:var(--accent-soft); border:1.5px solid #CFCCF2; border-radius:var(--radius-m); padding:10px 14px; margin-top:12px;}
+  .tg{display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin:6px 0;}
+  .tg .lb{font:700 12px 'Nunito Sans',sans-serif; color:var(--ink-soft); width:76px; flex-shrink:0;}
+  .tile{font:700 14px ui-monospace,Menlo,Consolas,monospace; background:#fff; color:var(--ink); border:1.5px solid #CFCCF2; border-bottom-width:3px; border-radius:9px; padding:4px 10px; cursor:pointer; display:inline-flex; flex-direction:column; align-items:center; line-height:1.2;}
+  .tile:hover{border-color:var(--pri);}
+  .tile:active{transform:translateY(1px);}
+  .tile small{font:600 10.5px 'Nunito Sans',sans-serif; color:var(--ink-soft);}
+  .tile.kw{color:var(--pri-dark);}
+  .tile.val{color:#188038;}
+  .tile-tools{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:10px;}
+  .tool{font:700 14px 'Nunito Sans',sans-serif; background:#fff; color:var(--ink); border:1.5px solid #CFCCF2; border-radius:999px; padding:7px 14px; cursor:pointer;}
+  .tool:disabled{opacity:.45; cursor:default;}
+</style>
+</head>
+<body data-lesson="lesson9-sql-query" data-hud="9 клас · Мова SQL і функція QUERY">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Впорядкування даних</div>
+      <h1>Говоримо мовою баз даних</h1>
+      <p>Бази даних розуміють мову SQL. Познайомимося з її чотирма головними словами, а потім запишемо такі самі запити в Google Таблицях функцією QUERY.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: база даних-циліндр, що «говорить» SELECT -->
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="62" fill="#EAE9FB"/>
+      <path d="M18 60v44c0 6 15 11 34 11s34-5 34-11V60" fill="#4338CA"/>
+      <ellipse cx="52" cy="60" rx="34" ry="11" fill="#6366F1"/>
+      <path d="M18 76c0 6 15 11 34 11s34-5 34-11M18 92c0 6 15 11 34 11s34-5 34-11" stroke="#3730A3" stroke-width="2.5"/>
+      <circle cx="41" cy="82" r="5" fill="#fff"/><circle cx="63" cy="82" r="5" fill="#fff"/>
+      <circle cx="42" cy="83" r="2.5" fill="#1C1A3D"/><circle cx="64" cy="83" r="2.5" fill="#1C1A3D"/>
+      <path d="M46 96q6 5 12 0" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+      <rect x="62" y="14" width="70" height="34" rx="11" fill="#1E1B3A"/>
+      <path d="M78 47l-8 12 18-12" fill="#1E1B3A"/>
+      <text x="97" y="37" text-anchor="middle" font-family="ui-monospace, Menlo, Consolas, monospace" font-weight="800" font-size="15" fill="#FFC163">SELECT</text>
+      <g fill="#F59E0B"><rect x="96" y="76" width="30" height="7" rx="3.5"/><rect x="96" y="89" width="22" height="7" rx="3.5"/><rect x="96" y="102" width="26" height="7" rx="3.5"/></g>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Поняття запиту в базі даних</div>
+    <h2>Що ти вже знаєш</h2>
+    <p class="soft">Обери термін, а потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Мова SQL</div>
+    <h2>Чотири слова, які розуміє база</h2>
+    <p><b>SQL</b> (Structured Query Language) — мова структурованих запитів. Нею «розмовляють» майже всі бази даних:</p>
+    <div class="db-row"><span class="db-chip">Microsoft Access</span><span class="db-chip">MySQL</span><span class="db-chip">PostgreSQL</span><span class="db-chip">SQLite — у кожному смартфоні</span></div>
+    <p>Запит SQL читається майже як англійське речення. Ось запит до таблиці притулку «Тварини»:</p>
+    <p class="soft">Змінюй частини запиту в списках — і дивись, як змінюється вибірка.</p>
+    <div class="sql-demo" id="sqlDemo">
+      <div class="sql-code">
+        <div class="sql-line"><code><b class="k1">SELECT</b> <select class="k1" data-p="sel"></select></code><span class="tr"><b>ВИБЕРИ</b> — які поля показати</span></div>
+        <div class="sql-line"><code><b class="k2">FROM</b> Тварини</code><span class="tr"><b>З</b> — з якої таблиці</span></div>
+        <div class="sql-line"><code><b class="k3">WHERE</b> <select class="k3" data-p="where"></select></code><span class="tr"><b>ДЕ</b> — умова відбору записів</span></div>
+        <div class="sql-line"><code><b class="k4">ORDER BY</b> <select class="k4" data-p="order"></select>;</code><span class="tr"><b>ВПОРЯДКУЙ ЗА</b> — сортування</span></div>
+      </div>
+      <div class="arr">→</div>
+      <div class="res-card">
+        <div class="t">Вибірка</div>
+        <div class="res-scroll" id="sqlRes"></div>
+        <div class="res-n" id="sqlN"></div>
+      </div>
+    </div>
+    <ul>
+      <li><code class="q">ASC</code> — сортування за зростанням (від А до Я, від меншого до більшого). Його можна не писати.</li>
+      <li><code class="q">DESC</code> — за спаданням (від Я до А, від більшого до меншого).</li>
+      <li><code class="q">*</code> після SELECT — показати всі поля.</li>
+      <li><code class="q">AND</code> і <code class="q">OR</code> — знайомі <b>І</b> та <b>АБО</b> для кількох умов.</li>
+    </ul>
+    <div class="note">Текст в умові береться в одинарні лапки: <code class="q">'Кіт'</code>. Числа — без лапок: <code class="q">Вік &gt; 5</code>.</div>
+    <p class="soft">Після якого слова SQL стоїть кожен фрагмент?</p>
+    <div id="partList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Функція QUERY</div>
+    <h2>SQL усередині Google Таблиць</h2>
+    <p>У Google Таблицях є функція <span class="mono">QUERY</span> — вона виконує запит, схожий на SQL. Ось той самий запит:</p>
+    <div class="formula-big">=QUERY(<span class="r0">Тварини!A1:F15</span>; <span class="str">"<b class="k1">SELECT</b> B, D <b class="k3">WHERE</b> C = 'Кіт' <b class="k4">ORDER BY</b> D DESC"</span>)</div>
+    <div class="map">
+      <div class="h">SQL</div><div></div><div class="h">QUERY</div>
+      <div class="c m1"><b class="k1">SELECT</b> Кличка, Вік</div><div class="a">→</div><div class="c m1"><b class="k1">SELECT</b> B, D<small>поля — літерами стовпців</small></div>
+      <div class="c m2"><b class="k2">FROM</b> Тварини</div><div class="a">→</div><div class="c m2">Тварини!A1:F15<small>FROM не пишуть: таблиця — перший аргумент</small></div>
+      <div class="c m3"><b class="k3">WHERE</b> Вид = 'Кіт'</div><div class="a">→</div><div class="c m3"><b class="k3">WHERE</b> C = 'Кіт'</div>
+      <div class="c m4"><b class="k4">ORDER BY</b> Вік DESC</div><div class="a">→</div><div class="c m4"><b class="k4">ORDER BY</b> D DESC</div>
+    </div>
+    <p>Правила запису:</p>
+    <ul>
+      <li>Перший аргумент — діапазон таблиці <b>разом із рядком заголовків</b>.</li>
+      <li>Другий аргумент — текст запиту в <b>подвійних</b> лапках <span class="mono">"…"</span>.</li>
+      <li>Стовпці називають <b>літерами</b>: <span class="mono">B</span>, а не <span class="mono">Кличка</span>.</li>
+      <li>Текст в умові — в <b>одинарних</b> лапках: <span class="mono">'Кіт'</span>.</li>
+      <li>Порядок частин сталий: <span class="mono">SELECT</span> → <span class="mono">WHERE</span> → <span class="mono">ORDER BY</span>.</li>
+    </ul>
+    <div class="note">Великі чи малі літери в словах запиту — неважливо: <span class="mono">select</span> теж спрацює. А на відміну від FILTER, QUERY сама додає рядок заголовків, вибирає потрібні стовпці й сортує — усе однією формулою.</div>
+    <p class="soft">Чи спрацює така формула?</p>
+    <div id="syntaxList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · SELECT і WHERE</div>
+    <h2>Які стовпці й які записи</h2>
+    <p><span class="mono">SELECT</span> обирає <b>стовпці</b> вибірки, а <span class="mono">WHERE</span> — <b>записи</b> (рядки). Без WHERE у вибірку потрапляють усі записи.</p>
+    <p class="soft">Обери стовпці, за потреби додай умову WHERE і натисни «Виконати». Вихідні дані — на аркуші «Тварини».</p>
+    <div class="exercise">
+      <div class="task" id="cTask"></div>
+      <div class="gs" id="cGs"></div>
+      <div class="qb" id="qb"></div>
+      <div class="emu-fb" id="cFb"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · ORDER BY</div>
+    <h2>Сортуємо вибірку</h2>
+    <p><span class="mono">ORDER BY</span> сортує вибірку за стовпцем: текст — за абеткою, числа — від меншого до більшого. Слово <span class="mono">DESC</span> після стовпця перевертає порядок.</p>
+    <div class="note">Можна сортувати за кількома стовпцями через кому: <span class="mono">ORDER BY C, D DESC</span> — спершу за видом, а всередині виду — від старших до молодших.</div>
+    <p class="soft">Обери стовпці, додай сортування ORDER BY (і умову WHERE, якщо треба) та натисни «Виконати».</p>
+    <div class="exercise">
+      <div class="task" id="oTask"></div>
+      <div class="gs" id="oGs"></div>
+      <div class="qb" id="oQb"></div>
+      <div class="emu-fb" id="oFb"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Запит повністю</div>
+    <h2>Збери запит з плиток</h2>
+    <p>Тепер — увесь запит самостійно: <span class="mono">SELECT</span>, потім за потреби <span class="mono">WHERE</span>, наприкінці <span class="mono">ORDER BY</span>. Кому між стовпцями формула поставить сама.</p>
+    <p class="soft">Клацай плитки по черзі — вони додаються в кінець запиту. Помилився — «⌫ Стерти».</p>
+    <div class="exercise">
+      <div class="task" id="tTask"></div>
+      <div class="gs" id="tGs"></div>
+      <div class="tiles" id="tiles"></div>
+      <div class="emu-fb" id="tFb"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Урок · «Мова SQL: основні команди SELECT, FROM, WHERE, ORDER BY. Функція QUERY у Google Таблицях» · 9 клас</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- СПІЛЬНІ ДАНІ: ТВАРИНИ ПРИТУЛКУ (ті самі, що в уроці «Запити») ---------- */
+const FIELDS = ['ID', 'Кличка', 'Вид', 'Вік', 'Щеплення', 'Корм, г/день'];
+const NUMERIC = [true, false, false, true, false, true];
+const L = ['A', 'B', 'C', 'D', 'E', 'F'];
+const PETS = [
+  [1, 'Мурчик', 'Кіт', 3, 'Так', 60],
+  [2, 'Рекс', 'Собака', 5, 'Так', 400],
+  [3, 'Сніжка', 'Кролик', 1, 'Ні', 150],
+  [4, 'Багіра', 'Кіт', 7, 'Так', 55],
+  [5, 'Бублик', 'Собака', 1, 'Ні', 300],
+  [6, 'Ласка', 'Собака', 9, 'Так', 350],
+  [7, 'Пухнастик', 'Кролик', 2, 'Так', 160],
+  [8, 'Тигра', 'Кіт', 1, 'Ні', 50],
+  [9, 'Джек', 'Собака', 2, 'Так', 450],
+  [10, 'Ромашка', 'Кролик', 4, 'Так', 140],
+  [11, 'Барсик', 'Кіт', 10, 'Ні', 70],
+  [12, 'Лорд', 'Собака', 6, 'Ні', 500],
+  [13, 'Зефірка', 'Кіт', 2, 'Так', 45],
+  [14, 'Плюшка', 'Собака', 1, 'Так', 250]
+];
+const KINDS = ['Кіт', 'Собака', 'Кролик'];
+const esc = s=>String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const plural = (n, a, b, c)=>n % 10 === 1 && n % 100 !== 11 ? a : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? b : c;
+function flash(el){ el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); setTimeout(()=>el.classList.remove('shake'), 400); }
+const sameArr = (a, b)=>a.length === b.length && a.every((x, i)=>x === b[i]);
+const sameSet = (a, b)=>sameArr([...a].sort(), [...b].sort());
+
+/* ---------- ВИКОНАННЯ ЗАПИТУ ----------
+   q = { cols:[номери стовпців] | null (*), where:[{c, op, v, join:'AND'|'OR'}], order:[{c, desc}] }
+   AND виконується раніше за OR — як у справжньому SQL */
+function test(r, w){
+  const a = r[w.c], v = w.v;
+  return { '=':a === v, '<>':a !== v, '>':a > v, '<':a < v, '>=':a >= v, '<=':a <= v }[w.op];
+}
+function runQuery(q){
+  const groups = [];
+  q.where.forEach((w, i)=>{ if(i === 0 || w.join === 'OR') groups.push([w]); else groups[groups.length - 1].push(w); });
+  let rows = PETS.filter(r=>!groups.length || groups.some(g=>g.every(w=>test(r, w))));
+  if(q.order.length) rows = rows.slice().sort((a, b)=>{
+    for(const o of q.order){
+      const d = NUMERIC[o.c] ? a[o.c] - b[o.c] : String(a[o.c]).localeCompare(String(b[o.c]), 'uk');
+      if(d) return o.desc ? -d : d;
+    }
+    return 0;
+  });
+  return rows;
+}
+const lit = (c, v)=>NUMERIC[c] ? String(v) : `'${v}'`;
+// Текст запиту (html — з виділеними словами)
+function queryText(q, html){
+  const K = w=>html ? `<b>${w}</b>` : w;
+  let s = K('SELECT') + ' ' + (q.cols ? q.cols.map(c=>L[c]).join(', ') : '*');
+  q.where.forEach((w, i)=>{ s += ' ' + K(i ? w.join : 'WHERE') + ' ' + L[w.c] + ' ' + esc(w.op) + ' ' + esc(lit(w.c, w.v)); });
+  if(q.order.length) s += ' ' + K('ORDER BY') + ' ' + q.order.map(o=>L[o.c] + (o.desc ? ' DESC' : '')).join(', ');
+  return s;
+}
+
+/* ---------- ІМІТАЦІЯ GOOGLE ТАБЛИЦЬ ---------- */
+const gsTop = name=>`<div class="gs-top"><img src="images/sheets.svg" alt=""><span class="name">Притулок «Хвостики»${name ? ' · ' + name : ''}</span></div>`;
+const fxBar = (addr, formula)=>`<div class="gs-fx"><span class="addr">${addr}</span><span class="fx">fx</span><span class="f">${formula}</span></div>`;
+const tabs = (names, on)=>`<div class="gs-tabs"><span class="ms">add</span><span class="ms">menu</span>${names.map(n=>`<button type="button" class="gs-tab${n === on ? ' on' : ''}" data-tab="${n}">${n}</button>`).join('')}</div>`;
+const colHead = n=>`<tr><th class="rn"></th>${L.slice(0, n).map(l=>`<th>${l}</th>`).join('')}</tr>`;
+function sourceSheet(){
+  return `<div class="gs-scroll"><table class="gs-grid">${colHead(6)}<tr class="hdr"><th>1</th>${FIELDS.map(f=>`<td>${f}</td>`).join('')}</tr>`
+    + PETS.map((r, k)=>`<tr><th>${k + 2}</th>${r.map((v, i)=>`<td class="${NUMERIC[i] ? 'num' : ''}">${v}</td>`).join('')}</tr>`).join('') + '</table></div>';
+}
+const QF = inner=>`=QUERY(<span class="r0">Тварини!A1:F15</span>; <span class="str">"${inner}"</span>)`;
+
+// Аркуш «Запит» з формулою QUERY в A1 і вкладкою «Тварини» з вихідними даними
+function querySheet(el){
+  let sheet = 'Запит', st = { inner:'<span class="ph">…</span>', q:null, rows:null, err:null }, spill = false;
+  function draw(){
+    let h = gsTop(`аркуш «${sheet}»`);
+    if(sheet === 'Тварини') h += fxBar('A1', 'ID') + sourceSheet();
+    else {
+      const cols = st.q && st.rows ? (st.q.cols || [0, 1, 2, 3, 4, 5]) : [];
+      const w = 6;
+      h += fxBar('A1', QF(st.inner)) + `<div class="gs-scroll"><table class="gs-grid">${colHead(w)}`;
+      if(st.err) h += `<tr><th>1</th><td class="cur err">#VALUE!</td>${'<td></td>'.repeat(w - 1)}</tr>` + [2, 3].map(n=>`<tr><th>${n}</th>${'<td></td>'.repeat(w)}</tr>`).join('');
+      else if(!st.rows) h += `<tr><th>1</th><td class="cur"></td>${'<td></td>'.repeat(w - 1)}</tr>` + [2, 3].map(n=>`<tr><th>${n}</th>${'<td></td>'.repeat(w)}</tr>`).join('');
+      else {
+        const pad = k=>'<td></td>'.repeat(w - k);
+        h += `<tr class="hdr${spill ? ' spill' : ''}"><th>1</th>${cols.map((c, i)=>`<td class="${i ? '' : 'cur'}">${FIELDS[c]}</td>`).join('')}${pad(cols.length)}</tr>`
+          + st.rows.map((r, k)=>`<tr${spill ? ' class="spill"' : ''}><th>${k + 2}</th>${cols.map(c=>`<td class="${NUMERIC[c] ? 'num' : ''}">${r[c]}</td>`).join('')}${pad(cols.length)}</tr>`).join('');
+      }
+      h += '</table></div>';
+      if(st.err) h += `<div class="err-tip">Помилка: ${st.err}</div>`;
+      else if(st.rows) h += `<div class="vis">У вибірці ${st.rows.length} ${plural(st.rows.length, 'запис', 'записи', 'записів')} з ${PETS.length}</div>`;
+    }
+    el.innerHTML = h + tabs(['Тварини', 'Запит'], sheet);
+    spill = false;
+  }
+  el.addEventListener('click', e=>{ const b = e.target.closest('[data-tab]'); if(b){ sheet = b.dataset.tab; draw(); } });
+  return {
+    set(s, run){ st = { q:null, rows:null, err:null, ...s }; if(run){ sheet = 'Запит'; spill = true; } draw(); }
+  };
+}
+
+// Перевірка результату завдання: стовпці (набір) і записи (ID у потрібному порядку)
+function verdict(T, q, rows){
+  const cols = q.cols || [0, 1, 2, 3, 4, 5], ids = rows.map(r=>r[0]);
+  if(!sameSet(cols, T.cols)) return `Записи можуть бути правильні, але стовпці інші. Потрібні: ${T.cols.map(c=>`${L[c]} (${FIELDS[c]})`).join(', ')}.`;
+  if(T.ordered && sameSet(ids, T.ids) && !sameArr(ids, T.ids)) return 'Записи ті, що треба, але порядок інший — перевір ORDER BY і DESC.';
+  if(sameArr(T.ordered ? ids : [...ids].sort((a, b)=>a - b), T.ids)) return true;
+  if(!rows.length) return 'Жоден запис не підходить під умову. Перевір WHERE.';
+  const extra = rows.filter(r=>!T.ids.includes(r[0]));
+  if(extra.length) return `У вибірку потрапили зайві записи, наприклад ${extra[0][1]} (${extra[0][2].toLowerCase()}, ${extra[0][3]} р.). Перевір умову WHERE.`;
+  return `Вибірка неповна: ${rows.length} з ${T.ids.length} потрібних записів. Перевір умову WHERE.`;
+}
+
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Запит', desc:'Запитання до бази даних, записане за точними правилами' },
+  { name:'Вибірка', desc:'Нова таблиця-відповідь із записами, що підходять під умови' },
+  { name:'І', desc:'Запис має відповідати всім умовам одразу' },
+  { name:'АБО', desc:'Достатньо, щоб запис відповідав хоча б одній умові' },
+  { name:'FILTER', desc:'Функція Google Таблиць, що будує вибірку, не змінюючи вихідну таблицю' },
+  { name:'Запит із параметром', desc:'Умову беруть з клітинки, тож той самий запит дає різні відповіді' },
+  { name:'Запит на обчислення', desc:'Відповідь — одне число: сума, кількість чи середнє' },
+  { name:'Перехресний запит', desc:'Підсумки в таблиці «рядки × стовпці»; у Google Таблицях — зведена таблиця' },
+  { name:'Вибірковий запит', desc:'Вид запиту, відповідь якого — список записів, а не одне число' },
+  { name:'#N/A', desc:'FILTER показує це, коли жоден запис не підходить під умову' }
+], 'recapProgress');
+
+/* ---------- КРОК 1: ЖИВИЙ ЗАПИТ SQL — частини з готових варіантів ---------- */
+(function(){
+  const box = document.getElementById('sqlDemo');
+  const OPTS = {
+    sel:[['Кличка, Вік', [1, 3]], ['Кличка, Вид', [1, 2]], ['Кличка, Корм', [1, 5]], ['Кличка, Вид, Вік', [1, 2, 3]], ['*', null]],
+    where:[["Вид = 'Кіт'", { c:2, op:'=', v:'Кіт' }], ["Вид = 'Собака'", { c:2, op:'=', v:'Собака' }], ["Вид = 'Кролик'", { c:2, op:'=', v:'Кролик' }],
+      ['Вік > 5', { c:3, op:'>', v:5 }], ["Щеплення = 'Ні'", { c:4, op:'=', v:'Ні' }], ['Корм < 100', { c:5, op:'<', v:100 }], ['— без умови', null]],
+    order:[['Вік DESC', { c:3, desc:true }], ['Вік', { c:3, desc:false }], ['Кличка', { c:1, desc:false }], ['Корм DESC', { c:5, desc:true }], ['— без сортування', null]]
+  };
+  const pick = { sel:0, where:0, order:0 };
+  box.querySelectorAll('select[data-p]').forEach(s=>{
+    s.innerHTML = OPTS[s.dataset.p].map(([t], i)=>`<option value="${i}">${esc(t)}</option>`).join('');
+    s.addEventListener('change', ()=>{ pick[s.dataset.p] = +s.value; draw(true); });
+  });
+  function draw(fresh){
+    const cols = OPTS.sel[pick.sel][1], w = OPTS.where[pick.where][1], o = OPTS.order[pick.order][1];
+    box.querySelector('[data-p="where"]').closest('.sql-line').classList.toggle('off', !w);
+    box.querySelector('[data-p="order"]').closest('.sql-line').classList.toggle('off', !o);
+    const rows = runQuery({ cols, where:w ? [w] : [], order:o ? [o] : [] });
+    const cs = cols || [0, 1, 2, 3, 4, 5];
+    document.getElementById('sqlRes').innerHTML = `<table class="mini-res${fresh ? ' fresh' : ''}"><tr>${cs.map(c=>`<th>${FIELDS[c]}</th>`).join('')}</tr>`
+      + rows.map(r=>`<tr>${cs.map(c=>`<td class="${NUMERIC[c] ? 'num' : ''}">${r[c]}</td>`).join('')}</tr>`).join('') + '</table>';
+    document.getElementById('sqlN').textContent = `${rows.length} ${plural(rows.length, 'запис', 'записи', 'записів')} з ${PETS.length}`;
+  }
+  draw(false);
+})();
+
+/* ---------- КРОК 1: ЧАСТИНИ ЗАПИТУ SQL ---------- */
+makeClassify('partList', [
+  { text:'<code class="q">Кличка, Вік</code>', correct:0, why:'Це поля, які треба показати, — їх перелічують після SELECT.' },
+  { text:'<code class="q">Тварини</code>', correct:1, why:'Назва таблиці стоїть після FROM.' },
+  { text:'<code class="q">Вік &gt; 5</code>', correct:2, why:'Це умова відбору записів — вона після WHERE.' },
+  { text:'<code class="q">Корм DESC</code>', correct:3, why:'DESC — сортування за спаданням, тож це ORDER BY.' },
+  { text:'<code class="q">*</code>', correct:0, why:'Зірочка після SELECT означає «усі поля».' },
+  { text:'<code class="q">Вид = \'Собака\' AND Щеплення = \'Так\'</code>', correct:2, why:'Дві умови, з\'єднані AND, — це WHERE.' }
+], ['SELECT', 'FROM', 'WHERE', 'ORDER BY']);
+// Після правильної відповіді — запит SQL до цієї частини включно, вгаданий фрагмент підсвічено
+(function(){
+  const S = '<b class="k1">SELECT</b> ', F = '\n<b class="k2">FROM</b> Тварини', W = '\n<b class="k3">WHERE</b> ', O = '\n<b class="k4">ORDER BY</b> ';
+  const m = s=>`<mark>${s}</mark>`;
+  const SQL = [
+    S + m('Кличка, Вік'),
+    S + '*\n<b class="k2">FROM</b> ' + m('Тварини'),
+    S + 'Кличка' + F + W + m('Вік &gt; 5'),
+    S + 'Кличка, Корм' + F + O + m('Корм DESC'),
+    S + m('*'),
+    S + 'Кличка' + F + W + m("Вид = 'Собака' AND Щеплення = 'Так'")
+  ];
+  const list = document.getElementById('partList');
+  list.addEventListener('click', ()=>{
+    list.querySelectorAll('.classify-card').forEach((card, i)=>{
+      if(!card.querySelector('.choice-btn.correct') || card.querySelector('.sql-after')) return;
+      const d = document.createElement('div');
+      d.className = 'sql-after'; d.innerHTML = SQL[i];
+      card.appendChild(d);
+    });
+  });
+})();
+
+/* ---------- КРОК 2: ЧИ СПРАЦЮЄ ФОРМУЛА ---------- */
+const fq = s=>`<code class="q">=QUERY(Тварини!A1:F15; ${esc(s)})</code>`;
+makeYesNo('syntaxList', [
+  { text:fq(`"SELECT B, D WHERE C = 'Кіт'"`), correct:true, why:'Усе за правилами: стовпці літерами, текст в одинарних лапках, запит — у подвійних.' },
+  { text:fq(`"SELECT Кличка WHERE Вид = 'Кіт'"`), correct:false, why:'У QUERY стовпці називають літерами: SELECT B WHERE C = \'Кіт\'.' },
+  { text:fq(`"SELECT B WHERE C = Кіт"`), correct:false, why:'Текст в умові потрібно взяти в одинарні лапки: \'Кіт\'.' },
+  { text:fq(`"SELECT * WHERE D > 5 ORDER BY D"`), correct:true, why:'Усі стовпці тварин, старших за 5 років, від молодших до старших.' },
+  { text:fq(`"SELECT B FROM Тварини"`), correct:false, why:'FROM у QUERY не пишуть — таблицю вже задає перший аргумент.' },
+  { text:fq(`"SELECT B ORDER BY D WHERE D > 5"`), correct:false, why:'Порядок частин сталий: спершу WHERE, потім ORDER BY.' }
+], 'Спрацює', 'Помилка');
+
+/* ---------- КОНСТРУКТОР ЗАПИТУ (кроки 3 і 4): стовпці-чипи, умови WHERE, за потреби ORDER BY ---------- */
+function makeBuilder(ids, TASKS, withOrder){
+  const CF = [2, 3, 4, 5];                              // поля для умови
+  const VALS = { 2:KINDS, 3:[...Array(11).keys()], 4:['Так', 'Ні'], 5:[50, 100, 150, 200, 250, 300, 350, 400, 450, 500] };
+  const OPS_T = ['='], OPS_N = ['=', '>', '<', '>=', '<='];
+  const OP_SHOW = { '=':'=', '>':'>', '<':'<', '>=':'≥', '<=':'≤' };
+  const gsEl = document.getElementById(ids.gs), qb = document.getElementById(ids.qb);
+  const taskEl = document.getElementById(ids.task), fb = document.getElementById(ids.fb);
+  const sheet = querySheet(gsEl);
+  const hit = trackTask(gsEl, TASKS.length, TASKS.length + 2);
+  let cols = [], star = false, conds = [], order = [], t = 0;
+
+  const ready = c=>c.c !== '' && c.v !== '';
+  function inner(){
+    let s = '<b>SELECT</b> ' + (star ? '*' : cols.length ? cols.map(c=>L[c]).join(', ') : '<span class="ph">…</span>');
+    conds.forEach((c, i)=>{
+      s += ` <b>${i ? c.join : 'WHERE'}</b> ` + (ready(c) ? `${L[c.c]} ${esc(c.op)} ${esc(lit(c.c, c.v))}` : '<span class="ph">…</span>');
+    });
+    if(order.length) s += ' <b>ORDER BY</b> ' + order.map(o=>o.c === '' ? '<span class="ph">…</span>' : L[o.c] + (o.desc ? ' DESC' : '')).join(', ');
+    return s;
+  }
+  const preview = ()=>sheet.set({ inner:inner() });
+  function drawTask(){
+    const fin = t === TASKS.length;
+    taskEl.className = 'task' + (fin ? ' done' : '');
+    taskEl.innerHTML = fin ? '<span class="tn">✓</span><span>Усі запити складено! Можеш поекспериментувати й далі.</span>'
+      : `<span class="tn">${t + 1} з ${TASKS.length}</span><span>${TASKS[t].text}</span>`;
+  }
+  function drawQb(){
+    let h = '<div class="qb-row"><span class="qb-tag t1">SELECT</span>'
+      + `<button type="button" class="colchip${star ? ' on' : ''}" data-star>*<small>усі</small></button>`
+      + L.map((l, i)=>{ const n = cols.indexOf(i); return `<button type="button" class="colchip${n >= 0 ? ' on' : ''}" data-col="${i}">${l}<small>${FIELDS[i].replace(', г/день', '')}</small></button>`; }).join('')
+      + '</div>';
+    conds.forEach((c, i)=>{
+      h += '<div class="qb-row">' + (i ? `<select class="join" data-i="${i}" data-k="join"><option${c.join === 'AND' ? ' selected' : ''}>AND</option><option${c.join === 'OR' ? ' selected' : ''}>OR</option></select>` : '<span class="qb-tag t3">WHERE</span>')
+        + `<select data-i="${i}" data-k="c"><option value="">стовпець…</option>${CF.map(f=>`<option value="${f}"${c.c === f ? ' selected' : ''}>${L[f]} · ${FIELDS[f]}</option>`).join('')}</select>`
+        + `<select data-i="${i}" data-k="op"${c.c === '' ? ' disabled' : ''}>${(c.c !== '' && NUMERIC[c.c] ? OPS_N : OPS_T).map(o=>`<option value="${o}"${c.op === o ? ' selected' : ''}>${OP_SHOW[o]}</option>`).join('')}</select>`
+        + `<select data-i="${i}" data-k="v"${c.c === '' ? ' disabled' : ''}><option value="">значення…</option>${c.c === '' ? '' : VALS[c.c].map(v=>`<option value="${v}"${String(c.v) === String(v) ? ' selected' : ''}>${NUMERIC[c.c] ? v : `'${v}'`}</option>`).join('')}</select>`
+        + `<button class="rm" type="button" data-rm="${i}" title="Прибрати умову">✕</button></div>`;
+    });
+    order.forEach((o, i)=>{
+      h += '<div class="qb-row">' + (i ? '<span class="qb-tag t4">, потім</span>' : '<span class="qb-tag t4">ORDER BY</span>')
+        + `<select data-o="${i}" data-k="c"><option value="">стовпець…</option>${L.map((l, f)=>`<option value="${f}"${o.c === f ? ' selected' : ''}>${l} · ${FIELDS[f]}</option>`).join('')}</select>`
+        + `<select data-o="${i}" data-k="desc"><option value="0"${o.desc ? '' : ' selected'}>ASC — за зростанням</option><option value="1"${o.desc ? ' selected' : ''}>DESC — за спаданням</option></select>`
+        + `<button class="rm" type="button" data-orm="${i}" title="Прибрати сортування">✕</button></div>`;
+    });
+    h += '<div class="qb-btns">' + (conds.length < 2 ? `<button class="qb-add" type="button" data-add>+ ${conds.length ? 'Ще одна умова (AND / OR)' : 'Умова WHERE'}</button>` : '')
+      + (withOrder && order.length < 2 ? `<button class="qb-add" type="button" data-oadd>+ ${order.length ? 'Ще один стовпець сортування' : 'Сортування ORDER BY'}</button>` : '')
+      + '<button class="btn-primary qb-run" type="button" data-run>↵ Виконати</button></div>';
+    qb.innerHTML = h;
+  }
+  function run(){
+    if(!star && !cols.length){ fb.className = 'emu-fb err'; fb.textContent = 'Обери хоча б один стовпець після SELECT (або *).'; return; }
+    if(!conds.every(ready)){ fb.className = 'emu-fb err'; fb.textContent = 'Допиши умову: стовпець, знак і значення — або прибери її ✕.'; return; }
+    if(order.some(o=>o.c === '')){ fb.className = 'emu-fb err'; fb.textContent = 'Обери стовпець для сортування — або прибери його ✕.'; return; }
+    const q = { cols:star ? null : cols.slice(), where:conds.map(c=>({ c:c.c, op:c.op, v:NUMERIC[c.c] ? +c.v : c.v, join:c.join })), order:order.map(o=>({ c:o.c, desc:o.desc })) };
+    const rows = runQuery(q);
+    sheet.set({ inner:queryText(q, true), q, rows }, true);
+    if(t >= TASKS.length){ fb.className = 'emu-fb'; fb.textContent = `Запит виконано: ${rows.length} ${plural(rows.length, 'запис', 'записи', 'записів')}.`; return; }
+    const T = TASKS[t], v = verdict(T, q, rows);
+    if(v === true){
+      fb.className = 'emu-fb ok'; fb.textContent = 'Правильно ✓ ' + T.done;
+      addNeurons(1); hit(); t++;
+      if(t === TASKS.length) addNeurons(2);
+      drawTask(); return;
+    }
+    fb.className = 'emu-fb err'; fb.textContent = v;
+    flash(gsEl);
+  }
+  qb.addEventListener('change', e=>{
+    const s = e.target.closest('select'); if(!s) return;
+    if(s.dataset.o !== undefined){ const o = order[+s.dataset.o]; if(s.dataset.k === 'c') o.c = s.value === '' ? '' : +s.value; else o.desc = s.value === '1'; preview(); return; }
+    const c = conds[+s.dataset.i], k = s.dataset.k;
+    if(k === 'c'){ c.c = s.value === '' ? '' : +s.value; c.op = '='; c.v = ''; drawQb(); }
+    else c[k] = s.value;
+    preview();
+  });
+  qb.addEventListener('click', e=>{
+    const col = e.target.closest('[data-col]');
+    if(col){ const i = +col.dataset.col, n = cols.indexOf(i); star = false; if(n >= 0) cols.splice(n, 1); else cols.push(i); drawQb(); preview(); }
+    if(e.target.closest('[data-star]')){ star = !star; cols = []; drawQb(); preview(); }
+    if(e.target.closest('[data-add]')){ conds.push({ c:'', op:'=', v:'', join:'AND' }); drawQb(); preview(); }
+    const rm = e.target.closest('[data-rm]');
+    if(rm){ conds.splice(+rm.dataset.rm, 1); drawQb(); preview(); }
+    if(e.target.closest('[data-oadd]')){ order.push({ c:'', desc:false }); drawQb(); preview(); }
+    const orm = e.target.closest('[data-orm]');
+    if(orm){ order.splice(+orm.dataset.orm, 1); drawQb(); preview(); }
+    if(e.target.closest('[data-run]')) run();
+  });
+  drawTask(); drawQb(); preview();
+}
+
+
+/* ---------- КРОК 3: SELECT + WHERE ---------- */
+makeBuilder({ gs:'cGs', qb:'qb', task:'cTask', fb:'cFb' }, [
+  { text:'Волонтерам потрібен список усіх тварин — лише кличка й вік.', cols:[1, 3], ids:PETS.map(r=>r[0]), done:'Усі 14 тварин, два стовпці.' },
+  { text:'Ветеринар просить клички тварин без щеплення.', cols:[1], ids:[3, 5, 8, 11, 12], done:'Сніжка, Бублик, Тигра, Барсик і Лорд.' },
+  { text:'Кінологи шукають щеплених собак: кличка й вік. Потрібні дві умови.', cols:[1, 3], ids:[2, 6, 9, 14], done:'Рекс, Ласка, Джек і Плюшка.' },
+  { text:'Куточок дрібних тварин: кличка й вид усіх котів і кроликів.', cols:[1, 2], ids:[1, 3, 4, 7, 8, 10, 11, 13], done:'П\'ятеро котів і троє кроликів — тут потрібне OR.' }
+], false);
+
+/* ---------- КРОК 4: ORDER BY (порядок записів рахується з еталонного запиту) ---------- */
+const sorted = (where, order)=>runQuery({ cols:null, where, order }).map(r=>r[0]);
+makeBuilder({ gs:'oGs', qb:'oQb', task:'oTask', fb:'oFb' }, [
+  { text:'Список усіх тварин за абеткою: кличка й вид.', cols:[1, 2], ordered:true, ids:sorted([], [{ c:1 }]), done:'Від Багіри до Тигри.' },
+  { text:'Хто з\'їдає найбільше корму? Кличка й корм усіх тварин — від найбільшого до найменшого.', cols:[1, 5], ordered:true, ids:sorted([], [{ c:5, desc:true }]), done:'Першим — Лорд, 500 г.' },
+  { text:'Коти від наймолодшого до найстаршого: кличка й вік.', cols:[1, 3], ordered:true, ids:sorted([{ c:2, op:'=', v:'Кіт' }], [{ c:3 }]), done:'Тигра, Зефірка, Мурчик, Багіра, Барсик.' },
+  { text:'Список за видами: вид і кличка. Види — за абеткою, а всередині виду — клички за абеткою. Потрібні два стовпці сортування.', cols:[1, 2], ordered:true, ids:sorted([], [{ c:2 }, { c:1 }]), done:'Спершу коти від Багіри, потім кролики, потім собаки.' }
+], true);
+
+/* ---------- КРОК 5: ЗАПИТ З ПЛИТОК ---------- */
+(function(){
+  const TASKS = [
+    { text:'Кролики: кличка й корм — від того, хто їсть найбільше.', cols:[1, 5], ids:[7, 3, 10], ordered:true, done:'Пухнастик, Сніжка, Ромашка.' },
+    { text:'Щеплені коти від наймолодшого: кличка й вік.', cols:[1, 3], ids:[13, 1, 4], ordered:true, done:'Зефірка, Мурчик, Багіра.' },
+    { text:'Тварини, старші за 5 років, за абеткою: кличка, вид і вік.', cols:[1, 2, 3], ids:[4, 11, 6, 12], ordered:true, done:'Багіра, Барсик, Ласка, Лорд.' }
+  ];
+  // Плитки: kw — слово запиту, star — *, col — стовпець, name — назва поля (пастка), op — знак, val — значення, bare — текст без лапок (пастка)
+  const GROUPS = [
+    ['Слова', ['SELECT', 'WHERE', 'AND', 'OR', 'ORDER BY', 'DESC'].map(v=>({ t:'kw', v }))],
+    ['Стовпці', [{ t:'star', v:'*' }, ...L.map((l, i)=>({ t:'col', v:i })), { t:'name', v:'Кличка' }]],
+    ['Знаки', ['=', '>', '<'].map(v=>({ t:'op', v }))],
+    ['Значення', [...KINDS, 'Так', 'Ні'].map(v=>({ t:'val', v })).concat([1, 5, 300].map(v=>({ t:'val', v })), [{ t:'bare', v:'Кіт' }])]
+  ];
+  const ALL = GROUPS.flatMap(g=>g[1]);
+  const show = k=>k.t === 'col' ? L[k.v] : k.t === 'val' && typeof k.v === 'string' ? `'${k.v}'` : String(k.v);
+  const gsEl = document.getElementById('tGs'), box = document.getElementById('tiles');
+  const taskEl = document.getElementById('tTask'), fb = document.getElementById('tFb');
+  const sheet = querySheet(gsEl);
+  const hit = trackTask(gsEl, TASKS.length, TASKS.length + 2);
+  let tk = [], t = 0;
+
+  const isCol = k=>k && (k.t === 'col' || k.t === 'name');
+  function inner(){
+    if(!tk.length) return '<span class="ph">…</span>';
+    return tk.map((k, i)=>{
+      const p = tk[i - 1];
+      const comma = i && isCol(k) && (isCol(p) || (p.t === 'kw' && p.v === 'DESC')) ? ',' : '';
+      const s = k.t === 'kw' ? `<b>${k.v}</b>` : esc(show(k));
+      return (i ? comma + ' ' : '') + s;
+    }).join('');
+  }
+  const nameErr = 'назви полів у QUERY не пишуть — лише літери стовпців (Кличка — це B).';
+  function parse(){
+    let i = 0;
+    const kw = v=>tk[i] && tk[i].t === 'kw' && tk[i].v === v;
+    if(!tk.length) return { err:'запит порожній. Почни з SELECT.' };
+    if(!kw('SELECT')) return { err:'запит починається зі слова SELECT.' };
+    i++;
+    const q = { cols:[], where:[], order:[] };
+    if(tk[i] && tk[i].t === 'star'){ q.cols = null; i++; }
+    else {
+      while(isCol(tk[i])){ if(tk[i].t === 'name') return { err:nameErr }; q.cols.push(tk[i].v); i++; }
+      if(!q.cols.length) return { err:'після SELECT вкажи стовпці (літерами) або *.' };
+    }
+    if(kw('WHERE')){
+      i++;
+      let join = null;
+      for(;;){
+        const c = tk[i];
+        if(!c) return { err:`після ${join || 'WHERE'} має бути умова: стовпець, знак, значення.` };
+        if(c.t === 'name') return { err:nameErr };
+        if(c.t !== 'col') return { err:'умова починається зі стовпця, наприклад: C = \'Кіт\'.' };
+        i++;
+        const o = tk[i];
+        if(!o || o.t !== 'op') return { err:`після ${L[c.v]} потрібен знак порівняння: =, > або <.` };
+        i++;
+        const v = tk[i];
+        if(!v) return { err:'умову не дописано — бракує значення.' };
+        if(v.t === 'bare') return { err:'текст в умові береться в одинарні лапки: \'Кіт\'.' };
+        if(v.t !== 'val') return { err:'після знака має бути значення: число або текст у лапках.' };
+        i++;
+        const num = typeof v.v === 'number';
+        if(NUMERIC[c.v] !== num) return { err:NUMERIC[c.v] ? `у стовпці ${L[c.v]} (${FIELDS[c.v]}) числа — порівнюй його з числом.` : `у стовпці ${L[c.v]} (${FIELDS[c.v]}) текст — порівнюй його з текстом у лапках.` };
+        q.where.push({ c:c.v, op:o.v, v:v.v, join });
+        if(kw('AND') || kw('OR')){ join = tk[i].v; i++; continue; }
+        break;
+      }
+    }
+    if(kw('ORDER BY')){
+      i++;
+      for(;;){
+        const c = tk[i];
+        if(c && c.t === 'name') return { err:nameErr };
+        if(!c || c.t !== 'col') return { err:'після ORDER BY вкажи стовпець, за яким сортувати.' };
+        i++;
+        let desc = false;
+        if(kw('DESC')){ desc = true; i++; }
+        q.order.push({ c:c.v, desc });
+        if(isCol(tk[i])) continue;
+        break;
+      }
+    }
+    if(i < tk.length){
+      const k = tk[i];
+      if(k.t === 'kw' && k.v === 'WHERE' && q.order.length) return { err:'WHERE має стояти перед ORDER BY.' };
+      if(k.t === 'kw' && k.v === 'DESC') return { err:'DESC пишуть одразу після стовпця в ORDER BY.' };
+      if(k.t === 'kw' && (k.v === 'AND' || k.v === 'OR')) return { err:`${k.v} з'єднує дві умови після WHERE.` };
+      if(k.t === 'kw' && k.v === 'SELECT') return { err:'SELECT у запиті лише один — на початку.' };
+      return { err:`незрозуміло, що робить тут «${show(k)}».` };
+    }
+    return { q };
+  }
+  function drawTask(){
+    const fin = t === TASKS.length;
+    taskEl.className = 'task' + (fin ? ' done' : '');
+    taskEl.innerHTML = fin ? '<span class="tn">✓</span><span>Ти записав усі запити! Можеш скласти й власні.</span>'
+      : `<span class="tn">${t + 1} з ${TASKS.length}</span><span>${TASKS[t].text}</span>`;
+  }
+  function drawTiles(){
+    box.innerHTML = GROUPS.map(([lb, items])=>`<div class="tg"><span class="lb">${lb}</span>${items.map(k=>{
+      const n = ALL.indexOf(k), cls = k.t === 'kw' ? ' kw' : k.t === 'val' ? ' val' : '';
+      const sub = k.t === 'col' ? `<small>${FIELDS[k.v].replace(', г/день', '')}</small>` : '';
+      return `<button type="button" class="tile${cls}" data-n="${n}">${esc(show(k))}${sub}</button>`;
+    }).join('')}</div>`).join('')
+      + `<div class="tile-tools"><button type="button" class="tool" data-back${tk.length ? '' : ' disabled'}>⌫ Стерти</button><button type="button" class="tool" data-clear${tk.length ? '' : ' disabled'}>Очистити</button><button type="button" class="btn-primary qb-run" data-run>↵ Виконати</button></div>`;
+  }
+  const refresh = ()=>{ drawTiles(); sheet.set({ inner:inner() }); };
+  box.addEventListener('click', e=>{
+    const b = e.target.closest('button'); if(!b || b.disabled) return;
+    if(b.dataset.n !== undefined){ tk.push(ALL[+b.dataset.n]); refresh(); return; }
+    if(b.hasAttribute('data-back')){ tk.pop(); refresh(); return; }
+    if(b.hasAttribute('data-clear')){ tk = []; refresh(); fb.className = 'emu-fb'; fb.textContent = ''; return; }
+    if(!b.hasAttribute('data-run')) return;
+    const p = parse();
+    if(p.err){
+      sheet.set({ inner:inner(), err:p.err }, true);
+      fb.className = 'emu-fb err'; fb.textContent = 'QUERY не розуміє запит: ' + p.err;
+      flash(gsEl); return;
+    }
+    const rows = runQuery(p.q);
+    sheet.set({ inner:inner(), q:p.q, rows }, true);
+    if(t >= TASKS.length){ fb.className = 'emu-fb'; fb.textContent = `Запит виконано: ${rows.length} ${plural(rows.length, 'запис', 'записи', 'записів')}.`; return; }
+    const T = TASKS[t], v = verdict(T, p.q, rows);
+    if(v === true){
+      fb.className = 'emu-fb ok'; fb.textContent = 'Правильно ✓ ' + T.done;
+      addNeurons(1); hit(); t++;
+      if(t === TASKS.length) addNeurons(2);
+      tk = []; drawTask(); drawTiles();
+      return;
+    }
+    fb.className = 'emu-fb err'; fb.textContent = v;
+    flash(gsEl);
+  });
+  drawTask(); refresh();
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що таке SQL?', opts:['Мова запитів до баз даних', 'Програма для створення таблиць', 'Формат файлів бази даних'], correct:0 },
+  { q:'Яке слово SQL задає умову, за якою відбирають записи?', opts:['<code>SELECT</code>', '<code>WHERE</code>', '<code>ORDER BY</code>'], correct:1 },
+  { q:'Що зробить <code>ORDER BY Вік DESC</code>?', opts:['Покаже лише найстаршу тварину', 'Відсортує від молодших до старших', 'Відсортує від старших до молодших'], correct:2, why:'DESC — за спаданням: від більшого числа до меншого.' },
+  { q:'Що означає <code>SELECT *</code>?', opts:['Показати всі стовпці', 'Показати лише перший стовпець', 'Помножити значення стовпців'], correct:0 },
+  { q:'Як у функції QUERY вказують таблицю, з якої беруть дані?', opts:['Словом <code>FROM</code> у тексті запиту', 'Першим аргументом — діапазоном, наприклад <code>Тварини!A1:F15</code>', 'Назвою файлу в лапках'], correct:1 },
+  { q:'Яку умову правильно записати в QUERY?', opts:['<code>WHERE Вид = \'Кіт\'</code>', '<code>WHERE C = Кіт</code>', '<code>WHERE C = \'Кіт\'</code>'], correct:2, why:'Стовпець — літерою, текст — в одинарних лапках.' },
+  { q:'Що поверне <code>=QUERY(Тварини!A1:F15; "SELECT B WHERE D &gt; 5 ORDER BY B")</code>?', opts:['Клички тварин, старших за 5 років, за абеткою', 'Усі дані тварин, старших за 5 років', 'Клички тварин, відсортовані за віком'], correct:0, why:'B — кличка, D &gt; 5 — старші за 5, ORDER BY B — за абеткою кличок.' },
+  { q:'Чим QUERY зручніша за FILTER?', opts:['Вона змінює вихідну таблицю', 'Однією формулою обирає стовпці, відбирає записи й сортує', 'Вона працює без діапазону даних'], correct:1 }
+], {summary:'Тепер ти знаєш чотири головні слова SQL — SELECT, FROM, WHERE, ORDER BY — і вмієш записувати такі запити в Google Таблицях функцією QUERY.', html:true});
+</script>
+
+</body>
+</html>
