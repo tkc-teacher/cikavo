@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Від питання до запиту — Мова SQL і функція QUERY</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в меню Google Таблиць -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#4338CA,#F59E0B); --accent:#4338CA; --accent-dark:#3730A3; --accent-soft:#EAE9FB; --bg:#F6F6FC; --line:#E0DFF2; }
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:1.15em; line-height:1; display:inline-block; vertical-align:-.2em; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em; margin-right:3px; color:#444746;}
+  .menu{white-space:normal;}
+  .h1-ico{height:1em; width:auto; vertical-align:-.12em; margin-right:.1em;}
+  .f{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; font-size:13.5px; background:#ECEBF8; padding:2px 7px; border-radius:5px; word-break:break-word;}
+  .ask{background:#FDEFE6; border-left:4px solid #C2410C; border-radius:8px; padding:8px 12px; margin:6px 0 10px; font-weight:700;}
+  .ask b{color:#9A3412;}
+  .sample td.hd{font-weight:800; background:#EAE9FB;}
+  .sample td.gap{background:#FAFAFD;}
+  .copy-btn{display:inline-flex; align-items:center; gap:6px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; background:var(--accent); color:#fff; border:0; border-radius:999px; padding:8px 18px; margin:10px 0 4px; cursor:pointer; transition:background .15s ease;}
+  .copy-btn:hover{background:var(--accent-dark);}
+  .copy-btn .ms{color:#fff; margin:0;}
+  /* Конструктор запитів */
+  .qb{background:var(--accent-soft); border:1.5px solid #CFCCF2; border-radius:14px; padding:12px 14px; margin-top:10px;}
+  .qb h4{font-family:'Baloo 2',sans-serif; font-size:16px; margin:0 0 4px; color:var(--accent-dark);}
+  .qb-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:8px 0;}
+  .qb-tag{font:800 13px ui-monospace,Menlo,Consolas,monospace; color:#fff; border-radius:999px; padding:3px 10px; min-width:76px; text-align:center;}
+  .qb-tag.t1{background:#2563EB;} .qb-tag.t3{background:#DB2777;} .qb-tag.t4{background:#D97706;}
+  .qb select{font:600 14px 'Nunito Sans',sans-serif; border:1.5px solid #CFCCF2; border-radius:8px; padding:5px 8px; background:#fff; color:#1C1A3D; cursor:pointer;}
+  .qb select.join{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:800; color:#DB2777;}
+  .qb .rm{border:0; background:none; color:#5A5878; cursor:pointer; font-size:18px; padding:0 4px;}
+  .colchip{display:inline-flex; flex-direction:column; align-items:center; min-width:52px; font:800 15px ui-monospace,Menlo,Consolas,monospace; background:#fff; color:#1C1A3D; border:1.5px solid #CFCCF2; border-radius:10px; padding:3px 8px; cursor:pointer;}
+  .colchip small{font:600 11px 'Nunito Sans',sans-serif; color:#5A5878;}
+  .colchip.on{background:#2563EB; border-color:#2563EB; color:#fff;}
+  .colchip.on small{color:#DCE7FF;}
+  .qb-add{font:700 14px 'Nunito Sans',sans-serif; background:#fff; color:var(--accent-dark); border:1.5px dashed var(--accent); border-radius:999px; padding:6px 13px; cursor:pointer;}
+  .qb-out{background:#fff; border:1px solid #DADCE0; border-radius:10px; padding:8px 12px; margin-top:10px; font:700 13.5px ui-monospace,Menlo,Consolas,monospace; overflow-wrap:anywhere;}
+  .qb-out .r0{color:#0B57D0;} .qb-out .str{color:#188038;} .qb-out .ph{color:#9AA0A6;}
+  .qb-prev{margin-top:8px;}
+  .run-btn{background:#188038;}
+  .run-btn:hover{background:#0D652D;}
+  .qb-btns{display:flex; gap:10px; flex-wrap:wrap;}
+  .tabs-demo{display:flex; flex-wrap:wrap; gap:4px; margin-top:6px; font:500 13px 'Roboto',Arial,sans-serif;}
+  .tabs-demo span{padding:4px 10px; border-radius:6px; color:#444746; background:#F1F3F4;}
+  .tabs-demo span.on{background:#E1E9F7; color:#0B57D0;}
+  .qb-prev .lb{font-size:13px; font-weight:700; color:#5A5878; margin-bottom:4px;}
+  .qb-prev .sample{min-width:0; width:auto; table-layout:fixed;}  /* ширини стовпців — як в основній таблиці */
+  .copy-btn:disabled{opacity:.45; cursor:default;}
+  .to-qb{font-size:13.5px; font-weight:700; color:var(--accent); text-decoration:none;}
+  .to-qb:hover{text-decoration:underline;}
+</style>
+</head>
+<body data-hud="9 клас · Практична · Від питання до запиту">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 9 клас · Мова SQL і функція QUERY</div>
+    <h1><svg class="h1-ico" viewBox="0 0 58 40" aria-hidden="true"><g transform="translate(0 0)" fill="#FFFFFF" stroke="#1C1A3D" stroke-width="2" stroke-linejoin="round"><circle cx="16" cy="11" r="6"/><path d="M11 18h10l-1.5 3 2.5 10H10l2.5-10z"/><rect x="6" y="31" width="20" height="5" rx="2"/></g><g transform="translate(25 0)" fill="#1C1A3D" stroke="#1C1A3D" stroke-width="2" stroke-linejoin="round"><circle cx="16" cy="11" r="6"/><path d="M11 18h10l-1.5 3 2.5 10H10l2.5-10z"/><rect x="6" y="31" width="20" height="5" rx="2"/></g></svg> Від питання до запиту</h1>
+    <p>Покупці магазину настільних ігор «Кубик» ставлять запитання. Підбери для кожного запит QUERY у конструкторі й встав його в Google Таблиці.</p>
+    <div class="meta"><span>⏱ 20 хв</span><span><img src="../../assets/logos/sheets.svg" alt="">Google Таблиці</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <p>Шість аркушів «Запит 1» … «Запит 6» — на кожному одна формула QUERY в A1.</p>
+    <div class="sheet-wrap">
+      <table class="sample">
+        <tr><th></th><th>A</th><th>B</th><th>C</th></tr>
+        <tr><th>1</th><td class="hd">Назва</td><td class="hd">Ціна</td><td></td></tr>
+        <tr><th>2</th><td>Каркасон</td><td class="r">1150</td><td></td></tr>
+        <tr><th>3</th><td>Колонізатори</td><td class="r">1600</td><td></td></tr>
+        <tr><th>4</th><td>Еволюція</td><td class="r">700</td><td></td></tr>
+        <tr><th>5</th><td>Шахи</td><td class="r">520</td><td></td></tr>
+      </table>
+    </div>
+    <div class="tabs-demo"><span>Ігри</span><span>Запит 1</span><span class="on">Запит 2</span><span>Запит 3</span><span>Запит 4</span><span>Запит 5</span><span>Запит 6</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи таблицю</h3>
+        <p>Обери один зі способів:</p>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Таблиці</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Таблиці</span>.</li>
+              <li>Назви файл: <b>Кубик — Прізвище</b>.</li>
+            </ol>
+          </div>
+        </div>
+        <ul>
+          <li>Двічі клацни вкладку аркуша внизу й назви її <b>Ігри</b>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Встав дані</h3>
+        <ol>
+          <li>Натисни кнопку нижче.</li>
+          <li>Клацни клітинку <b>A1</b> і натисни <b>Ctrl+V</b> (на Mac — <b>⌘+V</b>).</li>
+          <li>Виділи рядок 1 і натисни <span class="menu"><span class="ms">format_bold</span>Жирний</span>.</li>
+        </ol>
+        <button class="copy-btn" id="copyBtn" type="button"><span class="ms">content_copy</span>Скопіювати дані</button>
+        <div class="sheet-wrap">
+          <table class="sample" id="dataTable"></table>
+        </div>
+        <div class="check-val">Перевір себе: дані займають A1:E13.</div>
+        <div class="qb" id="qb">
+          <h4>Конструктор запитів</h4>
+          <p>Обери стовпці, умови й сортування та натисни «Виконати» — побачиш вибірку.</p>
+          <div id="qbForm"></div>
+          <div class="qb-out" id="qbOut"></div>
+          <div class="qb-btns"><button class="copy-btn run-btn" id="qbRun" type="button">▶ Виконати</button><button class="copy-btn" id="qbCopy" type="button"><span class="ms">content_copy</span>Скопіювати запит</button></div>
+          <div class="qb-prev"><div class="lb" id="qbN"></div><div class="sheet-wrap"><table class="sample" id="qbPrev"></table></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Усі ігри з цінами</h3>
+        <div class="ask">«Покажіть <b>усі ігри</b> і ціни на них».</div>
+        <ol>
+          <li>Склади запит у <a class="to-qb" href="#qb">конструкторі ↑</a>, натисни «Виконати» й перевір вибірку.</li>
+          <li>Натисни «Скопіювати запит».</li>
+          <li>У таблиці натисни <span class="ms">add</span> внизу ліворуч і назви новий аркуш <b>Запит 1</b>.</li>
+          <li>Клацни <b>A1</b>, натисни <b>Ctrl+V</b> (на Mac — <b>⌘+V</b>) і Enter.</li>
+        </ol>
+        <div class="tip">Помилка <b>#REF!</b>? Аркуш запиту має бути порожнім.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Стратегії</h3>
+        <div class="ask">«Які у вас є <b>стратегії</b> і скільки вони коштують?»</div>
+        <ul>
+          <li>Склади запит у <a class="to-qb" href="#qb">конструкторі ↑</a>, скопіюй і встав у клітинку <b>A1</b> нового аркуша <b>Запит 2</b>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Недорогі ігри</h3>
+        <div class="ask">«Що є <b>дешевше за 500 грн</b>? Спершу найдешевше».</div>
+        <ul>
+          <li>Склади запит у <a class="to-qb" href="#qb">конструкторі ↑</a>, скопіюй і встав у клітинку <b>A1</b> нового аркуша <b>Запит 3</b>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Гра для молодшого брата</h3>
+        <div class="ask">«Які ігри <b>в наявності</b> підійдуть 7-річному і з якого вони віку?»</div>
+        <ul>
+          <li>Склади запит у <a class="to-qb" href="#qb">конструкторі ↑</a>, скопіюй і встав у клітинку <b>A1</b> нового аркуша <b>Запит 4</b>.</li>
+        </ul>
+<div class="tip">«Підходить 7-річному» — вік від 7 або менше. Обидві умови мають виконуватись разом.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">7</div>
+      <div>
+        <h3>Гра на вечірку</h3>
+        <div class="ask">«Які є <b>вечіркові чи карткові</b> ігри? Ціни — від найдешевшої».</div>
+        <ul>
+          <li>Склади запит у <a class="to-qb" href="#qb">конструкторі ↑</a>, скопіюй і встав у клітинку <b>A1</b> нового аркуша <b>Запит 5</b>.</li>
+        </ul>
+<div class="tip">Гра має бути з однієї <b>або</b> з другої категорії.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">8</div>
+      <div>
+        <h3>Каталог за категоріями</h3>
+        <div class="ask">«Покажіть <b>ігри за категоріями</b> з цінами — спершу найдорожчі».</div>
+        <ul>
+          <li>Склади запит у <a class="to-qb" href="#qb">конструкторі ↑</a>, скопіюй і встав у клітинку <b>A1</b> нового аркуша <b>Запит 6</b>.</li>
+        </ul>
+<div class="tip">Потрібні два стовпці сортування: спершу категорія, потім ціна.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Практична робота · «Мова SQL: основні команди SELECT, FROM, WHERE, ORDER BY. Функція QUERY у Google Таблицях» · 9 клас</span></footer>
+
+<script src="../../assets/practice.js"></script>
+<script>
+// Ігри магазину: те саме джерело для таблиці на сторінці й для кнопки «Скопіювати дані»
+const DATA = [
+  ['Назва', 'Категорія', 'Ціна', 'Вік від', 'В наявності'],
+  ['Каркасон', 'Стратегія', 1150, 7, 'Так'],
+  ['Діксіт', 'Вечірка', 1250, 8, 'Так'],
+  ['Уно', 'Карткова', 250, 7, 'Так'],
+  ['Дженга', 'Сімейна', 450, 6, 'Ні'],
+  ['Монополія', 'Сімейна', 900, 8, 'Так'],
+  ['Колонізатори', 'Стратегія', 1600, 10, 'Ні'],
+  ['Скіп-Бо', 'Карткова', 180, 7, 'Так'],
+  ['Кодові імена', 'Вечірка', 650, 14, 'Так'],
+  ['Еволюція', 'Стратегія', 700, 12, 'Так'],
+  ['Галлі Галлі', 'Карткова', 400, 6, 'Ні'],
+  ['Аліас', 'Вечірка', 980, 12, 'Так'],
+  ['Шахи', 'Стратегія', 520, 6, 'Так']
+];
+document.getElementById('dataTable').innerHTML =
+  '<tr><th></th><th>A</th><th>B</th><th>C</th><th>D</th><th>E</th></tr>'
+  + DATA.map((r, i)=>`<tr><th>${i + 1}</th>${r.map(v=>`<td class="${i === 0 ? 'hd' : typeof v === 'number' ? 'r' : ''}">${v}</td>`).join('')}</tr>`).join('');
+
+// Копіювання в буфер обміну із запасним способом для браузерів без доступу до нього
+async function copyText(text){
+  try{ await navigator.clipboard.writeText(text); return true; }
+  catch(e){
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+    document.body.appendChild(ta); ta.select();
+    let ok = false;
+    try{ ok = document.execCommand('copy'); }catch(_){}
+    ta.remove();
+    return ok;
+  }
+}
+const btn = document.getElementById('copyBtn');
+btn.addEventListener('click', async ()=>{
+  if(!await copyText(DATA.map(r=>r.join('\t')).join('\n'))) return;
+  btn.innerHTML = '<span class="ms">check</span>Скопійовано';
+  setTimeout(()=>{ btn.innerHTML = '<span class="ms">content_copy</span>Скопіювати дані'; }, 1600);
+});
+
+/* ---------- КОНСТРУКТОР ЗАПИТІВ: SELECT, WHERE (до 2 умов), ORDER BY (до 2 стовпців) ---------- */
+(function(){
+  const L = ['A', 'B', 'C', 'D', 'E'], FIELDS = DATA[0], ROWS = DATA.slice(1);
+  const NUM = [false, false, true, true, false];
+  const VALS = { 1:['Вечірка', 'Карткова', 'Сімейна', 'Стратегія'], 2:[200, 300, 500, 700, 1000, 1500], 3:[6, 7, 8, 10, 12, 14], 4:['Так', 'Ні'] };
+  const OPS_T = ['='], OPS_N = ['=', '>', '<', '>=', '<='], OP_SHOW = { '=':'=', '>':'>', '<':'<', '>=':'≥', '<=':'≤' };
+  const esc = s=>String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const lit = (c, v)=>NUM[c] ? String(v) : `'${v}'`;
+  const form = document.getElementById('qbForm'), out = document.getElementById('qbOut'), copyBtn = document.getElementById('qbCopy'), runBtn = document.getElementById('qbRun');
+  let cols = [], star = false, conds = [], order = [];
+  const ready = c=>c.c !== '' && c.v !== '';
+
+  function queryText(){
+    if(!star && !cols.length) return null;
+    let s = 'SELECT ' + (star ? '*' : cols.map(c=>L[c]).join(', '));
+    conds.filter(ready).forEach((c, i)=>{ s += ` ${i ? c.join : 'WHERE'} ${L[c.c]} ${c.op} ${lit(c.c, c.v)}`; });
+    const o = order.filter(o=>o.c !== '');
+    if(o.length) s += ' ORDER BY ' + o.map(o=>L[o.c] + (o.desc ? ' DESC' : '')).join(', ');
+    return s;
+  }
+  const formula = q=>`=QUERY(Ігри!A1:E13; "${q}")`;
+  function test(r, w){ const a = r[w.c], v = NUM[w.c] ? +w.v : w.v; return { '=':a === v, '>':a > v, '<':a < v, '>=':a >= v, '<=':a <= v }[w.op]; }
+  function rows(){
+    const w = conds.filter(ready), groups = [];
+    w.forEach((c, i)=>{ if(i === 0 || c.join === 'OR') groups.push([c]); else groups[groups.length - 1].push(c); });
+    let res = ROWS.filter(r=>!groups.length || groups.some(g=>g.every(c=>test(r, c))));
+    const o = order.filter(o=>o.c !== '');
+    if(o.length) res = res.slice().sort((a, b)=>{
+      for(const k of o){ const d = NUM[k.c] ? a[k.c] - b[k.c] : String(a[k.c]).localeCompare(String(b[k.c]), 'uk'); if(d) return k.desc ? -d : d; }
+      return 0;
+    });
+    return res;
+  }
+  function drawForm(){
+    let h = '<div class="qb-row"><span class="qb-tag t1">SELECT</span>'
+      + `<button type="button" class="colchip${star ? ' on' : ''}" data-star>*<small>усі</small></button>`
+      + L.map((l, i)=>`<button type="button" class="colchip${cols.includes(i) ? ' on' : ''}" data-col="${i}">${l}<small>${FIELDS[i]}</small></button>`).join('') + '</div>';
+    conds.forEach((c, i)=>{
+      h += '<div class="qb-row">' + (i ? `<select class="join" data-i="${i}" data-k="join"><option${c.join === 'AND' ? ' selected' : ''}>AND</option><option${c.join === 'OR' ? ' selected' : ''}>OR</option></select>` : '<span class="qb-tag t3">WHERE</span>')
+        + `<select data-i="${i}" data-k="c"><option value="">стовпець…</option>${[1, 2, 3, 4].map(f=>`<option value="${f}"${c.c === f ? ' selected' : ''}>${L[f]} · ${FIELDS[f]}</option>`).join('')}</select>`
+        + `<select data-i="${i}" data-k="op"${c.c === '' ? ' disabled' : ''}>${(c.c !== '' && NUM[c.c] ? OPS_N : OPS_T).map(o=>`<option value="${o}"${c.op === o ? ' selected' : ''}>${OP_SHOW[o]}</option>`).join('')}</select>`
+        + `<select data-i="${i}" data-k="v"${c.c === '' ? ' disabled' : ''}><option value="">значення…</option>${c.c === '' ? '' : VALS[c.c].map(v=>`<option value="${v}"${String(c.v) === String(v) ? ' selected' : ''}>${NUM[c.c] ? v : `'${v}'`}</option>`).join('')}</select>`
+        + `<button class="rm" type="button" data-rm="${i}" title="Прибрати умову">✕</button></div>`;
+    });
+    order.forEach((o, i)=>{
+      h += `<div class="qb-row"><span class="qb-tag t4">${i ? ', потім' : 'ORDER BY'}</span>`
+        + `<select data-o="${i}" data-k="c"><option value="">стовпець…</option>${L.map((l, f)=>`<option value="${f}"${o.c === f ? ' selected' : ''}>${l} · ${FIELDS[f]}</option>`).join('')}</select>`
+        + `<select data-o="${i}" data-k="desc"><option value="0"${o.desc ? '' : ' selected'}>ASC — за зростанням</option><option value="1"${o.desc ? ' selected' : ''}>DESC — за спаданням</option></select>`
+        + `<button class="rm" type="button" data-orm="${i}" title="Прибрати сортування">✕</button></div>`;
+    });
+    h += '<div class="qb-row">' + (conds.length < 2 ? `<button class="qb-add" type="button" data-add>+ ${conds.length ? 'Ще одна умова (AND / OR)' : 'Умова WHERE'}</button>` : '')
+      + (order.length < 2 ? `<button class="qb-add" type="button" data-oadd>+ ${order.length ? 'Ще один стовпець сортування' : 'Сортування ORDER BY'}</button>` : '') + '</div>';
+    form.innerHTML = h;
+  }
+  // Формула оновлюється одразу, а вибірка — лише після «Виконати»
+  function update(){
+    const q = queryText();
+    copyBtn.disabled = runBtn.disabled = !q;
+    out.innerHTML = q ? `=QUERY(<span class="r0">Ігри!A1:E13</span>; <span class="str">"${esc(q)}"</span>)` : '=QUERY(<span class="r0">Ігри!A1:E13</span>; <span class="str">"SELECT <span class="ph">… обери стовпці</span>"</span>)';
+    const prev = document.getElementById('qbPrev'), n = document.getElementById('qbN');
+    if(prev.innerHTML){ prev.innerHTML = ''; n.textContent = ''; }
+  }
+  function run(){
+    const q = queryText(); if(!q) return;
+    const prev = document.getElementById('qbPrev'), n = document.getElementById('qbN');
+    const cs = star ? [0, 1, 2, 3, 4] : cols, res = rows();
+    n.textContent = `Вибірка: ${res.length} з ${ROWS.length} ігор`;
+    // Ширини стовпців беремо з основної таблиці, щоб вибірка виглядала так само
+    const w = [...document.querySelectorAll('#dataTable tr:first-child th')].map(th=>th.getBoundingClientRect().width);
+    prev.innerHTML = `<colgroup><col style="width:${w[0]}px">${cs.map(c=>`<col style="width:${w[c + 1]}px">`).join('')}</colgroup><tr><th></th>${cs.map((c, i)=>`<th>${L[i]}</th>`).join('')}</tr><tr><th>1</th>${cs.map(c=>`<td class="hd">${FIELDS[c]}</td>`).join('')}</tr>`
+      + res.map((r, k)=>`<tr><th>${k + 2}</th>${cs.map(c=>`<td class="${NUM[c] ? 'r' : ''}">${r[c]}</td>`).join('')}</tr>`).join('');
+  }
+  runBtn.addEventListener('click', run);
+  form.addEventListener('change', e=>{
+    const s = e.target.closest('select'); if(!s) return;
+    if(s.dataset.o !== undefined){ const o = order[+s.dataset.o]; if(s.dataset.k === 'c') o.c = s.value === '' ? '' : +s.value; else o.desc = s.value === '1'; update(); return; }
+    const c = conds[+s.dataset.i], k = s.dataset.k;
+    if(k === 'c'){ c.c = s.value === '' ? '' : +s.value; c.op = '='; c.v = ''; drawForm(); }
+    else c[k] = s.value;
+    update();
+  });
+  form.addEventListener('click', e=>{
+    const b = e.target.closest('button'); if(!b) return;
+    if(b.dataset.col !== undefined){ const i = +b.dataset.col, n = cols.indexOf(i); star = false; if(n >= 0) cols.splice(n, 1); else cols.push(i); }
+    else if(b.hasAttribute('data-star')){ star = !star; cols = []; }
+    else if(b.hasAttribute('data-add')) conds.push({ c:'', op:'=', v:'', join:'AND' });
+    else if(b.dataset.rm !== undefined) conds.splice(+b.dataset.rm, 1);
+    else if(b.hasAttribute('data-oadd')) order.push({ c:'', desc:false });
+    else if(b.dataset.orm !== undefined) order.splice(+b.dataset.orm, 1);
+    drawForm(); update();
+  });
+  copyBtn.addEventListener('click', async ()=>{
+    const q = queryText(); if(!q) return;
+    if(await copyText(formula(q))){
+      copyBtn.innerHTML = '<span class="ms">check</span>Скопійовано';
+      setTimeout(()=>{ copyBtn.innerHTML = '<span class="ms">content_copy</span>Скопіювати запит'; }, 1600);
+    }
+  });
+  drawForm(); update();
+})();
+</script>
+</body>
+</html>
