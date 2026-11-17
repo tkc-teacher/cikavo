@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тематична робота · Інтернет. Інформаційні процеси та системи — 5 клас</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --accent:#2F5BD3; --accent-dark:#1F3F9E; --accent-soft:#E8EEFC;
+    --label:#E2702B; --bg:#F5F7FD; --line:#DFE5F5;
+    --hud-bar:linear-gradient(90deg, #2F5BD3, #2BB3A3);
+  }
+  .rules{display:grid; grid-template-columns:repeat(4, 1fr); gap:10px; margin-top:14px;}
+  @media (max-width:640px){ .rules{grid-template-columns:repeat(2, 1fr);} }
+  .rule{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 12px 10px; text-align:center; font-size:14px;}
+  .rule b{display:block; font-family:'Baloo 2',sans-serif; font-size:26px; line-height:1.1; color:var(--accent);}
+  .rule svg{width:30px; height:30px; display:block; margin:0 auto 2px;}
+
+  /* ілюстрація над запитанням */
+  .q-ill{display:flex; justify-content:center; margin:0 0 14px;}
+  .q-ill svg{width:100%; max-width:340px; height:auto; max-height:170px;}
+  .q-ill.wide svg{max-width:420px;}
+  /* варіанти з картинкою */
+  .o-ic{display:inline-block; width:1.7em; margin-right:6px; font-size:20px; text-align:center; vertical-align:-2px;}
+  kbd{display:inline-block; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; min-width:2em; text-align:center; padding:1px 9px; border:1.5px solid #C9D3EE; border-bottom-width:3.5px; border-radius:7px; background:#fff; color:var(--ink);}
+  .mq-pic kbd{font-size:17px;}
+  .quiz-options code, .quiz-q code{font-family:ui-monospace, Menlo, Consolas, monospace; font-size:.93em; background:var(--accent-soft); border-radius:6px; padding:1px 6px;}
+</style>
+</head>
+<body data-lesson="test5-internet-info-processes" data-hud="5 клас · Тематична робота: Інтернет. Інформаційні процеси">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · 5 клас · Тематична робота</div>
+      <h1>Інтернет. Інформаційні процеси та системи</h1>
+      <p>Перевір, що запам'ятав з першого розділу: інформаційні процеси, передавання даних, мережі, пошук і достовірність інформації, програми, файли й папки.</p>
+      <button class="btn-primary" onclick="document.getElementById('testSection').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="56" fill="#E8EEFC"/>
+      <circle cx="70" cy="68" r="34" fill="#2F5BD3"/>
+      <path d="M36 68h68M70 34v68" stroke="#8FB0F5" stroke-width="2.5"/>
+      <ellipse cx="70" cy="68" rx="15" ry="34" stroke="#8FB0F5" stroke-width="2.5"/>
+      <path d="M41 51c18 6 40 6 58 0M41 85c18-6 40-6 58 0" stroke="#8FB0F5" stroke-width="2.5"/>
+      <circle cx="70" cy="68" r="34" stroke="#1F3F9E" stroke-width="3"/>
+      <rect x="86" y="80" width="38" height="44" rx="6" fill="#fff" stroke="#1F3F9E" stroke-width="3"/>
+      <path d="M94 93l4 4 7-8M94 106l4 4 7-8" stroke="#2BB3A3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M110 94h7M110 107h7" stroke="#DFE5F5" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="26" cy="36" r="5" fill="#FFC93C"/><circle cx="116" cy="30" r="4" fill="#2BB3A3"/><circle cx="20" cy="104" r="3.5" fill="#E2702B"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" data-guide>
+    <div class="step-label">Перед стартом</div>
+    <h2>Як проходити роботу</h2>
+    <div class="rules">
+      <div class="rule"><b>25</b>запитань</div>
+      <div class="rule"><b>42</b>нейрончики можна заробити</div>
+      <div class="rule"><svg viewBox="0 0 24 24" fill="none"><line x1="16.2" y1="12" x2="20.3" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="20.3" cy="12" r="1.2" fill="#FFC93C"/><line x1="14.1" y1="15.6" x2="16.6" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="20" r="1.2" fill="#FFC93C"/><line x1="9.9" y1="15.6" x2="7.4" y2="20" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="20" r="1.2" fill="#FFC93C"/><line x1="7.8" y1="12" x2="3.7" y2="12" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="3.7" cy="12" r="1.2" fill="#FFC93C"/><line x1="9.9" y1="8.4" x2="7.4" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="7.4" cy="4" r="1.2" fill="#FFC93C"/><line x1="14.1" y1="8.4" x2="16.6" y2="4" stroke="#FFC93C" stroke-width="1.6" stroke-linecap="round"/><circle cx="16.6" cy="4" r="1.2" fill="#FFC93C"/><circle cx="12" cy="12" r="4.4" fill="#FFC93C"/></svg>нейрончик за кожну правильну відповідь</div>
+      <div class="rule"><b>1</b>спроба</div>
+    </div>
+    <ul>
+      <li>Обери відповідь — її ще можна змінити, поки не натиснув «Далі».</li>
+      <li>Після «Далі» повернутися до запитання не вийде.</li>
+      <li>Наприкінці натисни «Поділитися результатами» й надішли посилання вчителю.</li>
+    </ul>
+  </section>
+
+  <section class="block" id="testSection">
+    <div class="step-label">Тематична робота</div>
+    <h2>Інтернет. Інформаційні процеси та системи</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Тематична робота · «Інтернет. Інформаційні процеси та системи» · 5 клас</span><span class="credits">Пінгвін Тукс — Larry Ewing, The GIMP. Логотипи — з Вікісховища.</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- ІЛЮСТРАЦІЇ (власні SVG) ---------- */
+const S = (svg, cls = '')=>`<div class="q-ill ${cls}"><svg viewBox="0 0 320 150" fill="none" stroke-linecap="round" stroke-linejoin="round">${svg}</svg></div>`;
+const phone = (x, y, inner = '')=>`<rect x="${x}" y="${y}" width="64" height="118" rx="12" fill="#1B1B3A"/><rect x="${x+5}" y="${y+12}" width="54" height="94" rx="4" fill="#fff"/>${inner}`;
+
+const ILL = {
+  gallery: S(`
+    ${phone(128, 16, `
+      <rect x="138" y="34" width="22" height="22" rx="3" fill="#8FB0F5"/><rect x="164" y="34" width="22" height="22" rx="3" fill="#FFC93C"/>
+      <rect x="138" y="60" width="22" height="22" rx="3" fill="#2BB3A3"/><rect x="164" y="60" width="22" height="22" rx="3" fill="#F4A3A8"/>
+      <rect x="138" y="86" width="22" height="14" rx="3" fill="#DFE5F5"/>
+      <rect x="162" y="84" width="26" height="20" rx="4" fill="#fff" stroke="#E2702B" stroke-width="2.5"/>
+      <path d="M165 100l7-7 5 5 3-3 6 5" stroke="#E2702B" stroke-width="2"/><circle cx="181" cy="89" r="2" fill="#E2702B"/>`)}
+    <path d="M70 50l40 30" stroke="#E2702B" stroke-width="3" stroke-dasharray="6 6"/><path d="M104 70l8 11-13-1" stroke="#E2702B" stroke-width="3"/>
+    <rect x="30" y="26" width="46" height="34" rx="7" fill="#1F3F9E"/><circle cx="53" cy="43" r="10" fill="#8FB0F5" stroke="#fff" stroke-width="3"/><rect x="38" y="21" width="14" height="8" rx="2" fill="#1F3F9E"/>
+    <text x="240" y="62" font-family="Baloo 2" font-size="15" fill="#5A5F7A">Галерея</text><text x="240" y="80" font-family="Baloo 2" font-size="15" fill="#5A5F7A">+1 фото</text>`),
+
+  voice: S(`
+    ${phone(30, 16, `<rect x="42" y="40" width="40" height="18" rx="9" fill="#2F5BD3"/><path d="M50 49h2M55 44v10M60 46v6M65 43v12M70 47v4" stroke="#fff" stroke-width="2"/><circle cx="62" cy="90" r="9" fill="#E2702B"/><rect x="59" y="84" width="6" height="9" rx="3" fill="#fff"/>`)}
+    ${phone(226, 16, `<rect x="238" y="64" width="40" height="18" rx="9" fill="#E8EEFC"/><path d="M246 73h2M251 68v10M256 70v6M261 67v12M266 71v4" stroke="#2F5BD3" stroke-width="2"/>`)}
+    <path d="M110 75h96" stroke="#2BB3A3" stroke-width="4" stroke-dasharray="2 10"/><path d="M198 66l11 9-11 9" stroke="#2BB3A3" stroke-width="4"/>`),
+
+  cpu: S(`
+    <rect x="110" y="25" width="100" height="100" rx="12" fill="#1F3F9E"/>
+    <rect x="128" y="43" width="64" height="64" rx="6" fill="#2F5BD3" stroke="#8FB0F5" stroke-width="2"/>
+    <path d="M128 75h-8M128 60h-8M128 90h-8M192 60h8M192 75h8M192 90h8M145 43v-8M160 43v-8M175 43v-8M145 107v8M160 107v8M175 107v8" stroke="#8FB0F5" stroke-width="2"/>
+    ${[0,1,2,3,4,5].map(i=>`<path d="M${110-10} ${35+i*16}h-60" stroke="#C9D3EE" stroke-width="3"/><path d="M${210+10} ${35+i*16}h60" stroke="#C9D3EE" stroke-width="3"/>`).join('')}
+    <circle cx="160" cy="75" r="9" fill="#FFC93C"/>`),
+
+  bits: S(`
+    <rect x="16" y="45" width="56" height="60" rx="8" fill="#E8EEFC" stroke="#2F5BD3" stroke-width="2.5"/><text x="44" y="83" text-anchor="middle" font-family="Baloo 2" font-size="22" font-weight="700" fill="#1F3F9E">Hi!</text>
+    <rect x="248" y="45" width="56" height="60" rx="8" fill="#E8EEFC" stroke="#2F5BD3" stroke-width="2.5"/><text x="276" y="83" text-anchor="middle" font-family="Baloo 2" font-size="22" font-weight="700" fill="#1F3F9E">?</text>
+    <path d="M78 75h164" stroke="#C9D3EE" stroke-width="30"/>
+    <text x="160" y="82" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="17" font-weight="700" fill="#1F3F9E" letter-spacing="2">010010000110</text>`),
+
+  fiber: S(`
+    <path d="M10 95c60 0 80-50 150-50s90 50 150 50" stroke="#1B1B3A" stroke-width="22"/>
+    <path d="M10 95c60 0 80-50 150-50s90 50 150 50" stroke="#2F5BD3" stroke-width="12"/>
+    <path d="M10 95c60 0 80-50 150-50s90 50 150 50" stroke="#FFF6C9" stroke-width="4" stroke-dasharray="14 22"/>
+    <circle cx="70" cy="70" r="5" fill="#FFC93C"/><circle cx="160" cy="45" r="5" fill="#FFC93C"/><circle cx="250" cy="70" r="5" fill="#FFC93C"/>
+    <text x="160" y="135" text-anchor="middle" font-family="Baloo 2" font-size="15" fill="#5A5F7A">оптоволоконний кабель</text>`),
+
+  headphones: S(`
+    ${phone(36, 16, `<circle cx="68" cy="60" r="16" fill="#E8EEFC"/><path d="M62 54l12 12-6 5V49l6 5-12 12" stroke="#2F5BD3" stroke-width="2.5"/>`)}
+    <path d="M200 86v-16a40 40 0 0 1 80 0v16" stroke="#1B1B3A" stroke-width="8"/>
+    <rect x="190" y="80" width="22" height="38" rx="8" fill="#2F5BD3"/><rect x="268" y="80" width="22" height="38" rx="8" fill="#2F5BD3"/>
+    <path d="M118 62q15 13 0 26M132 52q26 23 0 46M146 42q37 33 0 66" stroke="#2BB3A3" stroke-width="3.5"/>`),
+
+  router: S(`
+    <path d="M112 88l-14-62M208 88l14-62" stroke="#1B1B3A" stroke-width="7"/>
+    <rect x="80" y="84" width="160" height="44" rx="12" fill="#1F3F9E"/>
+    <circle cx="104" cy="106" r="4" fill="#2BB3A3"/><circle cx="120" cy="106" r="4" fill="#2BB3A3"/><circle cx="136" cy="106" r="4" fill="#FFC93C"/>
+    <path d="M190 106h28" stroke="#8FB0F5" stroke-width="4"/>
+    <path d="M146 54q14-14 28 0M138 44q22-22 44 0M130 34q30-30 60 0" stroke="#2BB3A3" stroke-width="4"/><circle cx="160" cy="64" r="4" fill="#2BB3A3"/>`),
+
+  lan: S(`
+    ${[40,160,280].map(x=>`<rect x="${x-26}" y="14" width="52" height="34" rx="4" fill="#1F3F9E"/><rect x="${x-21}" y="18" width="42" height="25" rx="2" fill="#8FB0F5"/><rect x="${x-10}" y="48" width="20" height="5" fill="#1B1B3A"/>`).join('')}
+    <rect x="110" y="96" width="100" height="22" rx="5" fill="#2BB3A3"/>${[0,1,2,3,4].map(i=>`<rect x="${122+i*16}" y="103" width="9" height="8" rx="1.5" fill="#fff"/>`).join('')}
+    <path d="M40 54v20q0 12 12 12h70v10M160 54v42M280 54v20q0 12-12 12h-70v10" stroke="#E2702B" stroke-width="3"/>
+    <text x="160" y="142" text-anchor="middle" font-family="Baloo 2" font-size="14" fill="#5A5F7A">кабінет інформатики</text>`),
+
+  datacenter: S(`
+    ${[60,130,200].map(x=>`<rect x="${x}" y="14" width="60" height="122" rx="6" fill="#1B1B3A"/>${[0,1,2,3,4,5].map(i=>`<rect x="${x+7}" y="${22+i*19}" width="46" height="13" rx="2" fill="#2E3560"/><circle cx="${x+14}" cy="${28.5+i*19}" r="2.4" fill="${(i+x)%3 ? '#2BB3A3' : '#FFC93C'}"/><path d="M${x+22} ${28.5+i*19}h24" stroke="#4A5288" stroke-width="2"/>`).join('')}`).join('')}`),
+
+
+  bus: S(`
+    <rect x="70" y="10" width="180" height="130" rx="10" fill="#fff" stroke="#2F5BD3" stroke-width="2.5"/>
+    <rect x="70" y="10" width="180" height="30" rx="10" fill="#2F5BD3"/><rect x="70" y="30" width="180" height="10" fill="#2F5BD3"/>
+    <text x="160" y="31" text-anchor="middle" font-family="Baloo 2" font-size="15" font-weight="700" fill="#fff">Автобус № 24 · розклад</text>
+    ${['07:15','08:40','10:05','12:30'].map((t,i)=>`<text x="96" y="${62+i*20}" font-family="Nunito Sans" font-size="14" font-weight="700" fill="#1B1B3A">${t}</text><path d="M150 ${57+i*20}h76" stroke="#DFE5F5" stroke-width="5"/>`).join('')}
+    <g transform="rotate(-12 236 118)"><rect x="196" y="102" width="86" height="30" rx="6" fill="#FDE6E1" stroke="#D2452B" stroke-width="2.5"/><text x="239" y="123" text-anchor="middle" font-family="Baloo 2" font-size="16" font-weight="700" fill="#D2452B">2023 рік</text></g>`),
+
+  fake: S(`
+    <rect x="30" y="8" width="260" height="136" rx="12" fill="#fff" stroke="#DFE5F5" stroke-width="2.5"/>
+    <circle cx="54" cy="32" r="12" fill="#C9D3EE"/><text x="74" y="29" font-family="Nunito Sans" font-size="12" font-weight="800" fill="#1B1B3A">Super_News_777</text><text x="74" y="43" font-family="Nunito Sans" font-size="11" fill="#9AA0B8">щойно</text>
+    <text x="44" y="70" font-family="Nunito Sans" font-size="15" font-weight="800" fill="#D2452B">ТЕРМІНОВО!!! 😱</text>
+    <text x="44" y="90" font-family="Nunito Sans" font-size="13" fill="#1B1B3A">Канікули скасовують — навчання</text>
+    <text x="44" y="107" font-family="Nunito Sans" font-size="13" fill="#1B1B3A">в суботу й неділю!</text>
+    <text x="44" y="128" font-family="Nunito Sans" font-size="13" font-weight="800" fill="#2F5BD3">ПЕРЕШЛИ ВСІМ ДРУЗЯМ!!!</text>`),
+
+  file: S(`<g transform="translate(-50 0)">
+    <path d="M120 12h56l28 28v98H120z" fill="#fff" stroke="#2F5BD3" stroke-width="3"/>
+    <path d="M176 12v28h28" fill="#E8EEFC" stroke="#2F5BD3" stroke-width="3"/>
+    <path d="M162 50l-22 36h44z" fill="#2BB3A3"/><path d="M162 66l-18 30h36z" fill="#1F8F81"/><rect x="157" y="96" width="10" height="10" fill="#8A5A2B"/>
+    <rect x="132" y="112" width="60" height="18" rx="4" fill="#2F5BD3"/><text x="162" y="125.5" text-anchor="middle" font-family="Baloo 2" font-size="12" font-weight="700" fill="#fff">PNG</text></g>
+    <text x="240" y="80" font-family="Baloo 2" font-size="18" font-weight="700" fill="#1B1B3A" text-anchor="middle">Ялинка.png</text>`),
+
+  tree: S(`
+    <g font-family="Nunito Sans" font-size="14" font-weight="700" fill="#1B1B3A">
+      <rect x="40" y="10" width="26" height="20" rx="3" fill="#8FB0F5"/><text x="74" y="25">Диск C:</text>
+      <path d="M53 32v20h20M53 52v0" stroke="#C9D3EE" stroke-width="2.5" fill="none"/>
+      <path d="M78 42h10l4 4h14v16H78z" fill="#FFC93C"/><text x="114" y="58">Навчання</text>
+      <path d="M92 64v20h20" stroke="#C9D3EE" stroke-width="2.5" fill="none"/>
+      <path d="M117 74h10l4 4h14v16h-28z" fill="#FFC93C"/><text x="153" y="90">Математика</text>
+      <path d="M131 96v20h20" stroke="#C9D3EE" stroke-width="2.5" fill="none"/>
+      <path d="M156 104h16l6 6v24h-22z" fill="#fff" stroke="#2F5BD3" stroke-width="2"/><text x="186" y="124">Задачі.docx</text>
+    </g>`),
+
+  bin: S(`
+    <rect x="70" y="20" width="76" height="56" rx="6" fill="#fff" stroke="#2F5BD3" stroke-width="2.5"/><path d="M80 34h40M80 46h56M80 58h30" stroke="#DFE5F5" stroke-width="5"/>
+    <path d="M150 50q30-26 66 2" stroke="#E2702B" stroke-width="3" stroke-dasharray="6 6"/><path d="M208 42l9 10-13 2" stroke="#E2702B" stroke-width="3"/>
+    <path d="M206 66h56l-6 70h-44z" fill="#E8EEFC" stroke="#1F3F9E" stroke-width="3"/><rect x="200" y="58" width="68" height="9" rx="3" fill="#1F3F9E"/>
+    <path d="M222 80v44M234 80v44M246 80v44" stroke="#8FB0F5" stroke-width="3"/>`)
+};
+const kb = (...k)=>k.map(x=>`<kbd>${x}</kbd>`).join(' + ');
+const ic = e=>`<span class="o-ic">${e}</span>`;
+
+/* ---------- ЗАПИТАННЯ ----------
+   Порядок варіантів перемішується для кожного учня (correct — індекс у списку нижче). */
+const QUESTIONS = [
+  // Інформаційні процеси та системи
+  { q: ILL.gallery + 'Ти сфотографував котика, і фото з\'явилося в галереї телефону. Який інформаційний процес відбувся з фото в галереї?',
+    opts: ['Зберігання', 'Передавання', 'Опрацювання', 'Пошук'], correct: 0 },
+  { q: ILL.voice + 'Ти надсилаєш другові голосове повідомлення. Який це інформаційний процес?',
+    opts: ['Зберігання', 'Передавання', 'Опрацювання', 'Захист'], correct: 1 },
+  { q: 'Ти розв\'язуєш задачу з математики: з умови знаходиш відповідь. Який це інформаційний процес?',
+    opts: ['Опрацювання', 'Зберігання', 'Передавання', 'Пошук'], correct: 0 },
+  { q: 'Що з цього — пристрій <b>введення</b> даних?',
+    opts: [ic('⌨️') + 'Клавіатура', ic('🖥️') + 'Монітор', ic('🖨️') + 'Принтер', ic('🔊') + 'Колонки'], correct: 0 },
+  { q: ILL.cpu + 'Цей пристрій — «мозок» комп\'ютера, він опрацьовує дані. Як він називається?',
+    opts: ['Процесор', 'Монітор', 'Флешка', 'Роутер'], correct: 0 },
+
+  // Передавання даних
+  { q: ILL.bits + 'У якому вигляді цифрові пристрої передають будь-яке повідомлення?',
+    opts: ['Як ланцюжок нулів і одиниць', 'Як маленькі малюнки', 'Як звичайні літери', 'Як паперові листи'], correct: 0 },
+  { q: ILL.fiber + 'Що біжить оптоволоконним кабелем?',
+    opts: ['Спалахи світла', 'Вода', 'Звукові хвилі', 'Повітря'], correct: 0 },
+  { q: ILL.headphones + 'Як бездротові навушники зазвичай з\'єднуються з телефоном?',
+    opts: ['Через Bluetooth', 'Через оптоволокно', 'Через супутник', 'Через кабель USB'], correct: 0 },
+  { q: ILL.router + 'Як називається цей пристрій, що роздає Wi-Fi удома?',
+    opts: ['Роутер', 'Сканер', 'Принтер', 'Процесор'], correct: 0 },
+
+  // Мережі та Інтернет
+  { q: ILL.lan + 'Комп\'ютери одного кабінету з\'єднані між собою. Яка це мережа?',
+    opts: ['Локальна', 'Глобальна', 'Супутникова', 'Соціальна'], correct: 0 },
+  { q: 'Правда чи неправда? Познач кожне твердження.',
+    tf: [
+      { text: 'Інтернет — глобальна мережа, що об\'єднує мільйони комп\'ютерів і мереж.', correct: true },
+      { text: 'Комп\'ютери одного кабінету утворюють глобальну мережу.', correct: false },
+      { text: 'Між континентами дані здебільшого біжать кабелями по дну океанів.', correct: true },
+      { text: 'Якщо пошкодити один кабель, Інтернет зникне в усьому світі.', correct: false }
+    ] },
+  { q: 'Хто за щомісячну плату під\'єднує твій дім до Інтернету?',
+    opts: ['Провайдер', 'Роутер', 'Вчитель', 'Антивірус'], correct: 0 },
+  { q: ILL.datacenter + 'Як називається будівля з сотнями серверів, де зберігаються сайти й відео?',
+    opts: ['Дата-центр', 'Бібліотека', 'Кабінет інформатики', 'Магазин комп\'ютерів'], correct: 0 },
+
+  // Пошук і достовірність інформації
+  { q: 'Розклади: це браузер чи пошукова система? Клацни картку, а потім потрібний кошик.',
+    buckets: ['Браузери', 'Пошукові системи'],
+    items: [
+      { html: '<img src="images/chrome.svg" alt="">Google Chrome', bucket: 0 },
+      { html: '<img src="images/firefox.svg" alt="">Mozilla Firefox', bucket: 0 },
+      { html: '<img src="images/edge.svg" alt="">Microsoft Edge', bucket: 0 },
+      { html: '<img src="images/google-g.svg" alt="">Google', bucket: 1 },
+      { html: '<img src="images/bing.svg" alt="">Bing', bucket: 1 },
+      { html: '<img src="images/yahoo.svg" alt="">Yahoo!', bucket: 1 }
+    ] },
+  { q: 'Ти береш для своєї презентації малюнок з чужого сайту. Що треба зробити?',
+    opts: ['Вказати автора й сайт, звідки взято малюнок', 'Підписати малюнок своїм іменем', 'Нічого — усе з Інтернету можна брати', 'Трохи змінити кольори малюнка'], correct: 0 },
+  { q: ILL.bus + 'Чого бракує розкладу автобусів минулого року?',
+    opts: ['Актуальності', 'Зрозумілості', 'Кольорів', 'Цифр'], correct: 0 },
+  { q: ILL.fake + 'Що в цьому дописі найбільше вказує на фейк?',
+    opts: ['Немає джерела, але просять переслати всім', 'Під дописом можна залишити коментар', 'У дописі є смайлик', 'Допис короткий'], correct: 0 },
+
+  // Апаратне й програмне забезпечення
+  { q: 'Що з цього — <b>апаратна</b> складова комп\'ютера?',
+    opts: [ic('🖱️') + 'Миша', ic('🎮') + 'Гра', ic('🌐') + 'Браузер', ic('🪟') + 'Windows'], correct: 0 },
+  { q: 'Яка з цих програм — операційна система?',
+    opts: ['Windows', 'Paint', 'Google Chrome', 'Minecraft'], correct: 0 },
+  { q: 'Поєднай назву операційної системи з її логотипом. Клацни назву, а потім логотип.',
+    pairs: [
+      { name: 'Windows', pic: '<img src="images/os-windows.svg" alt="">' },
+      { name: 'macOS',   pic: '<img src="images/os-apple.svg" alt="">' },
+      { name: 'Linux',   pic: '<img src="images/os-linux.svg" alt="">' },
+      { name: 'Android', pic: '<img src="images/os-android.svg" alt="">' }
+    ] },
+
+  // Файли й папки
+  { q: ILL.file + 'Яке розширення у файлу «Ялинка.png»?',
+    opts: ['png', 'Ялинка', 'Ялинка.png', 'файл'], correct: 0 },
+  { q: ILL.tree + 'Який шлях до файлу «Задачі.docx» правильний?',
+    opts: ['<code>C:\\Навчання\\Математика\\Задачі.docx</code>', '<code>C:\\Математика\\Навчання\\Задачі.docx</code>', '<code>Задачі.docx\\Математика\\Навчання\\C:</code>', '<code>C:\\Задачі.docx</code>'], correct: 0 },
+  { q: 'Як скопіювати файл в іншу папку? Клацай кроки по порядку.',
+    order: ['Виділити файл', 'Натиснути ' + kb('Ctrl', 'C'), 'Відкрити іншу папку', 'Натиснути ' + kb('Ctrl', 'V')] },
+  { q: 'Поєднай дію зі сполученням клавіш. Клацни дію, а потім клавіші.',
+    pairs: [
+      { name: 'Копіювати', pic: kb('Ctrl', 'C') },
+      { name: 'Вставити',  pic: kb('Ctrl', 'V') },
+      { name: 'Вирізати',  pic: kb('Ctrl', 'X') },
+      { name: 'Скасувати', pic: kb('Ctrl', 'Z') }
+    ] },
+  { q: ILL.bin + 'Куди потрапляє файл, видалений з диска комп\'ютера?',
+    opts: ['У Кошик', 'На флешку', 'В Інтернет', 'У принтер'], correct: 0 }
+];
+
+// перемішуємо варіанти; correct перераховуємо
+const questions = QUESTIONS.map(x=>{
+  if(!x.opts) return x;   // групові завдання перемішує ядро
+  const order = shuffle(x.opts.map((_, i)=>i));
+  return { q: x.q, opts: order.map(i=>x.opts[i]), correct: order.indexOf(x.correct) };
+});
+
+makeFinalQuiz('finalQuiz', questions, {
+  html: true, perCorrect: 1, bonus: 0, reveal: false, retake: false,
+  title: 'Роботу завершено!',
+  summary: 'Натисни «Поділитися результатами» й надішли посилання вчителю.'
+});
+</script>
+
+</body>
+</html>

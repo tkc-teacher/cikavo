@@ -47,6 +47,7 @@
   .btn-practice:hover{background:#EEEBFD;}
   .btn-open{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13px; background:var(--purple); color:#fff; text-decoration:none; padding:8px 14px; border-radius:999px; white-space:nowrap; transition:background .15s ease;}
   .btn-open:hover{background:var(--purple-dark);}
+  .btn-test{background:#E2702B;} .btn-test:hover{background:#B9561C;}
   .tag-soon{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12px; color:var(--ink-soft); background:var(--bg); border:1px solid var(--line); padding:6px 12px; border-radius:999px; white-space:nowrap;}
 
   footer{padding:36px 24px 60px; text-align:center; color:var(--ink-soft); font-size:13.5px;}
@@ -85,7 +86,8 @@ const PLAN = [
       { title: "Порівняння інформації з різних сайтів. Властивості інформації. Авторське право. Достовірність інформації. Поняття фейку", link: "lesson-info-reliability/index.html", practice: { title: "Мій власний аватар", link: "practice-info-reliability/index.html" } },
       { title: "Поняття апаратної і програмної складової комп'ютера. Програмне забезпечення комп'ютера. Поняття операційної системи", link: "lesson-hardware-software/index.html", practice: { title: "Паспорт мого пристрою", link: "practice-hardware-software/index.html" } },
       { title: "Поняття файлу та папки. Розширення файлів, шлях до файлу", link: "lesson-files-folders/index.html", practice: { title: "Мій зоопарк", link: "practice-files-folders/index.html" } },
-      { title: "Операції над файлами і папками", link: "lesson-file-operations/index.html", practice: { title: "Листівки друзям", link: "practice-file-operations/index.html" } }
+      { title: "Операції над файлами і папками", link: "lesson-file-operations/index.html", practice: { title: "Листівки друзям", link: "practice-file-operations/index.html" } },
+      { title: "Тематична робота", test: "test-internet-info-processes/index.html" }
     ]},
     { title: "2. Комп'ютерні презентації", hours: "5 год", lessons: [
       { title: "Представлення інформації та способи її опрацювання" },
@@ -136,11 +138,13 @@ PLAN.forEach(sem=>{
       const row = document.createElement('div');
       row.className = 'lesson-row';
       const action = (lesson.practice ? `<a class="btn-practice" href="${lesson.practice.link}" title="${lesson.practice.title}">Практикуємо</a>` : '')
-        + (lesson.link
+        + (lesson.test
+          ? `<a class="btn-open btn-test" href="${lesson.test}">Перевіряємо</a>`
+          : lesson.link
           ? `<a class="btn-open" href="${lesson.link}">Вчимося</a>`
           : `<span class="tag-soon">Скоро</span>`);
       row.innerHTML = `
-        <span class="lesson-num">${i+1}</span>
+        <span class="lesson-num">${lesson.test ? '✓' : i+1}</span>
         <div class="lesson-body">
           <div class="lesson-title">${lesson.title}</div>
         </div>
