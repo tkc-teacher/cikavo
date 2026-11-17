@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Листівки друзям — Операції над файлами і папками</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#3B5BDB,#FF8A3D); --accent:#3B5BDB; --accent-dark:#2B44A8; --accent-soft:#E8EDFD; --bg:#F5F7FD; --line:#DEE4F6; }
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; white-space:nowrap; direction:ltr; font-feature-settings:'liga'; overflow:hidden; width:1em;}
+  .ms.fill{font-variation-settings:'FILL' 1;}
+  .fo{color:#F2B705;}            /* значок папки */
+  .tx{color:#5B7BD6;}
+  .docs-ic{width:22px; height:19px; flex-shrink:0;}
+  .wx-t .docs-ic{width:17px; height:15px;}            /* значок текстового файлу */
+  kbd{display:inline-block; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13.5px; line-height:1; padding:4px 7px 3px; border-radius:6px; background:#fff; border:1.5px solid #C5CEE8; box-shadow:0 2px 0 #C5CEE8; color:var(--ink); white-space:nowrap;}
+  .meta .ms{font-size:18px; margin-right:2px;}
+
+  /* Зразок: дерево папок */
+  .paper{background:#fff; border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px; font-family:'Segoe UI',system-ui,sans-serif; font-size:14.5px;}
+  .tree, .tree ul{list-style:none; margin:0; padding:0;}
+  .tree ul{padding-left:18px; margin-left:11px; border-left:2px solid #D6DCEB;}
+  .tree li{position:relative; padding:2px 0;}
+  .tree ul > li::before{content:''; position:absolute; left:-18px; top:16px; width:13px; border-top:2px solid #D6DCEB;}
+  .tree ul > li:last-child::after{content:''; position:absolute; left:-20px; top:17px; bottom:0; width:2px; background:#fff;}
+  .nd{display:inline-flex; align-items:center; gap:8px; padding:2px 4px; white-space:nowrap;}
+  .nd .ms{font-size:22px;}
+  .nd.root{font-weight:600;}
+  .nd small{color:#6B7280; font-size:12px;}
+  @media (max-width:520px){ .nd{white-space:normal;} .tree ul{padding-left:12px; margin-left:8px;} .tree ul > li::before{left:-12px; width:8px;} .tree ul > li:last-child::after{left:-14px;} }
+
+  .w{font-family:'Segoe UI',system-ui,-apple-system,sans-serif; font-size:13px; color:#1B1B1B;}
+  .hl{outline:2.5px solid #F2B705; outline-offset:1px; border-radius:5px;}
+
+  /* Ілюстрації-послідовності: кадр → стрілка → кадр */
+  .flow{display:flex; align-items:stretch; gap:6px; margin:10px 0 8px;}
+  .fl{flex:1 1 0; min-width:0; display:flex; flex-direction:column;}
+  .fl > :last-child{flex:1;}
+  .fl-n{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13.5px; color:var(--accent-dark); margin-bottom:4px; line-height:1.2;}
+  .fl-arr{display:flex; align-items:center; color:#9AA5AF;}
+  .fl-arr .ms{font-size:22px;}
+  @media (max-width:640px){ .flow{flex-direction:column;} .fl-arr{justify-content:center;} .fl-arr .ms{transform:rotate(90deg);} }
+
+  /* Вікно Провідника Windows 11 */
+  .wx{background:#fff; border:1px solid #C9CDD3; border-radius:8px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,.1); position:relative;}
+  .wx-t{display:flex; align-items:center; gap:8px; background:#EBEBEB; padding:6px 0 6px 10px; font-size:12px;}
+  .wx-t .ms{font-size:16px;}
+  .wx-t span{flex:1;}
+  .wx-t .b{width:34px; text-align:center; color:#333; font-size:14px;}
+  .wx-a{display:flex; align-items:center; gap:2px; padding:5px 8px; background:#F9F9F9; border-bottom:1px solid #E5E5E5;}
+  .wx-a div{flex:1; display:flex; align-items:center; gap:2px; background:#fff; border:1px solid #DCDCDC; border-radius:4px; padding:3px 6px; white-space:nowrap; overflow:hidden;}
+  .wx-a .ms{font-size:15px; color:#666;}
+  .wx-r{display:flex; align-items:center; gap:9px; padding:5px 12px; white-space:nowrap; position:relative;}
+  .wx-r .ms{font-size:20px;}
+  .wx-r.sel{background:#CCE4F7;}
+  .wx-r.new{background:#FFF4CC;}
+  .wx-r.drop{background:#CCE4F7; box-shadow:inset 0 0 0 1px #3B8EDB;}
+  .wx-r .ed{border:1px solid #3B8EDB; background:#fff; padding:0 4px;}
+  .wx-r .ed i{font-style:normal; background:#0078D4; color:#fff;}
+  .wx-r small{margin-left:auto; color:#6B7280; font-size:11px;}
+  .wx-body{padding:4px 0 8px; min-height:60px;}
+  .tag{margin-left:auto; display:inline-flex; align-items:center; gap:2px; background:#F2B705; color:#4A3500; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:11.5px; border-radius:999px; padding:1px 8px 0 5px;}
+  .tag .ms{font-size:15px;}
+  .drag{position:absolute; left:46%; top:62px; display:flex; flex-direction:column; align-items:center; gap:2px; transform:rotate(-4deg); opacity:.95;}
+  .drag .ms{font-size:30px; filter:drop-shadow(0 4px 6px rgba(0,0,0,.25));}
+  .drag i{font-style:normal; font-size:11px; background:#3B8EDB; color:#fff; border-radius:4px; padding:2px 6px;}
+
+  /* Контекстне меню Windows 11 */
+  .cm{background:#FBFBFB; border:1px solid #D9D9D9; border-radius:8px; box-shadow:0 6px 18px rgba(0,0,0,.14); padding:4px; font-size:12.5px;}
+  .cm-wrap{padding:2px 12px 6px; display:flex; align-items:flex-start; gap:4px;}
+  .cm-wrap .cm{flex:1; min-width:0;}
+  .cm-row{display:flex; align-items:center; gap:10px; padding:5px 8px; border-radius:4px; white-space:nowrap;}
+  .cm-row .ms{font-size:17px; color:#444;}
+  .cm-row .ms.fo{color:#F2B705;}
+  .cm-row .ms.tx{color:#5B7BD6;}
+  .cm-row .ms.r{margin-left:auto; font-size:16px;}
+  .cm-row.on{background:#E5F1FB; outline:2.5px solid #F2B705; outline-offset:-2px;}
+  .cm-sep{height:1px; background:#E5E5E5; margin:3px 2px;}
+  .cm.sub{margin-top:120px;}
+  @media (max-width:420px){ .cm-wrap{flex-direction:column;} .cm.sub{margin:0 0 0 30px;} }
+
+  /* Блокнот */
+  .np{background:#fff; border:1px solid #C9CDD3; border-radius:8px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,.1);}
+  .np-tabs{display:flex; align-items:flex-end; gap:4px; background:#EBEBEB; padding:6px 0 0 8px;}
+  .np-tab{display:flex; align-items:center; gap:8px; background:#fff; border-radius:6px 6px 0 0; padding:6px 10px; font-size:12px;}
+  .np-tab .ms{font-size:15px;}
+  .np-tabs .sp{flex:1;}
+  .np-tabs .b{width:34px; text-align:center; font-size:14px; padding-bottom:6px; color:#333;}
+  .np-menu{display:flex; gap:16px; padding:5px 12px; font-size:12px; border-bottom:1px solid #EEE;}
+  .np-text{padding:12px 14px 30px; font-size:14px; line-height:1.5;}
+  .np-text .cur{display:inline-block; width:1.5px; height:15px; background:#111; vertical-align:-2px;}
+
+  /* Робочий стіл з Кошиком */
+  .desk{border-radius:8px; padding:12px; min-height:150px; display:flex; flex-direction:column; gap:10px; align-items:flex-start;
+    background:radial-gradient(ellipse 120% 80% at 70% 120%, #6A8DEB 0, #3D63D8 45%, #1E3FA8 100%);}
+  .desk-ic{display:flex; flex-direction:column; align-items:center; gap:3px; width:76px; padding:5px 2px; border-radius:4px; color:#fff; font-size:11.5px; text-shadow:0 1px 2px rgba(0,0,0,.5); text-align:center;}
+  .desk-ic .ms{font-size:34px; color:#fff;}
+  .desk-ic .ms.fo{color:#FBC02D;}
+  .desk.row{flex-direction:row; align-items:flex-start; gap:6px; flex-wrap:wrap;}
+  .desk.row .cm-wrap{flex:1; min-width:260px; padding:0;}
+  .desk.row .cm.sub{margin-top:96px;}
+  .desk-ic.on{background:rgba(255,255,255,.25); outline:2.5px solid #F2B705;}
+</style>
+</head>
+<body data-hud="5 клас · Практична · Листівки друзям">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 5 клас · Операції над файлами і папками</div>
+    <h1>💌 Листівки друзям</h1>
+    <p>Напиши одну листівку в Блокноті, розмнож її копіюванням і розклади копії по папках на Робочому столі. А наприкінці перенеси все в Документи.</p>
+    <div class="meta"><span>⏱ 20 хв</span><span><i class="ms fill fo">folder_open</i>Провідник Windows</span><span><i class="ms tx">edit_note</i>Блокнот</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="paper">
+      <ul class="tree">
+        <li><span class="nd root"><svg class="docs-ic" viewBox="0 0 24 20" fill="none"><path d="M1 3a2 2 0 0 1 2-2h6l2 2h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2z" fill="#E39B0B"/><rect x="8" y="4" width="10" height="11" rx="1.2" fill="#fff" stroke="#3B6FD8" stroke-width="1"/><path d="M10 7h6M10 9.5h6M10 12h4" stroke="#3B6FD8" stroke-width="1.1" stroke-linecap="round"/><path d="M1 8a2 2 0 0 1 2-2h18a2 2 0 0 1 2 2l-.6 9a2 2 0 0 1-2 2H3.6a2 2 0 0 1-2-2z" fill="#FBC02D" opacity=".92"/></svg>Документи</span>
+          <ul>
+            <li><span class="nd"><i class="ms fill fo">folder</i>Листівки</span>
+              <ul>
+                <li><span class="nd"><i class="ms fill fo">folder</i>Друзям</span>
+                  <ul>
+                    <li><span class="nd"><i class="ms tx">description</i>Для Олі <small>(імена — твоїх друзів)</small></span></li>
+                    <li><span class="nd"><i class="ms tx">description</i>Для Максима</span></li>
+                  </ul>
+                </li>
+                <li><span class="nd"><i class="ms fill fo">folder</i>Рідним</span>
+                  <ul>
+                    <li><span class="nd"><i class="ms tx">description</i>Для бабусі</span></li>
+                  </ul>
+                </li>
+                <li><span class="nd"><i class="ms tx">description</i>Листівка <small>(оригінал)</small></span></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Приготуй скриньку на Робочому столі</h3>
+        <ol>
+          <li>Згорни всі вікна: <kbd>Win</kbd> + <kbd>D</kbd>.</li>
+          <li>Правою кнопкою на порожньому місці Робочого столу → <span class="menu">Створити → Папку</span>.</li>
+          <li>Напиши <b>Листівки</b> і натисни <kbd>Enter</kbd>.</li>
+          <li>Двічі клацни папку <b>Листівки</b> — вона відкриється в Провіднику.</li>
+        </ol>
+        <div class="desk row w">
+          <div>
+            <div class="desk-ic"><i class="ms">delete</i>Кошик</div>
+            <div class="desk-ic"><i class="ms">computer</i>Цей ПК</div>
+          </div>
+          <div class="cm-wrap">
+            <div class="cm">
+              <div class="cm-row"><i class="ms">grid_view</i>Вигляд<i class="ms r">chevron_right</i></div>
+              <div class="cm-row"><i class="ms">sort</i>Сортувати<i class="ms r">chevron_right</i></div>
+              <div class="cm-row"><i class="ms">refresh</i>Оновити</div>
+              <div class="cm-row on"><i class="ms">add_circle</i>Створити<i class="ms r">chevron_right</i></div>
+              <div class="cm-sep"></div>
+              <div class="cm-row"><i class="ms">desktop_windows</i>Параметри дисплея</div>
+              <div class="cm-row"><i class="ms">palette</i>Персоналізація</div>
+            </div>
+            <div class="cm sub">
+              <div class="cm-row on"><i class="ms fill fo">folder</i>Папку</div>
+              <div class="cm-row"><i class="ms">shortcut</i>Ярлик</div>
+              <div class="cm-sep"></div>
+              <div class="cm-row"><i class="ms tx">description</i>Текстовий документ</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Напиши листівку</h3>
+        <ol>
+          <li>У папці <b>Листівки</b>: правою кнопкою → <span class="menu">Створити → Текстовий документ</span>.</li>
+          <li>Назви його <b>Листівка</b> → <kbd>Enter</kbd>.</li>
+          <li>Двічі клацни його — відкриється <b>Блокнот</b>.</li>
+          <li>Напиши побажання на 1–2 речення.</li>
+          <li>Збережи: <kbd>Ctrl</kbd> + <kbd>S</kbd>. Закрий Блокнот.</li>
+        </ol>
+        <div class="np w">
+          <div class="np-tabs"><div class="np-tab"><i class="ms tx">description</i>Листівка.txt<i class="ms" style="font-size:13px">close</i></div><span class="sp"></span><i class="b">—</i><i class="b">▢</i><i class="b">✕</i></div>
+          <div class="np-menu"><span>Файл</span><span>Редагування</span><span>Вигляд</span></div>
+          <div class="np-text">Привіт! Бажаю тобі гарного настрою, цікавих книжок і багато снігу на канікулах!<span class="cur"></span></div>
+        </div>
+        <div class="tip">Блокнот сам не зберігає — без <kbd>Ctrl</kbd> + <kbd>S</kbd> текст пропаде.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Розмнож листівку</h3>
+        <ol>
+          <li>Клацни <b>Листівка</b> один раз, щоб виділити.</li>
+          <li><kbd>Ctrl</kbd> + <kbd>C</kbd> — копія в буфері обміну.</li>
+          <li><kbd>Ctrl</kbd> + <kbd>V</kbd> — тричі.</li>
+        </ol>
+        <div class="flow w">
+          <div class="fl"><div class="fl-n">Виділи → Ctrl + C</div>
+            <div class="wx">
+              <div class="wx-a"><div>Робочий стіл<i class="ms">chevron_right</i>Листівки</div></div>
+              <div class="wx-body">
+                <div class="wx-r sel"><i class="ms tx">description</i>Листівка<span class="tag"><i class="ms">content_copy</i>Ctrl + C</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="fl-arr"><i class="ms">arrow_forward</i></div>
+          <div class="fl"><div class="fl-n">Ctrl + V ×3</div>
+            <div class="wx">
+              <div class="wx-a"><div>Робочий стіл<i class="ms">chevron_right</i>Листівки</div></div>
+              <div class="wx-body">
+                <div class="wx-r"><i class="ms tx">description</i>Листівка</div>
+                <div class="wx-r new"><i class="ms tx">description</i>Листівка - копія</div>
+                <div class="wx-r new"><i class="ms tx">description</i>Листівка - копія (2)</div>
+                <div class="wx-r new"><i class="ms tx">description</i>Листівка - копія (3)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="check-val">Перевір себе: 4 файли — оригінал і 3 копії.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Підпиши кожну копію</h3>
+        <ol>
+          <li>Клацни копію → <kbd>F2</kbd>.</li>
+          <li>Напиши <b>Для</b> та ім'я → <kbd>Enter</kbd>.</li>
+          <li>Так само підпиши решту: двоє друзів і хтось із рідних.</li>
+        </ol>
+        <div class="wx w" style="max-width:420px">
+          <div class="wx-a"><div>Робочий стіл<i class="ms">chevron_right</i>Листівки</div></div>
+          <div class="wx-body">
+            <div class="wx-r"><i class="ms tx">description</i>Листівка</div>
+            <div class="wx-r sel"><i class="ms tx">description</i><span class="ed hl">Для Олі</span><span class="tag"><i class="ms">keyboard</i>F2</span></div>
+            <div class="wx-r"><i class="ms tx">description</i>Листівка - копія (2)</div>
+            <div class="wx-r"><i class="ms tx">description</i>Листівка - копія (3)</div>
+          </div>
+        </div>
+        <div class="tip">Бачиш у назві <b>.txt</b>? Не стирай його — це розширення.</div>
+        <div class="check-val">Перевір себе: жодного файлу «… - копія» не залишилось.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Розклади по скриньках</h3>
+        <ol>
+          <li>У папці <b>Листівки</b> створи ще дві папки: <b>Друзям</b> і <b>Рідним</b>.</li>
+          <li>Перетягни кожну листівку мишею на потрібну папку.</li>
+        </ol>
+        <div class="wx w" style="max-width:460px">
+          <div class="wx-a"><div>Робочий стіл<i class="ms">chevron_right</i>Листівки</div></div>
+          <div class="wx-body">
+            <div class="wx-r drop"><i class="ms fill fo">folder</i>Друзям<span class="tag"><i class="ms">place_item</i>сюди</span></div>
+            <div class="wx-r"><i class="ms fill fo">folder</i>Рідним</div>
+            <div class="wx-r sel"><i class="ms tx">description</i>Для Олі</div>
+            <div class="wx-r"><i class="ms tx">description</i>Для Максима</div>
+            <div class="wx-r"><i class="ms tx">description</i>Для бабусі</div>
+            <div class="wx-r"><i class="ms tx">description</i>Листівка</div>
+          </div>
+          <div class="drag"><i class="ms tx">description</i><i>→ Перемістити до «Друзям»</i></div>
+        </div>
+        <div class="tip">Без перетягування: <kbd>Ctrl</kbd> + <kbd>X</kbd> → відкрий папку → <kbd>Ctrl</kbd> + <kbd>V</kbd>.</div>
+        <div class="check-val">Перевір себе: у «Листівках» лишились 2 папки й оригінал.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Переїзд у Документи</h3>
+        <ol>
+          <li>Закрий Провідник. На Робочому столі клацни папку <b>Листівки</b> → <kbd>Ctrl</kbd> + <kbd>X</kbd>.</li>
+          <li>Відкрий Провідник (<kbd>Win</kbd> + <kbd>E</kbd>) → ліворуч <b>Документи</b>.</li>
+          <li>Клацни на порожньому місці → <kbd>Ctrl</kbd> + <kbd>V</kbd>.</li>
+        </ol>
+        <div class="flow w">
+          <div class="fl"><div class="fl-n">Робочий стіл: Ctrl + X</div>
+            <div class="desk">
+              <div class="desk-ic"><i class="ms">delete</i>Кошик</div>
+              <div class="desk-ic on"><i class="ms fill fo">folder</i>Листівки</div>
+            </div>
+          </div>
+          <div class="fl-arr"><i class="ms">arrow_forward</i></div>
+          <div class="fl"><div class="fl-n">Документи: Ctrl + V</div>
+            <div class="wx">
+              <div class="wx-t"><svg class="docs-ic" viewBox="0 0 24 20" fill="none"><path d="M1 3a2 2 0 0 1 2-2h6l2 2h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2z" fill="#E39B0B"/><rect x="8" y="4" width="10" height="11" rx="1.2" fill="#fff" stroke="#3B6FD8" stroke-width="1"/><path d="M10 7h6M10 9.5h6M10 12h4" stroke="#3B6FD8" stroke-width="1.1" stroke-linecap="round"/><path d="M1 8a2 2 0 0 1 2-2h18a2 2 0 0 1 2 2l-.6 9a2 2 0 0 1-2 2H3.6a2 2 0 0 1-2-2z" fill="#FBC02D" opacity=".92"/></svg><span>Документи</span><i class="b">✕</i></div>
+              <div class="wx-a"><div><i class="ms">computer</i><i class="ms">chevron_right</i>Документи</div></div>
+              <div class="wx-body">
+                <div class="wx-r new"><i class="ms fill fo">folder</i>Листівки<span class="tag"><i class="ms">content_paste</i>Ctrl + V</span></div>
+                <div class="wx-r"><i class="ms fill fo">folder</i>Мої малюнки</div>
+                <div class="wx-r"><i class="ms tx">description</i>Розклад</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tip">Папка переїжджає разом з усім, що в ній лежить.</div>
+        <div class="check-val">Перевір себе: на Робочому столі «Листівок» більше немає, а в Документах — усе, як у «Що має вийти».</div>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+<footer><span class="page-name">Практична робота · «Листівки друзям» · 5 клас</span></footer>
+
+<script src="../../assets/practice.js"></script>
+</body>
+</html>
