@@ -12,7 +12,8 @@
        <script> makeMatching(...); ...; makeFinalQuiz('finalQuiz', [...], {summary:'…'}); </script>
 
    Для уроку доступні: addNeurons, stepTask, trackTask, shuffle, loadPic, makeChoices, makeClassify, makeYesNo,
-   makeWarmup, makeMatching, makeSortBoard, makeSequence, makeFinalQuiz. Власна вправа уроку підключається через trackTask. */
+   makeWarmup, makeMatching, makeSortBoard, makeSequence, makeFinalQuiz,
+   а також say, sayBtn, addRestart (голос 🔊 і «↻ Почати знову» для молодших класів). Власна вправа уроку підключається через trackTask. */
 (()=>{
 'use strict';
 
@@ -537,6 +538,7 @@ function makeFinalQuiz(containerId, questions, {summary:text = '', perCorrect = 
     const item = questions[qi];
     progEl.textContent = `Запитання ${qi + 1} з ${questions.length}`;
     qEl[put] = item.q;
+    if(VOICE) qEl.innerHTML = sayBtn(qEl.textContent.trim()) + `<span>${qEl.innerHTML}</span>`;
     whyEl.textContent = '';
     optsEl.innerHTML = '';
     item.opts.forEach((opt, i)=>{
@@ -810,6 +812,45 @@ function simulate(){
 }
 
 
+/* ---------- ГОЛОС І «ПОЧАТИ ЗНОВУ» (уроки для молодших класів) ----------
+   say(текст, кнопка?) читає текст українським голосом браузера; sayBtn(текст) — розмітка кнопки 🔊.
+   Елементи з data-say отримують 🔊 зліва; <body data-voice> — ще й 🔊 біля кожного запитання тесту.
+   Кнопки 🔊 видно, лише якщо в системі є український голос (клас .can-say на <body>).
+   addRestart(елементУВправі, fn) — кнопка «↻ Почати знову» під .exercise праворуч (як у Лабораторії). */
+const SPEAK_ICON = '<svg viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>';
+const VOICE = body.hasAttribute('data-voice');
+let ukVoice = null, sayingBtn = null;
+function pickVoice(){
+  ukVoice = speechSynthesis.getVoices().find(v=>/^uk/i.test(v.lang)) || null;
+  body.classList.toggle('can-say', !!ukVoice);
+}
+if('speechSynthesis' in window){ pickVoice(); speechSynthesis.addEventListener?.('voiceschanged', pickVoice); }
+function say(text, btn){
+  if(!ukVoice) return;
+  speechSynthesis.cancel();
+  sayingBtn?.classList.remove('talking');
+  const u = new SpeechSynthesisUtterance(text);
+  u.voice = ukVoice; u.lang = ukVoice.lang; u.rate = .92;
+  sayingBtn = btn || null;
+  btn?.classList.add('talking');
+  u.onend = u.onerror = ()=>btn?.classList.remove('talking');
+  speechSynthesis.speak(u);
+}
+function sayBtn(text){ return `<button class="say" type="button" aria-label="Послухати" data-text="${text.replace(/"/g, '&quot;')}">${SPEAK_ICON}</button>`; }
+document.addEventListener('click', e=>{
+  const b = e.target.closest('.say');
+  if(b) say(b.dataset.text, b);
+});
+document.querySelectorAll('[data-say]').forEach(el=>{
+  el.innerHTML = sayBtn(el.textContent.trim()) + `<span>${el.innerHTML}</span>`;
+});
+function addRestart(el, fn){
+  const b = document.createElement('button');
+  b.type = 'button'; b.className = 'restart'; b.textContent = '↻ Почати знову';
+  b.addEventListener('click', ()=>{ if('speechSynthesis' in window) speechSynthesis.cancel(); fn(); });
+  (el.closest('.exercise') || el).after(b);
+}
+
 /* ---------- САМОПЕРЕВІРКА ----------
    Для _tools/check-lessons.py: з ?selftest урок ловить помилки й попередження, сам «проходить» урок випадково,
    будує посилання з результатами й пише підсумок у document.title («SELFTEST {...}»). */
@@ -830,5 +871,5 @@ if(/[?&]selftest\b/.test(location.search)){
 }
 
 
-Object.assign(window, { addNeurons, stepTask, trackTask, shuffle, loadPic, makeChoices, makeClassify, makeYesNo, makeWarmup, makeMatching, makeSortBoard, makeSequence, makeFinalQuiz });
+Object.assign(window, { say, sayBtn, addRestart, addNeurons, stepTask, trackTask, shuffle, loadPic, makeChoices, makeClassify, makeYesNo, makeWarmup, makeMatching, makeSortBoard, makeSequence, makeFinalQuiz });
 })();

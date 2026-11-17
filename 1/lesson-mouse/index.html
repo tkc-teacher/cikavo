@@ -25,16 +25,6 @@
   .progress-line{font-size:20px;}
   .btn-primary{font-size:19px; padding:14px 30px; border-radius:999px;}
 
-  /* 🔊 — читає текст поруч українським голосом браузера; без українського голосу кнопок немає */
-  .say{display:none; vertical-align:middle; width:40px; height:40px; margin:0 10px 0 0; padding:0; border:0; border-radius:50%; background:var(--accent-soft); color:var(--accent-dark); cursor:pointer; flex-shrink:0; transition:background .15s ease, transform .15s ease;}
-  .can-say .say{display:inline-flex; align-items:center; justify-content:center;}
-  .say:hover{background:var(--accent); color:#fff;}
-  .say.talking{background:var(--accent); color:#fff; animation:talk .8s ease-in-out infinite;}
-  @keyframes talk{50%{transform:scale(1.12);}}
-  .say svg{width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round;}
-  .said{display:flex; align-items:flex-start; gap:0;}
-  .said .say{margin-top:-2px;}
-
   /* картка-завдання з озвученням */
   .ask{display:flex; align-items:center; justify-content:center; gap:12px; min-height:52px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:30px; color:var(--ink); text-align:center; margin-bottom:12px;}
   .ask .say{margin:0;}
@@ -119,10 +109,6 @@
   .gift.open{border-color:#3FAE58; background:var(--ok-soft); cursor:default;}
   .gift.open svg{opacity:0; transition:opacity .3s ease;}
   .gift.open .toy{opacity:1; transform:none;}
-  /* «↻ Почати знову» — як у Лабораторії (memo-alphabet), під вправою праворуч */
-  .block > .restart{display:block; margin:12px 0 0 auto;}
-  .restart{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; border:1.5px solid var(--accent); background:var(--surface); color:var(--accent-dark); border-radius:999px; padding:4px 14px; cursor:pointer; white-space:nowrap;}
-  .restart:hover{background:var(--accent-soft);}
   .hint2{text-align:center; font-size:21px; color:var(--ink-soft); min-height:1.5em; margin-top:10px;}
 
   /* Крок 8 · коліщатко: пірнаємо в море */
@@ -182,7 +168,7 @@
   .quiz-opt .em{font-size:40px; line-height:1;}
 </style>
 </head>
-<body data-lesson="lesson1-mouse" data-hud="1 клас · Комп'ютерна миша">
+<body data-lesson="lesson1-mouse" data-voice data-hud="1 клас · Комп'ютерна миша">
 
 <section class="hero">
   <div class="hero-inner">
@@ -318,46 +304,7 @@
 
 <script src="../../assets/lesson.js"></script>
 <script>
-/* ---------- ГОЛОС: 🔊 читає текст українським голосом браузера ----------
-   Кнопки з'являються, лише якщо в системі є український голос (клас .can-say на <body>). */
-const SPEAK_ICON = '<svg viewBox="0 0 24 24"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>';
-let ukVoice = null, sayingBtn = null;
-function pickVoice(){
-  const vs = speechSynthesis.getVoices();
-  ukVoice = vs.find(v=>/^uk/i.test(v.lang)) || null;
-  document.body.classList.toggle('can-say', !!ukVoice);
-}
-if('speechSynthesis' in window){ pickVoice(); speechSynthesis.addEventListener?.('voiceschanged', pickVoice); }
-function say(text, btn){
-  if(!ukVoice) return;
-  speechSynthesis.cancel();
-  sayingBtn?.classList.remove('talking');
-  const u = new SpeechSynthesisUtterance(text);
-  u.voice = ukVoice; u.lang = ukVoice.lang; u.rate = .92;
-  sayingBtn = btn || null;
-  btn?.classList.add('talking');
-  u.onend = u.onerror = ()=>btn?.classList.remove('talking');
-  speechSynthesis.speak(u);
-}
-const sayBtn = text=>`<button class="say" type="button" aria-label="Послухати" data-text="${text.replace(/"/g,'&quot;')}">${SPEAK_ICON}</button>`;
-document.addEventListener('click', e=>{
-  const b = e.target.closest('.say');
-  if(b) say(b.dataset.text, b);
-});
-// Абзаци з data-say отримують 🔊 зліва
-document.querySelectorAll('[data-say]').forEach(el=>{
-  const text = el.textContent.trim();
-  el.innerHTML = sayBtn(text) + `<span>${el.innerHTML}</span>`;
-});
-
-/* ---------- «Почати спочатку» під кожною вправою ----------
-   Повторне проходження нейрончиків не додає: кожен крок рахує свій найкращий результат (best). */
-function addRestart(el, fn){
-  const b = document.createElement('button');
-  b.type = 'button'; b.className = 'restart'; b.title = 'Почати знову'; b.textContent = '↻ Почати знову';
-  b.addEventListener('click', ()=>{ speechSynthesis?.cancel(); fn(); });
-  el.closest('.exercise').after(b);
-}
+/* Голос 🔊 (say, sayBtn, data-say, 🔊 у тесті — <body data-voice>) і addRestart дає ядро. */
 
 /* ---------- МАЛЮНКИ ---------- */
 const MONITOR = `<rect x="2" y="2" width="156" height="104" rx="10" fill="#2B2D42"/><rect x="11" y="11" width="138" height="86" rx="4" fill="#7FD3F7"/>
@@ -780,17 +727,6 @@ makeFinalQuiz('finalQuiz', [
   { q:'Що робить коліщатко?', opts:[opt('<span class="em">↕️</span>','Гортає сторінку'), opt('<span class="em">🔊</span>','Грає музику'), opt('<span class="em">⌨️</span>','Пише букви')], correct:0 },
   { q:'Як відкрити подарунок?', opts:['Клацнути один раз', 'Клацнути двічі', 'Не клацати'], correct:1 }
 ], {summary:'Ти вмієш клацати, двічі клацати й перетягувати!', html:true});
-// 🔊 біля кожного запитання тесту
-(function(){
-  const q = document.querySelector('#finalQuiz .quiz-q');
-  if(!q) return;
-  new MutationObserver(()=>{
-    if(q.querySelector('.say')) return;
-    const t = q.textContent.trim();
-    q.innerHTML = sayBtn(t) + `<span>${q.innerHTML}</span>`;
-  }).observe(q, {childList:true});
-  q.innerHTML = sayBtn(q.textContent.trim()) + `<span>${q.innerHTML}</span>`;
-})();
 </script>
 
 </body>

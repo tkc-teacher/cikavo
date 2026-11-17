@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Вмикаємо і вимикаємо комп'ютер — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  /* Гама — зелена, як вогник увімкненого комп'ютера */
+  :root{
+    --accent:#14A37F; --accent-dark:#0B7358; --accent-soft:#E0F5EE;
+    --label:#0E8F6E; --bg:#F5FAF8; --line:#DCEDE6;
+    --hud-bar:linear-gradient(90deg,#14A37F,#FFC93C);
+    --led:#5BE37D;
+  }
+
+  /* Першокласники тільки вчаться читати: мінімум тексту, великі картинки, пояснює вчитель */
+  .hero h1{font-size:44px;}
+  .block h2{font-size:32px;}
+  .btn-primary{font-size:19px; padding:14px 30px; border-radius:999px;}
+
+  .dots{display:flex; justify-content:center; gap:8px; margin-top:16px;}
+  .dots i{width:14px; height:14px; border-radius:50%; background:var(--line); transition:background .2s ease;}
+  .dots i.now{background:var(--accent-soft); box-shadow:0 0 0 2px var(--accent);}
+  .dots i.ok{background:#3FAE58;}
+  @keyframes wob{25%{transform:translateX(-5px);} 75%{transform:translateX(5px);}}
+  @keyframes pop{from{transform:scale(.6); opacity:0;}}
+  .glow{animation:glow 1.2s ease-in-out infinite;}
+  @keyframes glow{50%{box-shadow:0 0 0 6px rgba(255,201,60,.85), 0 0 18px rgba(255,201,60,.9);}}
+
+  /* Повторення 1 · збери комп'ютер */
+  .build{position:relative; aspect-ratio:420/270; max-width:620px; margin:0 auto; border-radius:var(--radius-m); background:linear-gradient(180deg,#EEF6FF 0%,#F7FBFF 84%,#E9C9A6 84%,#E9C9A6 100%); overflow:hidden;}
+  .build::after{content:""; position:absolute; left:0; right:0; top:84%; height:2.6%; background:#D9B48C;}
+  .slotp{position:absolute; border:2.5px dashed #B8CCC4; border-radius:10px; display:flex; align-items:center; justify-content:center; transition:border-color .2s ease, background .2s ease;}
+  .slotp svg{width:100%; height:100%; filter:grayscale(1) brightness(1.7); opacity:.35; transition:filter .3s ease, opacity .3s ease;}
+  .slotp.over{border-color:var(--accent); background:rgba(20,163,127,.1);}
+  .slotp.filled{border-color:transparent;}
+  .slotp.filled svg{filter:none; opacity:1; animation:pop .3s ease;}
+  .build.done .slotp.filled{animation:jump .5s ease;}
+  @keyframes jump{40%{transform:translateY(-8px);}}
+  .tray{display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:14px; min-height:110px; margin:16px auto 0; max-width:620px; padding:14px; border-radius:var(--radius-m); background:var(--bg); border:2px dashed var(--line); touch-action:none;}
+  .piece{display:flex; align-items:center; justify-content:center; cursor:grab; touch-action:none; user-select:none; -webkit-user-select:none; transition:transform .15s ease;}
+  .piece:hover{transform:scale(1.07) rotate(-3deg);}
+  .piece svg{width:100%; height:100%; pointer-events:none;}
+  .piece .em{font-size:62px; line-height:1;}
+  .piece.drag{position:fixed; z-index:100; cursor:grabbing; transform:scale(1.1) rotate(-4deg); transition:none; pointer-events:none; filter:drop-shadow(0 8px 10px rgba(0,0,0,.2));}
+  .piece.back{transition:left .3s ease, top .3s ease;}
+  .piece.miss{animation:wob .4s ease;}
+
+  /* Крок 1 · знайди кнопку живлення */
+  /* однакова висота для всіх трьох пристроїв і після завершення — блок не «стрибає» */
+  #devBox{height:min(400px,80vw); display:flex; align-items:center; justify-content:center;}
+  .device{display:block; height:100%; width:auto; max-width:100% !important; margin:0 auto; overflow:visible; animation:pop .35s ease;}
+  .device .hb{cursor:pointer; transform-box:fill-box; transform-origin:center;}
+  .device .hb .ring{fill:transparent; stroke:transparent; stroke-width:3;}
+  .device .hb:hover .ring{stroke:rgba(20,163,127,.7); stroke-dasharray:5 4; fill:rgba(20,163,127,.12);}
+  .device .hb.miss{animation:wob .4s ease;}
+  .device .hb.miss .ring{stroke:var(--coral); stroke-dasharray:none; fill:rgba(255,107,74,.25);}
+  .device .hb.ok .ring{stroke:#3FAE58; stroke-width:4; stroke-dasharray:none; fill:rgba(63,174,88,.25);}
+
+  /* Кроки 2–3 · комп'ютер-емулятор */
+  .pc{display:flex; align-items:flex-end; justify-content:center; gap:3%; max-width:700px; margin:0 auto; user-select:none; -webkit-user-select:none;}
+  .mon{flex:0 0 64%; min-width:0; display:flex; flex-direction:column; align-items:center;}
+  .bezel{width:100%; background:#2B2D42; border-radius:14px 14px 0 0; padding:3% 3% 0;}
+  .scr{position:relative; aspect-ratio:16/10; background:#06060C; border-radius:4px; overflow:hidden; container-type:inline-size; font-family:'Nunito Sans',sans-serif;}
+  .chin{width:100%; height:40px; background:#2B2D42; border-radius:0 0 14px 14px; display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:0 14px;}
+  .neck{width:13%; height:30px; background:linear-gradient(90deg,#4A4C63,#5C5E78,#4A4C63);}
+  .foot{width:44%; height:12px; border-radius:8px 8px 4px 4px; background:#2B2D42;}
+  .tower{position:relative; flex:0 0 18%; aspect-ratio:1/2; min-width:0; min-height:0; background:#3B3D56; border-radius:12px; display:flex; flex-direction:column; align-items:center; padding:16px 12% 0; gap:12px;}
+  .tower .slot{width:100%; height:12px; background:#2B2D42; border-radius:3px;}
+  .tower .grille{position:absolute; left:16%; right:16%; bottom:8%; height:16%; background:repeating-linear-gradient(180deg,#2B2D42 0 4px,transparent 4px 9px);}
+  .led{width:10px; height:10px; border-radius:50%; background:#55577A; transition:background .3s ease, box-shadow .3s ease;}
+  .led.on{background:var(--led); box-shadow:0 0 10px var(--led);}
+  .pw{display:grid; place-items:center; width:46px; height:46px; padding:0; border-radius:50%; border:3px solid #6B6D8A; background:#24253A; color:#C9C9DA; cursor:pointer; transition:border-color .2s ease, color .2s ease, transform .1s ease;}
+  .pw svg{width:24px; height:24px;}
+  .chin .pw{width:32px; height:32px; border-width:2px;} .chin .pw svg{width:18px; height:18px;}
+  .pw:hover{border-color:var(--led); color:#fff;}
+  .pw:active{transform:scale(.9);}
+  .pw.on{color:var(--led);}
+  .pw.miss{animation:wob .4s ease; border-color:var(--coral);}
+  .socket{flex:0 0 6%; align-self:center; cursor:pointer; margin-top:30%;}
+  .socket svg{width:100%; display:block; overflow:visible;}
+  .socket.miss{animation:wob .4s ease;}
+  .socket.miss .plate{stroke:var(--coral);}
+  @media (max-width:560px){ .socket{display:none;} .mon{flex-basis:74%;} .tower{flex-basis:22%; padding-top:10px; gap:8px;} .tower .slot{height:8px;} .pw{width:36px; height:36px;} .pw svg{width:20px; height:20px;} .chin{height:34px;} .chin .pw{width:26px; height:26px;} }
+
+  /* екран: усі розміри — у cqw, щоб масштабувались разом з монітором */
+  .scr .layer{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4cqw; color:#fff; animation:fadeIn .5s ease;}
+  @keyframes fadeIn{from{opacity:0;}}
+  .nosig{margin:auto; padding:2cqw 4cqw; border:1px solid #444; color:#9A9AB0; font-size:4cqw; font-weight:700;}
+  .boot .logo{width:14cqw; height:14cqw;}
+  .spin{position:relative; width:9cqw; height:9cqw; animation:spin 1.1s linear infinite;}
+  .spin i{position:absolute; left:50%; top:0; width:1.4cqw; height:1.4cqw; margin-left:-.7cqw; border-radius:50%; background:#fff; transform-origin:.7cqw 4.5cqw;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .bye{background:#0F4C9E; font-size:5cqw; font-weight:700;}
+  .wall{background:linear-gradient(180deg,#8FD3FF 0%,#CFEFFF 55%,#7CCB7A 56%,#4DA857 100%);}
+  .wall::before{content:""; position:absolute; left:-10%; right:30%; top:46%; height:40%; border-radius:50%; background:#5DBA63;}
+  .wall::after{content:""; position:absolute; right:12%; top:9%; width:10cqw; height:10cqw; border-radius:50%; background:#FFD84D;}
+  .icons{position:absolute; left:2cqw; top:2cqw; display:grid; gap:2cqw; z-index:1;}
+  .ic{display:flex; flex-direction:column; align-items:center; width:13cqw; font-size:2.6cqw; font-weight:700; color:#fff; text-shadow:0 1px 3px rgba(0,0,0,.6); cursor:default;}
+  .ic span{font-size:6.5cqw; line-height:1.1; text-shadow:none;}
+  .tb{position:absolute; left:0; right:0; bottom:0; height:9cqw; z-index:3; display:flex; align-items:center; justify-content:center; gap:2cqw; background:rgba(238,242,250,.94); border-top:1px solid rgba(0,0,0,.08);}
+  .tb .st{display:grid; place-items:center; width:7.5cqw; height:7.5cqw; padding:0; border:0; border-radius:1.5cqw; background:transparent; cursor:pointer;}
+  .tb .st:hover,.tb .st.on{background:rgba(0,0,0,.08);}
+  .tb .st svg{width:5cqw; height:5cqw;}
+  .tb .app{font-size:5cqw; padding:0 1cqw; border-bottom:.6cqw solid #3A86FF; line-height:1.3;}
+  .tb .clk{position:absolute; right:2.5cqw; font-size:2.8cqw; font-weight:700; color:#333;}
+  .win{position:absolute; left:18cqw; top:5cqw; width:62cqw; height:42cqw; z-index:2; background:#fff; border-radius:1.4cqw; overflow:hidden; box-shadow:0 2cqw 5cqw rgba(0,0,0,.35); display:flex; flex-direction:column;}
+  .wt{display:flex; align-items:center; height:7cqw; padding-left:2cqw; background:#F2F4F8; font-size:3.2cqw; font-weight:700; color:#333;}
+  .wt .x{margin-left:auto; width:9cqw; height:100%; padding:0; border:0; background:transparent; font-size:3.6cqw; color:#333; cursor:pointer;}
+  .wt .x:hover{background:#E81123; color:#fff;}
+  .wc{flex:1; display:flex; align-items:center; justify-content:center;}
+  .wc svg{height:90%;}
+  .smenu{position:absolute; left:50%; bottom:10cqw; width:58cqw; z-index:4; transform:translateX(-50%); background:rgba(246,248,252,.98); border-radius:2cqw; box-shadow:0 2cqw 6cqw rgba(0,0,0,.35); color:#222; animation:slideUp .25s ease;}
+  @keyframes slideUp{from{transform:translate(-50%,4cqw); opacity:0;}}
+  .sm-apps{display:grid; grid-template-columns:repeat(4,1fr); gap:2cqw; padding:4cqw 4cqw 3cqw;}
+  .sm-apps span{display:grid; place-items:center; font-size:6cqw; line-height:1.2;}
+  .sm-bot{position:relative; display:flex; align-items:center; justify-content:space-between; padding:1.8cqw 3cqw; border-top:1px solid #E1E4EC; background:#EEF1F7; border-radius:0 0 2cqw 2cqw; font-size:3cqw; font-weight:700;}
+  .sm-pw{display:grid; place-items:center; width:7cqw; height:7cqw; padding:0; border:0; border-radius:1.4cqw; background:transparent; color:#333; cursor:pointer;}
+  .sm-pw:hover,.sm-pw.on{background:rgba(0,0,0,.08);}
+  .sm-pw svg{width:4.4cqw; height:4.4cqw;}
+  .pmenu{position:absolute; right:1cqw; bottom:10cqw; display:flex; flex-direction:column; padding:1cqw; background:#fff; border-radius:1.6cqw; box-shadow:0 1cqw 4cqw rgba(0,0,0,.3); animation:pop .2s ease;}
+  .pmenu button{display:flex; align-items:center; gap:2cqw; padding:1.6cqw 2.6cqw; border:0; border-radius:1cqw; background:transparent; font:inherit; font-size:3.4cqw; font-weight:700; color:#222; white-space:nowrap; cursor:pointer; text-align:left;}
+  .pmenu button:hover{background:#E8EEF8;}
+  .pmenu button.miss{animation:wob .4s ease; background:#FDE6E1;}
+  .pmenu svg{width:4cqw; height:4cqw; flex-shrink:0;}
+  .scr .glow{border-radius:1.4cqw;}
+  .no-plug{display:flex; justify-content:center; margin-top:16px;}
+  .no-plug span{position:relative; font-size:64px; line-height:1; padding:12px 20px;}
+  .no-plug span::after{content:""; position:absolute; inset:0 8px; border:7px solid var(--coral); border-radius:50%; background:linear-gradient(135deg,transparent 46%,var(--coral) 46%,var(--coral) 54%,transparent 54%);}
+
+  /* Гра · Чарівний сад — клацання, перетягування з утриманням, подвійне клацання */
+  .stages{display:flex; justify-content:center; gap:12px; margin-bottom:14px;}
+  .stg{display:grid; place-items:center; width:58px; height:58px; border-radius:50%; font-size:30px; background:var(--bg); border:3px solid var(--line); filter:grayscale(.9); opacity:.55; transition:all .3s ease;}
+  .stg.now{filter:none; opacity:1; border-color:var(--accent); background:var(--accent-soft); transform:scale(1.12);}
+  .stg.ok{filter:none; opacity:1; border-color:#3FAE58; background:#E4F8E6;}
+  .garden{position:relative; aspect-ratio:16/10; max-width:720px; margin:0 auto; border-radius:var(--radius-m); overflow:hidden; container-type:inline-size; user-select:none; -webkit-user-select:none; touch-action:none;
+    background:
+      radial-gradient(ellipse 60% 22% at 22% 31%, #8ED16F 98%, transparent 100%),
+      radial-gradient(ellipse 55% 20% at 82% 32%, #7FC862 98%, transparent 100%),
+      linear-gradient(180deg,#9EDBFF 0%,#D4F0FF 30%,#6CC05A 30.5%,#58AE4A 100%);}
+  .garden .sun{position:absolute; left:4%; top:3%; width:11cqw; height:11cqw; border-radius:50%; background:#FFD84D; box-shadow:0 0 0 2cqw rgba(255,216,77,.35); transition:transform .6s ease;}
+  .garden .sun::after{content:""; position:absolute; left:28%; top:52%; width:44%; height:22%; border:.7cqw solid #C98A00; border-top:0; border-radius:0 0 50% 50%; opacity:0; transition:opacity .4s ease;}
+  .garden.win .sun{transform:scale(1.15) rotate(-8deg);} .garden.win .sun::after{opacity:1;}
+  .garden .cl{position:absolute; height:4cqw; background:#fff; border-radius:999px; opacity:.9; animation:drift 40s linear infinite;}
+  .garden .cl::before{content:""; position:absolute; left:20%; top:-60%; width:45%; height:130%; background:#fff; border-radius:50%;}
+  @keyframes drift{from{transform:translateX(0);} 50%{transform:translateX(8cqw);} to{transform:translateX(0);}}
+  .bed{position:absolute; width:17%; height:34%; transform:translate(-50%,-100%); --g:0;}
+  .bed .soil{position:absolute; left:4%; right:4%; bottom:-6%; height:20%; border-radius:50%; background:radial-gradient(ellipse at 50% 40%,#6B4426 0 32%,#8B5A33 34% 100%); box-shadow:inset 0 -.6cqw 0 rgba(0,0,0,.15);}
+  .bed .pl{position:absolute; left:50%; bottom:2%; height:92%; width:auto; transform:translateX(-50%) scale(var(--g)); transform-origin:50% 100%; overflow:visible; transition:transform .12s linear;}
+  .bed .flw{opacity:calc((var(--g) - .7) * 4); transform-box:fill-box; transform-origin:center;}
+  .bed.grown .pl{animation:sway 3s ease-in-out infinite;}
+  @keyframes sway{0%,100%{transform:translateX(-50%) rotate(-2deg);} 50%{transform:translateX(-50%) rotate(2deg);}}
+  .bed.grown .flw{animation:bloom .5s ease;}
+  @keyframes bloom{from{transform:scale(.3);}}
+  .bed .seed{position:absolute; left:50%; bottom:6%; width:2.4cqw; height:1.6cqw; margin-left:-1.2cqw; border-radius:50%; background:#7A4B2A; animation:drop .45s ease-in;}
+  @keyframes drop{from{transform:translateY(-14cqw) rotate(200deg); opacity:.4;}}
+  .s-plant .bed:not(.planted){cursor:pointer;}
+  .s-plant .bed:not(.planted):hover .soil{box-shadow:0 0 0 .6cqw #FFC93C;}
+  .bed .sparkle{position:absolute; left:50%; top:10%; font-size:5cqw; transform:translateX(-50%); animation:spark .8s ease-out forwards; pointer-events:none;}
+  @keyframes spark{from{transform:translate(-50%,0) scale(.4); opacity:1;} to{transform:translate(-50%,-6cqw) scale(1.3); opacity:0;}}
+  @keyframes wiggle{25%{transform:translateX(-50%) rotate(-14deg);} 75%{transform:translateX(-50%) rotate(14deg);}}
+  .can{position:absolute; left:84%; top:3%; width:13cqw; cursor:grab; z-index:4; display:none; touch-action:none; filter:drop-shadow(0 .8cqw .8cqw rgba(0,0,0,.2));}
+  .s-water .can{display:block;}
+  .can svg{display:block; width:100%; transition:transform .2s ease;}
+  .can.held{cursor:grabbing;}
+  .can.pour svg{transform:rotate(-24deg);}
+  .can .drops{position:absolute; left:-1cqw; top:28%; width:6cqw; height:14cqw; display:none;}
+  .can.pour .drops{display:block;}
+  .can .drops i{position:absolute; width:1.2cqw; height:1.8cqw; border-radius:50% 50% 50% 50% / 60% 60% 40% 40%; background:#3BA4F5; animation:rain .5s linear infinite;}
+  @keyframes rain{from{transform:translateY(0); opacity:1;} to{transform:translateY(12cqw); opacity:.2;}}
+  .can.hint{animation:canHint 1.2s ease-in-out infinite;}
+  @keyframes canHint{50%{transform:translate(-2cqw,1.5cqw) rotate(-10deg);}}
+  .banner{position:absolute; inset:0; z-index:6; display:flex; align-items:center; justify-content:center; gap:4cqw; background:rgba(255,255,255,.72); pointer-events:none; animation:bannerOut 1.9s ease forwards;}
+  .banner .big{font-size:16cqw; line-height:1; animation:pop .4s ease;}
+  .banner svg{height:22cqw; width:auto; animation:pop .4s ease .15s backwards;}
+  @keyframes bannerOut{0%,75%{opacity:1;} to{opacity:0;}}
+  .bed .st{transform-origin:50px 102px;}
+  .s-pick .bed .st{cursor:pointer;}
+  .s-pick .bed .st:hover .flw{filter:brightness(1.12) drop-shadow(0 0 2px #fff);}
+  .bed .st.tap{animation:wiggle .35s ease;}
+  @keyframes wiggle{25%{transform:rotate(-9deg);} 75%{transform:rotate(9deg);}}
+  .bed .st.gone{display:none;}
+  .fly-flower{position:fixed; z-index:200; pointer-events:none; transition:left .7s cubic-bezier(.5,-.3,.6,1), top .7s cubic-bezier(.3,-.5,.6,1), width .7s ease, height .7s ease;}
+  .vase{display:block; width:100%; max-width:300px; height:auto; margin:10px auto 0; overflow:visible;}
+  .vase .vf{animation:pop .35s ease; transform-box:fill-box; transform-origin:center;}
+  .vase.full .bunch{animation:joy2 1s ease;}
+  @keyframes joy2{40%{transform:translateY(-6px) rotate(-3deg);} 70%{transform:translateY(0) rotate(2deg);}}
+  .butter{position:absolute; font-size:5cqw; z-index:5; pointer-events:none; animation:flutter 6s ease-in-out infinite;}
+  @keyframes flutter{0%{transform:translate(0,0) rotate(-10deg);} 25%{transform:translate(18cqw,-6cqw) rotate(10deg);} 50%{transform:translate(30cqw,4cqw) rotate(-8deg);} 75%{transform:translate(12cqw,8cqw) rotate(12deg);} 100%{transform:translate(0,0) rotate(-10deg);}}
+  .cup2{position:absolute; right:3%; top:4%; font-size:12cqw; z-index:5; animation:pop .5s ease;}
+
+  /* Повторення · Що не так? — знайди небезпечне біля комп'ютера */
+  .room{position:relative; aspect-ratio:16/10; max-width:720px; margin:0 auto; border-radius:var(--radius-m); overflow:hidden; container-type:inline-size; user-select:none; -webkit-user-select:none;
+    background:linear-gradient(180deg,#FFF6E5 0%,#FDEFD6 76%,#C99A6B 76%,#B98858 100%);}
+  .room .wnd{position:absolute; left:4%; top:8%; width:17%; height:34%; border-radius:1.2cqw; background:linear-gradient(180deg,#9EDBFF,#D4F0FF); border:1.4cqw solid #fff; box-shadow:0 0 0 .4cqw #E8D5B5;}
+  .room .wnd::before{content:""; position:absolute; left:50%; top:0; bottom:0; width:.8cqw; margin-left:-.4cqw; background:#fff;}
+  .room .desk{position:absolute; left:14%; right:14%; top:62%; height:4%; background:#A86F3E; border-radius:.8cqw;}
+  .room .desk::before,.room .desk::after{content:""; position:absolute; top:100%; width:2.4cqw; height:9cqw; background:#8B5A33;}
+  .room .desk::before{left:4%;} .room .desk::after{right:4%;}
+  .room .part{position:absolute; pointer-events:none;}
+  .room .part svg{display:block; width:100%; height:auto;}
+  .thing{position:absolute; transform:translate(-50%,-50%); padding:.6cqw; border:0; background:none; font-size:6.5cqw; line-height:1; cursor:pointer; border-radius:50%; z-index:2; transition:transform .15s ease;}
+  .thing:hover{transform:translate(-50%,-50%) scale(1.12);}
+  .thing svg{display:block; width:9cqw; height:auto; overflow:visible;}
+  .thing.miss{animation:thingNo .4s ease;}
+  @keyframes thingNo{25%{transform:translate(calc(-50% - 1cqw),-50%);} 75%{transform:translate(calc(-50% + 1cqw),-50%);}}
+  .thing.found{cursor:default;}
+  .thing.found::after{content:""; position:absolute; inset:-1.2cqw; border:.8cqw solid var(--coral); border-radius:50%; animation:pop .3s ease;}
+  .thing.fixed{animation:poof .6s ease forwards; pointer-events:none;}
+  @keyframes poof{to{transform:translate(-50%,-50%) scale(.2); opacity:0;}}
+  .room .sp{position:absolute; font-size:4cqw; animation:zap .5s steps(2) infinite; pointer-events:none;}
+  @keyframes zap{50%{opacity:.2;}}
+  .room.ok::after{content:"👍"; position:absolute; right:4%; top:6%; font-size:12cqw; animation:pop .5s ease;}
+  .bads{display:flex; justify-content:center; gap:8px; margin-bottom:12px;}
+  .bads i{width:26px; height:26px; border-radius:50%; border:3px dashed var(--line); transition:all .2s ease;}
+  .bads i.ok{border:3px solid var(--coral); background:#FDE6E1;}
+  #finalQuiz .finish-box{display:none;}   /* урок завершується сам, коли знайдено все небезпечне */
+</style>
+</head>
+<body data-lesson="lesson1-power" data-hud="1 клас · Вмикаємо комп'ютер">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Знайомство з комп'ютером</div>
+      <h1>Вмикаємо і вимикаємо комп'ютер</h1>
+      <button class="btn-primary" onclick="document.getElementById('r1').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: усміхнений монітор, що прокидається, з зеленою кнопкою живлення -->
+    <svg class="mascot" viewBox="0 0 140 140" fill="none" aria-hidden="true">
+      <circle cx="70" cy="72" r="60" fill="#E0F5EE"/>
+      <rect x="22" y="26" width="96" height="70" rx="10" fill="#2B2D42"/>
+      <rect x="29" y="33" width="82" height="52" rx="5" fill="#8FD3FF"/>
+      <path d="M29 72 Q52 60 70 70 T111 66 V85 H29 Z" fill="#5DBA63"/>
+      <circle cx="56" cy="54" r="4.5" fill="#1B1B3A"/><circle cx="84" cy="54" r="4.5" fill="#1B1B3A"/>
+      <circle cx="57.5" cy="52.5" r="1.4" fill="#fff"/><circle cx="85.5" cy="52.5" r="1.4" fill="#fff"/>
+      <path d="M62 64 Q70 70 78 64" stroke="#1B1B3A" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="47" cy="63" r="4" fill="#FF9DBB" opacity=".7"/><circle cx="93" cy="63" r="4" fill="#FF9DBB" opacity=".7"/>
+      <rect x="62" y="96" width="16" height="14" fill="#4A4C63"/><rect x="44" y="108" width="52" height="8" rx="4" fill="#2B2D42"/>
+      <circle cx="112" cy="104" r="17" fill="#14A37F"/>
+      <path d="M106.5 98.5a8 8 0 1 0 11 0" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/><path d="M112 94v9" stroke="#fff" stroke-width="3.2" stroke-linecap="round"/>
+      <path d="M118 22 l4 -8 M126 30 l8 -4 M110 18 l0 -9" stroke="#FFC93C" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="r1">
+    <div class="step-label">Повторення · Збери комп'ютер</div>
+    <h2>Збери комп'ютер</h2>
+    <div class="exercise">
+      <div class="build" id="build"></div>
+      <div class="tray" id="tray"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Кнопка живлення</div>
+    <h2>Кнопка живлення</h2>
+    <div class="exercise">
+      <div id="devBox"></div>
+      <div class="dots" id="devDots"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Вмикаємо</div>
+    <h2>Увімкни комп'ютер</h2>
+    <div class="exercise">
+      <div id="pcOn"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Вимикаємо</div>
+    <h2>Вимкни комп'ютер</h2>
+    <div class="exercise">
+      <div id="pcOff"></div>
+    </div>
+    <div class="no-plug" aria-label="Не висмикуй шнур"><span>🔌</span></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Гра · Чарівний сад</div>
+    <h2>Чарівний сад</h2>
+    <div class="exercise">
+      <div class="stages" id="stages"></div>
+      <div class="garden" id="garden"></div>
+      <svg class="vase" id="vase" viewBox="0 0 240 186" aria-label="Букет"></svg>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Повторення · Що не так?</div>
+    <h2>Що не так?</h2>
+    <div class="exercise">
+      <div class="bads" id="bads"></div>
+      <div class="room" id="room"></div>
+    </div>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Урок · «Підготовка комп'ютера до роботи. Ввімкнення та вимкнення комп'ютера» · 1 клас</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* Тексту мінімум і без озвучення: першокласники тільки вчаться читати, пояснює вчитель.
+   Завдання пояснює вчитель; якщо дитина довго не діє — потрібна кнопка підсвічується. */
+
+/* ---------- ЗНАЧКИ Й МАЛЮНКИ ---------- */
+const PWR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M7.4 6.6a7.6 7.6 0 1 0 9.2 0"/><path d="M12 2.8v8.6"/></svg>';
+const LOGO = '<svg class="logo" viewBox="0 0 20 20"><rect x="1" y="1" width="8.4" height="8.4" rx="1" fill="#3A9BFF"/><rect x="10.6" y="1" width="8.4" height="8.4" rx="1" fill="#2F86EB"/><rect x="1" y="10.6" width="8.4" height="8.4" rx="1" fill="#2F86EB"/><rect x="10.6" y="10.6" width="8.4" height="8.4" rx="1" fill="#1F6FD1"/></svg>';
+const SLEEP = '<svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.2" stroke-linejoin="round"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>';
+const RESTART = '<svg viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12a7.5 7.5 0 1 0 2.4-5.5"/><path d="M4 3.5v4.5h4.5"/></svg>';
+const PWR_DARK = PWR.replace('currentColor', '#555');
+// частини комп'ютера — ті самі малюнки, що в уроці «Миша»
+const MONITOR = `<rect x="2" y="2" width="156" height="104" rx="10" fill="#2B2D42"/><rect x="11" y="11" width="138" height="86" rx="4" fill="#7FD3F7"/>
+  <path d="M11 78 L48 50 L74 70 L100 44 L149 82 V97 H11 Z" fill="#4CB873"/><circle cx="118" cy="32" r="10" fill="#FFC93C"/>
+  <rect x="70" y="106" width="20" height="20" fill="#4A4C63"/><rect x="44" y="124" width="72" height="9" rx="4.5" fill="#2B2D42"/>`;
+const UNIT = `<rect x="2" y="2" width="62" height="140" rx="8" fill="#3B3D56"/><rect x="10" y="14" width="46" height="8" rx="3" fill="#55577A"/>
+  <rect x="10" y="28" width="46" height="8" rx="3" fill="#55577A"/><circle cx="33" cy="70" r="9" fill="#55577A"/><circle cx="33" cy="70" r="4" fill="#5BE37D"/>
+  <g fill="#2B2D42"><rect x="14" y="104" width="38" height="3" rx="1.5"/><rect x="14" y="112" width="38" height="3" rx="1.5"/><rect x="14" y="120" width="38" height="3" rx="1.5"/></g>`;
+const SPEAKER = `<rect x="2" y="2" width="34" height="58" rx="7" fill="#3B3D56"/><circle cx="19" cy="18" r="6" fill="#2B2D42"/><circle cx="19" cy="18" r="2.5" fill="#55577A"/>
+  <circle cx="19" cy="41" r="11" fill="#2B2D42"/><circle cx="19" cy="41" r="4.5" fill="#55577A"/>`;
+const SPEAKERS = SPEAKER + `<g transform="translate(42 0)">${SPEAKER}</g>`;
+function keyboard(w = 176){
+  let k = `<rect x="2" y="2" width="${w}" height="44" rx="7" fill="#3B3D56"/>`;
+  for(let r = 0; r < 3; r++) for(let c = 0; c < 12; c++){
+    const kw = (w - 16) / 12;
+    k += `<rect x="${8 + c * kw + 1}" y="${8 + r * 11}" width="${kw - 2.4}" height="8.4" rx="2" fill="#E8E8F2"/>`;
+  }
+  return k;
+}
+const SMALL_MOUSE = `<path d="M18 2 C30 2 34 12 34 24 C34 38 27 46 18 46 C9 46 2 38 2 24 C2 12 6 2 18 2 Z" fill="#fff" stroke="#3B3D56" stroke-width="2.4"/>
+  <path d="M18 2 V20 M2.5 20 H33.5" stroke="#3B3D56" stroke-width="2"/><rect x="15.5" y="7" width="5" height="9" rx="2.5" fill="#14A37F"/>`;
+// [малюнок, ширина, висота] у координатах столу 420×270
+const PARTS = {
+  monitor:  [MONITOR, 160, 136],
+  unit:     [UNIT, 66, 144],
+  speakers: [SPEAKERS, 80, 62],
+  keyboard: [keyboard(), 180, 48],
+  mouse:    [SMALL_MOUSE, 36, 48],
+};
+const partSVG = k=>`<svg viewBox="0 0 ${PARTS[k][1]} ${PARTS[k][2]}">${PARTS[k][0]}</svg>`;
+
+const spinner = ()=>`<div class="spin">${Array.from({length:6}, (_, i)=>`<i style="transform:rotate(${i * 60}deg); opacity:${.3 + i * .14}"></i>`).join('')}</div>`;
+const flick = (el, cls = 'miss')=>{ el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), 600); };
+const glowOn = el=>{ document.querySelectorAll('.glow').forEach(g=>g.classList.remove('glow')); el?.classList.add('glow'); };
+// якщо дитина довго нічого не робить — підсвітити потрібну кнопку
+function idleHint(getTarget, ms = 7000){
+  let t = null;
+  return ()=>{ clearTimeout(t); t = setTimeout(()=>{ const el = getTarget(); if(el && el.isConnected) glowOn(el); }, ms); };
+}
+
+/* ---------- ПОВТОРЕННЯ 1: збери комп'ютер (перетягування) ----------
+   Деталі з лотка перетягують на їхні сірі силуети на столі; не на той силует — хибна спроба. */
+(function(){
+  const build = document.getElementById('build'), tray = document.getElementById('tray');
+  const PLACE = { unit:[14, 86], monitor:[112, 18], speakers:[296, 92], keyboard:[110, 178], mouse:[318, 178] };
+  const ORDER = Object.keys(PLACE);
+  build.innerHTML = ORDER.map(k=>{
+    const [x, y] = PLACE[k], [, w, h] = PARTS[k];
+    return `<div class="slotp" data-part="${k}" style="left:${x / 4.2}%; top:${y / 2.7}%; width:${w / 4.2}%; height:${h / 2.7}%">${partSVG(k)}</div>`;
+  }).join('');
+  const slots = [...build.querySelectorAll('.slotp')];
+  const hit = trackTask(build, ORDER.length, ORDER.length + 2);
+  let placed = 0, best = 0;
+  // деталь у лотку — такого самого розміру, як її силует на столі
+  const sizePiece = p=>{
+    const s = (build.getBoundingClientRect().width || 620) / 420;
+    if(p.dataset.part){ const [, w, h] = PARTS[p.dataset.part]; p.style.width = w * s + 'px'; p.style.height = h * s + 'px'; }
+    else p.style.width = p.style.height = Math.max(64, 76 * s) + 'px';
+  };
+  addEventListener('resize', ()=>tray.querySelectorAll('.piece').forEach(sizePiece));
+  const inside = (r, e, pad = 16)=>e.clientX > r.left - pad && e.clientX < r.right + pad && e.clientY > r.top - pad && e.clientY < r.bottom + pad;
+
+  function makePiece(kind){
+    const p = document.createElement('div');
+    p.className = 'piece';
+    if(PARTS[kind]){ p.dataset.part = kind; p.innerHTML = partSVG(kind); }
+    else p.innerHTML = `<span class="em">${kind}</span>`;
+    p.addEventListener('pointerdown', e=>{
+      e.preventDefault();
+      const r = p.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
+      const ph = document.createElement('div');          // місце-заглушка, щоб лоток не стрибав
+      ph.style.cssText = `width:${r.width}px; height:${r.height}px;`;
+      p.after(ph);
+      p.classList.add('drag');
+      const over = ev=>slots.find(s=>!s.classList.contains('filled') && inside(s.getBoundingClientRect(), ev));
+      const move = ev=>{
+        p.style.left = (ev.clientX - dx) + 'px'; p.style.top = (ev.clientY - dy) + 'px';
+        const o = over(ev);
+        slots.forEach(s=>s.classList.toggle('over', s === o));
+      };
+      move(e);
+      const up = ev=>{
+        removeEventListener('pointermove', move); removeEventListener('pointerup', up); removeEventListener('pointercancel', up);
+        slots.forEach(s=>s.classList.remove('over'));
+        const o = over(ev);
+        if(o && o.dataset.part === p.dataset.part){
+          p.remove(); ph.remove();
+          o.classList.add('filled');
+          placed++;
+          if(placed > best){ best = placed; addNeurons(1); hit(); if(best === ORDER.length) addNeurons(2); }
+          if(placed === ORDER.length) build.classList.add('done');
+          return;
+        }
+        const wrong = !!o;   // не на той силует — хибна спроба
+        const pr = ph.getBoundingClientRect();
+        p.classList.add('back');
+        p.style.left = pr.left + 'px'; p.style.top = pr.top + 'px';
+        setTimeout(()=>{
+          p.classList.remove('drag', 'back'); p.style.left = p.style.top = ''; ph.replaceWith(p);
+          if(wrong) flick(p);
+        }, 300);
+      };
+      addEventListener('pointermove', move); addEventListener('pointerup', up); addEventListener('pointercancel', up);
+    });
+    return p;
+  }
+  function reset(){
+    placed = 0; build.classList.remove('done');
+    slots.forEach(s=>s.classList.remove('filled'));
+    tray.innerHTML = '';
+    shuffle(ORDER).forEach(k=>{ const p = makePiece(k); tray.appendChild(p); sizePiece(p); });
+  }
+  reset();
+  addRestart(build, reset);
+})();
+
+/* ---------- КРОК 1: знайди кнопку живлення ---------- */
+(function(){
+  const box = document.getElementById('devBox'), dotsEl = document.getElementById('devDots');
+  const pwIcon = (x, y, s, c = '#C9C9DA')=>`<g transform="translate(${x - 12 * s} ${y - 12 * s}) scale(${s})" fill="none" stroke="${c}" stroke-width="2.6" stroke-linecap="round"><path d="M7.4 6.6a7.6 7.6 0 1 0 9.2 0"/><path d="M12 2.8v8.6"/></g>`;
+  const hb = (k, ring, inner)=>`<g class="hb" data-k="${k}">${inner}${ring.replace('/>', ' class="ring"/>')}</g>`;
+  const sun = (x, y)=>`<g stroke="#555" stroke-width="1.6" stroke-linecap="round" fill="none"><circle cx="${x}" cy="${y}" r="2.6"/><path d="M${x} ${y - 6}v1.5M${x} ${y + 4.5}v1.5M${x - 6} ${y}h1.5M${x + 4.5} ${y}h1.5"/></g>`;
+  const spk = (x, y, w)=>`<g stroke="#555" stroke-width="1.5" fill="#555" stroke-linejoin="round"><path d="M${x - 5} ${y - 2}h2.5l3.5-3v10l-3.5-3h-2.5z"/>${w ? `<path d="M${x + 3} ${y - 3}q2 3 0 6" fill="none"/>` : `<path d="M${x + 3} ${y - 3}l5 6M${x + 8} ${y - 3}l-5 6" fill="none"/>`}</g>`;
+  const DEVICES = [
+    { name:'Системний блок', max:240, view:'0 0 170 290', svg:`
+      <rect x="25" y="8" width="120" height="274" rx="14" fill="#3B3D56"/>
+      <rect x="38" y="28" width="94" height="22" rx="4" fill="#2B2D42"/>
+      ${hb('eject', '<rect x="104" y="54" width="34" height="22" rx="6"/>', '<rect x="110" y="58" width="22" height="14" rx="3" fill="#55577A"/><path d="M116 67l5-6 5 6z M116 69h10" fill="#C9C9DA" stroke="#C9C9DA" stroke-width="1.4"/>')}
+      ${hb('power', '<circle cx="85" cy="114" r="29"/>', `<circle cx="85" cy="114" r="22" fill="#24253A" stroke="#6B6D8A" stroke-width="3"/>${pwIcon(85, 114, 1.1)}`)}
+      ${hb('reset', '<circle cx="85" cy="160" r="15"/>', '<circle cx="85" cy="160" r="9" fill="#24253A" stroke="#6B6D8A" stroke-width="2.5"/>')}
+      ${hb('usb', '<rect x="44" y="184" width="82" height="24" rx="6"/>', '<rect x="52" y="190" width="26" height="12" rx="2" fill="#1B1B3A"/><rect x="56" y="193" width="18" height="4" fill="#9AA0C0"/><rect x="92" y="190" width="26" height="12" rx="2" fill="#1B1B3A"/><rect x="96" y="193" width="18" height="4" fill="#9AA0C0"/>')}
+      ${hb('audio', '<rect x="54" y="214" width="62" height="24" rx="12"/>', '<circle cx="70" cy="226" r="7" fill="#1B1B3A" stroke="#7BD08C" stroke-width="3"/><circle cx="100" cy="226" r="7" fill="#1B1B3A" stroke="#F49AC1" stroke-width="3"/>')}
+      <g stroke="#2B2D42" stroke-width="3" stroke-linecap="round"><path d="M45 252h80M45 262h80"/></g>` },
+    { name:'Монітор', max:460, view:'0 0 340 260', svg:`
+      <rect x="145" y="214" width="50" height="26" fill="#4A4C63"/><rect x="100" y="236" width="140" height="14" rx="7" fill="#2B2D42"/>
+      <rect x="10" y="10" width="320" height="208" rx="12" fill="#2B2D42"/>
+      <rect x="22" y="22" width="296" height="160" rx="4" fill="#1B1B3A"/><path d="M40 40 L90 40 L50 90 Z" fill="#fff" opacity=".06"/>
+      ${hb('menu', '<rect x="152" y="186" width="36" height="28" rx="6"/>', '<rect x="156" y="190" width="28" height="20" rx="4" fill="#3B3D56"/><path d="M163 196h14M163 200h14M163 204h14" stroke="#C9C9DA" stroke-width="2" stroke-linecap="round"/>')}
+      ${hb('minus', '<rect x="190" y="186" width="36" height="28" rx="6"/>', '<rect x="194" y="190" width="28" height="20" rx="4" fill="#3B3D56"/><path d="M202 200h12" stroke="#C9C9DA" stroke-width="2.4" stroke-linecap="round"/>')}
+      ${hb('plus', '<rect x="228" y="186" width="36" height="28" rx="6"/>', '<rect x="232" y="190" width="28" height="20" rx="4" fill="#3B3D56"/><path d="M240 200h12M246 194v12" stroke="#C9C9DA" stroke-width="2.4" stroke-linecap="round"/>')}
+      ${hb('power', '<rect x="266" y="186" width="36" height="28" rx="6"/>', `<rect x="270" y="190" width="28" height="20" rx="4" fill="#3B3D56"/>${pwIcon(284, 200, .62)}`)}
+      <circle cx="312" cy="200" r="3" fill="#55577A"/>` },
+    { name:'Ноутбук', max:460, view:'0 0 340 250', svg:`
+      <rect x="50" y="8" width="240" height="146" rx="10" fill="#2B2D42"/><rect x="60" y="18" width="220" height="126" rx="4" fill="#1B1B3A"/>
+      <path d="M50 154 H290 L332 238 H8 Z" fill="#CDD1DC"/><path d="M8 238 H332 V244 H8 Z" fill="#AEB3C2"/>
+      ${['esc', 'sun1', 'sun2', 'mute', 'vol', 'power'].map((k, i)=>{
+        const x = 46 + i * 42, y = 162;
+        const icon = k === 'esc' ? `<text x="${x + 17}" y="${y + 14}" font-size="11" font-family="sans-serif" font-weight="700" fill="#555" text-anchor="middle">Esc</text>`
+          : k === 'sun1' ? sun(x + 17, y + 10) : k === 'sun2' ? sun(x + 17, y + 10) + `<path d="M${x + 25} ${y + 4}h4M${x + 27} ${y + 2}v4" stroke="#555" stroke-width="1.4"/>`
+          : k === 'mute' ? spk(x + 15, y + 10, false) : k === 'vol' ? spk(x + 14, y + 10, true) : pwIcon(x + 17, y + 10, .62, '#555');
+        return hb(k, `<rect x="${x - 3}" y="${y - 3}" width="40" height="26" rx="6"/>`, `<rect x="${x}" y="${y}" width="34" height="20" rx="4" fill="#F4F5F8" stroke="#B6BBCA"/>${icon}`);
+      }).join('')}
+      ${Array.from({length:3}, (_, r)=>Array.from({length:11}, (_, c)=>`<rect x="${40 + r * 6 + c * (24 - r)}" y="${190 + r * 13}" width="${20 - r}" height="10" rx="2" fill="#F4F5F8" stroke="#C3C7D3"/>`).join('')).join('')}
+      <rect x="135" y="230" width="70" height="6" rx="3" fill="#BFC4D1"/>` },
+  ];
+  const hit = trackTask(box, DEVICES.length, DEVICES.length + 1);
+  let k = 0, best = 0, gen = 0;
+  function show(){
+    dotsEl.innerHTML = DEVICES.map((_, i)=>`<i class="${i < k ? 'ok' : i === k ? 'now' : ''}"></i>`).join('');
+    const d = DEVICES[k];
+    box.innerHTML = `<svg class="device" style="max-width:${d.max}px" viewBox="${d.view}" aria-label="${d.name}">${d.svg}</svg>`;
+    box.querySelectorAll('.hb').forEach(g=>g.addEventListener('click', ()=>{
+      if(box.querySelector('.hb.ok')) return;
+      if(g.dataset.k === 'power'){
+        g.classList.add('ok');
+        if(k >= best){ best = k + 1; addNeurons(1); hit(); if(best === DEVICES.length) addNeurons(1); }
+        const gg = gen;
+        k++;
+        if(k < DEVICES.length) setTimeout(()=>{ if(gg === gen) show(); }, 1200);
+        else dotsEl.innerHTML = DEVICES.map(()=>'<i class="ok"></i>').join('');
+      } else {
+        g.classList.remove('miss'); void g.getBBox(); g.classList.add('miss');
+        setTimeout(()=>g.classList.remove('miss'), 600);
+      }
+    }));
+  }
+  show();
+  addRestart(box, ()=>{ gen++; k = 0; show(); });
+})();
+
+/* ---------- КОМП'ЮТЕР-ЕМУЛЯТОР (кроки 2 і 3) ----------
+   Екран малюється за станом: off, boot, desk, win, start, pmenu, bye («Немає сигналу» — монітор увімкнено, блок ні). */
+function makePC(root, onAct){
+  root.innerHTML = `<div class="pc">
+      <div class="mon"><div class="bezel"><div class="scr"></div></div>
+        <div class="chin"><span class="led mon-led"></span><button class="pw mon-pw" type="button" aria-label="Кнопка живлення монітора">${PWR}</button></div>
+        <div class="neck"></div><div class="foot"></div></div>
+      <div class="tower"><span class="slot"></span><span class="slot"></span>
+        <button class="pw tw-pw" type="button" aria-label="Кнопка живлення системного блока">${PWR}</button><span class="led tw-led"></span><span class="grille"></span></div>
+      <div class="socket" aria-label="Розетка"><svg viewBox="0 0 50 120"><path d="M25 40 C25 10 4 8 -20 30" fill="none" stroke="#3B3D56" stroke-width="4" stroke-linecap="round"/>
+        <rect class="plate" x="3" y="40" width="44" height="44" rx="9" fill="#fff" stroke="#C9CCD8" stroke-width="2.5"/><circle cx="25" cy="62" r="14" fill="#EEF0F5"/>
+        <rect x="16" y="34" width="18" height="20" rx="4" fill="#3B3D56"/></svg></div>
+    </div>`;
+  const scr = root.querySelector('.scr');
+  const pc = { root, scr, state:'off', unit:false, mon:false,
+    monPw: root.querySelector('.mon-pw'), twPw: root.querySelector('.tw-pw'), socket: root.querySelector('.socket'),
+    set(state){ this.state = state; draw(); },
+    power(unit, mon){
+      this.unit = unit; this.mon = mon;
+      root.querySelector('.tw-led').classList.toggle('on', unit); this.twPw.classList.toggle('on', unit);
+      root.querySelector('.mon-led').classList.toggle('on', mon); this.monPw.classList.toggle('on', mon);
+      draw();
+    } };
+  function draw(){
+    const s = pc.state;
+    if(!pc.mon){ scr.innerHTML = ''; return; }
+    if(!pc.unit || s === 'off'){ scr.innerHTML = pc.unit ? '' : '<div class="layer"><div class="nosig">Немає сигналу</div></div>'; return; }
+    if(s === 'boot'){ scr.innerHTML = `<div class="layer boot">${LOGO}${spinner()}</div>`; return; }
+    if(s === 'bye'){ scr.innerHTML = `<div class="layer bye">${spinner()}<span>Завершення роботи</span></div>`; return; }
+    const win = s === 'win', menu = s === 'start' || s === 'pmenu';
+    scr.innerHTML = `<div class="layer wall" style="animation:none">
+      <div class="icons"><div class="ic"><span>🗑️</span>Кошик</div><div class="ic"><span>🎨</span>Малювання</div><div class="ic"><span>🎮</span>Гра</div></div>
+      ${win ? `<div class="win"><div class="wt">🎨&nbsp; Малювання<button class="x" type="button" data-act="close" aria-label="Закрити">✕</button></div>
+        <div class="wc"><svg viewBox="0 0 120 80"><circle cx="98" cy="18" r="10" fill="#FFC93C"/><rect x="30" y="38" width="44" height="34" fill="#FF8C2E"/><path d="M24 40 L52 16 L80 40 Z" fill="#E8458B"/><rect x="46" y="52" width="12" height="20" fill="#7A4B2A"/><path d="M0 74 H120" stroke="#3FAE58" stroke-width="6"/></svg></div></div>` : ''}
+      ${menu ? `<div class="smenu"><div class="sm-apps"><span>🎨</span><span>🎮</span><span>🎵</span><span>📷</span><span>🧮</span><span>📝</span><span>🌐</span><span>📁</span></div>
+        <div class="sm-bot"><span>🙂 Учень</span><button class="sm-pw${s === 'pmenu' ? ' on' : ''}" type="button" data-act="power" aria-label="Живлення">${PWR_DARK}</button>
+        ${s === 'pmenu' ? `<div class="pmenu"><button type="button" data-act="sleep">${SLEEP}Сплячий режим</button><button type="button" data-act="shutdown">${PWR_DARK}Завершити роботу</button><button type="button" data-act="restart">${RESTART}Перезавантажити</button></div>` : ''}</div></div>` : ''}
+      <div class="tb"><button class="st${menu ? ' on' : ''}" type="button" data-act="start" aria-label="Пуск">${LOGO}</button>${win ? '<span class="app">🎨</span>' : ''}<span class="clk">9:00</span></div>
+    </div>`;
+  }
+  root.addEventListener('click', e=>{
+    if(e.target.closest('.mon-pw')) return onAct('mon', pc.monPw);
+    if(e.target.closest('.tw-pw')) return onAct('unit', pc.twPw);
+    if(e.target.closest('.socket')) return onAct('socket', pc.socket);
+    const a = e.target.closest('[data-act]');
+    if(a) return onAct(a.dataset.act, a);
+    if(e.target.closest('.scr')) onAct('screen', null);
+  });
+  return pc;
+}
+
+/* ---------- КРОК 2: вмикаємо (блок і монітор — у будь-якому порядку, потім чекаємо) ---------- */
+(function(){
+  const box = document.getElementById('pcOn');
+  const hit = trackTask(box, 3, 5);
+  const got = new Set();
+  let gen = 0, pc = null;
+  const award = key=>{ if(got.has(key)) return; got.add(key); addNeurons(1); hit(); if(got.size === 3) addNeurons(2); };
+  const idle = idleHint(()=>!pc.unit ? pc.twPw : !pc.mon ? pc.monPw : null);
+  pc = makePC(box, (act, el)=>{
+    if(pc.state === 'boot' || pc.state === 'desk') return;      // чекаємо / уже працює
+    if(act === 'socket'){ flick(el); return; }
+    if(act === 'unit' && !pc.unit){ pc.power(true, pc.mon); award('unit'); next(); return; }
+    if(act === 'mon' && !pc.mon){ pc.power(pc.unit, true); award('mon'); next(); return; }
+    idle();
+  });
+  function next(){
+    glowOn(null);
+    if(!pc.unit || !pc.mon){ idle(); return; }
+    pc.set('boot');
+    const g = gen;
+    setTimeout(()=>{
+      if(g !== gen) return;
+      pc.set('desk'); award('desk');
+    }, 4200);
+  }
+  function reset(){ gen++; pc.state = 'off'; pc.power(false, false); next(); }
+  reset();
+  addRestart(box, reset);
+})();
+
+/* ---------- КРОК 3: вимикаємо ---------- */
+(function(){
+  const box = document.getElementById('pcOff');
+  const STEPS = ['close', 'start', 'power', 'shutdown', 'mon'];   // ✕ → Пуск → ⏻ → «Завершити роботу» → монітор
+  const hit = trackTask(box, STEPS.length, STEPS.length + 2);
+  let k = 0, best = 0, gen = 0, pc = null;
+  const target = ()=>{
+    const act = STEPS[k];
+    return act === 'mon' ? pc.monPw : box.querySelector(`[data-act="${act}"]`);
+  };
+  const idle = idleHint(target);
+  pc = makePC(box, (act, el)=>{
+    if(k >= STEPS.length || pc.state === 'bye') return;
+    if(act === STEPS[k]){
+      if(k >= best){ best = k + 1; addNeurons(1); hit(); if(best === STEPS.length) addNeurons(2); }
+      k++;
+      if(act === 'close') pc.set('desk');
+      if(act === 'start') pc.set('start');
+      if(act === 'power') pc.set('pmenu');
+      if(act === 'shutdown'){
+        pc.set('bye');
+        glowOn(null);
+        const g = gen;
+        setTimeout(()=>{ if(g !== gen) return; pc.state = 'off'; pc.power(false, true); show(); }, 3200);
+        return;
+      }
+      if(act === 'mon') pc.power(false, false);
+      show();
+      return;
+    }
+    // кнопка блока, розетка, монітор завчасно, «Сплячий режим», «Перезавантажити» — хибна спроба і підказка
+    if(['unit', 'socket', 'mon', 'sleep', 'restart'].includes(act)){ flick(el); glowOn(target()); return; }
+    idle();
+  });
+  function show(){
+    glowOn(null);
+    if(k < STEPS.length) idle();
+  }
+  function reset(){ gen++; k = 0; pc.state = 'win'; pc.power(true, true); show(); }
+  reset();
+  addRestart(box, reset);
+})();
+
+/* ---------- ГРА: ЧАРІВНИЙ САД ----------
+   Три етапи — три дії мишею, без тексту: на початку етапу банер «що робимо» + значок дії миші.
+   🌱 клацни лунку — посади насіння; 💧 перетягни лійку й тримай над рослиною — вона росте й розквітає;
+   💐 на кожній рослині три квітки: двічі клацни одну — вона летить у вазу разом зі стеблиною, збираємо букет з 18 квіток. */
+const mouseIco = (kind)=>{
+  const body = `<path d="M32 4 C52 4 60 20 60 40 C60 66 48 86 32 86 C16 86 4 66 4 40 C4 20 12 4 32 4Z" fill="#fff" stroke="#3B3D56" stroke-width="4"/>
+    <path d="M32 6 C15 6 7 19 6 36 H32 Z" fill="#FFC93C"/><path d="M32 4V36 M5 36H59" stroke="#3B3D56" stroke-width="3.5"/>`;
+  if(kind === 'drag') return `<svg viewBox="0 0 150 90">${body}<path d="M76 62 C96 30 116 30 136 44" fill="none" stroke="#14A37F" stroke-width="6" stroke-linecap="round" stroke-dasharray="2 11"/><path d="M128 32 L140 46 L122 50" fill="none" stroke="#14A37F" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  if(kind === 'dbl') return `<svg viewBox="0 0 140 90">${body}<text x="100" y="62" font-family="Baloo 2, sans-serif" font-weight="800" font-size="40" fill="#14A37F" text-anchor="middle">×2</text></svg>`;
+  return `<svg viewBox="0 0 110 90">${body}<path d="M76 18 L90 10 M78 32 H94 M76 46 L90 54" stroke="#FFC93C" stroke-width="5" stroke-linecap="round"/></svg>`;
+};
+(function(){
+  const garden = document.getElementById('garden'), stagesEl = document.getElementById('stages'), vase = document.getElementById('vase');
+  const STAGES = [['🌱', 'click'], ['💧', 'drag'], ['💐', 'dbl']];
+  const SPOTS = [[20, 54], [50, 54], [80, 54], [20, 93], [50, 93], [80, 93]];
+  const FLOWERS = ['#FF6B8A', '#FFC93C', '#8E7CF0', '#FF8C2E', '#E8458B', '#4CB8F5'];
+  // де стоять квітки в букеті (18 = 6 рослин × 3): три ряди віялом над шийкою вази (120, 112)
+  const BUNCH = [];
+  [[96, 6, -52, 52], [74, 7, -66, 66], [50, 5, -48, 48]].forEach(([r, n, a0, a1])=>{
+    for(let i = 0; i < n; i++){ const a = (a0 + (a1 - a0) * i / (n - 1)) * Math.PI / 180; BUNCH.push([120 + r * Math.sin(a), 112 - r * Math.cos(a)]); }
+  });
+  const ORDER = [0, 6, 13, 3, 9, 16, 1, 7, 14, 4, 10, 17, 2, 8, 15, 5, 11, 12];   // перемішаний порядок, щоб букет ріс рівномірно
+  const hit = trackTask(garden, STAGES.length, STAGES.length + 3);
+  let stage = 0, best = 0, gen = 0, seen = false, picked = 0;
+  let beds = [], can = null;
+
+  const flower = (c, cx = 50, cy = 32, k = 1)=>Array.from({length:6}, (_, i)=>{ const a = i * Math.PI / 3; return `<circle cx="${cx + 14 * k * Math.cos(a)}" cy="${cy + 14 * k * Math.sin(a)}" r="${11 * k}" fill="${c}"/>`; }).join('')
+    + `<circle cx="${cx}" cy="${cy}" r="${10 * k}" fill="#FFE27A" stroke="#E0A800" stroke-width="${2 * k}"/>`;
+  // три стеблини з квітками на одній рослині: [шлях стеблини, x і y квітки]
+  const STEMS = [['M50 102 C44 82 32 64 27 48', 27, 42], ['M50 102 C50 78 50 52 50 28', 50, 22], ['M50 102 C56 84 68 68 73 52', 73, 46]];
+  const stemSVG = (c, [d, x, y])=>`<path d="${d}" stroke="#3E9B4F" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="${d}" stroke="transparent" stroke-width="18" fill="none"/>
+      <g class="flw">${flower(c, x, y, .72)}</g>`;
+  const plantSVG = c=>`<svg class="pl" viewBox="0 0 100 140">
+    <path d="M50 140 C50 124 50 112 50 100" stroke="#3E9B4F" stroke-width="7" fill="none" stroke-linecap="round"/>
+    ${STEMS.map((st, j)=>`<g class="st" data-j="${j}">${stemSVG(c, st)}</g>`).join('')}
+    <path d="M50 128 C34 120 20 124 13 111 C29 104 44 111 50 123 Z" fill="#6CC05A"/>
+    <path d="M50 118 C66 110 80 114 87 101 C71 94 56 101 50 113 Z" fill="#4CAF50"/></svg>`;
+  const CAN = `<svg viewBox="0 0 100 80"><path d="M38 34 L6 14 L3 20 L34 44 Z" fill="#2D9CDB"/><ellipse cx="6" cy="16" rx="4" ry="6" fill="#1F7FBF" transform="rotate(-30 6 16)"/>
+    <rect x="34" y="26" width="52" height="48" rx="10" fill="#3BA4F5"/><rect x="34" y="26" width="52" height="10" rx="5" fill="#2D9CDB"/>
+    <path d="M86 36 C102 36 102 64 86 64" fill="none" stroke="#2D9CDB" stroke-width="7"/><path d="M44 18 C50 4 74 4 80 18" fill="none" stroke="#2D9CDB" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="52" cy="52" r="5" fill="#fff" opacity=".5"/></svg>`;
+
+  function drawVase(){
+    vase.classList.remove('full');
+    vase.innerHTML = `<g class="bunch"></g>
+      <path d="M92 124 H148 L142 176 Q120 184 98 176 Z" fill="#7FD3F7" stroke="#2D9CDB" stroke-width="3"/>
+      <path d="M90 118 H150 V128 H90 Z" fill="#5BC0EB" stroke="#2D9CDB" stroke-width="3"/>
+      <path d="M104 140 Q106 160 110 170" stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none" opacity=".6"/>`;
+  }
+  function addToVase(c, n){
+    const [x, y] = BUNCH[ORDER[n]], bx = 120 + (x - 120) * .12;
+    const bunch = vase.querySelector('.bunch');
+    // стебла — під квітками: нове стебло вставляємо на початок, квітку — в кінець
+    bunch.insertAdjacentHTML('afterbegin', `<path class="vf" d="M${bx} 122 Q${(bx + x) / 2} ${(122 + y) / 2 + 8} ${x} ${y}" stroke="#3E9B4F" stroke-width="3.5" fill="none" stroke-linecap="round"/>`);
+    bunch.insertAdjacentHTML('beforeend', `<g class="vf">${flower(c, x, y, .62)}</g>`);
+  }
+
+  function drawStages(){
+    stagesEl.innerHTML = STAGES.map(([e], i)=>`<span class="stg${i < stage ? ' ok' : i === stage ? ' now' : ''}">${e}</span>`).join('');
+    garden.className = 'garden' + (stage === 0 ? ' s-plant' : stage === 1 ? ' s-water' : stage === 2 ? ' s-pick' : ' win');
+  }
+  function banner(){
+    if(stage >= STAGES.length) return;
+    garden.querySelector('.banner')?.remove();
+    garden.insertAdjacentHTML('beforeend', `<div class="banner"><span class="big">${STAGES[stage][0]}</span>${mouseIco(STAGES[stage][1])}</div>`);
+    const b = garden.querySelector('.banner');
+    setTimeout(()=>b.remove(), 1900);
+  }
+  function sparkle(bed, e = '✨'){ bed.el.insertAdjacentHTML('beforeend', `<span class="sparkle">${e}</span>`); const sp = bed.el.lastElementChild; setTimeout(()=>sp.remove(), 800); }
+  function nextStage(){
+    stage++;
+    if(stage > best){ best = stage; addNeurons(1); hit(); if(best === STAGES.length) addNeurons(3); }
+    drawStages();
+    const g = gen;
+    if(stage === STAGES.length) finale();
+    else setTimeout(()=>{ if(g === gen) banner(); }, 500);
+  }
+
+  /* 🌱 посадити — клацнути лунку */
+  const setG = (bed, g)=>{ bed.g = g; bed.el.style.setProperty('--g', g); };
+  function plant(bed){
+    if(stage !== 0 || bed.planted) return;
+    bed.planted = true; bed.el.classList.add('planted');
+    bed.el.insertAdjacentHTML('beforeend', '<span class="seed"></span>');
+    setTimeout(()=>{ bed.el.querySelector('.seed')?.remove(); setG(bed, .22); }, 450);
+    if(beds.every(b=>b.planted)){ const g = gen; setTimeout(()=>{ if(g === gen) nextStage(); }, 800); }
+  }
+
+  /* 💧 полити: тягнемо лійку; поки «носик» над рослиною — вона росте */
+  function setupCan(){
+    can = document.createElement('div');
+    can.className = 'can hint';
+    can.innerHTML = CAN + `<div class="drops">${[0, 1, 2, 3].map(i=>`<i style="left:${i * 25}%; animation-delay:${i * .12}s"></i>`).join('')}</div>`;
+    garden.appendChild(can);
+    let held = false, dx = 0, dy = 0, last = 0, timer = 0;
+    const gr = ()=>garden.getBoundingClientRect();
+    can.addEventListener('pointerdown', e=>{
+      if(stage !== 1) return;
+      e.preventDefault(); held = true; can.classList.add('held'); can.classList.remove('hint');
+      can.setPointerCapture(e.pointerId);
+      const r = can.getBoundingClientRect(); dx = e.clientX - r.left; dy = e.clientY - r.top;
+      last = performance.now(); clearInterval(timer); timer = setInterval(tick, 40);
+    });
+    can.addEventListener('pointermove', e=>{
+      if(!held) return;
+      const g = gr(), r = can.getBoundingClientRect();
+      const x = Math.min(Math.max(e.clientX - dx - g.left, -r.width * .2), g.width - r.width * .8);
+      const y = Math.min(Math.max(e.clientY - dy - g.top, -r.height * .2), g.height - r.height * .6);
+      can.style.left = x / g.width * 100 + '%'; can.style.top = y / g.height * 100 + '%';
+    });
+    const stop = ()=>{ held = false; can.classList.remove('held', 'pour'); clearInterval(timer); };
+    can.addEventListener('pointerup', stop); can.addEventListener('pointercancel', stop);
+    function tick(){
+      if(!held) return;
+      const now = performance.now(), dt = Math.min(100, now - last); last = now;
+      const r = can.getBoundingClientRect();
+      const px = r.left + r.width * .06, py = r.bottom + r.width * .5;     // куди падає вода з носика
+      const bed = beds.find(b=>{ const br = b.el.getBoundingClientRect(); return px > br.left && px < br.right && py > br.top && py < br.bottom + br.height * .15; });
+      can.classList.toggle('pour', !!bed);
+      if(bed && bed.g < 1){
+        setG(bed, Math.min(1, bed.g + dt / 1400));
+        if(bed.g >= 1){ bed.el.classList.add('grown'); sparkle(bed, '🌸'); if(beds.every(b=>b.g >= 1)){ stop(); can.style.display = 'none'; nextStage(); } }
+      }
+    }
+  }
+
+  /* 💐 букет: двічі клацнути квітку (чи її стеблину) — вона летить у вазу разом зі стеблиною; одне клацання лише хитає її */
+  const TOTAL = SPOTS.length * STEMS.length;
+  function pick(bed, i, st){
+    if(stage !== 2 || st.classList.contains('gone')) return;
+    if(!st.tapT){
+      st.classList.remove('tap'); void st.getBBox(); st.classList.add('tap');
+      st.tapT = setTimeout(()=>{ st.tapT = null; }, 550);
+      return;
+    }
+    clearTimeout(st.tapT); st.tapT = null;
+    const bb = st.getBBox(), from = st.getBoundingClientRect(), to = vase.getBoundingClientRect();
+    const fl = document.createElement('div');
+    fl.className = 'fly-flower';
+    fl.innerHTML = `<svg viewBox="${bb.x} ${bb.y} ${bb.width} ${bb.height}" width="100%" height="100%">${stemSVG(FLOWERS[i], STEMS[+st.dataset.j])}</svg>`;
+    fl.style.cssText = `left:${from.left}px; top:${from.top}px; width:${from.width}px; height:${from.height}px;`;
+    document.body.appendChild(fl);
+    st.classList.add('gone');
+    void fl.offsetWidth;
+    const k = to.width / 300 * .8;
+    fl.style.left = to.left + to.width / 2 - from.width * k / 2 + 'px'; fl.style.top = to.top + to.height * .1 + 'px';
+    fl.style.width = from.width * k + 'px'; fl.style.height = from.height * k + 'px';
+    const n = picked++, g = gen;
+    setTimeout(()=>{
+      fl.remove();
+      if(g !== gen) return;
+      addToVase(FLOWERS[i], n);
+      if(n + 1 === TOTAL){ vase.classList.add('full'); nextStage(); }
+    }, 720);
+  }
+
+  function finale(){
+    garden.insertAdjacentHTML('beforeend', [[10, 30], [60, 20], [40, 50]].map(([x, y], i)=>`<span class="butter" style="left:${x}%; top:${y}%; animation-delay:${-i * 2}s">🦋</span>`).join('') + '<span class="cup2">🏆</span>');
+  }
+
+  function reset(){
+    gen++;
+    stage = 0; picked = 0;
+    drawVase();
+    garden.innerHTML = '<span class="sun"></span><span class="cl" style="left:30%; top:7%; width:12cqw"></span><span class="cl" style="left:62%; top:12%; width:9cqw; animation-delay:-14s"></span>';
+    beds = SPOTS.map(([x, y], i)=>{
+      const el = document.createElement('div');
+      el.className = 'bed';
+      el.style.left = x + '%'; el.style.top = y + '%';
+      el.innerHTML = `<span class="soil"></span>${plantSVG(FLOWERS[i])}`;
+      const bed = { el, g:0, planted:false };
+      el.addEventListener('click', e=>{
+        if(stage === 0) plant(bed);
+        else if(stage === 2){ const st = e.target.closest('.st'); if(st) pick(bed, i, st); }
+      });
+      garden.appendChild(el);
+      return bed;
+    });
+    setupCan();
+    drawStages();
+    if(seen) banner();
+  }
+  reset();
+  new IntersectionObserver((es, io)=>{ if(es[0].isIntersecting){ seen = true; banner(); io.disconnect(); } }, {threshold:.5}).observe(garden);
+  addRestart(garden, reset);
+})();
+
+/* ---------- ПОВТОРЕННЯ: ЩО НЕ ТАК? ----------
+   Кімната з комп'ютером: знайди 6 небезпечних речей (сік біля клавіатури, піца на клавіатурі, кіт на системному блоці,
+   вазон на моніторі, калюжа біля системного блока, висмикнута вилка з іскрами). Звичайні речі (вікно, годинник, картина,
+   книжки, олівці, стілець, рюкзак) — пастки. Коли знайдено все — небезпечне зникає, і ядро саме відкриває екран завершення. */
+(function(){
+  const room = document.getElementById('room'), bads = document.getElementById('bads');
+  const part = (k, x, y, w)=>`<div class="part" style="left:${x}%; top:${y}%; width:${w}%">${partSVG(k)}</div>`;
+  const PLUG = `<svg viewBox="0 0 90 70"><rect x="56" y="10" width="30" height="40" rx="6" fill="#fff" stroke="#C9CCD8" stroke-width="3"/><circle cx="66" cy="30" r="3" fill="#888"/><circle cx="76" cy="30" r="3" fill="#888"/>
+    <path d="M4 66 C10 40 24 36 34 32" fill="none" stroke="#3B3D56" stroke-width="5" stroke-linecap="round"/>
+    <rect x="30" y="20" width="18" height="22" rx="4" fill="#3B3D56" transform="rotate(-12 39 31)"/><path d="M48 25 h7 M48 35 h7" stroke="#B0B4C4" stroke-width="3" transform="rotate(-12 39 31)"/></svg>`;
+  // [вміст, x %, y %, небезпечне?]
+  const THINGS = [
+    ['🥤', 33, 55, true], ['🍕', 50, 57, true], ['🐈', 25, 19, true], ['🪴', 50, 21, true], ['💦', 29, 90, true],
+    [PLUG + '<span class="sp" style="left:30%; top:-20%">⚡</span><span class="sp" style="left:55%; top:-30%; animation-delay:.25s">⚡</span>', 90, 66, true],
+    ['🕘', 50, 7, false], ['🖼️', 77, 18, false], ['📚', 83, 56, false], ['✏️', 77.5, 55, false], ['🪑', 62, 86, false], ['🎒', 12, 86, false],
+  ];
+  const N = THINGS.filter(t=>t[3]).length;
+  const hit = trackTask(room, N, N + 2);
+  let found = 0, best = 0, gen = 0;
+  const drawBads = ()=>{ bads.innerHTML = Array.from({length:N}, (_, i)=>`<i class="${i < found ? 'ok' : ''}"></i>`).join(''); };
+  function build(){
+    gen++; found = 0; room.classList.remove('ok');
+    room.innerHTML = '<span class="wnd"></span><span class="desk"></span>'
+      + part('unit', 19.5, 24, 11) + part('monitor', 37, 27, 26) + part('speakers', 64, 46, 9) + part('keyboard', 38, 55, 24) + part('mouse', 64.5, 56.5, 3.4)
+      + THINGS.map(([c, x, y, bad], i)=>`<button class="thing" type="button" data-i="${i}" style="left:${x}%; top:${y}%">${c}</button>`).join('');
+    room.querySelectorAll('.thing').forEach(b=>b.addEventListener('click', ()=>{
+      if(b.classList.contains('found')) return;
+      if(!THINGS[+b.dataset.i][3]){ b.classList.remove('miss'); void b.offsetWidth; b.classList.add('miss'); setTimeout(()=>b.classList.remove('miss'), 450); return; }
+      b.classList.add('found'); found++; drawBads();
+      if(found > best){ best = found; addNeurons(1); hit(); if(best === N) addNeurons(2); }
+      if(found === N){
+        const g = gen;
+        setTimeout(()=>{ if(g !== gen) return; room.querySelectorAll('.thing.found').forEach(t=>t.classList.add('fixed')); room.classList.add('ok'); }, 700);
+        setTimeout(()=>{ if(g === gen) document.querySelector('#finalQuiz .finish-btn')?.click(); }, 2400);
+      }
+    }));
+    drawBads();
+  }
+  build();
+  addRestart(room, build);
+})();
+
+/* ---------- ЗАВЕРШЕННЯ: тесту немає; екран завершення відкривається сам, коли знайдено все небезпечне ---------- */
+makeFinalQuiz('finalQuiz', [], {summary:'🎉'});
+</script>
+
+</body>
+</html>
