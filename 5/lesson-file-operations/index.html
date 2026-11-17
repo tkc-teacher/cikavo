@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Операції над файлами і папками — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — для команд меню й панелі Провідника -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --accent:#3B5BDB; --accent-dark:#2B44A8; --accent-soft:#E8EDFD;
+    --label:#E8590C;
+    --bg:#F5F7FD; --line:#DEE4F6;
+    --hud-bar:linear-gradient(90deg,#3B5BDB,#FF8A3D);
+    --fold:#FBC02D; --fold-dark:#E39B0B;
+  }
+  .block ul{padding-left:22px;}
+  .block li{margin-bottom:5px;}
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em;}
+  kbd{display:inline-block; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; line-height:1; padding:5px 8px 4px; border-radius:7px; background:#fff; border:1.5px solid #C5CEE8; box-shadow:0 2px 0 #C5CEE8; color:var(--ink); white-space:nowrap;}
+
+  /* Крок 1: картки дій */
+  .ops{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:10px 0 4px;}
+  @media (max-width:640px){ .ops{grid-template-columns:repeat(2,minmax(0,1fr));} }
+  .op{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; display:flex; gap:12px; align-items:flex-start;}
+  .op .ms{flex-shrink:0; width:44px; height:44px; font-size:26px; border-radius:12px; display:flex; align-items:center; justify-content:center; background:var(--cs); color:var(--c);}
+  .op b{font-family:'Baloo 2',sans-serif; font-size:17px; display:block; line-height:1.15; color:var(--ink);}
+  .op span{font-size:13.5px; color:var(--ink-soft); line-height:1.3; display:block;}
+
+  /* Крок 2: копія чи переїзд — анімація */
+  .cvm{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:12px 0 6px;}
+  @media (max-width:600px){ .cvm{grid-template-columns:1fr;} }
+  .cvm-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 14px 16px; display:flex; flex-direction:column; align-items:center; text-align:center;}
+  .cvm-card h3{font-family:'Baloo 2',sans-serif; font-size:20px; margin:0; color:var(--c); line-height:1.1;}
+  .cvm-card .how{display:inline-block; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; color:var(--c); background:var(--cs); border-radius:999px; padding:2px 12px; margin:4px 0 6px;}
+  .cvm-card svg.scene{width:100%; max-width:340px; height:auto; display:block;}
+  .cvm-res{font-size:14.5px; font-weight:700; margin-top:4px; color:var(--ink);}
+  .scene .fly{animation:flyCopy 4.5s ease-in-out infinite;}
+  .move .scene .fly{animation-name:flyMove;}
+  .scene .slot{opacity:0; animation:slot 4.5s ease-in-out infinite;}
+  @keyframes flyCopy{
+    0%,14%{transform:translate(0,0); opacity:0;}
+    20%{transform:translate(0,-34px); opacity:1;}
+    48%{transform:translate(83px,-60px);}
+    74%{transform:translate(166px,-34px);}
+    84%,95%{transform:translate(166px,0); opacity:1;}
+    100%{transform:translate(166px,0); opacity:0;}
+  }
+  @keyframes flyMove{
+    0%,14%{transform:translate(0,0); opacity:1;}
+    20%{transform:translate(0,-34px);}
+    48%{transform:translate(83px,-60px);}
+    74%{transform:translate(166px,-34px);}
+    84%,95%{transform:translate(166px,0); opacity:1;}
+    100%{transform:translate(166px,0); opacity:0;}
+  }
+  @keyframes slot{ 0%,22%{opacity:0;} 30%,94%{opacity:1;} 100%{opacity:0;} }
+  @media (prefers-reduced-motion:reduce){
+    .scene .fly{animation:none; transform:translate(166px,0); opacity:1;}
+    .scene .slot{animation:none; opacity:1;}
+  }
+  .clip{display:flex; gap:12px; align-items:center; background:var(--accent-soft); border-radius:var(--radius-m); padding:10px 14px; margin:12px 0 4px; font-size:14.5px;}
+  .clip .ms{font-size:30px; color:var(--accent); width:30px; flex-shrink:0;}
+
+  /* Крок 3: контекстне меню (ілюстрація і емулятор) */
+  .cm-demo{display:grid; grid-template-columns:auto minmax(0,1fr); gap:20px; align-items:center; margin:12px 0 8px;}
+  @media (max-width:560px){ .cm-demo{grid-template-columns:1fr; justify-items:center;} }
+  .cm-left{display:flex; flex-direction:column; align-items:center; gap:8px;}
+  .cm-file{display:flex; flex-direction:column; align-items:center; gap:4px; font-family:'Segoe UI',system-ui,sans-serif; font-size:13px; background:#CCE4F7; border:1px solid #99C9EF; border-radius:4px; padding:6px 8px;}
+  .cm-file svg{width:40px; height:48px;}
+  .cm-mouse{width:64px; height:auto;}
+  .cm-mouse-cap{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; color:var(--label); text-align:center; line-height:1.15;}
+  .cm{background:#FBFBFB; border:1px solid #D9D9D9; border-radius:8px; box-shadow:0 8px 22px rgba(0,0,0,.16); padding:4px; font-family:'Segoe UI',system-ui,sans-serif; font-size:13.5px; color:#1B1B1B; width:100%; max-width:300px; user-select:none; -webkit-user-select:none;}
+  .cm-icons{display:flex; justify-content:space-around; gap:2px; padding:2px 2px 4px; border-bottom:1px solid #E5E5E5; margin-bottom:4px;}
+  .cm-icons > *{display:flex; flex-direction:column; align-items:center; gap:2px; padding:5px 4px 3px; border-radius:5px; min-width:54px; font:inherit; border:none; background:none; color:inherit; cursor:pointer;}
+  .cm-icons > *:hover{background:#EDEDED;}
+  .cm-icons small{font-size:10.5px; color:#555;}
+  .cm-icons .ms{font-size:20px;}
+  .cm-row{display:flex; align-items:center; gap:12px; padding:7px 10px; border-radius:5px; cursor:pointer; width:100%; border:none; background:none; font:inherit; color:inherit; text-align:left;}
+  .cm-row:hover{background:#EDEDED;}
+  .cm-row .ms{color:#444; font-size:19px;}
+  .cm-row[disabled], .cm-icons > [disabled]{color:#A8A8A8; cursor:default; background:none !important;}
+  .cm-row[disabled] .ms{color:#C2C2C2;}
+  .cm-sep{height:1px; background:#E5E5E5; margin:4px 2px;}
+  .keys{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px 14px; margin:10px 0 6px;}
+  @media (max-width:560px){ .keys{grid-template-columns:1fr;} }
+  .key{display:flex; align-items:center; gap:10px; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-s); padding:8px 12px; font-size:14.5px;}
+  .key .k{min-width:96px; display:flex; gap:4px; align-items:center; font-weight:700; color:var(--ink-soft);}
+  .key em{font-style:normal; font-size:12.5px; color:var(--ink-soft); display:block;}
+
+  /* Крок 4: Кошик */
+  .bin-row{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:12px 0 6px;}
+  @media (max-width:600px){ .bin-row{grid-template-columns:1fr;} }
+  .bin-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:12px 12px 14px; text-align:center;}
+  .bin-art{display:flex; align-items:center; justify-content:center; gap:8px; height:66px;}
+  .bin-art svg{width:42px; height:50px;}
+  .bin-art .ms{font-size:28px; color:var(--c); width:28px;}
+  .bin-card b{font-family:'Baloo 2',sans-serif; font-size:17px; display:block; color:var(--c); margin-top:4px;}
+  .bin-card span{font-size:13.5px; color:var(--ink-soft); line-height:1.3; display:block;}
+  .bin-art .gone{opacity:.25;}
+
+  /* Крок 5: Провідник Windows 11 */
+  .tasks{list-style:none; margin:0 0 14px; padding:0; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:6px 12px; counter-reset:t;}
+  @media (max-width:600px){ .tasks{grid-template-columns:1fr;} }
+  .tasks li{counter-increment:t; display:flex; gap:8px; align-items:flex-start; font-size:14px; line-height:1.3; padding:6px 10px; border-radius:var(--radius-s); border:1.5px solid var(--line); background:var(--bg); margin:0 !important;}
+  .tasks li::before{content:counter(t); flex-shrink:0; width:22px; height:22px; border-radius:50%; background:#fff; border:1.5px solid var(--line); font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; color:var(--ink-soft);}
+  .tasks li.now{border-color:var(--accent); background:var(--accent-soft);}
+  .tasks li.now::before{border-color:var(--accent); color:var(--accent-dark);}
+  .tasks li.ok{border-color:#B7E4C7; background:#EAF8EF; color:#2B6A3F;}
+  .tasks li > span{flex:1; min-width:0; padding-top:1px;}
+  .tasks li.ok::before{content:'✓'; background:#2F9E44; border-color:#2F9E44; color:#fff;}
+
+  .ex{position:relative; border:1px solid #C9CDD3; border-radius:8px; overflow:hidden; background:#F3F3F3; font-family:'Segoe UI',system-ui,-apple-system,sans-serif; color:#1B1B1B; font-size:13.5px; box-shadow:0 6px 20px rgba(0,0,0,.12); user-select:none; -webkit-user-select:none; outline:none;}
+  .ex:focus-visible{box-shadow:0 0 0 3px var(--accent);}
+  .ex.miss{animation:exNo .4s;}
+  @keyframes exNo{20%{transform:translateX(-6px)} 60%{transform:translateX(6px)}}
+  .ex-title{display:flex; align-items:center; gap:8px; padding:0 0 0 12px; height:34px; background:#EBEBEB;}
+  .ex-title svg{width:18px; height:15px;}
+  .ex-title span{flex:1; font-size:12.5px;}
+  .ex-title .ms{width:44px; text-align:center; font-size:16px; color:#333;}
+  .ex-nav{display:flex; align-items:center; gap:4px; padding:6px 10px; background:#F9F9F9;}
+  .ex-nav button{border:none; background:none; border-radius:5px; width:30px; height:30px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:#333;}
+  .ex-nav button:hover:not([disabled]){background:#E8E8E8;}
+  .ex-nav button[disabled]{color:#B5B5B5; cursor:default;}
+  .ex-addr{flex:1; display:flex; align-items:center; gap:0; min-width:0; background:#fff; border:1px solid #DCDCDC; border-radius:5px; padding:3px 6px; height:30px; overflow:hidden; white-space:nowrap;}
+  .ex-addr .ms{color:#666; font-size:16px;}
+  .ex-crumb{padding:2px 6px; border-radius:4px; cursor:pointer;}
+  .ex-crumb:hover, .ex-crumb.over{background:#E5F1FB;}
+  .ex-search{width:170px; display:flex; align-items:center; gap:6px; background:#fff; border:1px solid #DCDCDC; border-radius:5px; padding:0 8px; height:30px; color:#777; font-size:12.5px;}
+  .ex-search .ms{font-size:17px;}
+  @media (max-width:640px){ .ex-search{display:none;} }
+  .ex-cmd{display:flex; align-items:center; gap:2px; padding:4px 8px; background:#F9F9F9; border-bottom:1px solid #E3E3E3; flex-wrap:wrap; min-height:42px;}
+  .ex-cmd button{display:flex; align-items:center; gap:6px; border:none; background:none; border-radius:5px; padding:6px 9px; font:inherit; font-size:13px; color:#1B1B1B; cursor:pointer;}
+  .ex-cmd button:hover:not([disabled]){background:#EBEBEB;}
+  .ex-cmd button[disabled]{color:#ABABAB; cursor:default;}
+  .ex-cmd button .ms{font-size:19px;}
+  .ex-cmd .new{background:#fff; border:1px solid #DCDCDC; margin-right:6px;}
+  .ex-cmd .new .ms{color:var(--accent);}
+  .ex-cmd i.sep{width:1px; height:22px; background:#DDD; margin:0 4px;}
+  @media (max-width:700px){ .ex-cmd button:not(.new) span.lb{display:none;} .ex-cmd button{padding:7px 8px;} }
+  .ex-body{display:grid; grid-template-columns:168px minmax(0,1fr); min-height:300px; background:#fff;}
+  .ex-side{background:#F7F7F7; border-right:1px solid #E5E5E5; padding:8px 6px;}
+  .ex-side div{display:flex; align-items:center; gap:9px; padding:7px 10px; border-radius:5px; cursor:pointer; white-space:nowrap;}
+  .ex-side div:hover{background:#EBEBEB;}
+  .ex-side div.on{background:#E1E1E1; font-weight:600;}
+  .ex-side div.over, .ex-item.over{background:#CCE4F7 !important; box-shadow:inset 0 0 0 1px #3B8EDB;}
+  .ex-side .ms{font-size:19px;}
+  .ex-side hr{border:none; border-top:1px solid #E1E1E1; margin:6px 4px;}
+  @media (max-width:600px){
+    .ex-body{grid-template-columns:1fr;}
+    .ex-side{display:flex; gap:4px; border-right:none; border-bottom:1px solid #E5E5E5; overflow-x:auto; padding:6px;}
+    .ex-side hr{display:none;}
+    .ex-side div{padding:6px 10px;}
+  }
+  .ex-main{position:relative; padding:10px; display:flex; flex-wrap:wrap; align-content:flex-start; gap:4px; min-height:300px;}
+  .ex-item{width:96px; display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 3px; border-radius:4px; border:1px solid transparent; text-align:center; cursor:default; touch-action:none;}
+  .ex-item:hover{background:#E5F1FB;}
+  .ex-item.sel{background:#CCE4F7; border-color:#99C9EF;}
+  .ex-item.cut{opacity:.45;}
+  .ex-item svg{width:44px; height:48px;}
+  .ex-item .nm{font-size:12.5px; line-height:1.2; word-break:break-word; overflow-wrap:anywhere;}
+  .ex-item small{font-size:10.5px; color:#777;}
+  .ex-item.fresh{animation:fresh 1.4s ease;}
+  @keyframes fresh{0%,40%{background:#FFF1B8;} 100%{background:transparent;}}
+  .ex-item textarea{width:92px; font:inherit; font-size:12.5px; line-height:1.2; text-align:center; border:1px solid #3B8EDB; border-radius:2px; padding:1px 2px; resize:none; outline:none; overflow:hidden;}
+  .ex-empty{width:100%; text-align:center; color:#777; padding:40px 10px; font-size:13px;}
+  .ex-status{display:flex; gap:14px; flex-wrap:wrap; padding:5px 12px; font-size:12px; color:#444; background:#F3F3F3; border-top:1px solid #E3E3E3; min-height:26px;}
+  .ex-status .clipb{color:var(--accent-dark); font-weight:600;}
+  .ex-menu{position:absolute; z-index:20; width:250px;}
+  .ex-menu[hidden]{display:none;}
+  .ex-ghost{position:fixed; z-index:1000; pointer-events:none; display:flex; flex-direction:column; align-items:center; gap:2px; opacity:.85; transform:translate(-50%,-60%) rotate(-4deg);}
+  .ex-ghost svg{width:44px; height:48px; filter:drop-shadow(0 6px 10px rgba(0,0,0,.25));}
+  .ex-ghost b{position:absolute; right:-8px; top:-6px; background:var(--accent); color:#fff; border-radius:999px; font-size:11px; padding:1px 6px; font-family:'Segoe UI',sans-serif;}
+  .ex-ghost i{font-style:normal; font-size:11.5px; background:#3B8EDB; color:#fff; border-radius:4px; padding:2px 6px; white-space:nowrap;}
+  .ex-bar{display:flex; gap:10px; align-items:flex-start; margin-top:10px;}
+  .ex-fb{flex:1; font-size:14px; color:var(--ink-soft); min-height:2.6em;}
+  .ex-fb.ok{color:#2B6A3F; font-weight:700;}
+  .ex-fb.err{color:#C92A2A;}
+  .ex-hint{flex-shrink:0; display:inline-flex; align-items:center; gap:4px; border:1.5px solid var(--line); background:var(--surface); border-radius:999px; padding:5px 12px; font:600 13px 'Nunito Sans',sans-serif; color:var(--ink-soft); cursor:pointer;}
+  .ex-hint:hover{border-color:var(--accent); color:var(--accent-dark);}
+  .ex-hint .ms{font-size:17px;}
+</style>
+</head>
+<body data-lesson="lesson5-file-operations" data-hud="5 клас · Операції з файлами">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Файли й папки</div>
+      <h1>Що можна робити з файлами і папками</h1>
+      <p>Навчишся створювати, перейменовувати, копіювати, переміщувати й видаляти файли та папки — і рятувати їх із Кошика.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="58" fill="#E8EDFD"/>
+      <!-- два аркуші: оригінал і копія -->
+      <g transform="rotate(-12 60 46)">
+        <path d="M44 18h22l9 9v36H44z" fill="#fff" stroke="#AAB6DA" stroke-width="2"/>
+        <rect x="50" y="34" width="18" height="3" rx="1.5" fill="#AAB6DA"/><rect x="50" y="41" width="14" height="3" rx="1.5" fill="#AAB6DA"/>
+      </g>
+      <g transform="rotate(8 92 44)">
+        <path d="M76 16h22l9 9v36H76z" fill="#fff" stroke="#3B5BDB" stroke-width="2"/>
+        <rect x="82" y="32" width="18" height="3" rx="1.5" fill="#3B5BDB"/><rect x="82" y="39" width="14" height="3" rx="1.5" fill="#3B5BDB"/>
+      </g>
+      <!-- папка з обличчям -->
+      <path d="M24 56a5 5 0 0 1 5-5h22l7 7h53a5 5 0 0 1 5 5v48a5 5 0 0 1-5 5H29a5 5 0 0 1-5-5z" fill="#E39B0B"/>
+      <path d="M22 70a4 4 0 0 1 4-4h88a4 4 0 0 1 4 4l-4 42a5 5 0 0 1-5 5H31a5 5 0 0 1-5-5z" fill="#FBC02D"/>
+      <circle cx="56" cy="88" r="6" fill="#3B2A00"/><circle cx="84" cy="88" r="6" fill="#3B2A00"/>
+      <circle cx="58" cy="86" r="2" fill="#fff"/><circle cx="86" cy="86" r="2" fill="#fff"/>
+      <path d="M60 100q10 8 20 0" stroke="#3B2A00" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="46" cy="99" r="5" fill="#F59E7A" opacity=".6"/><circle cx="94" cy="99" r="5" fill="#F59E7A" opacity=".6"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Файли, папки, шлях до файлу</div>
+    <h2>Що ти вже знаєш</h2>
+    <p>Минулого уроку ти дізнався, що таке файл і папка. Обери термін, а потім клацни пояснення до нього.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Дії з файлами</div>
+    <h2>Що можна робити з файлом</h2>
+    <p>Дії з файлами називають <b>операціями</b>. Ті самі операції можна виконувати і з папками — разом з усім, що в них лежить.</p>
+    <div class="ops" id="ops"></div>
+    <div class="exercise">
+      <p class="soft">Яка дія потрібна в кожній ситуації?</p>
+      <div id="opsList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Копія чи переїзд</div>
+    <h2>Копіювати чи переміщувати</h2>
+    <p>Ці дві дії легко сплутати. Подивись, чим відрізняється результат.</p>
+    <div class="cvm">
+      <div class="cvm-card copy" style="--c:#2F9E44; --cs:#E6F6EA">
+        <h3>Копіювати</h3>
+        <div class="how">Копіювати → Вставити</div>
+        <div class="scene-box" data-scene="copy"></div>
+        <div class="cvm-res">Файл є в обох місцях.</div>
+      </div>
+      <div class="cvm-card move" style="--c:#E8590C; --cs:#FDEDE4">
+        <h3>Переміщувати</h3>
+        <div class="how">Вирізати → Вставити</div>
+        <div class="scene-box" data-scene="move"></div>
+        <div class="cvm-res">Файл лише в новому місці.</div>
+      </div>
+    </div>
+    <div class="clip"><span class="ms">content_paste</span><div>Команди «Копіювати» і «Вирізати» кладуть файл у <b>буфер обміну</b> — невидиму «кишеньку» комп'ютера. Команда «Вставити» дістає його з кишеньки там, де ти зараз.</div></div>
+    <div class="exercise">
+      <p class="soft">Як скопіювати файл на флешку? Обирай кроки по черзі.</p>
+      <ol class="seq-done" id="cpDone"></ol>
+      <div class="seq-q" id="cpQ"></div>
+      <div class="seq-opts" id="cpOpts"></div>
+      <div class="choice-feedback" id="cpFb"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Меню й клавіші</div>
+    <h2>Контекстне меню і гарячі клавіші</h2>
+    <p>Клацни файл <b>правою</b> кнопкою миші — з'явиться <b>контекстне меню</b>: список команд саме для цього файлу.</p>
+    <div class="cm-demo">
+      <div class="cm-left">
+        <div class="cm-file" id="cmFile"></div>
+        <svg class="cm-mouse" viewBox="0 0 64 92" fill="none">
+          <rect x="4" y="4" width="56" height="84" rx="28" fill="#fff" stroke="#AAB6DA" stroke-width="3"/>
+          <path d="M32 4v34" stroke="#AAB6DA" stroke-width="3"/>
+          <path d="M32 5.5a26.5 26.5 0 0 1 26.5 26.5V38H32z" fill="#FF8A3D"/>
+          <rect x="29" y="14" width="6" height="14" rx="3" fill="#AAB6DA"/>
+          <path d="M4 38h56" stroke="#AAB6DA" stroke-width="3"/>
+        </svg>
+        <div class="cm-mouse-cap">права кнопка</div>
+      </div>
+      <div class="cm">
+        <div class="cm-icons">
+          <span><i class="ms">content_cut</i><small>Вирізати</small></span>
+          <span><i class="ms">content_copy</i><small>Копіювати</small></span>
+          <span><i class="ms">edit</i><small>Перейменувати</small></span>
+          <span><i class="ms">delete</i><small>Видалити</small></span>
+        </div>
+        <div class="cm-row"><i class="ms">open_in_new</i>Відкрити</div>
+        <div class="cm-row"><i class="ms">apps</i>Відкрити за допомогою</div>
+        <div class="cm-row"><i class="ms">folder_zip</i>Стиснути до ZIP-файлу</div>
+        <div class="cm-sep"></div>
+        <div class="cm-row"><i class="ms">info</i>Властивості</div>
+      </div>
+    </div>
+    <p>Досвідчені користувачі натискають <b>гарячі клавіші</b> — це ще швидше. Утримуй першу клавішу й натисни другу.</p>
+    <div class="keys">
+      <div class="key"><span class="k"><kbd>Ctrl</kbd>+<kbd>C</kbd></span><div>Копіювати<em>C — від англ. Copy</em></div></div>
+      <div class="key"><span class="k"><kbd>Ctrl</kbd>+<kbd>X</kbd></span><div>Вирізати<em>X схожа на розкриті ножиці</em></div></div>
+      <div class="key"><span class="k"><kbd>Ctrl</kbd>+<kbd>V</kbd></span><div>Вставити<em>V — стоїть поруч із C</em></div></div>
+      <div class="key"><span class="k"><kbd>Ctrl</kbd>+<kbd>Z</kbd></span><div>Скасувати останню дію<em>рятує, якщо помилився</em></div></div>
+      <div class="key"><span class="k"><kbd>Ctrl</kbd>+<kbd>A</kbd></span><div>Виділити все<em>A — від англ. All, «усе»</em></div></div>
+      <div class="key"><span class="k"><kbd>Delete</kbd></span><div>Видалити<em>файл іде в Кошик</em></div></div>
+      <div class="key"><span class="k"><kbd>F2</kbd></span><div>Перейменувати<em>виділений файл чи папку</em></div></div>
+      <div class="key"><span class="k"><kbd>Ctrl</kbd>+клік</span><div>Виділити кілька файлів<em>клацай їх по черзі</em></div></div>
+    </div>
+    <div class="note">На комп'ютерах Apple замість <kbd>Ctrl</kbd> натискають <kbd>⌘</kbd>. А на Google Диску правий клік на файлі відкриває схоже меню.</div>
+    <div class="exercise">
+      <p class="soft">Обери клавіші, а потім клацни дію, яку вони виконують.</p>
+      <div class="match-pool" id="keyPool"></div>
+      <div id="keyList"></div>
+      <div class="progress-line" id="keyProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Кошик</div>
+    <h2>Кошик: другий шанс для файлів</h2>
+    <p>Видалений з комп'ютера файл не зникає одразу — він потрапляє в <b>Кошик</b>. Звідти його можна повернути.</p>
+    <div class="bin-row" id="binRow"></div>
+    <div class="trivia">Файли, видалені з <b>флешки</b>, у Кошик не потрапляють — вони зникають одразу.<br><kbd>Shift</kbd> + <kbd>Delete</kbd> видаляє файл назавжди, оминаючи Кошик.</div>
+    <div class="exercise">
+      <p class="soft">Правда чи ні?</p>
+      <div id="binList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Провідник</div>
+    <h2>Наведи лад у Провіднику</h2>
+    <p>Файли й папки у Windows показує програма <b>Провідник</b>. Виконай завдання будь-яким способом: кнопками на панелі, правим кліком, гарячими клавішами чи перетягуванням.</p>
+    <div class="exercise">
+      <ol class="tasks" id="exTasks"></ol>
+      <div class="ex" id="ex" tabindex="0">
+        <div class="ex-title"><span id="exWinIco"></span><span id="exWin">Документи</span><i class="ms">remove</i><i class="ms">crop_square</i><i class="ms">close</i></div>
+        <div class="ex-nav">
+          <button type="button" id="exUp" title="Вгору (до батьківської папки)"><i class="ms">arrow_upward</i></button>
+          <div class="ex-addr" id="exAddr"></div>
+          <div class="ex-search"><i class="ms">search</i><span id="exSearch">Пошук: Документи</span></div>
+        </div>
+        <div class="ex-cmd" id="exCmd"></div>
+        <div class="ex-body">
+          <div class="ex-side" id="exSide"></div>
+          <div class="ex-main" id="exMain"></div>
+        </div>
+        <div class="ex-status" id="exStatus"></div>
+        <div class="ex-menu cm" id="exMenu" hidden></div>
+      </div>
+      <div class="ex-bar">
+        <div class="ex-fb" id="exFb">Почни з першого завдання. Папки відкривай подвійним клацанням.</div>
+        <button type="button" class="ex-hint" id="exHint"><i class="ms">lightbulb</i>Підказка</button>
+      </div>
+    </div>
+    <div class="note">Загубив файл? Клацни поле <b>Пошук</b> у Провіднику (значок лупи) і введи частину його назви — комп'ютер сам знайде, у якій він папці.</div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Урок · «Операції над файлами і папками» · 5 клас</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- ЗНАЧКИ ФАЙЛІВ І ПАПОК (як в уроці «Файли й папки») ---------- */
+const TYPES = { doc:'#2B6BE6', img:'#E8590C', snd:'#9C36B5', vid:'#D6336C', exe:'#495057' };
+const EXT = {txt:'doc', docx:'doc', jpg:'img', png:'img', mp3:'snd', mp4:'vid', exe:'exe'};
+const GLYPH = {
+  doc:'<rect x="8" y="10" width="18" height="3" rx="1.5"/><rect x="8" y="16" width="22" height="3" rx="1.5"/><rect x="8" y="22" width="16" height="3" rx="1.5"/>',
+  img:'<circle cx="25" cy="12" r="3.5"/><path d="M6 27l8-10 6 7 4-4 7 7z"/>',
+  snd:'<circle cx="13" cy="24" r="4"/><rect x="15" y="9" width="3" height="16"/><path d="M18 9l9 3v5l-9-3z"/>',
+  vid:'<rect x="6" y="9" width="26" height="18" rx="3" fill-opacity=".25"/><path d="M15 13l9 5-9 5z"/>',
+  exe:'<circle cx="19" cy="18" r="8" fill="none" stroke="CC" stroke-width="4" stroke-dasharray="4 2.3"/><circle cx="19" cy="18" r="3"/>'
+};
+function fileSVG(ext){
+  const t = EXT[ext], c = t ? TYPES[t] : '#868E96';
+  const glyph = t ? `<g fill="${c}">${GLYPH[t].replaceAll('CC', c)}</g>` : '';
+  return `<svg viewBox="0 0 40 48" fill="none">
+    <path d="M4 1.5h22l11 11V44a2.5 2.5 0 0 1-2.5 2.5h-30A2.5 2.5 0 0 1 2 44V4a2.5 2.5 0 0 1 2-2.5z" fill="#fff" stroke="#BCC5C0" stroke-width="1.5"/>
+    <path d="M26 1.5V10a2.5 2.5 0 0 0 2.5 2.5H37" fill="#EDF1EE" stroke="#BCC5C0" stroke-width="1.5"/>
+    ${glyph}
+    <rect x="0" y="31" width="${ext.length > 3 ? 32 : 27}" height="12" rx="2.5" fill="${c}"/>
+    <text x="${ext.length > 3 ? 16 : 13.5}" y="40.3" font-family="Nunito Sans, sans-serif" font-size="8.6" font-weight="800" fill="#fff" text-anchor="middle">${ext.toUpperCase()}</text>
+  </svg>`;
+}
+const folderSVG = ()=>`<svg viewBox="0 0 48 40" fill="none"><path d="M2 7a3 3 0 0 1 3-3h13l4 4h21a3 3 0 0 1 3 3v24a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3z" fill="#E39B0B"/><path d="M1 15a3 3 0 0 1 3-3h40a3 3 0 0 1 3 3l-1.6 20a3 3 0 0 1-3 3H5.6a3 3 0 0 1-3-3z" fill="#FBC02D"/></svg>`;
+const binSVG = (full = true)=>`<svg viewBox="0 0 48 54" fill="none">
+  ${full ? '<path d="M15 14l6-11 9 4-4 9z" fill="#fff" stroke="#9AA5C4" stroke-width="1.5"/><rect x="18" y="6" width="8" height="1.6" fill="#9AA5C4" transform="rotate(24 22 7)"/>' : ''}
+  <path d="M8 16h32l-3 33a3 3 0 0 1-3 3H14a3 3 0 0 1-3-3z" fill="#DDE5F7" stroke="#7D93C9" stroke-width="2"/>
+  <rect x="5" y="12" width="38" height="6" rx="2" fill="#9FB2E0"/>
+  <path d="M19 24v22M24 24v22M29 24v22" stroke="#7D93C9" stroke-width="2" stroke-linecap="round"/></svg>`;
+const ms = n=>`<i class="ms">${n}</i>`;
+
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Файл', desc:'Дані, що мають ім\'я і зберігаються в пам\'яті пристрою' },
+  { name:'Папка', desc:'Місце, де лежать файли та інші папки' },
+  { name:'Розширення', desc:'Частина імені після крапки, яка показує тип файлу' },
+  { name:'Шлях до файлу', desc:'«Адреса» файлу: диск і всі папки, у яких він лежить' },
+  { name:'Диск C:', desc:'Головний диск комп\'ютера' },
+  { name:'Google Диск', desc:'Хмарне сховище, у якому файли відкриваються в браузері' }
+], 'recapProgress');
+
+/* ---------- КРОК 1: ДІЇ З ФАЙЛАМИ ---------- */
+document.getElementById('ops').innerHTML = [
+  ['create_new_folder', 'Створити', 'нова порожня папка чи файл', '#2F9E44', '#E6F6EA'],
+  ['edit', 'Перейменувати', 'дати файлу іншу назву', '#7048E8', '#EFEAFD'],
+  ['content_copy', 'Копіювати', 'зробити двійника файлу в іншому місці', '#1C7ED6', '#E4F0FB'],
+  ['drive_file_move', 'Перемістити', 'перенести файл в інше місце', '#E8590C', '#FDEDE4'],
+  ['delete', 'Видалити', 'прибрати непотрібний файл', '#C92A2A', '#FBE7E7'],
+  ['folder_open', 'Відкрити', 'подивитися, що всередині', '#0C8599', '#E1F4F7']
+].map(([ic, b, s, c, cs])=>`<div class="op" style="--c:${c};--cs:${cs}"><i class="ms">${ic}</i><div><b>${b}</b><span>${s}</span></div></div>`).join('');
+
+makeChoices('opsList', [
+  { text:'Олена намалювала листівку, а файл досі зветься «Без назви.png». Серед двадцяти таких самих його важко знайти.', opts:['Перейменувати', 'Видалити', 'Копіювати'], correct:0 },
+  { text:'Братові потрібна ця сама фотографія на його флешці. А в тебе на комп\'ютері вона теж має лишитися.', opts:['Перемістити', 'Копіювати', 'Створити'], correct:1, why:'Після копіювання фото буде в обох місцях.' },
+  { text:'Фото з екскурсії лежать на Робочому столі впереміш з іграми. Ти хочеш, щоб вони жили лише в папці «Екскурсія».', opts:['Копіювати', 'Відкрити', 'Перемістити'], correct:2, why:'На Робочому столі їх більше не буде.' },
+  { text:'Торішній список покупок більше ніколи не знадобиться і лише заважає.', opts:['Перейменувати', 'Видалити', 'Перемістити'], correct:1 },
+  { text:'Тобі треба подивитися, що написано в документі «Розклад.docx».', opts:['Відкрити', 'Створити', 'Копіювати'], correct:0 },
+  { text:'Почався новий гурток, і для його завдань на комп\'ютері ще немає окремого місця.', opts:['Перейменувати', 'Видалити', 'Створити папку'], correct:2 }
+]);
+
+/* ---------- КРОК 2: КОПІЯ ЧИ ПЕРЕЇЗД ---------- */
+/* сучасна плоска ілюстрація: дві папки, файл перелітає дугою */
+function scene(kind){
+  const copy = kind === 'copy', c = copy ? '#2F9E44' : '#E8590C';
+  const folder = (x, back, front, id)=>`
+    <ellipse cx="${x + 55}" cy="151" rx="50" ry="5" fill="#1B1B3A" opacity=".08"/>
+    <path d="M${x} 62a8 8 0 0 1 8-8h28a8 8 0 0 1 6 2.8l5 5.2h55a8 8 0 0 1 8 8v70a8 8 0 0 1-8 8H${x + 8}a8 8 0 0 1-8-8z" fill="${back}"/>
+    <g id="${id}"></g>`;
+  const front = (x, f1, f2, badge = '')=>`
+    <defs><linearGradient id="g${kind}${x}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${f1}"/><stop offset="1" stop-color="${f2}"/></linearGradient></defs>
+    <rect x="${x}" y="84" width="110" height="64" rx="8" fill="url(#g${kind}${x})"/>
+    <rect x="${x}" y="84" width="110" height="3" rx="1.5" fill="#fff" opacity=".45"/>${badge}`;
+  const file = (cls = '')=>`<g class="${cls}">
+    <rect x="55" y="38" width="44" height="54" rx="6" fill="#fff" stroke="#D5DBEA" stroke-width="1.5"/>
+    <rect x="62" y="47" width="22" height="4" rx="2" fill="#2B6BE6"/>
+    <rect x="62" y="56" width="30" height="3" rx="1.5" fill="#B9C6E8"/><rect x="62" y="63" width="26" height="3" rx="1.5" fill="#B9C6E8"/><rect x="62" y="70" width="28" height="3" rx="1.5" fill="#B9C6E8"/></g>`;
+  const usb = `<g transform="translate(243 116)"><circle r="15" fill="#fff" opacity=".9"/>
+    <path d="M0 -9v16M0 -9l-3.5 4.5M0 -9l3.5 4.5M0 2l-6 -4v-3M0 5l6 -4v-3" stroke="#2B5BD7" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="0" cy="8" r="2.2" fill="#2B5BD7"/><rect x="-7.5" y="-8.5" width="3" height="3" fill="#2B5BD7"/><circle cx="6" cy="-7" r="1.6" fill="#2B5BD7"/></g>`;
+  const L = copy ? 'Документи' : 'Робочий стіл', R = copy ? 'Флешка' : 'Навчання';
+  return `<svg class="scene" viewBox="0 -28 320 206" fill="none" role="img" aria-label="${copy ? 'Файл копіюється' : 'Файл переміщується'} з «${L}» у «${R}»">
+    <defs><marker id="ar${kind}" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M1 1l8 4-8 4z" fill="${c}"/></marker></defs>
+    <path d="M118 30Q160 -2 202 30" stroke="${c}" stroke-width="2.5" stroke-dasharray="5 6" stroke-linecap="round" marker-end="url(#ar${kind})" opacity=".7"/>
+    ${folder(22, '#F2A51E', '', 'l')}
+    ${folder(188, copy ? '#3E6FE0' : '#F2A51E', '', 'r')}
+    ${copy ? file() : `<g class="slot"><rect x="55" y="38" width="44" height="54" rx="6" stroke="#E8590C" stroke-width="2" stroke-dasharray="4 4" fill="#fff" fill-opacity=".5"/></g>`}
+    ${file('fly')}
+    ${front(22, '#FFD45C', '#FFC233')}
+    ${copy ? front(188, '#7EA4FF', '#5B87F5', usb) : front(188, '#FFD45C', '#FFC233')}
+    <text x="77" y="172" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="700" font-size="15" fill="#4A4F6A">${L}</text>
+    <text x="243" y="172" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="700" font-size="15" fill="#4A4F6A">${R}</text>
+  </svg>`;
+}
+document.querySelectorAll('[data-scene]').forEach(d=>d.innerHTML = scene(d.dataset.scene));
+makeSequence('cpDone', 'cpQ', 'cpOpts', 'cpFb', [
+  'Клацнути файл, щоб виділити його',
+  'Обрати команду «Копіювати»',
+  'Відкрити флешку',
+  'Обрати команду «Вставити»'
+], 'Готово! Файл тепер і на комп\'ютері, і на флешці. Для переміщення все те саме, лише замість «Копіювати» — «Вирізати».');
+
+/* ---------- КРОК 3: МЕНЮ Й КЛАВІШІ ---------- */
+document.getElementById('cmFile').innerHTML = fileSVG('docx') + 'Казка.docx';
+makeMatching('keyPool', 'keyList', [
+  { name:'Ctrl + C', desc:'Копіювати' },
+  { name:'Ctrl + X', desc:'Вирізати' },
+  { name:'Ctrl + V', desc:'Вставити' },
+  { name:'Ctrl + Z', desc:'Скасувати останню дію' },
+  { name:'Ctrl + A', desc:'Виділити все' },
+  { name:'Delete', desc:'Видалити в Кошик' },
+  { name:'F2', desc:'Перейменувати' }
+], 'keyProgress');
+
+/* ---------- КРОК 4: КОШИК ---------- */
+document.getElementById('binRow').innerHTML = [
+  [fileSVG('jpg') + ms('arrow_forward') + binSVG(false), 'Видалити', 'Файл переїжджає в Кошик', '#C92A2A'],
+  [binSVG() + ms('arrow_forward') + fileSVG('jpg'), 'Відновити', 'Файл повертається туди, де лежав', '#2F9E44'],
+  [binSVG() + ms('arrow_forward') + fileSVG('jpg').replace('<svg', '<svg class="gone"'), 'Очистити Кошик', 'Файли зникають назавжди', '#495057']
+].map(([art, b, s, c])=>`<div class="bin-card" style="--c:${c}"><div class="bin-art">${art}</div><b>${b}</b><span>${s}</span></div>`).join('');
+
+makeYesNo('binList', [
+  { text:'Файл, видалений з Робочого столу, ще можна повернути з Кошика.', correct:true },
+  { text:'Після «Очистити Кошик» файл можна повернути кнопкою «Відновити».', correct:false, why:'Очищення Кошика видаляє файли назавжди.' },
+  { text:'Файл, видалений з флешки, теж чекає в Кошику комп\'ютера.', correct:false, why:'З флешки файли видаляються одразу.' },
+  { text:'Відновлений файл повертається в ту саму папку, звідки його видалили.', correct:true },
+  { text:'Поки Кошик не очищено, файли в ньому займають місце на диску.', correct:true }
+], 'Правда', 'Неправда');
+
+/* ---------- КРОК 5: ЕМУЛЯТОР ПРОВІДНИКА ---------- */
+(function(){
+  const ex = document.getElementById('ex');
+  const $ = id=>document.getElementById(id);
+  const main = $('exMain'), side = $('exSide'), addr = $('exAddr'), cmdBar = $('exCmd'), status = $('exStatus'), menu = $('exMenu'), fb = $('exFb'), taskList = $('exTasks');
+  const IS_MAC = /Mac|iPhone|iPad/.test(navigator.platform);
+  const ROOTS = {
+    docs:{name:'Документи', icon:'<i class="ms" style="color:#1C7ED6">description</i>'},
+    usb:{name:'Флешка (E:)', icon:'<i class="ms" style="color:#495057">usb</i>'},
+    bin:{name:'Кошик', icon:'<i class="ms" style="color:#7D93C9">delete</i>'}
+  };
+  const NEWDOC = 'Новий текстовий документ.txt';
+  const PHOTOS = ['Море.jpg', 'Кіт.jpg', 'Ліс.jpg'];
+
+  let nodes = {}, seq = 0;
+  const add = (name, parent, folder = false, from)=>{ const id = 'n' + (++seq); nodes[id] = {id, name, parent, folder, from}; return id; };
+  add('Навчання', 'docs', true);
+  add('Ліс.jpg', 'docs'); add('Казка.docx', 'docs'); add('Море.jpg', 'docs');
+  add(NEWDOC, 'docs'); add('Кіт.jpg', 'docs'); add('Чернетка.txt', 'docs');
+  add('Пісні', 'usb', true); add('Музика.mp3', 'usb');
+  add('Розклад.docx', 'bin', false, 'docs');
+  ['Математика.docx', 'Англійська.docx'].forEach(n=>add(n, 'n1'));
+
+  let cur = 'docs', sel = new Set(), clip = null, renaming = null, fresh = new Set(), anchor = null;
+  const history = [];
+
+  const snap = ()=>JSON.stringify({nodes, seq});
+  const restore = s=>{ const o = JSON.parse(s); nodes = o.nodes; seq = o.seq; };
+  const exists = id=>!!nodes[id];
+  const ext = n=>{ const i = n.lastIndexOf('.'); return i > 0 ? n.slice(i + 1).toLowerCase() : ''; };
+  const iconOf = n=>n.folder ? folderSVG() : fileSVG(ext(n.name));
+  const children = loc=>Object.values(nodes).filter(n=>n.parent === loc)
+    .sort((a, b)=>(b.folder - a.folder) || a.name.localeCompare(b.name, 'uk'));
+  const rootOf = loc=>{ while(nodes[loc]) loc = nodes[loc].parent; return loc; };
+  const inside = (loc, id)=>{ while(nodes[loc]){ if(loc === id) return true; loc = nodes[loc].parent; } return false; };
+  const has = (name, loc)=>children(loc).some(n=>n.name === name);
+  const fotoId = ()=>children('docs').find(n=>n.folder && n.name.trim().toLowerCase() === 'фото')?.id;
+  const nameOf = loc=>ROOTS[loc]?.name || nodes[loc].name;
+  const mod = e=>e.ctrlKey || e.metaKey;
+
+  function uniq(name, loc, folder){
+    if(!has(name, loc)) return name;
+    const i = folder ? -1 : name.lastIndexOf('.');
+    const base = i > 0 ? name.slice(0, i) : name, e = i > 0 ? name.slice(i) : '';
+    for(let k = 1; ; k++){ const n = `${base} - копія${k > 1 ? ` (${k})` : ''}${e}`; if(!has(n, loc)) return n; }
+  }
+
+  function say(t, kind = ''){ fb.innerHTML = t; fb.className = 'ex-fb' + (kind ? ' ' + kind : ''); }
+
+  /* --- завдання --- */
+  const TASKS = [
+    { t:'Створи в Документах нову папку <b>Фото</b>', ok:()=>!!fotoId(),
+      hint:'Кнопка «Створити» → «Папку» (або правий клік на порожньому місці). Напиши назву <b>Фото</b> і натисни Enter.' },
+    { t:'Перемісти три фото — <b>Море, Кіт, Ліс</b> — у папку «Фото»', ok:()=>{ const f = fotoId(); return f && PHOTOS.every(p=>has(p, f)) && !PHOTOS.some(p=>has(p, 'docs')); },
+      hint:'Перетягни фото мишею на папку «Фото». Або: виділи фото (кілька — з Ctrl) → «Вирізати» → відкрий «Фото» → «Вставити».' },
+    { t:'Перейменуй «Новий текстовий документ.txt» на <b>Вірш.txt</b>', ok:()=>has('Вірш.txt', 'docs'),
+      hint:'Виділи файл → «Перейменувати» (або клавіша F2). Зміни назву й натисни Enter. Розширення .txt не чіпай.' },
+    { t:'Скопіюй <b>Казка.docx</b> на Флешку (E:)', ok:()=>has('Казка.docx', 'usb') && has('Казка.docx', 'docs'),
+      hint:'Виділи «Казка.docx» → «Копіювати» → ліворуч відкрий «Флешка (E:)» → «Вставити».' },
+    { t:'Видали непотрібний файл <b>Чернетка.txt</b>', ok:()=>!Object.values(nodes).some(n=>n.name === 'Чернетка.txt' && rootOf(n.parent) !== 'bin'),
+      hint:'Виділи «Чернетка.txt» і натисни «Видалити» на панелі або клавішу Delete.' },
+    { t:'Поверни з Кошика <b>Розклад.docx</b>', ok:()=>has('Розклад.docx', 'docs'),
+      hint:'Ліворуч відкрий «Кошик», виділи «Розклад.docx» і натисни «Відновити».' }
+  ];
+  const doneT = TASKS.map(()=>false);
+  const hit = trackTask(ex, TASKS.length, TASKS.length + 2);
+  function drawTasks(){
+    const now = doneT.indexOf(false);
+    taskList.innerHTML = TASKS.map((t, i)=>`<li class="${doneT[i] ? 'ok' : i === now ? 'now' : ''}"><span>${t.t}</span></li>`).join('');
+  }
+  function check(){
+    let got = null;
+    TASKS.forEach((t, i)=>{ if(!doneT[i] && t.ok()){ doneT[i] = true; addNeurons(1); hit(); got = i; } });
+    if(got !== null){
+      if(doneT.every(Boolean)){ addNeurons(2); say('Усі завдання виконано — у Документах повний порядок! ✓', 'ok'); }
+      else say(`Завдання ${got + 1} виконано ✓`, 'ok');
+    }
+    drawTasks();
+  }
+
+  /* --- що не можна ламати: інакше дія скасовується --- */
+  function broken(){
+    if(!has('Навчання', 'docs')) return 'Папку «Навчання» не чіпаємо — вона ще потрібна в Документах.';
+    if(!has('Казка.docx', 'docs')) return '«Казка.docx» має лишитися в Документах — на флешку потрібна лише копія.';
+    if(!has('Вірш.txt', 'docs') && !has(NEWDOC, 'docs')) return 'Цей текстовий документ має лишитися в Документах.';
+    const f = fotoId();
+    for(const p of PHOTOS) if(!has(p, 'docs') && !(f && has(p, f))) return `Фото «${p}» має опинитися саме в папці «Фото» в Документах.`;
+    if(!has('Музика.mp3', 'usb') || !has('Пісні', 'usb')) return 'Це чужі файли на флешці — їх не чіпаємо.';
+    if(!has('Розклад.docx', 'docs') && !has('Розклад.docx', 'bin')) return '«Розклад.docx» треба повернути саме в Документи.';
+    return '';
+  }
+  function act(fn){
+    const before = snap();
+    if(fn() === false){ render(); return; }
+    const bad = broken();
+    if(bad){
+      restore(before); render();
+      ex.classList.remove('miss'); void ex.offsetWidth; ex.classList.add('miss');
+      setTimeout(()=>ex.classList.remove('miss'), 450);
+      say(bad + ' Повертаю, як було.', 'err');
+      return;
+    }
+    history.push(before); if(history.length > 40) history.shift();
+    if(!exists(cur) && !ROOTS[cur] || rootOf(cur) === 'bin' && cur !== 'bin') cur = 'docs';
+    render(); check();
+  }
+
+  /* --- операції --- */
+  function moveTo(ids, loc){
+    for(const id of ids){
+      if(id === loc || inside(loc, id)){ say('Папку не можна покласти саму в себе.', 'err'); return false; }
+      if(nodes[id].parent !== loc && has(nodes[id].name, loc)){ say(`У «${nameOf(loc)}» уже є «${nodes[id].name}».`, 'err'); return false; }
+    }
+    let n = 0;
+    ids.forEach(id=>{ if(nodes[id].parent !== loc){ nodes[id].parent = loc; fresh.add(id); n++; } });
+    if(!n) return false;
+    say(`Переміщено: ${n}.`);
+  }
+  function copyNode(id, loc){
+    const o = nodes[id], nid = add(uniq(o.name, loc, o.folder), loc, o.folder);
+    children(id).forEach(c=>copyNode(c.id, nid));
+    return nid;
+  }
+  function copyTo(ids, loc, note = ''){
+    for(const id of ids) if(id === loc || inside(loc, id)){ say('Папку не можна скопіювати саму в себе.', 'err'); return false; }
+    ids.forEach(id=>fresh.add(copyNode(id, loc)));
+    say(`Скопійовано: ${ids.length}.` + note);
+  }
+  function remove(ids){
+    if(!ids.length) return false;
+    const usb = rootOf(nodes[ids[0]].parent) === 'usb';
+    const kill = id=>{ children(id).forEach(c=>kill(c.id)); delete nodes[id]; };
+    ids.forEach(id=>{ const n = nodes[id]; if(usb) kill(id); else { n.from = n.parent; n.parent = 'bin'; } });
+    if(clip) clip.ids = clip.ids.filter(exists);
+    say(usb ? 'З флешки файли видаляються одразу, без Кошика.' : `Перенесено в Кошик: ${ids.length}.`);
+  }
+  function restoreFromBin(ids){
+    for(const id of ids){
+      const n = nodes[id], to = n.from && (ROOTS[n.from] || exists(n.from)) && rootOf(n.from) !== 'bin' ? n.from : 'docs';
+      if(has(n.name, to)){ say(`У «${nameOf(to)}» уже є «${n.name}».`, 'err'); return false; }
+      n.parent = to; delete n.from; fresh.add(id);
+    }
+    say(`Відновлено: ${ids.length}. Файл повернувся туди, де лежав.`);
+  }
+
+  const selIds = ()=>[...sel].filter(exists);
+  const COMMANDS = {
+    newFolder(){ act(()=>{ const id = add(uniq('Нова папка', cur, true), cur, true); sel = new Set([id]); renaming = id; fresh.add(id); say('Напиши назву папки й натисни Enter.'); }); },
+    newText(){ act(()=>{ const id = add(uniq(NEWDOC, cur), cur); sel = new Set([id]); renaming = id; fresh.add(id); say('Напиши назву файлу й натисни Enter.'); }); },
+    cut(){ const ids = selIds(); if(!ids.length) return; clip = {ids, mode:'cut'}; render(); say('Вирізано в буфер обміну. Тепер відкрий потрібну папку й обери «Вставити».'); },
+    copy(){ const ids = selIds(); if(!ids.length) return; clip = {ids, mode:'copy'}; render(); say('Скопійовано в буфер обміну. Тепер відкрий потрібне місце й обери «Вставити».'); },
+    paste(){
+      if(!clip || cur === 'bin') return;
+      const ids = clip.ids.filter(id=>exists(id) && rootOf(nodes[id].parent) !== 'bin');
+      if(!ids.length){ clip = null; render(); return; }
+      if(clip.mode === 'cut') act(()=>{ const r = moveTo(ids, cur); if(r !== false) clip = null; return r; });
+      else act(()=>copyTo(ids, cur));
+    },
+    rename(){ const ids = selIds(); if(ids.length !== 1 || cur === 'bin') return; renaming = ids[0]; render(); },
+    del(){ const ids = selIds(); if(!ids.length || cur === 'bin') return; act(()=>remove(ids)); sel.clear(); render(); },
+    restore(){ const ids = selIds(); if(!ids.length || cur !== 'bin') return; act(()=>restoreFromBin(ids)); },
+    open(){ const ids = selIds(); if(ids.length === 1) open(ids[0]); },
+    props(){ say('«Властивості» показують розмір файлу й дату створення. Зараз вони не знадобляться.'); },
+    undo(){
+      if(!history.length){ say('Немає чого скасовувати.'); return; }
+      restore(history.pop()); renaming = null; sel.clear();
+      if(!exists(cur) && !ROOTS[cur]) cur = 'docs';
+      render(); say(`Останню дію скасовано (${IS_MAC ? '⌘' : 'Ctrl'} + Z).`);
+    }
+  };
+  function open(id){
+    const n = nodes[id];
+    if(cur === 'bin'){ say('Щоб відкрити файл з Кошика, його треба спершу відновити.'); return; }
+    if(n.folder){ go(id); return; }
+    say(`«${n.name}» відкрився б у своїй програмі. У цій вправі файли відкривати не потрібно.`);
+  }
+  function go(loc){ cur = loc; sel.clear(); renaming = null; anchor = null; render(); }
+
+  /* --- малювання --- */
+  const btn = (c, icon, label, on, cls = '')=>`<button type="button" class="${cls}" data-cmd="${c}" title="${label}"${on ? '' : ' disabled'}>${ms(icon)}<span class="lb">${label}</span></button>`;
+  function render(){
+    menu.hidden = true;
+    const ids = selIds(), inBin = cur === 'bin', one = ids.length === 1;
+    $('exWinIco').innerHTML = ROOTS[cur] ? ROOTS[cur].icon : folderSVG();
+    $('exWin').textContent = nameOf(cur);
+    $('exSearch').textContent = 'Пошук: ' + nameOf(cur);
+    $('exUp').disabled = !!ROOTS[cur];
+    // рядок адреси
+    const path = []; let l = cur; while(l){ path.unshift(l); l = nodes[l]?.parent; }
+    addr.innerHTML = `${ms('computer')}${path.map(p=>`${ms('chevron_right')}<span class="ex-crumb" data-loc="${p}">${nameOf(p)}</span>`).join('')}`;
+    // панель команд
+    cmdBar.innerHTML = inBin
+      ? btn('restore', 'restore_from_trash', 'Відновити', ids.length) + '<i class="sep"></i>' + btn('props', 'info', 'Властивості', one)
+      : btn('newFolder', 'add', 'Створити', true, 'new') +
+        btn('cut', 'content_cut', 'Вирізати', ids.length) + btn('copy', 'content_copy', 'Копіювати', ids.length) +
+        btn('paste', 'content_paste', 'Вставити', !!clip) + btn('rename', 'edit', 'Перейменувати', one) +
+        btn('del', 'delete', 'Видалити', ids.length);
+    // бічна панель
+    side.innerHTML = Object.entries(ROOTS).map(([k, r], i)=>(i === 2 ? '<hr>' : '') + `<div data-loc="${k}" class="${rootOf(cur) === k ? 'on' : ''}">${r.icon}${r.name}</div>`).join('');
+    // вміст
+    const list = children(cur);
+    main.innerHTML = list.length ? list.map(n=>{
+      const cls = ['ex-item', n.folder ? 'folder' : '', sel.has(n.id) ? 'sel' : '', clip?.mode === 'cut' && clip.ids.includes(n.id) ? 'cut' : '', fresh.has(n.id) ? 'fresh' : ''].join(' ');
+      const nm = renaming === n.id ? `<textarea rows="2" spellcheck="false">${n.name}</textarea>` : `<span class="nm">${n.name}</span>`;
+      const from = inBin ? `<small>з: ${nameOf(n.from && (ROOTS[n.from] || exists(n.from)) ? n.from : 'docs')}</small>` : '';
+      return `<div class="${cls}" data-id="${n.id}">${iconOf(n)}${nm}${from}</div>`;
+    }).join('') : `<div class="ex-empty">${inBin ? 'Кошик порожній.' : 'Ця папка порожня.'}</div>`;
+    fresh.clear();
+    // рядок стану
+    const cl = clip && clip.ids.filter(exists);
+    status.innerHTML = `<span>Елементів: ${list.length}</span>${ids.length ? `<span>Вибрано: ${ids.length}</span>` : ''}` +
+      (cl && cl.length ? `<span class="clipb">📋 Буфер обміну: ${cl.length === 1 ? nodes[cl[0]].name : cl.length + ' елем.'} (${clip.mode === 'cut' ? 'вирізано' : 'копія'})</span>` : '');
+    if(renaming) startRename();
+  }
+
+  /* --- перейменування --- */
+  function startRename(){
+    const ta = main.querySelector('textarea');
+    if(!ta) { renaming = null; return; }
+    const n = nodes[renaming], i = n.folder ? -1 : n.name.lastIndexOf('.');
+    ta.focus(); ta.setSelectionRange(0, i > 0 ? i : n.name.length);
+    let doneR = false;
+    const finish = save=>{
+      if(doneR) return; doneR = true;
+      const id = renaming; renaming = null;
+      const v = ta.value.replace(/\s+/g, ' ').trim();
+      if(!save || !v || v === nodes[id].name){ render(); ex.focus(); return; }
+      if(/[\\/:*?"<>|]/.test(v)){ say('У назві не можна використовувати знаки \\ / : * ? " < > |', 'err'); render(); return; }
+      if(has(v, nodes[id].parent)){ say(`Тут уже є «${v}». Обери іншу назву.`, 'err'); render(); return; }
+      act(()=>{ nodes[id].name = v; say(`Нова назва: «${v}».`); });
+      ex.focus();
+    };
+    ta.addEventListener('keydown', e=>{
+      e.stopPropagation();
+      if(e.key === 'Enter'){ e.preventDefault(); finish(true); }
+      if(e.key === 'Escape'){ e.preventDefault(); finish(false); }
+    });
+    ta.addEventListener('blur', ()=>finish(true));
+    ta.addEventListener('pointerdown', e=>e.stopPropagation());
+  }
+
+  /* --- контекстне меню --- */
+  function openMenu(x, y, onItem){
+    const ids = selIds(), one = ids.length === 1, inBin = cur === 'bin';
+    const ic = (c, i, l, on = true)=>`<button type="button" data-cmd="${c}"${on ? '' : ' disabled'} title="${l}">${ms(i)}<small>${l}</small></button>`;
+    const row = (c, i, l, on = true)=>`<button type="button" class="cm-row" data-cmd="${c}"${on ? '' : ' disabled'}>${ms(i)}${l}</button>`;
+    if(inBin) menu.innerHTML = onItem ? row('restore', 'restore_from_trash', 'Відновити') + '<div class="cm-sep"></div>' + row('props', 'info', 'Властивості', one) : row('props', 'info', 'Властивості Кошика', false);
+    else if(onItem) menu.innerHTML = `<div class="cm-icons">${ic('cut', 'content_cut', 'Вирізати')}${ic('copy', 'content_copy', 'Копіювати')}${ic('rename', 'edit', 'Перейменувати', one)}${ic('del', 'delete', 'Видалити')}</div>` +
+      row('open', 'open_in_new', 'Відкрити', one) + '<div class="cm-sep"></div>' + row('props', 'info', 'Властивості', one);
+    else menu.innerHTML = row('newFolder', 'create_new_folder', 'Створити → Папку') + row('newText', 'note_add', 'Створити → Текстовий документ') + '<div class="cm-sep"></div>' + row('paste', 'content_paste', 'Вставити', !!clip) + row('undo', 'undo', 'Скасувати', history.length > 0);
+    menu.hidden = false;
+    const r = ex.getBoundingClientRect();
+    const w = menu.offsetWidth, h = menu.offsetHeight;
+    menu.style.left = Math.max(4, Math.min(x - r.left, r.width - w - 4)) + 'px';
+    menu.style.top = Math.max(4, Math.min(y - r.top, r.height - h - 4)) + 'px';
+  }
+
+  /* --- миша, дотик, перетягування --- */
+  let press = null, lastClick = {id:null, t:0}, longT = null, ghost = null, over = null;
+  const itemAt = el=>el?.closest?.('.ex-item');
+  function dropTarget(x, y){
+    const el = document.elementFromPoint(x, y);
+    const it = itemAt(el);
+    if(it && it.classList.contains('folder') && !sel.has(it.dataset.id) && main.contains(it)) return {el:it, loc:it.dataset.id};
+    const s = el?.closest?.('.ex-side [data-loc], .ex-crumb');
+    if(s && s.dataset.loc !== cur) return {el:s, loc:s.dataset.loc};
+    return null;
+  }
+  function endDrag(e){
+    ghost?.remove(); ghost = null; over?.el.classList.remove('over');
+    const t = over; over = null;
+    if(!t) return;
+    const ids = selIds();
+    if(t.loc === 'bin') act(()=>remove(ids));
+    else if(rootOf(t.loc) !== rootOf(cur)) act(()=>copyTo(ids, t.loc, ' Перетягування на інший диск робить копію, а не переміщує.'));
+    else act(()=>moveTo(ids, t.loc));
+  }
+  main.addEventListener('pointerdown', e=>{
+    if(e.button > 0) return;
+    ex.focus({preventScroll:true});
+    menu.hidden = true;
+    const it = itemAt(e.target);
+    press = {x:e.clientX, y:e.clientY, it, drag:false, pt:e.pointerType};
+    if(it && e.pointerType !== 'mouse'){
+      clearTimeout(longT);
+      longT = setTimeout(()=>{ if(press && !press.drag){ if(!sel.has(it.dataset.id)){ sel = new Set([it.dataset.id]); render(); } press = null; openMenu(e.clientX, e.clientY, true); } }, 550);
+    }
+  });
+  document.addEventListener('pointermove', e=>{
+    if(!press) return;
+    if(!press.drag){
+      if(Math.hypot(e.clientX - press.x, e.clientY - press.y) < 7) return;
+      clearTimeout(longT);
+      if(!press.it || cur === 'bin'){ press = null; return; }
+      const id = press.it.dataset.id;
+      if(!sel.has(id)){ sel = new Set([id]); render(); }
+      press.drag = true;
+      const ids = selIds();
+      ghost = document.createElement('div');
+      ghost.className = 'ex-ghost';
+      ghost.innerHTML = iconOf(nodes[ids[0]]) + (ids.length > 1 ? `<b>${ids.length}</b>` : '') + '<i></i>';
+      document.body.appendChild(ghost);
+    }
+    e.preventDefault();
+    ghost.style.left = e.clientX + 'px'; ghost.style.top = e.clientY + 'px';
+    const t = dropTarget(e.clientX, e.clientY);
+    if(over?.el !== t?.el){ over?.el.classList.remove('over'); t?.el.classList.add('over'); }
+    over = t;
+    const lab = ghost.querySelector('i');
+    if(!t){ lab.textContent = ''; lab.style.display = 'none'; }
+    else {
+      lab.style.display = '';
+      lab.textContent = t.loc === 'bin' ? '→ Видалити в Кошик' : rootOf(t.loc) !== rootOf(cur) ? `+ Копіювати в «${nameOf(t.loc)}»` : `→ Перемістити в «${nameOf(t.loc)}»`;
+    }
+  });
+  document.addEventListener('pointerup', e=>{
+    clearTimeout(longT);
+    if(!press) return;
+    const p = press; press = null;
+    if(p.drag){ endDrag(e); return; }
+    const it = p.it;
+    if(!it){ if(e.target.closest('.ex-main')){ sel.clear(); anchor = null; render(); } return; }
+    const id = it.dataset.id, now = Date.now();
+    if(lastClick.id === id && now - lastClick.t < 450 && !mod(e) && !e.shiftKey){ lastClick = {id:null, t:0}; sel = new Set([id]); open(id); return; }
+    lastClick = {id, t:now};
+    if(mod(e)){ sel.has(id) ? sel.delete(id) : sel.add(id); anchor = id; }
+    else if(e.shiftKey && anchor){
+      const order = children(cur).map(n=>n.id), a = order.indexOf(anchor), b = order.indexOf(id);
+      sel = new Set(order.slice(Math.min(a, b), Math.max(a, b) + 1));
+    }
+    else { sel = new Set([id]); anchor = id; }
+    render();
+  });
+  document.addEventListener('pointercancel', ()=>{ clearTimeout(longT); if(press?.drag){ ghost?.remove(); ghost = null; over?.el.classList.remove('over'); over = null; } press = null; });
+  main.addEventListener('contextmenu', e=>{
+    e.preventDefault();
+    const it = itemAt(e.target);
+    if(it && !sel.has(it.dataset.id)){ sel = new Set([it.dataset.id]); anchor = it.dataset.id; render(); }
+    if(!it && sel.size){ sel.clear(); render(); }
+    openMenu(e.clientX, e.clientY, !!it);
+  });
+  ex.addEventListener('contextmenu', e=>{ if(!main.contains(e.target)) e.preventDefault(); });
+  side.addEventListener('click', e=>{ const d = e.target.closest('[data-loc]'); if(d) go(d.dataset.loc); });
+  addr.addEventListener('click', e=>{ const d = e.target.closest('[data-loc]'); if(d && d.dataset.loc !== cur) go(d.dataset.loc); });
+  $('exUp').addEventListener('click', ()=>{ if(nodes[cur]) go(nodes[cur].parent); });
+  const runCmd = e=>{ const b = e.target.closest('[data-cmd]'); if(!b || b.disabled) return; menu.hidden = true; COMMANDS[b.dataset.cmd](); };
+  cmdBar.addEventListener('click', runCmd);
+  menu.addEventListener('click', runCmd);
+  menu.addEventListener('pointerdown', e=>e.stopPropagation());
+  document.addEventListener('pointerdown', e=>{ if(!menu.hidden && !menu.contains(e.target) && !main.contains(e.target)) menu.hidden = true; });
+
+  /* --- гарячі клавіші (за фізичною клавішею, тож працює й в українській розкладці) --- */
+  ex.addEventListener('keydown', e=>{
+    if(renaming) return;
+    const k = e.code;
+    let c = null;
+    if(mod(e) && k === 'KeyC') c = 'copy';
+    else if(mod(e) && k === 'KeyX') c = 'cut';
+    else if(mod(e) && k === 'KeyV') c = 'paste';
+    else if(mod(e) && k === 'KeyZ') c = 'undo';
+    else if(mod(e) && k === 'KeyA'){ e.preventDefault(); sel = new Set(children(cur).map(n=>n.id)); render(); return; }
+    else if(k === 'Delete' || (e.metaKey && k === 'Backspace')) c = cur === 'bin' ? null : 'del';
+    else if(k === 'F2') c = 'rename';
+    else if(k === 'Enter') c = 'open';
+    else if(k === 'Escape'){ menu.hidden = true; return; }
+    if(!c) return;
+    e.preventDefault();
+    if(c === 'paste' && !clip){ say('Буфер обміну порожній — спершу скопіюй або виріж файл.'); return; }
+    if(['copy', 'cut', 'del', 'rename'].includes(c) && !selIds().length){ say('Спершу клацни файл, щоб виділити його.'); return; }
+    COMMANDS[c]();
+  });
+
+  $('exHint').addEventListener('click', ()=>{
+    const i = doneT.indexOf(false);
+    say(i < 0 ? 'Усе вже зроблено!' : `<b>Завдання ${i + 1}.</b> ${TASKS[i].hint}`);
+  });
+
+  drawTasks(); render();
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Чим копіювання відрізняється від переміщення?', opts:['Після копіювання файл є в обох місцях, а після переміщення — лише в новому', 'Копіювати можна лише папки, а переміщувати — лише файли', 'Нічим, це дві назви однієї дії'], correct:0 },
+  { q:'Як відкрити контекстне меню файлу?', opts:['Двічі клацнути файл лівою кнопкою', 'Клацнути файл правою кнопкою миші', 'Навести на файл вказівник і почекати'], correct:1 },
+  { q:'Ти хочеш перенести файл в іншу папку через меню. Яку команду обереш першою?', opts:['Копіювати', 'Вирізати', 'Видалити'], correct:1, why:'Вирізати → відкрити папку → Вставити.' },
+  { q:'Що робить сполучення Ctrl + V?', opts:['Видаляє файл', 'Перейменовує файл', 'Вставляє те, що лежить у буфері обміну'], correct:2 },
+  { q:'Куди потрапляє файл, видалений з диска комп\'ютера клавішею Delete?', opts:['У Кошик', 'Зникає назавжди', 'На флешку'], correct:0 },
+  { q:'Як повернути файл з Кошика на старе місце?', opts:['Очистити Кошик', 'Виділити файл і натиснути «Відновити»', 'Скопіювати Кошик на флешку'], correct:1 },
+  { q:'Яка клавіша допоможе швидко перейменувати виділений файл?', opts:['Enter', 'Ctrl + A', 'F2'], correct:2 },
+  { q:'Що станеться з файлами, якщо видалити папку, у якій вони лежать?', opts:['Вони потраплять у Кошик разом із папкою', 'Вони залишаться на Робочому столі', 'Папка не видалиться, поки в ній є файли'], correct:0 }
+], {summary:'Тепер ти вмієш створювати, перейменовувати, копіювати, переміщувати й видаляти файли та папки — і знаєш, як урятувати файл із Кошика.'});
+</script>
+
+</body>
+</html>
