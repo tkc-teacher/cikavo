@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Форматування абзаців — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<!-- Іконки Material Symbols — ті самі, що в інтерфейсі Google Документів -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,300..500,0..1,0&display=block" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  /* Гама «садівник»: бірюзово-зелений і помаранчевий */
+  :root{
+    --accent:#0F766E; --accent-dark:#134E4A; --accent-soft:#E4F3F0;
+    --label:#D9480F;
+    --bg:#F5F9F8; --line:#D9EAE6;
+    --hud-bar:linear-gradient(90deg,#0F766E,#F59F00);
+    /* інтерфейс Google */
+    --g-blue:#1A73E8; --g-ink:#1F1F1F; --g-soft:#444746; --g-line:#DADCE0; --g-bar:#EDF2FA; --g-canvas:#F9FBFD; --g-sel:#ACCEF7;
+    --bar:#B9CEC9;
+  }
+
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em;}
+  .kbd{display:inline-block; font-family:'Roboto',sans-serif; font-weight:500; font-size:.86em; line-height:1.2; padding:2px 7px; border:1px solid #C5C6DA; border-bottom-width:3px; border-radius:6px; background:#fff; color:var(--ink); white-space:nowrap;}
+  .fb{font-size:14px; min-height:1.4em; margin-top:12px;}
+  .np{color:#9AA0A6;}
+
+  /* ---------- Міні-макет Google Документа (кроки 1–5) ---------- */
+  .md{position:relative; border:1px solid var(--g-line); border-radius:10px; background:var(--g-canvas); font-family:'Roboto',sans-serif; color:var(--g-ink); box-shadow:0 1px 6px rgba(0,0,0,.06); overflow:hidden; --pad:20px; margin-bottom:10px;}
+  .md-head{display:flex; align-items:center; gap:7px; padding:6px 10px 0; font-size:13px; white-space:nowrap; overflow:hidden;}
+  .md-head img{width:13px; height:18px;}
+  .md-head .cap{margin-left:auto; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12.5px; color:var(--label); text-transform:uppercase; letter-spacing:.05em;}
+  .md .gd-tools{margin:5px 8px 0; padding:2px 6px;}
+  .md .gd-tools .tl{width:26px; height:26px; cursor:default;}
+  .md .gd-tools .tl .ms{font-size:18px;}
+  .md .gd-tools .tl:hover{background:none;}
+  .md .gd-tools .tl.on:hover{background:#D3E3FD;}
+  .md .gd-tools .tx{font-size:12.5px;}
+  .md-ruler{position:relative; margin:6px 9px 0; padding:0 var(--pad); height:20px; background:#E8EAED; border-radius:2px;}
+  .md-ruler .rt{position:relative; height:100%; background:#fff linear-gradient(to right,#9AA0A6 1px,transparent 1px) 0 100%/6.25% 4px repeat-x;}
+  .md-ruler .m{position:absolute; transform:translateX(-50%);}
+  .md-ruler .m-first{top:1px; width:10px; height:4px; background:var(--g-blue); border-radius:1px;}
+  .md-ruler .m-left, .md-ruler .m-right{top:6px; width:0; height:0; border-left:5px solid transparent; border-right:5px solid transparent; border-top:7px solid var(--g-blue);}
+  .md-ruler .m-first.hi{background:#F76707; box-shadow:0 0 0 2px #FFE8CC;}
+  .md-ruler .m-left.hi, .md-ruler .m-right.hi{border-top-color:#F76707; filter:drop-shadow(0 0 2px #FFC078);}
+  .md-page{position:relative; background:#fff; margin:6px 8px 10px; border:1px solid var(--g-line); border-radius:3px; padding:14px var(--pad); font-family:Arial,sans-serif; font-size:13px; line-height:1.45; color:#000;}
+  .md-page p{margin:0;}
+  .md-page .h{font-size:17px; font-weight:700;}
+  .md-page .sel{background:var(--g-sel);}
+  .caret{display:inline-block; width:1.5px; height:1.1em; background:#000; vertical-align:text-bottom; margin:0 -.75px; animation:caret 1s steps(1) infinite;}
+  @keyframes caret{50%{opacity:0;}}
+  .md-menu{position:absolute; right:10px; top:56px; z-index:2; background:#fff; border-radius:8px; padding:5px 0; box-shadow:0 2px 6px 2px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.3); font-size:12.5px;}
+  .md-menu div{display:flex; align-items:center; gap:8px; padding:5px 16px 5px 10px; white-space:nowrap;}
+  .md-menu .ms{font-size:16px; visibility:hidden;}
+  .md-menu .cur .ms{visibility:visible;}
+  .md-menu .hl{background:#E8F0FE;}
+  .md-menu hr{border:0; border-top:1px solid var(--g-line); margin:5px 0;}
+  .md .nb{position:relative; z-index:1;}
+  .nb{display:inline-flex; align-items:center; justify-content:center; width:19px; height:19px; border-radius:50%; background:var(--label); color:#fff; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12px; line-height:1; flex-shrink:0; margin:0 3px; vertical-align:middle;}
+  .md-ruler .nb{position:absolute; left:-24px; top:0;}
+
+  .legend{list-style:none; padding:0; margin:0 0 14px; display:grid; gap:6px;}
+  .legend li{display:flex; align-items:center; gap:8px; font-size:14.5px;}
+  .gallery{display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:12px; margin:12px 0 16px;}
+  .gallery figure{margin:0;}
+  .gallery .md{margin-bottom:6px; --pad:14px;}
+  .gallery .md-page{font-size:12px; padding-top:10px; padding-bottom:10px;}
+  .gallery figcaption{font-size:13.5px; color:var(--ink-soft); padding:0 4px;}
+  .gallery figcaption b{display:flex; align-items:center; gap:4px; font-family:'Baloo 2',sans-serif; font-size:16px; color:var(--ink); line-height:1.25;}
+  .gallery figcaption b .ms{color:var(--accent);}
+  .ba{display:grid; grid-template-columns:1fr auto 1fr; gap:8px; align-items:center; margin-bottom:12px;}
+  .ba > .ms{color:var(--ink-soft); font-size:26px;}
+  .ba .md{margin:0; --pad:14px;}
+  .ba .md-page{font-size:12px; text-align:justify;}
+  .two{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;}
+  .two .md{margin:0;}
+  .how{font-size:13.5px; color:var(--ink-soft); margin:-4px 0 10px;}
+  .how b{color:var(--ink);}
+  .choice-btn .ms{font-size:20px; vertical-align:-5px;}
+  .opt-ico .ms{font-size:24px; color:var(--g-soft);}
+  /* ---------- Крок 6: емулятор Google Документа ---------- */
+  .task-card{display:flex; align-items:center; gap:14px; background:var(--accent-soft); border-radius:var(--radius-m); padding:14px 18px; margin-bottom:16px; min-height:64px;}
+  .task-card .tnum{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:13px; color:var(--accent-dark); white-space:nowrap;}
+  .task-card .ttext{font-weight:700; font-size:16px;}
+  .gdoc{position:relative; border:1px solid var(--g-line); border-radius:var(--radius-m); background:var(--g-canvas); font-family:'Roboto',sans-serif; color:var(--g-ink); box-shadow:0 2px 10px rgba(0,0,0,.06);}
+  .gd-head{display:flex; align-items:center; gap:10px; padding:8px 12px 6px;}
+  .gd-head img{width:22px; height:30px;}
+  .gd-title{font-size:16px; color:var(--g-ink);}
+  .gd-title .ms{font-size:18px; color:var(--g-soft); margin-left:6px;}
+  .gd-menu{display:flex; gap:12px; font-size:13px; color:var(--g-ink); white-space:nowrap; overflow:hidden;}
+  .gd-tools{display:flex; align-items:center; gap:2px; margin:4px 10px 0; padding:4px 8px; background:var(--g-bar); border-radius:999px; white-space:nowrap; font-family:'Roboto',sans-serif; color:var(--g-ink); overflow-x:auto; scrollbar-width:none;}
+  .gd-tools::-webkit-scrollbar{display:none;}
+  .gd-tools .tl{width:30px; height:30px; border-radius:4px; display:inline-flex; align-items:center; justify-content:center; color:var(--g-soft); flex-shrink:0; border:0; background:none; padding:0; font:inherit; cursor:pointer;}
+  .gd-tools .tl:hover{background:#DCE3EE;}
+  .gd-tools .tl.on{background:#D3E3FD; color:#041E49;}
+  .gd-tools .tx{font-size:13.5px; color:var(--g-soft); padding:0 6px; flex-shrink:0;}
+  .gd-tools .size{border:1px solid #747775; border-radius:4px; padding:3px 6px; min-width:30px; text-align:center; color:var(--g-ink);}
+  .gd-tools .sep{width:1px; height:20px; background:#C7C7C7; margin:0 5px; flex-shrink:0;}
+  .gdoc .wrong-flash{background:#FDE6E1 !important; animation:shakeX .35s ease;}
+  .gpop{position:absolute; z-index:6; background:#fff; border-radius:8px; padding:6px 0; box-shadow:0 2px 6px 2px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.3); font-family:'Roboto',sans-serif; font-size:14px; color:var(--g-ink);}
+  .gpop[hidden]{display:none;}
+  .gpop .it{display:flex; align-items:center; gap:10px; padding:7px 18px 7px 12px; cursor:pointer; white-space:nowrap;}
+  .gpop .it:hover{background:#F1F3F4;}
+  .gpop .it .ms{font-size:18px; visibility:hidden;}
+  .gpop .it.cur .ms{visibility:visible;}
+  .gpop .div{height:1px; background:var(--g-line); margin:6px 0;}
+  /* лінійка */
+  .gruler{position:relative; margin:10px 12px 0; padding:0 27px; height:30px; background:#E8EAED; border-radius:3px; user-select:none; -webkit-user-select:none;}
+  .rtrack{position:relative; height:100%; background:#fff; touch-action:none;}
+  .rtrack .tk{position:absolute; bottom:3px; width:1px; height:4px; background:#9AA0A6;}
+  .rtrack .tk.half{height:2px;}
+  .rtrack .num{position:absolute; bottom:7px; transform:translateX(-50%); font-size:9px; color:#5F6368;}
+  .mk{position:absolute; width:20px; margin-left:-10px; cursor:ew-resize; z-index:2; touch-action:none;}
+  .mk::after{content:''; position:absolute; left:4px;}
+  .mk-first{top:0; height:9px;}
+  .mk-first::after{top:2px; width:12px; height:5px; background:var(--g-blue); border-radius:1px;}
+  .mk-left, .mk-right{top:9px; height:14px;}
+  .mk-left::after, .mk-right::after{top:0; width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent; border-top:9px solid var(--g-blue);}
+  .mk.wrong-flash{background:#FDE6E1; border-radius:3px;}
+  .mk.hint::after{animation:mkPulse 1.2s ease-in-out infinite;}
+  @keyframes mkPulse{50%{filter:drop-shadow(0 0 3px #F59F00) drop-shadow(0 0 2px #F59F00);}}
+  .rtip{position:absolute; top:-30px; transform:translateX(-50%); background:#3C4043; color:#fff; font-size:12px; padding:4px 8px; border-radius:4px; white-space:nowrap; z-index:5; pointer-events:none;}
+  .rtip[hidden]{display:none;}
+  .rguide{position:absolute; top:100%; width:0; border-left:1px dashed var(--g-blue); pointer-events:none; z-index:4;}
+  .rguide[hidden]{display:none;}
+  .gpage{background:#fff; margin:4px 12px 14px; border:1px solid var(--g-line); border-radius:4px; box-shadow:0 1px 3px rgba(60,64,67,.15); padding:22px 26px; font-family:Arial,sans-serif; font-size:14.3px; color:#000; min-height:250px; outline:none; caret-color:#000;}
+  .gpage ::selection{background:var(--g-sel);}
+  .gpage .gp{transition:margin .15s, background .3s;}
+  .gpage .gp-title{font-size:22px; font-weight:700;}
+  .gpage .gp-sign{font-style:italic; margin-top:14px;}
+  .gpage .gp.good{background:#CDEFD6;}
+
+  @media (max-width:560px){
+    .ba{grid-template-columns:1fr;}
+    .ba > .ms{transform:rotate(90deg); justify-self:center;}
+    .two{grid-template-columns:1fr;}
+    .gpage{padding:16px 14px;}
+    .gruler{padding:0 15px;}
+  }
+</style>
+</head>
+<body data-lesson="lesson6-paragraph-formatting" data-hud="6 клас · Форматування абзаців">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Текстові документи</div>
+      <h1>Абзаци на своїх місцях</h1>
+      <p>Вирівнювання, відступи й відстань між рядками.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: аркуш з лінійкою, рядками-абзацами й знаком абзацу ¶ -->
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="72" r="56" fill="#E4F3F0"/>
+      <rect x="24" y="22" width="84" height="98" rx="10" fill="#fff" stroke="#0F766E" stroke-width="3"/>
+      <!-- лінійка -->
+      <rect x="24" y="22" width="84" height="12" rx="6" fill="#D9EAE6"/>
+      <rect x="34" y="24.5" width="10" height="4" rx="1" fill="#1A73E8"/>
+      <path d="M33 30 h8 l-4 5 z" fill="#1A73E8"/>
+      <!-- заголовок по центру -->
+      <rect x="46" y="42" width="40" height="7" rx="3.5" fill="#134E4A"/>
+      <!-- абзац з червоним рядком -->
+      <rect x="44" y="57" width="54" height="5" rx="2.5" fill="#F59F00"/>
+      <rect x="34" y="66" width="64" height="5" rx="2.5" fill="#B9CEC9"/>
+      <rect x="34" y="75" width="64" height="5" rx="2.5" fill="#B9CEC9"/>
+      <rect x="34" y="84" width="38" height="5" rx="2.5" fill="#B9CEC9"/>
+      <!-- підпис праворуч -->
+      <rect x="66" y="100" width="32" height="5" rx="2.5" fill="#0F766E"/>
+      <!-- знак абзацу -->
+      <circle cx="112" cy="100" r="17" fill="#D9480F"/>
+      <text x="112" y="108" text-anchor="middle" font-family="Arial,sans-serif" font-weight="700" font-size="22" fill="#fff">¶</text>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Параметри шрифту</div>
+    <h2>Що ти вже знаєш</h2>
+    <p class="soft">Обери термін, а потім — його пояснення.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Абзац</div>
+    <h2>Від Enter до Enter</h2>
+    <p><b>Абзац</b> — текст, введення якого завершили клавішею <span class="kbd">Enter</span>.</p>
+    <p>Властивості абзацу в Google Документах:</p>
+    <div id="propsDoc"></div>
+    <ul class="legend">
+      <li><b class="nb">1</b><span><b>Вирівнювання</b> — до якого краю рядки</span></li>
+      <li><b class="nb">2</b><span><b>Відступи</b> — відстань від країв сторінки</span></li>
+      <li><b class="nb">3</b><span><b>Інтервали</b> — відстань між рядками й абзацами</span></li>
+    </ul>
+    <div class="note">Для одного абзацу досить поставити в ньому курсор. Кілька абзаців — виділяють.</div>
+    <div id="paraList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Вирівнювання</div>
+    <h2>До якого краю?</h2>
+    <p>Кнопки — на панелі інструментів і в меню <b>Формат → Вирівнювання та відступи</b>.</p>
+    <div class="gallery" id="alignCards"></div>
+    <p class="soft">Як вирівняно текст у документі?</p>
+    <div id="alignList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Відступи</div>
+    <h2>Відступи й лінійка</h2>
+    <p><b>Відступи</b> задають маркерами на <b>лінійці</b> над сторінкою. Немає лінійки — <b>Вигляд → Показати лінійку</b>.</p>
+    <div class="gallery" id="indentCards"></div>
+    <p class="soft">Який відступ змінили? Подивись і на лінійку.</p>
+    <div id="indentList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Інтервали</div>
+    <h2>Повітря між рядками</h2>
+    <p><b>Міжрядковий інтервал</b> — відстань між рядками абзацу. Його змінює кнопка <span class="ms" style="color:var(--g-soft)">format_line_spacing</span> на панелі інструментів:</p>
+    <div id="spacingMenu"></div>
+    <div class="gallery" id="spacingFigs"></div>
+    <p class="soft">Обери правильну відповідь.</p>
+    <div id="spaceList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Без зайвих пробілів</div>
+    <h2>Пробіл — не лінійка</h2>
+    <p>Відступи й вирівнювання роблять маркерами й кнопками, а не пробілами. Enter натискають лише в кінці абзацу.</p>
+    <p class="soft">Так правильно чи ні?</p>
+    <div id="spacesList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Оформлюємо замітку</div>
+    <h2>Спробуй у Google Документі</h2>
+    <p>Оформи замітку. Один абзац — <b>клацни</b> в ньому, кілька — <b>виділи</b> мишею.</p>
+    <div class="exercise" id="parEx">
+      <div class="task-card"><span class="tnum" id="parNum"></span><span class="ttext" id="parTask"></span></div>
+      <div class="gdoc" id="parDoc">
+        <div class="gd-head">
+          <img src="images/docs.svg" alt="">
+          <div>
+            <div class="gd-title">Шкільний сад<span class="ms">star</span><span class="ms">cloud_done</span></div>
+            <div class="gd-menu"><span>Файл</span><span>Редагувати</span><span>Вигляд</span><span>Вставлення</span><span>Формат</span><span>Інструменти</span></div>
+          </div>
+        </div>
+        <div class="gd-tools" id="parTools"></div>
+        <div class="gruler" id="parRuler"><div class="rtrack" id="parTrack"></div></div>
+        <div class="gpage" id="parPage" contenteditable="true" inputmode="none" spellcheck="false"></div>
+        <div class="gpop" id="parPop" hidden></div>
+      </div>
+      <div class="fb" id="parFb"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Урок · «Форматування абзаців: вирівнювання, відступи, міжрядковий інтервал» · 6 клас</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+const ms = i=>`<span class="ms">${i}</span>`;
+const flash = (el, cls = 'wrong-flash')=>{ el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), 650); };
+const fmt = v=>String(v).replace('.', ',');
+const ALIGN_ICON = { left:'format_align_left', center:'format_align_center', right:'format_align_right', justify:'format_align_justify' };
+
+/* Міні-макет Google Документа.
+   tools: 'full' | 'align' | false; on: { align, spacing }; ruler: { first, left, right } у см (ширина тексту 16 см) або null;
+   hi: який маркер підсвітити; badges: номери 1–3 на панелі; menu: розмітка відкритого меню; cap: підпис праворуч у шапці */
+const CMW = 16;
+const pc = cm=>(cm / CMW * 100).toFixed(3) + '%';
+function md({ name = 'Шкільний сад', tools = 'full', on = {}, ruler = null, hi = '', badges = false, menu = '', cap = '', body = '', page = '' } = {}){
+  const tl = (icon, isOn)=>`<span class="tl${isOn ? ' on' : ''}">${ms(icon)}</span>`;
+  const nb = n=>badges ? `<b class="nb">${n}</b>` : '';
+  const sep = '<span class="sep"></span>';
+  const aligns = Object.entries(ALIGN_ICON).map(([a, i])=>tl(i, on.align === a)).join('');
+  let bar = '';
+  if(tools === 'full') bar = `<div class="gd-tools">${tl('undo')}${tl('redo')}${sep}<span class="tx">Звичайний текст</span>${sep}<span class="tx" style="color:var(--g-ink)">Arial</span>${sep}<span class="tx">−</span><span class="tx size">11</span><span class="tx">+</span>${sep}${tl('format_bold')}${tl('format_italic')}${tl('format_underlined')}${sep}${nb(1)}${aligns}${sep}${nb(3)}${tl('format_line_spacing', on.spacing)}${sep}${nb(2)}${tl('format_indent_decrease')}${tl('format_indent_increase')}</div>`;
+  else if(tools === 'align') bar = `<div class="gd-tools">${aligns}${sep}${tl('format_line_spacing')}</div>`;
+  let rl = '';
+  if(ruler){
+    const r = { first:0, left:0, right:0, ...ruler };
+    rl = `<div class="md-ruler"><div class="rt"><i class="m m-first${hi === 'first' ? ' hi' : ''}" style="left:${pc(r.first)}"></i><i class="m m-left${hi === 'left' ? ' hi' : ''}" style="left:${pc(r.left)}"></i><i class="m m-right${hi === 'right' ? ' hi' : ''}" style="left:${pc(CMW - r.right)}"></i></div></div>`;
+  }
+  return `<div class="md"><div class="md-head"><img src="images/docs.svg" alt="">${name}${cap ? `<span class="cap">${cap}</span>` : ''}</div>${bar}${rl}<div class="md-page" style="${page}">${body}</div>${menu}</div>`;
+}
+// Абзац на сторінці: відступи в см, як на лінійці
+function para(text, { align = 'left', first = 0, left = 0, right = 0, line = 1.15, after = 0, cls = '' } = {}){
+  return `<p class="${cls}" style="text-align:${align}; margin-left:${pc(left)}; margin-right:${pc(right)}; text-indent:${pc(first - left)}; line-height:${(line * 1.2).toFixed(2)}; margin-bottom:${after}px">${text}</p>`;
+}
+// Меню «Міжрядковий інтервал і інтервал між абзацами»
+function spacingMenu({ line = 1.15, after = false, hl = '' } = {}){
+  const it = (label, cur, key)=>`<div class="${cur ? 'cur' : ''}${hl === key ? ' hl' : ''}">${ms('check')}${label}</div>`;
+  return `<div class="md-menu">${[[1, 'Одинарний'], [1.15, '1,15'], [1.5, '1,5'], [2, 'Подвійний']].map(([v, n])=>it(n, line === v, v)).join('')}<hr>`
+    + it('Додати пробіл перед абзацом', false, 'before') + it(after ? 'Видалити пробіл після абзацу' : 'Додати пробіл після абзацу', false, 'after') + '</div>';
+}
+const T1 = 'Цієї осені наш клас посадив біля школи невеликий сад. Ми викопали ямки, принесли саджанці й полили кожне деревце.';
+const T2 = 'Навесні ми повісимо на гілки шпаківні й годівнички, щоб у саду жило більше птахів.';
+
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Шрифт', desc:'Набір літер і знаків, намальованих в одному стилі' },
+  { name:'Пункт (пт)', desc:'Одиниця, у якій вимірюють розмір шрифту' },
+  { name:'Курсив', desc:'Накреслення з нахилом літер' },
+  { name:'Колір виділення', desc:'Фарбує тло під літерами, як маркер' },
+  { name:'Пензлик', desc:'Переносить форматування з одного фрагмента на інший' }
+], 'recapProgress');
+
+/* ---------- КРОК 1: АБЗАЦ ---------- */
+document.getElementById('propsDoc').innerHTML = md({ badges:true, on:{ align:'justify' }, ruler:{ first:1.25 },
+  body:para('Шкільний сад', { align:'center', cls:'h', after:8 }) + para(T1, { align:'justify', first:1.25 }) });
+makeChoices('paraList', [
+  { pre:md({ tools:false, ruler:{ first:1.25 }, body:para('Шкільний сад', { align:'center', cls:'h', after:8 }) + para(T1, { align:'justify', first:1.25 }) + para(T2, { align:'justify', first:1.25 }) }),
+    text:'Скільки абзаців у цьому документі?', opts:['3', '6', '2'], correct:0,
+    why:'Заголовок і два абзаци тексту.' }
+]);
+
+/* ---------- КРОК 2: ВИРІВНЮВАННЯ ---------- */
+const ALIGNS = [
+  { a:'left', name:'За лівим краєм', key:'L', use:'Для нотаток і списків.' },
+  { a:'center', name:'По центру', key:'E', use:'Для заголовків.' },
+  { a:'right', name:'За правим краєм', key:'R', use:'Для підписів і дат.' },
+  { a:'justify', name:'За шириною', key:'J', use:'Рівні обидва краї. Для основного тексту.' }
+];
+document.getElementById('alignCards').innerHTML = ALIGNS.map(x=>`<figure>
+  ${md({ tools:'align', on:{ align:x.a }, body:para(T1, { align:x.a }) })}
+  <figcaption><b>${ms(ALIGN_ICON[x.a])}${x.name}</b>${x.use} <span class="kbd">Ctrl</span> + <span class="kbd">Shift</span> + <span class="kbd">${x.key}</span></figcaption></figure>`).join('');
+
+const AOPTS = Object.entries({ left:'За лівим краєм', center:'По центру', right:'За правим краєм', justify:'За шириною' })
+  .map(([a, n])=>`${ms(ALIGN_ICON[a])} ${n}`);
+const AI = { left:0, center:1, right:2, justify:3 };
+const doc = (name, body)=>md({ name, tools:false, body });
+makeClassify('alignList', [
+  { pre:doc('Вірш', para('Осінь', { align:'center', cls:'h', after:8 }) + ['Жовте листя у саду', 'Тихо падає в траву,', 'Я по стежці йду-іду', 'Й осінь радісно зову.'].map(l=>para(l, { align:'center' })).join('')),
+    text:'Як вирівняно вірш?', correct:AI.center, why:'Рядки однаково віддалені від обох країв.' },
+  { pre:doc('Лист', para('Дорога бабусю! Цієї осені ми посадили біля школи сад. Навесні приїзди подивитися, як він цвіте.', { align:'justify', after:10 }) + para('Твій онук Андрій', { align:'right' })),
+    text:'Як вирівняно підпис «Твій онук Андрій»?', correct:AI.right, why:'Підпис притиснуто до правого краю.' },
+  { pre:doc('Реферат', para(T1 + ' ' + T2, { align:'justify', first:1.25 })),
+    text:'Як вирівняно абзац?', correct:AI.justify, why:'Рівні обидва краї — процесор трохи розтягнув пробіли.' },
+  { pre:doc('Покупки', para('Купити до свята:', { after:4 }) + ['— кульки', '— печиво', '— сік', '— серветки'].map(l=>para(l)).join('')),
+    text:'Як вирівняно список?', correct:AI.left, why:'Рядки починаються від лівого краю.' },
+  { pre:doc('Замітка', para(T1 + ' ' + T2)),
+    text:'Як вирівняно абзац?', correct:AI.left, why:'Лівий край рівний, а правий — «рваний». За шириною були б рівні обидва.' },
+  { pre:doc('Заява', para('14 листопада 2026 р.', { align:'right', after:10 }) + para('ЗАЯВА', { align:'center', cls:'h', after:8 }) + para('Прошу зарахувати мене до гуртка «Юні садівники».', { first:1.25 })),
+    text:'Як вирівняно дату?', correct:AI.right, why:'Дата стоїть біля правого краю.' }
+], AOPTS);
+
+/* ---------- КРОК 3: ВІДСТУПИ ---------- */
+(function(){
+  const T3 = 'Коваленко О. Таємниці шкільного саду. — Київ : Весна, 2024. — 96 с.';
+  const J = { align:'justify' };
+  const card = (r, hi, text, name, d)=>`<figure>${md({ tools:false, ruler:r, hi, body:para(text, { ...J, ...r }) })}<figcaption><b>${name}</b>${d}</figcaption></figure>`;
+  document.getElementById('indentCards').innerHTML =
+      card({ first:1.5 }, 'first', T1, 'Відступ першого рядка', 'Перший рядок починається правіше за інші. Його ще називають «червоним рядком». Верхній прямокутник.')
+    + card({ left:2, first:2 }, 'left', T1, 'Відступ зліва', 'Нижній трикутник ліворуч. Відсуває весь абзац.')
+    + card({ right:2.5 }, 'right', T1, 'Відступ справа', 'Трикутник праворуч.')
+    + card({ left:1.5, first:0 }, 'first', T3, 'Виступ', 'Прямокутник лівіше за трикутник: перший рядок виступає. Так оформлюють списки книжок.');
+
+  const ba = (text, r)=>`<div class="ba">${md({ tools:false, cap:'Було', ruler:{}, body:para(text, J) })}${ms('arrow_forward')}${md({ tools:false, cap:'Стало', ruler:r, body:para(text, { ...J, ...r }) })}</div>`;
+  makeClassify('indentList', [
+    { pre:ba(T1, { first:1.5 }), text:'Що змінили?', correct:0, why:'Відсунувся лише перший рядок.' },
+    { pre:ba(T2, { left:2.5, first:2.5 }), text:'Що змінили?', correct:2, why:'Усі рядки відсунулися від лівого краю.' },
+    { pre:ba(T3, { left:1.5, first:0 }), text:'Що змінили?', correct:1, why:'Перший рядок виступає вперед.' },
+    { pre:ba(T1, { right:3 }), text:'Що змінили?', correct:3, why:'Рядки коротші праворуч.' }
+  ], ['Відступ першого рядка', 'Виступ', 'Відступ зліва', 'Відступ справа']);
+})();
+
+/* ---------- КРОК 4: ІНТЕРВАЛИ ---------- */
+(function(){
+  document.getElementById('spacingMenu').innerHTML = md({ on:{ align:'justify', spacing:true }, page:'min-height:190px',
+    body:para('Шкільний сад', { align:'center', cls:'h' }) + para(T1, { align:'justify' }), menu:spacingMenu({ line:1.15 }) });
+  const fig = (line, name, d)=>`<figure>${md({ tools:false, body:para(T1, { align:'justify', line }) })}<figcaption><b>${name}</b>${d}</figcaption></figure>`;
+  document.getElementById('spacingFigs').innerHTML = fig(1, 'Одинарний', 'Рядки щільно.') + fig(1.5, '1,5', 'Читати легше.') + fig(2, 'Подвійний', 'Між рядками вміщається ще рядок.');
+
+  makeChoices('spaceList', [
+    { pre:`<div class="two">${md({ tools:false, cap:'А · одинарний', body:para(T2, { line:1 }) })}${md({ tools:false, cap:'Б · ?', body:para(T2, { line:2 }) })}</div>`,
+      text:'Який міжрядковий інтервал у документі Б?', opts:['Одинарний', '1,15', 'Подвійний'], correct:2,
+      why:'Між рядками вміщається ще рядок.' },
+    { text:'Яку кнопку натиснути, щоб встановити інтервал 1,5?',
+      opts:[ms('format_align_justify'), ms('format_line_spacing'), ms('format_indent_increase')].map(x=>`<span class="opt-ico">${x}</span>`), correct:1,
+      why:'Це кнопка «Міжрядковий інтервал і інтервал між абзацами».' }
+  ]);
+})();
+
+/* ---------- КРОК 5: ПРОБІЛИ ПРОТИ КНОПКИ ---------- */
+(function(){
+  const look = (body, how, ruler = {})=>md({ tools:false, ruler, body }) + `<p class="how">Як зробили: <b>${how}</b></p>`;
+  makeYesNo('spacesList', [
+    { pre:look(`<p style="text-align:justify"><span class="sel">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>${T1}</p>`, 'натиснули Пробіл 6 разів (рядок виділено, щоб їх було видно)'),
+      text:'Так правильно робити відступ першого рядка?', correct:false, why:'Для цього є маркер на лінійці.' },
+    { pre:look('<p style="font-size:16px">Цієї осені наш клас посадив</p><p style="font-size:16px">біля школи невеликий</p><p style="font-size:16px">сад.</p>', 'натискали Enter у кінці кожного рядка, а тоді збільшили шрифт'),
+      text:'Так правильно переходити на новий рядок?', correct:false, why:'Процесор сам переносить слова. Enter — лише в кінці абзацу.' },
+    { pre:look(para(T1, { align:'justify', first:1.25 }), 'перетягнули маркер першого рядка на лінійці', { first:1.25 }),
+      text:'Так правильно робити відступ першого рядка?', correct:true }
+  ], 'Правильно', 'Неправильно');
+})();
+/* ---------- КРОК 6: ЕМУЛЯТОР GOOGLE ДОКУМЕНТА ---------- */
+(function(){
+  const CM = 16;                       // ширина тексту між полями, см
+  const ALN = { left:'за лівим краєм', center:'по центру', right:'за правим краєм', justify:'за шириною' };
+  const PROP = { align:'вирівнювання', first:'відступ першого рядка', left:'відступ зліва', right:'відступ справа',
+    line:'міжрядковий інтервал', after:'пробіл після абзацу', before:'пробіл перед абзацом', char:'вигляд символів' };
+  const TIP = { first:'Відступ першого рядка', left:'Відступ зліва', right:'Відступ справа' };
+  const NAME = { title:'заголовок', p1:'перший абзац', p2:'другий абзац', sign:'підпис' };
+  const TEXT = {
+    title:'Шкільний сад',
+    p1:'Цієї осені наш клас посадив біля школи невеликий сад. Ми викопали ямки, принесли саджанці, засипали коріння землею й полили кожне деревце.',
+    p2:'Тепер у саду ростуть дві яблуні, груша й вишня. Навесні ми повісимо на гілки шпаківні й годівнички, щоб у саду жило якомога більше птахів.',
+    sign:'Учні 6-А класу'
+  };
+  const P = {};
+  Object.keys(TEXT).forEach(k=>P[k] = { align:'left', left:0, first:0, right:0, line:1.15, before:false, after:false });
+  const TASKS = [
+    { T:['title'], what:'заголовок', want:{ align:'center' }, t:'Заголовок — по центру.' },
+    { T:['p1', 'p2'], what:'основний текст — обидва абзаци', want:{ align:'justify' }, t:'Виділи обидва абзаци тексту й вирівняй за шириною.' },
+    { T:['p1', 'p2'], what:'основний текст — обидва абзаци', want:{ first:1.25 }, t:'Відступ першого рядка 1,25 см в обох абзацах: перетягни на лінійці синій прямокутник.' },
+    { T:['p1', 'p2'], what:'основний текст — обидва абзаци', want:{ line:1.5 }, t:'Міжрядковий інтервал 1,5 для обох абзаців.' },
+    { T:['sign'], what:'підпис', want:{ align:'right' }, t:'Підпис — за правим краєм.' }
+  ];
+  const $ = id=>document.getElementById(id);
+  const ex = $('parEx'), gdoc = $('parDoc'), page = $('parPage'), tools = $('parTools'), pop = $('parPop');
+  const ruler = $('parRuler'), track = $('parTrack'), num = $('parNum'), task = $('parTask'), fb = $('parFb');
+  page.innerHTML = Object.keys(TEXT).map(k=>`<div class="gp gp-${k}" data-p="${k}">${TEXT[k]}</div>`).join('');
+  const els = {};
+  page.querySelectorAll('[data-p]').forEach(el=>els[el.dataset.p] = el);
+  let sel = [], i = 0, busy = false, drag = null;
+  const hit = trackTask(ex, TASKS.length, TASKS.length + 2);
+
+  /* Панель інструментів */
+  const tl = (act, icon, title, extra = '')=>`<button type="button" class="tl" data-act="${act}" ${extra} title="${title}">${ms(icon)}</button>`;
+  tools.innerHTML = `<span class="tl">${ms('undo')}</span><span class="tl">${ms('redo')}</span><span class="sep"></span>`
+    + `<span class="tx">Звичайний текст</span><span class="sep"></span><span class="tx" style="color:var(--g-ink)">Arial</span><span class="sep"></span>`
+    + `<span class="tx">−</span><span class="tx size">11</span><span class="tx">+</span><span class="sep"></span>`
+    + tl('char', 'format_bold', 'Напівжирний (Ctrl+B)') + tl('char', 'format_italic', 'Курсив (Ctrl+I)') + tl('char', 'format_underlined', 'Підкреслити (Ctrl+U)') + '<span class="sep"></span>'
+    + tl('align', 'format_align_left', 'Вирівняти за лівим краєм (Ctrl+Shift+L)', 'data-al="left"')
+    + tl('align', 'format_align_center', 'Вирівняти по центру (Ctrl+Shift+E)', 'data-al="center"')
+    + tl('align', 'format_align_right', 'Вирівняти за правим краєм (Ctrl+Shift+R)', 'data-al="right"')
+    + tl('align', 'format_align_justify', 'Вирівняти за шириною (Ctrl+Shift+J)', 'data-al="justify"') + '<span class="sep"></span>'
+    + tl('spacing', 'format_line_spacing', 'Міжрядковий інтервал і інтервал між абзацами') + '<span class="sep"></span>'
+    + tl('indent', 'format_indent_decrease', 'Зменшити відступ (Ctrl+[)', 'data-d="-1"') + tl('indent', 'format_indent_increase', 'Збільшити відступ (Ctrl+])', 'data-d="1"');
+
+  /* Лінійка: поділки, маркери, підказка */
+  let rh = '';
+  for(let c = .5; c < CM; c += .5) rh += `<span class="tk${c % 1 ? ' half' : ''}" data-cm="${c}"></span>` + (c % 1 ? '' : `<span class="num" data-cm="${c}">${c}</span>`);
+  track.innerHTML = rh + `<span class="mk mk-first" data-mk="first" title="Відступ першого рядка"></span><span class="mk mk-left" data-mk="left" title="Відступ зліва"></span><span class="mk mk-right" data-mk="right" title="Відступ справа"></span><span class="rtip" hidden></span><span class="rguide" hidden></span>`;
+  const tip = track.querySelector('.rtip'), guide = track.querySelector('.rguide');
+  const mk = { first:track.querySelector('.mk-first'), left:track.querySelector('.mk-left'), right:track.querySelector('.mk-right') };
+  const ppc = ()=>track.clientWidth / CM;
+
+  const render = ()=>{
+    const k = ppc();
+    Object.entries(els).forEach(([id, el])=>{
+      const s = P[id];
+      el.style.textAlign = s.align;
+      el.style.marginLeft = (s.left * k) + 'px';
+      el.style.marginRight = (s.right * k) + 'px';
+      el.style.textIndent = ((s.first - s.left) * k) + 'px';
+      el.style.lineHeight = (s.line * 1.15).toFixed(3);
+      el.style.marginTop = s.before ? '14px' : (id === 'sign' ? '14px' : '0');
+      el.style.paddingBottom = s.after ? '14px' : '0';
+    });
+    track.querySelectorAll('[data-cm]').forEach(t=>t.style.left = (+t.dataset.cm * k) + 'px');
+    const s = sel.length ? P[sel[0]] : { first:0, left:0, right:0, align:'' };
+    mk.first.style.left = (s.first * k) + 'px';
+    mk.left.style.left = (s.left * k) + 'px';
+    mk.right.style.left = ((CM - s.right) * k) + 'px';
+    tools.querySelectorAll('[data-al]').forEach(b=>b.classList.toggle('on', !!sel.length && b.dataset.al === s.align));
+    mk.first.classList.toggle('hint', i < TASKS.length && 'first' in TASKS[i].want);
+  };
+  new ResizeObserver(render).observe(track);
+
+  const show = ()=>{
+    if(i >= TASKS.length){ num.textContent = '🎉'; task.textContent = 'Замітка готова!'; return; }
+    num.textContent = `Завдання ${i + 1} з ${TASKS.length}`;
+    task.textContent = TASKS[i].t;
+  };
+  const closePop = ()=>{ pop.hidden = true; };
+  const names = ids=>ids.map(id=>NAME[id]).join(' і ');
+
+  // Чи можна зараз змінювати властивість prop? Якщо ні — хибна спроба й підказка
+  const guard = (prop, btn)=>{
+    if(busy || i >= TASKS.length) return false;
+    const tk = TASKS[i];
+    let msg = '';
+    if(!sel.length) msg = 'Спершу клацни в потрібний абзац — там з\'явиться курсор.';
+    else if(sel.some(id=>!tk.T.includes(id))) msg = `Курсор чи виділення зачіпає ${names(sel.filter(id=>!tk.T.includes(id)))}. Зараз оформлюємо ${tk.what}.`;
+    else if(!(prop in tk.want)) msg = `Ця кнопка змінює ${PROP[prop]}, а зараз потрібно змінити ${Object.keys(tk.want).map(p=>PROP[p]).join(' і ')}.`;
+    if(!msg) return true;
+    closePop(); flash(btn); fb.textContent = '🤔 ' + msg;
+    return false;
+  };
+  const okFor = id=>Object.entries(TASKS[i].want).every(([p, v])=>P[id][p] === v);
+  const check = ()=>{
+    const tk = TASKS[i];
+    const done = tk.T.filter(okFor);
+    if(done.length < tk.T.length){
+      if(done.length) fb.textContent = `👍 ${NAME[done[0]][0].toUpperCase() + NAME[done[0]].slice(1)} готовий. Тепер ${names(tk.T.filter(id=>!okFor(id)))} — або виділи обидва абзаци разом.`;
+      return;
+    }
+    busy = true;
+    addNeurons(1); hit();
+    fb.textContent = '✓ Готово!';
+    render();
+    tk.T.forEach(id=>els[id].classList.add('good'));
+    setTimeout(()=>{
+      tk.T.forEach(id=>els[id].classList.remove('good'));
+      busy = false; i++;
+      const next = TASKS[i];
+      if(!next || next.T.join() !== tk.T.join()){ sel = []; const s = getSelection(); if(s && page.contains(s.anchorNode)) s.removeAllRanges(); }
+      if(i === TASKS.length){ addNeurons(2); fb.textContent = '🎉 Чудова робота!'; }
+      else fb.textContent = '';
+      render(); show();
+    }, 1100);
+  };
+  // Застосувати значення до виділених абзаців; хибне значення потрібної властивості — теж помилка
+  const apply = (prop, val, btn)=>{
+    const tk = TASKS[i];
+    sel.forEach(id=>P[id][prop] = val);
+    render();
+    if(val !== tk.want[prop]){
+      flash(btn);
+      fb.textContent = prop === 'align' ? `🤔 Це вирівнювання ${ALN[val]}. Потрібно — ${ALN[tk.want.align]}.`
+        : prop === 'line' ? `🤔 Це інтервал ${fmt(val)}. Потрібно ${fmt(tk.want.line)}.`
+        : '🤔 Подивись уважно на завдання.';
+      return;
+    }
+    fb.textContent = '';
+    check();
+  };
+
+  /* Виділення: абзаци, яких торкається курсор чи виділення */
+  const readSel = ()=>{
+    const s = getSelection();
+    if(!s || !s.rangeCount) return null;
+    const r = s.getRangeAt(0);
+    if(!page.contains(r.commonAncestorContainer) && r.commonAncestorContainer !== page) return null;
+    if(r.collapsed){
+      let n = r.startContainer;
+      if(n === page) n = page.children[Math.min(r.startOffset, page.children.length - 1)];
+      const p = n && (n.nodeType === 1 ? n : n.parentElement).closest('[data-p]');
+      return p ? [p.dataset.p] : null;
+    }
+    const out = Object.keys(els).filter(id=>{
+      const el = els[id];
+      if(!r.intersectsNode(el)) return false;
+      const er = document.createRange(); er.selectNodeContents(el);
+      const ir = r.cloneRange();
+      if(ir.compareBoundaryPoints(Range.START_TO_START, er) < 0) ir.setStart(er.startContainer, er.startOffset);
+      if(ir.compareBoundaryPoints(Range.END_TO_END, er) > 0) ir.setEnd(er.endContainer, er.endOffset);
+      return ir.toString().trim().length > 0;
+    });
+    return out.length ? out : null;
+  };
+  document.addEventListener('selectionchange', ()=>{
+    if(busy || drag) return;
+    const res = readSel();
+    if(!res) return;               // клацання на панелі чи поза документом не знімає курсора
+    if(res.join() !== sel.join()){ sel = res; closePop(); render(); }
+  });
+
+  /* Кнопки панелі */
+  [tools, pop, ruler].forEach(el=>el.addEventListener('mousedown', e=>e.preventDefault()));
+  const spacingPop = btn=>{
+    const s = P[sel[0]];
+    const it = (attr, label, cur)=>`<div class="it${cur ? ' cur' : ''}" ${attr}>${ms('check')}${label}</div>`;
+    pop.innerHTML = [[1, 'Одинарний'], [1.15, '1,15'], [1.5, '1,5'], [2, 'Подвійний']].map(([v, n])=>it(`data-line="${v}"`, n, s.line === v)).join('')
+      + '<div class="div"></div>'
+      + it('data-tog="before"', s.before ? 'Видалити пробіл перед абзацом' : 'Додати пробіл перед абзацом')
+      + it('data-tog="after"', s.after ? 'Видалити пробіл після абзацу' : 'Додати пробіл після абзацу');
+    pop.hidden = false;
+    const r = btn.getBoundingClientRect(), g = gdoc.getBoundingClientRect();
+    pop.style.top = (r.bottom - g.top + 4) + 'px';
+    pop.style.left = Math.max(4, Math.min(r.left - g.left, g.width - pop.offsetWidth - 4)) + 'px';
+  };
+  tools.addEventListener('click', e=>{
+    const btn = e.target.closest('[data-act]');
+    if(!btn) return;
+    e.stopPropagation();
+    const act = btn.dataset.act;
+    if(act === 'char'){ guard('char', btn); return; }
+    if(act === 'indent'){ guard('left', btn); return; }
+    if(act === 'align'){ if(guard('align', btn)){ closePop(); apply('align', btn.dataset.al, btn); } return; }
+    if(act === 'spacing'){
+      if(!pop.hidden){ closePop(); return; }
+      const tk = TASKS[i];
+      // меню відкривається для будь-якого завдання з інтервалами; в інших — підказка
+      if(!guard(('line' in (tk?.want || {})) ? 'line' : ('after' in (tk?.want || {})) ? 'after' : 'line', btn)) return;
+      spacingPop(btn);
+    }
+  });
+  pop.addEventListener('click', e=>{
+    e.stopPropagation();
+    const it = e.target.closest('[data-line],[data-tog]');
+    if(!it || !sel.length) return;
+    closePop();
+    const btn = tools.querySelector('[data-act="spacing"]');
+    if(it.dataset.line){ if(guard('line', btn)) apply('line', +it.dataset.line, btn); return; }
+    const p = it.dataset.tog;
+    if(guard(p, btn)) apply(p, !P[sel[0]][p], btn);
+  });
+  document.addEventListener('click', e=>{ if(!pop.hidden && !pop.contains(e.target)) closePop(); });
+
+  /* Перетягування маркерів лінійки */
+  const showTip = (prop, cm, x)=>{
+    tip.hidden = false; tip.textContent = `${TIP[prop]}: ${fmt(cm)} см`; tip.style.left = x + 'px';
+    guide.hidden = false; guide.style.left = x + 'px'; guide.style.height = (page.offsetTop + page.offsetHeight - ruler.offsetTop - ruler.offsetHeight) + 'px';
+  };
+  track.addEventListener('pointerdown', e=>{
+    const m = e.target.closest('.mk');
+    e.preventDefault();
+    if(!m) return;
+    const prop = m.dataset.mk;
+    if(!guard(prop, m)) return;
+    closePop();
+    drag = { prop, m };
+    m.setPointerCapture(e.pointerId);
+    moveTo(e);
+  });
+  const moveTo = e=>{
+    const { prop } = drag, k = ppc(), s = P[sel[0]];
+    const x = e.clientX - track.getBoundingClientRect().left;
+    let cm = Math.round((prop === 'right' ? CM - x / k : x / k) * 4) / 4;
+    const room = prop === 'right' ? CM - Math.max(s.left, s.first) - 2 : CM - s.right - 2;
+    cm = Math.max(0, Math.min(room, cm));
+    sel.forEach(id=>{
+      const q = P[id];
+      if(prop === 'left'){ const d = q.first - q.left; q.left = cm; q.first = Math.max(0, cm + d); }
+      else q[prop] = cm;
+    });
+    render();
+    showTip(prop, cm, prop === 'right' ? (CM - cm) * k : cm * k);
+  };
+  track.addEventListener('pointermove', e=>{ if(drag) moveTo(e); });
+  const drop = ()=>{
+    if(!drag) return;
+    const { prop } = drag;
+    drag = null; tip.hidden = true; guide.hidden = true;
+    const tk = TASKS[i], want = tk.want[prop];
+    const v = P[sel[0]][prop];
+    if(v === want) check();
+    else fb.textContent = v === 0 ? '' : `Зараз ${fmt(v)} см, а потрібно ${fmt(want)} см. Підсунь маркер ${v < want ? 'правіше' : 'лівіше'}.`;
+  };
+  track.addEventListener('pointerup', drop);
+  track.addEventListener('pointercancel', drop);
+
+  /* Клавіатура: гарячі клавіші вирівнювання; текст змінювати не можна */
+  page.addEventListener('keydown', e=>{
+    const mod = e.ctrlKey || e.metaKey;
+    if(mod && e.shiftKey && !e.altKey){
+      const a = { KeyL:'left', KeyE:'center', KeyR:'right', KeyJ:'justify' }[e.code];
+      if(a){ e.preventDefault(); const btn = tools.querySelector(`[data-al="${a}"]`); if(guard('align', btn)) apply('align', a, btn); return; }
+    }
+    if(mod && !e.shiftKey && (e.code === 'BracketLeft' || e.code === 'BracketRight')){ e.preventDefault(); guard('left', tools.querySelector('[data-act="indent"]')); return; }
+    if(mod && !e.shiftKey && ['KeyA', 'KeyC'].includes(e.code)) return;
+    if(/^(Arrow|Home|End|Page)/.test(e.key) || ['Shift', 'Control', 'Meta', 'Alt', 'CapsLock'].includes(e.key)) return;
+    e.preventDefault();
+    if(e.key.length === 1 || ['Enter', 'Backspace', 'Delete', 'Tab'].includes(e.key)) fb.textContent = '🙂 Текст уже набрано — сьогодні змінюємо лише вигляд абзаців.';
+  });
+  ['beforeinput', 'paste', 'drop', 'cut'].forEach(t=>page.addEventListener(t, e=>e.preventDefault()));
+
+  render(); show();
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що таке абзац?', opts:['Один рядок тексту', 'Текст, введення якого завершили клавішею Enter', 'Будь-яке виділене слово'], correct:1 },
+  { q:'Яке вирівнювання найчастіше обирають для заголовка?', opts:['За лівим краєм', 'По центру', 'За правим краєм'], correct:1 },
+  { q:'Як інакше називають відступ першого рядка?', opts:['Виступ', '«Червоний рядок»', 'Інтервал'], correct:1 },
+  { q:'Як правильно зробити відступ першого рядка?', opts:['Кількома пробілами', 'Клавішею Enter', 'Маркером на лінійці'], correct:2 },
+  { q:'Що таке міжрядковий інтервал?', opts:['Відстань між рядками всередині абзацу', 'Відстань між словами', 'Відстань від краю аркуша'], correct:0 },
+  { q:'Чому не варто відсувати текст пробілами?', opts:['Пробіли не видно на екрані', 'Після зміни шрифту текст роз\'їдеться', 'Пробіли не можна видалити'], correct:1 }
+], {summary:'Тепер ти вмієш вирівнювати абзаци, робити відступи й налаштовувати інтервали.'});
+</script>
+
+</body>
+</html>
