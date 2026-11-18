@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Лист у майбутнє — Форматування абзаців</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#0F766E,#F59F00); --accent:#0F766E; --accent-dark:#134E4A; --accent-soft:#E4F3F0; --bg:#F5F9F8; --line:#D9EAE6; }
+  .p-hero p{max-width:none;}
+  .ms{font-family:'Material Symbols Outlined'; font-weight:normal; font-style:normal; line-height:1; display:inline-block; -webkit-font-smoothing:antialiased;}
+  .ms.ic{font-size:19px; vertical-align:-5px; color:#444746; background:#EDF2FA; border-radius:4px; padding:1px;}
+  .kbd{display:inline-block; font-family:'Roboto',sans-serif; font-weight:500; font-size:.86em; line-height:1.2; padding:1px 6px; border:1px solid #C5C6DA; border-bottom-width:3px; border-radius:6px; background:#fff; white-space:nowrap;}
+
+  /* Що має вийти: аркуш A4; відступи — частки ширини тексту (16 см) */
+  .page-wrap{background:#E8EAED; border-radius:var(--radius-m); padding:18px; display:flex; justify-content:center;}
+  .page-box{width:100%; max-width:620px; container-type:inline-size;}
+  .page{position:relative; background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.25); padding:9% 12% 8%; font-family:Arial,sans-serif; color:#000; font-size:2.25cqw; line-height:1.3;}
+  .page p{margin:0;}
+  .page .r{text-align:right;}
+  .page .c{text-align:center;}
+  .page .t{font-size:1.65em; font-weight:700; margin-top:1.6em;}
+  .page .o{font-style:italic; color:#D9480F; margin:.9em 0 1.6em;}
+  .page .ep{font-style:italic;}
+  .page .ep-a{margin-bottom:1.6em;}
+  .page .b{text-align:justify; text-indent:7.8%; line-height:1.95;}   /* 1,25 см із 16 см; інтервал 1,5 */
+  .page .adv{text-align:justify; line-height:1.95; margin:1.2em 12.5% 0;}  /* 2 см із 16 см */
+  .page .sg{margin-top:1.8em;}
+  /* Позначки на зразку */
+  .page i{font-style:normal;}
+  .page .edge{position:absolute; top:4%; bottom:4%; border-left:1px dashed #B9C3C1;}
+  .page .box{position:absolute; border:1.5px solid #2F9E44; border-radius:.6cqw; pointer-events:none;}
+  .page .tag{position:absolute; transform:translateY(-70%); min-width:2.8cqw; height:2.8cqw; padding:0 .5cqw; border-radius:.6cqw; background:#2F9E44; color:#fff; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:1.9cqw; line-height:1; display:flex; align-items:center; justify-content:center;}
+  .page .dim{position:absolute; height:0; border-top:1.5px solid #E8590C;}
+  .page .dim::before, .page .dim::after{content:''; position:absolute; top:-.75cqw; border:.7cqw solid transparent;}
+  .page .dim::before{left:-.2cqw; border-right-color:#E8590C; border-left-width:0;}
+  .page .dim::after{right:-.2cqw; border-left-color:#E8590C; border-right-width:0;}
+  .page .dim span{position:absolute; left:50%; bottom:.35cqw; transform:translateX(-50%); font-family:'Roboto',sans-serif; font-weight:500; font-size:1.45cqw; color:#E8590C; white-space:nowrap; background:#fff; padding:0 .3cqw; line-height:1.2;}
+  .font-all{font-size:14px; margin:0 0 10px;}
+  /* Інструкція */
+  .bx{display:inline-flex; align-items:center; justify-content:center; min-width:22px; height:22px; padding:0 5px; border-radius:5px; background:#2F9E44; color:#fff; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; line-height:1; margin-right:6px; vertical-align:2px;}
+  .gb{display:inline-flex; align-items:center; gap:4px; font-family:'Roboto',sans-serif; font-size:13px; font-weight:500; color:#1F1F1F; background:#EDF2FA; border-radius:6px; padding:1px 7px 1px 3px; white-space:nowrap; vertical-align:1px;}
+  .gb .ms{font-size:18px; color:#444746;}
+  .gf{display:inline-block; font-family:'Roboto',sans-serif; font-size:13px; color:#1F1F1F; border:1px solid #747775; border-radius:4px; padding:0 6px; background:#fff; white-space:nowrap;}
+  .page{-webkit-user-select:none; user-select:none; -webkit-touch-callout:none;}
+  .copy-row{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:6px 0 4px;}
+  .copy-btn{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; background:var(--accent); color:#fff; border:0; border-radius:999px; padding:8px 18px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;}
+  .copy-btn:hover{background:var(--accent-dark);}
+  .copy-msg{font-size:13.5px; font-weight:700;}
+  .ruler-hint{display:block; width:100%; max-width:520px; height:auto; margin:6px 0 4px;}
+</style>
+</head>
+<body data-hud="6 клас · Практична · Лист у майбутнє">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 6 клас · Форматування абзаців</div>
+    <h1>✉️ Лист у майбутнє</h1>
+    <p>Оформи в Google Документах лист самому собі — тому, хто відкриє його через 10 років. А наприкінці допиши власну пораду дорослому собі.</p>
+    <div class="meta"><span>⏱ 20–25 хв</span><span><img src="../../assets/logos/docs.svg" alt="">Google Документи</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти?</h2>
+    <p class="font-all">Створи документ, встав текст листа й оформи його, як на малюнку.</p>
+    <div class="page-wrap">
+      <div class="page-box">
+        <div class="page" id="sample">
+          <p class="r">17 листопада 2026 року</p>
+          <p class="c t">Лист у майбутнє</p>
+          <p class="c o">Відкрити у 2036 році!</p>
+          <p class="r ep">Хто сьогодні садить дерево, той завтра відпочиває в його тіні.</p>
+          <p class="r ep-a">Народна мудрість</p>
+          <p class="b">Привіт, дорослий я! Пишу тобі із шостого класу. Зараз я вчуся оформлювати документи: вирівнювати абзаци, робити відступи й налаштовувати інтервали. Цікаво, чи ти ще пам'ятаєш, як це робиться?</p>
+          <p class="b">Цієї осені наш клас посадив біля школи сад. Коли ти читатимеш цей лист, яблуні вже даватимуть урожай. Сходи подивитися на них і згадай, як ми їх поливали.</p>
+          <p class="adv">Моя порада тобі: не забувай гратися, дружити й щодня дізнаватися щось нове!</p>
+          <p class="r sg">Твій шестикласник із 2026 року</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Як це зробити?</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи документ</h3>
+        <p>Обери один зі способів:</p>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Документи</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Документи</span> → <span class="menu">Порожній документ</span>.</li>
+              <li>Назви файл: <b>Лист у майбутнє — Прізвище</b>.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Встав текст листа</h3>
+        <div class="copy-row"><button type="button" class="copy-btn" id="copyBtn"><span class="ms" style="font-size:18px">content_copy</span>Скопіювати текст</button><span class="copy-msg" id="copyMsg"></span></div>
+        <ul>
+          <li>Клацни в документ і натисни <span class="kbd">Ctrl</span> + <span class="kbd">Shift</span> + <span class="kbd">V</span> — текст вставиться без чужого оформлення.</li>
+          <li>Увімкни лінійку, якщо її не видно: <span class="menu">Вигляд → Показати лінійку</span>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Шрифт для всього тексту</h3>
+        <ol>
+          <li>Виділи весь текст: <span class="kbd">Ctrl</span> + <span class="kbd">A</span>.</li>
+          <li>Поле <b>Шрифт</b> на панелі інструментів → <span class="gf">Arial</span>.</li>
+          <li>Поле <b>Розмір шрифту</b> → <span class="gf">11</span>.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3><span class="bx">1</span><span class="bx">7</span>Дата й підпис</h3>
+        <ol>
+          <li>Клацни в дату.</li>
+          <li>Натисни <span class="gb"><span class="ms">format_align_right</span>Вирівняти за правим краєм</span>.</li>
+          <li>Те саме зроби з підписом.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3><span class="bx">2</span>Заголовок</h3>
+        <ol>
+          <li>Виділи «Лист у майбутнє».</li>
+          <li>Натисни <span class="gb"><span class="ms">format_bold</span>Напівжирний</span>.</li>
+          <li>Поле <b>Розмір шрифту</b> → <span class="gf">20</span>.</li>
+          <li>Натисни <span class="gb"><span class="ms">format_align_center</span>Вирівняти по центру</span>.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3><span class="bx">3</span>Відкрити у 2036 році!</h3>
+        <ol>
+          <li>Виділи рядок.</li>
+          <li>Натисни <span class="gb"><span class="ms">format_italic</span>Курсив</span>.</li>
+          <li><span class="gb"><span class="ms">format_color_text</span>Колір тексту</span> → <b>помаранчевий</b>.</li>
+          <li>Натисни <span class="gb"><span class="ms">format_align_center</span>Вирівняти по центру</span>.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="guide-card">
+      <div class="g-num">7</div>
+      <div>
+        <h3><span class="bx">4</span>Епіграф</h3>
+        <ol>
+          <li>Виділи обидва рядки епіграфа.</li>
+          <li>Натисни <span class="gb"><span class="ms">format_align_right</span>Вирівняти за правим краєм</span>.</li>
+          <li>Виділи лише перший рядок і натисни <span class="gb"><span class="ms">format_italic</span>Курсив</span>.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="guide-card">
+      <div class="g-num">8</div>
+      <div>
+        <h3><span class="bx">5</span>Основний текст</h3>
+        <svg class="ruler-hint" viewBox="0 0 420 58" aria-hidden="true">
+          <rect x="0" y="16" width="420" height="24" rx="3" fill="#E8EAED"/><rect x="20" y="16" width="380" height="24" fill="#fff"/>
+          <rect x="44" y="18" width="14" height="6" rx="1" fill="#1A73E8"/>
+          <path d="M13 27 h14 l-7 9 z M393 27 h14 l-7 9 z" fill="#1A73E8"/>
+          <text x="40" y="11" text-anchor="start" font-family="Roboto,Arial" font-size="12" fill="#D9480F">Відступ першого рядка</text>
+          <text x="20" y="54" text-anchor="start" font-family="Roboto,Arial" font-size="12" fill="#0F766E">↑ Відступ зліва</text>
+          <text x="400" y="54" text-anchor="end" font-family="Roboto,Arial" font-size="12" fill="#0F766E">Відступ справа ↑</text>
+        </svg>
+        <ol>
+          <li>Виділи обидва абзаци: від «Привіт» до «поливали».</li>
+          <li>Натисни <span class="gb"><span class="ms">format_align_justify</span>Вирівняти за шириною</span>.</li>
+          <li>Натисни <span class="gb"><span class="ms">format_line_spacing</span>Міжрядковий інтервал і інтервал між абзацами</span> → <b>1,5</b>.</li>
+          <li>На лінійці перетягни синій прямокутник <b>Відступ першого рядка</b> на <b>1,25</b> — число видно над маркером.</li>
+        </ol>
+      </div>
+    </div>
+    <div class="guide-card">
+      <div class="g-num">9</div>
+      <div>
+        <h3><span class="bx">6</span>Порада</h3>
+        <ol>
+          <li>Заміни «…» на свою пораду собі через 10 років.</li>
+          <li>Клацни в пораду й натисни <span class="gb"><span class="ms">format_align_justify</span>Вирівняти за шириною</span>.</li>
+          <li>Натисни <span class="gb"><span class="ms">format_line_spacing</span>Міжрядковий інтервал і інтервал між абзацами</span> → <b>1,5</b>.</li>
+          <li>Перетягни лівий трикутник <b>Відступ зліва</b> на <b>2</b>.</li>
+          <li>Перетягни правий трикутник <b>Відступ справа</b> на <b>2</b> см від правого краю.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Практична робота · «Форматування абзаців: вирівнювання, відступи, міжрядковий інтервал» · 6 клас</span></footer>
+
+<script src="../../assets/practice.js"></script>
+<script>
+  // Зразок: без виділення, копіювання й контекстного меню
+  const sample = document.getElementById('sample');
+  ['copy', 'cut', 'selectstart', 'contextmenu', 'dragstart'].forEach(t=>sample.addEventListener(t, e=>e.preventDefault()));
+
+  // Текст листа без оформлення: кожен рядок — окремий абзац
+  const TEXT = [
+    '17 листопада 2026 року',
+    'Лист у майбутнє',
+    'Відкрити у 2036 році!',
+    'Хто сьогодні садить дерево, той завтра відпочиває в його тіні.',
+    'Народна мудрість',
+    'Привіт, дорослий я! Пишу тобі із шостого класу. Зараз я вчуся оформлювати документи: вирівнювати абзаци, робити відступи й налаштовувати інтервали. Цікаво, чи ти ще пам\'ятаєш, як це робиться?',
+    'Цієї осені наш клас посадив біля школи сад. Коли ти читатимеш цей лист, яблуні вже даватимуть урожай. Сходи подивитися на них і згадай, як ми їх поливали.',
+    'Моя порада тобі: …',
+    'Твій шестикласник із 2026 року'
+  ].join('\n');
+  // Позначки на зразку: зелені рамки з номерами блоків, краї тексту, стрілки відступів
+  (function(){
+    const P = [...sample.querySelectorAll('p')];
+    const GROUPS = [[0], [1], [2], [3, 4], [5, 6], [7], [8]];   // номери блоків — як в інструкції
+    const add = (cls, css, html = '')=>{ const el = document.createElement('i'); el.className = cls; el.style.cssText = css; el.innerHTML = html; el.dataset.ov = 1; sample.appendChild(el); return el; };
+    const layout = ()=>{
+      sample.querySelectorAll('[data-ov]').forEach(el=>el.remove());
+      const L = P[0].offsetLeft, W = P[0].offsetWidth, u = sample.offsetWidth / 100;
+      add('edge', `left:${L}px`); add('edge', `left:${L + W}px`);
+      GROUPS.forEach((g, k)=>{
+        const a = P[g[0]], b = P[g[g.length - 1]];
+        const top = a.offsetTop - .3 * u, h = b.offsetTop + b.offsetHeight - a.offsetTop + .6 * u;
+        add('box', `left:${L - u}px; width:${W + 2 * u}px; top:${top}px; height:${h}px`);
+        add('tag', `left:${L}px; top:${top}px`, String(k + 1));
+      });
+      const ind = W * .078, lh = parseFloat(getComputedStyle(P[5]).lineHeight);
+      [5, 6].forEach(i=>add('dim', `left:${L}px; width:${ind}px; top:${P[i].offsetTop + lh * .5}px`, i === 5 ? '<span>1,25 см</span>' : ''));
+      const a = P[7], y = a.offsetTop + a.offsetHeight / 2;
+      add('dim', `left:${L}px; width:${a.offsetLeft - L}px; top:${y}px`, '<span>2 см</span>');
+      add('dim', `left:${a.offsetLeft + a.offsetWidth}px; width:${L + W - a.offsetLeft - a.offsetWidth}px; top:${y}px`, '<span>2 см</span>');
+    };
+    new ResizeObserver(layout).observe(sample);
+    addEventListener('load', layout);
+  })();
+
+  const msg = document.getElementById('copyMsg');
+  document.getElementById('copyBtn').addEventListener('click', async ()=>{
+    let ok = false;
+    try{ await navigator.clipboard.writeText(TEXT); ok = true; }
+    catch(e){
+      const ta = document.createElement('textarea');
+      ta.value = TEXT; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try{ ok = document.execCommand('copy'); }catch(_){}
+      ta.remove();
+    }
+    msg.style.color = ok ? '#137333' : '#B3261E';
+    msg.textContent = ok ? '✓ Скопійовано! Тепер встав у документ.' : 'Не вдалося скопіювати — спробуй ще раз.';
+  });
+</script>
+</body>
+</html>
