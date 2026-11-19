@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Повторення: впорядкування даних — Урок</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  /* Гама «автосалон»: синій + помаранчевий */
+  :root{
+    --pri:#2B4C9B; --pri-dark:#1E3770; --org:#E8590C; --org-dark:#B5420A; --grn:#188038; --grn-dark:#0D652D;
+    --accent:var(--pri); --accent-dark:var(--pri-dark); --accent-soft:#E7EDF9;
+    --label:var(--org);
+    --bg:#F5F7FC; --ink:#17213A; --ink-soft:#56627D; --line:#DCE3F1; --surface:#FFFFFF;
+    --note:var(--pri); --note-soft:#E7EDF9; --note-ink:var(--pri-dark);
+    --sun:var(--org); --sun-soft:#FDEEE4; --sun-ink:var(--org-dark);
+    --hud-bar:linear-gradient(90deg,var(--pri),var(--org));
+  }
+  .mono{font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; background:#EDF1FA; padding:1px 6px; border-radius:5px; font-size:.9em; white-space:nowrap;}
+
+  /* Карта розділу (hero-підсумок) */
+  .map{display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin:14px 0 4px;}
+  @media (max-width:700px){ .map{grid-template-columns:repeat(2,1fr);} }
+  .map div{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 12px; font-size:13.5px;}
+  .map b{display:block; font-family:'Baloo 2',sans-serif; font-size:15px; color:var(--pri-dark);}
+
+  /* Імітація Google Таблиць */
+  .gs{font-family:'Roboto',sans-serif; color:#1F1F1F; background:#F9FBFD; border:1px solid #DADCE0; border-radius:10px; font-size:12.5px; overflow:hidden;}
+  .gs.shake{animation:shakeX .35s ease;}
+  .gs-top{display:flex; align-items:center; gap:8px; padding:8px 10px 6px; font-size:14px;}
+  .gs-top svg{width:15px; height:20px; flex-shrink:0;}
+  .gs-fx{display:flex; align-items:flex-start; gap:8px; background:#fff; border-top:1px solid #DADCE0; padding:5px 10px; min-height:30px;}
+  .gs-fx .addr{flex-shrink:0; width:34px; color:#444746; border-right:1px solid #E1E3E1; line-height:20px;}
+  .gs-fx .fx{flex-shrink:0; font-style:italic; color:#80868B; font-family:serif; font-size:15px; line-height:20px;}
+  .gs-fx .f{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px; line-height:20px; word-break:break-word;}
+  .f .kw{color:#0B57D0; font-weight:700;} .f .q{color:#188038;}
+  .gs-scroll{overflow-x:auto; background:#fff; border-top:1px solid #DADCE0;}
+  .gs-grid{border-collapse:collapse; width:100%; min-width:540px; background:#fff;}
+  .gs-grid th, .gs-grid td{border:1px solid #E1E3E1; height:26px; padding:0 7px; white-space:nowrap;}
+  .gs-grid th{background:#F8F9FA; color:#444746; font-weight:500; font-size:11px; text-align:center;}
+  .gs-grid th.rn{width:26px;}
+  .gs-grid tr.hdr td{font-weight:700;}
+  .gs-grid td.num{text-align:right;}
+  .gs-grid td.mid{text-align:center;}
+  .gs-tabs{display:flex; gap:4px; padding:4px 8px; border-top:1px solid #DADCE0;}
+  .gs-tab{font:500 13px 'Roboto',sans-serif; padding:5px 12px; border-radius:6px; color:#444746;}
+  .gs-tab.on{background:#E1E9F7; color:#0B57D0;}
+  .gs-grid td.mid{line-height:0;}
+  .cb{display:block; box-sizing:border-box; width:16px; height:16px; margin:0 auto; border:2px solid #5F6368; border-radius:3px; position:relative;}
+  .cb.on{background:#0B57D0; border-color:#0B57D0;}
+  .cb.on::after{content:''; position:absolute; left:3px; top:0; width:4px; height:8px; border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg);}
+
+  /* Крок 2: клацни на аркуші */
+  .pick .gs-grid td{cursor:pointer;}
+  .pick .gs-grid td:hover{background:#F1F5FE;}
+  .pick .gs-grid tr:hover td{background:#F7F9FE;}
+  .pick .gs-grid td.found{background:#CEEAD6 !important;}
+  .pick .gs-grid tr.found td{background:#E6F4EA;}
+  .pick .gs-grid td.wrong-flash{background:#FCE8E6 !important;}
+  .task{display:flex; gap:10px; align-items:flex-start; background:var(--sun-soft); border:1.5px solid #F6C6A6; border-radius:var(--radius-m); padding:10px 14px; margin-bottom:12px; font-weight:700;}
+  .task .tn{flex-shrink:0; font-weight:800; background:var(--org); color:#fff; border-radius:999px; padding:0 10px; font-size:13px; line-height:24px; white-space:nowrap;}
+  .task.done{background:#E6F4EA; border-color:#A8D5B5;}
+  .task.done .tn{background:var(--grn);}
+  .emu-fb{min-height:24px; font-size:14px; margin-top:10px;}
+  .emu-fb.err{color:#B3261E;}
+  .emu-fb.ok{color:var(--grn-dark); font-weight:700;}
+
+  /* Крок 4: схема зв'язків */
+  .rel{display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; margin:6px 0 10px;}
+  .rel .tb{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; background:var(--accent-soft); color:var(--pri-dark); border:1.5px solid #C5D2EE; border-radius:8px; padding:4px 12px;}
+  .rel .ln{width:46px; height:2px; background:var(--pri); position:relative;}
+  .rel .ln::before, .rel .ln::after{content:'?'; position:absolute; top:-18px; font:800 12px 'Baloo 2',sans-serif; color:var(--org);}
+  .rel .ln::before{left:-2px;} .rel .ln::after{right:-2px;}
+
+  /* Крок 5: макет запитання Google Форми */
+  .gf{background:#fff; border:1px solid #DADCE0; border-left:5px solid #673AB7; border-radius:8px; padding:10px 14px; margin-bottom:8px; font-family:'Roboto',sans-serif;}
+  .gf .t{font-size:15px; color:#202124;}
+  .gf .t i{color:#D93025; font-style:normal;}
+  .gf .s{font-size:12.5px; color:#5F6368; margin-top:2px;}
+
+  /* Крок 7: конструктор QUERY */
+  .qb{background:var(--accent-soft); border:1.5px solid #C5D2EE; border-radius:var(--radius-m); padding:12px 14px; margin:12px 0;}
+  .qb-row{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin:6px 0;}
+  .qb-tag{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; color:#fff; background:var(--org); border-radius:999px; padding:1px 10px; min-width:84px; text-align:center;}
+  .qb select{font:600 14px 'Nunito Sans',sans-serif; border:1.5px solid #C5D2EE; border-radius:8px; padding:5px 8px; background:#fff; color:var(--ink); cursor:pointer; max-width:100%;}
+  .qb-btns{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
+  .qb-run{font-size:15px; padding:9px 18px;}
+  .res-empty{padding:12px; color:#5F6368; font-size:13px; background:#fff;}
+  .gs-grid tr.spill td{animation:rowIn .45s ease;}
+  @keyframes rowIn{from{background:#FFF4D6;}}
+</style>
+</head>
+<body data-lesson="lesson9-data-review" data-hud="9 клас · Повторення: впорядкування даних">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Повторення розділу</div>
+      <h1>Повторюємо: впорядкування даних</h1>
+      <p>Збираємо в одне все, що вивчили про бази даних: від поля й запису до запиту QUERY. Усі вправи — на даних автосалону.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: автівка, що везе таблицю -->
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="56" fill="#E7EDF9"/>
+      <rect x="42" y="24" width="56" height="40" rx="5" fill="#fff" stroke="#2B4C9B" stroke-width="3"/>
+      <path d="M42 37h56M42 50h56M60 24v40M79 24v40" stroke="#2B4C9B" stroke-width="2"/>
+      <rect x="43.5" y="25.5" width="53" height="10" fill="#FDEEE4"/>
+      <path d="M26 92l10-18c2-4 6-6 10-6h44c4 0 8 2 10 6l12 18v14H26z" fill="#E8590C"/>
+      <path d="M44 72h20v14H38zM70 72h18l8 14H70z" fill="#CFE0FA"/>
+      <rect x="26" y="92" width="88" height="14" rx="4" fill="#B5420A"/>
+      <circle cx="48" cy="106" r="11" fill="#17213A"/><circle cx="48" cy="106" r="5" fill="#DCE3F1"/>
+      <circle cx="94" cy="106" r="11" fill="#17213A"/><circle cx="94" cy="106" r="5" fill="#DCE3F1"/>
+      <circle cx="56" cy="80" r="2.5" fill="#17213A"/><circle cx="80" cy="80" r="2.5" fill="#17213A"/>
+      <path d="M60 90q8 5 16 0" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+      <rect x="108" y="94" width="6" height="5" rx="1" fill="#FFD43B"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" data-guide>
+    <div class="step-label">Карта розділу</div>
+    <h2>Що ми пройшли</h2>
+    <p>Розділ «Впорядкування даних» — це шлях від ідеї бази даних до відповідей на будь-які запитання про дані.</p>
+    <div class="map">
+      <div><b>Будова</b>поле, запис, тип даних, ключ</div>
+      <div><b>Зв'язки</b>реляційна база, первинний і зовнішній ключ</div>
+      <div><b>Проєктування</b>об'єкти, поля, ключі, аркуші</div>
+      <div><b>Форми</b>введення даних без помилок</div>
+      <div><b>Обробка</b>сортування, фільтр, звіт, запит</div>
+    </div>
+  </section>
+
+  <section class="block" id="recap">
+    <div class="step-label">Крок 1 · Словник розділу</div>
+    <h2>Згадай головні терміни</h2>
+    <p class="soft">Обери термін, а потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Будова бази даних</div>
+    <h2>Знайди на аркуші</h2>
+    <p>Аркуш Google Таблиць — найпростіша база даних:</p>
+    <ul>
+      <li><b>поле</b> — стовпець, назва поля — у першому рядку;</li>
+      <li><b>запис</b> — рядок про один об'єкт;</li>
+      <li><b>ключове поле</b> — значення в ньому ніколи не повторюються.</li>
+    </ul>
+    <p class="soft">Виконай завдання — клацни потрібну клітинку.</p>
+    <div class="exercise pick" id="pickEx">
+      <div class="task" id="pickTask"><span class="tn"></span><span class="tt"></span></div>
+      <div class="gs" id="pickGs">
+        <div class="gs-top"><svg viewBox="0 0 15 20"><path d="M0 2a2 2 0 012-2h8l5 5v13a2 2 0 01-2 2H2a2 2 0 01-2-2z" fill="#0F9D58"/><path d="M10 0l5 5h-4a1 1 0 01-1-1z" fill="#87CEAC"/><rect x="3" y="9" width="9" height="7" fill="#fff"/><path d="M3 11.5h9M3 14h9M7 9v7" stroke="#0F9D58"/></svg>Автосалон</div>
+        <div class="gs-scroll"><table class="gs-grid" id="pickGrid"></table></div>
+        <div class="gs-tabs"><span class="gs-tab on">Авто</span><span class="gs-tab">Клієнти</span><span class="gs-tab">Продажі</span></div>
+      </div>
+      <div class="emu-fb" id="pickFb"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Проєктування</div>
+    <h2>Проєктуємо базу автосалону</h2>
+    <p>Хороша база даних починається не з таблиці, а з плану. Розстав етапи проєктування в правильному порядку.</p>
+    <div class="exercise">
+      <ol class="seq-done" id="seqDone"></ol>
+      <div class="seq-q" id="seqQ"></div>
+      <div class="seq-opts" id="seqOpts"></div>
+      <div class="choice-feedback" id="seqFb"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Зв'язки між таблицями</div>
+    <h2>Скільки з одного боку — скільки з іншого</h2>
+    <p>У реляційній базі даних таблиці пов'язані ключами: <b>первинний ключ</b> однієї таблиці стає <b>зовнішнім ключем</b> іншої.</p>
+    <ul>
+      <li><b>Один до одного</b> — кожному запису відповідає рівно один запис іншої таблиці.</li>
+      <li><b>Один до багатьох</b> — одному запису відповідає багато записів іншої таблиці.</li>
+      <li><b>Багато до багатьох</b> — багато записів з обох боків.</li>
+    </ul>
+    <div id="relList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Форми</div>
+    <h2>Форма запису на тест-драйв</h2>
+    <p>Форма — «вхідні двері» бази даних: кожна надіслана відповідь стає новим записом таблиці. Правильний тип запитання береже дані від помилок.</p>
+    <p class="soft">Який тип запитання Google Форми найкраще підійде?</p>
+    <div id="formList"></div>
+    <div class="note">Перевірка відповідей (наприклад, «число від 18 до 99») не пропустить у таблицю «вісімнадцять» чи «180».</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Обробка даних</div>
+    <h2>Який інструмент допоможе?</h2>
+    <ul>
+      <li><b>Сортування</b> — переставляє рядки цілими за значеннями поля.</li>
+      <li><b>Фільтр</b> — тимчасово ховає записи, які не підходять під умову.</li>
+      <li><b>Зведена таблиця</b> — звіт: групує записи й рахує підсумки.</li>
+      <li><b>Форма</b> — збирає нові записи.</li>
+    </ul>
+    <div id="toolList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 7 · Запит QUERY</div>
+    <h2>Відповідай покупцям запитом</h2>
+    <p>Запит відбирає з бази лише потрібне. У функції <span class="mono">QUERY</span> стовпці звуть літерами: <span class="mono">SELECT</span> — які стовпці показати, <span class="mono">WHERE</span> — умова, <span class="mono">ORDER BY</span> — порядок (<span class="mono">DESC</span> — за спаданням).</p>
+    <div class="exercise" id="qEx">
+      <div class="task" id="qTask"><span class="tn"></span><span class="tt"></span></div>
+      <div class="gs">
+        <div class="gs-top"><svg viewBox="0 0 15 20"><path d="M0 2a2 2 0 012-2h8l5 5v13a2 2 0 01-2 2H2a2 2 0 01-2-2z" fill="#0F9D58"/><path d="M10 0l5 5h-4a1 1 0 01-1-1z" fill="#87CEAC"/><rect x="3" y="9" width="9" height="7" fill="#fff"/><path d="M3 11.5h9M3 14h9M7 9v7" stroke="#0F9D58"/></svg>Автосалон</div>
+        <div class="gs-scroll"><table class="gs-grid" id="srcGrid"></table></div>
+        <div class="gs-tabs"><span class="gs-tab on">Авто</span></div>
+      </div>
+      <div class="qb">
+        <div class="qb-row"><span class="qb-tag">SELECT</span><select id="qSel"></select></div>
+        <div class="qb-row"><span class="qb-tag">WHERE</span><select id="qWhere"></select></div>
+        <div class="qb-row"><span class="qb-tag">ORDER BY</span><select id="qOrder"></select></div>
+        <div class="qb-btns"><button class="btn-primary qb-run" id="qRun">▶ Виконати</button></div>
+      </div>
+      <div class="gs" id="qGs">
+        <div class="gs-fx"><span class="addr">A1</span><span class="fx">fx</span><span class="f" id="qFormula"></span></div>
+        <div class="gs-scroll" id="qOut"><div class="res-empty">Тут з'явиться вибірка після «▶ Виконати».</div></div>
+        <div class="gs-tabs"><span class="gs-tab">Авто</span><span class="gs-tab on">Запит</span></div>
+      </div>
+      <div class="emu-fb" id="qFb"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Урок · «Повторення розділу «Впорядкування даних»» · 9 клас</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- ДАНІ АВТОСАЛОНУ ---------- */
+const COLS = ['ID', 'Марка', 'Модель', 'Рік', 'Ціна', 'Двигун', 'У наявності'];
+const LET = ['A','B','C','D','E','F','G'];
+const CARS = [
+  [1, 'Skoda', 'Octavia', 2021, 720000, 'Бензин', true],
+  [2, 'Toyota', 'Corolla', 2022, 850000, 'Гібрид', true],
+  [3, 'Tesla', 'Model 3', 2023, 1450000, 'Електро', false],
+  [4, 'Renault', 'Duster', 2020, 610000, 'Дизель', true],
+  [5, 'Nissan', 'Leaf', 2019, 480000, 'Електро', true],
+  [6, 'Hyundai', 'Tucson', 2023, 1250000, 'Гібрид', false],
+  [7, 'Kia', 'Ceed', 2021, 690000, 'Бензин', true],
+  [8, 'Volkswagen', 'Golf', 2018, 520000, 'Дизель', true]
+];
+const money = v=>v.toLocaleString('uk-UA').replace(/\s/g,' ');
+function cellHTML(c, v){
+  if(c === 6) return `<span class="cb${v ? ' on' : ''}"></span>`;
+  if(c === 4) return money(v);
+  return v;
+}
+const cellCls = c=> c === 6 ? 'mid' : (c === 0 || c === 3 || c === 4) ? 'num' : '';
+function sheetHTML(cols, rows){
+  let h = '<tr><th class="rn"></th>' + cols.map((c, i)=>`<th>${LET[i]}</th>`).join('') + '</tr>';
+  h += '<tr class="hdr"><th class="rn">1</th>' + cols.map(c=>`<td>${COLS[c]}</td>`).join('') + '</tr>';
+  rows.forEach((r, i)=>{
+    h += `<tr><th class="rn">${i + 2}</th>` + cols.map(c=>`<td class="${cellCls(c)}">${cellHTML(c, r[c])}</td>`).join('') + '</tr>';
+  });
+  return h;
+}
+
+/* ---------- КРОК 1: СЛОВНИК ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Поле', desc:'Стовпець таблиці: одна властивість усіх об\'єктів' },
+  { name:'Запис', desc:'Рядок таблиці: усі відомості про один об\'єкт' },
+  { name:'Первинний ключ', desc:'Поле, значення якого не повторюються й однозначно вказують на запис' },
+  { name:'Зовнішній ключ', desc:'Поле, що зберігає ID запису з іншої таблиці' },
+  { name:'Реляційна база даних', desc:'Кілька таблиць, пов\'язаних між собою через ключі' },
+  { name:'Інтерфейс бази даних', desc:'«Вітрина», через яку користувач працює з даними, не бачачи таблиць' },
+  { name:'Форма', desc:'Бланк, через який зручно вносити нові записи' },
+  { name:'Запит', desc:'Звернення до бази, що відбирає записи за умовами' }
+], 'recapProgress');
+
+/* ---------- КРОК 2: КЛАЦНИ НА АРКУШІ ---------- */
+(function(){
+  const grid = document.getElementById('pickGrid');
+  const gs = document.getElementById('pickGs');
+  const fb = document.getElementById('pickFb');
+  const taskEl = document.getElementById('pickTask');
+  grid.innerHTML = sheetHTML([0,1,2,3,4,5,6], CARS);
+  // r: 0 — рядок назв полів, 1…8 — записи; c: 0…6
+  const TASKS = [
+    { t:'Клацни назву ключового поля.', ok:(r, c)=>r === 0 && c === 0,
+      why:'Ключ — поле ID: номери не повторюються.', mark:'cell' },
+    { t:'Клацни будь-яку клітинку запису про електромобіль 2023 року.', ok:(r)=>r === 3,
+      why:'Увесь рядок 4 — один запис про Tesla Model 3.', mark:'row' },
+    { t:'Клацни назву поля, за яким можна впорядкувати авто від найдешевшого до найдорожчого.', ok:(r, c)=>r === 0 && c === 4,
+      why:'Ціна — поле числового типу, його можна сортувати від меншого до більшого.', mark:'cell' },
+    { t:'Клацни значення логічного типу в записі про Kia.', ok:(r, c)=>r === 7 && c === 6,
+      why:'Прапорець — логічний тип: TRUE або FALSE.', mark:'cell' },
+    { t:'Клацни значення, яке в жодному іншому записі не може повторитися, — у записі про Nissan.', ok:(r, c)=>r === 5 && c === 0,
+      why:'ID 5 належить лише Nissan Leaf. Марка, рік чи двигун можуть повторюватися.', mark:'cell' }
+  ];
+  const hit = trackTask(grid, TASKS.length, TASKS.length + 2);
+  let k = 0;
+  function show(){
+    taskEl.classList.remove('done');
+    taskEl.querySelector('.tn').textContent = `Завдання ${k + 1} з ${TASKS.length}`;
+    taskEl.querySelector('.tt').textContent = TASKS[k].t;
+  }
+  show();
+  grid.querySelectorAll('tr').forEach((tr, ri)=>{
+    if(ri === 0) return;
+    tr.querySelectorAll('td').forEach((td, c)=>{
+      td.addEventListener('click', ()=>{
+        if(k >= TASKS.length) return;
+        grid.querySelectorAll('.found').forEach(e=>e.classList.remove('found'));
+        const T = TASKS[k];
+        if(T.ok(ri - 1, c)){
+          (T.mark === 'row' ? tr : td).classList.add('found');
+          fb.className = 'emu-fb ok'; fb.textContent = 'Так! ' + T.why;
+          addNeurons(1); hit(); k++;
+          if(k === TASKS.length){
+            addNeurons(2);
+            taskEl.classList.add('done');
+            taskEl.querySelector('.tn').textContent = 'Готово';
+            taskEl.querySelector('.tt').textContent = 'Усі завдання виконано!';
+          } else show();
+        } else {
+          td.classList.add('wrong-flash');
+          gs.classList.add('shake');
+          setTimeout(()=>{ td.classList.remove('wrong-flash'); gs.classList.remove('shake'); }, 450);
+          fb.className = 'emu-fb err'; fb.textContent = 'Не ця клітинка — перечитай завдання.';
+        }
+      });
+    });
+  });
+})();
+
+/* ---------- КРОК 3: ПРОЄКТУВАННЯ ---------- */
+makeSequence('seqDone', 'seqQ', 'seqOpts', 'seqFb', [
+  'Описати предметну область: продаж авто в автосалоні',
+  'Виділити об\'єкти: «Авто», «Клієнти», «Продажі»',
+  'Скласти поля кожного об\'єкта й обрати їхні типи',
+  'Додати в кожну таблицю первинний ключ ID',
+  'Визначити зв\'язки: у «Продажі» — поля «ID авто» і «ID клієнта»',
+  'Створити аркуші в Google Таблицях і наповнити їх даними'
+], 'Готово! План бази автосалону складено — від ідеї до аркушів.');
+
+/* ---------- КРОК 4: ЗВ'ЯЗКИ ---------- */
+const relPre = (a, b)=>`<div class="rel"><span class="tb">${a}</span><span class="ln"></span><span class="tb">${b}</span></div>`;
+const REL = ['Один до одного', 'Один до багатьох', 'Багато до багатьох'];
+makeChoices('relList', [
+  { pre:relPre('Марки', 'Авто'), text:'Одна марка — у багатьох авто, а в кожного авто лише одна марка.', opts:REL, correct:1 },
+  { pre:relPre('Авто', 'Техпаспорти'), text:'Кожне авто має рівно один техпаспорт, а техпаспорт описує лише одне авто.', opts:REL, correct:0 },
+  { pre:relPre('Авто', 'Опції'), text:'В одному авто — кондиціонер, підігрів сидінь, камера. І кожна така опція є в багатьох авто.', opts:REL, correct:2 },
+  { pre:relPre('Менеджери', 'Продажі'), text:'Кожен продаж оформлює один менеджер, а за місяць він оформлює десятки продажів.', opts:REL, correct:1 }
+]);
+
+/* ---------- КРОК 5: ФОРМА ---------- */
+const gf = (t, s)=>`<div class="gf"><div class="t">${t} <i>*</i></div><div class="s">${s}</div></div>`;
+makeClassify('formList', [
+  { pre:gf('Ваше ім\'я та прізвище', 'Клієнт пише одним рядком'), text:'Яким типом зробити це запитання?', correct:0 },
+  { pre:gf('Який двигун вас цікавить?', 'Бензин, дизель, гібрид чи електро — лише щось одне'), text:'Яким типом зробити це запитання?', correct:1 },
+  { pre:gf('Що має бути в авто?', 'Кондиціонер, камера, підігрів сидінь, люк — можна позначити кілька'), text:'Яким типом зробити це запитання?', correct:2 },
+  { pre:gf('Модель для тест-драйву', 'Одна з 40 моделей салону'), text:'Яким типом зробити це запитання?', correct:3,
+    why:'40 варіантів кружечками займуть пів екрана — список розгортається лише за потреби.' },
+  { pre:gf('Коли зручно приїхати?', 'День тест-драйву'), text:'Яким типом зробити це запитання?', correct:4 }
+], ['Коротка відповідь', 'Кілька варіантів', 'Прапорці', 'Спадний список', 'Дата']);
+
+/* ---------- КРОК 6: ІНСТРУМЕНТИ ---------- */
+makeClassify('toolList', [
+  { text:'Менеджер хоче, щоб угорі списку стояли найновіші авто.', correct:0 },
+  { text:'Покупець просить показати тільки електромобілі.', correct:1 },
+  { text:'Директор питає, скільки авто з кожним типом двигуна є в салоні.', correct:2,
+    why:'Рядки — «Двигун», значення — COUNTA від ID.' },
+  { text:'Клієнти мають самі записуватися на тест-драйв, не бачачи таблиці.', correct:3 },
+  { text:'На екрані мають лишитися тільки авто до 700 000 грн, але решта записів не повинна зникнути з бази.', correct:1 },
+  { text:'Бухгалтерка хоче знати середню ціну авто кожної марки.', correct:2,
+    why:'Рядки — «Марка», значення — AVERAGE від «Ціна».' }
+], ['Сортування', 'Фільтр', 'Зведена таблиця', 'Форма']);
+
+/* ---------- КРОК 7: КОНСТРУКТОР QUERY ---------- */
+(function(){
+  document.getElementById('srcGrid').innerHTML = sheetHTML([0,1,2,3,4,5,6], CARS);
+  const SEL = [
+    { v:'*', cols:[0,1,2,3,4,5,6], t:'* (усі стовпці)' },
+    { v:'B, C', cols:[1,2], t:'B, C (Марка, Модель)' },
+    { v:'B, C, E', cols:[1,2,4], t:'B, C, E (Марка, Модель, Ціна)' },
+    { v:'B, E', cols:[1,4], t:'B, E (Марка, Ціна)' }
+  ];
+  const WHERE = [
+    { v:'', t:'— без умови —', f:()=>true },
+    { v:"F = 'Електро'", t:"F = 'Електро'", f:r=>r[5] === 'Електро' },
+    { v:'E < 700000', t:'E < 700000', f:r=>r[4] < 700000 },
+    { v:'D >= 2022', t:'D >= 2022', f:r=>r[3] >= 2022 },
+    { v:'G = TRUE', t:'G = TRUE', f:r=>r[6] === true }
+  ];
+  const ORDER = [
+    { v:'', t:'— без сортування —' },
+    { v:'E', t:'E (ціна за зростанням)', k:4, d:1 },
+    { v:'E DESC', t:'E DESC (ціна за спаданням)', k:4, d:-1 },
+    { v:'D DESC', t:'D DESC (рік за спаданням)', k:3, d:-1 }
+  ];
+  // для кожного завдання — індекси правильних s, w, o; o:null — порядок не важливий
+  const TASKS = [
+    { t:'Покупець: «Покажіть марку, модель і ціну всіх електромобілів».', s:2, w:1, o:null },
+    { t:'Покупець: «Мій бюджет — до 700 000 грн. Покажіть усе про такі авто, від найдешевшого».', s:0, w:2, o:1 },
+    { t:'Покупець: «Хочу авто 2022 року чи новіше — лише марку й модель, спершу найновіші».', s:1, w:3, o:3 },
+    { t:'Директор: «Марка й ціна авто, які є в наявності, — від найдорожчого».', s:3, w:4, o:2 }
+  ];
+  const $ = id=>document.getElementById(id);
+  const fill = (el, arr)=>arr.forEach((o, i)=>el.insertAdjacentHTML('beforeend', `<option value="${i}">${o.t}</option>`));
+  fill($('qSel'), SEL); fill($('qWhere'), WHERE); fill($('qOrder'), ORDER);
+  const taskEl = $('qTask'), fb = $('qFb'), out = $('qOut');
+  const hit = trackTask($('qEx'), TASKS.length, TASKS.length * 2);
+  let k = 0;
+  const idx = ()=>[+$('qSel').value, +$('qWhere').value, +$('qOrder').value];
+  function formula(){
+    const [s, w, o] = idx();
+    let q = `<span class="kw">SELECT</span> ${SEL[s].v}`;
+    if(WHERE[w].v) q += ` <span class="kw">WHERE</span> ${WHERE[w].v}`;
+    if(ORDER[o].v) q += ` <span class="kw">ORDER BY</span> ${ORDER[o].v.replace('DESC', '<span class="kw">DESC</span>')}`;
+    $('qFormula').innerHTML = `=QUERY(Авто!A1:G9; <span class="q">"</span>${q}<span class="q">"</span>)`;
+  }
+  function show(){
+    taskEl.classList.remove('done');
+    taskEl.querySelector('.tn').textContent = `Запит ${k + 1} з ${TASKS.length}`;
+    taskEl.querySelector('.tt').textContent = TASKS[k].t;
+  }
+  function run(){
+    const [s, w, o] = idx();
+    let rows = CARS.filter(WHERE[w].f);
+    if(ORDER[o].k != null){ const {k:key, d} = ORDER[o]; rows = rows.slice().sort((a, b)=>(a[key] - b[key]) * d); }
+    const cols = SEL[s].cols;
+    out.innerHTML = `<table class="gs-grid">${sheetHTML(cols, rows)}</table>`;
+    out.querySelectorAll('tr').forEach((tr, i)=>{ if(i > 1) tr.classList.add('spill'); });
+  }
+  function check(){
+    run();
+    if(k >= TASKS.length) return;
+    const [s, w, o] = idx(), T = TASKS[k];
+    const errs = [];
+    if(s !== T.s) errs.push('у SELECT не ті стовпці');
+    if(w !== T.w) errs.push('умова WHERE не та');
+    if(T.o !== null && o !== T.o) errs.push('порядок ORDER BY не той');
+    if(errs.length){
+      fb.className = 'emu-fb err';
+      fb.textContent = 'Вибірка не та: ' + errs.join(', ') + '.';
+      $('qGs').classList.add('shake');
+      setTimeout(()=>$('qGs').classList.remove('shake'), 450);
+      return;
+    }
+    fb.className = 'emu-fb ok';
+    fb.textContent = 'Саме це й треба покупцю!';
+    addNeurons(2); hit(); k++;
+    if(k === TASKS.length){
+      taskEl.classList.add('done');
+      taskEl.querySelector('.tn').textContent = 'Готово';
+      taskEl.querySelector('.tt').textContent = 'Усі запити складено! Можеш ще поекспериментувати.';
+    } else setTimeout(show, 900);
+  }
+  ['qSel','qWhere','qOrder'].forEach(id=>$(id).addEventListener('change', formula));
+  $('qRun').addEventListener('click', check);
+  formula(); show();
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що в таблиці бази даних є записом?', opts:['Стовпець з однією властивістю', 'Назва таблиці', 'Одна клітинка', 'Рядок з усіма відомостями про один об\'єкт'], correct:3 },
+  { q:'Яке поле автосалону найкраще підійде як первинний ключ?', opts:['Марка', 'Ціна', 'ID авто', 'Колір'], correct:2,
+    why:'Марка, ціна й колір можуть повторюватися, а ID — ні.' },
+  { q:'У таблиці «Продажі» є поле «ID клієнта». Чим воно є?', opts:['Первинним ключем', 'Зовнішнім ключем', 'Формою', 'Звітом'], correct:1 },
+  { q:'З чого починається проєктування бази даних?', opts:['Зі створення аркушів', 'З введення даних', 'З опису предметної області', 'З вибору шрифту'], correct:2 },
+  { q:'Чим стає кожна надіслана Google Форма в зв\'язаній таблиці?', opts:['Новим стовпцем', 'Новим рядком-записом', 'Новим аркушем', 'Новою таблицею'], correct:1 },
+  { q:'Що відбувається з рядками, які сховав фільтр?', opts:['Видаляються назавжди', 'Переносяться в кінець', 'Лишаються в таблиці, але тимчасово не видні', 'Потрапляють у Кошик'], correct:2 },
+  { q:'Учень виділив лише стовпець «Ціна» й відсортував тільки його. Що станеться?', opts:['Нічого страшного', 'Ціни відірвуться від своїх авто — дані перемішаються', 'Таблиця сама відсортується вся', 'З\'явиться помилка #VALUE!'], correct:1 },
+  { q:'Для чого потрібна зведена таблиця?', opts:['Щоб зв\'язати дві таблиці', 'Щоб збирати відповіді клієнтів', 'Щоб змінити шрифт', 'Щоб згрупувати записи й порахувати підсумки'], correct:3 },
+  { q:'Що зробить запит SELECT B WHERE F = \'Дизель\'?', opts:['Покаже марки всіх авто', 'Покаже марки авто з дизельним двигуном', 'Видалить дизельні авто', 'Відсортує авто за двигуном'], correct:1 },
+  { q:'Що означає ORDER BY D DESC?', opts:['Упорядкувати за D від більшого до меншого', 'Лише авто зі стовпця D', 'Упорядкувати за D від меншого до більшого', 'Сховати стовпець D'], correct:0 }
+], {summary:'Розділ повторено: будову й зв\'язки таблиць, проєктування, форми, сортування, фільтри, зведені таблиці та запити. Попереду — проєкт!'});
+</script>
+
+</body>
+</html>
