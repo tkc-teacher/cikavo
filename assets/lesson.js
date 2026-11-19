@@ -996,7 +996,7 @@ function say(text, btn){
 }
 function sayBtn(text){ return `<button class="say" type="button" aria-label="Послухати" data-text="${text.replace(/"/g, '&quot;')}">${SPEAK_ICON}</button>`; }
 document.addEventListener('click', e=>{
-  const b = e.target.closest('.say');
+  const b = e.target.closest('button.say');
   if(b) say(b.dataset.text, b);
 });
 document.querySelectorAll('[data-say]').forEach(el=>{
