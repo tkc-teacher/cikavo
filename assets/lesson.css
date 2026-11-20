@@ -37,7 +37,7 @@ h1,h2,h3,h4,.headline,.step-label,.bucket-title{text-wrap:balance;}
 .session-mark:hover{border-color:var(--accent);}
 .session-mark:focus{outline:none;}
 .session-mark:focus-visible{outline:3px solid var(--accent); outline-offset:2px;}
-.session-mark.spin{animation:mark-spin .35s cubic-bezier(.3,1.4,.5,1);}
+.session-mark.mark-spin{animation:mark-spin .35s cubic-bezier(.3,1.4,.5,1);}
 @keyframes mark-spin{from{transform:scale(.5) rotate(-90deg);}}
 .neuron-counter{display:flex; align-items:center; gap:8px; background:var(--surface); border:1.5px solid var(--line); border-radius:999px; padding:5px 14px 5px 6px; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px; transition:opacity .4s ease, transform .4s ease;}
 .neuron-counter svg{width:24px; height:24px;}

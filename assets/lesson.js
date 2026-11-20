@@ -88,7 +88,7 @@ markEl.addEventListener('click', ()=>{
   const rest = MARKS.filter(m=>m !== MARK);
   MARK = rest[Math.floor(Math.random() * rest.length)];
   showMark();
-  markEl.classList.remove('spin'); markEl.offsetWidth; markEl.classList.add('spin');
+  markEl.classList.remove('mark-spin'); markEl.offsetWidth; markEl.classList.add('mark-spin');  // не «spin»: такий клас мають крутилки в уроках
 });
 const hudFill = hud.querySelector('.hud-bar-fill');
 const counterEl = hud.querySelector('.neuron-counter');
