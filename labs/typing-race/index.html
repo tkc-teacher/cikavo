@@ -249,6 +249,13 @@
   .tab-lang button{display:flex; border:2.5px solid transparent; background:none; border-radius:9px; padding:3px; cursor:pointer; opacity:.35; filter:grayscale(.7); transition:all .15s ease;}
   .tab-lang svg{display:block; width:30px; height:20px; border-radius:4px; box-shadow:0 0 0 1px rgba(27,27,58,.12);}
   .tab-lang button:hover{opacity:.8; filter:none;}
+  /* Перемикач «клавіатура під текстом» — перед прапорцями; натиснуто (заїзд без клавіатури) — значок напівпрозорий, над ним ×2 */
+  .tab-lang .kb-toggle{position:relative; color:var(--ink); opacity:1; filter:none; margin-right:6px;}
+  .tab-lang .kb-toggle svg{width:34px; height:24px; box-shadow:none; border-radius:0; overflow:visible;}
+  .tab-lang .kb-toggle.off svg{opacity:.35;}
+  .kb-toggle .bonus{display:none; position:absolute; top:-7px; right:-12px; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:11px; line-height:1; padding:3px 5px 2px; border-radius:999px; background:var(--yellow); color:var(--ink);}
+  .kb-toggle.off .bonus{display:block;}
+  .tab-lang .sep{width:1.5px; height:22px; background:var(--line); margin-right:4px;}
   .tab-lang button.on{opacity:1; filter:none; border-color:var(--teal); box-shadow:0 2px 6px rgba(22,163,160,.3);}
   .tab-count{font-size:12px; background:var(--yellow); color:var(--ink); border-radius:999px; padding:0 7px; margin-left:2px;}
 
@@ -449,6 +456,7 @@
   .color-name.full .ltr.on{opacity:1; filter:none;}
   .start-over{position:absolute; inset:0; z-index:3; display:flex; align-items:center; justify-content:center; pointer-events:none;}
   .start-over .btn{pointer-events:auto; box-shadow:0 4px 0 var(--teal-dark), 0 10px 24px rgba(27,27,58,.3);}
+  .race-panel.blind .kb{display:none;}   /* заїзд без клавіатури під текстом */
   .exit-btn{position:absolute; bottom:12px; right:12px; z-index:2; width:34px; height:34px; border-radius:50%; border:1.5px solid var(--line); background:var(--surface); color:var(--ink-soft); font-size:16px; font-weight:700; line-height:1; cursor:pointer;}
   .exit-btn:hover{border-color:var(--coral); color:var(--coral);}
   .pick .label:last-child{padding-bottom:10px;}
@@ -706,86 +714,8 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="data.js"></script>
 <script>
-/* ================= Тексти ================= */
-// Слова лише з літер основного ряду (ФІВА ПР ОЛДЖЄ / ASDF G H JKL)
-const TEXTS = {
-  uk:{
-    // Парк розваг (молодша школа): короткі слова лише з основного ряду, малими літерами
-    tiny:['дід','два','від','рід','рів','лід','дар','жар','лад','пар','віл','вал','ода','вода','лава','ліва','пара','рада',
-          'лапа','фара','дало','рало','папа','двір','ліпа','жало'],
-    home:['два','дід','вода','лава','пара','двір','ліпа','фара','рада','права','лапа','відро','жало','діра','водопад',
-          'папір','лід','овал','оладі','радів','жар','дрова','ода','поділ','плід','провід','дало'],
-    words:['кіт','сонце','миша','файл','папка','екран','клавіша','школа','урок','друг','книга','місто','весна','ранок',
-           'хмара','річка','зошит','олівець','пісня','вікно','принтер','мережа','пароль','браузер','курсор','сайт','робот',
-           'ракета','планета','зірка','дельфін','їжак','щастя','юнак','мрія','гра','код','піксель','дані','текст','кнопка','монітор'],
-    sentences:['Клавіатура допомагає швидко вводити текст.','Миша та клавіатура є пристроями введення.',
-           'Друкуй усіма десятьма пальцями.','Дивись на екран і не підглядай на клавіші.','Надійний пароль довгий і складний.',
-           'Тиха вода греблю рве.','Повторення мати навчання.','Наш робот вчиться друкувати без помилок.',
-           'Принтер друкує текст на папері.','Файли зберігаються в папках.','Не відкривай листи від незнайомців.',
-           'Монітор показує зображення.','Без праці не виловиш і рибки зі ставка.','Терпіння і праця все перетруть.',
-           'Інформатика вчить думати логічно.','Зберігай роботу кожні кілька хвилин.']
-  },
-  en:{
-    tiny:['as','dad','sad','lad','add','ask','gas','had','has','all','fall','hall','flag','glad','lag','ash','dash','half','gala','lass'],
-    home:['dad','sad','lad','add','ask','glass','flask','salad','hall','fall','all','gas','flag','half','shall','dash',
-          'glad','has','had','lash','flash','gala','lag'],
-    words:['cat','sun','mouse','file','folder','screen','key','school','friend','book','robot','rocket','planet','star',
-           'music','window','printer','network','password','browser','cursor','game','apple','river','cloud','pixel',
-           'code','data','button','monitor','text','zebra','quiz','jump','yellow','happy'],
-    sentences:['Practice makes perfect.','My robot can type very fast.','The mouse and the keyboard are input devices.',
-           'Save your work every few minutes.','A strong password is long and secret.','The printer puts text on paper.',
-           'Every file lives in a folder.','Slow and steady wins the race.','Look at the screen and not at the keys.',
-           'Computers help us learn new things.','Keep your fingers on the home row.'],
-    // Речення з розділовими знаками . , - ( ) " ! ? @ ' : — для змагання «Слалом знаків»
-    punct:['Hi, Anna! Can you send me the file?','My e-mail is robot@school.ua: write to me!',
-           "Don't forget: save your work (every few minutes)!",'"Ready?" asked the robot. "Go!"',
-           "It's a mouse, not a cat (a computer mouse)!",'Write to help@lab.org - or ask the teacher.',
-           'Is it a mouse, a keyboard, or a printer?',"Let's race: you, me, and the robot!",
-           "Tom's laptop isn't new, but it's fast.",'Is this link safe? Check it: look at the address!',
-           'Sam asked: "Where is my folder?"','Ready, steady - go!','Click "Save" (or press the keys).',
-           "We're online: kate@mail.com, max@mail.com.",'Oops! Wrong key - try again.',
-           'Wow! The robot is fast, but you are faster.',"Where's my mouse? (It's under the book!)",
-           'Note: the password is secret - never share it!','Ann wrote: "See you at school!"',
-           "My login is anna_k@mail.com - don't tell anyone!",'What is a file? It is a box for data.',
-           'Hello, world! Hello, robot!',"Is it raining? Yes, it is - take your umbrella!",
-           'Max said: "I can type with ten fingers!"',"First, open the browser; then, type the address."]
-  }
-};
-
-/* ================= Автошкола: літери додаються поступово ================= */
-// Етапи — пари літер: спершу основний ряд від вказівних пальців, далі найчастіші літери верхнього й нижнього рядів
-const ABC_STAGES = {
-  uk:['ао','вл','ід','фж','пр','ен','кг','ти','уш','мь','сб','цщ','зє','яч','юй','хї'],
-  en:['fj','dk','sl','ah','ge','ri','tn','ou','cm','wy','pb','vx','qz']
-};
-// Справжні слова для етапів (до них додаються слова з TEXTS); у заїзд беруться лише ті, що складаються з уже вивчених літер
-const ABC_WORDS = {
-  uk:`вал віл лава вола ліва ліво дід два дві від лід дало вода діва долі ода дол жало жила ждав жав фол фал
-      пар рад рід рів дар жар лад рада пара фара папа лапа ліпа двір рало дрова права поділ плід провід папір відро радів оладі
-      день дерево не на він вона воно вони ріпа ріка рано неділя дорога поле лен оренда
-      нога ганок ніготь книга кеди кадр око рука гора горіх гра голова дні дно рік кіно кран гарно
-      тато тітка кіт кит вітер літо тепло тиша ракета плита пірат тир тінь риба
-      уроки тиша шапка каша наша ваша шкіра шлях вуха шум друг дуже уважно шина
-      мама мій сім мало малина мир мова мед мені сіль тінь біль день кінь пень лось
-      сова сад сік сон сир сила бал біла білка банан бобер сніг собака сестра слон суп сусід білий баба
-      цукор цибуля цвіт щастя щука щоки ящик кущ плащ цирк вулиця сонце щітка цвях
-      зима зошит зуб коза завжди їжак є єнот зелений знову зірка зебра
-      яблуко я ячмінь час чай чашка чорний чотири учень червоний ягода яма ясно
-      юла юнак юшка йога мій твій край гай чайник мрія
-      хата хліб холод хмара їжа їде їсти хвіст хор хлопчик дах`,
-  en:`jaffa fed dad sad lad add ask all fall hall flag glad lag ash dash half gala lass has had
-      fall kid did skid dill silk lid lid
-      he she held shed head hedge egg leg seal sell shall
-      red ride rise fire hire his her girl grid fries
-      ten tent net nest hint tin then this that the train treat sent
-      out our four sun run fun round house hot note shout
-      cat come cool camp milk mice mouse moon music
-      way why yes you yard wow window yellow
-      play puppy pen bed bag bus bear best boy
-      very van seven box six fox next
-      quiz quick queen zoo zebra lazy`
-};
 // Набір літер етапу k: усі пари до k включно; нові — пара етапу k
 const abcLetters = (lang, k) => ABC_STAGES[lang].slice(0, k + 1).join('');
 const ABC_ACC = 90;   // точність, з якою відкриваються нові літери
@@ -1546,12 +1476,6 @@ const BOAT_ORDER = ['kayak','sailboat','jetski','speedboat','submarine'];
 const VEHICLES = [...CAR_ORDER, ...PLANE_ORDER, ...BOAT_ORDER];
 const CAR_CPM = { trike:15, beetle:35, taxi:50, jeep:65, monster:80, sport:100, f1:125, biplane:45, jet:95, rocket:140, kayak:40, sailboat:60, jetski:95, speedboat:110, submarine:125 };
 const BOT_COLOR = '#6C5CE7';
-// Суперники: на кожен заїзд — випадковий нікнейм (український чи англійський — за мовою заїзду)
-const RIVALS = {   // короткі (до 9 літер), щоб табличка над транспортом на старті не виходила за трасу
-  uk:['Блискавка','Турбо','Їжачок','Совеня','Пікселько','Метеорит','Комета','Зайчик','Білочка','Котик','Вареник','Пробіл',
-      'Ніндзя','Шустрик','Байт','Лисичка','Курсор','Дракончик','Вітерець','Хмаринка','Бджілка','Капітан','Мишка','Ведмедик'],
-  en:['Speedy','Turbo','Panda','Koala','Hippo','Zoom','Lucky','Buzzy','Comet','Jaguar','Snail','Mouse','Owl','Shark','Pixel','Tiger']
-};
 let rival = null;
 // Суперник лишається тим самим, доки не завершено заїзд чи не змінено мову.
 // Нікнейм, що збігається з іменем гравця (без огляду на регістр і пробіли), не обирається — береться інший
@@ -1685,6 +1609,10 @@ BADGES.wave = `<path d="M3 35 Q3 19 16 9 Q27 2 35 9 Q38 13 34 16 Q30 11 25 13 Q1
 BADGES.anchor = `<circle cx="20" cy="20" r="16.5" fill="#1F5F99" ${OUT}/>
     <g fill="none" stroke="#FFC93C" stroke-width="2.8" stroke-linecap="round"><circle cx="20" cy="9.5" r="3"/><path d="M20 12.5 V31 M14 17 H26 M9.5 23 Q11 31 20 31 Q29 31 30.5 23"/></g>
     <path d="M7 24.5 L9.5 21 L12 24.5 Z M28 24.5 L30.5 21 L33 24.5 Z" fill="#FFC93C"/>`;
+BADGES.keys = `<rect x="3" y="10" width="34" height="22" rx="5" fill="#6C5CE7" ${OUT}/>
+    ${[0,1,2,3,4].map(i=>`<rect x="${7+i*5.6}" y="14" width="4" height="4" rx="1" fill="#fff"/>`).join('')}${[0,1,2,3].map(i=>`<rect x="${9.8+i*5.6}" y="20" width="4" height="4" rx="1" fill="#fff"/>`).join('')}
+    <rect x="12" y="26" width="16" height="3" rx="1.5" fill="#FFC93C"/>
+    <path d="M30 3 L32 8 L37 8.5 L33 11.5 L34.5 16.5 L30 13.6 L25.5 16.5 L27 11.5 L23 8.5 L28 8 Z" fill="#FFC93C" ${OUT}/>`;
 const badgeHTML = (id, title='') => BADGES[id] ? `<span class="badge-ico"${title ? ` title="${esc(title)}"` : ''}><svg viewBox="-2 -2 44 44" aria-hidden="true">${BADGES[id]}</svg></span>` : '';
 
 /* ================= Змагання ================= */
@@ -1751,7 +1679,11 @@ const COMPS = [
     stages:[['port','en'],['tropics','uk'],['tropics','en'],['tropics','uk']] },
   { id:'deepsea', name:'Глибоководна експедиція', badge:'anchor', cpm:125, minAcc:94, cars:['submarine'], lvl:10, bonus:50,
     desc:'Тільки для субмарин: від островів — у глибини океану до китів.',
-    stages:[['tropics','uk','long'],['ocean','uk'],['ocean','en'],['ocean','uk']] }
+    stages:[['tropics','uk','long'],['ocean','uk'],['ocean','en'],['ocean','uk']] },
+  // Без клавіатури під текстом (noKb:true)
+  { id:'nokb', name:'Ралі без підказок', badge:'keys', cpm:45, minAcc:90, cars:null, lvl:6, bonus:30, noKb:true,
+    desc:'Клавіатури під текстом не буде — лише пальці й пам\'ять. Підійде будь-яка автівка.',
+    stages:[['city','uk'],['forest','uk'],['forest','en'],['desert','uk']] }
 ];
 // Порядок у списку: змагання з first — на початку, з before — перед указаним; показаний номер — місце в списку, а в посиланні — номер у COMPS
 const COMP_VIEW = [...COMPS.filter(c=>c.first), ...COMPS.filter(c=>!c.first && !c.before)];
@@ -2128,6 +2060,7 @@ function renderSetup(){
   setP(carMe, 0); setP(carBot, 0);
   renderPlayerBtn();
   renderComps();
+  renderBlind();
   saveStore();
 }
 
@@ -2206,25 +2139,6 @@ const HK_GROUPS = [
 const HOTKEYS = HK_GROUPS.flatMap(g=>g.items);
 const TICKS = 3;   // гарячі клавіші й символи: скільки разів натиснути, щоб картка стала зеленою (+1 нейрончик)
 const K = s => `<kbd class="kc">${s}</kbd>`;
-// Символи. Як набрати — рахується з розкладок (TRAIN_NUM + LAYOUTS): на картці — потрібна клавіша серед сусідніх, з Shift, якщо треба.
-// Символів, яких у розкладці немає (@ в українській, № в англійській), там не показуємо.
-// Порядок — групами: розділові знаки, дужки, математичні, інші. Прогрес — за самим знаком, тож порядок можна міняти
-const SYMBOLS = [
-  // розділові знаки
-  { c:'.', name:'крапка' }, { c:',', name:'кома' }, { c:'!', name:'знак оклику' }, { c:'?', name:'знак питання' },
-  { c:':', name:'двокрапка' }, { c:';', name:'крапка з комою' }, { c:'-', name:'дефіс' }, { c:'"', name:'лапки' },
-  { c:"'", name:'апостроф', alt:['’','ʼ'] },
-  // дужки
-  { c:'(', name:'дужка' }, { c:')', name:'дужка' }, { c:'[', name:'квадратна дужка' }, { c:']', name:'квадратна дужка' },
-  { c:'{', name:'фігурна дужка' }, { c:'}', name:'фігурна дужка' },
-  // математичні
-  { c:'+', name:'плюс' }, { c:'=', name:'дорівнює' }, { c:'*', name:'зірочка (множення)' }, { c:'/', name:'скісна риска (ділення)' },
-  { c:'%', name:'відсоток' }, { c:'<', name:'менше' }, { c:'>', name:'більше' }, { c:'^', name:'«дашок»' },
-  // інші
-  { c:'@', name:'«собачка»' }, { c:'#', name:'решітка' }, { c:'№', name:'номер' }, { c:'&', name:'амперсанд («і»)' },
-  { c:'$', name:'долар' }, { c:'_', name:'підкреслення' }, { c:'\\', name:'зворотна скісна риска' }, { c:'|', name:'вертикальна риска' },
-  { c:'~', name:'тильда' }, { c:'`', name:'зворотний апостроф' }
-];
 // Клавіша \ | є лише в англійській розкладці тут: в українських розкладках Windows і Mac на ній різні знаки (ґ, \, /), тож її не показуємо
 const EXTRA_KEY = { en:[1, ['\\','|']] };
 function kbRows(lang){
@@ -2446,8 +2360,12 @@ const FLAG_SVG = {
 function renderTabLang(id = activeTab()){
   const el = document.getElementById('tabLang');
   el.hidden = !['paneFree','paneTrain'].includes(id);
-  el.innerHTML = LANGS.map(l=>`<button type="button" data-id="${l.id}" class="${l.id === settings.lang ? 'on' : ''}" title="${l.html.slice(l.html.indexOf(' ') + 1)}" aria-label="${l.html.slice(l.html.indexOf(' ') + 1)}">${FLAG_SVG[l.id]}</button>`).join('');
-  el.querySelectorAll('button').forEach(b=>b.addEventListener('click', ()=>{
+  const kb = id === 'paneFree' && noKbAllowed()
+    ? `<button type="button" class="kb-toggle${settings.noKb ? ' off' : ''}" data-kb aria-pressed="${!settings.noKb}"
+        title="${settings.noKb ? 'Заїзд без клавіатури під текстом: нейрончики ×2. Натисни, щоб повернути клавіатуру' : 'Клавіатура під текстом. Натисни, щоб їхати без неї: нейрончики ×2'}">${KB_SVG}<span class="bonus">×2</span></button><span class="sep"></span>` : '';
+  el.innerHTML = kb + LANGS.map(l=>`<button type="button" data-id="${l.id}" class="${l.id === settings.lang ? 'on' : ''}" title="${l.html.slice(l.html.indexOf(' ') + 1)}" aria-label="${l.html.slice(l.html.indexOf(' ') + 1)}">${FLAG_SVG[l.id]}</button>`).join('');
+  el.querySelector('[data-kb]')?.addEventListener('click', ()=>{ settings.noKb = !settings.noKb; saveStore(); renderTabLang(id); });
+  el.querySelectorAll('button[data-id]').forEach(b=>b.addEventListener('click', ()=>{
     if(b.dataset.id === settings.lang) return;
     settings.lang = b.dataset.id;
     saveStore();
@@ -2462,6 +2380,7 @@ function showTab(id){
   document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on', t.dataset.tab===id));
   document.querySelectorAll('.pane').forEach(p=>p.hidden = p.id!==id);
   renderTabLang(id);
+  renderBlind();
   startBtn.disabled = false;
   if(id === 'paneComp'){ renderCompPane(); previewComp(); startBar.hidden = false; }
   else if(id === 'paneComps'){ renderComps(); startBar.hidden = true; }
@@ -2780,7 +2699,8 @@ function startRace(opts){
   race = {
     text:'', stage:opts.stage, track:opts.track, lang:opts.lang, level, model:opts.model, comp:opts.comp || null,
     pos:0, errors:0, missed:false, phase:'countdown', startT:0, lastKeyT:0,
-    botCpm:opts.cpm, botChars:0, seed:Math.random()*10, lastFrame:0
+    botCpm:opts.cpm, botChars:0, seed:Math.random()*10, lastFrame:0,
+    blind:!!opts.blind
   };
   setupEl.hidden = true;
   shareView.hidden = true;
@@ -2788,6 +2708,7 @@ function startRace(opts){
   raceEl.hidden = false;
   applyTrack(opts.track);
   raceEl.classList.toggle('kids', !!TRACKS[trackIdx(opts.track)].kids);
+  raceEl.classList.toggle('blind', race.blind);
   race.text = makeText(opts.lang, level, opts.stage);   // після показу поля: текст підбирається під його ширину
   buildKeyboard();
   drawCars(opts.model, opts.lang);
@@ -2801,11 +2722,21 @@ function startRace(opts){
   window.scrollTo({ top:0, behavior:'smooth' });
   runCountdown();
 }
+// Суперник вільного заїзду підлаштовується під гравця: їде на 5% повільніше за його попередній заїзд на цій трасі цією мовою
+// (profile.last), але не повільніше, ніж задають транспорт і траса (CAR_CPM, botCap)
 function startFree(){
   const t = TRACKS[trackIdx(settings.track)];
-  startRace({ track:settings.track, lang:settings.lang, cpm:Math.min(CAR_CPM[settings.model], t.botCap || Infinity), model:settings.model,
-              stage:t.abc ? abcOpen(settings.lang) : undefined });
+  const plan = Math.min(CAR_CPM[settings.model], t.botCap || Infinity);
+  const last = Math.round((profile.last?.[bestKey(settings.lang, settings.track)] || 0) * 0.95);
+  startRace({ track:settings.track, lang:settings.lang, cpm:Math.max(plan, last), model:settings.model,
+              stage:t.abc ? abcOpen(settings.lang) : undefined, blind:noKbAllowed() && !!settings.noKb });
 }
+// Без клавіатури під текстом — у вільному заїзді на будь-якій трасі, крім Автошколи (там клавіатура показує нові літери)
+const noKbAllowed = () => !TRACKS[trackIdx(settings.track)].abc;
+const renderBlind = () => renderTabLang();
+const KB_SVG = `<svg viewBox="0 0 34 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+  <rect x="2" y="3" width="30" height="18" rx="3.5"/><path d="M7 8.5h.01M12 8.5h.01M17 8.5h.01M22 8.5h.01M27 8.5h.01M7 12.5h.01M12 12.5h.01M17 12.5h.01M22 12.5h.01M27 12.5h.01" stroke-width="2.6"/>
+  <path d="M11 16.5h12"/></svg>`;
 function startComp(id){
   const c = compById(id);
   const car = compCar(c);
@@ -2815,7 +2746,7 @@ function startComp(id){
   saveStore();
   const stage = c.stages[profile.runs[id].stage];
   const [track, lang] = stage;
-  startRace({ track, lang, cpm:c.cpm, model:car, comp:c, level:stageLevel(stage) });
+  startRace({ track, lang, cpm:c.cpm, model:car, comp:c, level:stageLevel(stage), blind:!!c.noKb });
 }
 
 function runCountdown(){
@@ -2932,6 +2863,7 @@ function finish(){
   const prevBest = profile.bests[key] || 0;
   const record = won && speed > prevBest;  // рекорд — лише за повний текст
   if(record) profile.bests[key] = speed;
+  (profile.last ||= {})[key] = speed;   // під цю швидкість підлаштується суперник наступного вільного заїзду тут
   profile.races++;
   if(won) profile.wins++;
 
@@ -2940,6 +2872,7 @@ function finish(){
   let gain = nb.total;
   const parts = [`траса +${nb.base}`, `швидкість +${nb.speedPts}`, `точність ×${nb.mult}`];
   if(nb.win) parts.push(`перемога +${nb.win}`);
+  if(race.blind){ gain *= 2; parts.push('без клавіатури ×2'); }
 
   // Змагання
   let compHTML = '';
