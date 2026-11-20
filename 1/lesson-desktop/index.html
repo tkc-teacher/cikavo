@@ -42,7 +42,12 @@
   .desk .sun{position:absolute; right:12%; top:9%; width:10cqw; height:10cqw; border-radius:50%; background:#FFD84D; box-shadow:0 0 0 2cqw rgba(255,216,77,.3); pointer-events:none;}
   .desk .cloud{position:absolute; height:3.6cqw; background:#fff; border-radius:999px; opacity:.9; pointer-events:none;}
   .desk .cloud::before{content:""; position:absolute; left:20%; top:-60%; width:45%; height:130%; background:#fff; border-radius:50%;}
-  .desk.hit-wall{box-shadow:inset 0 0 0 1.2cqw var(--ok);}
+  /* рамка фону — поверх пагорбів, піктограм і панелі завдань (::after), інакше видно лише шматки */
+  .desk::after{content:""; position:absolute; inset:0; z-index:60; pointer-events:none; border-radius:inherit; box-shadow:inset 0 0 0 0 transparent; transition:box-shadow .25s ease;}
+  .desk.hit-wall::after{box-shadow:inset 0 0 0 1.2cqw var(--ok);}
+  .desk.glow{animation:none;}
+  .desk.glow::after{animation:wallGlow 1.2s ease-in-out infinite;}
+  @keyframes wallGlow{50%{box-shadow:inset 0 0 0 1.2cqw rgba(255,201,60,.9), inset 0 0 4cqw rgba(255,201,60,.6);}}
 
   /* піктограма */
   .di{position:absolute; width:17cqw; padding:.8cqw .4cqw; display:flex; flex-direction:column; align-items:center; gap:.4cqw; border-radius:1cqw; border:.3cqw solid transparent; cursor:pointer; z-index:2; touch-action:none;}
@@ -200,11 +205,10 @@
   .sm-item.miss{animation:wob .4s ease; background:#FDE6E1;}
   .sm-item.glow{animation:glow 1.2s ease-in-out infinite;}
 
-  /* Крок 6 · перетягни на зірку: картка «перетягнути + піктограма», зірка перескакує після кожного разу */
+  /* Крок 5 · перетягни в рамочку: картка «піктограма → рамочка»; з піктограм у рамочках складається смайлик */
   .want-card .pair{display:flex; align-items:center; gap:10px;}
   .want-card svg.arr{width:60px; height:36px; overflow:visible;}
-  .want-card .st-ring{display:grid; place-items:center; width:72px; height:72px; border:3.5px dashed #FFC93C; border-radius:50%; background:#FFF8E1;}   /* як зірка на столі */
-  .want-card .st-ring svg{width:40px; height:40px;}
+  .want-card .sl-box{display:block; width:64px; height:64px; border:3.5px dashed #FFC93C; border-radius:12px; background:#FFF8E1;}   /* як рамочка на столі */
   /* поруч із карткою — миша з натиснутою лівою кнопкою: тягнемо, тримаючи ліву кнопку */
   .want.with-mouse{align-items:center; gap:18px;}
   .lmb{width:58px; height:auto; display:block; overflow:visible;}
@@ -214,10 +218,18 @@
   @keyframes blink2{0%{fill:#FFC93C;} 9%{fill:#fff;} 16%{fill:#FFC93C;} 25%{fill:#fff;}}   /* клац-клац — пауза */
   @keyframes blink1{0%{fill:#FFC93C;} 12%{fill:#fff;}}
   @keyframes lit{50%{fill:#FFE38A;}}
-  .star-spot{position:absolute; left:58%; top:22%; width:17cqw; height:17cqw; z-index:1; display:grid; place-items:center; border:.6cqw dashed #FFC93C; border-radius:50%; background:rgba(255,255,255,.3); pointer-events:none;}
-  .star-spot svg{width:8cqw; height:8cqw; opacity:.85;}
-  .star-spot.pop{animation:popIn .35s ease;}
-  .star-spot.over{background:rgba(255,201,60,.45);}
+  .desk.face-desk .sun,.desk.face-desk .cloud{display:none;}   /* сонце й хмарки — там, де смайлик */
+  .fslot{position:absolute; width:8cqw; height:8cqw; margin:-4cqw 0 0 -4cqw; z-index:1; border:.5cqw dashed #FFC93C; border-radius:1.4cqw; background:rgba(255,248,225,.6); pointer-events:none; display:none; animation:slotPulse 1.2s ease-in-out infinite;}
+  .fslot.cur{display:block;}   /* видно лише рамочку, у яку класти зараз — щоб не здогадались, що вийде */
+  .fslot.over{background:rgba(255,201,60,.75);}
+  @keyframes slotPulse{50%{transform:scale(1.12);}}
+  .di.placed{width:8cqw; height:8cqw; margin:-4cqw 0 0 -4cqw; padding:0; border:0; display:grid; place-items:center; background:none; pointer-events:none; z-index:3; transition:left .25s ease, top .25s ease;}
+  .di.placed svg{width:6.6cqw; height:6.6cqw;}
+  .di.placed b{display:none;}
+  .di.placed.party{animation:faceJump .6s ease;}
+  @keyframes faceJump{40%{transform:translateY(-1.6cqw) scale(1.15);}}
+  .confetti{position:absolute; top:-3cqw; width:1.4cqw; height:2.2cqw; z-index:8; border-radius:.3cqw; pointer-events:none; animation:confFall var(--t) cubic-bezier(.25,.6,.5,1) var(--d) forwards;}
+  @keyframes confFall{80%{opacity:1;} to{transform:translate(var(--x), 68cqw) rotate(var(--r)); opacity:0;}}
 
   /* заголовок частини уроку */
   .part-head{display:flex; align-items:center; gap:16px; margin:36px 0 4px; padding:14px 20px; border-radius:var(--radius-l); background:var(--accent-soft); font-family:'Baloo 2',sans-serif; font-weight:800; font-size:30px; line-height:1.1; color:var(--accent-dark);}
@@ -316,7 +328,7 @@
 
   <section class="block">
     <div class="step-label">Крок 5 · Перетягуємо</div>
-    <h2>Перетягни на зірку</h2>
+    <h2>Перетягни в рамочку</h2>
     <div class="exercise">
       <div class="ask" id="cmdAsk"></div>
       <div class="want" id="cmdWant"></div>
@@ -422,7 +434,7 @@ const ART = {
 };
 const art = k=>`<svg viewBox="0 0 120 80">${ART[k]}</svg>`;
 // назви піктограм у знахідному відмінку (кого? що?) — по складах
-const ACC = { bin:'*Ко|шик*', paint:'*Ма|лю|ван|ня*', music:'*Му|зи|ку*', game:'*Гру*', calc:'*Каль|ку|ля|тор*', folder:'*Мо|ї* *фо|то*', web:'*Ін|тер|нет*' };
+const ACC = { bin:'*Ко|шик*', paint:'*Ма|лю|ван|ня*', music:'*Му|зи|ку*', game:'*Гру*', calc:'*Каль|ку|ля|тор*', folder:'*Мо|ї* *фо|то*', web:'*Ін|тер|нет*', video:'*Ві|де|о*', mail:'*Пош|ту*' };
 // значок дії миші: клацнути / двічі клацнути / перетягнути (як в уроці «Вмикаємо і вимикаємо комп'ютер»)
 // миша з підсвіченою лівою кнопкою: hold — світиться (тягнемо, тримаючи), dbl — блимає двічі, click — блимає раз
 const lmb = mode=>`<svg class="lmb ${mode}" viewBox="0 0 64 90" aria-label="Ліва кнопка миші">
@@ -610,7 +622,8 @@ function makeDesk(root, icons, pins = ['web', 'folder', 'music']){
       e.preventDefault();
       const r = p.getBoundingClientRect(), dx = e.clientX - r.left, dy = e.clientY - r.top;
       const ph = document.createElement('div');
-      ph.style.cssText = `width:${r.width}px; height:${r.height}px;`;
+      // розмір без збільшення від наведення (scale), інакше лоток розпирає
+      ph.style.cssText = `width:${p.offsetWidth}px; height:${p.offsetHeight}px; flex:none;`;
       p.after(ph);
       p.classList.add('drag');
       const cards = [...wins.querySelectorAll('.mw:not(.filled)')];
@@ -883,93 +896,110 @@ function makeDesk(root, icons, pins = ['web', 'folder', 'music']){
   addRestart(desk, reset);
 })();
 
-/* ---------- КРОК 5 · ПЕРЕТЯГУЄМО: НА ЗІРКУ ----------
-   Усі завдання однакові: перетягнути піктограму з картки на зірку. Після кожного разу зірка перескакує в нове місце.
-   Не та піктограма на зірці — хибна спроба; клацання лише виділяє. */
+/* ---------- КРОК 5 · ПЕРЕТЯГУЄМО: У РАМОЧКУ ----------
+   По краях столу 8 піктограм, і всі вони потрібні. Картка показує, яку піктограму тягнути; на столі видно лише одну рамочку —
+   у випадковому місці майбутнього смайлика, щоб діти не здогадались, що вийде. Піктограма лишається в рамочці (маленькою, без назви).
+   Коли всі 8 на місцях, посередині столу — смайлик з піктограм (очі й усмішка), і летить конфеті.
+   Не та піктограма — хибна спроба; клацання лише виділяє. */
 (function(){
   const want = document.getElementById('cmdWant'), dotsEl = document.getElementById('cmdDots'), askEl = document.getElementById('cmdAsk');
-  const LAYOUT = [['bin', 2, 3], ['folder', 2, 27], ['paint', 2, 51], ['game', 20, 3], ['music', 20, 27], ['calc', 20, 51]];
-  const D = makeDesk(document.getElementById('cmdDesk'), LAYOUT), desk = D.desk;
-  desk.insertAdjacentHTML('beforeend', '<div class="star-spot"><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" fill="#FFC93C" stroke="#E0A800" stroke-width="1.2" stroke-linejoin="round"/></svg></div>');
-  const star = desk.querySelector('.star-spot');
-  const STAR = '<span class="st-ring"><svg viewBox="0 0 24 24"><path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4 6.1 20.5l1.2-6.5L2.5 9.4l6.6-.9z" fill="#FFC93C" stroke="#E0A800" stroke-width="1.2" stroke-linejoin="round"/></svg></span>';
-  // дугою від піктограми до зірки — як рука веде мишу
+  const KEYS = ['paint', 'music', 'game', 'calc', 'folder', 'web', 'video', 'mail'];
+  const CELLS = [1, 82].flatMap(x=>[1, 22, 43, 64].map(y=>[x, y]));   // дві колонки по краях, у % ширини й висоти столу
+  const D = makeDesk(document.getElementById('cmdDesk'), []), desk = D.desk;
+  desk.classList.add('face-desk');
+  // смайлик посередині: точки рамочок у cqw від центру (ширина столу = 100cqw, висота = 62.5cqw → % висоти = y / .625)
+  const CX = 50, CY = 26.5;
+  const arc = a=>[+(17 * Math.cos(a * Math.PI / 180)).toFixed(1), +(-4 - 17 * Math.sin(a * Math.PI / 180)).toFixed(1)];
+  const PTS = [[-8, -10], [8, -10], ...[200, 228, 256, 284, 312, 340].map(arc)];   // очі й усмішка — дуга кола
+  const N = PTS.length;
+  const pos = ([x, y])=>({ left:(CX + x) + '%', top:((CY + y) / .625) + '%' });
+  desk.insertAdjacentHTML('beforeend', PTS.map(p=>{ const q = pos(p); return `<div class="fslot" style="left:${q.left}; top:${q.top}"></div>`; }).join(''));
+  const slots = [...desk.querySelectorAll('.fslot')];
+  // дугою від піктограми до рамочки — як рука веде мишу
   const ARROW = '<svg class="arr" viewBox="0 0 60 36"><defs><marker id="arrHead" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="3.2" markerHeight="3.2" orient="auto"><path d="M1 1 L8 5 L1 9" fill="none" stroke="#2E7BE6" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>'
     + '<path d="M4 30 C12 2 40 8 54 18" fill="none" stroke="#2E7BE6" stroke-width="4" stroke-linecap="round" stroke-dasharray="1 8" marker-end="url(#arrHead)"/></svg>';
   const LMB = lmb('hold');
   want.classList.add('with-mouse');
-  const SPOTS = [[46, 6], [62, 30], [78, 8], [50, 50], [72, 52], [40, 30], [80, 30], [60, 6]];   // де може стояти зірка (праворуч від піктограм)
-  const N = 8;
   const hit = trackTask(desk, N, N + 2);
-  let tasks = [], i = 0, best = 0, busy = false, spot = -1, gen = 0;
+  let tasks = [], spots = [], i = 0, best = 0, busy = false, gen = 0;
   const idle = idleHint(()=>i < N && !busy ? D.icon(tasks[i]) : null, 9000);
-  function moveStar(){
-    let j; do j = Math.floor(Math.random() * SPOTS.length); while(j === spot);
-    spot = j;
-    star.style.left = SPOTS[j][0] + '%'; star.style.top = SPOTS[j][1] + '%';
-    star.classList.remove('pop'); void star.offsetWidth; star.classList.add('pop');
-  }
   function show(){
     dots(dotsEl, N, i);
-    if(i >= N){ want.innerHTML = '<div class="want-card done"><span style="font-size:52px">👍</span></div>'; praise(askEl, 'Мо|ло|дець!'); star.style.display = 'none'; return; }
-    star.style.display = '';
-    want.innerHTML = `<div class="want-card"><div class="pair">${icon(tasks[i])}${ARROW}${STAR}</div></div>${LMB}`;
-    ask(askEl, `Пе|ре|тяг|ни ${ACC[tasks[i]]} на *зір|ку*`);
+    slots.forEach((sl, j)=>sl.classList.toggle('cur', i < N && j === spots[i]));
+    if(i >= N){ want.innerHTML = '<div class="want-card done"><span style="font-size:52px">😊</span></div>'; praise(askEl, 'Ви|йшов *смай|лик*!'); return; }
+    want.innerHTML = `<div class="want-card"><div class="pair">${icon(tasks[i])}${ARROW}<span class="sl-box"></span></div></div>${LMB}`;
+    ask(askEl, `Пе|ре|тяг|ни ${ACC[tasks[i]]} у *ра|моч|ку*`);
     idle();
   }
-  desk.querySelectorAll('.di').forEach(di=>{
-    di.dataset.home = di.style.left + ' ' + di.style.top;
-    di.addEventListener('pointerdown', e=>{
-      if(busy || i >= N) return;
-      e.preventDefault();
-      di.setPointerCapture(e.pointerId);
-      D.select(di);
-      const dr = desk.getBoundingClientRect(), r = di.getBoundingClientRect();
-      const dx = e.clientX - r.left, dy = e.clientY - r.top;
-      let moved = false;
-      const overStar = ev=>{ const b = star.getBoundingClientRect(); return b.width && ev.clientX > b.left && ev.clientX < b.right && ev.clientY > b.top && ev.clientY < b.bottom; };
-      const move = ev=>{
-        moved = true; di.classList.add('drag');
-        const x = Math.min(Math.max(ev.clientX - dx - dr.left, 0), dr.width - r.width);
-        const y = Math.min(Math.max(ev.clientY - dy - dr.top, 0), dr.height * .91 - r.height);
-        di.style.left = x / dr.width * 100 + '%'; di.style.top = y / dr.height * 100 + '%';
-        star.classList.toggle('over', overStar(ev));
-      };
-      const up = ev=>{
-        di.removeEventListener('pointermove', move); di.removeEventListener('pointerup', up); di.removeEventListener('pointercancel', up);
-        di.classList.remove('drag'); star.classList.remove('over');
-        if(!moved) return;
-        if(!overStar(ev)){ goHome(di); return; }
-        if(di.dataset.k !== tasks[i]){ goHome(di); setTimeout(()=>flick(di), 320); flick(want.firstElementChild); idle(); return; }
-        busy = true; glowOn(null); idle.stop();
-        di.classList.add('hit');
-        if(i + 1 > best){ best = i + 1; addNeurons(1); hit(); if(best === N) addNeurons(2); }
-        const g = gen;
-        setTimeout(()=>{
-          if(g !== gen) return;
-          di.classList.remove('hit'); D.select(null); goHome(di);
-          busy = false; i++;
-          if(i < N) moveStar();
-          show();
-        }, 700);
-      };
-      di.addEventListener('pointermove', move); di.addEventListener('pointerup', up); di.addEventListener('pointercancel', up);
-    });
-  });
+  function confetti(){
+    const COLORS = ['#FFC93C', '#FF6B6B', '#4DABF7', '#51CF66', '#CC5DE8', '#FF922B'];
+    for(let n = 0; n < 70; n++){
+      const c = document.createElement('i');
+      c.className = 'confetti';
+      c.style.cssText = `left:${Math.random() * 100}%; background:${COLORS[n % COLORS.length]}; --x:${(Math.random() * 16 - 8).toFixed(1)}cqw; --r:${Math.round(Math.random() * 720 - 360)}deg; --t:${(1.6 + Math.random() * 1.2).toFixed(2)}s; --d:${(Math.random() * .6).toFixed(2)}s`;
+      desk.appendChild(c);
+    }
+    setTimeout(()=>desk.querySelectorAll('.confetti').forEach(c=>c.remove()), 3600);
+  }
   function goHome(di){
     const [l, t] = di.dataset.home.split(' ');
     di.classList.add('home'); di.style.left = l; di.style.top = t;
     setTimeout(()=>di.classList.remove('home'), 320);
   }
+  function bind(di){
+    di.addEventListener('pointerdown', e=>{
+      if(busy || i >= N || di.classList.contains('placed')) return;
+      e.preventDefault();
+      di.setPointerCapture(e.pointerId);
+      D.select(di);
+      const dr = desk.getBoundingClientRect(), r = di.getBoundingClientRect();
+      const dx = e.clientX - r.left, dy = e.clientY - r.top;
+      const slot = slots[spots[i]];
+      let moved = false;
+      const overSlot = ev=>{ const b = slot.getBoundingClientRect(), pad = b.width * .35; return ev.clientX > b.left - pad && ev.clientX < b.right + pad && ev.clientY > b.top - pad && ev.clientY < b.bottom + pad; };
+      const move = ev=>{
+        moved = true; di.classList.add('drag');
+        const x = Math.min(Math.max(ev.clientX - dx - dr.left, 0), dr.width - r.width);
+        const y = Math.min(Math.max(ev.clientY - dy - dr.top, 0), dr.height * .91 - r.height);
+        di.style.left = x / dr.width * 100 + '%'; di.style.top = y / dr.height * 100 + '%';
+        slot.classList.toggle('over', overSlot(ev));
+      };
+      const up = ev=>{
+        di.removeEventListener('pointermove', move); di.removeEventListener('pointerup', up); di.removeEventListener('pointercancel', up);
+        di.classList.remove('drag'); slot.classList.remove('over');
+        if(!moved) return;
+        if(!overSlot(ev)){ goHome(di); return; }
+        if(di.dataset.k !== tasks[i]){ goHome(di); setTimeout(()=>flick(di), 320); flick(want.firstElementChild); idle(); return; }
+        // правильно: піктограма стає в рамочку
+        glowOn(null); idle.stop(); D.select(null);
+        const q = pos(PTS[spots[i]]);
+        di.classList.add('placed'); di.style.left = q.left; di.style.top = q.top;
+        if(i + 1 > best){ best = i + 1; addNeurons(1); hit(); if(best === N) addNeurons(2); }
+        i++;
+        show();
+        if(i < N) return;
+        busy = true;
+        const g = gen;
+        setTimeout(()=>{ if(g !== gen) return; confetti(); desk.querySelectorAll('.di.placed').forEach((d, j)=>setTimeout(()=>d.classList.add('party'), j * 80)); }, 350);
+      };
+      di.addEventListener('pointermove', move); di.addEventListener('pointerup', up); di.addEventListener('pointercancel', up);
+    });
+  }
   desk.addEventListener('click', e=>{ if(!e.target.closest('.di')) D.select(null); });
   function reset(){
     gen++; i = 0; busy = false;
-    desk.querySelectorAll('.di').forEach(di=>{ di.classList.remove('hit', 'sel', 'drag'); const [l, t] = di.dataset.home.split(' '); di.style.left = l; di.style.top = t; });
-    // 8 перетягувань: усі 6 піктограм і ще 2, щоб ціль не повторювалась двічі поспіль
-    const keys = LAYOUT.map(l=>l[0]);
-    tasks = shuffle([...keys]);
-    while(tasks.length < N){ const k = keys[Math.floor(Math.random() * keys.length)]; if(k !== tasks[tasks.length - 1]) tasks.push(k); }
-    moveStar(); show();
+    desk.querySelectorAll('.di, .confetti').forEach(d=>d.remove());
+    // 8 піктограм на випадкових місцях по краях; просимо всі у випадковому порядку, рамочки — теж у випадковому
+    shuffle([...KEYS]).forEach((k, j)=>{
+      const [x, y] = CELLS[j];
+      desk.insertAdjacentHTML('beforeend', `<div class="di" data-k="${k}" style="left:${x}%; top:${y}%">${icon(k)}<b>${ICONS[k].name}</b></div>`);
+      const di = desk.lastElementChild;
+      di.dataset.home = di.style.left + ' ' + di.style.top;
+      bind(di);
+    });
+    tasks = shuffle([...KEYS]);
+    spots = shuffle(PTS.map((_, j)=>j));
+    show();
   }
   reset();
   addRestart(desk, reset);
