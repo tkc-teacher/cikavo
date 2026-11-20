@@ -43,6 +43,7 @@ assets/practice.css, assets/practice.js ← спільні стилі й HUD с�
 assets/footer.js                    ← спільний футер усіх сторінок: «© рік автор, м. Київ · логотип CC · Про проєкт» (текст, логотип і стилі — лише тут)
 assets/python.css, assets/python.js ← Python-модуль ядра: редактор коду й запуск Python на сторінці (лише для гуртка, див. «Гурток Python»)
 assets/skulpt/                      ← Skulpt 1.2.0 (Python у браузері, MIT), вантажиться python.js під час першого запуску
+assets/fonts/                       ← шрифти сайту (локальні копії Google Fonts) і fonts.css, будує _tools/build-fonts.py
 _tools/check-lessons.py             ← перевірка уроків (не публікується: Jekyll пропускає теки з «_»)
 _tools/lesson-template/index.html   ← шаблон нового уроку на ядрі (розділ 3)
 ```
@@ -99,7 +100,7 @@ _tools/lesson-template/index.html   ← шаблон нового уроку н�
 
 ### Гурток Python (`python/`)
 - Гурток «Python Basic» для **5–7 класів**, 34 заняття в 5 модулях. План — `_materials/python/plan-python.txt`. Список занять — масив `PLAN` у `python/index.html`: наскрізна нумерація 1–34, `note` — короткий зміст (з `<code>`), `kind: 'practice' | 'project'` — бейдж «Практикум»/«Проєкт». У список уже внесено правки вчителя до плану: `int(input())` і f-рядки — у занятті 2, `and`/`or`/`not` — у занятті 4, `break` — у занятті 6, `len`/`sum`/`min`/`max` — у занятті 12, коментарі — у занятті 1. На головній сторінці — широка синя картка «Python Basic» перед «Лабораторією».
-- Заняття — `python/lesson-slug/index.html` на ядрі (розділ 3) плюс Python-модуль: `<link … python.css>` після `lesson.css`, `<script … python.js>` після `lesson.js`, а в посиланні Google Fonts — ще `JetBrains+Mono:wght@400;600` (шрифт коду). `data-lesson` — з префіксом `py-`, `data-hud` — «Python Basic · {коротка назва}», рубрика hero — «Python Basic · Заняття N», футер — «Заняття N · «{назва}» · Гурток Python Basic». Зразок — `python/lesson-first-program/`.
+- Заняття — `python/lesson-slug/index.html` на ядрі (розділ 3) плюс Python-модуль: `<link … python.css>` після `lesson.css`, `<script … python.js>` після `lesson.js` (шрифт коду JetBrains Mono вже є в `assets/fonts/fonts.css`). `data-lesson` — з префіксом `py-`, `data-hud` — «Python Basic · {коротка назва}», рубрика hero — «Python Basic · Заняття N», футер — «Заняття N · «{назва}» · Гурток Python Basic». Зразок — `python/lesson-first-program/`.
 - **Практикуми й проєкти** — звичайні заняття з задачами на код (`makeCodeTask`), не окремі сторінки «Практикуємо».
 - Гама: синьо-жовта гама Python (`--accent:#3776AB`, `--accent-dark:#25567F`, `--accent-soft:#E8F0F8`, `--bg:#F4F7FB`, HUD — градієнт `#3776AB → #FFD43B`). Між заняттями акцент можна варіювати. Редактор і код завжди темні (тема задана в `python.css`, у заняттях її не міняти).
 - Механіки Python-модуля:
@@ -214,7 +215,7 @@ addNeurons(1); hit();          // після останнього hit() впра
 
 ### Базова система
 Змінні за замовчуванням задає `assets/lesson.css` (фіолетово-бірюзова гама: `--accent:#6C5CE7`, `--bg:#F6F5FB`, `--ink:#1B1B3A`, `--line:#E4E1F5`…, радіуси `--radius-s/m/l` = 10/16/26 px). Урок перевизначає лише потрібне (розділ 3).
-Шрифти: `Baloo 2` (заголовки, лейбли, кнопки, цифри) + `Nunito Sans` (основний текст) через Google Fonts — `<link>` у `<head>` кожного уроку.
+Шрифти: `Baloo 2` (заголовки, лейбли, кнопки, цифри) + `Nunito Sans` (основний текст). **Шрифти лежать на сайті, не на Google Fonts** — щоб сторінки працювали без інтернету: у `<head>` кожної сторінки один рядок `<link rel="stylesheet" href="{шлях до кореня}assets/fonts/fonts.css">` (у шаблоні вже є). У `fonts.css` описано всі сімейства — Baloo 2, Nunito Sans, Roboto, JetBrains Mono, Material Symbols Outlined (усі значки, оптичний розмір 20, FILL 0/1) і декоративні Caveat, Lobster, Merriweather, PT Serif, Montserrat, Pacifico, Marck Script; браузер вантажить лише ті файли, якими сторінка справді пише. Посилань на `fonts.googleapis.com` у сторінках не ставити. Новий шрифт — рядок у `FAMILIES` у `_tools/build-fonts.py` і `python3 _tools/build-fonts.py` (завантажить `.woff2` у `assets/fonts/` і перебудує `fonts.css`; лише кирилиця й латиниця). У Baloo 2 кирилиці немає — українські заголовки й раніше показувались запасним шрифтом.
 Переноси рядків: ядро вмикає `text-wrap:pretty` для тексту й `text-wrap:balance` для заголовків, щоб в останньому рядку не лишалось одне-два слова. Абзаци, списки й запитання карток займають усю ширину контейнера — не звужувати їх `max-width` у `ch` і не балансувати запитання `.q`. Власні віджети з довгим текстом не повинні це вимикати; формулювання підбирати так, щоб рядки лягали рівно.
 
 ### Варіювати дизайн між уроками

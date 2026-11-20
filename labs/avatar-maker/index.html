@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Конструктор аватарів · Лабораторія</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
 <style>
   :root{
     --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
@@ -1188,18 +1186,20 @@ function toast(msg){
   clearTimeout(toast.t); toast.t = setTimeout(()=>t.classList.remove('show'), 2200);
 }
 /* Картинка з SVG не бачить шрифтів сторінки, тож написи (футболки, кепки) вийшли б звичайним Arial.
-   Тому вбудовуємо в SVG сам шрифт Baloo 2 — лише літери, що є в написах. Без інтернету — збережемо без нього. */
+   Тому вбудовуємо в SVG сам шрифт Baloo 2 з assets/fonts/ (латиниця — кирилиці в Baloo 2 немає).
+   Якщо файл не прочитався (сторінка відкрита як файл, без сервера) — збережемо без нього. */
 async function fontCSS(svg){
-  const chars = [...new Set((svg.match(/<text[^>]*>[^<]*/g)||[]).map(t=>t.replace(/<text[^>]*>/,'')).join(''))].join('');
-  if(!chars) return '';
+  if(!/<text[\s>]/.test(svg)) return '';
   try{
-    const ctl = new AbortController(); setTimeout(()=>ctl.abort(), 4000);
-    const css = await (await fetch('https://fonts.googleapis.com/css2?family=Baloo+2:wght@800&text=' + encodeURIComponent(chars), {signal:ctl.signal})).text();
-    const url = (css.match(/url\((https:[^)]+)\)/)||[])[1];
-    if(!url) return '';
-    const blob = await (await fetch(url, {signal:ctl.signal})).blob();
-    const data = await new Promise((ok, fail)=>{ const r = new FileReader(); r.onload = ()=>ok(r.result); r.onerror = fail; r.readAsDataURL(blob); });
-    return `<style>@font-face{font-family:'Baloo 2';font-weight:800;src:url(${data}) format('woff2');}</style>`;
+    const faces = await Promise.all([
+      ['baloo2-latin-400-800.woff2', 'U+0000-00FF,U+2000-206F'],
+      ['baloo2-latin-ext-400-800.woff2', 'U+0100-024F,U+1E00-1EFF'],
+    ].map(async ([file, range])=>{
+      const blob = await (await fetch('../../assets/fonts/' + file)).blob();
+      const data = await new Promise((ok, fail)=>{ const r = new FileReader(); r.onload = ()=>ok(r.result); r.onerror = fail; r.readAsDataURL(blob); });
+      return `@font-face{font-family:'Baloo 2';font-weight:400 800;src:url(${data}) format('woff2');unicode-range:${range};}`;
+    }));
+    return `<style>${faces.join('')}</style>`;
   }catch(e){ return ''; }
 }
 $('saveBtn').addEventListener('click', async ()=>{
