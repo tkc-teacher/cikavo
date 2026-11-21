@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Шкільна дискотека — Змінні та списки</title>
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#4A50C8,#FF9F1C); --accent:#4A50C8; --accent-dark:#33389A; --accent-soft:#ECEDFB; --bg:#F5F5FC; --line:#E0E1F3; }
+
+  .ms{font-family:'Material Symbols Outlined'; font-weight:normal; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; -webkit-font-feature-settings:'liga'; font-feature-settings:'liga';}
+
+  /* Клітинки Colab */
+  .nb{background:#fff; border:1px solid #DADCE0; border-radius:10px; padding:10px 14px 12px 6px; font-family:Roboto, Arial, sans-serif; margin:10px 0 4px;}
+  .nb-head{display:flex; align-items:center; gap:8px; padding:0 0 8px 8px; margin-bottom:8px; border-bottom:1px solid #E8EAED; font-size:16px;}
+  .nb-head img{width:34px; height:34px;}
+  .cell{display:grid; grid-template-columns:38px 1fr; gap:2px 4px; margin:6px 0;}
+  .cell .run{color:#444746; font-size:28px; font-variation-settings:'FILL' 1; justify-self:center; margin-top:2px;}
+  .cell pre{margin:0; background:#F7F7F7; border-radius:6px; padding:8px 12px; font-family:'JetBrains Mono', monospace; font-variant-ligatures:none; font-size:13.5px; line-height:1.55; white-space:pre-wrap; color:#1F1F1F; overflow-x:auto;}
+  .cell .out{grid-column:2; font-family:'JetBrains Mono', monospace; font-variant-ligatures:none; font-size:13.5px; line-height:1.5; white-space:pre-wrap; padding:4px 12px 2px; color:#1F1F1F;}
+  .cell.text{grid-template-columns:38px 1fr;}
+  .cell.text .md{font-size:22px; padding:2px 12px;}
+  .cell.text pre{color:#1F1F1F;}
+  .k{color:#AF00DB;} .f{color:#795E26;} .s{color:#A31515;} .n{color:#098658;} .c{color:#008000;}
+  .mine{background:#FFF1C2; border-radius:3px; box-shadow:0 0 0 1px #F2C94C;}
+
+  .ui{font-family:Roboto, Arial, sans-serif; font-weight:500; background:#F1F3F4; border-radius:6px; padding:0 6px; white-space:nowrap;}
+  .kbd{display:inline-block; font-family:Roboto, Arial, sans-serif; font-size:12.5px; font-weight:500; border:1px solid #C9CBD6; border-bottom-width:3px; border-radius:6px; padding:0 6px; background:#fff; color:#3C4043; white-space:nowrap;}
+  .legend{font-size:13.5px; color:var(--ink-soft, #555);}
+</style>
+</head>
+<body data-hud="8 клас · Практична · Шкільна дискотека">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 8 клас · Змінні та списки</div>
+    <h1>🎧 Шкільна дискотека</h1>
+    <p>Підготуй у Google Colab класну дискотеку: афіша, каса квитків і плейлист, а наприкінці Python сам стане діджеєм.</p>
+    <div class="meta"><span>⏱ 20–25 хв</span><span><img src="../../assets/logos/colab.svg" alt="">Google Colab</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <p>Блокнот, у якому шість клітинок коду — кожна зі своїм результатом. Ось перша:</p>
+    <div class="nb">
+      <div class="nb-head"><img src="../../assets/logos/colab.svg" alt="">Дискотека — Прізвище.ipynb</div>
+      <div class="cell"><span class="ms run">play_circle</span><pre class="hl">dj = "Оля"
+start = 18
+print("Діджей вечора:", dj)
+print("Початок о", start, "годині")</pre>
+        <div class="out">Діджей вечора: Оля
+Початок о 18 годині</div></div>
+      <div class="cell"><span class="ms run">play_circle</span><pre class="hl">price = 20
+...</pre></div>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи блокнот</h3>
+        <p>Обери один зі способів:</p>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🌐 Через сайт</div>
+            <ol>
+              <li>Відкрий <b>colab.research.google.com</b>.</li>
+              <li><span class="menu">+ New notebook</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Більше → Google Colaboratory</span>.</li>
+            </ol>
+          </div>
+        </div>
+        <p>Клацни назву <span class="ui">Untitled0.ipynb</span> угорі й назви блокнот: <b>Дискотека — Прізвище</b>.</p>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Афіша</h3>
+        <ol>
+          <li>Впиши програму в клітинку коду.</li>
+          <li>Заміни <span class="mine">виділене</span> на своє ім'я.</li>
+          <li>Запусти: <span class="kbd">Shift</span> + <span class="kbd">Enter</span>.</li>
+        </ol>
+        <div class="cell"><span class="ms run">play_circle</span><pre class="hl" data-mine="Оля">dj = "Оля"
+start = 18
+print("Діджей вечора:", dj)
+print("Початок о", start, "годині")
+print(type(dj), type(start))</pre></div>
+        <div class="check-val">Перевір себе: останній рядок — &lt;class 'str'&gt; &lt;class 'int'&gt;. Ім'я — рядок, година — ціле число.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Каса квитків</h3>
+        <p>Нова клітинка: <span class="ui">+ Code</span>. Програма спитає, скільки прийде гостей, і порахує гроші.</p>
+        <div class="cell"><span class="ms run">play_circle</span><pre class="hl">price = 20
+guests = int(input("Скільки гостей прийде? "))
+print("Зібрано за квитки:", guests * price, "грн")</pre></div>
+        <ul>
+          <li>Після запуску під клітинкою з'явиться поле — введи <b>25</b> і натисни <span class="kbd">Enter</span>.</li>
+          <li><span class="mono">input()</span> завжди дає рядок, тому <span class="mono">int()</span> перетворює його на число.</li>
+        </ul>
+        <div class="check-val">Перевір себе: «Зібрано за квитки: 500 грн».</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Плейлист</h3>
+        <p>Нова клітинка. Заміни <span class="mine">виділені</span> назви на 5 своїх улюблених пісень — кожна в лапках, між ними коми.</p>
+        <div class="cell"><span class="ms run">play_circle</span><pre class="hl" data-mine="Пісня 1|Пісня 2|Пісня 3|Пісня 4|Пісня 5">playlist = ["Пісня 1", "Пісня 2", "Пісня 3", "Пісня 4", "Пісня 5"]
+print("Пісень у плейлисті:", len(playlist))
+print("Відкриває вечір:", playlist[0])
+print("Фінальна пісня:", playlist[-1])</pre></div>
+        <div class="tip">Нумерація з нуля: <span class="mono">[0]</span> — перша пісня, <span class="mono">[-1]</span> — остання.</div>
+        <div class="check-val">Перевір себе: пісень — 5, виведено першу й п'яту з твого списку.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Замовлення від друзів</h3>
+        <p>Друг просить додати свою пісню, а одна з твоїх уже набридла. Нова клітинка:</p>
+        <div class="cell"><span class="ms run">play_circle</span><pre class="hl" data-mine="Пісня друга|Пісня 3">playlist.append("Пісня друга")
+playlist.remove("Пісня 3")
+print(playlist)</pre></div>
+        <div class="tip">У <span class="mono">remove</span> — назва однієї з твоїх пісень, <b>точнісінько</b> як у списку. Інакше буде помилка <span class="mono">ValueError</span>.</div>
+        <div class="check-val">Перевір себе: нова пісня — в кінці, видаленої немає.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Скільки триватиме музика</h3>
+        <p>Тривалість пісень у хвилинах — окремий список. Нова клітинка:</p>
+        <div class="cell"><span class="ms run">play_circle</span><pre class="hl">minutes = [3.5, 4.0, 2.5, 3.0, 4.5]
+print("Усього хвилин:", sum(minutes))
+print("Найдовша пісня:", max(minutes), "хв")</pre></div>
+        <div class="check-val">Перевір себе: усього — 17.5, найдовша — 4.5.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">7</div>
+      <div>
+        <h3>Режим діджея</h3>
+        <p>Нехай Python сам обере пісню. Нова клітинка:</p>
+        <div class="cell"><span class="ms run">play_circle</span><pre class="hl">import random
+print(dj, "ставить пісню:", random.choice(playlist))</pre></div>
+        <ul>
+          <li><span class="mono">random</span> — бібліотека випадковостей, <span class="mono">choice</span> обирає випадковий елемент списку;</li>
+          <li><span class="mono">dj</span> — змінна з кроку 2: у Colab її видно в усіх клітинках.</li>
+        </ul>
+        <div class="check-val">Перевір себе: запусти клітинку 3–4 рази клавішами <span class="kbd">Ctrl</span> + <span class="kbd">Enter</span> — пісня щоразу інша.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">8</div>
+      <div>
+        <h3>Перевір увесь блокнот</h3>
+        <ol>
+          <li>Меню <span class="menu">Runtime → Restart session and run all</span> — Colab «забуде» все й запустить клітинки по черзі згори донизу.</li>
+          <li>На касі знову введи кількість гостей.</li>
+          <li>Переконайся, що жодна клітинка не дала помилки.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Практична робота · «Змінні та команди. Типи даних і списки» · 8 клас</span></footer>
+
+<script src="../../assets/practice.js"></script>
+<script>
+/* Підсвітка коду в стилі Colab; data-mine — фрагменти, які учень замінює своїми */
+(()=>{
+  const KW = new Set('import from for in if else elif while def return and or not True False None'.split(' '));
+  const FN = new Set('print len sum max min append remove shuffle choice type int input'.split(' '));
+  const esc = s=>s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  document.querySelectorAll('pre.hl').forEach(pre=>{
+    const mine = (pre.dataset.mine || '').split('|').filter(Boolean);
+    pre.innerHTML = pre.textContent.replace(/(#.*)|("[^"\n]*"?)|(\b\d+(?:\.\d+)?\b)|(\b[A-Za-z_]\w*\b)|([^#"\w]+|\w+)/g, (m, c, s, n, w)=>{
+      if(c) return `<span class="c">${esc(c)}</span>`;
+      if(s){
+        const inner = s.slice(1, s.endsWith('"') && s.length > 1 ? -1 : undefined);
+        const body = mine.includes(inner) ? `<span class="mine">${esc(inner)}</span>` : esc(inner);
+        return `<span class="s">"${body}${s.length > 1 && s.endsWith('"') ? '"' : ''}</span>`;
+      }
+      if(n) return `<span class="n">${n}</span>`;
+      if(w) return KW.has(w) ? `<span class="k">${w}</span>` : FN.has(w) ? `<span class="f">${w}</span>` : w;
+      return esc(m);
+    });
+  });
+})();
+</script>
+</body>
+</html>
