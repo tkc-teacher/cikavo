@@ -96,6 +96,7 @@ pre.py-code{font-family:var(--code-font); font-size:14.5px; line-height:1.6; bac
 .var-box.t-float{--vb:#9B5DE5; --vb-soft:#F3EAFD;}
 .var-box.t-str{--vb:#2E9E5B; --vb-soft:#E4F5EA;}
 .var-box.t-bool{--vb:#3776AB; --vb-soft:#E6EFF8;}
+.var-box.t-list{--vb:#D6336C; --vb-soft:#FCE8EF;}
 .vb-tag{font-family:var(--code-font); font-weight:600; font-size:13px; color:#fff; background:var(--vb); border-radius:8px 8px 0 0; padding:1px 10px; transition:background .3s ease;}
 .vb-body{position:relative; align-self:stretch; height:52px; padding:0 16px; display:flex; align-items:center; justify-content:center; background:var(--vb-soft); border:2px solid var(--vb); border-radius:0 10px 10px 10px; overflow:hidden; transition:background .3s ease, border-color .3s ease;}
 .vb-val{font-family:var(--code-font); font-weight:600; font-size:17px; color:var(--ink); white-space:nowrap;}

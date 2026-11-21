@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Змінні та команди. Працюємо зі списками — Урок</title>
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<link rel="stylesheet" href="../../assets/python.css">
+<style>
+  :root{
+    --accent:#4A50C8; --accent-dark:#33389A; --accent-soft:#ECEDFB;
+    --label:#C46A00;
+    --bg:#F5F5FC; --line:#E0E1F3; --ink-soft:#4E5170;
+    --sun:#FF9F1C; --sun-soft:#FFF3E0; --sun-ink:#7A4300;
+    --hud-bar:linear-gradient(90deg, #4A50C8, #FF9F1C);
+    --pink:#D6336C; --pink-soft:#FCE8EF;
+  }
+
+  /* --- Список-коробка з відділеннями --- */
+  .lbox{display:inline-flex; flex-direction:column; align-items:flex-start; max-width:100%;}
+  .lb-tag{font-family:var(--code-font); font-weight:600; font-size:13px; color:#fff; background:var(--pink); border-radius:8px 8px 0 0; padding:1px 10px;}
+  .lb-body{display:flex; flex-wrap:wrap; background:var(--pink-soft); border:2px solid var(--pink); border-radius:0 12px 12px 12px; padding:8px; gap:6px;}
+  .lb-cell{display:flex; flex-direction:column; align-items:center; gap:3px; min-width:74px;}
+  .lb-i, .lb-n{font-family:var(--code-font); font-size:13px; font-weight:700;}
+  .lb-i{color:var(--accent-dark);}
+  .lb-n{color:#9A9CB8;}
+  .lb-v{font-family:var(--code-font); font-weight:600; font-size:16px; background:#fff; border:2px solid #F3B5CB; border-radius:10px; padding:8px 10px; width:100%; text-align:center; white-space:nowrap; transition:background .2s, border-color .2s, transform .2s;}
+  .lb-cell.hl .lb-v{background:#FFE9C7; border-color:var(--sun);}
+  .lb-cell.dim .lb-v{opacity:.45;}
+  .lb-cell.edge .lb-i{color:var(--sun-ink); text-decoration:underline dotted;}
+  .lbox.pick .lb-v{cursor:pointer;}
+  .lbox.pick .lb-v:hover{border-color:var(--accent); transform:translateY(-2px);}
+  .lb-cell.ok .lb-v{background:#DDF5E5; border-color:#2E9E5B;}
+  .lb-cell.wrong-flash .lb-v{background:#FDE2E2; border-color:#D64545; animation:shakeX .35s ease;}
+
+  .one-many{display:grid; grid-template-columns:auto 1fr; gap:14px 22px; align-items:center; margin:14px 0;}
+  .one-many .om-cap{font-size:15px; color:var(--ink-soft);}
+  @media (max-width:620px){ .one-many{grid-template-columns:1fr;} }
+
+  /* --- Гра «Знайди за індексом» --- */
+  .idx-game{display:flex; flex-direction:column; align-items:center; gap:14px;}
+  .idx-q{font-family:var(--code-font); font-size:20px; font-weight:600; background:var(--code-bg); color:var(--code-ink); border-radius:var(--radius-s); padding:8px 18px;}
+  .idx-legend{font-size:14px; color:var(--ink-soft); display:flex; gap:18px; flex-wrap:wrap; justify-content:center;}
+  .idx-legend b{font-family:var(--code-font);}
+
+  .cmd-list{list-style:none; padding:0; margin:12px 0; display:grid; gap:8px;}
+  .cmd-list li{display:grid; grid-template-columns:minmax(170px, auto) 1fr; gap:12px; align-items:center; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-s); padding:8px 12px;}
+  .cmd-list code{font-size:15px;}
+  @media (max-width:560px){ .cmd-list li{grid-template-columns:1fr; gap:4px;} }
+
+  .slice-ill{display:flex; flex-direction:column; align-items:center; gap:6px; margin:12px 0;}
+  .slice-ill .cap{font-family:var(--code-font); font-weight:600; color:var(--sun-ink);}
+
+  .match-chip code, .desc-text code{font-size:14.5px;}
+  /* команди функцій — у два рядки: 3 + 2 */
+  #fnPool .match-chip{flex:0 0 calc((100% - 16px) / 3); box-sizing:border-box; text-align:center;}
+
+  /* --- Google Colab: інструкція --- */
+  .how{counter-reset:how; list-style:none; padding:0; margin:12px 0; display:grid; gap:10px;}
+  .how li{counter-increment:how; position:relative; padding:10px 14px 10px 54px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m);}
+  .how li::before{content:counter(how); position:absolute; left:12px; top:9px; width:30px; height:30px; border-radius:50%; background:#F9AB00; color:#fff; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:17px; display:grid; place-items:center;}
+  .kbd{display:inline-block; font-family:Roboto, Arial, sans-serif; font-size:13px; font-weight:500; border:1px solid #C9CBD6; border-bottom-width:3px; border-radius:6px; padding:0 7px; background:#fff; color:#3C4043; white-space:nowrap;}
+  .ui{font-family:Roboto, Arial, sans-serif; font-weight:500; background:#F1F3F4; border-radius:6px; padding:0 6px; white-space:nowrap;}
+
+  /* --- Google Colab: макет і емулятор --- */
+  .ms{font-family:'Material Symbols Outlined'; font-weight:normal; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; -webkit-font-feature-settings:'liga'; font-feature-settings:'liga';}
+  .colab{position:relative; font-family:Roboto, Arial, sans-serif; color:#202124; background:#fff; border:1px solid #DADCE0; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(30,30,80,.08); text-align:left;}
+  .co-top{display:flex; align-items:center; gap:10px; padding:8px 12px 4px;}
+  .co-logo{width:42px; height:42px; flex:none;}
+  .co-titles{flex:1; min-width:0;}
+  .co-name-row{display:flex; align-items:center; gap:4px; font-size:18px;}
+  .co-name{padding:1px 6px; border-radius:4px; cursor:text; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .co-name:hover{outline:1px solid #DADCE0;}
+  .co-name-in{font:inherit; font-size:17px; border:2px solid #1A73E8; border-radius:4px; padding:0 6px; width:220px; max-width:100%;}
+  .co-name-row .ms{color:#5F6368; font-size:19px;}
+  .co-menu{display:flex; gap:12px; flex-wrap:nowrap; overflow:hidden; white-space:nowrap; font-size:13.5px; color:#3C4043; padding:2px 6px;}
+  .co-right{display:flex; align-items:center; gap:10px;}
+  .co-share{display:flex; align-items:center; gap:4px; font:inherit; font-size:13.5px; font-weight:500; border:1px solid #DADCE0; background:#fff; color:#3C4043; border-radius:18px; padding:5px 12px; cursor:default;}
+  .co-ava{width:30px; height:30px; border-radius:50%; background:#7E57C2; color:#fff; display:grid; place-items:center; font-size:14px; font-weight:500;}
+  .co-bar{display:flex; align-items:center; gap:4px; padding:4px 12px; border-top:1px solid #E8EAED; border-bottom:1px solid #E8EAED;}
+  .co-add{display:flex; align-items:center; gap:2px; font:inherit; font-size:13.5px; font-weight:500; color:#3C4043; background:none; border:none; border-radius:6px; padding:5px 9px; cursor:pointer;}
+  .co-add .ms{font-size:18px;}
+  .co-add:hover{background:#F1F3F4;}
+  .co-spacer{flex:1;}
+  .co-runall{display:flex; align-items:center; gap:2px; font-size:13.5px; font-weight:500; color:#3C4043; padding:5px 6px;}
+  .co-runall .ms{font-size:18px;}
+  .co-gear{color:#5F6368;}
+  .co-gear .ms{font-size:22px;}
+  @media (max-width:560px){ .co-runall{display:none;} }
+  .co-conn{display:flex; align-items:center; gap:6px; font-size:13px; color:#3C4043; border:1px solid #DADCE0; border-radius:16px; padding:3px 10px; white-space:nowrap;}
+  .co-conn .ms{font-size:17px; color:#188038;}
+  .co-conn .bars{display:inline-flex; flex-direction:column; gap:2px;}
+  .co-conn .bars i{display:block; width:34px; height:4px; border-radius:2px; background:#E8EAED; position:relative; overflow:hidden;}
+  .co-conn .bars i::after{content:''; position:absolute; inset:0 auto 0 0; width:var(--w); background:#188038;}
+  .co-conn.wait{color:#5F6368;}
+  .co-main{display:flex; min-height:240px;}
+  .co-side{display:flex; flex-direction:column; gap:14px; padding:12px 8px; border-right:1px solid #E8EAED; color:#5F6368;}
+  .co-cells{flex:1; min-width:0; padding:12px 14px 18px; display:flex; flex-direction:column; gap:10px;}
+  .co-cell{display:grid; grid-template-columns:44px 1fr; gap:4px 6px;}
+  .co-gut{display:flex; flex-direction:column; align-items:center; gap:2px; padding-top:4px;}
+  .co-run{width:30px; height:30px; border-radius:50%; border:none; background:none; color:#5F6368; display:grid; place-items:center; cursor:pointer; padding:0;}
+  .co-run .ms{font-size:26px; font-variation-settings:'FILL' 1;}
+  .co-run:hover{color:#202124; background:#F1F3F4;}
+  .co-run.busy{animation:co-spin 1s linear infinite; color:#1A73E8;}
+  @keyframes co-spin{to{transform:rotate(360deg);}}
+  .co-count{font-family:var(--code-font); font-size:11.5px; color:#80868B; min-height:14px;}
+  .co-box{background:#F7F7F7; border:1px solid transparent; border-radius:6px; min-width:0;}
+  .co-cell.focus .co-box{border-color:#C2C8D0; background:#F3F3F3;}
+  .co-box textarea{display:block; width:100%; box-sizing:border-box; resize:none; border:none; outline:none; background:transparent; font-family:var(--code-font); font-variant-ligatures:none; font-size:14.5px; line-height:1.5; color:#202124; padding:8px 10px; overflow:hidden;}
+  .co-out{grid-column:2; font-family:var(--code-font); font-variant-ligatures:none; font-size:14px; line-height:1.45; white-space:pre-wrap; padding:2px 10px 4px; color:#202124;}
+  .co-out:empty{display:none;}
+  .co-err{background:#FCE8E6; border-radius:4px; padding:6px 10px; margin-top:2px; color:#A50E0E;}
+  .co-err b{color:#A50E0E;}
+  .co-cell.text .co-box{background:none; border:1px dashed transparent;}
+  .co-cell.text.editing .co-box{background:#F7F7F7; border-color:#C2C8D0;}
+  .co-txt{font-family:Roboto, Arial, sans-serif; font-size:15px; padding:6px 10px; cursor:text; min-height:24px; white-space:pre-wrap;}
+  .co-txt h3{font-size:20px; margin:0; font-weight:500;}
+  .co-txt:empty::before{content:'Двічі клацни, щоб писати текст'; color:#9AA0A6;}
+  .co-cell.text textarea{font-family:Roboto, Arial, sans-serif; font-size:15px;}
+  .co-hl{outline:3px solid #F9AB00 !important; outline-offset:2px; border-radius:6px; animation:co-pulse 1.2s ease infinite;}
+  @keyframes co-pulse{50%{outline-color:rgba(249,171,0,.3);}}
+
+  .colab.static{pointer-events:none; user-select:none;}
+  .co-badge{position:absolute; z-index:2; width:24px; height:24px; border-radius:50%; background:var(--accent); color:#fff; font:800 14px 'Baloo 2',sans-serif; display:grid; place-items:center; box-shadow:0 0 0 3px #fff;}
+  .co-legend{display:grid; grid-template-columns:1fr 1fr; gap:6px 18px; list-style:none; padding:0; margin:12px 0 4px;}
+  .co-legend li{display:flex; gap:8px; align-items:baseline; font-size:15px;}
+  .co-legend li b.n{flex:none; width:22px; height:22px; border-radius:50%; background:var(--accent); color:#fff; font:800 13px 'Baloo 2',sans-serif; display:grid; place-items:center;}
+  @media (max-width:620px){ .co-legend{grid-template-columns:1fr;} .co-menu{display:none;} .co-side{display:none;} .co-share span:last-child{display:none;} }
+
+  /* --- Емулятор: завдання --- */
+  .co-wrap{display:grid; gap:14px;}
+  .co-tasks{background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:12px 14px;}
+  .co-tasks h3{margin:0 0 8px; font-family:'Baloo 2',sans-serif; font-size:17px; color:var(--accent-dark);}
+  .co-tasks ol{list-style:none; padding:0; margin:0; display:grid; grid-template-columns:1fr 1fr; gap:6px 14px;}
+  @media (max-width:620px){ .co-tasks ol{grid-template-columns:1fr;} }
+  .co-tasks li{display:grid; grid-template-columns:24px 1fr; gap:8px; font-size:14.5px; line-height:1.35; padding:6px 8px; border-radius:10px; cursor:pointer;}
+  .co-tasks li:hover{background:var(--accent-soft);}
+  .co-tasks li .tick{width:22px; height:22px; border-radius:50%; border:2px solid var(--line); display:grid; place-items:center; font-size:13px; color:#fff;}
+  .co-tasks li.done .tick{background:#2E9E5B; border-color:#2E9E5B;}
+  .co-tasks li.done{color:var(--ink-soft);}
+  .co-tasks li.cur{background:#FFF3E0;}
+  .co-fb{margin-top:10px; min-height:22px; font-size:14.5px;}
+  .co-fb.ok{color:#1E7B45; font-weight:600;}
+  .co-fb.tip{color:var(--sun-ink);}
+  .co-fb.err{color:#B3261E;}
+
+  /* --- «Як почати»: ілюстрації з інтерфейсу Colab і Google Диска --- */
+  .how li > p{margin:2px 0 8px;}
+  .how li > p.soft{margin:8px 0 0;}
+  .how-two{display:grid; gap:12px;}
+  .sh-cap{font-size:13.5px; color:var(--ink-soft); margin-bottom:4px;}
+  .g-ui{font-family:Roboto, Arial, sans-serif; font-size:13.5px; color:#1F1F1F;}
+  .sh{background:#fff; border:1px solid #DADCE0; border-radius:10px; overflow:hidden; max-width:560px; box-shadow:0 1px 4px rgba(60,64,67,.12);}
+  .sh img{width:18px; height:18px; flex:none;}
+  .sh .ms{font-size:18px;}
+  .g-ui .on{outline:2.5px solid #F9AB00; outline-offset:-1px; border-radius:6px;}
+  /* браузер */
+  .br-tabs{display:flex; align-items:flex-end; gap:6px; background:#DFE3E7; padding:6px 8px 0;}
+  .br-tab{display:flex; align-items:center; gap:8px; background:#fff; border-radius:8px 8px 0 0; padding:6px 10px; font-size:12.5px; white-space:nowrap; overflow:hidden;}
+  .br-tab .ms{font-size:15px; color:#5F6368;}
+  .br-plus{color:#5F6368; padding-bottom:6px;}
+  .br-bar{display:flex; align-items:center; gap:8px; padding:7px 10px; color:#5F6368;}
+  .br-url{flex:1; display:flex; align-items:center; gap:8px; background:#F1F3F4; border-radius:16px; padding:5px 12px; color:#1F1F1F; font-size:13.5px; white-space:nowrap; overflow:hidden;}
+  .br-url.on{border-radius:16px;}
+  /* Google Диск */
+  .dr{background:#F8FAFD; padding:10px 10px 12px;}
+  .dr-new{display:inline-flex; align-items:center; gap:8px; background:#fff; border-radius:14px; padding:9px 16px 9px 12px; box-shadow:0 1px 3px rgba(0,0,0,.25); font-weight:500;}
+  .dr-new .ms{font-size:22px;}
+  .dr-menus{display:flex; align-items:flex-end; margin-top:8px; max-width:480px;}
+  .dr-menu{background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.2); padding:4px 0; flex:1 1 0; min-width:0;}
+  .dr-menu.sub{margin-left:-6px; margin-bottom:-14px; position:relative;}
+  .dr .dr-menus{padding-bottom:14px;}
+  .dr-menu > div{display:flex; align-items:center; gap:10px; padding:5px 10px; white-space:nowrap; font-size:12.5px;}
+  .dr-menu .ms{color:#444746;}
+  .dr-menu .dr-arr{margin-left:auto;}
+  .dr-menu hr{border:0; border-top:1px solid #E1E3E1; margin:3px 0;}
+  .dr-menu .on{background:#E3EAF8;}
+  /* шапка Colab */
+  .cb-top{display:flex; align-items:center; gap:10px; padding:8px 12px 6px;}
+  .cb-logo{width:40px !important; height:40px !important;}
+  .cb-t{flex:1; min-width:0;}
+  .cb-name{display:flex; align-items:center; gap:6px; font-size:18px;}
+  .cb-menu{font-size:13px; color:#444746; padding-left:2px; white-space:nowrap; overflow:hidden;}
+  .cb-ic{color:#5F6368; font-size:22px !important;}
+  .cb-sign{background:#0B57D0; color:#fff; font-weight:500; border-radius:18px; padding:7px 18px;}
+  .cb-sign.on{outline-offset:2px; border-radius:18px;}
+  .cb-bar{display:flex; gap:16px; padding:6px 14px; border-top:1px solid #E8EAED; font-weight:500; color:#444746; font-size:13px;}
+  .cb-bar .ms{font-size:16px;}
+  .cb-edit{border:2px solid #0B57D0; border-radius:4px; padding:0 6px;}
+  .cb-edit.on{outline-offset:2px;}
+  .caret{display:inline-block; width:2px; height:20px; background:#1F1F1F; vertical-align:-3px; margin:0 1px; animation:caret 1s steps(1) infinite;}
+  @keyframes caret{50%{opacity:0;}}
+  /* вікно Open notebook */
+  .dl-head{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 14px 8px;}
+  .dl-head b{font-weight:400; font-size:18px;}
+  .dl-search{display:flex; align-items:center; gap:6px; border-bottom:1px solid #9AA0A6; color:#5F6368; padding:2px 4px; font-size:13px;}
+  .dl-body{display:grid; grid-template-columns:120px 1fr; border-top:1px solid #E8EAED;}
+  .dl-nav{padding:6px 0; border-right:1px solid #E8EAED;}
+  .dl-nav div{padding:6px 14px; font-size:13px; color:#444746;}
+  .dl-nav .cur{background:#E8F0FE; color:#0B57D0; font-weight:500; border-radius:0 16px 16px 0;}
+  .dl-list{padding:4px 12px;}
+  .dl-row{display:grid; grid-template-columns:1fr auto; gap:10px; padding:7px 0; border-bottom:1px solid #F1F3F4; font-size:13px;}
+  .dl-row > span:first-child{display:flex; align-items:center; gap:8px;}
+  .dl-row.th{color:#5F6368; font-size:12px;}
+  .dl-foot{display:flex; justify-content:space-between; align-items:center; padding:10px 14px; border-top:1px solid #E8EAED;}
+  .dl-new{display:inline-flex; align-items:center; gap:4px; color:#0B57D0; font-weight:500; padding:6px 10px;}
+  .dl-cancel{color:#0B57D0; font-weight:500; padding:6px 10px;}
+  /* клітинка */
+  .cb-cellshot{padding:12px 14px;}
+  .cb-cell{display:flex; align-items:flex-start; gap:8px;}
+  .cb-run{font-size:30px !important; color:#444746; font-variation-settings:'FILL' 1; border-radius:50% !important;}
+  .cb-code{flex:1; background:#F7F7F7; border-radius:6px; padding:8px 10px; font-family:var(--code-font); font-variant-ligatures:none; font-size:14px;}
+  .cb-out{font-family:var(--code-font); font-size:14px; padding:6px 0 0 48px;}
+</style>
+</head>
+<body data-lesson="lesson8-lists" data-hud="8 клас · Працюємо зі списками">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Розділ «Програмування»</div>
+      <h1>Змінні та команди. Працюємо зі списками</h1>
+      <p>Як зберегти багато значень в одній змінній, знайти потрібне за номером і змінити список. А наприкінці — Google Colab, де можна писати Python просто в браузері.</p>
+      <button class="btn-primary" onclick="document.getElementById('start').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none" aria-hidden="true">
+      <circle cx="70" cy="70" r="60" fill="#ECEDFB"/>
+      <!-- рейки -->
+      <rect x="10" y="102" width="120" height="5" rx="2.5" fill="#33389A"/>
+      <!-- паровозик -->
+      <rect x="96" y="62" width="30" height="34" rx="6" fill="#4A50C8"/>
+      <rect x="102" y="50" width="14" height="16" rx="3" fill="#33389A"/>
+      <rect x="104" y="70" width="14" height="10" rx="2" fill="#FFF3E0"/>
+      <circle cx="104" cy="98" r="6" fill="#33389A"/><circle cx="120" cy="98" r="6" fill="#33389A"/>
+      <circle cx="112" cy="40" r="5" fill="#E0E1F3"/><circle cx="104" cy="30" r="4" fill="#E0E1F3"/>
+      <!-- вагончики-елементи -->
+      <g font-family="monospace" font-weight="700" text-anchor="middle">
+        <rect x="64" y="66" width="28" height="28" rx="5" fill="#FCE8EF" stroke="#D6336C" stroke-width="3"/>
+        <text x="78" y="85" font-size="14" fill="#D6336C">2</text>
+        <rect x="34" y="66" width="28" height="28" rx="5" fill="#FCE8EF" stroke="#D6336C" stroke-width="3"/>
+        <text x="48" y="85" font-size="14" fill="#D6336C">1</text>
+        <rect x="4" y="66" width="28" height="28" rx="5" fill="#FFF3E0" stroke="#FF9F1C" stroke-width="3"/>
+        <text x="18" y="85" font-size="14" fill="#C46A00">0</text>
+      </g>
+      <circle cx="18" cy="98" r="5" fill="#33389A"/><circle cx="48" cy="98" r="5" fill="#33389A"/><circle cx="78" cy="98" r="5" fill="#33389A"/>
+      <path d="M32 80 H34 M62 80 H64 M92 80 H96" stroke="#33389A" stroke-width="3"/>
+      <text x="70" y="128" text-anchor="middle" font-family="monospace" font-weight="700" font-size="15" fill="#33389A">[ ]</text>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block">
+    <div class="step-label">Повторення · Змінні та типи даних</div>
+    <h2>Згадаймо минулий урок</h2>
+    <p>Ти вже вмієш зберігати значення у змінних і знаєш основні типи даних.</p>
+    <div class="exercise">
+      <p class="soft">Клацни термін, а потім — його пояснення.</p>
+      <div class="match-pool" id="repPool"></div>
+      <div id="repList"></div>
+      <div class="progress-line" id="repProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" id="start">
+    <div class="step-label">Крок 1 · Що таке список</div>
+    <h2>Багато значень в одній змінній</h2>
+    <p>У звичайній змінній — одне значення. А якщо треба зберегти всіх своїх улюбленців чи всі оцінки за місяць? Для цього є <b>список</b>.</p>
+    <ul>
+      <li><b>Список</b> (<code>list</code>) — упорядкований набір значень, збережений в одній змінній.</li>
+      <li><b>Елемент</b> — одне значення в списку.</li>
+    </ul>
+    <div class="one-many">
+      <div id="omOne"></div><div class="om-cap">Змінна — одне значення.</div>
+      <div id="omMany"></div><div class="om-cap">Список — багато значень у порядку, як вагончики потяга.</div>
+    </div>
+    <p>Список записують у <b>квадратних дужках</b>, елементи — <b>через кому</b>:</p>
+<pre class="py-code">
+pets = ["кіт", "пес", "хом'як", "папуга", "рибка"]
+marks = [10, 8, 11, 9]
+empty = []                    # порожній список
+mix = [14, "Оля", 1.65, True]  # можна змішувати типи
+</pre>
+    <div class="exercise">
+      <p class="soft">Чи правильно записано список?</p>
+      <div class="yn-grid" id="syntaxList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Індекси</div>
+    <h2>Кожен елемент має номер</h2>
+    <p>Номер елемента в списку називають <b>індексом</b>. Щоб дістати елемент, індекс пишуть у квадратних дужках після назви списку: <code>pets[1]</code>.</p>
+    <ul>
+      <li>нумерація починається з <b>нуля</b>: перший елемент — <code>pets[0]</code>;</li>
+      <li>від'ємні індекси рахують з кінця: <code>pets[-1]</code> — останній елемент;</li>
+      <li>індексу, якого немає, брати не можна: <code>pets[5]</code> — помилка <code>IndexError</code>.</li>
+    </ul>
+    <div class="exercise">
+      <div class="idx-game" id="idxGame"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Змінюємо список</div>
+    <h2>Замінити, додати, видалити</h2>
+    <p>Список можна змінювати після створення. Більшість команд пишуть <b>через крапку</b> після назви списку:</p>
+    <ul class="cmd-list">
+      <li><code>songs[0] = "Зірка"</code><span>замінити елемент з індексом 0</span></li>
+      <li><code>songs.append("Дощ")</code><span>додати елемент у кінець списку</span></li>
+      <li><code>songs.remove("Сонце")</code><span>видалити елемент за значенням (перший такий)</span></li>
+      <li><code>del songs[2]</code><span>видалити елемент за індексом</span></li>
+    </ul>
+    <p class="soft">Виконуй програму рядок за рядком і стеж за списком у пам'яті.</p>
+    <div id="trace1"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Функції для списків</div>
+    <h2>Скільки, сума, найбільше</h2>
+    <p>Python уміє швидко порахувати щось про весь список:</p>
+    <ul class="cmd-list">
+      <li><code>len(marks)</code><span>кількість елементів</span></li>
+      <li><code>sum(marks)</code><span>сума всіх елементів</span></li>
+      <li><span><code>max(marks)</code>, <code>min(marks)</code></span><span>найбільший і найменший елемент</span></li>
+      <li><code>marks.sort()</code><span>упорядкувати за зростанням</span></li>
+    </ul>
+    <div class="trivia"><code>sum()</code>, <code>max()</code> і <code>min()</code> не працюють зі змішаним списком, де є і числа, і текст.</div>
+    <div class="exercise">
+      <p class="soft">Список <code>marks = [9, 12, 6, 10, 6]</code>. Клацни команду, а потім — її результат.</p>
+      <div class="match-pool" id="fnPool"></div>
+      <div id="fnList"></div>
+      <div class="progress-line" id="fnProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Зрізи</div>
+    <h2>Беремо частину списку</h2>
+    <p><b>Зріз</b> — частина списку. Його записують двома індексами через двокрапку: <code>week[2:5]</code> — від індексу 2 <b>до</b> 5, але сам елемент з індексом 5 не входить.</p>
+    <div class="slice-ill" id="sliceIll"></div>
+    <ul>
+      <li><code>week[:3]</code> — від початку до індексу 3;</li>
+      <li><code>week[5:]</code> — від індексу 5 до кінця.</li>
+    </ul>
+    <div class="exercise">
+      <p class="soft">Що виведе програма?</p>
+      <div id="sliceList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Пишемо код</div>
+    <h2>Середній бал</h2>
+    <div id="task2"></div>
+  </section>
+
+  <section class="block" data-guide>
+    <div class="step-label">Крок 7 · Google Colab</div>
+    <h2>Python просто в браузері</h2>
+    <p><b>Google Colab</b> — безкоштовний онлайн-сервіс Google, у якому пишуть і запускають програми на Python. Нічого встановлювати не треба: потрібні лише браузер та обліковий запис Google.</p>
+    <ul>
+      <li>Файл Colab називають <b>блокнотом</b> (notebook), розширення — <code>.ipynb</code>.</li>
+      <li>Блокнот складається з <b>клітинок</b>: у клітинках коду — програма, у текстових — нотатки.</li>
+      <li>Результат з'являється одразу під клітинкою.</li>
+    </ul>
+
+    <h3>Як почати</h3>
+    <ol class="how">
+      <li>
+        <p>Відкрий Colab одним зі способів:</p>
+        <div class="how-two">
+          <div>
+            <div class="sh-cap">у браузері — адреса сайту</div>
+            <div class="sh g-ui">
+              <div class="br-tabs"><div class="br-tab"><img src="../../assets/logos/colab.svg" alt="">Welcome To Colab - Colab<span class="ms">close</span></div><span class="ms br-plus">add</span></div>
+              <div class="br-bar"><span class="ms">arrow_back</span><span class="ms">arrow_forward</span><span class="ms">refresh</span><div class="br-url on"><span class="ms">tune</span>colab.research.google.com</div></div>
+            </div>
+          </div>
+          <div>
+            <div class="sh-cap">або на Google Диску: <b>Створити → Більше</b></div>
+            <div class="sh g-ui dr">
+              <div class="dr-new"><span class="ms">add</span>Створити</div>
+              <div class="dr-menus">
+                <div class="dr-menu">
+                  <div><span class="ms">create_new_folder</span>Нова папка</div>
+                  <hr>
+                  <div><span class="ms">upload_file</span>Завантажити файл</div>
+                  <hr>
+                  <div><img src="../../assets/logos/docs.svg" alt="">Google Документи</div>
+                  <div><img src="../../assets/logos/sheets.svg" alt="">Google Таблиці</div>
+                  <div class="on"><span class="ms"></span>Більше<span class="ms dr-arr">chevron_right</span></div>
+                </div>
+                <div class="dr-menu sub">
+                  <div><span class="ms" style="color:#E94235">draw</span>Google Малюнки</div>
+                  <div><span class="ms" style="color:#1A73E8">language</span>Google Сайти</div>
+                  <div class="on"><img src="../../assets/logos/colab.svg" alt="">Google Colaboratory</div>
+                  <hr>
+                  <div><span class="ms">add</span>Під'єднати інші додатки</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="soft">Немає Colab у меню «Більше»? Обери <b>Під'єднати інші додатки</b>, знайди <b>Colaboratory</b> і натисни <b>Встановити</b>.</p>
+      </li>
+      <li>
+        <p>Увійди шкільним акаунтом Google — синя кнопка <span class="ui">Sign in</span> праворуч угорі.</p>
+        <div class="sh g-ui">
+          <div class="cb-top">
+            <img class="cb-logo" src="../../assets/logos/colab.svg" alt="">
+            <div class="cb-t"><div class="cb-name">Welcome To Colab</div><div class="cb-menu">File&nbsp; Edit&nbsp; View&nbsp; Insert&nbsp; Runtime&nbsp; Tools&nbsp; Help</div></div>
+            <span class="ms cb-ic">settings</span>
+            <span class="cb-sign on">Sign in</span>
+          </div>
+          <div class="cb-bar"><span>+ Code</span><span>+ Text</span><span><span class="ms">add_to_drive</span> Copy to Drive</span></div>
+        </div>
+      </li>
+      <li>
+        <p>У вікні <b>Open notebook</b> натисни <span class="ui">+ New notebook</span> — новий блокнот. Пізніше те саме — у меню <span class="ui">File</span> → <span class="ui">New notebook in Drive</span>.</p>
+        <div class="sh g-ui on-dlg">
+          <div class="dl-head"><b>Open notebook</b><div class="dl-search"><span class="ms">search</span>Search notebooks</div></div>
+          <div class="dl-body">
+            <div class="dl-nav"><div>Examples</div><div class="cur">Recent</div><div>Google Drive</div><div>GitHub</div><div>Upload</div></div>
+            <div class="dl-list">
+              <div class="dl-row th"><span>Title</span><span>Last opened</span></div>
+              <div class="dl-row"><span><img src="../../assets/logos/colab.svg" alt="">Welcome To Colab</span><span>0 minutes ago</span></div>
+            </div>
+          </div>
+          <div class="dl-foot"><span class="dl-new on"><span class="ms">add</span>New notebook</span><span class="dl-cancel">Cancel</span></div>
+        </div>
+      </li>
+      <li>
+        <p>Клацни назву <span class="ui">Untitled0.ipynb</span> угорі ліворуч, впиши свою — наприклад, «Списки» — і натисни <span class="kbd">Enter</span>.</p>
+        <div class="sh g-ui">
+          <div class="cb-top">
+            <img class="cb-logo" src="../../assets/logos/colab.svg" alt="">
+            <div class="cb-t"><div class="cb-name"><span class="cb-edit on">Списки<i class="caret"></i>.ipynb</span><span class="ms" style="color:#5F6368">star</span></div><div class="cb-menu">File&nbsp; Edit&nbsp; View&nbsp; Insert&nbsp; Runtime&nbsp; Tools&nbsp; Help</div></div>
+          </div>
+        </div>
+      </li>
+      <li>
+        <p>Напиши код у клітинці й запусти: кнопка <span class="ms">play_circle</span> ліворуч від клітинки або <span class="kbd">Shift</span> + <span class="kbd">Enter</span>. Результат з'явиться під клітинкою.</p>
+        <div class="sh g-ui cb-cellshot">
+          <div class="cb-cell"><span class="ms cb-run on">play_circle</span><div class="cb-code"><span style="color:#795E26">print</span>(<span style="color:#A31515">"Привіт, Colab!"</span>)</div></div>
+          <div class="cb-out">Привіт, Colab!</div>
+        </div>
+      </li>
+    </ol>
+
+    <h3>З чого складається вікно</h3>
+    <div id="colabShot"></div>
+    <ul class="co-legend">
+      <li><b class="n">1</b><span>Назва блокнота — клацни, щоб змінити.</span></li>
+      <li><b class="n">2</b><span>Меню: <span class="ui">File</span> — файл, <span class="ui">Runtime</span> — запуск програм.</span></li>
+      <li><b class="n">3</b><span><span class="ui">+ Code</span> — нова клітинка коду, <span class="ui">+ Text</span> — текстова.</span></li>
+      <li><b class="n">4</b><span>Запуск клітинки; число <code>[1]</code> — якою за порядком вона виконувалась.</span></li>
+      <li><b class="n">5</b><span>Результат роботи клітинки.</span></li>
+      <li><b class="n">6</b><span>Підключення до сервера Google: зелена галочка — усе готово.</span></li>
+    </ul>
+
+    <h3>Корисно знати</h3>
+    <ul>
+      <li><span class="kbd">Shift</span> + <span class="kbd">Enter</span> — запустити клітинку й перейти до наступної; <span class="kbd">Ctrl</span> + <span class="kbd">Enter</span> — запустити й лишитися в ній.</li>
+      <li>Змінні з однієї клітинки видно в інших, але лише <b>після</b> того, як ту клітинку запустили.</li>
+      <li>Блокнот зберігається сам — на Google Диску, у папці <b>Colab Notebooks</b>.</li>
+    </ul>
+    <div class="note">Colab може бути англійською — тут назви кнопок такі, як на екрані. Він також пропонує дописати код за допомогою ШІ: спершу спробуй сам, інакше не навчишся.</div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 8 · Спробуй Colab</div>
+    <h2>Перший блокнот</h2>
+    <p>Це тренажер, схожий на справжній Colab: код у ньому справді виконується. Виконай завдання під ним — клацни на завдання, і потрібне місце підсвітиться.</p>
+    <div class="co-wrap" id="colabEx">
+      <div id="colabEmu"></div>
+      <div class="co-tasks">
+        <h3>Завдання</h3>
+        <ol id="coTasks"></ol>
+        <div class="co-fb" id="coFb"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Урок · «Змінні та команди. Працюємо зі списками» · 8 клас</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script src="../../assets/python.js"></script>
+<script>
+const esc = s=>String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+/* Список-коробка: назва вкладкою, елементи з індексами зверху й від'ємними знизу */
+function listBox(name, items, {neg = true, cls = i=>''} = {}){
+  const n = items.length;
+  return `<div class="lbox"><div class="lb-tag">${name}</div><div class="lb-body">${items.map((v, i)=>
+    `<div class="lb-cell ${cls(i)}" data-i="${i}"><span class="lb-i">${i}</span><span class="lb-v">${esc(v)}</span>${neg ? `<span class="lb-n">${i - n}</span>` : ''}</div>`).join('')}</div></div>`;
+}
+
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('repPool', 'repList', [
+  { name:'<code>int</code>', desc:'Ціле число, наприклад 14' },
+  { name:'<code>float</code>', desc:'Дійсне число з крапкою: 1.65' },
+  { name:'<code>str</code>', desc:'Рядок — текст у лапках' },
+  { name:'<code>print()</code>', desc:'Виводить значення в консоль' },
+  { name:'<code>input()</code>', desc:'Чекає відповіді користувача й завжди повертає рядок' },
+  { name:'<code>int("12")</code>', desc:'Перетворює рядок на ціле число' }
+], 'repProgress');
+
+/* ---------- КРОК 1 ---------- */
+const PETS = ['"кіт"', '"пес"', '"хом\'як"', '"папуга"', '"рибка"'];
+document.getElementById('omOne').innerHTML = varBox('pet', '"кіт"');
+document.getElementById('omMany').innerHTML = listBox('pets', PETS, {neg:false});
+
+makeYesNo('syntaxList', [
+  { text:'<code>nums = [4, 8, 15]</code>', correct:true },
+  { text:'<code>nums = [4 8 15]</code>', correct:false, why:'Між елементами потрібні коми.' },
+  { text:'<code>days = ["Пн", "Вт"]</code>', correct:true },
+  { text:'<code>days = {"Пн", "Вт"}</code>', correct:false, why:'Фігурні дужки — це вже не список. Список — у квадратних.' },
+  { text:'<code>info = [13, "Тарас", True]</code>', correct:true, why:'У списку можуть бути значення різних типів.' },
+  { text:'<code>cities = ["Київ, "Львів"]</code>', correct:false, why:'Після «Київ» не закрито лапки.' }
+], 'Правильно', 'Неправильно');
+
+/* ---------- КРОК 2: знайди за індексом ---------- */
+(function(){
+  const box = document.getElementById('idxGame');
+  const QS = [1, 0, 3, -1];
+  const hit = trackTask(box, QS.length, QS.length);
+  let k = 0;
+  box.innerHTML = `<div class="idx-q"></div>${listBox('pets', PETS)}
+    <div class="idx-legend"><span><b style="color:var(--accent-dark)">0 1 2…</b> — індекси з початку</span><span><b style="color:#9A9CB8">-1 -2…</b> — з кінця</span></div>
+    <div class="choice-feedback"></div>`;
+  const q = box.querySelector('.idx-q'), fb = box.querySelector('.choice-feedback'), lb = box.querySelector('.lbox');
+  lb.classList.add('pick');
+  const ask = ()=>{
+    if(k === QS.length){ q.textContent = 'Усі елементи знайдено ✓'; lb.classList.remove('pick'); fb.className = 'choice-feedback ok'; fb.innerHTML = 'Молодець! Індекс <code>5</code> тут уже не існує — <code>pets[5]</code> дасть помилку.'; return; }
+    q.textContent = `print(pets[${QS[k]}])`;
+  };
+  lb.querySelectorAll('.lb-cell').forEach(c=>c.addEventListener('click', ()=>{
+    if(k === QS.length) return;
+    const want = (QS[k] + PETS.length) % PETS.length, i = +c.dataset.i;
+    if(i === want){
+      c.classList.add('ok'); setTimeout(()=>c.classList.remove('ok'), 700);
+      fb.className = 'choice-feedback ok'; fb.textContent = `Правильно ✓ pets[${QS[k]}] → ${PETS[i]}`;
+      addNeurons(1); hit(); k++; ask();
+    } else {
+      c.classList.remove('wrong-flash'); void c.offsetWidth; c.classList.add('wrong-flash');
+      setTimeout(()=>c.classList.remove('wrong-flash'), 600);
+      fb.className = 'choice-feedback';
+      fb.textContent = QS[k] < 0 ? 'Ні. Від’ємні індекси рахують з кінця: -1 — останній.' : 'Ні. Пам’ятай: нумерація починається з нуля.';
+    }
+  }));
+  ask();
+})();
+
+/* ---------- КРОК 3 ---------- */
+makeTrace('trace1', {
+  code:'songs = ["Мрія", "Сонце"]\nsongs.append("Дощ")\nsongs[0] = "Зірка"\nsongs.remove("Сонце")\nprint(songs)\nprint(len(songs))',
+  steps:[
+    { line:1, set:{ songs:"['Мрія', 'Сонце']" } },
+    { line:2, set:{ songs:"['Мрія', 'Сонце', 'Дощ']" }, ask:{ q:'Що зробить <code>songs.append("Дощ")</code>?', opts:['Додасть «Дощ» у кінець списку', 'Додасть «Дощ» на початок', 'Замінить останню пісню на «Дощ»'], correct:0 } },
+    { line:3, set:{ songs:"['Зірка', 'Сонце', 'Дощ']" }, ask:{ q:'Яку пісню замінить рядок 3?', opts:['«Сонце» — другу', '«Мрія» — з індексом 0', 'Усі пісні'], correct:1, why:'Індекс 0 — перший елемент.' } },
+    { line:4, set:{ songs:"['Зірка', 'Дощ']" }, ask:{ q:'Який вигляд матиме список після рядка 4?', opts:["['Зірка', 'Сонце']", "['Сонце']", "['Зірка', 'Дощ']"], correct:2 } },
+    { line:5, out:"['Зірка', 'Дощ']" },
+    { line:6, out:'2', ask:{ q:'Що виведе рядок 6?', opts:['3', '2', '1'], correct:1, why:'У списку лишилося два елементи.' } }
+  ]
+});
+
+/* ---------- КРОК 4 ---------- */
+makeMatching('fnPool', 'fnList', [
+  { name:'<code>len(marks)</code>', desc:'<code>5</code>' },
+  { name:'<code>sum(marks)</code>', desc:'<code>43</code>' },
+  { name:'<code>max(marks)</code>', desc:'<code>12</code>' },
+  { name:'<code>min(marks)</code>', desc:'<code>6</code>' },
+  { name:'<code>marks.sort()</code>', desc:'Список став <code>[6, 6, 9, 10, 12]</code>' }
+], 'fnProgress');
+
+/* ---------- КРОК 5 ---------- */
+const WEEK = ['"Пн"', '"Вт"', '"Ср"', '"Чт"', '"Пт"', '"Сб"', '"Нд"'];
+document.getElementById('sliceIll').innerHTML = `<div class="cap">week[2:5] → ['Ср', 'Чт', 'Пт']</div>` +
+  listBox('week', WEEK, {neg:false, cls:i=>i >= 2 && i < 5 ? 'hl' : i === 5 ? 'dim edge' : 'dim'});
+
+makeChoices('sliceList', [
+  { pre:pyCode('week = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"]\nprint(week[0:2])'), text:'Що з’явиться в консолі?', opts:["['Пн', 'Вт', 'Ср']", "['Пн', 'Вт']", "['Вт', 'Ср']"], correct:1, why:'Від індексу 0 до 2, а сам елемент з індексом 2 не входить.' },
+  { text:'Який зріз дасть робочі дні — з понеділка до п’ятниці?', opts:['<code>week[0:4]</code>', '<code>week[0:5]</code>', '<code>week[1:5]</code>'], correct:1, why:'П’ятниця має індекс 4, тож кінець зрізу — 5.' }
+]);
+
+/* ---------- КРОК 6 ---------- */
+makeCodeTask('task2', {
+  task:'Середній бал. До списку додали нову оцінку 12, а програма й далі ділить суму на 4. Виправ рядок 3: поділи суму на кількість оцінок — <code>len(grades)</code>.',
+  code:'grades = [10, 8, 11, 9]\ngrades.append(12)\naverage = sum(grades) / 4\nprint("Середній бал:", average)',
+  file:'grades.py',
+  expect:'Середній бал: 10.0',
+  hint:'average = sum(grades) / len(grades)',
+  check:(out, code)=>/len\s*\(\s*grades\s*\)/.test(code) || 'Ділити треба на len(grades) — тоді програма працюватиме з будь-якою кількістю оцінок.'
+});
+
+/* ---------- GOOGLE COLAB: макет і емулятор ---------- */
+const ms = i=>`<span class="ms">${i}</span>`;
+const CO_LOGO = `<img class="co-logo" src="../../assets/logos/colab.svg" alt="Colab">`;
+const CO_MARK = '@@co-mark-7731@@';
+
+/* colab(host, {name, connected, cells:[{type:'code'|'text', code, count, out}], static, on}) — макет Colab.
+   on(подія, дані): 'rename' {name}, 'run' {cell, via, ok, out, error}, 'add' {cell}, 'text' {cell}. */
+function colab(host, {name = 'Untitled0.ipynb', connected = false, cells = [], static:st = false, on = ()=>{}} = {}){
+  host.innerHTML = `<div class="colab${st ? ' static' : ''}">
+    <div class="co-top">${CO_LOGO}
+      <div class="co-titles">
+        <div class="co-name-row"><span class="co-name"></span>${ms('star')}</div>
+        <div class="co-menu"><span>File</span><span>Edit</span><span>View</span><span>Insert</span><span>Runtime</span><span>Tools</span><span>Help</span></div>
+      </div>
+      <div class="co-right"><span class="co-share">${ms('person_add')}<span>Share</span></span><span class="co-gear">${ms('settings')}</span><span class="co-ava">У</span></div>
+    </div>
+    <div class="co-bar">
+      <button class="co-add" type="button" data-add="code">${ms('add')}Code</button>
+      <button class="co-add" type="button" data-add="text">${ms('add')}Text</button>
+      <span class="co-runall">${ms('play_arrow')}Run all${ms('arrow_drop_down')}</span>
+      <span class="co-spacer"></span>
+      <span class="co-conn"></span>
+    </div>
+    <div class="co-main">
+      <div class="co-side">${['menu', 'search', 'data_object', 'key', 'folder'].map(ms).join('')}</div>
+      <div class="co-cells"></div>
+    </div>
+  </div>`;
+  const root = host.firstElementChild, list = root.querySelector('.co-cells'), conn = root.querySelector('.co-conn'), nameEl = root.querySelector('.co-name');
+  const all = [];
+  let hist = [], count = 0, isConn = connected;
+  const setConn = s=>{
+    conn.className = 'co-conn' + (s === 'wait' ? ' wait' : '');
+    conn.innerHTML = s === 'on' ? `${ms('check')}<span class="bars"><i style="--w:30%"></i><i style="--w:45%"></i></span><span>RAM · Disk</span>`
+      : s === 'wait' ? 'Connecting…' : `Connect ${ms('arrow_drop_down')}`;
+  };
+  setConn(connected ? 'on' : 'off');
+  const setName = n=>{ nameEl.textContent = n; };
+  setName(name);
+
+  const fit = ta=>{ ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; };
+
+  async function run(cell, via){
+    if(cell.busy) return;
+    cell.busy = true;
+    cell.runBtn.classList.add('busy');
+    cell.out.innerHTML = '';
+    if(!isConn){ setConn('wait'); await new Promise(r=>setTimeout(r, 1100)); isConn = true; setConn('on'); }
+    const src = cell.ta.value;
+    const full = (hist.length ? hist.join('\n') + '\n' : '') + `print("${CO_MARK}")\n` + src;
+    const res = await runPython(full, { write:()=>{}, ask:()=>Promise.resolve('') }).catch(e=>({ out:'', error:e }));
+    const i = res.out.indexOf(CO_MARK + '\n');
+    const text = i < 0 ? '' : res.out.slice(i + CO_MARK.length + 1);
+    cell.countEl.textContent = `[${++count}]`;
+    cell.out.textContent = text;
+    let error = null;
+    if(res.error && !['STOP', 'BIG'].includes(res.error.message)){
+      const raw = String(res.error.toString ? res.error.toString() : res.error).replace(/ on line \d+\s*$/, '');
+      const [tp, ...rest] = raw.split(': ');
+      error = { type:tp, text:rest.join(': ') };
+      cell.out.insertAdjacentHTML('beforeend', `<div class="co-err"><b>${esc(tp)}</b>${rest.length ? ': ' + esc(rest.join(': ')) : ''}</div>`);
+    } else hist.push(src);
+    cell.busy = false;
+    cell.runBtn.classList.remove('busy');
+    on('run', { cell, via, ok:!error, out:text, error });
+  }
+
+  function focusCell(cell){
+    all.forEach(c=>c.el.classList.toggle('focus', c === cell));
+  }
+
+  function addCell({type = 'code', code = '', count:cnt, out = ''} = {}, after){
+    const el = document.createElement('div');
+    el.className = 'co-cell' + (type === 'text' ? ' text' : '');
+    const cell = { type, el };
+    if(type === 'code'){
+      el.innerHTML = `<div class="co-gut"><button class="co-run" type="button" title="Запустити клітинку">${ms('play_circle')}</button><span class="co-count">${cnt ? `[${cnt}]` : '[ ]'}</span></div>
+        <div class="co-box"><textarea spellcheck="false" autocapitalize="off" autocomplete="off" wrap="off" rows="1" aria-label="Клітинка коду"${st ? ' readonly tabindex="-1"' : ''}></textarea></div>
+        <div class="co-out"></div>`;
+      Object.assign(cell, { ta:el.querySelector('textarea'), runBtn:el.querySelector('.co-run'), countEl:el.querySelector('.co-count'), out:el.querySelector('.co-out') });
+      cell.ta.value = code;
+      cell.out.textContent = out;
+      cell.runBtn.addEventListener('click', ()=>{ focusCell(cell); run(cell, 'button'); });
+      cell.ta.addEventListener('focus', ()=>{ focusCell(cell); loadPy(); });
+      cell.ta.addEventListener('input', ()=>fit(cell.ta));
+      cell.ta.addEventListener('keydown', e=>{
+        if(e.key !== 'Enter' || !(e.shiftKey || e.ctrlKey || e.metaKey)){
+          if(e.key === 'Tab' && !e.shiftKey){ e.preventDefault(); cell.ta.setRangeText('  ', cell.ta.selectionStart, cell.ta.selectionEnd, 'end'); }
+          return;
+        }
+        e.preventDefault();
+        run(cell, e.shiftKey ? 'shift' : 'ctrl');
+        if(e.shiftKey){ const next = all[all.indexOf(cell) + 1]; if(next?.ta) next.ta.focus(); else if(next) focusCell(next); }
+      });
+    } else {
+      el.innerHTML = `<div class="co-gut"></div><div class="co-box"><div class="co-txt"></div><textarea hidden aria-label="Текстова клітинка"></textarea></div>`;
+      Object.assign(cell, { txt:el.querySelector('.co-txt'), ta:null, area:el.querySelector('textarea') });
+      const render = ()=>{
+        const v = cell.area.value.trim();
+        cell.txt.innerHTML = v.split('\n').map(l=>/^#+\s/.test(l) ? `<h3>${esc(l.replace(/^#+\s/, ''))}</h3>` : esc(l)).join('\n');
+      };
+      const edit = ()=>{ if(st) return; el.classList.add('editing'); cell.txt.hidden = true; cell.area.hidden = false; fit(cell.area); cell.area.focus(); focusCell(cell); };
+      cell.txt.addEventListener('dblclick', edit);
+      cell.txt.addEventListener('click', ()=>{ if(!cell.area.value) edit(); });
+      cell.area.addEventListener('input', ()=>fit(cell.area));
+      const done = ()=>{ el.classList.remove('editing'); cell.area.hidden = true; cell.txt.hidden = false; render(); on('text', { cell, text:cell.area.value.trim() }); };
+      cell.area.addEventListener('blur', done);
+      cell.area.addEventListener('keydown', e=>{ if(e.key === 'Enter' && (e.shiftKey || e.ctrlKey || e.metaKey)){ e.preventDefault(); cell.area.blur(); } });
+      cell.area.value = code; render();
+      cell.edit = edit;
+    }
+    const idx = after ? all.indexOf(after) + 1 : all.length;
+    if(idx < all.length) all[idx].el.before(el); else list.appendChild(el);
+    all.splice(idx, 0, cell);
+    if(cell.ta) requestAnimationFrame(()=>fit(cell.ta));
+    return cell;
+  }
+
+  let loaded = false;
+  const loadPy = ()=>{ if(!loaded){ loaded = true; runPython('', { write(){}, ask:()=>Promise.resolve('') }).catch(()=>{}); } };
+
+  cells.forEach(c=>addCell(c));
+  document.fonts?.ready.then(()=>all.forEach(c=>c.ta && fit(c.ta)));
+  if(!st){
+    nameEl.addEventListener('click', ()=>{
+      const inp = document.createElement('input');
+      inp.className = 'co-name-in';
+      inp.value = nameEl.textContent;
+      nameEl.replaceWith(inp);
+      inp.focus(); inp.select();
+      let closed = false;
+      const finish = ()=>{
+        if(closed) return; closed = true;
+        let v = inp.value.trim() || 'Untitled0.ipynb';
+        if(!/\.ipynb$/i.test(v)) v += '.ipynb';
+        setName(v); inp.replaceWith(nameEl);
+        on('rename', { name:v });
+      };
+      inp.addEventListener('keydown', e=>{ if(e.key === 'Enter') finish(); if(e.key === 'Escape'){ inp.value = nameEl.textContent; finish(); } });
+      inp.addEventListener('blur', finish);
+    });
+    root.querySelectorAll('.co-add').forEach(b=>b.addEventListener('click', ()=>{
+      const cur = all.find(c=>c.el.classList.contains('focus'));
+      const cell = addCell({ type:b.dataset.add }, cur);
+      if(cell.ta) cell.ta.focus(); else cell.edit();
+      on('add', { cell });
+    }));
+  }
+  return { root, cells:all };
+}
+
+/* Статичний макет з номерами */
+(function(){
+  const host = document.getElementById('colabShot');
+  const ui = colab(host, { name:'Списки.ipynb', connected:true, static:true, cells:[
+    { code:'pets = ["кіт", "пес", "рибка"]\nprint(pets[0])', count:1, out:'кіт' },
+    { code:'print(len(pets))', count:2, out:'3' }
+  ]});
+  const r = ui.root;
+  const badge = (el, n, dx = 0, dy = 0, right = false)=>{
+    const a = el.getBoundingClientRect(), b = r.getBoundingClientRect();
+    if(right) dx += a.width;
+    const i = document.createElement('i');
+    i.className = 'co-badge'; i.textContent = n;
+    i.style.left = (a.left - b.left + dx) + 'px'; i.style.top = (a.top - b.top + dy) + 'px';
+    r.appendChild(i);
+  };
+  const place = ()=>{
+    r.querySelectorAll('.co-badge').forEach(b=>b.remove());
+    const m = r.querySelector('.co-menu');
+    badge(r.querySelector('.co-name-row .ms'), 1, 6, -2, true);
+    if(m.offsetParent) badge(m.lastElementChild, 2, 6, -4, true);
+    badge(r.querySelector('.co-add'), 3, -10, -12);
+    badge(ui.cells[0].runBtn, 4, -22, -10);
+    badge(ui.cells[0].out, 5, -22, -2);
+    badge(r.querySelector('.co-conn'), 6, -14, -12);
+  };
+  requestAnimationFrame(place);
+  document.fonts?.ready.then(place);
+  addEventListener('resize', place);
+})();
+
+/* Емулятор із завданнями */
+(function(){
+  const wrap = document.getElementById('colabEx'), fb = document.getElementById('coFb'), tl = document.getElementById('coTasks');
+  const TASKS = [
+    { t:'Перейменуй блокнот на <b>Списки</b>: клацни назву вгорі, впиши й натисни <span class="kbd">Enter</span>.', hl:()=>ui.root.querySelector('.co-name') },
+    { t:'Запусти першу клітинку кнопкою <span class="ms">play_circle</span>.', hl:()=>ui.cells[0].runBtn },
+    { t:'Запусти другу клітинку клавішами: клацни в неї й натисни <span class="kbd">Shift</span> + <span class="kbd">Enter</span>.', hl:()=>ui.cells[1].el.querySelector('.co-box') },
+    { t:'Натисни <span class="ui">+ Code</span> і в новій клітинці виведи кількість фруктів: <code>print(len(fruits))</code>. Запусти.', hl:()=>ui.root.querySelector('.co-add[data-add="code"]') }
+  ];
+  const done = TASKS.map(()=>false);
+  const hit = trackTask(wrap, TASKS.length, TASKS.length);
+  const original = new Set();
+  const say = (cls, html)=>{ fb.className = 'co-fb ' + cls; fb.innerHTML = html; };
+  const bad = html=>{ wrap.classList.remove('wrong-try'); void wrap.offsetWidth; wrap.classList.add('wrong-try'); setTimeout(()=>wrap.classList.remove('wrong-try'), 700); say('err', html); };
+  const complete = (i, msg)=>{
+    if(done[i]) return;
+    done[i] = true; addNeurons(1); hit();
+    render();
+    say('ok', done.every(Boolean) ? 'Усе виконано ✓ Тепер ти готовий працювати в справжньому Colab!' : 'Готово ✓ ' + (msg || ''));
+  };
+  const render = ()=>{
+    const cur = done.indexOf(false);
+    tl.innerHTML = TASKS.map((x, i)=>`<li class="${done[i] ? 'done' : ''}${i === cur ? ' cur' : ''}" data-i="${i}"><span class="tick">${done[i] ? '✓' : ''}</span><span>${x.t}</span></li>`).join('');
+  };
+  tl.addEventListener('click', e=>{
+    const li = e.target.closest('li'); if(!li) return;
+    const el = TASKS[+li.dataset.i].hl(); if(!el) return;
+    el.classList.add('co-hl'); el.scrollIntoView({ block:'nearest', behavior:'smooth' });
+    setTimeout(()=>el.classList.remove('co-hl'), 2600);
+  });
+
+  const ui = colab(document.getElementById('colabEmu'), {
+    cells:[
+      { code:'fruits = ["яблуко", "груша", "слива"]' },
+      { code:'fruits.append("ківі")\nprint(fruits)' }
+    ],
+    on(type, d){
+      if(type === 'rename'){
+        if(/^списки\.ipynb$/i.test(d.name)) complete(0, 'Назву змінено — блокнот уже збережено на Google Диску.');
+        else if(!done[0] && d.name !== 'Untitled0.ipynb') bad('Назва має бути «Списки».');
+      }
+      if(type === 'run'){
+        const idx = ui.cells.indexOf(d.cell);
+        if(!d.ok){
+          if(d.error.type === 'NameError') bad(`Змінної ще немає. Спершу запусти клітинку, де її створюють, — у Colab важливий порядок запуску.`);
+          else bad('У клітинці помилка — виправ і запусти ще раз.');
+          return;
+        }
+        if(original.has(d.cell) && idx === 0) complete(1, 'Клітинка без print() нічого не показує, але список уже в пам’яті.');
+        else if(original.has(d.cell) && idx === ui.cells.indexOf(second)){
+          if(d.via === 'shift') complete(2, 'Shift + Enter запускає клітинку й переходить далі.');
+          else if(!done[2]) say('tip', 'Клітинка спрацювала. А тепер спробуй клавішами: клацни в неї й натисни Shift + Enter.');
+        } else if(!original.has(d.cell)){
+          if(/len\s*\(\s*fruits\s*\)/.test(d.cell.ta.value) && /^\d+\s*$/.test(d.out)) complete(3, `Елементів у списку: ${d.out.trim()}. Якщо запускати другу клітинку кілька разів, «ківі» додається щоразу.`);
+          else if(!done[3]) say('tip', 'Клітинка працює. Для завдання виведи <code>print(len(fruits))</code>.');
+        }
+      }
+    }
+  });
+  ui.cells.forEach(c=>original.add(c));
+  const second = ui.cells[1];
+  render();
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Який запис створює список?', opts:['<code>nums = [3 5 8]</code>', '<code>nums = [3, 5, 8]</code>', '<code>nums = (3; 5; 8)</code>'], correct:1 },
+  { q:'Що виведе програма?' + pyCode('colors = ["red", "green", "blue"]\nprint(colors[1])'), opts:['red', 'green', 'blue'], correct:1, why:'Нумерація з нуля: індекс 1 — другий елемент.' },
+  { q:'У списку 5 елементів. Який індекс в останнього?', opts:['5', '0', '4'], correct:2, why:'Індекси — від 0 до 4. Ще можна написати -1.' },
+  { q:'Що виведе програма?' + pyCode('a = [1, 2]\na.append(3)\nprint(a)'), opts:['[3, 1, 2]', '[1, 2, 3]', '[1, 2]'], correct:1, why:'append() додає елемент у кінець.' },
+  { q:'Що виведе програма?' + pyCode('n = [10, 20, 30, 40]\nprint(n[1:3])'), opts:['[20, 30]', '[10, 20, 30]', '[20, 30, 40]'], correct:0, why:'Від індексу 1 до 3, без елемента з індексом 3.' },
+  { q:'Як запустити клітинку в Google Colab?', opts:['Кнопкою запуску ліворуч або Shift + Enter', 'Двічі клацнути назву блокнота', 'Натиснути «+ Code»'], correct:0 }
+], {summary:'Тепер ти вмієш створювати списки, діставати елементи за індексом, змінювати список, рахувати len, sum, max і min, брати зрізи — і знаєш, як почати працювати в Google Colab.', html:true});
+</script>
+
+</body>
+</html>

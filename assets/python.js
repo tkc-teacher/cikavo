@@ -13,7 +13,8 @@
      makeFindBug(id, [{code, line, why}]) — «У якому рядку помилка?»: клац на рядок коду.
      makeTrace(id, {code, steps}) — покрокове виконання: код, «Пам'ять» з коробками-змінними й консоль;
        перед деякими рядками учень передбачає, що станеться (див. коментар біля функції).
-     varBox(name, 'значення') — коробка змінної для ілюстрацій (рядок HTML; тип — за записом значення).
+     varBox(name, 'значення') — коробка змінної для ілюстрацій (рядок HTML; тип — за записом значення, [..] — список).
+     runPython(code, {write(text), ask(prompt) → Promise<string>}) → Promise<{out, error}> — запуск коду для власних віджетів (напр. емулятор Colab).
      pyCode(src) — підсвічений блок коду (рядок HTML) — напр. для pre у makeChoices.
    Статичні приклади в розмітці: <pre class="py-code">…</pre> — підсвічуються самі.
    Skulpt (assets/skulpt/) вантажиться лише під час першого запуску чи фокуса в редакторі. */
@@ -391,8 +392,8 @@ function makeFindBug(id, items){
 }
 
 /* ---------- ЗМІННІ-КОРОБКИ ---------- */
-// Тип за записом значення: "текст" — str, True/False — bool, з крапкою — float, інакше — int
-const litType = v=>/^["']/.test(v) ? 'str' : /^(True|False)$/.test(v) ? 'bool' : /\./.test(v) ? 'float' : 'int';
+// Тип за записом значення: [..] — list, "текст" — str, True/False — bool, з крапкою — float, інакше — int
+const litType = v=>/^\[/.test(v) ? 'list' : /^["']/.test(v) ? 'str' : /^(True|False)$/.test(v) ? 'bool' : /\./.test(v) ? 'float' : 'int';
 const boxInner = val=>`<span class="vb-val">${esc(val)}</span>`;
 // Коробка змінної: назва зверху, значення всередині, колір — за типом
 const varBox = (name, val)=>`<div class="var-box t-${litType(val)}" data-name="${name}"><div class="vb-tag">${name}</div><div class="vb-body">${boxInner(val)}</div></div>`;
@@ -484,5 +485,5 @@ function makeTrace(id, {code, steps}){
   mark();
 }
 
-Object.assign(window, { makeCodeTask, makeSandbox, makeFindBug, makeTrace, pyCode, varBox });
+Object.assign(window, { makeCodeTask, makeSandbox, makeFindBug, makeTrace, pyCode, varBox, runPython });
 })();
