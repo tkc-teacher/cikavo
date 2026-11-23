@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Представлення інформації та способи її опрацювання — Урок</title>
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  :root{
+    --accent:#E8590C; --accent-dark:#B8460A; --accent-soft:#FFF0E6;
+    --label:#1971C2;
+    --bg:#FFF9F4; --line:#F3E1D3;
+    --hud-bar:linear-gradient(90deg,#E8590C,#FAB005);
+    --c-text:#1971C2; --c-table:#2F9E44; --c-chart:#E8590C; --c-pic:#AE3EC9;
+  }
+  .block ul{padding-left:22px;}
+  .block li{margin-bottom:5px;}
+
+  /* Крок 1: одна інформація — чотири способи */
+  .ways-tabs{display:flex; gap:8px; flex-wrap:wrap; margin:12px 0 10px;}
+  .way-tab{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15.5px; border:2px solid var(--line); background:var(--surface); color:var(--ink); border-radius:999px; padding:7px 16px 6px; cursor:pointer; display:flex; align-items:center; gap:7px; transition:border-color .15s, background .15s;}
+  .way-tab:hover{border-color:var(--c);}
+  .way-tab.seen::after{content:'✓'; color:var(--c); font-weight:800;}
+  .way-tab.active{border-color:var(--c); background:color-mix(in srgb, var(--c) 12%, #fff); color:var(--c);}
+  .way-tab .dot{width:10px; height:10px; border-radius:50%; background:var(--c);}
+  .way-stage{background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:18px 20px; min-height:230px; display:flex; flex-direction:column; justify-content:center;}
+  .way-stage .hint{font-size:14px; color:var(--ink-soft); text-align:center; margin:0;}
+  .way-panel{animation:wayIn .3s ease;}
+  @keyframes wayIn{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;}}
+  .way-panel .way-text{font-size:17px; line-height:1.6; margin:0;}
+  .way-note{margin-top:14px; font-size:14px; color:var(--ink-soft); border-top:1px dashed var(--line); padding-top:10px;}
+  .way-note b{color:var(--c);}
+  .fr-table{border-collapse:collapse; margin:0 auto; font-size:16px; min-width:260px;}
+  .fr-table th, .fr-table td{border:1.5px solid #CFE3D4; padding:7px 18px; text-align:left;}
+  .fr-table th{background:#E6F4EA; font-family:'Baloo 2',sans-serif; color:#1E6B30;}
+  .fr-table td:last-child{text-align:center; font-weight:700;}
+  .bars{display:flex; flex-direction:column; gap:9px; max-width:460px; margin:0 auto; width:100%;}
+  .bar-row{display:grid; grid-template-columns:90px 1fr; align-items:center; gap:10px; font-weight:700; font-size:15px;}
+  .bar-track{height:26px; border-bottom:none;}
+  .bar-fill{height:100%; border-radius:0 8px 8px 0; background:var(--c-chart); display:flex; align-items:center; justify-content:flex-end; padding-right:8px; color:#fff; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; animation:grow .7s ease both;}
+  .bar-fill.top{background:#D9480F;}
+  @keyframes grow{from{width:0;}}
+  .picto{display:flex; flex-direction:column; gap:8px; max-width:520px; margin:0 auto; width:100%;}
+  .picto-row{display:grid; grid-template-columns:90px 1fr; align-items:center; gap:10px; font-weight:700; font-size:15px;}
+  .picto-row .icons{font-size:22px; letter-spacing:2px; line-height:1;}
+  .picto-key{font-size:13.5px; color:var(--ink-soft); text-align:right;}
+
+  /* Крок 3: текст у таблицю */
+  .src-text{background:#FFFDF6; border:1.5px solid #EADFC5; border-radius:var(--radius-m); padding:14px 18px; font-size:16px; line-height:1.6; position:relative;}
+  .src-text::before{content:'Текст'; position:absolute; top:-11px; left:14px; background:var(--c-text); color:#fff; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12.5px; padding:1px 10px; border-radius:999px;}
+  .tf-arrow{text-align:center; font-size:26px; color:var(--accent); line-height:1; margin:8px 0 4px;}
+  .tf-wrap{overflow-x:auto;}
+  .tf-table{border-collapse:collapse; width:100%; min-width:460px; font-size:15.5px;}
+  .tf-table th{background:#E6F4EA; color:#1E6B30; font-family:'Baloo 2',sans-serif; font-size:15.5px; border:1.5px solid #CFE3D4; padding:7px 10px; text-align:left;}
+  .tf-table td{border:1.5px solid #CFE3D4; padding:5px 6px; height:46px; vertical-align:middle;}
+  .tf-table td.animal{font-weight:700; padding-left:10px; white-space:nowrap; background:#FAFDF9;}
+  .tf-cell{cursor:pointer; transition:background .15s;}
+  .tf-cell:not(.filled){background:repeating-linear-gradient(45deg,#fff,#fff 6px,#F8F6F2 6px,#F8F6F2 12px);}
+  .tf-cell:not(.filled):hover, .tf-cell.drop-over{background:var(--accent-soft);}
+  .tf-cell.wrong{animation:tfShake .35s; background:#FFE3E3;}
+  @keyframes tfShake{25%{transform:translateX(-4px);} 75%{transform:translateX(4px);}}
+  .tf-cell.filled{cursor:default;}
+  .tf-pool{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; justify-content:center;}
+  .tf-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:15px; background:var(--surface); border:2px solid var(--line); border-radius:999px; padding:6px 14px 5px; cursor:pointer; user-select:none; -webkit-user-select:none; touch-action:none;}
+  .tf-chip:hover{border-color:color-mix(in srgb, var(--accent) 45%, var(--line));}
+  .tf-chip.selected{border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);}
+  .tf-cell .tf-chip{background:#E6F4EA; border-color:#9BD3A8; cursor:default; display:inline-block;}
+
+  /* Крок 4: пам'ять */
+  .mem{display:grid; gap:10px; margin:14px 0 6px;}
+  .mem-row{display:grid; grid-template-columns:140px 1fr; align-items:center; gap:12px; font-weight:700; font-size:15px;}
+  .mem-row .who{display:flex; align-items:center; gap:6px;}
+  .mem-row .who span{font-size:22px;}
+  .mem-track{background:#F3EEE9; border-radius:999px; height:24px; overflow:hidden;}
+  .mem-fill{height:100%; border-radius:999px; display:flex; align-items:center; justify-content:flex-end; padding-right:10px; font-family:'Baloo 2',sans-serif; font-weight:700; color:#fff; font-size:14px; white-space:nowrap;}
+  @media (max-width:520px){ .mem-row{grid-template-columns:1fr;} }
+
+  /* Крок 4: канали */
+  .channels{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:12px 0 6px;}
+  @media (max-width:640px){ .channels{grid-template-columns:1fr;} }
+  .ch{background:var(--surface); border:1.5px solid var(--line); border-top:5px solid var(--c); border-radius:var(--radius-m); padding:12px 14px; text-align:center;}
+  .ch svg{width:70px; height:70px; display:block; margin:0 auto 4px;}
+  .ch b{font-family:'Baloo 2',sans-serif; font-size:18px; color:var(--c); display:block; line-height:1.15;}
+  .ch .q{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; color:var(--ink); display:block; margin:2px 0 4px;}
+  .ch span{font-size:13.5px; color:var(--ink-soft); line-height:1.35; display:block;}
+  .bucket-title .em{font-size:20px; display:block;}
+
+  /* Крок 5: причини */
+  .causes{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:12px 0 8px;}
+  @media (max-width:640px){ .causes{grid-template-columns:repeat(2,minmax(0,1fr));} }
+  .cause{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px 12px; display:flex; gap:10px; align-items:flex-start;}
+  .cause .ic{font-size:26px; line-height:1; flex-shrink:0;}
+  .cause b{font-family:'Baloo 2',sans-serif; font-size:15.5px; line-height:1.15; display:block;}
+  .cause span{font-size:13px; color:var(--ink-soft); line-height:1.3; display:block;}
+
+  /* Крок 6: зала */
+  .hall{position:relative; z-index:0; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:10px; }
+  .hall svg{width:100%; height:auto; display:block;}
+  .hall .eq{cursor:pointer;}
+  .hall .eq .hl{fill:transparent; stroke:transparent; stroke-width:3; stroke-dasharray:6 4; transition:stroke .15s, fill .15s;}
+  .hall.picking .eq:not(.done):hover .hl, .hall .eq.drop-over .hl{stroke:#FAB005; fill:rgba(250,176,5,.1);}
+  .hall .eq.wrong .hl{stroke:#E03131; fill:rgba(224,49,49,.08);}
+  .hall .eq.done{cursor:default;}
+  .hall .eq.on .hl{stroke:#2F9E44; fill:rgba(47,158,68,.07);}
+  .hall .badge circle{fill:#fff; stroke:var(--accent); stroke-width:2.5;}
+  .hall .badge text{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:16px; fill:var(--accent); text-anchor:middle; dominant-baseline:central;}
+  .hall .eq.done .badge circle{fill:#2F9E44; stroke:#2F9E44;}
+  .eq-ex{position:relative;}
+  .wires{position:absolute; left:0; top:0; width:100%; height:100%; pointer-events:none; overflow:visible; z-index:1;}
+  .wires path{fill:none; stroke-width:2.5; stroke-linecap:round;}
+  .wires .wire{stroke:var(--w); stroke-width:3;}
+  .wires .rubber{stroke:var(--accent); stroke-dasharray:7 6;}
+  .eq-pool{display:flex; flex-wrap:wrap; gap:22px 10px; justify-content:center; margin-top:22px;}
+  .eq-chip{position:relative; z-index:2; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:8px 12px 7px; cursor:pointer; text-align:center; user-select:none; -webkit-user-select:none; touch-action:none; max-width:190px;}
+  .eq-chip::before{content:''; position:absolute; left:50%; top:-9px; width:14px; height:14px; margin-left:-7px; border-radius:50%; background:#fff; border:3px solid var(--accent); box-sizing:border-box; cursor:crosshair;}
+  .eq-chip b{font-family:'Baloo 2',sans-serif; font-size:15.5px; display:block; line-height:1.15;}
+  .eq-chip small{font-size:12px; color:var(--ink-soft); line-height:1.25; display:block;}
+  .eq-chip:not(.linked):hover{border-color:color-mix(in srgb, var(--accent) 45%, var(--line));}
+  .eq-chip.selected{border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);}
+  .eq-chip.linked{border-color:var(--w); background:color-mix(in srgb, var(--w) 10%, #fff); cursor:default;}
+  .eq-chip.linked::before{background:var(--w); border-color:var(--w); cursor:default;}
+  html.wiring, html.wiring *{cursor:crosshair !important;}
+  @media (prefers-reduced-motion:reduce){ .bar-fill, .way-panel{animation:none;} }
+</style>
+</head>
+<body data-lesson="lesson5-info-presentation" data-hud="5 клас · Представлення інформації">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Комп'ютерні презентації</div>
+      <h1>Як краще донести інформацію?</h1>
+      <p>Одне й те саме можна розповісти текстом, таблицею чи малюнком. Дізнаймося, який спосіб коли доречний і що таке презентація.</p>
+      <button class="btn-primary" onclick="document.getElementById('step1').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="58" fill="#FFF0E6"/>
+      <path d="M44 104 L34 128 M96 104 L106 128 M70 104 V130" stroke="#8C5A3C" stroke-width="5" stroke-linecap="round"/>
+      <rect x="22" y="26" width="96" height="78" rx="8" fill="#fff" stroke="#E8590C" stroke-width="4"/>
+      <rect x="32" y="36" width="50" height="8" rx="4" fill="#1971C2"/>
+      <rect x="36" y="74" width="11" height="20" rx="2" fill="#FAB005"/>
+      <rect x="52" y="64" width="11" height="30" rx="2" fill="#2F9E44"/>
+      <rect x="68" y="54" width="11" height="40" rx="2" fill="#E8590C"/>
+      <circle cx="101" cy="72" r="10" fill="#FAB005"/><path d="M101 62 A10 10 0 0 1 111 72 H101 Z" fill="#AE3EC9"/>
+      <circle cx="102" cy="44" r="7" fill="#1B1B3A"/><circle cx="104.5" cy="42" r="2.2" fill="#fff"/>
+      <circle cx="88" cy="44" r="7" fill="#1B1B3A"/><circle cx="90.5" cy="42" r="2.2" fill="#fff"/>
+      <path d="M90 54 Q95 59 100 54" stroke="#1B1B3A" stroke-width="3" stroke-linecap="round"/>    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <!-- КРОК 1 -->
+  <section class="block" id="step1">
+    <div class="step-label">Крок 1 · Способи подання</div>
+    <h2>Одна інформація — різний вигляд</h2>
+    <p>Учні 5 класу розповіли, які фрукти вони люблять найбільше. Ці самі відомості можна подати по-різному.</p>
+    <p class="soft">Переглянь усі чотири способи — клацни кожну кнопку.</p>
+    <div class="exercise">
+      <div class="ways-tabs" id="waysTabs"></div>
+      <div class="way-stage" id="wayStage"><p class="hint">👆 Обери спосіб подання</p></div>
+      <div class="progress-line" id="waysProgress"></div>
+    </div>
+    <p>А тепер скажи, який спосіб найзручніший для кожного запитання.</p>
+    <div id="waysQuiz"></div>
+  </section>
+
+  <!-- КРОК 2 -->
+  <section class="block">
+    <div class="step-label">Крок 2 · Доречний спосіб</div>
+    <h2>Що обрати?</h2>
+    <p>Немає одного «найкращого» способу — усе залежить від того, що саме хочемо показати.</p>
+    <ul>
+      <li><b>Текст</b> — для розповіді, пояснення, побажання.</li>
+      <li><b>Таблиця</b> — коли багато точних даних, які треба швидко знаходити.</li>
+      <li><b>Діаграма</b> — щоб одразу порівняти, чого більше, а чого менше.</li>
+      <li><b>Малюнок чи фото</b> — щоб показати, як щось виглядає.</li>
+      <li><b>Схема</b> — щоб показати шлях, будову чи зв'язки.</li>
+    </ul>
+    <div id="bestWay"></div>
+  </section>
+
+  <!-- КРОК 3 -->
+  <section class="block">
+    <div class="step-label">Крок 3 · Опрацювання інформації</div>
+    <h2>Перетвори текст на таблицю</h2>
+    <p><b>Опрацювати інформацію</b> — означає щось із нею зробити:</p>
+    <ul>
+      <li>упорядкувати чи порівняти;</li>
+      <li>скоротити до головного;</li>
+      <li>перетворити з одного вигляду в інший — наприклад, з тексту в таблицю.</li>
+    </ul>
+    <p class="soft">Прочитай текст і заповни таблицю: клацни картку, а потім клітинку (або перетягни картку).</p>
+    <div class="exercise" id="tfEx">
+      <div class="src-text">У нашому шкільному живому куточку живуть троє улюбленців. Хом'якові Пиріжку 2 роки, найбільше він любить зерно. Найстарша мешканка — черепаха Тереза: їй уже 15 років, а її улюблена їжа — листя салату. Наймолодший — папужка Кеша: йому 1 рік, він обожнює насіння соняшнику.</div>
+      <div class="tf-arrow">⬇</div>
+      <div class="tf-wrap">
+        <table class="tf-table">
+          <thead><tr><th>Тварина</th><th>Кличка</th><th>Вік</th><th>Улюблена їжа</th></tr></thead>
+          <tbody id="tfBody"></tbody>
+        </table>
+      </div>
+      <div class="tf-pool" id="tfPool"></div>
+      <div class="progress-line" id="tfProgress"></div>
+    </div>
+    <div class="note" id="tfNote" hidden>Подивись: у таблиці одразу видно, хто найстарший і хто що їсть, — а в тексті це довелося б шукати. Саме так опрацьовують інформацію для презентації: з довгого тексту — коротко й наочно.</div>
+  </section>
+
+  <!-- КРОК 4 -->
+  <section class="block">
+    <div class="step-label">Крок 4 · Що таке презентація</div>
+    <h2>Розповісти так, щоб зацікавити</h2>
+    <p><b>Презентація</b> — це спосіб подати інформацію слухачам так, щоб зацікавити їх або переконати. Презентують проєкти, ідеї, товари, результати роботи.</p>
+    <ul>
+      <li>Презентація може бути <b>з технічними засобами</b>: слайди на екрані, відео, звук.</li>
+      <li>А може бути <b>без них</b>: розповідь, плакат, показ саморобного виробу.</li>
+    </ul>
+    <p>Чому виступ зі слайдами зазвичай кращий за просту розповідь? Бо ми краще запам'ятовуємо, коли водночас <b>бачимо й чуємо</b>:</p>
+    <div class="mem">
+      <div class="mem-row"><div class="who"><span>👂</span>Лише чую</div><div class="mem-track"><div class="mem-fill" style="width:20%; background:#74C0FC;">≈ 20 %</div></div></div>
+      <div class="mem-row"><div class="who"><span>👀</span>Лише бачу</div><div class="mem-track"><div class="mem-fill" style="width:30%; background:#FFA94D;">≈ 30 %</div></div></div>
+      <div class="mem-row"><div class="who"><span>👀👂</span>Бачу й чую</div><div class="mem-track"><div class="mem-fill" style="width:65%; background:#E8590C;">50–70 %</div></div></div>
+    </div>
+    <div class="note">Слово «презентація» має два значення: сам <b>виступ</b> перед слухачами («провести презентацію») і <b>файл зі слайдами</b> («зберегти презентацію»).</div>
+    <h3>Слова, голос і тіло</h3>
+    <p>Доповідач передає інформацію слухачам одразу трьома каналами:</p>
+    <div class="channels">
+      <div class="ch" style="--c:#1971C2">
+        <svg viewBox="0 0 70 70"><path d="M10 14h50a6 6 0 0 1 6 6v24a6 6 0 0 1-6 6H30l-12 10v-10h-8a6 6 0 0 1-6-6V20a6 6 0 0 1 6-6z" fill="#D0EBFF" stroke="#1971C2" stroke-width="3"/><path d="M18 27h34M18 37h24" stroke="#1971C2" stroke-width="4" stroke-linecap="round"/></svg>
+        <b>Вербальний</b><span class="q">що я кажу</span><span>слова, приклади, пояснення</span>
+      </div>
+      <div class="ch" style="--c:#2F9E44">
+        <svg viewBox="0 0 70 70"><path d="M12 27h10l14-12v40L22 43H12z" fill="#D3F9D8" stroke="#2F9E44" stroke-width="3" stroke-linejoin="round"/><path d="M44 26q6 9 0 18M51 19q12 16 0 32" stroke="#2F9E44" stroke-width="4" stroke-linecap="round" fill="none"/></svg>
+        <b>Вокальний</b><span class="q">як я кажу</span><span>гучність, темп, паузи, інтонація</span>
+      </div>
+      <div class="ch" style="--c:#AE3EC9">
+        <svg viewBox="0 0 70 70"><circle cx="35" cy="15" r="9" fill="#F3D9FA" stroke="#AE3EC9" stroke-width="3"/><path d="M35 25v22M35 47l-9 16M35 47l9 16M35 31l-15-9M35 31l14 -14" stroke="#AE3EC9" stroke-width="4" stroke-linecap="round"/></svg>
+        <b>Невербальний</b><span class="q">без слів</span><span>погляд, усмішка, жести, постава</span>
+      </div>
+    </div>
+    <p class="soft">Розклади поради для доповідача по каналах.</p>
+    <div class="exercise">
+      <div class="sort-buckets three">
+        <div class="bucket" id="bkVerb"><div class="bucket-title"><span class="em">💬</span>Вербальний<small>що я кажу</small></div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkVoc"><div class="bucket-title"><span class="em">🔊</span>Вокальний<small>як я кажу</small></div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkNon"><div class="bucket-title"><span class="em">🙌</span>Невербальний<small>без слів</small></div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="chPool"></div>
+      <div class="progress-line" id="chProgress"></div>
+    </div>
+  </section>
+
+  <!-- КРОК 5 -->
+  <section class="block">
+    <div class="step-label">Крок 5 · Успіх і невдача</div>
+    <h2>Чому виступ не вдався?</h2>
+    <p><b>Успішна</b> презентація — та, що досягла мети: слухачі зацікавились, зрозуміли, повірили. Найчастіше виступ не вдається через такі причини:</p>
+    <div class="causes">
+      <div class="cause"><div class="ic">😰</div><div><b>Хвилювання</b><span>страх перед великою аудиторією</span></div></div>
+      <div class="cause"><div class="ic">⏳</div><div><b>Погана підготовка</b><span>не продумали, що й коли казати</span></div></div>
+      <div class="cause"><div class="ic">🧩</div><div><b>Безлад у змісті</b><span>немає чіткого початку, середини й кінця</span></div></div>
+      <div class="cause"><div class="ic">👀</div><div><b>Немає контакту з залом</b><span>не дивляться на слухачів, не стежать за часом</span></div></div>
+      <div class="cause"><div class="ic">📚</div><div><b>Забагато інформації</b><span>слухачі не встигають усе сприйняти</span></div></div>
+      <div class="cause"><div class="ic">🖼️</div><div><b>Невдала наочність</b><span>дрібне, розмите, нечитабельне</span></div></div>
+    </div>
+    <p>Визнач, що пішло не так у кожного доповідача.</p>
+    <div id="failList"></div>
+    <div class="trivia">💡 Щоб менше хвилюватися, порепетируй виступ удома перед дзеркалом чи рідними, а перед початком повільно вдихни й видихни кілька разів.</div>
+  </section>
+
+  <!-- КРОК 6 -->
+  <section class="block">
+    <div class="step-label">Крок 6 · Обладнання</div>
+    <h2>Що потрібно для виступу</h2>
+    <p>Для комп'ютерної презентації в залі готують спеціальне обладнання.</p>
+    <p class="soft">З'єднай кожну назву з предметом на малюнку: потягни лінію від кружечка на картці до предмета (або клацни картку, а потім предмет).</p>
+    <div class="exercise eq-ex" id="eqEx">
+      <div class="hall">
+        <svg viewBox="0 0 700 330" id="hallSvg" role="img" aria-label="Зала для презентації">
+          <rect x="0" y="0" width="700" height="300" fill="#FFF8EF"/>
+          <rect x="0" y="0" width="700" height="10" fill="#EDE0D2"/>
+          <rect x="0" y="300" width="700" height="30" fill="#E9D8C6"/>
+          <!-- промінь проєктора -->
+          <polygon points="514,44 156,34 156,172 514,52" fill="#FFE066" opacity=".28"/>
+          <!-- 2 Екран -->
+          <g class="eq" data-i="1">
+            <rect class="hl" x="138" y="20" width="270" height="286" rx="10"/>
+            <path d="M273 176 V296 M273 296 l-30 6 M273 296 l30 6" stroke="#6B6B7B" stroke-width="5" stroke-linecap="round"/>
+            <rect x="146" y="26" width="254" height="152" rx="4" fill="#fff" stroke="#6B6B7B" stroke-width="4"/>
+            <rect x="166" y="44" width="120" height="12" rx="6" fill="#1971C2"/>
+            <rect x="174" y="118" width="22" height="40" fill="#FAB005"/><rect x="204" y="98" width="22" height="60" fill="#2F9E44"/><rect x="234" y="76" width="22" height="82" fill="#E8590C"/>
+            <circle cx="336" cy="116" r="34" fill="#74C0FC"/><path d="M336 82 A34 34 0 0 1 370 116 H336 Z" fill="#AE3EC9"/>
+            <g class="badge"><circle cx="152" cy="30" r="14"/><text x="152" y="31">?</text></g>
+          </g>
+          <!-- 1 Проєктор -->
+          <g class="eq" data-i="0">
+            <rect class="hl" x="500" y="8" width="96" height="66" rx="10"/>
+            <path d="M560 10 V28" stroke="#6B6B7B" stroke-width="5"/>
+            <rect x="514" y="28" width="74" height="32" rx="7" fill="#495057"/>
+            <circle cx="522" cy="44" r="10" fill="#ADB5BD" stroke="#343A40" stroke-width="3"/>
+            <circle cx="576" cy="38" r="3" fill="#51CF66"/>
+            <g class="badge"><circle cx="590" cy="66" r="14"/><text x="590" y="67">?</text></g>
+          </g>
+          <!-- 3 Ноутбук -->
+          <g class="eq" data-i="2">
+            <rect class="hl" x="10" y="182" width="124" height="122" rx="10"/>
+            <rect x="16" y="246" width="112" height="9" rx="3" fill="#C68B59"/>
+            <path d="M26 255 V298 M118 255 V298" stroke="#A46B3D" stroke-width="6" stroke-linecap="round"/>
+            <path d="M42 205 H104 L108 240 H38 Z" fill="#343A40"/>
+            <path d="M46 209 H100 L103 236 H43 Z" fill="#A5D8FF"/>
+            <rect x="52" y="214" width="26" height="4" rx="2" fill="#1971C2"/>
+            <rect x="30" y="240" width="88" height="7" rx="3" fill="#868E96"/>
+            <g class="badge"><circle cx="24" cy="196" r="14"/><text x="24" y="197">?</text></g>
+          </g>
+          <!-- 5 Мікрофон і колонка -->
+          <g class="eq" data-i="4">
+            <rect class="hl" x="414" y="186" width="74" height="118" rx="10"/>
+            <rect x="420" y="232" width="32" height="66" rx="5" fill="#343A40"/>
+            <circle cx="436" cy="250" r="8" fill="#868E96"/><circle cx="436" cy="276" r="12" fill="#868E96"/><circle cx="436" cy="276" r="5" fill="#343A40"/>
+            <path d="M472 214 V296 M472 296 l-12 4 M472 296 l12 4" stroke="#495057" stroke-width="4" stroke-linecap="round"/>
+            <rect x="466" y="198" width="12" height="20" rx="6" fill="#212529"/>
+            <g class="badge"><circle cx="428" cy="210" r="14"/><text x="428" y="211">?</text></g>
+          </g>
+          <!-- доповідач з 4 Презентером -->
+          <g>
+            <circle cx="520" cy="166" r="17" fill="#F1C27D"/>
+            <path d="M503 160 Q505 144 520 145 Q536 144 538 160 Q530 152 520 154 Q510 152 503 160z" fill="#5C3A21"/>
+            <path d="M505 186 Q520 180 535 186 L538 250 H502 Z" fill="#1971C2"/>
+            <path d="M508 250 L506 298 M532 250 L534 298" stroke="#343A40" stroke-width="10" stroke-linecap="round"/>
+            <path d="M533 192 L548 222 L566 210" stroke="#F1C27D" stroke-width="8" stroke-linecap="round" fill="none"/>
+            <path d="M507 192 L500 236" stroke="#F1C27D" stroke-width="8" stroke-linecap="round"/>
+          </g>
+          <g class="eq" data-i="3">
+            <rect class="hl" x="552" y="188" width="40" height="38" rx="8"/>
+            <rect x="562" y="200" width="20" height="12" rx="4" fill="#212529" transform="rotate(-30 572 206)"/>
+            <path d="M580 196 L596 186" stroke="#FA5252" stroke-width="2" stroke-dasharray="3 3"/>
+            <g class="badge"><circle cx="572" cy="178" r="14"/><text x="572" y="179">?</text></g>
+          </g>
+          <!-- 6 Фліпчарт -->
+          <g class="eq" data-i="5">
+            <rect class="hl" x="596" y="118" width="96" height="186" rx="10"/>
+            <path d="M622 220 L608 298 M666 220 L680 298 M644 220 V298" stroke="#A46B3D" stroke-width="5" stroke-linecap="round"/>
+            <rect x="606" y="132" width="76" height="92" rx="3" fill="#fff" stroke="#ADB5BD" stroke-width="3"/>
+            <rect x="602" y="126" width="84" height="9" rx="3" fill="#868E96"/>
+            <path d="M616 152 H664 M616 166 H650" stroke="#1971C2" stroke-width="4" stroke-linecap="round"/>
+            <path d="M618 206 L634 186 L648 198 L668 176" stroke="#E8590C" stroke-width="4" stroke-linecap="round" fill="none"/>
+            <g class="badge"><circle cx="680" cy="134" r="14"/><text x="680" y="135">?</text></g>
+          </g>
+          <!-- 7 Відеокамера (у залі, перед сценою) -->
+          <g class="eq" data-i="6">
+            <rect class="hl" x="314" y="196" width="94" height="110" rx="10"/>
+            <path d="M356 236 L330 298 M356 236 L382 298 M356 236 V298" stroke="#495057" stroke-width="4" stroke-linecap="round"/>
+            <rect x="334" y="210" width="44" height="26" rx="5" fill="#343A40"/>
+            <path d="M378 216 L396 208 V238 L378 230Z" fill="#495057"/>
+            <circle cx="346" cy="223" r="6" fill="#FA5252"/>
+            <g class="badge"><circle cx="326" cy="206" r="14"/><text x="326" y="207">?</text></g>
+          </g>
+        </svg>
+      </div>
+      <div class="eq-pool" id="eqPool"></div>
+      <div class="progress-line" id="eqProgress"></div>
+      <svg class="wires" id="eqWires"><path class="rubber" id="eqRubber"/></svg>
+    </div>
+    <div class="trivia">🎞️ Колись замість комп'ютера й проєктора були <b>діапроєктори</b>: вони просвічували маленькі прозорі плівкові кадри — слайди — і показували їх великими на стіні. Звідти й походить слово «слайд».</div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Урок · «Представлення інформації та способи її опрацювання» · 5 клас</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ---------- КРОК 1: ЧОТИРИ СПОСОБИ ---------- */
+(function(){
+  const DATA = [['Яблука','🍎',10],['Банани','🍌',6],['Груші','🍐',5],['Виноград','🍇',3]];
+  const WAYS = [
+    { name:'Текст', c:'var(--c-text)', html:()=>`<p class="way-text">У нашому класі 24 учні. Найбільше люблять яблука — 10 учнів. Банани обрали 6 учнів, груші — 5, а виноград — лише 3 учні.</p>`,
+      note:'<b>Текстом</b> зручно розповідати, але щоб знайти потрібне число, доводиться читати все.' },
+    { name:'Таблиця', c:'var(--c-table)', html:()=>`<table class="fr-table"><tr><th>Фрукт</th><th>Учнів</th></tr>${DATA.map(d=>`<tr><td>${d[1]} ${d[0]}</td><td>${d[2]}</td></tr>`).join('')}</table>`,
+      note:'У <b>таблиці</b> кожне число стоїть на своєму місці — його легко знайти.' },
+    { name:'Діаграма', c:'var(--c-chart)', html:()=>`<div class="bars">${DATA.map((d,i)=>`<div class="bar-row"><span>${d[0]}</span><div class="bar-track"><div class="bar-fill${i===0?' top':''}" style="width:${d[2]*10}%">${d[2]}</div></div></div>`).join('')}</div>`,
+      note:'На <b>діаграмі</b> одним поглядом видно, чого найбільше, а чого найменше.' },
+    { name:'Піктограма', c:'var(--c-pic)', html:()=>`<div class="picto">${DATA.map(d=>`<div class="picto-row"><span>${d[0]}</span><span class="icons">${d[1].repeat(d[2])}</span></div>`).join('')}<div class="picto-key">один значок = один учень</div></div>`,
+      note:'<b>Малюнками</b> інформація стає яскравою й зрозумілою навіть малятам.' }
+  ];
+  const tabs = document.getElementById('waysTabs'), stage = document.getElementById('wayStage'), prog = document.getElementById('waysProgress');
+  const hit = trackTask(tabs, WAYS.length, 0);
+  let seen = 0;
+  const upd = ()=>prog.textContent = seen === WAYS.length ? 'Усі способи переглянуто ✓' : `Переглянуто: ${seen} з ${WAYS.length}`;
+  WAYS.forEach(w=>{
+    const b = document.createElement('button');
+    b.className = 'way-tab'; b.style.setProperty('--c', w.c);
+    b.innerHTML = `<span class="dot"></span>${w.name}`;
+    b.addEventListener('click', ()=>{
+      tabs.querySelectorAll('.way-tab').forEach(t=>t.classList.remove('active'));
+      b.classList.add('active');
+      stage.style.borderColor = w.c;
+      stage.innerHTML = `<div class="way-panel" style="--c:${w.c}">${w.html()}<div class="way-note">${w.note}</div></div>`;
+      if(!b.classList.contains('seen')){ b.classList.add('seen'); seen++; hit(); upd(); }
+    });
+    tabs.appendChild(b);
+  });
+  upd();
+})();
+
+makeChoices('waysQuiz', [
+  { text:'Як найшвидше побачити, який фрукт клас любить найбільше?', opts:['Текст', 'Таблиця', 'Діаграма', 'Піктограма'], correct:2, why:'Найдовший стовпчик видно одразу, нічого не читаючи.' },
+  { text:'Скільки учнів обрали груші? Де це число знайти найлегше й найточніше?', opts:['Текст', 'Таблиця', 'Діаграма', 'Піктограма'], correct:1, why:'У таблиці навпроти слова «Груші» стоїть точне число 5.' }
+]);
+
+/* ---------- КРОК 2 ---------- */
+makeClassify('bestWay', [
+  { text:'📅 Розклад уроків на весь тиждень', correct:1, why:'Дні, номери уроків і предмети зручно розкласти по рядках і стовпцях.' },
+  { text:'🗳️ Скільки голосів отримав кожен із п\'яти кандидатів у старости класу — і хто переміг', correct:2, why:'Найвищий стовпчик одразу покаже переможця.' },
+  { text:'🦋 Як виглядає рідкісний метелик, якого знайшли в парку', correct:3, why:'Забарвлення крил словами не опишеш так точно, як покаже фото.' },
+  { text:'🚪 Як пройти від входу до шкільної бібліотеки', correct:4, why:'Стрілки й позначки на схемі покажуть шлях краще за довгі пояснення.' },
+  { text:'📢 Повідомлення в чаті класу: «Завтра екскурсію перенесено на 10:00, бо обіцяють дощ»', correct:0, why:'Коротке повідомлення з причиною найпростіше передати кількома словами.' },
+  { text:'🏃 Результати трьох спроб стрибка в довжину для кожного учня', correct:1, why:'Багато точних чисел — рядок для учня, стовпець для спроби.' }
+], ['Текст', 'Таблиця', 'Діаграма', 'Малюнок або фото', 'Схема']);
+
+/* ---------- КРОК 3: ТЕКСТ У ТАБЛИЦЮ ---------- */
+(function(){
+  const ROWS = [
+    ['🐹 Хом\'як', ['Пиріжок', '2 роки', 'зерно']],
+    ['🐢 Черепаха', ['Тереза', '15 років', 'салат']],
+    ['🦜 Папужка', ['Кеша', '1 рік', 'насіння']]
+  ];
+  const body = document.getElementById('tfBody'), pool = document.getElementById('tfPool');
+  const prog = document.getElementById('tfProgress'), ex = document.getElementById('tfEx');
+  const total = ROWS.length * 3;
+  const hit = trackTask(ex, total, total + 2);
+  let selected = null, placed = 0;
+  const upd = ()=>prog.textContent = placed === total ? 'Таблицю заповнено ✓' : `Заповнено: ${placed} з ${total}`;
+
+  ROWS.forEach(([animal, vals])=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td class="animal">${animal}</td>` + vals.map(v=>`<td class="tf-cell" data-v="${v}"></td>`).join('');
+    body.appendChild(tr);
+  });
+  const cells = [...body.querySelectorAll('.tf-cell')];
+
+  function place(chip, cell){
+    if(cell.classList.contains('filled')) return;
+    if(chip.dataset.v === cell.dataset.v){
+      leaveSlot(chip);
+      chip.classList.remove('selected'); chip.classList.add('placed');
+      cell.appendChild(chip); cell.classList.add('filled');
+      selected = null; placed++;
+      addNeurons(1); hit(); upd();
+      if(placed === total){ clearSlots(pool); addNeurons(2); document.getElementById('tfNote').hidden = false; }
+    } else {
+      cell.classList.add('wrong');
+      setTimeout(()=>cell.classList.remove('wrong'), 400);
+      chip.classList.remove('selected'); selected = null;
+    }
+  }
+  shuffle(ROWS.flatMap(r=>r[1])).forEach(v=>{
+    const chip = document.createElement('div');
+    chip.className = 'tf-chip'; chip.textContent = v; chip.dataset.v = v;
+    chip.addEventListener('click', ()=>{
+      if(chip.classList.contains('placed')) return;
+      pool.querySelectorAll('.tf-chip').forEach(c=>c.classList.remove('selected'));
+      chip.classList.add('selected'); selected = chip;
+    });
+    dragTo(chip, (x, y)=>{ const c = document.elementFromPoint(x, y)?.closest('.tf-cell'); return c && !c.classList.contains('filled') ? c : null; }, cell=>place(chip, cell));
+    pool.appendChild(chip);
+  });
+  cells.forEach(cell=>cell.addEventListener('click', ()=>{ if(selected) place(selected, cell); }));
+  upd();
+})();
+
+/* ---------- КРОК 4: ТРИ КАНАЛИ ---------- */
+makeSortBoard('chPool', { v:'bkVerb', o:'bkVoc', n:'bkNon' }, [
+  { text:'Навести цікавий приклад з життя', bucket:'v' },
+  { text:'Пояснити нові слова просто', bucket:'v' },
+  { text:'Говорити короткими реченнями', bucket:'v' },
+  { text:'Говорити достатньо гучно', bucket:'o' },
+  { text:'Не поспішати, не «тараторити»', bucket:'o' },
+  { text:'Зробити паузу перед головним', bucket:'o' },
+  { text:'Дивитися на слухачів', bucket:'n' },
+  { text:'Усміхатися', bucket:'n' },
+  { text:'Стояти рівно, не крутитися', bucket:'n' },
+  { text:'Показати рукою на слайд', bucket:'n' }
+], 'chProgress');
+
+/* ---------- КРОК 5 ---------- */
+makeChoices('failList', [
+  { text:'У Віри тремтіли руки, вона забувала слова й говорила ледь чутно — так боялася, що на неї дивиться весь клас.', opts:['Хвилювання', 'Забагато інформації', 'Невдала наочність'], correct:0, why:'Страх завадив їй говорити впевнено.' },
+  { text:'Тарас згадав про виступ лише на перерві: слайдів не зробив, а біля дошки не знав, що казати.', opts:['Невдала наочність', 'Погана підготовка', 'Хвилювання'], correct:1, why:'Виступ треба продумати заздалегідь.' },
+  { text:'Соня розповідала про песика: то як його купили, то про іграшки, то про ветеринара, то знову як купили. Клас так і не зрозумів, що за чим.', opts:['Забагато інформації', 'Хвилювання', 'Безлад у змісті'], correct:2, why:'Розповіді бракувало порядку: початок → середина → кінець.' },
+  { text:'Марко весь виступ стояв спиною до класу й читав зі слайдів. Учні позіхали, а він цього навіть не помітив.', opts:['Немає контакту з залом', 'Невдала наочність', 'Забагато інформації'], correct:0, why:'Він не дивився на слухачів і не бачив, що їм нудно.' },
+  { text:'За 5 хвилин Марта назвала 40 дат, 25 імен і 30 чисел. Наприкінці ніхто не пригадав жодного.', opts:['Безлад у змісті', 'Забагато інформації', 'Хвилювання'], correct:1, why:'Стільки відомостей за раз ніхто не запам\'ятає.' },
+  { text:'Дмитро цікаво розповідав про жука, але фото на слайді було крихітне й розмите, а підпис — жовтим на білому.', opts:['Хвилювання', 'Безлад у змісті', 'Невдала наочність'], correct:2, why:'Картинка мала допомогти, а її ніхто не розгледів.' }
+]);
+
+/* ---------- КРОК 6: ЗАЛА ---------- */
+const EQUIP = [
+  { name:'Проєктор', desc:'Показує зображення з комп\'ютера великим — на екрані чи стіні.' },
+  { name:'Екран', desc:'Велике світле полотно, на якому всі бачать слайди.' },
+  { name:'Ноутбук', desc:'Тут зберігається файл презентації; з нього керують показом слайдів.' },
+  { name:'Презентер', desc:'Маленький пульт у руці доповідача: гортає слайди, часто має лазерну указку.' },
+  { name:'Мікрофон і колонка', desc:'Роблять голос гучнішим, щоб чули навіть у задніх рядах.' },
+  { name:'Фліпчарт', desc:'Дошка на ніжках з великими аркушами паперу: на них пишуть і малюють маркером.' },
+  { name:'Відеокамера', desc:'Записує виступ або показує його наживо тим, хто не в залі.' }
+];
+(function(){
+  const svg = document.getElementById('hallSvg'), hall = svg.closest('.hall'), ex = document.getElementById('eqEx');
+  const wires = document.getElementById('eqWires'), rubber = document.getElementById('eqRubber');
+  const pool = document.getElementById('eqPool'), prog = document.getElementById('eqProgress');
+  const groups = [...svg.querySelectorAll('.eq')];
+  const hit = trackTask(svg, EQUIP.length, EQUIP.length + 2);
+  const links = [];            // [картка, предмет]
+  let selected = null;
+  const upd = ()=>prog.textContent = links.length === EQUIP.length ? 'Усе обладнання з\'єднано ✓' : `З'єднано: ${links.length} з ${EQUIP.length}`;
+
+  // координати всередині вправи
+  const local = (x, y)=>{ const r = ex.getBoundingClientRect(); return [x - r.left, y - r.top]; };
+  const chipPt = chip=>{ const r = chip.getBoundingClientRect(); return local(r.left + r.width / 2, r.top - 2); };
+  // лінія підходить до нижнього краю кружечка, тож галочку не закриває
+  const eqPt = g=>{ const r = g.querySelector('.badge circle').getBoundingClientRect(); return local(r.left + r.width / 2, r.bottom - 1); };
+  const WIRE = ['#E8590C', '#1971C2', '#2F9E44', '#AE3EC9', '#E64980', '#0C8599', '#F59F00'];
+  const curve = (a, b)=>{ const m = (a[1] + b[1]) / 2; return `M${a[0]} ${a[1]} C${a[0]} ${m} ${b[0]} ${m} ${b[0]} ${b[1]}`; };
+  function drawWires(){
+    wires.querySelectorAll('.wire').forEach(n=>n.remove());
+    links.forEach(([chip, g])=>{
+      const a = chipPt(chip), b = eqPt(g);
+      rubber.insertAdjacentHTML('beforebegin', `<path class="wire" style="--w:${chip.style.getPropertyValue('--w')}" d="${curve(a, b)}"/>`);
+    });
+  }
+  new ResizeObserver(drawWires).observe(ex);
+
+  const select = chip=>{
+    pool.querySelectorAll('.eq-chip').forEach(c=>c.classList.remove('selected'));
+    selected = chip; chip?.classList.add('selected');
+    hall.classList.toggle('picking', !!chip);
+  };
+  function place(chip, g){
+    if(g.classList.contains('done') || chip.classList.contains('linked')) return;
+    if(+chip.dataset.i === +g.dataset.i){
+      select(null);
+      const col = WIRE[links.length % WIRE.length];
+      chip.style.setProperty('--w', col);
+      chip.classList.add('linked');
+      g.classList.add('done');
+      g.querySelector('.badge circle').style.cssText = `fill:${col}; stroke:${col}`;
+      const c = g.querySelector('.badge circle'), cx = +c.getAttribute('cx'), cy = +c.getAttribute('cy');
+      g.querySelector('.badge text').remove();
+      g.querySelector('.badge').insertAdjacentHTML('beforeend', `<path d="M${cx - 6} ${cy} l4 4.5 l8 -9" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>`);
+      links.push([chip, g]);
+      drawWires();
+      addNeurons(1); hit(); upd();
+      if(links.length === EQUIP.length) addNeurons(2);
+    } else {
+      g.classList.add('wrong');
+      setTimeout(()=>g.classList.remove('wrong'), 450);
+    }
+  }
+  const SHORT = ['світить картинкою на екран', 'полотно для слайдів', 'тут файл зі слайдами', 'пульт, що гортає слайди', 'роблять голос гучним', 'дошка з аркушами паперу', 'записує виступ'];
+  const target = (x, y)=>{ const g = document.elementFromPoint(x, y)?.closest('.eq'); return g && svg.contains(g) && !g.classList.contains('done') ? g : null; };
+  shuffle(EQUIP.map((e, i)=>i)).forEach(i=>{
+    const chip = document.createElement('div');
+    chip.className = 'eq-chip'; chip.dataset.i = i;
+    chip.innerHTML = `<b>${EQUIP[i].name}</b><small>${SHORT[i]}</small>`;
+    // тягнемо від картки лінію-з'єднувач; без руху — це просто клацання (вибрати картку)
+    chip.addEventListener('pointerdown', e=>{
+      if(e.button > 0 || chip.classList.contains('linked')) return;
+      const sx = e.clientX, sy = e.clientY;
+      let wiring = false, over = null;
+      const setOver = t=>{ if(t === over) return; over?.classList.remove('drop-over'); over = t; over?.classList.add('drop-over'); };
+      const move = ev=>{
+        if(!wiring){
+          if(Math.hypot(ev.clientX - sx, ev.clientY - sy) < 6) return;
+          wiring = true; select(chip);
+          document.documentElement.classList.add('wiring');
+        }
+        ev.preventDefault();
+        rubber.setAttribute('d', curve(chipPt(chip), local(ev.clientX, ev.clientY)));
+        setOver(target(ev.clientX, ev.clientY));
+      };
+      const end = ev=>{
+        removeEventListener('pointermove', move); removeEventListener('pointerup', end); removeEventListener('pointercancel', end);
+        if(!wiring){ select(chip); return; }
+        rubber.removeAttribute('d'); setOver(null);
+        document.documentElement.classList.remove('wiring');
+        const g = ev.type === 'pointerup' ? target(ev.clientX, ev.clientY) : null;
+        if(g) place(chip, g); else select(null);
+      };
+      addEventListener('pointermove', move, {passive:false});
+      addEventListener('pointerup', end);
+      addEventListener('pointercancel', end);
+    });
+    pool.appendChild(chip);
+  });
+  groups.forEach(g=>g.addEventListener('click', ()=>{ if(selected) place(selected, g); }));
+  upd();
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що таке презентація?', opts:['Спосіб подати інформацію слухачам, щоб зацікавити чи переконати їх', 'Будь-який файл на комп\'ютері', 'Розмова двох друзів телефоном', 'Програма для малювання'], correct:0 },
+  { q:'Як найзручніше подати бали кожного учня за три конкурси?', opts:['Текстом', 'Таблицею', 'Малюнком', 'Схемою'], correct:1, why:'Багато точних чисел — рядки для учнів, стовпці для конкурсів.' },
+  { q:'Перетворити текст на таблицю — це…', opts:['зберігання інформації', 'пошук інформації', 'опрацювання інформації', 'передавання інформації'], correct:2 },
+  { q:'Гучність, темп і паузи в мовленні — це канал…', opts:['вербальний', 'вокальний', 'невербальний', 'зоровий'], correct:1, why:'Вокальний канал — те, ЯК ми говоримо.' },
+  { q:'Що належить до невербального каналу?', opts:['Цікаві приклади', 'Гучний голос', 'Погляд і жести', 'Слайди з текстом'], correct:2 },
+  { q:'Коли ми запам\'ятовуємо найбільше?', opts:['Коли лише слухаємо', 'Коли лише дивимось', 'Коли водночас бачимо й чуємо', 'Однаково завжди'], correct:2, why:'Разом зір і слух дають 50–70 % запам\'ятованого.' },
+  { q:'Яка презентація вважається успішною?', opts:['Найдовша', 'Та, що досягла своєї мети', 'Та, де найбільше слайдів', 'Та, де найдрібніший текст'], correct:1 },
+  { q:'Яким пристроєм гортають слайди, стоячи далеко від комп\'ютера?', opts:['Фліпчартом', 'Проєктором', 'Презентером', 'Мікрофоном'], correct:2 }
+], {summary:'Тепер ти знаєш, як по-різному можна подати інформацію, що таке презентація і як зробити виступ успішним.'});
+</script>
+
+</body>
+</html>

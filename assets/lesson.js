@@ -1113,5 +1113,5 @@ if(/[?&]selftest\b/.test(location.search)){
 }
 
 
-Object.assign(window, { say, sayBtn, addRestart, addNeurons, stepTask, trackTask, shuffle, loadPic, makeChoices, makeClassify, makeYesNo, makeWarmup, makeMatching, makeSortBoard, makeSequence, makeFinalQuiz });
+Object.assign(window, { say, sayBtn, addRestart, addNeurons, stepTask, trackTask, shuffle, loadPic, dragTo, leaveSlot, clearSlots, makeChoices, makeClassify, makeYesNo, makeWarmup, makeMatching, makeSortBoard, makeSequence, makeFinalQuiz });
 })();
