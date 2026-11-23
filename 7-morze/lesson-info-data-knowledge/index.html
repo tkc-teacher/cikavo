@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Інформація, повідомлення, дані, знання — Урок</title>
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  /* Гама уроку: фіолетово-бірюзова «нейронна» */
+  :root{
+    --accent:#6741D9; --accent-dark:#4C2EA8; --accent-soft:#EFEAFF;
+    --label:#0C8599;
+    --bg:#F7F5FD; --line:#E3DDF5; --ink:#1E1838; --ink-soft:#5B5578;
+    --hud-bar:linear-gradient(90deg,#6741D9,#15AABF);
+    --cyan:#15AABF; --cyan-soft:#E3F8FB; --pink:#E64980; --amber:#F59F00;
+  }
+  .ico{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; line-height:1; display:inline-block; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 20;}
+
+  /* ---------- МАСКОТ ---------- */
+  .mascot .bit{animation:bitIn 3.2s linear infinite; opacity:0;}
+  .mascot .bit:nth-of-type(2){animation-delay:.8s;}
+  .mascot .bit:nth-of-type(3){animation-delay:1.6s;}
+  .mascot .bit:nth-of-type(4){animation-delay:2.4s;}
+  @keyframes bitIn{0%{transform:translate(0,0); opacity:0;} 15%{opacity:1;} 70%{opacity:1;} 100%{transform:translate(52px,10px) scale(.4); opacity:0;}}
+  .mascot .glow{animation:glow 2.4s ease-in-out infinite; transform-origin:96px 70px;}
+  @keyframes glow{50%{transform:scale(1.08); opacity:.55;}}
+
+  /* ---------- КРОК 1: КАНАЛИ ПОВІДОМЛЕНЬ ---------- */
+  .sig-row{display:flex; flex-wrap:wrap; gap:8px; margin:12px 0 4px;}
+  .sig{display:inline-flex; align-items:center; gap:6px; padding:6px 12px 6px 8px; border-radius:999px; background:var(--accent-soft); color:var(--accent-dark); font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px;}
+  .sig .ico{font-size:19px;}
+  /* картки — рівною сіткою 2 стовпці однакової ширини */
+  #chPool{display:grid; grid-template-columns:1fr 1fr;}
+  #chPool .sort-chip{max-width:none; display:flex; align-items:center; gap:8px; min-height:48px;}
+  @media (max-width:520px){ #chPool{grid-template-columns:1fr;} }
+  .ch-ico{display:flex; align-items:center; justify-content:center; gap:4px; font-size:26px; margin-bottom:4px;}
+  .ch-ico i{font-style:normal; font-size:16px; color:var(--ink-soft);}
+
+  /* ---------- КРОК 2: КАМ'ЯНА МОГИЛА ---------- */
+  .rock{display:block; width:100%; height:auto; border-radius:var(--radius-m); margin:14px 0 4px;}
+  .rock .gl{fill:none; stroke:#7A4A26; stroke-width:4; stroke-linecap:round; stroke-linejoin:round;}
+  /* люди — картки однакової ширини по центру; на місці зіставленої — сіре місце (ядро), порожній лоток ховається */
+  #rockPool .match-chip{display:flex; align-items:center; justify-content:center; gap:6px; width:155px; white-space:nowrap;}
+  #rockPool:not(:has(.match-chip:not(.placed))){display:none;}
+  @media (max-width:560px){ #rockPool .match-chip{width:calc(50% - 4px);} }
+  .cap{font-size:13px; color:var(--ink-soft); text-align:center;}
+
+  /* ---------- КРОК 3: ЕТИКЕТКА ---------- */
+  .carriers{display:flex; flex-wrap:wrap; gap:8px; margin:10px 0 0;}
+  .carrier{display:flex; align-items:center; gap:6px; padding:6px 12px; border:1.5px solid var(--line); border-radius:var(--radius-s); background:var(--surface); font-size:14px; font-weight:700;}
+  .carrier .ico{font-size:20px; color:var(--accent);}
+  .lbl-wrap{display:grid; grid-template-columns:150px 1fr; gap:18px; align-items:center;}
+  @media (max-width:600px){ .lbl-wrap{grid-template-columns:1fr;} .lbl-wrap svg{width:110px; margin:0 auto;} }
+  .lbl{background:#FFFDF7; border:2px solid #F1E3C8; border-radius:14px; padding:14px 16px; font-size:14px; line-height:1.55; box-shadow:0 6px 16px rgba(30,24,56,.08);}
+  .lbl-brand{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:22px; color:#D6336C; line-height:1;}
+  .lbl-sub{font-size:13px; color:var(--ink-soft); margin-bottom:8px;}
+  .fld{display:inline; padding:1px 3px; border-radius:5px; border-bottom:2px dashed #C9B8F2; cursor:pointer; transition:background .15s;}
+  .fld:hover{background:var(--accent-soft);}
+  .fld.found{background:var(--ok-soft); border-bottom-color:var(--ok); cursor:default;}
+  .fld.wrong{background:#FDE6E1; border-bottom-color:var(--coral);}
+  .lbl-row{display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin-top:8px; flex-wrap:wrap;}
+  .barcode{display:flex; align-items:flex-end; gap:1.5px; height:34px; padding:2px 4px; border-bottom:none;}
+  .barcode b{display:block; background:#1E1838; height:100%;}
+  .price{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:20px;}
+  .lq{display:flex; gap:10px; align-items:flex-start; background:var(--accent-soft); border-radius:var(--radius-m); padding:12px 14px; margin-bottom:14px; min-height:64px;}
+  .lq .ico{font-size:26px; color:var(--accent); flex-shrink:0;}
+  .lq b{font-family:'Baloo 2',sans-serif; font-size:16px; display:block; line-height:1.3;}
+  .lq small{display:block; font-size:13.5px; color:var(--ink-soft); margin-top:2px;}
+  .lq.ok{background:var(--ok-soft);}
+  .lq.ok .ico{color:var(--ok);}
+
+  /* ---------- КРОК 4: ПРОЦЕСИ ---------- */
+  .proc-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px;}
+  @media (max-width:640px){ .proc-grid{grid-template-columns:1fr 1fr;} }
+  .proc{border-radius:var(--radius-m); padding:12px; background:var(--surface); border:1.5px solid var(--line); border-top:5px solid var(--c);}
+  .proc .ico{font-size:28px; color:var(--c);}
+  .proc b{display:block; font-family:'Baloo 2',sans-serif; font-size:16px; line-height:1.2; margin:4px 0 4px;}
+  .proc span{display:block; font-size:13px; color:var(--ink-soft); line-height:1.35;}
+  .station{display:flex; align-items:center; gap:12px; background:var(--cyan-soft); border-radius:var(--radius-m); padding:12px 14px; margin:18px 0 12px;}
+  .station svg{width:62px; height:62px; flex-shrink:0;}
+  .station p{margin:0; font-size:14.5px;}
+  .pq-emo{font-size:26px; margin-right:10px; vertical-align:-4px;}
+  .pq-head{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; color:var(--ink-soft);}
+  .pq-dots{display:flex; gap:6px;}
+  .pq-dots i{width:12px; height:12px; border-radius:50%; background:var(--line); transition:background .3s;}
+  .pq-dots i.cur{background:var(--accent);}
+  .pq-dots i.ok{background:var(--ok);}
+  .pq-dots i.miss-d{background:var(--amber);}
+  .pq-card{display:flex; align-items:center; min-height:64px; padding:12px 16px; border-radius:var(--radius-m); background:var(--cyan-soft); margin-bottom:12px; font-size:16px;}
+  .pq-card.in{animation:pqIn .35s ease;}
+  @keyframes pqIn{from{opacity:0; transform:translateX(16px);}}
+  .pq-btns{display:grid; grid-template-columns:repeat(3,1fr); gap:8px;}
+  @media (max-width:560px){ .pq-btns{grid-template-columns:1fr 1fr;} }
+  .pq-btns .choice-btn{justify-content:center;}
+  #procList .choice-btn{display:inline-flex; align-items:center; gap:5px;}
+  #procList .choice-btn .ico{font-size:18px;}
+
+  /* ---------- КРОК 5: ІНФОРМАЦІЙНА СИСТЕМА ---------- */
+  .is-flow{display:grid; grid-template-columns:1fr 34px 1fr 34px 1fr; align-items:stretch; margin:16px 0 0;}
+  .is-node{background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:10px 12px; text-align:center; transition:border-color .3s, background .3s, transform .3s;}
+  .is-node .ico{font-size:30px; color:var(--accent);}
+  .is-node b{display:block; font-family:'Baloo 2',sans-serif; font-size:15.5px; line-height:1.2;}
+  .is-node span{display:block; font-size:13px; color:var(--ink-soft); line-height:1.35; margin-top:3px;}
+  .is-node.on{border-color:var(--accent); background:var(--accent-soft); transform:translateY(-3px);}
+  .is-arr{display:flex; align-items:center; justify-content:center; color:#B7ACE0; font-size:26px;}
+  .is-arr.on{color:var(--accent);}
+  .is-back{margin:6px 9% 0; height:34px; border:2.5px dashed #B7ACE0; border-top:none; border-radius:0 0 18px 18px; position:relative; transition:border-color .3s;}
+  .is-back.on{border-color:var(--pink);}
+  .is-back::before{content:""; position:absolute; left:-7.5px; top:-2px; border:6px solid transparent; border-bottom:9px solid #B7ACE0; border-top:none; transition:border-color .3s;}
+  .is-back.on::before{border-bottom-color:var(--pink);}
+  .is-back span{position:absolute; left:50%; bottom:-11px; transform:translateX(-50%); background:var(--bg); padding:0 8px; font-size:12.5px; font-weight:700; color:var(--ink-soft); white-space:nowrap;}
+  .is-back.on span{color:var(--pink);}
+  .is-cap{text-align:center; font-size:14px; min-height:22px; margin:18px 0 0; color:var(--accent-dark); font-weight:700;}
+  @media (max-width:600px){
+    .is-flow{grid-template-columns:1fr;}
+    .is-arr{transform:rotate(90deg); height:28px;}
+    .is-back{display:none;}
+  }
+  .sort-buckets.five{display:flex; flex-wrap:wrap; justify-content:center;}
+  .sort-buckets.five .bucket{flex:0 0 calc((100% - 24px) / 3); min-height:96px;}
+  @media (max-width:620px){ .sort-buckets.five .bucket{flex-basis:calc((100% - 12px) / 2);} }
+  /* картки-варіанти однакового розміру: 5 у рядку, на вузькому — 2 */
+  #isPool{display:grid; grid-template-columns:repeat(5, 1fr); gap:8px;}
+  #isPool .sort-chip{display:flex; align-items:center; justify-content:center; text-align:center; max-width:none; min-height:62px;}
+  @media (max-width:620px){ #isPool{grid-template-columns:1fr 1fr;} }
+  .b-ico{display:block; text-align:center; font-size:26px; color:var(--accent);}
+
+  /* ---------- КРОК 6: МЕТЕОДЕТЕКТИВ ---------- */
+  .ladder{display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:6px; margin-bottom:16px;}
+  .rung{display:flex; align-items:center; gap:6px; padding:7px 13px; border-radius:999px; border:2px solid var(--line); background:var(--surface); font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14.5px; color:#A9A3C2; transition:all .35s;}
+  .rung .ico{font-size:19px;}
+  .rung.on{border-color:var(--c); background:var(--c); color:#fff; box-shadow:0 4px 12px rgba(30,24,56,.15);}
+  .ladder > i{color:#C9C2E3; font-style:normal; font-weight:800;}
+  .meteo{min-height:150px; display:flex; align-items:center; justify-content:center;}
+  .raw{display:flex; gap:10px; flex-wrap:wrap; justify-content:center;}
+  .raw span{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:30px; width:58px; height:58px; display:flex; align-items:center; justify-content:center; border-radius:14px; background:var(--bg); border:2px solid var(--line); animation:pop .4s backwards;}
+  @keyframes pop{from{transform:scale(.4); opacity:0;}}
+  .wtab{border-collapse:collapse; width:100%; max-width:560px; text-align:center; font-size:15px;}
+  .wtab th{background:var(--accent-soft); color:var(--accent-dark); font-family:'Baloo 2',sans-serif; padding:6px 4px; border:1.5px solid var(--line);}
+  .wtab td{padding:8px 4px; border:1.5px solid var(--line); font-weight:800; font-size:18px; animation:pop .4s backwards;}
+  .wchart{width:100%; max-width:560px;}
+  .wchart .ln{fill:none; stroke:var(--accent); stroke-width:4; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:600; stroke-dashoffset:600; animation:draw 1.4s ease forwards;}
+  @keyframes draw{to{stroke-dashoffset:0;}}
+  .wchart .dot{fill:#fff; stroke:var(--accent); stroke-width:3; animation:pop .3s backwards;}
+  .m-say{text-align:center; font-size:14.5px; color:var(--ink-soft); margin:12px 0 10px; min-height:22px;}
+  .m-say b{color:var(--ink);}
+  .m-act{display:flex; justify-content:center;}
+  .m-q{margin-top:6px;}
+  .m-q .q{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16px; text-align:center; margin:0 0 10px;}
+  .m-q .choice-row{justify-content:center;}
+  .m-q .choice-feedback{text-align:center;}
+
+  /* ---------- КРОК 6: ДАНІ, ІНФОРМАЦІЯ, ЗНАННЯ (ілюстрації) ---------- */
+  .tl{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:14px 0 4px;}
+  @media (max-width:600px){ .tl{grid-template-columns:1fr;} }
+  .tl-c{display:flex; flex-direction:column; border-radius:var(--radius-m); padding:12px; background:var(--surface); border:1.5px solid var(--line); border-top:5px solid var(--c); font-size:14px; line-height:1.4;}
+  .tl-c b{display:block; font-family:'Baloo 2',sans-serif; font-size:16px; color:var(--c);}
+  .tl-c em{display:block; font-style:normal; font-weight:700; margin-top:6px;}
+  .tl-c .def{margin:2px 0 0;}
+  .tl-c .ex{margin:8px 0 0; padding:7px 10px; border-radius:var(--radius-s); background:color-mix(in srgb, var(--c) 10%, transparent); font-weight:600;}
+  .tl-c .blink{animation:blink 1.2s steps(1) infinite;}
+  @keyframes blink{50%{opacity:.15;}}
+  .tl-c svg{display:block; width:100%; height:auto; margin-bottom:10px;}
+  .tl-c .bulb{animation:bulb 2.4s ease-in-out infinite;}
+  @keyframes bulb{50%{transform:translateY(-3px);}}
+</style>
+</head>
+<body data-lesson="lesson7m-info-data-knowledge" data-hud="7 клас · Інформація, дані, знання">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Дані та дії з ними · Урок 12</div>
+      <h1>Інформація, повідомлення, дані, знання</h1>
+      <p>Щосекунди до тебе летять сигнали: звуки, написи, сповіщення. З'ясуймо, як із них народжуються дані, інформація і, зрештою, знання.</p>
+      <button class="btn-primary" onclick="document.getElementById('step1').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: лампочка-ідея, у яку влітають біти даних -->
+    <svg class="mascot" viewBox="0 0 160 160" fill="none" aria-hidden="true">
+      <circle cx="84" cy="84" r="66" fill="#EFEAFF"/>
+      <g font-family="Baloo 2, sans-serif" font-weight="800" font-size="15">
+        <g class="bit"><rect x="14" y="44" width="22" height="22" rx="6" fill="#15AABF"/><text x="21" y="60" fill="#fff">1</text></g>
+        <g class="bit"><rect x="10" y="78" width="22" height="22" rx="6" fill="#E64980"/><text x="17" y="94" fill="#fff">0</text></g>
+        <g class="bit"><rect x="22" y="110" width="22" height="22" rx="6" fill="#F59F00"/><text x="29" y="126" fill="#fff">1</text></g>
+        <g class="bit"><rect x="20" y="20" width="22" height="22" rx="6" fill="#6741D9"/><text x="27" y="36" fill="#fff">0</text></g>
+      </g>
+      <circle class="glow" cx="96" cy="70" r="44" fill="#FFE066" opacity=".35"/>
+      <path d="M96 30 C120 30 134 48 134 68 C134 84 124 92 118 102 C115 107 114 111 114 116 H78 C78 111 77 107 74 102 C68 92 58 84 58 68 C58 48 72 30 96 30 Z" fill="#FFD43B"/>
+      <rect x="78" y="116" width="36" height="9" rx="3" fill="#6741D9"/>
+      <rect x="81" y="127" width="30" height="8" rx="3" fill="#4C2EA8"/>
+      <rect x="87" y="137" width="18" height="6" rx="3" fill="#4C2EA8"/>
+      <circle cx="84" cy="68" r="6" fill="#1E1838"/><circle cx="108" cy="68" r="6" fill="#1E1838"/>
+      <circle cx="86" cy="66" r="2" fill="#fff"/><circle cx="110" cy="66" r="2" fill="#fff"/>
+      <path d="M86 84 Q96 94 106 84" stroke="#1E1838" stroke-width="4" stroke-linecap="round"/>
+      <path d="M140 34 l6 -6 M146 52 h9 M134 20 l3 -8" stroke="#F59F00" stroke-width="4" stroke-linecap="round"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <!-- КРОК 1 -->
+  <section class="block" id="step1">
+    <div class="step-label">Крок 1 · Повідомлення</div>
+    <h2>Хто кому щось повідомляє?</h2>
+    <p><b>Повідомлення</b> — це набір сигналів різної природи:</p>
+    <div class="sig-row">
+      <span class="sig"><span class="ico">volume_up</span>звуки</span>
+      <span class="sig"><span class="ico">text_fields</span>текст</span>
+      <span class="sig"><span class="ico">image</span>зображення</span>
+      <span class="sig"><span class="ico">waving_hand</span>жести</span>
+      <span class="sig"><span class="ico">show_chart</span>графіки</span>
+    </div>
+    <p>Обмінюються повідомленнями не лише люди, а й люди з пристроями та пристрої між собою.</p>
+    <p class="soft">Клацни картку, а потім напрям, яким іде повідомлення.</p>
+    <div class="exercise">
+      <div class="sort-buckets">
+        <div class="bucket" id="chHH"><div class="bucket-title"><div class="ch-ico">🧑<i>➜</i>🧑</div>Людина → людина</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="chHD"><div class="bucket-title"><div class="ch-ico">🧑<i>➜</i>📱</div>Людина → пристрій</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="chDH"><div class="bucket-title"><div class="ch-ico">📱<i>➜</i>🧑</div>Пристрій → людина</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="chDD"><div class="bucket-title"><div class="ch-ico">📱<i>➜</i>🖨️</div>Пристрій → пристрій</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="chPool"></div>
+      <div class="progress-line" id="chProgress"></div>
+    </div>
+  </section>
+
+  <!-- КРОК 2 -->
+  <section class="block">
+    <div class="step-label">Крок 2 · Кожен бачить своє</div>
+    <h2>Один малюнок — різна інформація</h2>
+    <p>Ми сприймаємо не сам предмет, а <b>дані</b> про нього. А яку інформацію з них дістанемо, залежить від того, хто ми й що нас цікавить.</p>
+    <svg class="rock" viewBox="0 0 640 230" aria-label="Наскельні малюнки на камені">
+      <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D0EBFF"/><stop offset="1" stop-color="#FFF4E0"/></linearGradient></defs>
+      <rect width="640" height="230" fill="url(#sky)"/>
+      <circle cx="575" cy="44" r="22" fill="#FFD43B"/>
+      <path d="M0 200 Q160 180 320 196 T640 190 V230 H0Z" fill="#C3E19A"/>
+      <path d="M40 210 Q30 120 90 80 Q170 30 300 44 Q420 30 520 70 Q600 110 590 212 Z" fill="#E3C79C"/>
+      <path d="M90 80 Q170 30 300 44 Q420 30 520 70 Q470 60 400 62 Q300 52 200 70 Q130 80 90 80Z" fill="#EFD8B2"/>
+      <path d="M150 190 Q260 170 380 184 M430 120 l30 18 M120 140 l20 -14" stroke="#CDAE80" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <!-- бик -->
+      <g class="gl"><path d="M120 128 Q140 112 175 116 Q205 114 214 128 Q210 146 196 148 L194 170 M180 148 L178 170 M140 146 L138 170 M126 140 L122 168 M120 128 Q112 134 114 146"/><path d="M214 128 Q224 120 232 124 M226 118 Q238 104 246 112 M224 118 Q232 100 222 96"/></g>
+      <!-- мамонт -->
+      <g class="gl"><path d="M300 150 Q296 104 336 96 Q352 84 372 96 Q404 100 412 128 Q414 146 404 150 L402 176 M386 152 L384 176 M330 152 L328 176 M312 150 L310 176"/><path d="M412 128 Q426 140 420 162 Q416 172 424 176"/><path d="M406 140 Q420 150 432 144"/></g>
+      <!-- люди -->
+      <g class="gl"><circle cx="478" cy="114" r="6"/><path d="M478 120 V146 M478 128 l-12 8 M478 128 l14 -10 M478 146 l-9 16 M478 146 l9 16 M492 118 l10 -22"/></g>
+      <g class="gl"><circle cx="512" cy="126" r="5"/><path d="M512 131 V152 M512 138 l-10 6 M512 138 l10 6 M512 152 l-7 14 M512 152 l7 14"/></g>
+      <!-- сонце-спіраль -->
+      <g class="gl"><path d="M250 80 m-4 0 a4 4 0 1 1 8 0 a8 8 0 1 1 -16 0 a12 12 0 1 1 24 0"/></g>
+    </svg>
+    <div class="cap">Малюнки на зразок тих, що знайдено в заповіднику «Кам'яна могила» біля Мелітополя</div>
+    <p class="soft" style="margin-top:14px">Хто з відвідувачів яку інформацію дістане з цих малюнків? Перетягни людину до її думки або клацни людину, а потім думку.</p>
+    <div class="exercise">
+      <div class="match-pool" id="rockPool"></div>
+      <div id="rockList"></div>
+      <div class="progress-line" id="rockProgress"></div>
+    </div>
+  </section>
+
+  <!-- КРОК 3 -->
+  <section class="block">
+    <div class="step-label">Крок 3 · Дані</div>
+    <h2>Що розповідає етикетка</h2>
+    <p><b>Дані</b> — це відомості, зафіксовані на <b>носії</b>, щоб їх зберігати, передавати й опрацьовувати. Слово походить від англійського <i>data</i> — «факт».</p>
+    <div class="carriers">
+      <span class="carrier"><span class="ico">description</span>папір</span>
+      <span class="carrier"><span class="ico">movie</span>фотоплівка</span>
+      <span class="carrier"><span class="ico">sd_card</span>картка пам'яті</span>
+      <span class="carrier"><span class="ico">hard_drive</span>диск</span>
+      <span class="carrier"><span class="ico">usb</span>флешка</span>
+    </div>
+    <p style="margin-top:16px">Етикетка в магазині — теж носій даних. Знайди на ній відповідь на кожне запитання.</p>
+    <div class="exercise" id="label">
+      <div class="lq" id="lq"><span class="ico">help</span><div><b></b><small></small></div></div>
+      <div class="lbl-wrap">
+        <svg viewBox="0 0 150 170" aria-hidden="true">
+          <ellipse cx="75" cy="160" rx="52" ry="7" fill="#E3DDF5"/>
+          <path d="M28 40 H122 L110 154 Q109 160 102 160 H48 Q41 160 40 154 Z" fill="#fff" stroke="#E3DDF5" stroke-width="3"/>
+          <path d="M33 80 H117 L112 128 H38 Z" fill="#FCC2D7"/>
+          <path d="M50 94 Q62 88 74 94 Q74 110 62 120 Q50 110 50 94Z" fill="#E03131"/>
+          <path d="M78 98 Q88 93 98 98 Q98 111 88 119 Q78 111 78 98Z" fill="#F03E3E"/>
+          <g fill="#FFE8A1"><circle cx="57" cy="100" r="1.3"/><circle cx="66" cy="99" r="1.3"/><circle cx="61" cy="108" r="1.3"/><circle cx="85" cy="104" r="1.2"/><circle cx="92" cy="104" r="1.2"/><circle cx="88" cy="111" r="1.2"/></g>
+          <path d="M54 93 l8 -6 l8 6 M82 97 l6 -5 l6 5" stroke="#2F9E44" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <rect x="22" y="28" width="106" height="14" rx="5" fill="#D6336C"/>
+          <path d="M40 30 l6 -12 h58 l6 12" fill="#F783AC"/>
+        </svg>
+        <div class="lbl">
+          <div class="lbl-brand">Ранок</div>
+          <div class="lbl-sub">Йогурт полуничний · 2,5 % жиру</div>
+          <div>Склад: <span class="fld" data-f="sklad">молоко, полуниця, цукор, закваска; може містити сліди горіхів</span></div>
+          <div>Маса нетто: <span class="fld" data-f="mass">300 г</span></div>
+          <div>Виготовлено: <span class="fld" data-f="made">15.11.2026</span> · Вжити до: <span class="fld" data-f="till">27.11.2026</span></div>
+          <div>Зберігати: <span class="fld" data-f="store">за температури від +2 до +6 °C</span></div>
+          <div>Виробник: <span class="fld" data-f="maker">ТОВ «Зелений луг», Житомирська обл.</span></div>
+          <div class="lbl-row">
+            <span class="fld barcode" data-f="code" aria-label="Штрихкод"></span>
+            <span class="price"><span class="fld" data-f="price">42,90 грн</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note">Однакові етикетки — а інформацію люди дістають різну: людині з алергією найважливіший склад, а ощадливому покупцеві — ціна.</div>
+  </section>
+
+  <!-- КРОК 4 -->
+  <section class="block">
+    <div class="step-label">Крок 4 · Інформаційні процеси</div>
+    <h2>Що відбувається з даними</h2>
+    <p>Люди й пристрої постійно діють із повідомленнями. Ці дії називають <b>інформаційними процесами</b>.</p>
+    <div class="proc-grid">
+      <div class="proc" style="--c:#15AABF"><span class="ico">sensors</span><b>Збирання</b><span>спостереження, вимірювання, опитування</span></div>
+      <div class="proc" style="--c:#4263EB"><span class="ico">search</span><b>Пошук</b><span>запит в інтернеті, каталог</span></div>
+      <div class="proc" style="--c:#6741D9"><span class="ico">lock</span><b>Зберігання й захист</b><span>запис на носій, захист від втрати й пошкодження</span></div>
+      <div class="proc" style="--c:#E64980"><span class="ico">settings</span><b>Опрацювання</b><span>сортування, порівняння, обчислення, аналіз</span></div>
+      <div class="proc" style="--c:#F59F00"><span class="ico">bar_chart</span><b>Подання</b><span>текст, таблиця, графік, малюнок</span></div>
+      <div class="proc" style="--c:#2F9E44"><span class="ico">cell_tower</span><b>Передавання й використання</b><span>від передавача до приймача, ухвалення рішень</span></div>
+    </div>
+    <div class="station">
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <rect x="29" y="22" width="6" height="38" rx="2" fill="#5B5578"/>
+        <rect x="18" y="58" width="28" height="5" rx="2" fill="#5B5578"/>
+        <rect x="20" y="30" width="24" height="16" rx="4" fill="#fff" stroke="#15AABF" stroke-width="3"/>
+        <path d="M25 41 v-6 M30 41 v-4 M35 41 v-8 M40 41 v-5" stroke="#15AABF" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M32 18 l-12 -6 M32 18 l12 -6" stroke="#5B5578" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="18" cy="11" r="5" fill="#F59F00"/><circle cx="46" cy="11" r="5" fill="#F59F00"/>
+        <path d="M48 26 q6 6 0 12 M53 22 q10 10 0 20" stroke="#15AABF" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      </svg>
+      <p>У школі поставили <b>метеостанцію</b>. Який інформаційний процес відбувається в кожній ситуації?</p>
+    </div>
+    <div class="exercise" id="procList"></div>
+  </section>
+
+  <!-- КРОК 5 -->
+  <section class="block">
+    <div class="step-label">Крок 5 · Інформаційна система</div>
+    <h2>Як працює шкільна бібліотека</h2>
+    <p>Пристрої, програми, засоби зв'язку, бази даних і люди разом утворюють <b>інформаційну систему</b>. Вона збирає, шукає, опрацьовує й пересилає інформацію.</p>
+    <div class="is-flow" id="isFlow">
+      <div class="is-node"><span class="ico">barcode_scanner</span><b>Введення</b><span>Сканер зчитує штрихкод книжки й квиток читача</span></div>
+      <div class="is-arr ico">arrow_forward</div>
+      <div class="is-node"><span class="ico">memory</span><b>Опрацювання</b><span>Програма знаходить книжку й записує, хто її взяв</span></div>
+      <div class="is-arr ico">arrow_forward</div>
+      <div class="is-node"><span class="ico">desktop_windows</span><b>Виведення</b><span>На екрані: «Видано до 5 грудня»</span></div>
+    </div>
+    <div class="is-back" id="isBack"><span>↺ зворотний зв'язок</span></div>
+    <div class="is-cap" id="isCap"></div>
+    <p style="margin-top:18px" class="soft">З чого складається ця інформаційна система? Перетягни картку до складової або клацни картку, а потім складову.</p>
+    <div class="exercise">
+      <div class="sort-buckets five">
+        <div class="bucket" id="isHw"><div class="bucket-title"><span class="ico b-ico">computer</span>Апаратна складова</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="isSw"><div class="bucket-title"><span class="ico b-ico">apps</span>Програмна складова</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="isDb"><div class="bucket-title"><span class="ico b-ico">database</span>Бази даних</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="isNet"><div class="bucket-title"><span class="ico b-ico">wifi</span>Телекомунікації</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="isPpl"><div class="bucket-title"><span class="ico b-ico">groups</span>Люди та процедури</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="isPool"></div>
+      <div class="progress-line" id="isProgress"></div>
+    </div>
+  </section>
+
+  <!-- КРОК 6 -->
+  <section class="block">
+    <div class="step-label">Крок 6 · Від даних до знань</div>
+    <h2>Три сходинки до знань</h2>
+    <p>Розгляньмо кожну сходинку на прикладі телефона, який от-от розрядиться.</p>
+    <div class="tl">
+      <div class="tl-c" style="--c:#15AABF"><svg viewBox="0 0 200 120" aria-hidden="true"><defs><clipPath id="dk1"><rect width="200" height="120" rx="12"/></clipPath></defs><g clip-path="url(#dk1)"><rect width="200" height="120" fill="#E3F8FB"/><rect x="36" y="30" width="118" height="60" rx="12" fill="#1E1838"/><text x="80" y="72" font-family="Baloo 2, sans-serif" font-weight="800" font-size="32" fill="#fff" text-anchor="middle">15</text><rect x="108" y="51" width="28" height="16" rx="3.5" fill="none" stroke="#fff" stroke-width="2.5"/><rect x="137" y="56" width="3.5" height="6" rx="1" fill="#fff"/><rect class="blink" x="111" y="54" width="5" height="10" rx="1.5" fill="#FA5252"/><text x="176" y="36" font-family="Baloo 2, sans-serif" font-weight="800" font-size="26" fill="#5B5578" text-anchor="middle">?</text><text x="20" y="104" font-family="Baloo 2, sans-serif" font-weight="800" font-size="20" fill="#5B5578" text-anchor="middle">?</text></g></svg><b>Дані</b><p class="def">Записані числа, слова, знаки. Самі по собі вони ще нічого не пояснюють.</p><p class="ex">У кутку екрана — число 15 і червона рисочка в прямокутнику.</p></div>
+      <div class="tl-c" style="--c:#4263EB"><svg viewBox="0 0 200 120" aria-hidden="true"><defs><clipPath id="dk2"><rect width="200" height="120" rx="12"/></clipPath></defs><g clip-path="url(#dk2)"><rect width="200" height="120" fill="#EDF2FF"/><rect x="56" y="10" width="88" height="130" rx="14" fill="#1E1838"/><rect x="62" y="16" width="76" height="120" rx="9" fill="#fff"/><text x="112" y="30" font-family="Baloo 2, sans-serif" font-weight="800" font-size="10" fill="#FA5252" text-anchor="end">15%</text><rect x="116" y="22" width="14" height="8" rx="2" fill="none" stroke="#FA5252" stroke-width="1.6"/><rect x="118" y="24" width="3" height="4" fill="#FA5252"/><rect x="80" y="44" width="40" height="56" rx="7" fill="none" stroke="#4263EB" stroke-width="3.5"/><rect x="92" y="38" width="16" height="6" rx="2" fill="#4263EB"/><rect class="blink" x="85" y="86" width="30" height="9" rx="2.5" fill="#FA5252"/><text x="100" y="74" font-family="Baloo 2, sans-serif" font-weight="800" font-size="15" fill="#4263EB" text-anchor="middle">15 %</text><text x="100" y="118" font-family="Baloo 2, sans-serif" font-weight="800" font-size="12" fill="#5B5578" text-anchor="middle">Заряд</text></g></svg><b>Інформація</b><p class="def">Дані, зміст яких ми зрозуміли.</p><p class="ex">Це заряд батареї: залишилось 15 %.</p></div>
+      <div class="tl-c" style="--c:#6741D9"><svg viewBox="0 0 200 120" aria-hidden="true"><defs><clipPath id="dk3"><rect width="200" height="120" rx="12"/></clipPath></defs><g clip-path="url(#dk3)"><rect width="200" height="120" fill="#F3F0FF"/><g transform="translate(-50 21) scale(1.5)"><g class="bulb"><path d="M55.8 21.6 L50.6 19.7 M62.5 14.2 L60.2 9.2 M73.5 14.2 L75.8 9.2 M80.2 21.6 L85.4 19.7" stroke="#F59F00" stroke-width="2.5" stroke-linecap="round"/><circle cx="68" cy="26" r="9" fill="#FFD43B" stroke="#1E1838" stroke-width="2"/><rect x="64" y="34" width="8" height="5" rx="1.5" fill="#5B5578"/></g></g><rect x="96" y="22" width="96" height="34" rx="10" fill="#fff"/><rect x="104" y="31" width="22" height="13" rx="3" fill="none" stroke="#FA5252" stroke-width="2.2"/><rect x="127" y="35" width="3" height="5" rx="1" fill="#FA5252"/><rect x="106.5" y="33.5" width="4" height="8" rx="1" fill="#FA5252"/><text x="160" y="45" font-family="Baloo 2, sans-serif" font-weight="800" font-size="14" fill="#FA5252" text-anchor="middle">≈ 1 год</text><rect x="96" y="66" width="96" height="34" rx="10" fill="#fff"/><path d="M104 84 L115 74 L126 84 M107 82 V94 H123 V82" fill="none" stroke="#1E1838" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/><text x="160" y="89" font-family="Baloo 2, sans-serif" font-weight="800" font-size="14" fill="#1E1838" text-anchor="middle">2 год</text></g></svg><b>Знання</b><p class="def">Висновок з інформації, який спирається на досвід і правила.</p><p class="ex">15 % вистачить приблизно на годину, а до дому — дві.</p><em>→ Рішення: вмикаю режим енергозбереження.</em></div>
+    </div>
+    <p class="soft" style="margin-top:22px">Метеостанція надіслала числа за тиждень. Розгадай, що вони означають.</p>
+    <div class="exercise" id="meteo">
+      <div class="ladder">
+        <span class="rung" style="--c:#15AABF"><span class="ico">grid_on</span>Дані</span><i>›</i>
+        <span class="rung" style="--c:#4263EB"><span class="ico">info</span>Інформація</span><i>›</i>
+        <span class="rung" style="--c:#6741D9"><span class="ico">lightbulb</span>Знання</span><i>›</i>
+        <span class="rung" style="--c:#2F9E44"><span class="ico">task_alt</span>Рішення</span>
+      </div>
+      <div class="meteo" id="mView"></div>
+      <div class="m-say" id="mSay"></div>
+      <div class="m-act" id="mAct"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Урок · «Інформаційні процеси і системи. Інформація, повідомлення, дані, знання» · 7 клас</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+const ICO = n => `<span class="ico">${n}</span>`;
+
+/* ---------- КРОК 1: НАПРЯМИ ПОВІДОМЛЕНЬ ---------- */
+makeSortBoard('chPool', { hh:'chHH', hd:'chHD', dh:'chDH', dd:'chDD' }, [
+  { text:'👍 Друг показує «клас» через усе подвір\'я', bucket:'hh' },
+  { text:'✉️ Записка від однокласниці', bucket:'hh' },
+  { text:'🗣️ «Окей, Google, постав таймер на 10 хвилин»', bucket:'hd' },
+  { text:'📺 Перемикаєш канал пультом', bucket:'hd' },
+  { text:'⏰ О 7:00 дзвенить будильник', bucket:'dh' },
+  { text:'🚦 Для пішоходів загорівся зелений', bucket:'dh' },
+  { text:'⌚ Годинник надсилає кроки за день у телефон', bucket:'dd' },
+  { text:'🖨️ Ноутбук відправляє реферат на принтер', bucket:'dd' }
+], 'chProgress');
+
+/* ---------- КРОК 2: КАМ'ЯНА МОГИЛА ---------- */
+makeMatching('rockPool', 'rockList', [
+  { icon:'🏛️ ', name:'Історик', desc:'«Отже, тисячі років тому тут уже жили люди»' },
+  { icon:'🎨 ', name:'Художниця', desc:'«Цікаво, якими лініями давні майстри передавали рух тварин»' },
+  { icon:'🎒 ', name:'Турист', desc:'«Незвичне місце — обов\'язково порадити друзям»' },
+  { icon:'🦴 ', name:'Палеонтологиня', desc:'«Колись у цих степах паслися мамонти»' }
+], 'rockProgress');
+
+/* ---------- КРОК 3: ЕТИКЕТКА ---------- */
+(function(){
+  const box = document.getElementById('label');
+  // штрихкод
+  const bc = box.querySelector('.barcode');
+  [3,1,2,1,3,2,1,1,3,1,2,3,1,2,1,3,1,1,2,3,1,2].forEach(w=>bc.insertAdjacentHTML('beforeend', `<b style="width:${w}px"></b>`));
+  const Q = [
+    { f:'till', ic:'event', q:'Сьогодні 21 листопада. Чи можна ще з\'їсти цей йогурт?', ok:'27 листопада ще не настало — можна.' },
+    { f:'sklad', ic:'health_and_safety', q:'У Марка харчова алергія. Що йому прочитати насамперед?', ok:'Склад показує, з чого зроблено продукт і що в ньому може трапитись.' },
+    { f:'store', ic:'thermostat', q:'Мама хоче залишити йогурт на балконі, де зараз +12 °C. Чи варто?', ok:'Треба від +2 до +6 °C, тож на балконі йогурт зіпсується.' },
+    { f:'mass', ic:'scale', q:'Вам із сестрою треба по 150 г. Чи вистачить одного стаканчика?', ok:'300 г — якраз по 150 г кожному.' },
+    { f:'code', ic:'point_of_sale', q:'Касир пробиває покупку за секунду. Які дані зчитує сканер на касі?', ok:'Штрихкод — це дані, записані смужками для пристрою.' }
+  ];
+  const hit = trackTask(box, Q.length, Q.length + 2);
+  const lq = document.getElementById('lq'), qi = lq.querySelector('.ico'), qb = lq.querySelector('b'), qs = lq.querySelector('small');
+  let n = 0, busy = false;
+  function show(){
+    lq.classList.remove('ok');
+    if(n === Q.length){ qi.textContent = 'celebration'; qb.textContent = 'Усі відповіді знайдено!'; qs.textContent = 'Одна етикетка — а скільки корисних даних.'; lq.classList.add('ok'); return; }
+    qi.textContent = Q[n].ic; qb.textContent = `${n + 1}/${Q.length}. ${Q[n].q}`; qs.textContent = 'Клацни потрібні дані на етикетці.';
+  }
+  box.querySelectorAll('.fld').forEach(el=>el.addEventListener('click', ()=>{
+    if(busy || n === Q.length || el.classList.contains('found')) return;
+    if(el.dataset.f === Q[n].f){
+      el.classList.add('found'); lq.classList.add('ok');
+      qi.textContent = 'check_circle'; qs.textContent = Q[n].ok;
+      addNeurons(1); hit();
+      busy = true;
+      setTimeout(()=>{ busy = false; if(++n === Q.length) addNeurons(2); show(); }, 1900);
+    } else {
+      el.classList.add('wrong'); qs.textContent = 'Ці дані тут не допоможуть. Пошукай інші.';
+      setTimeout(()=>el.classList.remove('wrong'), 600);
+    }
+  }));
+  show();
+})();
+
+/* ---------- КРОК 4: ІНФОРМАЦІЙНІ ПРОЦЕСИ ---------- */
+const PROC = [['sensors','Збирання'], ['search','Пошук'], ['lock','Зберігання й захист'], ['settings','Опрацювання'], ['bar_chart','Подання'], ['cell_tower','Передавання']];
+const PROC_Q = [
+  { logo:'🌡️', text:'Датчик щогодини вимірює температуру повітря біля школи', correct:0 },
+  { logo:'💾', text:'Метеостанція записує результати на картку пам\'яті', correct:2 },
+  { logo:'📶', text:'Через Wi-Fi дані потрапляють на шкільний сервер', correct:5 },
+  { logo:'🧮', text:'Програма обчислює середню температуру за день', correct:3 },
+  { logo:'📈', text:'На сайті школи температуру за тиждень показано лінією на графіку', correct:4 },
+  { logo:'🔎', text:'Учениця з\'ясовує в інтернеті, якою була температура торік у листопаді', correct:1 },
+  { logo:'🔑', text:'Учитель ставить надійний пароль на обліковий запис метеостанції', correct:2 }
+];
+// ситуації по одній: картка з ситуацією, під нею 6 процесів
+(function(){
+  const box = document.getElementById('procList');
+  const hit = trackTask(box, PROC_Q.length, PROC_Q.length + 2);
+  box.innerHTML = `<div class="pq-head"><span class="pq-count"></span><span class="pq-dots">${PROC_Q.map(()=>'<i></i>').join('')}</span></div>
+    <div class="pq-card"><span class="pq-emo"></span><b class="pq-text"></b></div>
+    <div class="pq-btns">${PROC.map(([ic, t], i)=>`<button class="choice-btn" data-i="${i}">${ICO(ic)}${t}</button>`).join('')}</div>
+    <div class="choice-feedback"></div>`;
+  const $ = q=>box.querySelector(q), btns = box.querySelectorAll('.pq-btns .choice-btn'), dots = box.querySelectorAll('.pq-dots i'), fb = $('.choice-feedback');
+  let n = 0, missed = false, busy = false;
+  function show(){
+    btns.forEach(b=>b.className = 'choice-btn');
+    dots.forEach((d, i)=>d.classList.toggle('cur', i === n));
+    if(n === PROC_Q.length){ $('.pq-count').textContent = 'Усі ситуації розібрано ✓'; $('.pq-card').style.display = 'none'; $('.pq-btns').style.display = 'none'; fb.textContent = 'З даними метеостанції відбулися всі шість інформаційних процесів.'; return; }
+    $('.pq-count').textContent = `Ситуація ${n + 1} з ${PROC_Q.length}`;
+    $('.pq-emo').textContent = PROC_Q[n].logo; $('.pq-text').textContent = PROC_Q[n].text;
+    const c = $('.pq-card'); c.classList.remove('in'); void c.offsetWidth; c.classList.add('in');
+    fb.textContent = ''; missed = false;
+  }
+  btns.forEach(b=>b.addEventListener('click', ()=>{
+    if(busy || n === PROC_Q.length) return;
+    if(+b.dataset.i !== PROC_Q[n].correct){ b.classList.add('wrong'); missed = true; fb.textContent = 'Ні, подумай ще.'; return; }
+    b.classList.add('correct'); fb.textContent = 'Правильно ✓';
+    dots[n].classList.add(missed ? 'miss-d' : 'ok');
+    addNeurons(1); hit(); busy = true;
+    setTimeout(()=>{ busy = false; if(++n === PROC_Q.length) addNeurons(2); show(); }, 1100);
+  }));
+  show();
+})();
+
+/* ---------- КРОК 5: ІНФОРМАЦІЙНА СИСТЕМА ---------- */
+(function(){
+  const flow = document.getElementById('isFlow'), back = document.getElementById('isBack'), cap = document.getElementById('isCap');
+  const nodes = flow.querySelectorAll('.is-node'), arrs = flow.querySelectorAll('.is-arr');
+  const STEPS = [
+    { on:[nodes[0]], t:'1. Дані надходять у систему' },
+    { on:[arrs[0], nodes[1]], t:'2. Комп\'ютер опрацьовує їх за програмою' },
+    { on:[arrs[1], nodes[2]], t:'3. Результат показано людині' },
+    { on:[back], t:'4. Бібліотекарка бачить помилку — і сканує квиток ще раз' }
+  ];
+  let i = 0;
+  setInterval(()=>{
+    flow.querySelectorAll('.on').forEach(e=>e.classList.remove('on')); back.classList.remove('on');
+    STEPS[i].on.forEach(e=>e.classList.add('on')); cap.textContent = STEPS[i].t;
+    i = (i + 1) % STEPS.length;
+  }, 1800);
+})();
+makeSortBoard('isPool', { hw:'isHw', sw:'isSw', db:'isDb', net:'isNet', ppl:'isPpl' }, [
+  { text:'Комп\'ютер бібліотекарки', bucket:'hw' },
+  { text:'Сканер штрихкодів', bucket:'hw' },
+  { text:'Програма обліку книжок', bucket:'sw' },
+  { text:'Пошук книжок на сайті', bucket:'sw' },
+  { text:'Перелік усіх книжок', bucket:'db' },
+  { text:'Список читачів', bucket:'db' },
+  { text:'Шкільний Wi-Fi', bucket:'net' },
+  { text:'Кабель до сервера', bucket:'net' },
+  { text:'Бібліотекарка', bucket:'ppl' },
+  { text:'Правила видачі книжок', bucket:'ppl' }
+], 'isProgress');
+
+/* ---------- КРОК 6: МЕТЕОДЕТЕКТИВ ---------- */
+(function(){
+  const box = document.getElementById('meteo');
+  const view = document.getElementById('mView'), say = document.getElementById('mSay'), act = document.getElementById('mAct');
+  const rungs = box.querySelectorAll('.rung');
+  const T = [3, 5, 6, 8, 9, 11, 12], D = ['Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
+  const hit = trackTask(box, 4, 3);
+  const btn = (txt, fn)=>{ act.innerHTML = ''; const b = document.createElement('button'); b.className = 'btn-primary'; b.textContent = txt; b.onclick = fn; act.appendChild(b); };
+  function question(q, opts, correct, okText, next, badText = 'Подумай ще: це не висновок із даних.'){
+    act.innerHTML = `<div class="m-q"><p class="q">${q}</p><div class="choice-row"></div><div class="choice-feedback"></div></div>`;
+    const row = act.querySelector('.choice-row'), fb = act.querySelector('.choice-feedback');
+    let done = false;
+    shuffle(opts.map((o, i)=>({o, i}))).forEach(({o, i})=>{
+      const b = document.createElement('button'); b.className = 'choice-btn'; b.textContent = o;
+      b.onclick = ()=>{
+        if(done) return;
+        if(i === correct){ done = true; b.classList.add('correct'); fb.textContent = 'Правильно ✓ ' + okText; addNeurons(1); hit(); setTimeout(next, 1600); }
+        else { b.classList.add('wrong'); fb.textContent = badText; }
+      };
+      row.appendChild(b);
+    });
+  }
+  // 1. Дані
+  rungs[0].classList.add('on');
+  view.innerHTML = `<div class="raw">${T.map((t, i)=>`<span style="animation-delay:${i * .07}s">${t}</span>`).join('')}</div>`;
+  say.innerHTML = '<b>Це дані.</b> Числа записано, але що вони означають — незрозуміло.';
+  btn('Додати підписи', ()=>{
+    hit(); rungs[1].classList.add('on');
+    view.innerHTML = `<table class="wtab"><tr>${D.map(d=>`<th>${d}</th>`).join('')}</tr><tr>${T.map((t, i)=>`<td style="animation-delay:${i * .07}s">+${t} °C</td>`).join('')}</tr></table>`;
+    say.innerHTML = '<b>Тепер це інформація:</b> ми розуміємо, що це температура повітря в кожен день тижня.';
+    btn('Побудувати графік', ()=>{
+      hit();
+      const W = 560, H = 160, x = i=>40 + i * 80, y = t=>H - 26 - t * 9;
+      view.innerHTML = `<svg class="wchart" viewBox="0 0 ${W} ${H}">
+        <line x1="20" y1="${H - 24}" x2="${W - 10}" y2="${H - 24}" stroke="#E3DDF5" stroke-width="2"/>
+        ${D.map((d, i)=>`<text x="${x(i)}" y="${H - 6}" text-anchor="middle" font-size="13" fill="#5B5578" font-weight="700">${d}</text>`).join('')}
+        <polyline class="ln" points="${T.map((t, i)=>`${x(i)},${y(t)}`).join(' ')}"/>
+        ${T.map((t, i)=>`<circle class="dot" cx="${x(i)}" cy="${y(t)}" r="6" style="animation-delay:${.2 * i}s"/><text x="${x(i)}" y="${y(t) - 12}" text-anchor="middle" font-size="13" font-weight="800" fill="#4C2EA8">+${t}°</text>`).join('')}
+      </svg>`;
+      say.innerHTML = 'Графік допомагає побачити те, що в числах ховається.';
+      question('Яку закономірність показує графік?', ['Цього тижня щодня теплішає', 'Цього тижня щодня холоднішає', 'Температура весь тиждень однакова'], 0, 'Це вже знання: ми побачили закономірність.', ()=>{
+        rungs[2].classList.add('on');
+        say.innerHTML = '<b>Знання:</b> температура зростає протягом тижня.';
+        question('Як скористатися цим знанням?', ['Вдягати легшу куртку, якщо тепло протримається', 'Видалити дані — вони вже не потрібні', 'Переписати числа в зошит ще раз'], 0, 'Знання допомагають ухвалювати рішення.', ()=>{
+          rungs[3].classList.add('on');
+          addNeurons(1);
+          say.innerHTML = '<b>Дані → інформація → знання → рішення.</b> Ось навіщо ми збираємо й опрацьовуємо дані!';
+          act.innerHTML = '';
+        });
+      }, 'Подивись, куди йде лінія графіка.');
+    });
+  });
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+// правильна відповідь у даних — перша; варіанти перемішуються для кожного учня
+const mix = qs=>qs.map(q=>{ const o = shuffle(q.opts.map((t, i)=>({t, i}))); return {...q, opts:o.map(x=>x.t), correct:o.findIndex(x=>x.i === q.correct)}; });
+makeFinalQuiz('finalQuiz', mix([
+  { q:'Що таке повідомлення?', opts:['Набір сигналів різної природи: звуків, тексту, зображень, жестів', 'Лише текст, надісланий у месенджері', 'Будь-який пристрій, що передає дані', 'Висновок, зроблений після аналізу'], correct:0 },
+  { q:'Що таке дані?', opts:['Відомості, зафіксовані на носії для зберігання, передавання й опрацювання', 'Тільки числа в таблиці', 'Те, що людина відчуває, але не може записати', 'Програми, встановлені на комп\'ютері'], correct:0 },
+  { q:'Учні опитали однокласників про улюблені фрукти. Який це інформаційний процес?', opts:['Збирання', 'Подання', 'Захист', 'Передавання'], correct:0 },
+  { q:'Результати опитування показали секторною діаграмою. Який це процес?', opts:['Подання', 'Пошук', 'Збирання', 'Зберігання'], correct:0 },
+  { q:'Що НЕ є складовою інформаційної системи?', opts:['Погода за вікном', 'Програмне забезпечення', 'Бази даних', 'Люди, які обслуговують систему'], correct:0 },
+  { q:'Що з цього — знання?', opts:['«Взимку ця річка замерзає, тому в січні тут можна кататися на ковзанах»', '«−5, −8, −3, −10»', '«У понеділок було −5 °C»', '«Річка Дніпро»'], correct:0 },
+  { q:'Як пов\'язані дані й знання?', opts:['Знання з\'являються, коли ми опрацьовуємо й розуміємо дані', 'Це одне й те саме', 'Знання завжди передують даним', 'Дані з\'являються, коли знання застарівають'], correct:0 }
+]), {summary:'Тепер ти знаєш, як сигнали стають даними, дані — інформацією, а інформація — знаннями, і що таке інформаційні процеси й системи.'});
+</script>
+
+</body>
+</html>

@@ -292,6 +292,71 @@ function makeYesNo(containerId, items, optYes = 'Так', optNo = 'Ні'){
   makeChoices(containerId, items.map(it=>({...it, opts:[optYes, optNo], correct: it.correct ? 0 : 1})));
 }
 
+// Сіре місце замість картки, що пішла з лотка: решта карток не зсувається.
+// Лоток із власною логікою (data-nodrag) сам вирішує, що лишити.
+function leaveSlot(el){
+  const pool = el.parentNode;
+  if(!pool || 'nodrag' in (pool.dataset || {})) return null;
+  const r = el.getBoundingClientRect(), cs = getComputedStyle(el);
+  const slot = document.createElement('div');
+  slot.className = 'chip-slot';
+  Object.assign(slot.style, {width:r.width + 'px', height:r.height + 'px', borderRadius:cs.borderRadius, margin:cs.margin});
+  el.before(slot);
+  return slot;
+}
+
+// Усе розкладено — сірі місця більше не потрібні
+function clearSlots(pool){ pool.querySelectorAll(':scope > .chip-slot').forEach(s=>s.remove()); }
+
+// Перетягування мишею чи пальцем: el — що тягнемо, findTarget(x, y) → елемент-ціль або null,
+// onDrop(ціль) — що зробити, коли відпустили над ціллю. Клацання (без руху) працює як і раніше.
+function dragTo(el, findTarget, onDrop){
+  el.classList.add('draggable');
+  el.addEventListener('pointerdown', e=>{
+    if(e.button > 0 || el.classList.contains('placed')) return;
+    const sx = e.clientX, sy = e.clientY;
+    let ghost = null, hole = null, over = null, dx = 0, dy = 0;
+    const setOver = t=>{ if(t === over) return; over?.classList.remove('drop-over'); over = t; over?.classList.add('drop-over'); };
+    const move = ev=>{
+      if(!ghost){
+        if(Math.hypot(ev.clientX - sx, ev.clientY - sy) < 6) return;
+        const r = el.getBoundingClientRect();
+        dx = sx - r.left; dy = sy - r.top;
+        ghost = el.cloneNode(true);
+        ghost.classList.add('drag-ghost');
+        ghost.classList.remove('selected');
+        // привид поза своїм контейнером не бачить стилів уроку на кшталт «#pool .chip» — переносимо вигляд явно
+        const cs = getComputedStyle(el);
+        ['display','alignItems','justifyContent','gap','whiteSpace','textAlign','fontSize','fontWeight','lineHeight','padding','borderRadius'].forEach(k=>ghost.style[k] = cs[k]);
+        Object.assign(ghost.style, {boxSizing:'border-box', width:r.width + 'px', height:r.height + 'px', overflow:'hidden'});
+        document.body.appendChild(ghost);
+        hole = leaveSlot(el);
+        if(hole) el.style.display = 'none'; else el.classList.add('dragging');
+        document.documentElement.classList.add('is-dragging');
+      }
+      ev.preventDefault();
+      ghost.style.left = (ev.clientX - dx) + 'px';
+      ghost.style.top = (ev.clientY - dy) + 'px';
+      setOver(findTarget(ev.clientX, ev.clientY));
+    };
+    const end = ev=>{
+      removeEventListener('pointermove', move);
+      removeEventListener('pointerup', end);
+      removeEventListener('pointercancel', end);
+      if(!ghost) return;
+      ghost.remove(); el.classList.remove('dragging');
+      if(hole){ hole.remove(); el.style.display = ''; }
+      document.documentElement.classList.remove('is-dragging');
+      const t = ev.type === 'pointerup' ? findTarget(ev.clientX, ev.clientY) : null;
+      setOver(null);
+      if(t) onDrop(t);
+    };
+    addEventListener('pointermove', move, {passive:false});
+    addEventListener('pointerup', end);
+    addEventListener('pointercancel', end);
+  });
+}
+
 // Зіставлення «термін ↔ пояснення»: pairs — [{name, desc, icon?}] (desc можна назвати func або def);
 // progressId — необов'язковий рядок «Зіставлено: N з M»; onDone — що зробити, коли всі пари знайдено
 // (можна передати замість bonus: makeMatching(pool, list, pairs, progress, ()=>…))
@@ -311,12 +376,20 @@ function makeMatching(poolId, listId, pairs, progressId, bonus = 2, onDone){
     const chip = document.createElement('div');
     chip.className = 'match-chip';
     chip.innerHTML = (p.icon || '') + p.name;
+    chip.dataset.name = p.name;
     chip.addEventListener('click', ()=>{
       if(chip.classList.contains('placed')) return;
       pool.querySelectorAll('.match-chip').forEach(c=>c.classList.remove('selected'));
       chip.classList.add('selected');
       selected = p.name;
     });
+    // або перетягнути термін на пояснення
+    dragTo(chip, (x, y)=>{ const c = document.elementFromPoint(x, y)?.closest('.desc-card'); return c && list.contains(c) && !c.classList.contains('matched') ? c : null; },
+      card=>{
+        chip.click(); card.click();
+        // не туди — картка не лишається вибраною, інакше наступне клацання поставить її деінде
+        if(!chip.classList.contains('placed')){ chip.classList.remove('selected'); selected = null; }
+      });
     pool.appendChild(chip);
   });
   shuffle(pairs).forEach(p=>{
@@ -330,13 +403,13 @@ function makeMatching(poolId, listId, pairs, progressId, bonus = 2, onDone){
         slot.innerHTML = (p.icon || '') + p.name;
         slot.classList.add('filled');
         card.classList.add('matched');
-        const chip = [...pool.children].find(c=>c.textContent.trim() === p.name);
-        if(chip) chip.classList.add('placed');
+        const chip = [...pool.children].find(c=>c.dataset.name === p.name);
+        if(chip){ leaveSlot(chip); chip.classList.add('placed'); chip.classList.remove('selected'); }
         selected = null;
         matched++; done.item();
         addNeurons(1);
         updateProgress();
-        if(matched === pairs.length){ addNeurons(bonus); done(); onDone?.(); }
+        if(matched === pairs.length){ clearSlots(pool); addNeurons(bonus); done(); onDone?.(); }
       } else {
         card.classList.add('shake');
         setTimeout(()=>card.classList.remove('shake'), 350);
@@ -355,6 +428,7 @@ function makeSortBoard(poolId, bucketMap, items, progressId, bonus = 2){
   const progress = progressId ? document.getElementById(progressId) : null;
   const done = stepTask(pool, items.length + bonus, items.length);
   let selected = null, placed = 0;
+  const buckets = [];
 
   function updateProgress(){
     if(progress) progress.textContent = (placed === items.length) ? 'Усе розкладено ✓' : `Розкладено: ${placed} з ${items.length}`;
@@ -371,13 +445,23 @@ function makeSortBoard(poolId, bucketMap, items, progressId, bonus = 2){
       chip.classList.add('selected');
       selected = chip;
     });
+    // або перетягнути картку в кошик (урок із власним перетягуванням ставить пулу data-nodrag)
+    if(!('nodrag' in pool.dataset)) dragTo(chip, (x, y)=>{
+      const t = document.elementFromPoint(x, y);
+      return buckets.find(b=>b.contains(t)) || null;
+    }, b=>{
+      chip.click(); b.click();
+      if(!chip.classList.contains('placed')){ chip.classList.remove('selected'); selected = null; }
+    });
     pool.appendChild(chip);
   });
   Object.entries(bucketMap).forEach(([key, target])=>{
     const el = typeof target === 'string' ? document.getElementById(target) : target;
+    buckets.push(el);
     el.addEventListener('click', ()=>{
       if(!selected) return;
       if(selected.dataset.bucket === key){
+        leaveSlot(selected);
         selected.classList.add('placed');
         selected.classList.remove('selected');
         el.querySelector('.bucket-items').appendChild(selected);
@@ -385,7 +469,7 @@ function makeSortBoard(poolId, bucketMap, items, progressId, bonus = 2){
         placed++; done.item();
         addNeurons(1);
         updateProgress();
-        if(placed === items.length){ addNeurons(bonus); done(); }
+        if(placed === items.length){ addNeurons(bonus); done(); clearSlots(pool); }
       } else {
         el.classList.add('wrong');
         setTimeout(()=>el.classList.remove('wrong'), 350);

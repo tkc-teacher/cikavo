@@ -132,10 +132,24 @@ section.block{padding:38px 0; border-top:1px solid var(--line); scroll-margin-to
 
 /* ЗІСТАВЛЕННЯ (makeMatching) */
 .match-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; padding:14px; background:var(--surface); border:1.5px dashed var(--line); border-radius:var(--radius-m); margin-bottom:16px;}
-.match-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:8px 14px; cursor:pointer; transition:border-color .15s ease, transform .12s ease;}
-.match-chip:hover{transform:translateY(-2px);}
+.match-chip{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:13.5px; background:var(--bg); border:2px solid var(--line); border-radius:999px; padding:8px 14px; cursor:pointer; transition:border-color .15s ease, box-shadow .15s ease;}
+/* наведення не зсуває картку: інакше біля краю курсор виходить з неї й вона «мигтить» */
+.match-chip:hover{border-color:color-mix(in srgb, var(--accent) 45%, var(--line)); box-shadow:0 3px 8px rgba(0,0,0,.08);}
 .match-chip.selected{border-color:var(--accent); box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);}
-.match-chip.placed{display:none;}
+.match-chip.placed{display:none !important;} /* і коли урок задав чипам display:flex */
+/* перетягування (dragTo): картка-привид іде за курсором, ціль під ним підсвічується */
+.draggable{touch-action:none; user-select:none; -webkit-user-select:none;}
+.match-chip.draggable{cursor:grab;}
+.dragging{opacity:.35;}
+/* сіре місце, звідки забрали картку (leaveSlot): лоток не перешиковується */
+.chip-slot{box-sizing:border-box; flex:none; background:color-mix(in srgb, var(--ink) 6%, transparent); border:2px dashed color-mix(in srgb, var(--ink) 12%, transparent);}
+.drag-ghost{position:fixed; z-index:1000; pointer-events:none; margin:0; transform:rotate(-2deg); box-shadow:0 10px 24px rgba(0,0,0,.18); cursor:grabbing; border-color:var(--accent) !important;}
+/* поки тягнемо — увесь час «рука, що тримає», без виділення тексту */
+.is-dragging, .is-dragging *{cursor:grabbing !important; user-select:none !important; -webkit-user-select:none !important;}
+.sort-chip.draggable{cursor:grab;}
+.sort-chip.placed{cursor:default;}
+.bucket.drop-over{border-color:var(--accent); background:var(--accent-soft);}
+.desc-card.drop-over{border-color:var(--accent); background:var(--accent-soft);}
 .desc-card{display:flex; align-items:center; gap:12px; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; margin-bottom:10px; cursor:pointer; transition:border-color .2s ease, background .2s ease;}
 .desc-card.matched{border-color:var(--accent); background:var(--accent-soft); cursor:default;}
 .desc-card.shake{animation:shakeX .35s ease;}
@@ -155,11 +169,11 @@ section.block{padding:38px 0; border-top:1px solid var(--line); scroll-margin-to
 .bucket-items{display:flex; flex-direction:column; gap:6px; min-height:36px;}
 .bucket.wrong{border-color:var(--coral); background:#FDE6E1;}
 .sort-pool{display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin-top:14px;}
-.sort-chip{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; line-height:1.35; background:var(--bg); border:2px solid var(--line); border-radius:var(--radius-s); padding:8px 12px; cursor:pointer; max-width:340px; transition:border-color .15s ease, transform .12s ease;}
-.sort-chip:hover{transform:translateY(-2px);}
+.sort-chip{font-family:'Nunito Sans',sans-serif; font-weight:700; font-size:13.5px; line-height:1.35; background:var(--bg); border:2px solid var(--line); border-radius:var(--radius-s); padding:8px 12px; cursor:pointer; max-width:340px; transition:border-color .15s ease, box-shadow .15s ease;}
+.sort-chip:hover{border-color:color-mix(in srgb, var(--accent) 45%, var(--line)); box-shadow:0 3px 8px rgba(0,0,0,.08);}
 .sort-chip.selected{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft);}
 .sort-chip.placed{background:var(--ok-soft); border-color:var(--ok); cursor:default; font-size:12.5px; max-width:none;}
-.sort-chip.placed:hover{transform:none;}
+.sort-chip.placed:hover{border-color:var(--ok); box-shadow:none;}
 
 /* ПОСЛІДОВНИЙ ВИБІР КРОКУ (makeSequence) */
 /* лише для списку виконаних кроків (у деяких уроках .seq-done — це div із повідомленням) */
