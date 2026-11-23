@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: День повітряного змія — Інформація, повідомлення, дані, знання</title>
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#15AABF,#6741D9); --accent:#6741D9; --accent-dark:#4C2EA8; --accent-soft:#EFEAFF; --bg:#F7F5FD; --line:#E3DDF5; --ink:#1E1838; --ink-soft:#5B5578; }
+  .paper{background:#fff; border:1.5px solid var(--line); border-radius:var(--radius-m); padding:14px 16px;}
+  .paper-title{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:18px; margin-bottom:8px;}
+  .paper p{margin:10px 0 0;}
+  .sample td{text-align:center;}
+  .sample td.b{font-weight:800; background:var(--accent-soft); text-align:left; white-space:nowrap;}
+  .sample td.hi{background:#FFF3BF;}
+  .raw{display:flex; flex-direction:column; gap:6px; margin:8px 0;}
+  .raw div{font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:700; letter-spacing:.04em; background:#fff; border:1.5px dashed var(--line); border-radius:var(--radius-s); padding:8px 12px; width:max-content; max-width:100%;}
+  .chart-box{margin-top:12px; border:1px solid #DADCE0; border-radius:8px; padding:6px 8px 2px; background:#fff;}
+  .gchart{display:block; width:100%; height:auto; font-family:'Roboto',sans-serif; font-size:12px; fill:#5F6368;}
+  table.sample.src{width:auto; min-width:280px;}
+  .src td{text-align:center;}
+  .rule{display:flex; gap:10px; align-items:center; background:#E3F8FB; border-radius:var(--radius-m); padding:10px 14px; margin:8px 0; font-weight:700;}
+  .rule span{font-size:26px;}
+</style>
+</head>
+<body data-hud="7 клас · Практична · День повітряного змія">
+<div class="container">
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 7 клас · Інформація, повідомлення, дані, знання</div>
+    <h1>🪁 День повітряного змія</h1>
+    <p>Клас хоче запускати повітряних зміїв. Перетвори дані метеостанції на інформацію, побудуй діаграму й виріши, у який день іти.</p>
+    <div class="meta"><span>⏱ 25–30 хв</span><span><img src="../../assets/logos/docs.svg" alt="">Google Документи</span><span><img src="../../assets/logos/sheets.svg" alt="">Google Таблиці</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="paper">
+      <div class="paper-title">День повітряного змія</div>
+      <div class="sheet-wrap">
+        <table class="sample">
+          <tr><td class="b"></td><td class="b">Пн</td><td class="b">Вт</td><td class="b">Ср</td><td class="b">Чт</td><td class="b">Пт</td><td class="b">Сб</td><td class="b">Нд</td></tr>
+          <tr><td class="b">Вітер, м/с</td><td>2</td><td>3</td><td class="hi">6</td><td>8</td><td class="hi">7</td><td>3</td><td>1</td></tr>
+          <tr><td class="b">Дощ, мм</td><td>0</td><td>0</td><td class="hi">0</td><td>5</td><td class="hi">0</td><td>2</td><td>0</td></tr>
+        </table>
+      </div>
+      <div class="chart-box"><svg class="gchart" viewBox="0 0 640 262" role="img" aria-label="Лінійна діаграма: вітер і дощ за тиждень"><text x="320" y="24" text-anchor="middle" font-size="16" fill="#202124">Вітер і дощ за тиждень</text><rect x="226" y="40" width="20" height="3" fill="#4285F4"/><text x="252" y="46">Вітер, м/с</text><rect x="346" y="40" width="20" height="3" fill="#EA4335"/><text x="372" y="46">Дощ, мм</text><line x1="60" y1="230" x2="616" y2="230" stroke="#E0E0E0"/><text x="50" y="234" text-anchor="end">0</text><line x1="60" y1="198" x2="616" y2="198" stroke="#E0E0E0"/><text x="50" y="202" text-anchor="end">2</text><line x1="60" y1="166" x2="616" y2="166" stroke="#E0E0E0"/><text x="50" y="170" text-anchor="end">4</text><line x1="60" y1="134" x2="616" y2="134" stroke="#E0E0E0"/><text x="50" y="138" text-anchor="end">6</text><line x1="60" y1="102" x2="616" y2="102" stroke="#E0E0E0"/><text x="50" y="106" text-anchor="end">8</text><line x1="60" y1="70" x2="616" y2="70" stroke="#E0E0E0"/><text x="50" y="74" text-anchor="end">10</text><text x="90" y="252" text-anchor="middle">Пн</text><text x="172" y="252" text-anchor="middle">Вт</text><text x="254" y="252" text-anchor="middle">Ср</text><text x="336" y="252" text-anchor="middle">Чт</text><text x="418" y="252" text-anchor="middle">Пт</text><text x="500" y="252" text-anchor="middle">Сб</text><text x="582" y="252" text-anchor="middle">Нд</text><polyline points="90,198 172,182 254,134 336,102 418,118 500,182 582,214" fill="none" stroke="#4285F4" stroke-width="3" stroke-linejoin="round"/><circle cx="90" cy="198" r="4" fill="#4285F4"/><circle cx="172" cy="182" r="4" fill="#4285F4"/><circle cx="254" cy="134" r="4" fill="#4285F4"/><circle cx="336" cy="102" r="4" fill="#4285F4"/><circle cx="418" cy="118" r="4" fill="#4285F4"/><circle cx="500" cy="182" r="4" fill="#4285F4"/><circle cx="582" cy="214" r="4" fill="#4285F4"/><polyline points="90,230 172,230 254,230 336,150 418,230 500,198 582,230" fill="none" stroke="#EA4335" stroke-width="3" stroke-linejoin="round"/><circle cx="90" cy="230" r="4" fill="#EA4335"/><circle cx="172" cy="230" r="4" fill="#EA4335"/><circle cx="254" cy="230" r="4" fill="#EA4335"/><circle cx="336" cy="150" r="4" fill="#EA4335"/><circle cx="418" cy="230" r="4" fill="#EA4335"/><circle cx="500" cy="198" r="4" fill="#EA4335"/><circle cx="582" cy="230" r="4" fill="#EA4335"/></svg></div>
+      <p><b>Знання:</b> повітряний змій полетить у середу й п'ятницю.</p>
+      <p><b>Рішення:</b> ідемо в п'ятницю після уроків.</p>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи документ</h3>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Документи</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Документи</span>.</li>
+              <li>Назви файл: <b>День повітряного змія — Прізвище</b>.</li>
+            </ol>
+          </div>
+        </div>
+        <ol>
+          <li>Напиши заголовок: <b>День повітряного змія</b>.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Дані</h3>
+        <p>Метеостанція школи надіслала два рядки чисел:</p>
+        <div class="raw"><div>2 3 6 8 7 3 1</div><div>0 0 0 5 0 2 0</div></div>
+        <ol>
+          <li>Встав таблицю: <span class="menu">Вставлення → Таблиця</span> — <b>8 стовпчиків і 3 рядки</b>.</li>
+          <li>Впиши перший рядок чисел у другий рядок таблиці, другий — у третій. Перша клітинка кожного рядка лишається порожньою.</li>
+        </ol>
+        <div class="tip">Поки що це просто числа: незрозуміло, що вони означають.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Інформація</h3>
+        <p>Метеостанція пояснює: перший рядок — швидкість вітру в м/с, другий — кількість дощу в мм, з понеділка по неділю.</p>
+        <ol>
+          <li>У перший рядок таблиці впиши дні: <b>Пн, Вт, Ср, Чт, Пт, Сб, Нд</b>.</li>
+          <li>У перший стовпчик — <b>Вітер, м/с</b> і <b>Дощ, мм</b>.</li>
+          <li>Виділи перший рядок і перший стовпчик жирним: <span class="mono">Ctrl</span> + <span class="mono">B</span>.</li>
+        </ol>
+        <div class="tip">Ті самі числа отримали підписи — тепер це інформація.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Лінійна діаграма</h3>
+        <ol>
+          <li>Постав курсор під таблицею.</li>
+          <li><span class="menu">Вставлення → Діаграма → Лінійна</span>. З'явиться діаграма з прикладом даних.</li>
+          <li>Клацни діаграму → значок посилання в її правому верхньому куті → <span class="menu">Відкрити джерело</span>. Дані діаграми відкриються в Google Таблицях.</li>
+          <li>Заміни приклад даними метеостанції — так, як нижче. Зайві стовпчики й рядки видали.</li>
+          <li>Двічі клацни назву діаграми й напиши: <b>Вітер і дощ за тиждень</b>.</li>
+          <li>Повернись у документ і натисни на діаграмі <span class="menu">Оновити</span>.</li>
+        </ol>
+        <div class="sheet-wrap">
+          <table class="sample src">
+            <tr><td class="b"></td><td class="b">Вітер, м/с</td><td class="b">Дощ, мм</td></tr>
+            <tr><td>Пн</td><td>2</td><td>0</td></tr><tr><td>Вт</td><td>3</td><td>0</td></tr><tr><td>Ср</td><td>6</td><td>0</td></tr><tr><td>Чт</td><td>8</td><td>5</td></tr><tr><td>Пт</td><td>7</td><td>0</td></tr><tr><td>Сб</td><td>3</td><td>2</td></tr><tr><td>Нд</td><td>1</td><td>0</td></tr>
+          </table>
+        </div>
+        <div class="tip">Діаграма — це подання інформації: на ній одразу видно, коли вітер дужчав, а коли йшов дощ.</div>
+        <div class="check-val">Перевір себе: обидві лінії найвище в четвер — вітер 8 м/с і дощ 5 мм.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Знання</h3>
+        <p>Правило, яке знають усі, хто запускає повітряних зміїв:</p>
+        <div class="rule"><span>🪁</span>Повітряний змій злітає, коли вітер від 4 до 9 м/с і немає дощу.</div>
+        <ol>
+          <li>Перевір кожен день за цим правилом. На діаграмі шукай дні, де синя лінія між 4 і 9, а червона — на нулі.</li>
+          <li>Виділи числа у стовпчиках відповідних днів кольором: <span class="menu">Колір виділення</span> (значок маркера) → жовтий.</li>
+          <li>Під діаграмою напиши: <b>Знання:</b> повітряний змій полетить у … .</li>
+        </ol>
+        <div class="check-val">Перевір себе: таких днів два. У четвер вітер підходить, але йде дощ.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Рішення</h3>
+        <ol>
+          <li>Обери один із цих днів.</li>
+          <li>Напиши: <b>Рішення:</b> ідемо в … і коли саме.</li>
+        </ol>
+      </div>
+    </div>
+
+  </section>
+</div>
+<footer><span class="page-name">Практична робота · «День повітряного змія» · 7 клас</span></footer>
+<script src="../../assets/practice.js"></script>
+</body>
+</html>
