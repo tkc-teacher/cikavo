@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Знайомимося з Google Презентаціями</title>
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#E8590C,#FAB005); --accent:#E8590C; --accent-dark:#B8460A; --accent-soft:#FFF0E6; --bg:#FFF9F4; --line:#F3E1D3; }
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; white-space:nowrap; direction:ltr; font-feature-settings:'liga'; overflow:hidden; width:1em;}
+  .g{font-family:'Roboto',sans-serif; font-size:14px; color:#1F1F1F;}
+  kbd{display:inline-block; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13.5px; line-height:1; padding:4px 7px 3px; border-radius:6px; background:#fff; border:1.5px solid #D9CFC4; box-shadow:0 2px 0 #D9CFC4; white-space:nowrap;}
+  .hlt{outline:2.5px solid #FAB005; outline-offset:1px; border-radius:6px;}
+
+  /* Слайд (зразок і мініатюри): усе в cqw, тож текст масштабується разом зі слайдом */
+  .sl{aspect-ratio:16/9; background:#fff; border:1px solid #DADCE0; border-radius:6px; position:relative; overflow:hidden; font-family:'Roboto',sans-serif; container-type:inline-size;}
+  .sl::before{content:''; position:absolute; left:0; right:0; bottom:0; height:7%; background:#FAB005;}
+  .sl::after{content:''; position:absolute; right:0; top:0; width:20%; height:100%; background:linear-gradient(160deg,transparent 55%,#FFE8CC 55%);}
+  .sl > *{position:relative; z-index:1;}
+  .sl h4{font-weight:700; color:#B8460A; margin:0;}
+  .sl.title{display:flex; flex-direction:column; justify-content:center; padding:0 8%;}
+  .sl.title h4{font-size:9.5cqw; line-height:1.08; margin-bottom:3cqw;}
+  .sl.title p{font-size:5.6cqw; margin:0; color:#5F6368;}
+  .sl.body{padding:5.5% 7%;}
+  .sl.body h4{font-size:8cqw; margin-bottom:4cqw;}
+  .sl.body .cols{display:grid; grid-template-columns:1fr 1fr; gap:5cqw; align-items:center;}
+  .sl.body p, .sl.body li{font-size:5.6cqw; line-height:1.3; margin:0; color:#3C4043;}
+  .sl.body ul{margin:0; padding-left:6cqw;}
+  .sl.body li{margin-bottom:2cqw;}
+  .sl .photo{aspect-ratio:4/3; border-radius:2cqw; background:#FFF4E0; display:flex; align-items:center; justify-content:center;}
+  .sl .photo svg{height:90%; width:auto;}
+  .sl.end{display:flex; align-items:center; justify-content:center;}
+  .sl.end h4{font-size:10cqw;}
+  .sl .ph{border:.4cqw dashed #9AA0A6; color:#80868B; padding:2cqw 3cqw; font-weight:400;}
+  .sl .ph.t{font-size:7cqw; margin-bottom:3cqw;}
+  .sl .ph.s{font-size:4.4cqw;}
+  .sl .edit{border:.4cqw solid #1A73E8;}
+  .caret{display:inline-block; width:.35cqw; min-width:1.5px; height:1em; background:#1A73E8; vertical-align:-.12em; margin-left:.4cqw; animation:blink 1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  @media (prefers-reduced-motion:reduce){ .caret{animation:none;} }
+
+  .deck{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px;}
+  @media (max-width:560px){ .deck{grid-template-columns:1fr;} }
+  .deck figure{margin:0;}
+  .deck figcaption{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; color:var(--accent-dark); margin-bottom:4px;}
+
+  /* Кадри-ілюстрації: кадр → стрілка → кадр */
+  .flow{display:flex; align-items:flex-start; gap:8px; margin:10px 0 8px;}
+  .fl{flex:1 1 0; min-width:0;}
+  .fl-n{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13.5px; color:var(--accent-dark); margin-bottom:5px; line-height:1.2;}
+  .fl-arr{align-self:center; color:#B0A89F;}
+  .fl-arr .ms{font-size:24px;}
+  @media (max-width:640px){ .flow{flex-direction:column; align-items:stretch;} .fl-arr{text-align:center;} .fl-arr .ms{transform:rotate(90deg);} }
+
+  /* Макет вікна Google Презентацій */
+  .gs{border:1px solid #DADCE0; border-radius:10px; overflow:hidden; background:#F9FBFD; margin:10px 0 8px; user-select:none; -webkit-user-select:none; position:relative;}
+  .gs-top{display:flex; align-items:center; gap:10px; padding:8px 12px 2px;}
+  .gs-top > img{width:26px; height:26px;}
+  .gs-name{font-size:16px; display:flex; align-items:center; gap:8px; min-width:0; padding:2px 6px; border-radius:4px;}
+  .gs-name .ms{color:#5F6368; font-size:18px;}
+  .gs-right{margin-left:auto; display:flex; align-items:center; gap:8px;}
+  .gs-show{display:flex; align-items:center; gap:6px; border:1px solid #747775; border-radius:999px; padding:6px 12px; font-weight:500; font-size:13px; white-space:nowrap; background:#fff;}
+  .gs-show .ms{font-size:18px;}
+  .gs-share{background:#C2E7FF; border-radius:999px; padding:7px 14px; font-weight:500; font-size:13px; display:flex; align-items:center; gap:6px; white-space:nowrap;}
+  .gs-share .ms{font-size:18px;}
+  @media (max-width:600px){ .gs-share{display:none;} }
+  .gs-menu{display:flex; gap:12px; margin:0 12px 6px 44px; padding:1px 4px; font-size:13.5px; flex-wrap:wrap; row-gap:2px; border-radius:4px;}
+  .gs-tools{display:flex; align-items:center; gap:4px; margin:0 10px 8px; background:#EDF2FA; border-radius:999px; padding:4px 10px; overflow:hidden; white-space:nowrap;}
+  .gs-tools .ms{color:#444746; font-size:19px; padding:3px; width:auto;}
+  .gs-tools .sep{width:1px; height:20px; background:#C7C7C7; margin:0 4px; flex-shrink:0;}
+  .gs-tools .tx{font-size:13px; color:#444746; padding:2px 6px;}
+  .gs-plus{display:flex; align-items:center; background:#fff; border-radius:8px;}
+  .gs-main{display:grid; grid-template-columns:120px 1fr; min-height:250px;}
+  .gs-film{padding:10px 10px 10px 6px; display:flex; flex-direction:column; gap:10px; border-right:1px solid #E1E3E1;}
+  .gs-thumb{display:grid; grid-template-columns:12px 1fr; gap:4px; align-items:start; font-size:11px; color:#5F6368;}
+  .gs-thumb .sl{border-radius:3px;}
+  .gs-thumb.sel .sl{box-shadow:0 0 0 2.5px #FBBC04; border-color:#FBBC04;}
+  .gs-canvas{padding:14px 18px 10px; display:flex; flex-direction:column; gap:10px; min-width:0;}
+  .gs-slide{box-shadow:0 1px 3px rgba(60,64,67,.3); max-width:520px; width:100%; margin:0 auto; border:none; border-radius:0;}
+  .gs-notes{background:#fff; padding:8px 12px; font-size:12.5px; color:#80868B; max-width:520px; width:100%; margin:0 auto; border-radius:4px; box-shadow:0 1px 2px rgba(60,64,67,.15);}
+  @media (max-width:560px){ .gs-main{grid-template-columns:76px 1fr;} .gs-menu{margin-left:12px; gap:10px; font-size:12.5px;} }
+  /* підказки при наведенні */
+  .gs [data-tip]{cursor:help; transition:box-shadow .12s, background .12s;}
+  .gs [data-tip].hot{box-shadow:0 0 0 2.5px #FAB005; background-color:rgba(250,176,5,.1);}
+  .gs [data-tip].seen:not(.hot){box-shadow:0 0 0 1.5px rgba(250,176,5,.45);}
+  .gs-tip{position:absolute; z-index:5; max-width:260px; background:#3C2A1E; color:#fff; font-family:'Nunito Sans',sans-serif; font-size:14px; line-height:1.4; padding:9px 12px; border-radius:10px; box-shadow:0 6px 18px rgba(0,0,0,.25); pointer-events:none; opacity:0; transform:translateY(4px); transition:opacity .15s, transform .15s;}
+  .gs-tip.show{opacity:1; transform:none;}
+  .gs-tip b{color:#FFD43B; font-family:'Baloo 2',sans-serif; font-size:15px; display:block;}
+  .tip-count{font-size:13.5px; color:var(--ink-soft); margin:4px 0 0;}
+  .tip-count b{color:var(--accent-dark);}
+
+  /* Меню й панелі Google */
+  .pop{background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.2); padding:6px 0; font-size:13px;}
+  .pop > div{display:flex; align-items:center; gap:12px; padding:7px 14px; white-space:nowrap;}
+  .pop .ms{color:#444746; font-size:18px;}
+  .pop img{width:20px; height:20px;}
+  .pop .sub{margin-left:auto;}
+  .pop hr{border:0; border-top:1px solid #E1E3E1; margin:5px 0;}
+  .pop .on{background:#E3EAF8; box-shadow:inset 0 0 0 2.5px #FAB005;}
+  .gbtn{display:inline-flex; align-items:center; gap:10px; background:#fff; border-radius:16px; padding:11px 18px 11px 14px; box-shadow:0 1px 3px rgba(0,0,0,.25); font-weight:500; margin-bottom:8px;}
+  .gbtn .ms{font-size:24px;}
+  .lay{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; padding:10px; background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,.2);}
+  .lay > div{border:1px solid #DADCE0; border-radius:4px; aspect-ratio:16/9; padding:8% 10%; display:flex; flex-direction:column; gap:7%;}
+  .lay i{display:block; background:#C4C7C5; border-radius:2px; height:8%;}
+  .lay i.big{height:13%; width:70%; background:#80868B;}
+  .lay > .on{box-shadow:0 0 0 2.5px #FAB005; border-color:#FAB005;}
+  .side{background:#fff; border:1px solid #DADCE0; border-radius:8px; padding:10px; font-size:13px;}
+  .side-h{display:flex; align-items:center; justify-content:space-between; font-size:14px; margin-bottom:8px;}
+  .side-h .ms{font-size:18px; color:#5F6368;}
+  .search{display:flex; align-items:center; gap:6px; border:1px solid #DADCE0; border-radius:999px; padding:5px 10px; margin-bottom:8px;}
+  .search .ms{font-size:18px; color:#5F6368;}
+  .imgs{display:grid; grid-template-columns:repeat(3,1fr); gap:5px; margin-bottom:8px;}
+  .imgs div{aspect-ratio:1; border-radius:4px; background:#FFF4E0; display:flex; align-items:center; justify-content:center; font-size:22px;}
+  .imgs .on{box-shadow:inset 0 0 0 3px #1A73E8;}
+  .btn-blue{display:inline-block; background:#0B57D0; color:#fff; border-radius:999px; padding:5px 16px; font-weight:500; font-size:12.5px;}
+  .right{text-align:right;}
+  .themes{display:grid; grid-template-columns:1fr 1fr; gap:8px;}
+  .themes .sl{border-radius:4px;}
+  .themes .on{box-shadow:0 0 0 3px #1A73E8;}
+  .th-dark{background:#263238;}
+  .th-dark::before{background:#4DD0E1;} .th-dark::after{display:none;}
+  .th-dark h4{color:#fff !important;}
+  .th-green::before{background:#2F9E44;} .th-green::after{background:linear-gradient(160deg,transparent 55%,#D3F9D8 55%);}
+  .th-green h4{color:#2B8A3E !important;}
+  .th-plain::before, .th-plain::after{display:none;}
+  .th-plain h4{color:#1F1F1F !important;}
+  .rename{background:#fff; border-radius:8px; padding:10px 12px; border:1px solid #DADCE0; display:flex; align-items:center; gap:8px; font-size:15px;}
+  .rename img{width:24px; height:24px;}
+  .rename span.in{border:2px solid #1A73E8; border-radius:4px; padding:2px 6px; flex:1; min-width:0;}
+  .resize{position:relative; width:150px; height:112px; margin:10px auto 4px; border:2px solid #1A73E8; background:#FFF4E0; display:flex; align-items:center; justify-content:center;}
+  .resize svg{height:90%; width:auto;}
+  .resize b{position:absolute; width:9px; height:9px; background:#fff; border:1.5px solid #1A73E8;}
+  .resize b.k{width:12px; height:12px; background:#FAB005; border-color:#B06000;}
+  /* стрічка слайдів: перетягування */
+  .strip{background:#F9FBFD; border:1px solid #DADCE0; border-radius:8px; padding:10px; display:flex; flex-direction:column; gap:9px; position:relative;}
+  .strip .gs-thumb{grid-template-columns:12px 1fr;}
+  .strip .ghost{position:absolute; left:46%; width:46%; top:38%; transform:rotate(-4deg); box-shadow:0 6px 14px rgba(0,0,0,.25); opacity:.95;}
+  .strip .drop{height:3px; background:#1A73E8; border-radius:2px; margin:-6px 0 -6px 16px;}
+  .strip .gone{opacity:.25;}
+  .keybig{display:flex; justify-content:center; gap:6px; align-items:center; margin-top:8px; font-size:13px; color:#5F6368;}
+  /* показ */
+  .screen{background:#111; border-radius:8px; padding:6% 7% 4%; display:flex; flex-direction:column; align-items:center; gap:10px;}
+  .screen .sl{width:100%; border:none;}
+  .screen .keys{display:flex; gap:6px; align-items:center; color:#ccc; font-size:12.5px; flex-wrap:wrap; justify-content:center;}
+</style>
+</head>
+<body data-hud="5 клас · Практична · Google Презентації">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 5 клас · Комп'ютерні презентації</div>
+    <h1>🐾 Знайомимося з Google Презентаціями</h1>
+    <p>Створи свою першу презентацію з чотирьох слайдів — про улюблену тварину.</p>
+    <div class="meta"><span>⏱ 30 хв</span><span><img src="../../assets/logos/slides.svg" alt="">Google Презентації</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="deck">
+      <figure><figcaption>Слайд 1 · титульний</figcaption><div class="sl" data-sl="title"></div></figure>
+      <figure><figcaption>Слайд 2 · «Який він»</figcaption><div class="sl" data-sl="look"></div></figure>
+      <figure><figcaption>Слайд 3 · «Цікаві факти»</figcaption><div class="sl" data-sl="facts"></div></figure>
+      <figure><figcaption>Слайд 4 · завершення</figcaption><div class="sl" data-sl="end"></div></figure>
+    </div>
+    <div class="tip">Тварину обирай свою — кота, собаку, папугу, коня, дельфіна… Тексти на слайдах теж пишеш сам.</div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи презентацію</h3>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Презентації</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li>Натисни <span class="menu">+ Створити</span>.</li>
+              <li>Обери <span class="menu">Google Презентації</span>.</li>
+            </ol>
+          </div>
+        </div>
+        <div class="flow g">
+          <div class="fl"><div class="fl-n">Classroom: «Ваша робота»</div>
+            <div class="pop">
+              <div style="font-size:14px;"><b style="font-weight:500;">Ваша робота</b><span style="margin-left:auto; color:#188038; font-size:12px;">Призначено</span></div>
+              <div style="justify-content:center; color:#1967D2; font-weight:500; margin:2px 10px; border:1px solid #DADCE0; border-radius:4px;"><span class="ms" style="color:#1967D2;">add</span>Додати або створити</div>
+              <hr>
+              <div><img src="../../assets/logos/drive.svg" alt="">Google Диск</div>
+              <div><span class="ms">link</span>Посилання</div>
+              <hr>
+              <div><img src="../../assets/logos/docs.svg" alt="">Документи</div>
+              <div class="on"><img src="../../assets/logos/slides.svg" alt="">Презентації</div>
+              <div><img src="../../assets/logos/sheets.svg" alt="">Таблиці</div>
+            </div>
+          </div>
+          <div class="fl-arr" style="visibility:hidden;"><span class="ms">arrow_forward</span></div>
+          <div class="fl"><div class="fl-n">або Google Диск: «Створити»</div>
+            <div class="gbtn"><span class="ms">add</span>Створити</div>
+            <div class="pop">
+              <div><span class="ms">create_new_folder</span>Нова папка</div>
+              <hr>
+              <div><span class="ms">upload_file</span>Завантажити файл</div>
+              <hr>
+              <div><img src="../../assets/logos/docs.svg" alt="">Google Документи</div>
+              <div><img src="../../assets/logos/sheets.svg" alt="">Google Таблиці</div>
+              <div class="on"><img src="../../assets/logos/slides.svg" alt="">Google Презентації</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Роздивись вікно</h3>
+        <p>Наведи вказівник миші на частину вікна (на планшеті — торкнися) — з'явиться підказка, що це.</p>
+        <div class="gs g" id="gs">
+          <div class="gs-top">
+            <img src="../../assets/logos/slides.svg" alt="">
+            <div class="gs-name" data-tip="<b>Назва файлу</b>Клацни, щоб перейменувати презентацію.">Презентація без назви <span class="ms">star</span></div>
+            <div class="gs-right">
+              <div class="gs-show" data-tip="<b>Слайд-шоу</b>Показує презентацію на весь екран — так, як побачать слухачі."><span class="ms">slideshow</span>Слайд-шоу</div>
+              <div class="gs-share" data-tip="<b>Надати доступ</b>Дозволяє іншим людям переглядати чи редагувати презентацію."><span class="ms">lock</span>Надати доступ</div>
+            </div>
+          </div>
+          <div class="gs-menu" data-tip="<b>Меню</b>Тут зібрано всі команди програми: вставити картинку, змінити тему, додати слайд…"><span>Файл</span><span>Редагувати</span><span>Вигляд</span><span>Вставити</span><span>Формат</span><span>Слайд</span><span>Упорядкувати</span><span>Інструменти</span><span>Довідка</span></div>
+          <div class="gs-tools" data-tip="<b>Панель інструментів</b>Кнопки для найчастіших дій: + новий слайд, текстове поле, зображення, фігури, макет і тема.">
+            <span class="gs-plus"><span class="ms">add</span><span class="ms" style="font-size:16px;">arrow_drop_down</span></span>
+            <span class="ms">undo</span><span class="ms">redo</span><span class="ms">print</span><span class="ms">format_paint</span>
+            <span class="sep"></span>
+            <span class="ms">arrow_selector_tool</span><span class="ms">text_fields</span><span class="ms">image</span><span class="ms">category</span><span class="ms">pen_size_2</span>
+            <span class="sep"></span>
+            <span class="tx">Фон</span><span class="tx">Макет</span><span class="tx">Тема</span><span class="tx">Перехід</span>
+          </div>
+          <div class="gs-main">
+            <div class="gs-film" data-tip="<b>Стрічка слайдів</b>Мініатюри всіх слайдів по порядку. Клацни мініатюру — слайд відкриється праворуч.">
+              <div class="gs-thumb sel">1<div class="sl" data-sl="empty"></div></div>
+              <div class="gs-thumb">2<div class="sl" data-sl="look"></div></div>
+            </div>
+            <div class="gs-canvas">
+              <div class="sl gs-slide" data-sl="empty" data-tip="<b>Слайд</b>Робоче поле: тут ти пишеш текст і розставляєш картинки."></div>
+              <div class="gs-notes" data-tip="<b>Нотатки доповідача</b>Підказки для себе під час виступу. Глядачі їх не бачать.">Натисніть, щоб додати нотатки доповідача</div>
+            </div>
+          </div>
+          <div class="gs-tip" id="gsTip"></div>
+        </div>
+        <p class="tip-count" id="tipCount"></p>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Назви файл і обери тему</h3>
+        <ol>
+          <li>Клацни назву <b>Презентація без назви</b> вгорі.</li>
+          <li>Напиши <b>Моя улюблена тварина — Прізвище</b> і натисни <kbd>Enter</kbd>.</li>
+          <li>Праворуч відкрито панель <b>Теми</b> — клацни тему, яка подобається.</li>
+        </ol>
+        <div class="flow g">
+          <div class="fl"><div class="fl-n">Нова назва</div>
+            <div class="rename"><img src="../../assets/logos/slides.svg" alt=""><span class="in">Моя улюблена тварина — Коваль<span class="caret"></span></span></div>
+          </div>
+          <div class="fl-arr"><span class="ms">arrow_forward</span></div>
+          <div class="fl"><div class="fl-n">Панель «Теми»</div>
+            <div class="side">
+              <div class="side-h">Теми<span class="ms">close</span></div>
+              <div class="themes">
+                <div class="sl th-plain" data-sl="mini"></div>
+                <div class="sl on" data-sl="mini"></div>
+                <div class="sl th-dark" data-sl="mini"></div>
+                <div class="sl th-green" data-sl="mini"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tip">Панелі тем немає? <span class="menu">Слайд → Змінити тему</span>. Тему можна змінити будь-коли — текст залишиться.</div>
+        <div class="check-val">Зберігати не треба: Google Презентації зберігають усе самі.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Заповни титульний слайд</h3>
+        <ol>
+          <li>Клацни <b>Натисніть, щоб додати заголовок</b> і напиши: <b>Моя улюблена тварина — …</b> (назва твоєї тварини).</li>
+          <li>Клацни поле підзаголовка — напиши своє ім'я, прізвище й клас.</li>
+          <li>Клацни на порожньому місці поза слайдом — рамки зникнуть.</li>
+        </ol>
+        <div class="flow">
+          <div class="fl"><div class="fl-n">Клацни поле й пиши</div><div class="sl" data-sl="typing"></div></div>
+          <div class="fl-arr"><span class="ms">arrow_forward</span></div>
+          <div class="fl"><div class="fl-n">Готово</div><div class="sl" data-sl="title"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Додай другий слайд</h3>
+        <ol>
+          <li>Біля кнопки <span class="ms" style="font-size:18px;">add</span> угорі ліворуч натисни трикутник <span class="ms" style="font-size:18px;">arrow_drop_down</span>.</li>
+          <li>Обери макет із заголовком і текстом.</li>
+          <li>Заголовок: <b>Який він</b> (чи <b>Яка вона</b>). У полі тексту — 2–3 речення про свою тварину: як виглядає, що любить.</li>
+        </ol>
+        <div class="flow g">
+          <div class="fl"><div class="fl-n">Трикутник біля «+» → макет</div>
+            <div class="gs-tools" style="margin:0 0 8px; width:max-content;"><span class="gs-plus"><span class="ms">add</span><span class="ms hlt" style="font-size:16px;">arrow_drop_down</span></span><span class="ms">undo</span><span class="ms">redo</span><span class="ms">print</span></div>
+            <div class="lay">
+              <div style="justify-content:center; align-items:center;"><i class="big"></i><i style="width:45%;"></i></div>
+              <div class="on"><i class="big"></i><i></i><i style="width:85%;"></i><i style="width:60%;"></i></div>
+              <div><i class="big"></i></div>
+              <div><i class="big"></i><span style="display:grid; grid-template-columns:1fr 1fr; gap:10%; flex:1;"><span style="display:flex; flex-direction:column; gap:14%;"><i style="height:18%;"></i><i style="height:18%;"></i></span><span style="display:flex; flex-direction:column; gap:14%;"><i style="height:18%;"></i><i style="height:18%;"></i></span></span></div>
+            </div>
+          </div>
+          <div class="fl-arr"><span class="ms">arrow_forward</span></div>
+          <div class="fl"><div class="fl-n">Напиши заголовок і текст</div><div class="sl" data-sl="lookText"></div></div>
+        </div>
+        <div class="tip">Просто <span class="ms" style="font-size:16px;">add</span> (або <kbd>Ctrl</kbd> + <kbd>M</kbd>) додає слайд із таким самим макетом, як у поточного. Макет готового слайда змінює кнопка <span class="menu">Макет</span> на панелі інструментів.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Встав зображення</h3>
+        <ol>
+          <li>На другому слайді: <span class="menu">Вставити → Зображення → Пошук в Інтернеті</span>.</li>
+          <li>Праворуч у полі пошуку напиши назву тварини й натисни <kbd>Enter</kbd>.</li>
+          <li>Клацни картинку, яка подобається, і натисни <span class="menu">Вставити</span>.</li>
+        </ol>
+        <div class="flow g">
+          <div class="fl"><div class="fl-n">Вставити → Зображення</div>
+            <div class="pop">
+              <div><span class="ms">text_fields</span>Текстове поле</div>
+              <div class="on"><span class="ms">image</span>Зображення<span class="ms sub">arrow_right</span></div>
+              <div><span class="ms">category</span>Фігура<span class="ms sub">arrow_right</span></div>
+              <hr>
+              <div><span class="ms">upload</span>Завантажити з комп'ютера</div>
+              <div class="on"><span class="ms">search</span>Пошук в Інтернеті</div>
+              <div><span class="ms">add_to_drive</span>Диск</div>
+            </div>
+          </div>
+          <div class="fl-arr"><span class="ms">arrow_forward</span></div>
+          <div class="fl"><div class="fl-n">Знайди й встав</div>
+            <div class="side">
+              <div class="side-h">Пошук зображень<span class="ms">close</span></div>
+              <div class="search"><span class="ms">search</span>кіт</div>
+              <div class="imgs"><div class="on">🐈</div><div>🐱</div><div>🐈‍⬛</div><div>😺</div><div>🐾</div><div>😸</div></div>
+              <div class="right"><span class="btn-blue">Вставити</span></div>
+            </div>
+          </div>
+        </div>
+        <p>Картинку перетягни на вільне місце. Щоб змінити розмір — тягни за <b>кутовий</b> квадратик, тоді тварина не сплющиться.</p>
+        <div class="flow">
+          <div class="fl"><div class="fl-n">Тягни за кут</div>
+            <div class="resize" aria-hidden="true">
+              <b style="left:-6px; top:-6px;"></b><b style="right:-6px; top:-6px;"></b><b class="k" style="right:-7px; bottom:-7px;"></b><b style="left:-6px; bottom:-6px;"></b>
+              <b style="left:calc(50% - 5px); top:-6px;"></b><b style="left:calc(50% - 5px); bottom:-6px;"></b><b style="left:-6px; top:calc(50% - 5px);"></b><b style="right:-6px; top:calc(50% - 5px);"></b>
+              <span data-cat></span>
+            </div>
+          </div>
+          <div class="fl-arr"><span class="ms">arrow_forward</span></div>
+          <div class="fl"><div class="fl-n">Слайд 2 готовий</div><div class="sl" data-sl="look"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">7</div>
+      <div>
+        <h3>Слайд із фактами й останній слайд</h3>
+        <ol>
+          <li>Додай слайд 3 з макетом «заголовок і текст»: заголовок <b>Цікаві факти</b>.</li>
+          <li>У полі тексту напиши 3 факти про свою тварину. Новий пункт списку — <kbd>Enter</kbd>.</li>
+          <li>Додай слайд 4 з макетом, де є лише заголовок: <b>Дякую за увагу!</b></li>
+        </ol>
+        <div class="flow g">
+          <div class="fl"><div class="fl-n">Слайд 3: Enter — новий пункт</div><div class="sl" data-sl="factsTyping"></div></div>
+          <div class="fl-arr"><span class="ms">arrow_forward</span></div>
+          <div class="fl"><div class="fl-n">Слайд 4 · макет «лише заголовок»</div><div class="sl" data-sl="end"></div></div>
+        </div>
+        <div class="tip">Факти шукай у пошуковій системі, але пиши своїми словами — коротко, одним реченням.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">8</div>
+      <div>
+        <h3>Наведи лад у слайдах</h3>
+        <ul>
+          <li><b>Перемістити</b> слайд — перетягни його мініатюру в стрічці слайдів ліворуч.</li>
+          <li><b>Видалити</b> зайвий слайд — клацни мініатюру й натисни <kbd>Delete</kbd>.</li>
+          <li><b>Скасувати</b> помилку — <kbd>Ctrl</kbd> + <kbd>Z</kbd>.</li>
+        </ul>
+        <div class="flow g">
+          <div class="fl"><div class="fl-n">Перетягни мініатюру</div>
+            <div class="strip">
+              <div class="gs-thumb">1<div class="sl" data-sl="title"></div></div>
+              <div class="drop"></div>
+              <div class="gs-thumb">2<div class="sl" data-sl="look"></div></div>
+              <div class="gs-thumb">3<div class="sl gone" data-sl="end"></div></div>
+              <div class="sl ghost" data-sl="end"></div>
+            </div>
+          </div>
+          <div class="fl-arr"><span class="ms">arrow_forward</span></div>
+          <div class="fl"><div class="fl-n">Виділи зайвий і натисни Delete</div>
+            <div class="strip">
+              <div class="gs-thumb">1<div class="sl" data-sl="title"></div></div>
+              <div class="gs-thumb sel">2<div class="sl" data-sl="empty"></div></div>
+              <div class="gs-thumb">3<div class="sl" data-sl="look"></div></div>
+              <div class="keybig"><kbd>Delete</kbd> — слайд 2 зникне</div>
+            </div>
+          </div>
+        </div>
+        <div class="check-val">Перевір себе: у стрічці ліворуч рівно 4 слайди — титульний, «Який він», «Цікаві факти», «Дякую за увагу!».</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">9</div>
+      <div>
+        <h3>Переглянь презентацію</h3>
+        <ol>
+          <li>Клацни перший слайд у стрічці ліворуч.</li>
+          <li>Натисни кнопку <span class="menu">Слайд-шоу</span> угорі праворуч.</li>
+          <li>Гортай слайди клавішами <kbd>→</kbd> і <kbd>←</kbd> або клацанням миші.</li>
+          <li>Щоб вийти з показу — <kbd>Esc</kbd>.</li>
+        </ol>
+        <div class="flow g">
+          <div class="fl" style="flex:.7;"><div class="fl-n">Кнопка вгорі праворуч</div>
+            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; padding:10px; background:#F9FBFD; border:1px solid #DADCE0; border-radius:8px;">
+              <div class="gs-show hlt"><span class="ms">slideshow</span>Слайд-шоу</div>
+              <div class="gs-share" style="display:flex;"><span class="ms">lock</span>Надати доступ</div>
+            </div>
+          </div>
+          <div class="fl-arr"><span class="ms">arrow_forward</span></div>
+          <div class="fl"><div class="fl-n">Показ на весь екран</div>
+            <div class="screen">
+              <div class="sl" data-sl="title"></div>
+              <div class="keys"><kbd>←</kbd><kbd>→</kbd> гортати · <kbd>Esc</kbd> вийти</div>
+            </div>
+          </div>
+        </div>
+        <div class="tip">Під час показу уяви, що розповідаєш класу: дивишся на слухачів, говориш голосно й не поспішаєш — як учили на уроці.</div>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+<footer><span class="page-name">Практична робота · «Знайомимося з Google Презентаціями» · 5 клас</span></footer>
+
+<script src="../../assets/practice.js"></script>
+<script>
+/* Слайди-ілюстрації: однаковий вміст у зразку й мініатюрах */
+const CAT = '<svg viewBox="26 4 62 74"><ellipse cx="52" cy="75" rx="24" ry="2.6" fill="#E9C9A3"/><path d="M60 72 Q84 74 83 56 Q82 47 74 50" fill="none" stroke="#E8590C" stroke-width="6" stroke-linecap="round"/><path d="M35 73 Q29 52 41 39 L59 39 Q71 52 65 73 Z" fill="#F08C00"/><path d="M40 50 Q44 47 46 52 M58 47 Q62 49 61 54" stroke="#D9480F" stroke-width="2" fill="none" stroke-linecap="round"/><ellipse cx="50" cy="57" rx="7" ry="11" fill="#FFD8A8"/><ellipse cx="44" cy="72.5" rx="5.5" ry="3.2" fill="#FFC078"/><ellipse cx="56" cy="72.5" rx="5.5" ry="3.2" fill="#FFC078"/><path d="M37 24 L35 7 L47 16Z M63 24 L65 7 L53 16Z" fill="#F08C00"/><path d="M38.5 19 L37.5 11 L44 16Z M61.5 19 L62.5 11 L56 16Z" fill="#FFC9C9"/><circle cx="50" cy="27" r="14" fill="#F08C00"/><path d="M44 15 L46 20 M50 14 V19 M56 15 L54 20" stroke="#D9480F" stroke-width="1.8" stroke-linecap="round"/><circle cx="44.5" cy="26" r="2.6" fill="#2B2B2B"/><circle cx="55.5" cy="26" r="2.6" fill="#2B2B2B"/><circle cx="45.3" cy="25.2" r=".9" fill="#fff"/><circle cx="56.3" cy="25.2" r=".9" fill="#fff"/><path d="M48 31 H52 L50 33.2Z" fill="#E64980"/><path d="M50 33.2 Q48 35.5 46 34.5 M50 33.2 Q52 35.5 54 34.5" stroke="#8A4E0F" stroke-width="1.1" fill="none"/><path d="M42 31 H31 M42 33 L32 36 M58 31 H69 M58 33 L68 36" stroke="#8A4E0F" stroke-width="1"/></svg>';
+const SLIDES = {
+  title:   ['title', '<h4>Моя улюблена тварина — кіт</h4><p>Олена Коваль, 5-А клас</p>'],
+  empty:   ['title', '<div class="ph t">Натисніть, щоб додати заголовок</div><div class="ph s">Натисніть, щоб додати підзаголовок</div>'],
+  typing:  ['title', '<div class="ph t edit" style="color:#B8460A; font-weight:700;">Моя улюблена тварина — кіт<span class="caret"></span></div><div class="ph s">Натисніть, щоб додати підзаголовок</div>'],
+  mini:    ['title', '<h4>Заголовок</h4><p>Підзаголовок</p>'],
+  look:    ['body',  `<h4>Який він</h4><div class="cols"><div class="photo">${CAT}</div><p>Мій кіт Рудик рудий і пухнастий. Любить спати на підвіконні.</p></div>`],
+  lookText:['body',  '<h4>Який він</h4><p style="border:.4cqw solid #1A73E8; padding:2cqw 3cqw;">Мій кіт Рудик рудий і пухнастий. Любить спати на підвіконні.<span class="caret"></span></p>'],
+  facts:   ['body',  '<h4>Цікаві факти</h4><ul><li>Коти сплять до 16 годин на добу.</li><li>Кіт чує те, чого не чує людина.</li><li>Коти мурчать, коли спокійні.</li></ul>'],
+  factsTyping:['body','<h4>Цікаві факти</h4><ul style="border:.4cqw solid #1A73E8; padding:2cqw 3cqw 2cqw 9cqw;"><li>Коти сплять до 16 годин на добу.</li><li>Кіт чує те, чого не чує людина.</li><li><span class="caret"></span></li></ul>'],
+  end:     ['end',   '<h4>Дякую за увагу!</h4>']
+};
+document.querySelectorAll('[data-sl]').forEach(el=>{
+  const [kind, html] = SLIDES[el.dataset.sl];
+  el.classList.add(kind);
+  el.innerHTML = html;
+});
+document.querySelectorAll('[data-cat]').forEach(el=>el.outerHTML = CAT);
+
+/* Роздивись вікно: підказка при наведенні чи дотику */
+(function(){
+  const gs = document.getElementById('gs'), tip = document.getElementById('gsTip'), count = document.getElementById('tipCount');
+  const parts = [...gs.querySelectorAll('[data-tip]')];
+  let cur = null;
+  const upd = ()=>{
+    const n = gs.querySelectorAll('[data-tip].seen').length;
+    count.innerHTML = n === parts.length ? '<b>Усі частини вікна знайдено ✓</b>' : `Знайдено частин вікна: <b>${n} з ${parts.length}</b>`;
+  };
+  function show(el){
+    if(cur === el) return;
+    cur?.classList.remove('hot');
+    cur = el; el.classList.add('hot', 'seen');
+    tip.innerHTML = el.dataset.tip;
+    const g = gs.getBoundingClientRect(), r = el.getBoundingClientRect();
+    tip.classList.add('show');
+    const w = tip.offsetWidth, h = tip.offsetHeight;
+    let left = r.left - g.left + r.width / 2 - w / 2;
+    left = Math.max(8, Math.min(left, g.width - w - 8));
+    let top = r.bottom - g.top + 8;
+    if(top + h > g.height - 4) top = r.top - g.top - h - 8;
+    if(top < 4) top = r.top - g.top + 12;
+    tip.style.left = left + 'px'; tip.style.top = top + 'px';
+    upd();
+  }
+  function hide(){ cur?.classList.remove('hot'); cur = null; tip.classList.remove('show'); }
+  gs.addEventListener('pointerover', e=>{ const el = e.target.closest('[data-tip]'); if(el) show(el); else if(e.pointerType === 'mouse') hide(); });
+  gs.addEventListener('pointerleave', e=>{ if(e.pointerType === 'mouse') hide(); });
+  gs.addEventListener('click', e=>{ const el = e.target.closest('[data-tip]'); el ? show(el) : hide(); });
+  upd();
+})();
+</script>
+</body>
+</html>
