@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Галузі використання 3D-моделей. Етапи створення тривимірного зображення — Урок</title>
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  /* Гама «креслення»: синій + кораловий */
+  :root{
+    --pri:#2457C5; --pri-dark:#183C8C; --cor:#F2643D; --cor-dark:#C2441F; --grn:#1F9D63;
+    --accent:var(--pri); --accent-dark:var(--pri-dark); --accent-soft:#E8EEFB;
+    --label:var(--cor);
+    --bg:#F4F6FC; --ink:#18213D; --ink-soft:#56607E; --line:#DCE3F2; --surface:#FFFFFF;
+    --note:var(--pri); --note-soft:#E8EEFB; --note-ink:var(--pri-dark);
+    --sun:var(--cor); --sun-soft:#FEEDE6; --sun-ink:var(--cor-dark);
+    --hud-bar:linear-gradient(90deg,var(--pri),var(--cor));
+  }
+
+  /* Переглядач 3D-моделей (SVG) */
+  .v3d{display:block; width:100%; height:auto; user-select:none; -webkit-user-select:none;}
+  .v3d.grab{cursor:grab; touch-action:none;}
+  .v3d.grab:active{cursor:grabbing;}
+  .v3d .hit{cursor:pointer;}
+  .stage{position:relative; background:linear-gradient(180deg,#FFFFFF,#EEF2FB); border:1.5px solid var(--line); border-radius:var(--radius-m); overflow:hidden;}
+  .stage.render{background:radial-gradient(ellipse at 50% 35%,#FFFFFF 0%,#E3EAF7 60%,#CBD6EC 100%);}
+  .stage .hint3d{position:absolute; right:10px; bottom:8px; font:700 12.5px 'Baloo 2',sans-serif; color:var(--ink-soft); background:rgba(255,255,255,.85); border-radius:999px; padding:2px 10px; pointer-events:none; transition:opacity .4s;}
+  .stage .hint3d.gone{opacity:0;}
+
+  /* Крок 1: 2D → 3D */
+  .dims{display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:12px; margin:14px 0;}
+  .dims figure{margin:0; text-align:center; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); padding:10px;}
+  .dims figcaption{font:700 15px 'Baloo 2',sans-serif; color:var(--pri-dark);}
+  .dims .arr{font:800 28px 'Baloo 2',sans-serif; color:var(--cor);}
+  .dims svg{width:100%; max-width:220px; height:auto;}
+  .box-task{display:grid; grid-template-columns:1.3fr 1fr; gap:16px; align-items:center;}
+  @media (max-width:720px){ .box-task{grid-template-columns:1fr;} .dims{grid-template-columns:1fr;} .dims .arr{transform:rotate(90deg); text-align:center;} }
+  .bt-goal{font:700 16px 'Baloo 2',sans-serif; background:var(--sun-soft); color:var(--sun-ink); border-radius:var(--radius-m); padding:8px 14px; margin-bottom:12px;}
+  .bt-goal.ok{background:#E3F5EC; color:#146B44;}
+  .sl{display:grid; grid-template-columns:86px 1fr; align-items:center; gap:10px; margin:10px 0;}
+  .sl label{font:700 15px 'Baloo 2',sans-serif;}
+  .sl input{width:100%;}
+  .sl.x label{color:#D63B3B;} .sl.x input{accent-color:#D63B3B;}
+  .sl.y label{color:#1F9D63;} .sl.y input{accent-color:#1F9D63;}
+  .sl.z label{color:#2F6FE0;} .sl.z input{accent-color:#2F6FE0;}
+
+  /* Крок 2: галузі */
+  .areas{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:12px 0 18px;}
+  @media (max-width:760px){ .areas{grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:460px){ .areas{grid-template-columns:1fr;} }
+  .area{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-m); overflow:hidden;}
+  .area .stage{border:0; border-radius:0; border-bottom:1.5px solid var(--line);}
+  .area .txt{padding:10px 12px 12px;}
+  .area h3{margin:0 0 4px; font:700 17px 'Baloo 2',sans-serif; color:var(--pri-dark);}
+  .area p{margin:0; font-size:14.5px;}
+
+  /* Крок 3: модель → візуалізація */
+  .vis{display:grid; grid-template-columns:1fr auto 1fr; gap:12px; align-items:center; margin:12px 0;}
+  @media (max-width:640px){ .vis{grid-template-columns:1fr;} .vis .arr{transform:rotate(90deg); text-align:center;} }
+  .vis .arr{font:800 15px 'Baloo 2',sans-serif; color:var(--cor); text-align:center;}
+  .vis .arr b{display:block; font-size:28px; line-height:1;}
+  .coords{font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12.5px; line-height:1.55; background:#1F2740; color:#C9D6F5; border-radius:var(--radius-m); padding:12px 14px;}
+  .coords .k{color:#FFB38F;}
+  .vis .stage svg{max-height:200px;}
+
+  /* Крок 4: майстерня */
+  .ws{display:grid; grid-template-columns:1.25fr 1fr; gap:16px;}
+  @media (max-width:760px){ .ws{grid-template-columns:1fr;} }
+  .ws .stage{min-height:340px;}
+  .st-tag{position:absolute; left:10px; top:8px; z-index:2; font:700 13px 'Baloo 2',sans-serif; color:#fff; background:var(--pri); border-radius:999px; padding:2px 12px;}
+  .ws-empty{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; color:var(--ink-soft); font:700 16px 'Baloo 2',sans-serif; text-align:center; padding:20px;}
+  .ws-empty span{font-size:46px; line-height:1;}
+  .tz{position:absolute; inset:38px 14px 14px; background:#fff; border:1.5px solid #C9D5EE; border-radius:10px; padding:10px 14px; display:grid; grid-template-columns:1fr 110px; gap:4px 10px; font-size:13.5px; overflow:hidden; box-shadow:0 4px 14px rgba(24,60,140,.08);}
+  .tz h4{grid-column:1/-1; margin:0; font:700 16px 'Baloo 2',sans-serif; color:var(--pri-dark); border-bottom:1.5px dashed #C9D5EE; padding-bottom:4px;}
+  .tz ul{margin:0; padding-left:18px;}
+  .tz li{margin:2px 0;}
+  .tz svg{width:100%; height:auto; align-self:center;}
+  .ws-files{position:absolute; left:10px; right:10px; bottom:10px; display:flex; flex-wrap:wrap; gap:6px; justify-content:center;}
+  .ws-files span{background:#fff; border:1.5px solid var(--line); border-radius:8px; padding:3px 9px; font-size:12.5px; animation:pop .35s ease both;}
+  .ws-files b{font-family:ui-monospace,Menlo,Consolas,monospace; color:var(--pri-dark);}
+  @keyframes pop{from{transform:scale(.6); opacity:0;}}
+  .ws-q{font:700 16px 'Baloo 2',sans-serif; margin-bottom:8px;}
+  .ws-btns{display:flex; flex-direction:column; gap:8px;}
+  .ws-btn{font:700 15px 'Nunito Sans',sans-serif; text-align:left; border:2px solid var(--line); background:var(--surface); color:var(--ink); border-radius:var(--radius-m); padding:9px 14px; cursor:pointer; transition:border-color .2s, background .2s;}
+  .ws-btn:hover:not(:disabled){border-color:var(--pri);}
+  .ws-btn:disabled{display:none;}
+  .ws-btn.wrong-flash{animation:shakeX .35s ease; border-color:#E5484D; background:#FDECEC;}
+  .ws-fb{min-height:22px; font-size:14px; color:#B3261E; margin:8px 0;}
+  .ws-log{list-style:none; margin:6px 0 0; padding:0; counter-reset:st;}
+  .ws-log li{counter-increment:st; position:relative; padding:8px 10px 8px 42px; margin-bottom:8px; background:var(--accent-soft); border-radius:var(--radius-m); font-size:14.5px; animation:pop .35s ease both;}
+  .ws-log li::before{content:counter(st); position:absolute; left:10px; top:8px; width:24px; height:24px; border-radius:50%; background:var(--pri); color:#fff; font:800 14px/24px 'Baloo 2',sans-serif; text-align:center;}
+  .ws-log b{color:var(--pri-dark);}
+  @keyframes shakeX{25%{transform:translateX(-5px);}75%{transform:translateX(5px);}}
+</style>
+</head>
+<body data-lesson="lesson9-3d-models" data-hud="9 клас · 3D-моделі">
+
+<!-- Візерунки текстур для 3D-моделей (спільні для всіх переглядачів) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs id="defs3d">
+    <pattern id="tx-wood" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(6)">
+      <path d="M0 3.5h16M0 10q4-1.5 8 0t8 0" stroke="#7A4A1E" stroke-width="1" fill="none" opacity=".55"/>
+    </pattern>
+    <pattern id="tx-tile" width="12" height="9" patternUnits="userSpaceOnUse">
+      <path d="M0 8.5h12M3 0v4.5M9 4.5v4" stroke="#4A1A10" stroke-width="1" opacity=".5"/>
+    </pattern>
+  </defs>
+</svg>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Тривимірне моделювання</div>
+      <h1>3D-моделі: де вони потрібні й як їх створюють</h1>
+      <p>Покрутимо справжні 3D-моделі, з'ясуємо, хто й навіщо їх створює, і пройдемо всі етапи — від технічного завдання до готової картинки.</p>
+      <button class="btn-primary" onclick="document.getElementById('start').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: кубик з обличчям і трьома осями -->
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="56" fill="#E8EEFB"/>
+      <path d="M70 34l34 18-34 18-34-18z" fill="#F7A48A"/>
+      <path d="M36 52l34 18v40L36 92z" fill="#2457C5"/>
+      <path d="M70 70l34-18v40l-34 18z" fill="#183C8C"/>
+      <path d="M70 34l34 18v40l-34 18-34-18V52z" stroke="#18213D" stroke-width="2.5" stroke-linejoin="round"/>
+      <path d="M36 52l34 18 34-18M70 70v40" stroke="#18213D" stroke-width="2" stroke-linejoin="round"/>
+      <circle cx="47" cy="74" r="4" fill="#fff"/><circle cx="60" cy="81" r="4" fill="#fff"/>
+      <circle cx="48" cy="75" r="1.8" fill="#18213D"/><circle cx="61" cy="82" r="1.8" fill="#18213D"/>
+      <path d="M47 86q6 6 13 6" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+      <path d="M104 92l18-9" stroke="#D63B3B" stroke-width="3" stroke-linecap="round"/><circle cx="123" cy="82.5" r="3.5" fill="#D63B3B"/>
+      <path d="M70 34V16" stroke="#1F9D63" stroke-width="3" stroke-linecap="round"/><circle cx="70" cy="14" r="3.5" fill="#1F9D63"/>
+      <path d="M36 92l-18-9" stroke="#2F6FE0" stroke-width="3" stroke-linecap="round"/><circle cx="17" cy="82.5" r="3.5" fill="#2F6FE0"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <!-- КРОК 1 -->
+  <section class="block" id="start">
+    <div class="step-label">Крок 1 · Три виміри</div>
+    <h2>Що додає третій вимір</h2>
+    <p>Звичайний малюнок плаский: у нього є лише ширина й висота — це 2D, два виміри. Тривимірний об'єкт має ще й глибину — це 3D.</p>
+    <div class="dims">
+      <figure>
+        <svg viewBox="0 0 200 150"><rect x="55" y="25" width="90" height="90" fill="#C9D8F7" stroke="#2457C5" stroke-width="3"/>
+          <path d="M55 128h90" stroke="#D63B3B" stroke-width="2.5"/><path d="M55 123v10M145 123v10" stroke="#D63B3B" stroke-width="2"/>
+          <text x="100" y="145" text-anchor="middle" font-size="13" font-weight="700" fill="#D63B3B">ширина</text>
+          <path d="M42 25v90" stroke="#1F9D63" stroke-width="2.5"/><path d="M37 25h10M37 115h10" stroke="#1F9D63" stroke-width="2"/>
+          <text x="30" y="74" text-anchor="middle" font-size="13" font-weight="700" fill="#1F9D63" transform="rotate(-90 30 70)">висота</text></svg>
+        <figcaption>2D — квадрат</figcaption>
+      </figure>
+      <div class="arr">→</div>
+      <figure>
+        <svg viewBox="0 0 200 158"><path d="M50 45h80l30-22H80z" fill="#E1E9FB" stroke="#2457C5" stroke-width="3" stroke-linejoin="round"/>
+          <path d="M130 45l30-22v80l-30 22z" fill="#7FA0E6" stroke="#2457C5" stroke-width="3" stroke-linejoin="round"/>
+          <rect x="50" y="45" width="80" height="80" fill="#C9D8F7" stroke="#2457C5" stroke-width="3"/>
+          <path d="M50 138h80" stroke="#D63B3B" stroke-width="2.5"/>
+          <text x="90" y="154" text-anchor="middle" font-size="13" font-weight="700" fill="#D63B3B">ширина</text>
+          <path d="M38 45v80" stroke="#1F9D63" stroke-width="2.5"/>
+          <text x="26" y="89" text-anchor="middle" font-size="13" font-weight="700" fill="#1F9D63" transform="rotate(-90 26 85)">висота</text>
+          <path d="M142 133l30-22" stroke="#2F6FE0" stroke-width="2.5"/>
+          <text x="172" y="134" text-anchor="middle" font-size="13" font-weight="700" fill="#2F6FE0">глибина</text></svg>
+        <figcaption>3D — куб</figcaption>
+      </figure>
+    </div>
+    <ul>
+      <li><b>3D-графіка</b> — методи й інструменти, за допомогою яких створюють зображення тривимірних об'єктів.</li>
+      <li><b>3D-моделювання</b> — процес створення цифрової моделі об'єкта в трьох вимірах: ширині, висоті й глибині.</li>
+    </ul>
+    <div class="note">«3D» — скорочення від англійського <i>three dimensions</i>, «три виміри».</div>
+
+    <h3>Підбери розміри коробки</h3>
+    <p class="soft">Рухай повзунки, щоб синя коробка збіглася з пунктирним контуром. Модель можна обертати мишею чи пальцем.</p>
+    <div class="exercise box-task" id="boxTask">
+      <div class="stage" id="boxView"><div class="hint3d">↻ потягни, щоб повернути</div></div>
+      <div>
+        <div class="bt-goal" id="boxGoal"></div>
+        <div class="sl x"><label for="bx">Ширина</label><input type="range" id="bx" min="1" max="5" step="1" value="2"></div>
+        <div class="sl y"><label for="by">Висота</label><input type="range" id="by" min="1" max="5" step="1" value="2"></div>
+        <div class="sl z"><label for="bz">Глибина</label><input type="range" id="bz" min="1" max="5" step="1" value="2"></div>
+        <div class="progress-line" id="boxProgress"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- КРОК 2 -->
+  <section class="block" data-guide>
+    <div class="step-label">Крок 2 · Галузі використання</div>
+    <h2>Де працюють 3D-моделі</h2>
+    <p>3D-моделі потрібні всюди, де об'єкт корисно побачити чи випробувати ще до того, як його зроблять насправді.</p>
+    <div class="areas">
+      <div class="area"><div class="stage" id="arArch"></div><div class="txt"><h3>Архітектура</h3><p>Проєктують будинки й інтер'єри. Можна показати, якою буде школа, ще до початку будівництва.</p></div></div>
+      <div class="area"><div class="stage" id="arMed"></div><div class="txt"><h3>Медицина</h3><p>Навчають лікарів, планують складні операції, виготовляють протези точно під людину.</p></div></div>
+      <div class="area"><div class="stage" id="arGame"></div><div class="txt"><h3>Ігри</h3><p>Персонажі, будівлі й цілі світи у відеоіграх — це 3D-моделі.</p></div></div>
+      <div class="area"><div class="stage" id="arFilm"></div><div class="txt"><h3>Кіно й мультфільми</h3><p>Фантастичних істот і спецефекти створюють на комп'ютері й додають у кадр.</p></div></div>
+      <div class="area"><div class="stage" id="arMake"></div><div class="txt"><h3>Виробництво</h3><p>Деталі машин і гаджетів перевіряють у цифровому вигляді ще до виготовлення.</p></div></div>
+      <div class="area"><div class="stage" id="arSci"></div><div class="txt"><h3>Освіта й наука</h3><p>Молекули, клітини чи вулкан можна віртуально «розібрати» й роздивитися зсередини.</p></div></div>
+    </div>
+  </section>
+
+  <!-- КРОК 3 -->
+  <section class="block">
+    <div class="step-label">Крок 3 · Модель, візуалізація, віртуальний світ</div>
+    <h2>Від чисел до картинки</h2>
+    <ul>
+      <li><b>Модель</b> — спрощене уявлення реального чи вигаданого об'єкта.</li>
+      <li><b>Візуалізація</b> — перетворення математичної моделі на зображення, яке можна побачити.</li>
+      <li><b>Віртуальний світ</b> — штучне цифрове середовище, зібране з 3D-моделей.</li>
+    </ul>
+    <p>Для комп'ютера 3D-модель — це числа: координати вершин і перелік граней. Програма перетворює їх на зображення.</p>
+    <div class="vis">
+      <div class="coords"><span class="k">вершини:</span><br>A(0, 0, 0) &nbsp;B(1, 0, 0)<br>C(1, 1, 0) &nbsp;D(0, 1, 0)<br>E(0, 0, 1) &nbsp;F(1, 0, 1)<br>G(1, 1, 1) &nbsp;H(0, 1, 1)<br><span class="k">грані:</span><br>ABCD, EFGH, ABFE,<br>DCGH, ADHE, BCGF</div>
+      <div class="arr"><b>→</b>візуалізація</div>
+      <div class="stage" id="visView"></div>
+    </div>
+    <p class="soft">А з багатьох моделей складається віртуальний світ. Покрути містечко:</p>
+    <div class="stage" id="townView"><div class="hint3d">↻ потягни, щоб повернути</div></div>
+
+    <h3>Зістав терміни</h3>
+    <p class="soft">Обери термін, а потім клацни пояснення, яке йому відповідає.</p>
+    <div class="exercise">
+      <div class="match-pool" id="termPool"></div>
+      <div id="termList"></div>
+      <div class="progress-line" id="termProgress"></div>
+    </div>
+  </section>
+
+  <!-- КРОК 4 -->
+  <section class="block">
+    <div class="step-label">Крок 4 · Етапи створення</div>
+    <h2>Майстерня: шпаківня для шкільного саду</h2>
+    <p>Тривимірне зображення створюють у п'ять етапів. Подумай, що логічно робити спершу, а що — потім, і проведи шпаківню через усі етапи.</p>
+    <div class="exercise ws" id="wsTask">
+      <div class="stage" id="wsView"><div class="st-tag" id="wsTag">Етап —</div>
+        <div class="ws-empty" id="wsEmpty"><span>📐</span>Тут з'явиться шпаківня</div></div>
+      <div>
+        <div class="ws-q" id="wsQ">Що робимо першим?</div>
+        <div class="ws-btns" id="wsBtns"></div>
+        <div class="ws-fb" id="wsFb"></div>
+        <ol class="ws-log" id="wsLog"></ol>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Урок · «Галузі використання 3D-моделей. Етапи створення тривимірного зображення» · 9 клас</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* ============ МІНІ-3D: моделі з граней, обертання, малювання в SVG ============ */
+const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]];
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const unit=a=>{const l=Math.hypot(a[0],a[1],a[2])||1; return [a[0]/l,a[1]/l,a[2]/l];};
+const avg=pts=>{const c=[0,0,0]; pts.forEach(p=>{c[0]+=p[0]; c[1]+=p[1]; c[2]+=p[2];}); return c.map(v=>v/pts.length);};
+const LIGHT=unit([-0.45,0.75,0.6]);
+const hexRgb=h=>[1,3,5].map(i=>parseInt(h.substr(i,2),16));
+const tone=(hex,k)=>'rgb('+hexRgb(hex).map(v=>Math.max(0,Math.min(255,Math.round(v*k)))).join(',')+')';
+
+// Призма: многокутник poly [[u,v]…] (проти годинникової) видавлено вздовж осі від t0 до t1
+function prism(poly, axis, t0, t1, color, o={}){
+  let a=0; poly.forEach((p,i)=>{const q=poly[(i+1)%poly.length]; a+=p[0]*q[1]-q[0]*p[1];});
+  if(a<0) poly=poly.slice().reverse();
+  const M = axis==='x' ? (u,v,t)=>[t,v,u] : axis==='y' ? (u,v,t)=>[u,t,v] : (u,v,t)=>[u,v,t];
+  const F=(pts,n)=>({pts, n:unit(n), c:avg(pts), color, tex:o.tex, decals:[], kids:[]});
+  const cap0=F(poly.map(p=>M(p[0],p[1],t0)), M(0,0,-1));
+  const cap1=F(poly.map(p=>M(p[0],p[1],t1)), M(0,0,1));
+  const sides=poly.map((p,i)=>{const q=poly[(i+1)%poly.length];
+    return F([M(p[0],p[1],t0),M(q[0],q[1],t0),M(q[0],q[1],t1),M(p[0],p[1],t1)], M(q[1]-p[1],-(q[0]-p[0]),0));});
+  const c=avg(poly.map(p=>[p[0],p[1],0]));
+  return {faces:[cap0,cap1,...sides], cap0, cap1, sides, center:M(c[0],c[1],(t0+t1)/2), under:o.under};
+}
+const rect=(x0,y0,x1,y1)=>[[x0,y0],[x1,y0],[x1,y1],[x0,y1]];
+function box(cx,cy,cz,w,h,d,color,o){
+  const p=prism(rect(cx-w/2,cy-h/2,cx+w/2,cy+h/2),'z',cz-d/2,cz+d/2,color,o);
+  Object.assign(p,{back:p.cap0, front:p.cap1, bottom:p.sides[0], right:p.sides[1], top:p.sides[2], left:p.sides[3]});
+  return p;
+}
+const ngon=(r,n,cx=0,cy=0,rot=0)=>Array.from({length:n},(_,i)=>{const a=rot+i*2*Math.PI/n; return [cx+r*Math.cos(a), cy+r*Math.sin(a)];});
+const starPts=(cx,cy,r)=>Array.from({length:10},(_,i)=>{const a=Math.PI/2+i*Math.PI/5, rr=i%2?r*0.45:r; return [cx+rr*Math.cos(a), cy+rr*Math.sin(a)];});
+function dec(face, pts, color, o={}){ face.decals.push({pts, color, ...o}); }
+function mdl(){ const m={parts:[]}; m.add=(p,on)=>{ if(on){ p.on=true; on.kids.push(p); } m.parts.push(p); return p; }; return m; }
+
+// Кульки з градієнтом (молекула, крони дерев)
+function grad(color){
+  const id='bg'+color.slice(1);
+  if(!document.getElementById(id)){
+    const g=document.createElementNS('http://www.w3.org/2000/svg','radialGradient');
+    g.id=id; g.setAttribute('cx','.36'); g.setAttribute('cy','.32'); g.setAttribute('r','.72');
+    g.innerHTML=`<stop offset="0" stop-color="${tone(color,1.3)}"/><stop offset=".55" stop-color="${color}"/><stop offset="1" stop-color="${tone(color,.62)}"/>`;
+    document.getElementById('defs3d').appendChild(g);
+  }
+  return `url(#${id})`;
+}
+
+// Малює модель m з поглядом v → вміст SVG (рядок)
+function render3d(m, v){
+  const cyw=Math.cos(v.yaw), syw=Math.sin(v.yaw), cp=Math.cos(v.pitch), sp=Math.sin(v.pitch);
+  const D=v.D||9, S=v.S, CX=v.W/2, CY=v.H/2+(v.dy||0), oy=v.oy||0;
+  const rd=p=>{const x1=p[0]*cyw+p[2]*syw, z1=-p[0]*syw+p[2]*cyw; return [x1, p[1]*cp-z1*sp, p[1]*sp+z1*cp];};
+  const rot=p=>rd([p[0],p[1]-oy,p[2]]);
+  const pr=q=>{const f=D/(D-q[2]); return [CX+q[0]*S*f, CY-q[1]*S*f, f];};
+  const P=pts=>pts.map(p=>{const s=pr(rot(p)); return s[0].toFixed(1)+','+s[1].toFixed(1);}).join(' ');
+  const mode=v.mode||'color', out=[];
+  const isVis=f=>{const q=rot(f.pts[0]); return dot(rd(f.n),[-q[0],-q[1],D-q[2]])>0;};
+  const allFaces=[]; m.parts.forEach(p=>p.faces&&p.faces.forEach(f=>allFaces.push(f)));
+
+  // Підлога й тіні
+  if(v.floor && v.pitch>0.02){
+    const g=v.ground; out.push(`<polygon points="${P(ngon(v.floor,40).map(([x,z])=>[x,g,z]))}" fill="${mode==='render'?'#D5DFF0':'#E6ECF7'}"/>`);
+  }
+  if(v.shadow){
+    const g=v.ground, sh=p=>[p[0]+0.45*(p[1]-g), g, p[2]+0.3*(p[1]-g)];
+    out.push('<g fill="#14213D" opacity=".22">');
+    allFaces.forEach(f=>out.push(`<polygon points="${P(f.pts.map(sh))}"/>`));
+    out.push('</g>');
+  }
+
+  if(mode==='wire'){
+    const vis=[], hid=[]; allFaces.forEach(f=>(isVis(f)?vis:hid).push(f));
+    hid.forEach(f=>out.push(`<polygon points="${P(f.pts)}" fill="none" stroke="#2457C5" stroke-width="1" stroke-dasharray="3 3" opacity=".35"/>`));
+    vis.forEach(f=>out.push(`<polygon points="${P(f.pts)}" fill="none" stroke="#2457C5" stroke-width="1.6" stroke-linejoin="round"/>`));
+  } else {
+    const shade=rn=>{const d=Math.max(0,dot(rn,LIGHT)); return mode==='render' ? 0.42+0.72*d : 0.55+0.5*d;};
+    const face=(f)=>{
+      const rn=rd(f.n), k=shade(rn), base=mode==='clay'?'#C9CED9':f.color, fill=tone(base,k);
+      const st=mode==='render'?fill:tone(base,k*0.72);
+      out.push(`<polygon points="${P(f.pts)}" fill="${fill}" stroke="${st}" stroke-width="${mode==='render'?0.8:1.1}" stroke-linejoin="round"/>`);
+      if(f.tex && mode!=='clay') out.push(`<polygon points="${P(f.pts)}" fill="url(#tx-${f.tex})" opacity=".6"/>`);
+      f.decals.forEach(d=>{
+        const col = mode==='clay' ? tone('#AEB4C2',k) : d.flat ? d.color : tone(d.color,k);
+        out.push(`<polygon points="${P(d.pts)}" fill="${col}"${d.hit?` data-hit="${d.hit}" class="hit" stroke="${d.flat?tone(d.color,.7):'none'}" stroke-width="1.2" stroke-linejoin="round"`:''}/>`);
+      });
+    };
+    const part=p=>{
+      if(p.ball){ const q=rot(p.c), s=pr(q);
+        out.push(`<circle cx="${s[0].toFixed(1)}" cy="${s[1].toFixed(1)}" r="${(p.r*S*s[2]).toFixed(1)}" fill="${mode==='clay'?grad('#C9CED9'):grad(p.color)}" stroke="${tone(p.color,.6)}" stroke-width=".8"/>`); return; }
+      if(p.stick){ const a=pr(rot(p.a)), b=pr(rot(p.b));
+        out.push(`<line x1="${a[0].toFixed(1)}" y1="${a[1].toFixed(1)}" x2="${b[0].toFixed(1)}" y2="${b[1].toFixed(1)}" stroke="${p.color}" stroke-width="${(p.w*S*(a[2]+b[2])/2).toFixed(1)}" stroke-linecap="round"/>`); return; }
+      const info=p.faces.map(f=>({f, vis:isVis(f), z:rot(f.c)[2]}));
+      info.filter(i=>!i.vis).forEach(i=>i.f.kids.forEach(part));
+      info.filter(i=>i.vis).sort((a,b)=>a.z-b.z).forEach(i=>{ face(i.f); i.f.kids.forEach(part); });
+    };
+    const depth=p=>p.ball?rot(p.c)[2]+p.r*0.5 : p.stick?rot(avg([p.a,p.b]))[2]-0.05 : rot(p.center)[2];
+    const roots=m.parts.filter(p=>!p.on);
+    roots.filter(p=>p.under).forEach(part);
+    roots.filter(p=>!p.under).map(p=>({p,z:depth(p)})).sort((a,b)=>a.z-b.z).forEach(r=>part(r.p));
+  }
+
+  // Пунктирний контур-ціль
+  if(v.ghost){
+    v.ghost.parts.forEach(p=>p.faces.forEach(f=>{ const vis=isVis(f);
+      out.push(`<polygon points="${P(f.pts)}" fill="none" stroke="#F2643D" stroke-width="${vis?2:1.2}" stroke-dasharray="6 4" opacity="${vis?1:.45}" stroke-linejoin="round"/>`); }));
+  }
+  // Осі: ширина, висота, глибина
+  if(v.axes){
+    const ox=36, oyy=v.H-34;
+    [[[1,0,0],'#D63B3B','Ш'],[[0,1,0],'#1F9D63','В'],[[0,0,1],'#2F6FE0','Г']].forEach(([d,c,t])=>{
+      const r=rd(d), x=ox+r[0]*24, y=oyy-r[1]*24;
+      out.push(`<line x1="${ox}" y1="${oyy}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" stroke="${c}" stroke-width="3" stroke-linecap="round"/><text x="${(ox+r[0]*34).toFixed(1)}" y="${(oyy-r[1]*34+4).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="800" fill="${c}" font-family="Baloo 2, sans-serif">${t}</text>`);
+    });
+  }
+  return out.join('');
+}
+
+// Переглядач: SVG у host, перетягування обертає модель, spin — автоповорот
+const spinning=new Set();
+let lastT=0;
+function spinLoop(t){
+  const dt=lastT?Math.min(0.05,(t-lastT)/1000):0; lastT=t;
+  spinning.forEach(api=>{ if(api.seen && !api.dragging && api.v.spin){ api.v.yaw+=dt*api.v.spin; api.draw(); } });
+  requestAnimationFrame(spinLoop);
+}
+requestAnimationFrame(spinLoop);
+const io=new IntersectionObserver(es=>es.forEach(e=>{ e.target._api.seen=e.isIntersecting; }));
+
+function viewer(host, model, opts){
+  const v=Object.assign({W:360,H:260,S:60,yaw:0.6,pitch:0.35,mode:'color',minP:-1.45,maxP:1.45,drag:true}, opts);
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('viewBox',`0 0 ${v.W} ${v.H}`); svg.classList.add('v3d');
+  host.insertBefore(svg, host.firstChild);
+  const api={v, model, svg, draw(){ svg.innerHTML=render3d(typeof api.model==='function'?api.model():api.model, v); }};
+  if(v.drag){
+    svg.classList.add('grab');
+    let d=null;
+    svg.addEventListener('pointerdown',e=>{
+      d={x:e.clientX, y:e.clientY, yaw:v.yaw, p:v.pitch, moved:false, hit:e.target.closest('[data-hit]')?.dataset.hit};
+      api.dragging=true; svg.setPointerCapture(e.pointerId);
+    });
+    svg.addEventListener('pointermove',e=>{
+      if(!d) return;
+      const dx=e.clientX-d.x, dy=e.clientY-d.y;
+      if(Math.abs(dx)+Math.abs(dy)>5 && !d.moved){ d.moved=true; host.querySelector('.hint3d')?.classList.add('gone'); }
+      if(!d.moved) return;
+      v.yaw=d.yaw+dx*0.012; v.pitch=Math.max(v.minP,Math.min(v.maxP,d.p+dy*0.01)); api.draw();
+    });
+    const up=()=>{ if(d && !d.moved && d.hit && v.onHit) v.onHit(d.hit); d=null; api.dragging=false; };
+    svg.addEventListener('pointerup',up); svg.addEventListener('pointercancel',up);
+  }
+  svg._api=api; api.seen=false; io.observe(svg); spinning.add(api);
+  api.draw();
+  return api;
+}
+
+/* ============ МОДЕЛІ ============ */
+function addHouse(m, x, z, w, d, h, wall, roof, o={}){
+  const b=m.add(box(x,h/2,z,w,h,d,wall));
+  const ov=0.12, rh=o.rh||h*0.6;
+  const r=m.add(prism([[x-w/2-ov,h],[x+w/2+ov,h],[x,h+rh]],'z',z-d/2-ov,z+d/2+ov,roof,{tex:'tile'}), b.top);
+  if(o.chimney) m.add(box(x+w*0.24,h+rh*0.62,z-d*0.15,w*0.13,rh*0.75,w*0.13,'#8E5A4B'), r.sides[1]);
+  const zf=z+d/2;
+  dec(b.front, rect(x-w*0.11,0,x+w*0.11,h*0.6).map(([u,vv])=>[u,vv,zf]), '#7A4A2A');
+  [-1,1].forEach(s=>dec(b.front, rect(x+s*w*0.31-w*0.09,h*0.42,x+s*w*0.31+w*0.09,h*0.68).map(([u,vv])=>[u,vv,zf]), '#BFE3FF'));
+  return b;
+}
+function houseModel(){
+  const m=mdl(), w=2, d=1.6, h=1.4;
+  const b=addHouse(m,0,0,w,d,h,'#F4D58D','#C8553D',{chimney:true});
+  return {m, b};
+}
+function crossModel(){
+  const m=mdl(), a=0.32, l=1.05;
+  m.add(prism([[-a,-l],[a,-l],[a,-a],[l,-a],[l,a],[a,a],[a,l],[-a,l],[-a,a],[-l,a],[-l,-a],[-a,-a]],'z',-0.25,0.25,'#E5484D'));
+  return m;
+}
+function gamerModel(){
+  const m=mdl();
+  const body=m.add(box(0,1.45,0,0.9,1,0.5,'#1FB5A6'));
+  const head=m.add(box(0,2.35,0,0.8,0.8,0.8,'#F2C29B'), body.top);
+  [[-0.17],[0.17]].forEach(([x])=>dec(head.front, rect(x-0.08,2.33,x+0.08,2.45).map(([u,vv])=>[u,vv,0.4]), '#2B2F45'));
+  dec(head.front, rect(-0.14,2.13,0.14,2.19).map(([u,vv])=>[u,vv,0.4]), '#B5554A');
+  dec(head.top, rect(-0.4,-0.4,0.4,0.4).map(([u,vv])=>[u,2.75,vv]), '#5A3A22');
+  [-1,1].forEach(s=>m.add(box(s*0.65,1.45,0,0.38,1,0.42,'#F2C29B')));
+  [-1,1].forEach(s=>m.add(box(s*0.22,0.47,0,0.42,0.95,0.46,'#3D5AFE'), body.bottom));
+  return m;
+}
+function cameraModel(){
+  const m=mdl();
+  const b=m.add(box(0,0,0,1.6,0.95,0.75,'#3B3F4A'));
+  m.add(prism(ngon(0.3,16),'x',0.8,1.3,'#5D6475'), b.right);
+  [[-0.45],[0.38]].forEach(([x])=>{
+    const r=m.add(prism(ngon(0.42,20,x,0.92),'z',-0.1,0.1,'#E5484D'), b.top);
+    dec(r.cap1, ngon(0.12,12,x,0.92).map(([u,vv])=>[u,vv,0.1]), '#FFD9D0');
+    dec(r.cap0, ngon(0.12,12,x,0.92).map(([u,vv])=>[u,vv,-0.1]), '#FFD9D0');
+  });
+  return m;
+}
+function gearModel(){
+  const m=mdl(), pts=[], n=10;
+  for(let i=0;i<n;i++){ const a=i*2*Math.PI/n, w=Math.PI/n;
+    [[0.82,a-w*0.95],[1.12,a-w*0.5],[1.12,a+w*0.5],[0.82,a+w*0.95]].forEach(([r,t])=>pts.push([r*Math.cos(t), r*Math.sin(t)])); }
+  const g=m.add(prism(pts,'z',-0.22,0.22,'#8E9BB0'));
+  dec(g.cap1, ngon(0.38,20).map(([u,vv])=>[u,vv,0.22]), '#6B7890');
+  dec(g.cap1, ngon(0.16,16).map(([u,vv])=>[u,vv,0.22]), '#2B3245', {flat:true});
+  dec(g.cap0, ngon(0.38,20).map(([u,vv])=>[u,vv,-0.22]), '#6B7890');
+  dec(g.cap0, ngon(0.16,16).map(([u,vv])=>[u,vv,-0.22]), '#2B3245', {flat:true});
+  return m;
+}
+function moleculeModel(){
+  const m=mdl(), k=1.15/Math.sqrt(3);
+  [[1,1,1],[1,-1,-1],[-1,1,-1],[-1,-1,1]].forEach(p=>{ const c=p.map(v=>v*k);
+    m.add({stick:true, a:[0,0,0], b:c, w:0.14, color:'#9AA3B5'});
+    m.add({ball:true, c, r:0.32, color:'#E9EDF5'}); });
+  m.add({ball:true, c:[0,0,0], r:0.48, color:'#3D5AFE'});
+  return m;
+}
+function townModel(){
+  const m=mdl();
+  const g=m.add(box(0,-0.06,0,6,0.12,6,'#9CCC65',{under:true}));
+  dec(g.top, rect(-3,-0.35,3,0.35).map(([u,vv])=>[u,0,vv]), '#8E98A8');
+  for(let x=-2.7;x<3;x+=0.9) dec(g.top, rect(x,-0.04,x+0.4,0.04).map(([u,vv])=>[u,0.001,vv]), '#F5F7FB');
+  addHouse(m,-1.6,-1.4,1.3,1.1,1.0,'#F4D58D','#C8553D',{chimney:true});
+  addHouse(m,1.3,-1.5,1.6,1.2,1.3,'#9ED0F0','#3B5BA5');
+  addHouse(m,-1.4,1.5,1.2,1.0,0.9,'#F7B7A3','#7A4E9C');
+  [[0.9,1.3],[1.9,1.7],[2.4,0.9],[0.1,-1.9],[-2.5,0.9]].forEach(([x,z])=>{
+    m.add(box(x,0.3,z,0.16,0.6,0.16,'#8B5A2B'));
+    m.add({ball:true, c:[x,0.85,z], r:0.38, color:'#43A047'});
+  });
+  return m;
+}
+function cubeModel(){
+  const m=mdl(); m.add(box(0,0,0,1.6,1.6,1.6,'#5B8DEF')); return m;
+}
+function birdhouseModel(){
+  const m=mdl(), z0=-0.65, z1=0.65;
+  const b=m.add(prism([[-0.7,0],[0.7,0],[0.7,1.1],[0,1.7],[-0.7,1.1]],'z',z0,z1,'#D9A066',{tex:'wood'}));
+  const u=unit([0.7,-0.6,0]), n=[0.6/0.922,0.7/0.922];
+  [[1,b.sides[2]],[-1,b.sides[3]]].forEach(([s,f])=>{
+    const p0=[-u[0]*0.06*s, 1.7+0.06*u[1]*-1], p1=[s*(0.7+u[0]*0.25), 1.1+u[1]*0.25];
+    const nn=[s*n[0], n[1]];
+    const q=[p0, p1, [p1[0]+nn[0]*0.12, p1[1]+nn[1]*0.12], [p0[0]+nn[0]*0.12, p0[1]+nn[1]*0.12]];
+    m.add(prism(q,'z',-0.82,0.82,'#B5523B',{tex:'tile'}), f);
+  });
+  dec(b.cap1, ngon(0.22,20,0,0.85).map(([x,y])=>[x,y,z1]), '#3A2A1E', {flat:true});
+  m.add(prism(ngon(0.05,10,0,0.45),'z',z1,z1+0.32,'#8B5A2B'), b.cap1);
+  m.add(box(0,-0.6,0,0.16,1.2,0.16,'#7A5230'), b.sides[0]);
+  return m;
+}
+
+/* ============ КРОК 1: КОРОБКА ЗА РОЗМІРАМИ ============ */
+(function(){
+  const GOALS=[
+    {name:'🧊 Холодильник', s:[3,5,3]},
+    {name:'🐠 Акваріум', s:[5,3,2]},
+    {name:'📕 Книжка', s:[3,4,1]}
+  ];
+  const K=0.42, ins=['bx','by','bz'].map(id=>document.getElementById(id));
+  const goalEl=document.getElementById('boxGoal'), prog=document.getElementById('boxProgress');
+  const task=document.getElementById('boxTask');
+  const hit=trackTask(task, GOALS.length, GOALS.length+2);
+  let g=0, busy=false;
+  const mk=(s,color)=>{const m=mdl(); m.add(box(0,s[1]*K/2-1,0,s[0]*K,s[1]*K,s[2]*K,color)); return m;};
+  const view=viewer(document.getElementById('boxView'), ()=>mk(ins.map(i=>+i.value),'#5B8DEF'), {W:380,H:280,S:62,yaw:0.62,pitch:0.42,axes:true});
+  function show(){
+    goalEl.className='bt-goal';
+    goalEl.textContent=`Зроби заготовку: ${GOALS[g].name} (${g+1} з ${GOALS.length})`;
+    view.v.ghost=mk(GOALS[g].s,'#000'); view.draw();
+    prog.textContent=`Готово: ${g} з ${GOALS.length}`;
+  }
+  ins.forEach(i=>i.addEventListener('input',()=>{
+    view.draw();
+    if(busy || g>=GOALS.length) return;
+    if(ins.every((el,k)=>+el.value===GOALS[g].s[k])){
+      busy=true; addNeurons(1); hit();
+      goalEl.className='bt-goal ok'; goalEl.textContent=`✓ ${GOALS[g].name} — розміри збіглися!`;
+      g++;
+      if(g===GOALS.length){ addNeurons(2); view.v.ghost=null; view.draw(); prog.textContent='Усі заготовки готові ✓'; return; }
+      setTimeout(()=>{ busy=false; show(); }, 1100);
+    }
+  }));
+  show();
+})();
+
+/* ============ КРОК 2: ГАЛУЗІ ============ */
+(function(){
+  const mini=(id,m,o)=>viewer(document.getElementById(id), m, Object.assign({W:240,H:150,drag:false,spin:0.7,pitch:0.32}, o));
+  mini('arArch', houseModel().m, {S:40, oy:1.1});
+  mini('arMed', crossModel(), {S:48, pitch:0.25});
+  mini('arGame', gamerModel(), {S:42, oy:1.45, pitch:0.2});
+  mini('arFilm', cameraModel(), {S:46, oy:0.35});
+  mini('arMake', gearModel(), {S:48, pitch:0.45});
+  mini('arSci', moleculeModel(), {S:50, spin:0.9});
+})();
+
+/* ============ КРОК 3: ВІЗУАЛІЗАЦІЯ Й ВІРТУАЛЬНИЙ СВІТ ============ */
+viewer(document.getElementById('visView'), cubeModel(), {W:240,H:190,S:52,drag:false,spin:0.6,pitch:0.45});
+viewer(document.getElementById('townView'), townModel(), {W:560,H:320,S:44,yaw:0.5,pitch:0.55,minP:0.15,maxP:1.3,oy:0.5,dy:12});
+
+makeMatching('termPool', 'termList', [
+  { name:'3D-графіка', desc:'Методи й інструменти для створення зображень тривимірних об\'єктів' },
+  { name:'3D-моделювання', desc:'Процес створення цифрової моделі об\'єкта з шириною, висотою й глибиною' },
+  { name:'Модель', desc:'Спрощене уявлення реального чи вигаданого об\'єкта' },
+  { name:'Візуалізація', desc:'Перетворення математичної моделі на зображення, яке можна побачити' },
+  { name:'Віртуальний світ', desc:'Штучне цифрове середовище, зібране з 3D-моделей' }
+], 'termProgress');
+
+/* ============ КРОК 4: МАЙСТЕРНЯ (ЕТАПИ) ============ */
+(function(){
+  const ST=[
+    { btn:'Скласти технічне завдання', tag:'ТЗ',
+      text:'<b>Технічне завдання (ТЗ).</b> Записують, яким має бути об\'єкт: розміри, матеріали, креслення.' },
+    { btn:'Створити 3D-об\'єкт', tag:'Створення об\'єкта',
+      text:'<b>Створення 3D-об\'єкта.</b> У програмі для 3D-моделювання будують форму з потрібними розмірами — поки без кольору.',
+      early:'Не поспішай: щоб будувати модель, треба знати її розміри й матеріал.' },
+    { btn:'Зробити модель реалістичною', tag:'Реалістична модель',
+      text:'<b>Реалістична модель.</b> Додають текстури (деревина, черепиця), налаштовують світло й тіні, обирають точку огляду: з висоти зросту людини чи з пташиного польоту.',
+      early:'Текстури й світло поки ні на що накласти — моделі ще немає.' },
+    { btn:'Рендеринг', tag:'Рендеринг',
+      text:'<b>Рендеринг.</b> Програма обчислює готове реалістичне зображення з відблисками й тінями, а ще може зробити відео, де камера облітає модель.',
+      early:'Рендерити ще рано: спершу модель має отримати форму, текстури й світло.' },
+    { btn:'Експорт', tag:'Експорт',
+      text:'<b>Експорт.</b> Модель зберігають у файл потрібного формату — для перегляду, іншої програми чи 3D-принтера.',
+      early:'Зберігати поки нічого: спершу модель має бути готова.' }
+  ];
+  const host=document.getElementById('wsView'), tag=document.getElementById('wsTag'), empty=document.getElementById('wsEmpty');
+  const btns=document.getElementById('wsBtns'), fb=document.getElementById('wsFb'), log=document.getElementById('wsLog'), q=document.getElementById('wsQ');
+  const hit=trackTask(document.getElementById('wsTask'), ST.length, ST.length+2);
+  let next=0, view=null, extra=null;
+  const ORD=['першим','другим','третім','четвертим','п\'ятим'];
+
+  function place(html){ if(extra) extra.remove(); extra=document.createElement('div'); extra.innerHTML=html; extra=extra.firstElementChild; host.appendChild(extra); }
+  function apply(i){
+    tag.textContent=`Етап ${i+1} · ${ST[i].tag}`;
+    if(i===0){
+      empty.remove();
+      place(`<div class="tz"><h4>Технічне завдання: шпаківня</h4>
+        <ul><li>Висота: 30 см</li><li>Ширина: 20 см</li><li>Глибина: 20 см</li><li>Отвір: ⌀ 5 см, з жердинкою</li><li>Матеріал: сосна</li><li>Дах: двосхилий, червоний</li></ul>
+        <svg viewBox="0 0 120 150"><path d="M25 60L60 25l35 35v70H25z" fill="#EEF2FB" stroke="#2457C5" stroke-width="2.5" stroke-linejoin="round"/>
+        <circle cx="60" cy="80" r="11" fill="none" stroke="#2457C5" stroke-width="2"/><path d="M60 99v8" stroke="#2457C5" stroke-width="2"/>
+        <path d="M25 140h70M25 136v8M95 136v8" stroke="#F2643D" stroke-width="1.6"/><text x="60" y="150" font-size="11" text-anchor="middle" fill="#C2441F" font-weight="700">20 см</text>
+        <path d="M108 25v105M104 25h8M104 130h8" stroke="#F2643D" stroke-width="1.6"/><text x="113" y="80" font-size="11" fill="#C2441F" font-weight="700" transform="rotate(90 113 80)" text-anchor="middle">30 см</text></svg></div>`);
+    }
+    if(i===1){
+      if(extra){ extra.remove(); extra=null; }
+      view=viewer(host, birdhouseModel(), {W:380,H:300,S:70,yaw:0.6,pitch:0.3,oy:0.55,mode:'wire',ground:-1.2});
+      setTimeout(()=>{ if(view.v.mode==='wire'){ view.v.mode='clay'; view.draw(); } }, 700);
+    }
+    if(i===2){ view.v.mode='color'; view.v.pitch=0.12; view.draw(); }
+    if(i===3){ host.classList.add('render'); Object.assign(view.v,{mode:'render', shadow:true, floor:2.4, spin:0.5, pitch:0.3}); view.draw(); }
+    if(i===4){ view.v.spin=0.25;
+      place(`<div class="ws-files"><span><b>shpakivnia.stl</b> для 3D-принтера</span><span><b>shpakivnia.obj</b> для інших програм</span><span><b>shpakivnia.png</b> картинка</span><span><b>obolit.mp4</b> відео</span></div>`); }
+  }
+  shuffle(ST.map((_,i)=>i)).forEach(i=>{
+    const b=document.createElement('button');
+    b.className='ws-btn'; b.textContent=ST[i].btn;
+    b.addEventListener('click',()=>{
+      if(i===next){
+        b.disabled=true; fb.textContent='';
+        const li=document.createElement('li'); li.innerHTML=ST[i].text; log.appendChild(li);
+        apply(i); addNeurons(1); next++;
+        if(next===ST.length){ addNeurons(2); q.textContent='Шпаківня готова! ✓'; }
+        else q.textContent=`Що робимо ${ORD[next]}?`;
+        hit();
+      } else {
+        b.classList.remove('wrong-flash'); void b.offsetWidth; b.classList.add('wrong-flash');
+        fb.textContent=ST[i].early || 'Не зараз — подумай, що має бути готовим перед цим.';
+      }
+    });
+    btns.appendChild(b);
+  });
+})();
+
+/* ============ ФІНАЛЬНИЙ ТЕСТ ============ */
+makeFinalQuiz('finalQuiz', [
+  { q:'Який вимір додається, коли від 2D переходимо до 3D?', opts:['Глибина', 'Ширина', 'Висота', 'Колір'], correct:0, why:'У плаского малюнка є лише ширина й висота.' },
+  { q:'Що таке 3D-моделювання?', opts:['Створення цифрової моделі об\'єкта в трьох вимірах', 'Малювання плаского малюнка в редакторі', 'Друк фотографії на принтері', 'Фотографування предмета з усіх боків'], correct:0 },
+  { q:'Візуалізація — це…', opts:['перетворення математичної моделі на зображення', 'збереження моделі у файл', 'запис розмірів і матеріалів об\'єкта', 'друк моделі на 3D-принтері'], correct:0 },
+  { q:'Віртуальний світ — це…', opts:['штучне цифрове середовище з 3D-моделей', 'будь-який сайт в інтернеті', 'фото справжнього міста', 'креслення будинку на папері'], correct:0 },
+  { q:'Інженери перевіряють, чи пасують деталі нового смартфона одна до одної, ще до виготовлення. Це галузь…', opts:['виробництво', 'архітектура', 'кіно', 'медицина'], correct:0 },
+  { q:'З чого починають створення тривимірного зображення?', opts:['З технічного завдання', 'З рендерингу', 'З експорту', 'З вибору текстур'], correct:0, why:'Спершу треба знати, яким має бути об\'єкт: розміри, матеріали, креслення.' },
+  { q:'На якому етапі додають текстури, світло й обирають точку огляду?', opts:['Реалістична модель', 'Технічне завдання', 'Експорт', 'Створення 3D-об\'єкта'], correct:0 },
+  { q:'Що відбувається під час рендерингу?', opts:['Програма обчислює готове реалістичне зображення чи відео', 'Записують розміри об\'єкта', 'Модель зберігають для 3D-принтера', 'Із фігур складають форму'], correct:0 }
+], {summary:'Тепер ти знаєш, що таке 3D-модель, де її використовують і які п\'ять етапів проходить тривимірне зображення.'});
+</script>
+
+</body>
+</html>
