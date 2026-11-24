@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Мій перший будиночок у Tinkercad — 3D-моделі</title>
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#2457C5,#F2643D); --accent:#2457C5; --accent-dark:#183C8C; --accent-soft:#E8EEFB; --bg:#F4F6FC; --line:#DCE3F2; --hl:#F2643D; }
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:18px; line-height:1; display:inline-block; vertical-align:middle; white-space:nowrap; direction:ltr; font-feature-settings:'liga'; overflow:hidden; width:1em;}
+  .v3d{display:block; width:100%; height:auto; user-select:none; -webkit-user-select:none;}
+  .v3d.grab{cursor:grab; touch-action:none;}
+
+  /* Що має вийти */
+  .result{display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:center; background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:12px 18px;}
+  @media (max-width:600px){ .result{grid-template-columns:1fr;} }
+  .result ul{margin:0; padding-left:20px; font-size:15px;}
+
+  /* Підсвітка того, що треба натиснути: рамка + курсор */
+  .hl{outline:2.5px solid var(--hl); outline-offset:2px; border-radius:6px; position:relative; z-index:2; animation:hlp 1.6s ease-in-out infinite;}
+  .hl::after{content:''; position:absolute; right:-9px; bottom:-15px; width:18px; height:22px; pointer-events:none;
+    background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 22'%3E%3Cpath d='M2 1v17l4.5-4 3 7 3-1.3-3-6.8H16z' fill='white' stroke='black' stroke-width='1.4' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat;}
+  @keyframes hlp{50%{outline-color:rgba(242,100,61,.3);}}
+  .num{display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background:var(--hl); color:#fff; font:700 12px 'Baloo 2',sans-serif; flex-shrink:0;}
+  .legend{list-style:none; padding:0 !important; margin:8px 0 4px;}
+  .legend li{display:flex; gap:8px; align-items:flex-start; margin-bottom:6px;}
+  .frames{display:grid; grid-template-columns:1fr auto 1fr; gap:10px; align-items:center; margin:10px 0 6px;}
+  .frames > .ms{font-size:26px; color:var(--hl); width:auto;}
+  @media (max-width:600px){ .frames{grid-template-columns:1fr;} .frames > .ms{transform:rotate(90deg); justify-self:center;} }
+
+  /* Вікно редактора Tinkercad */
+  .tcw{border:1px solid #CBD3E1; border-radius:10px; overflow:hidden; background:#fff; font-family:'Roboto',sans-serif; font-size:12.5px; color:#1F2937; margin:10px 0 6px; box-shadow:0 2px 10px rgba(20,40,90,.06);}
+  .tcw-top{display:flex; align-items:center; gap:10px; height:42px; padding:0 10px; border-bottom:1px solid #E3E8F0;}
+  .tc-logo{display:grid; grid-template-columns:repeat(3,8px); gap:1.5px; flex-shrink:0;}
+  .tc-logo i{width:8px; height:8px; border-radius:1.5px; background:#1477D1;}
+  .tc-logo i:nth-child(3n+2){background:#F2643D;} .tc-logo i:nth-child(4n){background:#2FA84F;} .tc-logo i:nth-child(5){background:#F4C542;}
+  .tcw-name{font-size:14px; padding:3px 6px; border-radius:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .tcw-name.edit{border:1.5px solid #1477D1; box-shadow:0 0 0 3px #D6E8FB;}
+  .tcw-name.edit::after{content:'|'; color:#1477D1; animation:blink 1s steps(1) infinite;}
+  @keyframes blink{50%{opacity:0;}}
+  .tcw-act{margin-left:auto; display:flex; gap:6px; align-items:center;}
+  .tb{border:1px solid #CBD3E1; border-radius:4px; padding:3px 10px; background:#fff; font-size:12px; white-space:nowrap; color:#1F2937;}
+  .tb.pri{background:#1477D1; color:#fff; border-color:#1477D1;}
+  @media (max-width:560px){ .tcw-act .tb:not(.pri){display:none;} }
+  .tcw-tools{display:flex; align-items:center; gap:2px; height:34px; padding:0 8px; border-bottom:1px solid #E3E8F0;}
+  .ti{min-width:28px; height:26px; display:flex; align-items:center; justify-content:center; gap:4px; border-radius:4px; color:#3F4B5E; padding:0 3px;}
+  .sep{width:1px; height:18px; background:#E3E8F0; margin:0 6px;} .grow{flex:1;}
+  .tcw-main{display:grid; grid-template-columns:46px 1fr 150px;}
+  @media (max-width:600px){ .tcw-main{grid-template-columns:40px 1fr 100px;} }
+  .tcw-left{display:flex; flex-direction:column; align-items:center; gap:6px; padding:8px 0;}
+  .vcube{width:36px; height:36px;}
+  .rb{width:24px; height:24px; border-radius:50%; border:1px solid #CBD3E1; display:flex; align-items:center; justify-content:center; background:#fff; color:#3F4B5E;}
+  .rb .ms{font-size:15px;}
+  .tcw-scene{position:relative; min-height:200px;}
+  .tcw-snap{position:absolute; right:8px; bottom:6px; font-size:11px; color:#5B6578; background:rgba(255,255,255,.85); border-radius:4px; padding:1px 5px;}
+  .tcw-right{border-left:1px solid #E3E8F0; padding:8px;}
+  .tcw-sel{border:1px solid #CBD3E1; border-radius:4px; padding:3px 6px; display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:12px;}
+  .shp{display:grid; grid-template-columns:1fr 1fr; gap:4px;}
+  .shp div{text-align:center; font-size:10.5px; border-radius:6px; padding:2px 0 3px; color:#3F4B5E;}
+  .shp svg{width:100%; height:auto; display:block;}
+  .tcw .num.abs{position:absolute; z-index:3;}
+  .tcw-tools .num{margin-right:6px;}
+  /* Панель фігури (інспектор) */
+  .insp{position:absolute; top:8px; right:8px; width:156px; background:#fff; border:1px solid #CBD3E1; border-radius:6px; box-shadow:0 4px 14px rgba(0,0,0,.14); padding:6px 8px 8px; z-index:2;}
+  .insp-h{display:flex; justify-content:space-between; align-items:center; font-weight:500; margin-bottom:6px;}
+  .insp-h .ms{font-size:15px; color:#5B6578;}
+  .insp-row{display:flex; gap:6px;}
+  .insp-b{flex:1; border:1px solid #CBD3E1; border-radius:4px; padding:4px 2px; display:flex; align-items:center; gap:5px; justify-content:center; font-size:12px;}
+  .sw{width:14px; height:14px; border-radius:3px; border:1px solid rgba(0,0,0,.2);}
+  .sw.hole{background:repeating-linear-gradient(45deg,#C3C8D2 0 3px,#fff 3px 5px);}
+  .pal{display:grid; grid-template-columns:repeat(6,1fr); gap:4px; margin-top:7px;}
+  .pal i{aspect-ratio:1; border-radius:3px; border:1px solid rgba(0,0,0,.12);}
+
+  /* Сайт tinkercad.com і панель керування */
+  .web{border:1px solid #CBD3E1; border-radius:10px; overflow:hidden; background:#fff; font-family:'Roboto',sans-serif; font-size:12.5px; color:#1F2937; margin:10px 0 6px;}
+  .web-top{display:flex; align-items:center; gap:14px; height:44px; padding:0 12px; border-bottom:1px solid #E3E8F0;}
+  .web-top b{font-size:15px; letter-spacing:.5px; color:#1477D1;}
+  .web-nav{display:flex; gap:12px; color:#3F4B5E;}
+  @media (max-width:640px){ .web-nav{display:none;} }
+  .web-body{padding:18px; background:#F3F6FB; display:flex; justify-content:center;}
+  .card{background:#fff; border:1px solid #D9E0EC; border-radius:10px; padding:14px 16px; width:100%; max-width:290px;}
+  .card h4{margin:0 0 10px; font:500 16px 'Roboto',sans-serif; text-align:center;}
+  .sbtn{display:flex; align-items:center; gap:8px; border:1px solid #CBD3E1; border-radius:6px; padding:7px 10px; margin-bottom:7px; font-size:13px;}
+  .sbtn .g{font:700 15px 'Roboto',sans-serif; width:16px; text-align:center;}
+  .dash{display:grid; grid-template-columns:130px 1fr; min-height:220px;}
+  @media (max-width:560px){ .dash{grid-template-columns:1fr;} .dash-side{display:none;} }
+  .dash-side{border-right:1px solid #E3E8F0; padding:12px 10px; display:flex; flex-direction:column; gap:6px; color:#3F4B5E;}
+  .dash-side .av{width:38px; height:38px; border-radius:50%; background:#F4C542; display:flex; align-items:center; justify-content:center; font-weight:700; color:#fff; margin-bottom:6px;}
+  .dash-side .on{color:#1477D1; font-weight:500;}
+  .dash-main{padding:12px; position:relative;}
+  .dash-row{display:flex; justify-content:flex-end; margin-bottom:10px; position:relative;}
+  .dd{position:absolute; top:34px; right:0; background:#fff; border:1px solid #CBD3E1; border-radius:6px; box-shadow:0 4px 14px rgba(0,0,0,.14); padding:4px 0; min-width:130px; z-index:3;}
+  .dd div{padding:6px 12px; display:flex; align-items:center; gap:8px;}
+  .cards{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+  .dc{border:1px solid #D9E0EC; border-radius:8px; overflow:hidden; position:relative;}
+  .dc .th{background:#F3F6FB; height:84px; display:flex; align-items:center; justify-content:center;}
+  .dc .th svg{width:100%; height:100%;}
+  .dc .nm{padding:5px 8px; font-size:11.5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .dc .gear{position:absolute; top:6px; right:6px; width:24px; height:24px; border-radius:50%; background:#fff; border:1px solid #CBD3E1; display:flex; align-items:center; justify-content:center;}
+  .dc .gear .ms{font-size:16px;}
+  .dc.empty .th{background:#F7F9FC;}
+  /* Діалог властивостей */
+  .dlg{background:#fff; border:1px solid #CBD3E1; border-radius:10px; box-shadow:0 6px 20px rgba(0,0,0,.12); width:100%; max-width:320px; padding:12px 14px; font-size:12.5px;}
+  .dlg h4{margin:0 0 10px; font:500 15px 'Roboto',sans-serif;}
+  .fld{margin-bottom:8px;}
+  .fld label{display:block; color:#5B6578; font-size:11.5px; margin-bottom:2px;}
+  .fld .in{border:1px solid #CBD3E1; border-radius:4px; padding:5px 8px; display:flex; justify-content:space-between; align-items:center; position:relative;}
+  .opts{border:1px solid #CBD3E1; border-radius:4px; margin-top:2px; box-shadow:0 4px 12px rgba(0,0,0,.1);}
+  .opts div{padding:5px 8px;}
+  .opts .cur{background:#EEF3FB;}
+  .dlg-b{display:flex; justify-content:flex-end; gap:8px; margin-top:10px;}
+  .link{display:flex; align-items:center; gap:6px; border:1px solid #CBD3E1; border-radius:4px; padding:5px 8px; font-size:12px; color:#1477D1; background:#F7FAFF;}
+  .link span{flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  /* Google Classroom */
+  .gcr{background:#fff; border:1px solid #DADCE0; border-radius:8px; padding:14px; max-width:300px; width:100%; font-family:'Roboto',sans-serif; font-size:13px; color:#1F1F1F; position:relative;}
+  .gcr-h{display:flex; justify-content:space-between; font-size:16px; margin-bottom:12px;}
+  .gcr-h small{font-size:12px; color:#188038;}
+  .gbtn{border:1px solid #DADCE0; border-radius:4px; padding:7px; text-align:center; color:#0B57D0; font-weight:500; margin-bottom:8px;}
+  .gbtn.blue{background:#0B57D0; color:#fff; border-color:#0B57D0;}
+  .gmenu{border:1px solid #DADCE0; border-radius:4px; box-shadow:0 4px 12px rgba(0,0,0,.14); margin:-4px 0 8px; padding:4px 0;}
+  .gmenu div{padding:6px 12px; display:flex; gap:10px; align-items:center;}
+  .gmenu .ms{color:#444746;}
+  .center{display:flex; justify-content:center;}
+  .mouse{display:grid; grid-template-columns:auto 1fr; gap:8px 12px; align-items:center; font-size:14.5px; margin:8px 0;}
+  .mouse svg{width:34px; height:44px;}
+</style>
+</head>
+<body data-hud="9 клас · Практична · Перший будиночок у Tinkercad">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 9 клас · 3D-моделі</div>
+    <h1>🏠 Мій перший будиночок у Tinkercad</h1>
+    <p>Познайомся з онлайн-редактором Tinkercad, склади будиночок з двох фігур і поділися ним з учителем.</p>
+    <div class="meta"><span>⏱ 20–25 хв</span><span>🧊 Tinkercad (tinkercad.com)</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="result">
+      <div id="resultView"></div>
+      <ul>
+        <li><b>Стіни</b> — куб (Box).</li>
+        <li><b>Дах</b> — призма (Roof) рівно посередині куба.</li>
+        <li>Свої кольори для стін і даху.</li>
+        <li>Посилання на модель — у Google Classroom.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Увійди в Tinkercad</h3>
+        <ol>
+          <li>Відкрий <b>tinkercad.com</b> → <span class="menu">Log In</span>.</li>
+          <li><span class="menu">Sign in with Google</span> → обери шкільний акаунт.</li>
+        </ol>
+        <div class="frames">
+          <div class="web"><div class="web-top"><div class="tc-logo"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><b>TINKERCAD</b>
+            <div class="tcw-act"><span class="tb">Join Class</span><span class="tb pri hl">Log In</span></div></div>
+            <div class="web-body" style="min-height:120px; align-items:center; color:#5B6578;">From mind to design in minutes</div></div>
+          <span class="ms">arrow_forward</span>
+          <div class="web"><div class="web-body"><div class="card"><h4>Log in</h4>
+            <div class="sbtn hl"><span class="g" style="color:#4285F4">G</span>Sign in with Google</div>
+            <div class="sbtn"><span class="g">⊞</span>Sign in with Microsoft</div>
+            <div class="sbtn"><span class="g"></span>Sign in with Apple</div>
+            <div class="sbtn"><span class="ms">mail</span>Email or Username</div></div></div></div>
+        </div>
+        <div class="tip">Учитель дав код класу? Тоді натисни <span class="menu">Join Class</span>, введи код і свій нікнейм.<br>Української мови в Tinkercad немає, тож назви кнопок тут англійською — як на екрані.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Створи нову модель</h3>
+        <ol>
+          <li><span class="menu">Create → 3D Design</span>.</li>
+        </ol>
+        <div class="web"><div class="dash">
+          <div class="dash-side"><div class="av">О</div><span class="on">3D Designs</span><span>Circuits</span><span>Codeblocks</span><span>Classes</span></div>
+          <div class="dash-main"><div class="dash-row"><span class="tb pri">+ Create</span>
+            <div class="dd"><div class="hl"><span class="ms">deployed_code</span>3D Design</div><div><span class="ms">memory</span>Circuit</div><div><span class="ms">extension</span>Codeblocks</div></div></div>
+            <div class="cards"><div class="dc empty"><div class="th"></div><div class="nm">&nbsp;</div></div><div class="dc empty"><div class="th"></div><div class="nm">&nbsp;</div></div></div></div>
+        </div></div>
+        <ol start="2">
+          <li>Угорі ліворуч Tinkercad дав моделі випадкову назву. Клацни на неї й напиши: <b>Будиночок — Прізвище</b>.</li>
+        </ol>
+        <div class="frames">
+          <div class="tcw"><div class="tcw-top"><div class="tc-logo"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span class="tcw-name hl">Fantastic Jaagub-Bombul</span></div></div>
+          <span class="ms">arrow_forward</span>
+          <div class="tcw"><div class="tcw-top"><div class="tc-logo"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span class="tcw-name edit">Будиночок — Прізвище</span></div></div>
+        </div>
+        <div class="tip">Кнопки «Зберегти» немає: Tinkercad зберігає кожну зміну сам.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Роздивися вікно</h3>
+        <div class="tcw" id="ed3"></div>
+        <ul class="legend">
+          <li><span class="num">1</span><span>Назва моделі.</span></li>
+          <li><span class="num">2</span><span><b>Панель інструментів</b>: копіювати, видалити, скасувати; праворуч — <b>Align</b> (вирівняти), <b>Group</b> (згрупувати).</span></li>
+          <li><span class="num">3</span><span><b>ViewCube</b> — кубик огляду, під ним кнопки: <span class="ms">home</span> звичайний вигляд, <span class="ms">add</span> <span class="ms">remove</span> наблизити й віддалити.</span></li>
+          <li><span class="num">4</span><span><b>Workplane</b> — робоча площина з сіткою, на ній складають модель.</span></li>
+          <li><span class="num">5</span><span><b>Basic Shapes</b> — базові фігури, які перетягують на площину.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Постав куб</h3>
+        <ol>
+          <li>Знайди в <span class="menu">Basic Shapes</span> червоний <b>Box</b>.</li>
+          <li>Затисни його лівою кнопкою миші й перетягни на робочу площину.</li>
+        </ol>
+        <div class="tcw" id="ed4"></div>
+        <div class="check-val">Перевір себе: куб виділено — по кутах білі квадратики-маркери, розмір 20 × 20 мм.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Постав дах</h3>
+        <ol>
+          <li>Знайди зелений <b>Roof</b>.</li>
+          <li>Перетягни його <b>прямо на верх куба</b> — дах ляже на куб, а не на площину.</li>
+        </ol>
+        <div class="tcw" id="ed5"></div>
+        <div class="tip">Дах опинився на площині поруч? Натисни <b>Ctrl + Z</b> і перетягни ще раз, відпустивши мишу над верхом куба.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Постав дах рівно посередині</h3>
+        <ol>
+          <li>Обведи рамкою мишею обидві фігури — виділяться і куб, і дах.</li>
+          <li><span class="menu">Align</span> на панелі інструментів — довкола з'являться чорні точки.</li>
+          <li>Клацни <b>середню</b> точку спереду, а потім середню збоку.</li>
+        </ol>
+        <div class="tcw" id="ed6"></div>
+        <div class="frames">
+          <div class="result" style="padding:6px" id="al1"></div>
+          <span class="ms">arrow_forward</span>
+          <div class="result" style="padding:6px" id="al2"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">7</div>
+      <div>
+        <h3>Розфарбуй</h3>
+        <ol>
+          <li>Клацни на дах — з'явиться панель фігури <span class="menu">Shape</span>.</li>
+          <li>Клацни квадратик кольору біля <span class="menu">Solid</span> і обери колір.</li>
+          <li>Так само розфарбуй стіни.</li>
+        </ol>
+        <div class="tcw" id="ed7"></div>
+        <div class="tip">Не натискай <span class="menu">Hole</span>: фігура стане сірою й прозорою — це «отвір», який вирізає частину інших фігур.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">8</div>
+      <div>
+        <h3>Роздивися з усіх боків</h3>
+        <div class="mouse">
+          <svg viewBox="0 0 34 44"><rect x="2" y="2" width="30" height="40" rx="15" fill="#fff" stroke="#1F2937" stroke-width="2"/><path d="M17 2v16M2 18h30" stroke="#1F2937" stroke-width="2"/><path d="M17 3.5h-.5A13.5 13.5 0 0 1 30.5 17v.5H17z" fill="#F2643D"/></svg>
+          <span><b>Права кнопка</b> — затисни й потягни: вигляд обертається навколо моделі.</span>
+          <svg viewBox="0 0 34 44"><rect x="2" y="2" width="30" height="40" rx="15" fill="#fff" stroke="#1F2937" stroke-width="2"/><path d="M17 2v16M2 18h30" stroke="#1F2937" stroke-width="2"/><rect x="14" y="7" width="6" height="9" rx="3" fill="#F2643D"/></svg>
+          <span><b>Коліщатко</b> — наблизити чи віддалити.</span>
+        </div>
+        <p>Спробуй тут — потягни будиночок мишею чи пальцем:</p>
+        <div class="tcw" id="ed8"></div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">9</div>
+      <div>
+        <h3>Відкрий доступ за посиланням</h3>
+        <ol>
+          <li>Клацни логотип Tinkercad угорі ліворуч — відкриється список твоїх моделей.</li>
+          <li>Наведи на картку будиночка → значок <span class="ms">settings</span> → <span class="menu">Properties</span>.</li>
+        </ol>
+        <div class="web"><div class="dash">
+          <div class="dash-side"><div class="av">О</div><span class="on">3D Designs</span><span>Circuits</span><span>Codeblocks</span><span>Classes</span></div>
+          <div class="dash-main"><div class="dash-row"><span class="tb pri">+ Create</span></div>
+            <div class="cards"><div class="dc" style="overflow:visible"><div class="th" id="thumb1" style="border-radius:8px 8px 0 0"></div><div class="nm">Будиночок — Прізвище</div><div class="gear hl"><span class="ms">settings</span></div>
+              <div class="dd" style="top:34px; left:calc(100% - 26px); right:auto; min-width:110px"><div class="hl">Properties</div><div>Duplicate</div><div>Delete</div></div></div>
+              <div class="dc empty"><div class="th"></div><div class="nm">&nbsp;</div></div><div class="dc empty"><div class="th"></div><div class="nm">&nbsp;</div></div></div></div>
+        </div></div>
+        <ol start="3">
+          <li>У списку <span class="menu">Privacy</span> обери <b>Shareable</b> → <span class="menu">Save changes</span>.</li>
+        </ol>
+        <div class="web"><div class="web-body"><div class="dlg"><h4>Properties</h4>
+          <div class="fld"><label>Name</label><div class="in">Будиночок — Прізвище</div></div>
+          <div class="fld"><label>Description</label><div class="in" style="color:#9AA3B2">&nbsp;</div></div>
+          <div class="fld"><label>Privacy</label><div class="in">Private<span class="ms">arrow_drop_down</span></div>
+            <div class="opts"><div>Private</div><div class="cur hl">Shareable</div><div>Public</div></div></div>
+          <div class="dlg-b"><span class="tb">Cancel</span><span class="tb pri hl">Save changes</span></div></div></div></div>
+        <div class="tip">З <b>Shareable</b> модель бачить лише той, хто має посилання, — і тільки дивиться, змінити її не може. Значок людинки з «+» у редакторі — це інше: запрошення до спільної роботи, де можна змінювати й видаляти. Його вчителю не надсилай.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">10</div>
+      <div>
+        <h3>Здай посилання в Classroom</h3>
+        <ol>
+          <li>Клацни на картку будиночка — у вікні під моделлю з'явиться посилання. Скопіюй його.</li>
+          <li>У Google Classroom відкрий завдання → <span class="menu">Додати або створити → Посилання</span> → встав → <span class="menu">Здати</span>.</li>
+        </ol>
+        <div class="frames">
+          <div class="web"><div class="web-body" style="flex-direction:column; gap:8px; align-items:stretch;">
+            <div class="dc" style="background:#fff"><div class="th" id="thumb2" style="height:110px"></div><div class="nm"><b>Будиночок — Прізвище</b></div></div>
+            <div class="link hl"><span>tinkercad.com/things/…</span><span class="ms">content_copy</span></div></div></div>
+          <span class="ms">arrow_forward</span>
+          <div class="center"><div class="gcr"><div class="gcr-h">Ваша робота <small>Призначено</small></div>
+            <div class="gbtn">+ Додати або створити</div>
+            <div class="gmenu"><div><span class="ms">add_to_drive</span>Google Диск</div><div class="hl"><span class="ms">link</span>Посилання</div><div><span class="ms">attach_file</span>Файл</div></div>
+            <div class="gbtn blue">Здати</div></div></div>
+        </div>
+        <div class="check-val">Перевір себе: відкрий посилання в іншому браузері чи в режимі анонімного перегляду — будиночок має відкритися без входу в акаунт.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Практична робота · «Галузі використання 3D-моделей. Етапи створення тривимірного зображення» · 9 клас</span></footer>
+
+<script src="../../assets/practice.js"></script>
+<script src="../../assets/mini3d.js"></script>
+<script>
+/* ---------- Будиночок і фігури Tinkercad (1 одиниця = 10 мм) ---------- */
+const RED='#E8433A', GREEN='#2FA84F', YELLOW='#F4C542', BLUE='#3D7FE0', ORANGE='#F29A2E';
+function house(dx=0, cBox=RED, cRoof=GREEN){
+  const m=mdl();
+  const b=m.add(box(0,1,0,2,2,2,cBox));
+  m.add(prism([[dx-1,2],[dx+1,2],[dx,4]],'z',-1,1,cRoof), b.top);
+  return m;
+}
+const thumbs={
+  box:()=>{const m=mdl(); m.add(box(0,1,0,2,2,2,RED)); return m;},
+  cyl:()=>{const m=mdl(); m.add(prism(ngon(1,24),'y',0,2,ORANGE)); return m;},
+  sph:()=>{const m=mdl(); m.add({ball:true,c:[0,1,0],r:1.05,color:BLUE}); return m;},
+  roof:()=>{const m=mdl(); m.add(prism([[-1,0],[1,0],[0,2]],'z',-1,1,GREEN)); return m;},
+  hbox:()=>{const m=mdl(); m.add(box(0,1,0,2,2,2,'#999',{hole:true})); return m;},
+  hcyl:()=>{const m=mdl(); m.add(prism(ngon(1,24),'y',0,2,'#999',{hole:true})); return m;}
+};
+const NAMES={box:'Box', cyl:'Cylinder', sph:'Sphere', roof:'Roof', hbox:'Box', hcyl:'Cylinder'};
+const svgOf=(m,o)=>`<svg viewBox="0 0 ${o.W} ${o.H}">${render3d(m, Object.assign({yaw:0.6,pitch:0.42,mode:'render',oy:1},o))}</svg>`;
+const LOGO='<div class="tc-logo"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>';
+const ms=n=>`<span class="ms">${n}</span>`;
+
+/* Вікно редактора. cfg: tool — підсвічена кнопка; shape — підсвічена фігура; insp — панель фігури;
+   scene — {m, marks, yaw, pitch, drag}; nums — номери частин вікна */
+function editor(id, cfg){
+  const el=document.getElementById(id), h=k=>cfg.tool===k?' hl':'';
+  const n=(i,css)=>cfg.nums?`<span class="num${css?' abs':''}" style="${css}">${i}</span>`:'';
+  const tools=[['copy','content_copy'],['paste','content_paste'],['dup','library_add'],['del','delete'],['undo','undo'],['redo','redo']]
+    .map(([k,i])=>`<span class="ti${h(k)}">${ms(i)}</span>`).join('');
+  const right=[['align','align_horizontal_center','Align'],['mirror','flip',''],['group','join','Group']]
+    .map(([k,i,t])=>`<span class="ti${h(k)}">${ms(i)}${t?`<span style="font-size:12px">${t}</span>`:''}</span>`).join('');
+  const shapes=Object.keys(thumbs).map(k=>`<div class="${cfg.shape===k?'hl':''}">${svgOf(thumbs[k](),{W:60,H:52,S:11,oy:1.1})}${NAMES[k]}</div>`).join('');
+  let insp='';
+  if(cfg.insp){ const c=cfg.insp;
+    insp=`<div class="insp"><div class="insp-h">Shape <span>${ms('lightbulb')} ${ms('lock_open')}</span></div>
+      <div class="insp-row"><div class="insp-b${c.hlSolid?' hl':''}"><span class="sw" style="background:${c.color}"></span>Solid</div><div class="insp-b"><span class="sw hole"></span>Hole</div></div>
+      ${c.palette?`<div class="pal">${['#E8433A','#F29A2E','#F4C542','#2FA84F','#3D7FE0','#8E5BD9','#EC6AA8','#8B5A2B','#FFFFFF','#9AA3B2','#4B5563','#111827'].map(x=>`<i style="background:${x}"${x===c.pick?' class="hl"':''}></i>`).join('')}</div>`:''}</div>`;
+  }
+  el.style.position='relative';
+  el.innerHTML=`<div class="tcw-top" style="position:relative">${n(1,'')}${LOGO}<span class="tcw-name">${cfg.name||'Будиночок — Прізвище'}</span>
+      <div class="tcw-act">${ms('person_add')}<span class="tb">Import</span><span class="tb">Export</span><span class="tb pri">Send To</span></div></div>
+    <div class="tcw-tools" style="position:relative">${n(2,'')}${tools}<span class="grow"></span>${right}</div>
+    <div class="tcw-main">
+      <div class="tcw-left" style="position:relative">${n(3,'')}
+        <svg class="vcube" viewBox="0 0 40 40"><path d="M20 4l15 8-15 8-15-8z" fill="#EEF2F8" stroke="#8A97AD"/><path d="M5 12l15 8v16L5 28z" fill="#DCE3EE" stroke="#8A97AD"/><path d="M20 20l15-8v16l-15 8z" fill="#C9D3E3" stroke="#8A97AD"/><text x="20" y="14" font-size="5" text-anchor="middle" fill="#5B6578" font-family="Roboto">TOP</text></svg>
+        <span class="rb">${ms('home')}</span><span class="rb">${ms('fit_screen')}</span><span class="rb">${ms('add')}</span><span class="rb">${ms('remove')}</span></div>
+      <div class="tcw-scene">${n(4,'left:8px;top:8px')}${insp}<span class="tcw-snap">Snap Grid 1.0 mm ▾</span></div>
+      <div class="tcw-right" style="position:relative"><div style="display:flex;gap:4px;align-items:center">${n(5,'')}<div class="tcw-sel" style="flex:1">Basic Shapes ${ms('arrow_drop_down')}</div></div><div class="shp">${shapes}</div></div>
+    </div>`;
+  const s=cfg.scene||{};
+  viewer(el.querySelector('.tcw-scene'), s.m||mdl(), {W:480,H:300,S:s.S||46,yaw:s.yaw??0.55,pitch:s.pitch??0.5,oy:1.7,dy:6,mode:'render',grid:{n:3},marks:s.marks||[],drag:!!s.drag,minP:0.1,maxP:1.4});
+}
+
+/* Ручки виділеної фігури */
+const handles=(x0,x1,y0,y1,z0,z1,o={})=>[
+  ...[[x0,z0],[x1,z0],[x1,z1],[x0,z1]].map(([x,z])=>({p:[x,y0,z],kind:'handle'})),
+  {p:[(x0+x1)/2,y1,(z0+z1)/2],kind:'top'}, {p:[(x0+x1)/2,y1+0.7,(z0+z1)/2],kind:'lift'},
+  ...(o.labels?[{p:[(x0+x1)/2,y0,z1+0.7],kind:'label',text:'20.00'},{p:[x1+0.8,y0,(z0+z1)/2],kind:'label',text:'20.00'}]:[])
+];
+
+/* ---------- Ілюстрації ---------- */
+viewer(document.getElementById('resultView'), house(0,YELLOW,RED), {W:300,H:220,S:34,yaw:0.6,pitch:0.4,oy:1.6,mode:'render',grid:{n:3},drag:false,spin:0.45});
+editor('ed3', {nums:true, name:'Fantastic Jaagub-Bombul'});
+editor('ed4', {shape:'box', scene:{m:thumbs.box(), marks:handles(-1,1,0,2,-1,1,{labels:true})}});
+editor('ed5', {shape:'roof', scene:{m:house(), marks:handles(-1,1,2,4,-1,1)}});
+const alignDots=(hot)=>[
+  ...[-1,0.3,1.6].map((x,i)=>({p:[x,0,1.7],kind:i===1&&hot?'hot':'dot'})),
+  ...[-1,0,1].map((z,i)=>({p:[-1.7,0,z],kind:i===1&&hot?'hot':'dot'}))
+];
+editor('ed6', {tool:'align', scene:{m:house(0.6), marks:alignDots(true)}});
+document.getElementById('al1').innerHTML=svgOf(house(0.6),{W:220,H:150,S:22,pitch:0.35,oy:1.6})+'<div style="text-align:center;font-size:13px">Дах зсунувся</div>';
+document.getElementById('al2').innerHTML=svgOf(house(0),{W:220,H:150,S:22,pitch:0.35,oy:1.6})+'<div style="text-align:center;font-size:13px">Рівно посередині ✓</div>';
+document.querySelectorAll('#al1, #al2').forEach(e=>{e.style.display='block';});
+editor('ed7', {insp:{color:RED, palette:true, hlSolid:true, pick:RED}, scene:{m:house(0,YELLOW,RED), marks:handles(-1,1,2,4,-1,1), yaw:0.4}});
+editor('ed8', {scene:{m:house(0,YELLOW,RED), drag:true}});
+['thumb1','thumb2'].forEach(id=>document.getElementById(id).innerHTML=svgOf(house(0,YELLOW,RED),{W:160,H:100,S:12,pitch:0.35,oy:1.8}));
+</script>
+</body>
+</html>
