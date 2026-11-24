@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>9 клас · Інформатика — Теми уроків</title>
 <link rel="stylesheet" href="../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../assets/topics.css">
 <style>
   :root{
     --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
@@ -18,14 +19,9 @@
   .container{max-width:820px; margin:0 auto; padding:0 24px;}
 
   .topbar{padding:18px 24px; border-bottom:1px solid var(--line); background:rgba(246,245,251,.9); position:sticky; top:0; backdrop-filter:blur(6px);}
-  .topbar-inner{max-width:820px; margin:0 auto;}
   .back-link{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--purple-dark); text-decoration:none;}
   .back-link:hover{text-decoration:underline;}
 
-  .hero{padding:40px 24px 28px;}
-  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--purple-dark); margin-bottom:8px;}
-  .hero h1{font-size:30px; line-height:1.2; margin-bottom:10px;}
-  .hero p{color:var(--ink-soft); font-size:15.5px; max-width:60ch;}
 
   .theme-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:20px 22px; margin-bottom:18px;}
   .theme-head{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:6px; flex-wrap:wrap;}
@@ -51,109 +47,84 @@
 </head>
 <body>
 
-<div class="topbar"><div class="topbar-inner"><a class="back-link" href="../index.html">← Усі класи</a></div></div>
+<div class="topbar"><div class="topbar-inner">
+  <nav class="crumbs" aria-label="Навігація"><a class="back-link" href="../index.html">Усі класи</a><span class="crumb-sep" aria-hidden="true">›</span><span class="crumb-here">9 клас</span></nav>
+  <div id="view-slot"></div>
+</div></div>
 
-<section class="hero container">
-  <div class="hero-eyebrow">9 клас · Інформатика</div>
-  <h1>Теми уроків</h1>
-  <p>«Вчимося» — інтерактивний урок, «Практикуємо» — практична робота до нього.</p>
-</section>
 
-<div class="container" id="plan"></div>
+<div class="container" id="plan" data-view="cards"></div>
 
 <footer><span class="page-name">9 клас · Інформатика · Інтерактивні уроки</span></footer>
 
 <script>
 const PLAN = [
-  { title: "1. Життя з розумними пристроями", hours: "6 год", lessons: [
-    { title: "Поняття інтернету речей. Приклади ІоТ у повсякденному житті. Принципи роботи ІоТ. Архітектура інтернету речей. Користь і небезпека ІоТ" },
-    { title: "Основні сфери застосування ІоТ. Конфіденційність: що про нас «знають» пристрої" },
-    { title: "Потенційні загрози. Етичні питання використання ІоТ" },
-    { title: "Моделювання інформаційної системи ІоТ. Програмування пристроїв інтернету речей" },
-    { title: "Технічний/дизайнерський проєкт «Розумний клас майбутнього»", link: "lesson-smart-classroom/index.html" },
-    { title: "Дослідницький проєкт «ІоТ у моєму житті». Проєкт «ІоТ для майбутнього: ідея, реклама, презентація»" }
+  { title: "1. Життя з розумними пристроями", hours: "6 год", icon: "smarthome", lessons: [
+    { title: "Поняття інтернету речей. Приклади ІоТ у повсякденному житті. Принципи роботи ІоТ. Архітектура інтернету речей. Користь і небезпека ІоТ", short: "Інтернет речей", icon: "smarthome" },
+    { title: "Основні сфери застосування ІоТ. Конфіденційність: що про нас «знають» пристрої", short: "Що знають пристрої", icon: "profile" },
+    { title: "Потенційні загрози. Етичні питання використання ІоТ", short: "Загрози ІоТ", icon: "warn" },
+    { title: "Моделювання інформаційної системи ІоТ. Програмування пристроїв інтернету речей", short: "Програмуємо ІоТ", icon: "chip" },
+    { title: "Технічний/дизайнерський проєкт «Розумний клас майбутнього»", link: "lesson-smart-classroom/index.html", short: "Розумний клас", icon: "classroom" },
+    { title: "Дослідницький проєкт «ІоТ у моєму житті». Проєкт «ІоТ для майбутнього: ідея, реклама, презентація»", short: "ІоТ у моєму житті", icon: "survey" }
   ]},
-  { title: "2. Впорядкування даних", hours: "11 год", lessons: [
-    { title: "Поняття бази даних. Поле, запис, типи даних. Ключове поле. Електронна таблиця як найпростіша база даних: типи стовпців і стовпець ID як ключ у Google Таблицях", link: "lesson-database-basics/index.html" },
-    { title: "Поняття реляційної бази даних. Емуляція зв'язку в Google Таблицях: аркуші як таблиці, підстановка даних за ID", link: "lesson-relational-db/index.html" },
-    { title: "Інтерфейс бази даних: можливості та обмеження", link: "lesson-db-interface/index.html" },
-    { title: "Етапи проєктування бази даних: об'єкти, поля, ключі, зв'язки. Проєктування бази даних як набору аркушів Google Таблиць", link: "lesson-db-design/index.html" },
-    { title: "Основні принципи створення таблиць бази даних. Наповнення таблиць даними", link: "lesson-create-tables/index.html", practice: { title: "Кінотеатр мрії", link: "practice-create-tables/index.html" } },
-    { title: "Зображення в базі даних. Цілісність даних", link: "lesson-db-images/index.html", practice: { title: "Магазин спорттоварів", link: "practice-db-images/index.html" } },
-    { title: "Форми в базах даних: призначення та основні елементи. Google Форми із записом відповідей у таблицю", link: "lesson-db-forms/index.html", practice: { title: "Реєстрація на шкільний турнір", link: "practice-db-forms/index.html" } },
-    { title: "Сортування та фільтрація даних. Звіти в базах даних. Фільтри й зведені таблиці в Google Таблицях", link: "lesson-sort-filter-pivot/index.html", practice: { title: "Кібертурнір класів", link: "practice-sort-filter-pivot/index.html" } },
-    { title: "Поняття запиту в базі даних. Емуляція запитів у Google Таблицях: відбір за умовами, підсумки, зведена таблиця", link: "lesson-db-queries/index.html", practice: { title: "Шкільна бібліотека", link: "practice-db-queries/index.html" } },
-    { title: "Мова SQL: основні команди SELECT, FROM, WHERE, ORDER BY. Функція QUERY у Google Таблицях", link: "lesson-sql-query/index.html", practice: { title: "Від питання до запиту", link: "practice-sql-query/index.html" } },
-    { title: "Повторення розділу «Впорядкування даних»: база даних, зв'язки, проєктування, форми, сортування, фільтри, зведені таблиці та запити", link: "lesson-data-review/index.html" }
+  { title: "2. Впорядкування даних", hours: "11 год", icon: "db", lessons: [
+    { title: "Поняття бази даних. Поле, запис, типи даних. Ключове поле. Електронна таблиця як найпростіша база даних: типи стовпців і стовпець ID як ключ у Google Таблицях", link: "lesson-database-basics/index.html", short: "Що таке база даних", icon: "db" },
+    { title: "Поняття реляційної бази даних. Емуляція зв'язку в Google Таблицях: аркуші як таблиці, підстановка даних за ID", link: "lesson-relational-db/index.html", short: "Зв'язані таблиці", icon: "link" },
+    { title: "Інтерфейс бази даних: можливості та обмеження", link: "lesson-db-interface/index.html", short: "Інтерфейс бази даних", icon: "window" },
+    { title: "Етапи проєктування бази даних: об'єкти, поля, ключі, зв'язки. Проєктування бази даних як набору аркушів Google Таблиць", link: "lesson-db-design/index.html", short: "Проєктуємо базу", icon: "pencil" },
+    { title: "Основні принципи створення таблиць бази даних. Наповнення таблиць даними", link: "lesson-create-tables/index.html", practice: { title: "Кінотеатр мрії", link: "practice-create-tables/index.html" }, short: "Створюємо таблиці", icon: "table" },
+    { title: "Зображення в базі даних. Цілісність даних", link: "lesson-db-images/index.html", practice: { title: "Магазин спорттоварів", link: "practice-db-images/index.html" }, short: "Зображення в базі", icon: "image" },
+    { title: "Форми в базах даних: призначення та основні елементи. Google Форми із записом відповідей у таблицю", link: "lesson-db-forms/index.html", practice: { title: "Реєстрація на шкільний турнір", link: "practice-db-forms/index.html" }, short: "Форми", icon: "survey" },
+    { title: "Сортування та фільтрація даних. Звіти в базах даних. Фільтри й зведені таблиці в Google Таблицях", link: "lesson-sort-filter-pivot/index.html", practice: { title: "Кібертурнір класів", link: "practice-sort-filter-pivot/index.html" }, short: "Сортування й фільтри", icon: "filter" },
+    { title: "Поняття запиту в базі даних. Емуляція запитів у Google Таблицях: відбір за умовами, підсумки, зведена таблиця", link: "lesson-db-queries/index.html", practice: { title: "Шкільна бібліотека", link: "practice-db-queries/index.html" }, short: "Запити", icon: "search" },
+    { title: "Мова SQL: основні команди SELECT, FROM, WHERE, ORDER BY. Функція QUERY у Google Таблицях", link: "lesson-sql-query/index.html", practice: { title: "Від питання до запиту", link: "practice-sql-query/index.html" }, short: "Мова SQL", icon: "terminal" },
+    { title: "Повторення розділу «Впорядкування даних»: база даних, зв'язки, проєктування, форми, сортування, фільтри, зведені таблиці та запити", link: "lesson-data-review/index.html", short: "Повторення розділу", icon: "check" }
   ]},
-  { title: "3. Тривимірне моделювання", hours: "7 год", lessons: [
-    { title: "Галузі використання 3D-моделей. Етапи створення тривимірного зображення" },
-    { title: "Програми для 3D-моделювання. Види 3D-моделей" },
-    { title: "Основні інструменти створення фігур. Інструменти трансформації" },
-    { title: "Проста 3D-фігура з базових форм" },
-    { title: "Інструменти витягування. Створення груп і компонентів" },
-    { title: "Рендеринг. Екструдування форми об'єкта. Завантаження готових моделей, вставка в проєкт і адаптація" },
-    { title: "Індивідуальний проєкт «Будинок моєї мрії. Інтер'єр та екстер'єр»" }
+  { title: "3. Тривимірне моделювання", hours: "7 год", icon: "cube", lessons: [
+    { title: "Галузі використання 3D-моделей. Етапи створення тривимірного зображення", short: "Де потрібне 3D", icon: "cube" },
+    { title: "Програми для 3D-моделювання. Види 3D-моделей", short: "Програми для 3D", icon: "apps" },
+    { title: "Основні інструменти створення фігур. Інструменти трансформації", short: "Інструменти фігур", icon: "shapes" },
+    { title: "Проста 3D-фігура з базових форм", short: "Проста 3D-фігура", icon: "blocks" },
+    { title: "Інструменти витягування. Створення груп і компонентів", short: "Витягування й групи", icon: "extrude" },
+    { title: "Рендеринг. Екструдування форми об'єкта. Завантаження готових моделей, вставка в проєкт і адаптація", short: "Рендеринг", icon: "camera" },
+    { title: "Індивідуальний проєкт «Будинок моєї мрії. Інтер'єр та екстер'єр»", short: "Будинок моєї мрії", icon: "house" }
   ]},
-  { title: "4. Програмні проєкти", hours: "22 год", lessons: [
-    { title: "Повторюємо основи Python. Поняття програми. Структура програми. Модулі Python. Приклади програм" },
-    { title: "Поняття функції у Python. Функції з параметрами. Локальні та глобальні змінні" },
-    { title: "Поняття списків. Правила створення списків. Додавання та видалення елементів" },
-    { title: "Ітерація списків. Цикли для ітерації. Підрахунок і сумування елементів" },
-    { title: "Пошук у списках. Наявність елемента, позиція, максимум і мінімум" },
-    { title: "Сортування списків. Виведення за зростанням/спаданням" },
-    { title: "Генерація списків" },
-    { title: "Рядки: оголошення, методи, індексація" },
-    { title: "Маніпуляції із рядками" },
-    { title: "Шифрування: шифр Цезаря" },
-    { title: "Створення текстових повідомлень із параметрами" },
-    { title: "Розумний перевірник паролів" },
-    { title: "Моя ідея програмного проєкту" },
-    { title: "Поняття пріоритезації. Визначення пріоритетів проєкту" },
-    { title: "Калькулятор середнього балу" },
-    { title: "Підключення бібліотеки. Щасливе число дня" },
-    { title: "Списки і рядки з Tkinter" },
-    { title: "Тестування програм: try-except, перевірка" },
-    { title: "Добір текстових даних. Таблиця тестування. Оцінювання правильності" },
-    { title: "Документація. Коментарі, структурування коду" },
-    { title: "Проєкт «Камінь, ножиці, папір»" },
-    { title: "Проєкт «Хто хоче стати мільйонером»" }
+  { title: "4. Програмні проєкти", hours: "22 год", icon: "python", lessons: [
+    { title: "Повторюємо основи Python. Поняття програми. Структура програми. Модулі Python. Приклади програм", short: "Повторюємо Python", icon: "python" },
+    { title: "Поняття функції у Python. Функції з параметрами. Локальні та глобальні змінні", short: "Функції", icon: "func" },
+    { title: "Поняття списків. Правила створення списків. Додавання та видалення елементів", short: "Списки", icon: "list" },
+    { title: "Ітерація списків. Цикли для ітерації. Підрахунок і сумування елементів", short: "Перебір списків", icon: "loop" },
+    { title: "Пошук у списках. Наявність елемента, позиція, максимум і мінімум", short: "Пошук у списках", icon: "search" },
+    { title: "Сортування списків. Виведення за зростанням/спаданням", short: "Сортування списків", icon: "sort" },
+    { title: "Генерація списків", short: "Генерація списків", icon: "wand" },
+    { title: "Рядки: оголошення, методи, індексація", short: "Рядки", icon: "abc" },
+    { title: "Маніпуляції із рядками", short: "Робота з рядками", icon: "textcursor" },
+    { title: "Шифрування: шифр Цезаря", short: "Шифр Цезаря", icon: "lock" },
+    { title: "Створення текстових повідомлень із параметрами", short: "Текстові повідомлення", icon: "message" },
+    { title: "Розумний перевірник паролів", short: "Перевірник паролів", icon: "key" },
+    { title: "Моя ідея програмного проєкту", short: "Моя ідея проєкту", icon: "bulb" },
+    { title: "Поняття пріоритезації. Визначення пріоритетів проєкту", short: "Пріоритети", icon: "flag" },
+    { title: "Калькулятор середнього балу", short: "Калькулятор балу", icon: "calc" },
+    { title: "Підключення бібліотеки. Щасливе число дня", short: "Щасливе число дня", icon: "dice" },
+    { title: "Списки і рядки з Tkinter", short: "Вікна з Tkinter", icon: "window" },
+    { title: "Тестування програм: try-except, перевірка", short: "Тестування програм", icon: "bug" },
+    { title: "Добір текстових даних. Таблиця тестування. Оцінювання правильності", short: "Таблиця тестування", icon: "check" },
+    { title: "Документація. Коментарі, структурування коду", short: "Документація", icon: "book" },
+    { title: "Проєкт «Камінь, ножиці, папір»", short: "Камінь, ножиці, папір", icon: "scissors" },
+    { title: "Проєкт «Хто хоче стати мільйонером»", short: "Гра «Мільйонер»", icon: "quiz" }
   ]},
-  { title: "5. Безпека цифрових систем", hours: "6 год", lessons: [
-    { title: "Цифрове середовище. Інформаційна безпека. Загрози в інтернеті. Правила безпечної поведінки. Захист особистого цифрового простору" },
-    { title: "Цифровий слід та конфіденційність" },
-    { title: "Електронна демократія. Електронне урядування. Цифровий підпис" },
-    { title: "Соціальні аспекти масштабного збору й аналізу даних. Великі дані. Кодування та шифрування даних. Системи числення" },
-    { title: "Штучний інтелект" },
-    { title: "Правові відносини у сфері інформаційних технологій. Навчання у цифрову епоху. Сервіси електронного навчання" }
+  { title: "5. Безпека цифрових систем", hours: "6 год", icon: "shield", lessons: [
+    { title: "Цифрове середовище. Інформаційна безпека. Загрози в інтернеті. Правила безпечної поведінки. Захист особистого цифрового простору", short: "Безпека в інтернеті", icon: "shield" },
+    { title: "Цифровий слід та конфіденційність", short: "Цифровий слід", icon: "trail" },
+    { title: "Електронна демократія. Електронне урядування. Цифровий підпис", short: "Е-урядування", icon: "egov" },
+    { title: "Соціальні аспекти масштабного збору й аналізу даних. Великі дані. Кодування та шифрування даних. Системи числення", short: "Великі дані", icon: "binary" },
+    { title: "Штучний інтелект", short: "Штучний інтелект", icon: "robot" },
+    { title: "Правові відносини у сфері інформаційних технологій. Навчання у цифрову епоху. Сервіси електронного навчання", short: "Право й е-навчання", icon: "scales" }
   ]}
 ];
-
-const root = document.getElementById('plan');
-PLAN.forEach(theme=>{
-  const card = document.createElement('div');
-  card.className = 'theme-card';
-  const head = document.createElement('div');
-  head.className = 'theme-head';
-  head.innerHTML = `<h2>${theme.title}</h2><span class="theme-hours">${theme.hours}</span>`;
-  card.appendChild(head);
-
-  theme.lessons.forEach((lesson, i)=>{
-    const row = document.createElement('div');
-    row.className = 'lesson-row';
-    const action = (lesson.practice ? `<a class="btn-practice" href="${lesson.practice.link}" title="${lesson.practice.title}">Практикуємо</a>` : '')
-      + (lesson.link
-        ? `<a class="btn-open" href="${lesson.link}">Вчимося</a>`
-        : `<span class="tag-soon">Скоро</span>`);
-    row.innerHTML = `
-      <span class="lesson-num">${i+1}</span>
-      <div class="lesson-body"><div class="lesson-title">${lesson.title}</div></div>
-      <div class="lesson-action">${action}</div>`;
-    card.appendChild(row);
-  });
-  root.appendChild(card);
-});
 </script>
+<script src="../assets/topic-icons.js"></script>
+<script src="../assets/topics.js"></script>
 
 <script src="../assets/footer.js"></script>
 </body>

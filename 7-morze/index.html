@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>7 клас · Інформатика — Теми уроків</title>
 <link rel="stylesheet" href="../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../assets/topics.css">
 <style>
   :root{
     --bg:#F6F5FB; --ink:#1B1B3A; --ink-soft:#514F72; --surface:#FFFFFF; --line:#E4E1F5;
@@ -18,14 +19,10 @@
   .container{max-width:820px; margin:0 auto; padding:0 24px;}
 
   .topbar{padding:18px 24px; border-bottom:1px solid var(--line); background:rgba(246,245,251,.9); position:sticky; top:0; backdrop-filter:blur(6px);}
-  .topbar-inner{max-width:820px; margin:0 auto;}
+  .course-bar{padding-top:22px;} .course-bar .course-switch{margin-top:0;}
   .back-link{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px; color:var(--purple-dark); text-decoration:none;}
   .back-link:hover{text-decoration:underline;}
 
-  .hero{padding:40px 24px 28px;}
-  .hero-eyebrow{font-family:'Baloo 2',sans-serif; font-size:14px; font-weight:600; color:var(--purple-dark); margin-bottom:8px;}
-  .hero h1{font-size:30px; line-height:1.2; margin-bottom:10px;}
-  .hero p{color:var(--ink-soft); font-size:15.5px; max-width:60ch;}
 
   .theme-card{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-l); padding:20px 22px; margin-bottom:18px;}
   .theme-head{display:flex; align-items:baseline; justify-content:space-between; gap:10px; margin-bottom:6px; flex-wrap:wrap;}
@@ -56,96 +53,70 @@
 </head>
 <body>
 
-<div class="topbar"><div class="topbar-inner"><a class="back-link" href="../index.html">← Усі класи</a></div></div>
+<div class="topbar"><div class="topbar-inner">
+  <nav class="crumbs" aria-label="Навігація"><a class="back-link" href="../index.html">Усі класи</a><span class="crumb-sep" aria-hidden="true">›</span><span class="crumb-here">7 клас</span></nav>
+  <div id="view-slot"></div>
+</div></div>
 
-<section class="hero container">
-  <div class="hero-eyebrow">7 клас · Інформатика · за підручником Морзе</div>
-  <h1>Теми уроків</h1>
-  <p>«Вчимося» — інтерактивний урок, «Практикуємо» — практична робота до нього.</p>
+<div class="container course-bar">
   <nav class="course-switch" aria-label="Курс за підручником">
     <a href="../7/index.html">Тріщук</a>
     <span class="on">Морзе</span>
   </nav>
-</section>
+</div>
 
-<div class="container" id="plan"></div>
+<div class="container" id="plan" data-view="cards"></div>
 
 <footer><span class="page-name">7 клас · Інформатика (Морзе) · Інтерактивні уроки</span></footer>
 
 <script>
 const PLAN = [
-  { title: "1. Комунікація та взаємодія", hours: "8 год", lessons: [
-    { title: "Комп'ютерні мережі. Поняття про штучний інтелект" },
-    { title: "Пошук інформації в інтернеті. Технології штучного інтелекту. ChatGPT" },
-    { title: "Авторське право" },
-    { title: "Поштові служби інтернету. Обліковий запис онлайн-сервісу та його налаштування. Надсилання, отримання, перенаправлення повідомлень. Пересилання файлів" },
-    { title: "Використання адресної книги та списків розсилки", link: "lesson-address-book/index.html" },
-    { title: "Етика спілкування і взаємодії в реальному та віртуальному просторі. Небезпеки використання цифрових пристроїв і технологій для людини та суспільства", link: "lesson-online-safety/index.html" },
-    { title: "Електронні послуги (е-урядування). Використання інтернету для навчання", link: "lesson-e-services/index.html" },
-    { title: "Хмарні сервіси. Рівні та способи доступу до ресурсів", link: "lesson-cloud-services/index.html", practice: { title: "Опитування класу в Google Формах", link: "practice-cloud-services/index.html" } }
+  { title: "1. Комунікація та взаємодія", hours: "8 год", icon: "chat", lessons: [
+    { title: "Комп'ютерні мережі. Поняття про штучний інтелект", short: "Мережі та ШІ", icon: "network" },
+    { title: "Пошук інформації в інтернеті. Технології штучного інтелекту. ChatGPT", short: "Пошук і ШІ", icon: "robot" },
+    { title: "Авторське право", short: "Авторське право", icon: "copyright" },
+    { title: "Поштові служби інтернету. Обліковий запис онлайн-сервісу та його налаштування. Надсилання, отримання, перенаправлення повідомлень. Пересилання файлів", short: "Електронна пошта", icon: "letter" },
+    { title: "Використання адресної книги та списків розсилки", link: "lesson-address-book/index.html", short: "Адресна книга", icon: "contacts" },
+    { title: "Етика спілкування і взаємодії в реальному та віртуальному просторі. Небезпеки використання цифрових пристроїв і технологій для людини та суспільства", link: "lesson-online-safety/index.html", short: "Безпека в мережі", icon: "shield" },
+    { title: "Електронні послуги (е-урядування). Використання інтернету для навчання", link: "lesson-e-services/index.html", short: "Е-послуги", icon: "egov" },
+    { title: "Хмарні сервіси. Рівні та способи доступу до ресурсів", link: "lesson-cloud-services/index.html", practice: { title: "Опитування класу в Google Формах", link: "practice-cloud-services/index.html" }, short: "Хмарні сервіси", icon: "cloud" }
   ]},
-  { title: "2. Інформаційна грамотність. Цифрова безпека", hours: "7 год", lessons: [
-    { title: "Переваги і небезпеки цифрових технологій. Засоби діагностики апаратних і програмних проблем", link: "lesson-tech-diagnostics/index.html", practice: { title: "Медична картка комп'ютера", link: "practice-tech-diagnostics/index.html" } },
-    { title: "Інформаційне «сміття» цифрового і нецифрового формату", link: "lesson-info-trash/index.html", practice: { title: "Справа про сакуру", link: "practice-info-trash/index.html" } },
-    { title: "Цифрові пристрої і проблеми", link: "lesson-device-problems/index.html", practice: { title: "Чи потягне мій комп'ютер?", link: "practice-device-problems/index.html" } },
-    { title: "Інформаційні процеси і системи. Інформація, повідомлення, дані, знання", link: "lesson-info-data-knowledge/index.html", practice: { title: "День повітряного змія", link: "practice-info-data-knowledge/index.html" } },
-    { title: "Типи даних. Опрацювання даних: впорядкування, сортування" },
-    { title: "Кодування та декодування. Двійкове кодування. Одиниці вимірювання довжини двійкового коду. Кодування даних різних типів" },
-    { title: "Об'єкти та їх властивості" }
+  { title: "2. Інформаційна грамотність. Цифрова безпека", hours: "7 год", icon: "shield", lessons: [
+    { title: "Переваги і небезпеки цифрових технологій. Засоби діагностики апаратних і програмних проблем", link: "lesson-tech-diagnostics/index.html", practice: { title: "Медична картка комп'ютера", link: "practice-tech-diagnostics/index.html" }, short: "Діагностика комп'ютера", icon: "doctor" },
+    { title: "Інформаційне «сміття» цифрового і нецифрового формату", link: "lesson-info-trash/index.html", practice: { title: "Справа про сакуру", link: "practice-info-trash/index.html" }, short: "Інформаційне сміття", icon: "trash" },
+    { title: "Цифрові пристрої і проблеми", link: "lesson-device-problems/index.html", practice: { title: "Чи потягне мій комп'ютер?", link: "practice-device-problems/index.html" }, short: "Пристрої та проблеми", icon: "warn" },
+    { title: "Інформаційні процеси і системи. Інформація, повідомлення, дані, знання", link: "lesson-info-data-knowledge/index.html", practice: { title: "День повітряного змія", link: "practice-info-data-knowledge/index.html" }, short: "Дані й знання", icon: "bulb" },
+    { title: "Типи даних. Опрацювання даних: впорядкування, сортування", short: "Сортування даних", icon: "sort" },
+    { title: "Кодування та декодування. Двійкове кодування. Одиниці вимірювання довжини двійкового коду. Кодування даних різних типів", short: "Двійковий код", icon: "binary" },
+    { title: "Об'єкти та їх властивості", short: "Об'єкти й властивості", icon: "shapes" }
   ]},
-  { title: "3. Цифрова творчість", hours: "11 год", lessons: [
-    { title: "Етапи розв'язування задач за допомогою комп'ютера. Моделі та їх види. Інформаційна модель" },
-    { title: "Табличні процесори, їх призначення" },
-    { title: "Абсолютні та мішані посилання в електронних таблицях" },
-    { title: "Функції в електронних таблицях. Форматування даних" },
-    { title: "Текстовий процесор. Шаблони документів. Стилі. Додавання символів і формул" },
-    { title: "Структура сайту. Правила ергономічного розміщення відомостей на вебсторінці" },
-    { title: "Етапи створення вебсайту. Автоматизовані засоби створення та публікації вебресурсів" },
-    { title: "Векторний графічний редактор" },
-    { title: "Особливості побудови й опрацювання векторних зображень" },
-    { title: "Додавання тексту до графічних зображень та його форматування. Анімація. Редактори анімації" },
-    { title: "Створення та зберігання анімацій у різних форматах" }
+  { title: "3. Цифрова творчість", hours: "11 год", icon: "brush", lessons: [
+    { title: "Етапи розв'язування задач за допомогою комп'ютера. Моделі та їх види. Інформаційна модель", short: "Моделі", icon: "model" },
+    { title: "Табличні процесори, їх призначення", short: "Табличні процесори", icon: "sheet" },
+    { title: "Абсолютні та мішані посилання в електронних таблицях", short: "Посилання в таблицях", icon: "ref" },
+    { title: "Функції в електронних таблицях. Форматування даних", short: "Функції в таблицях", icon: "formula" },
+    { title: "Текстовий процесор. Шаблони документів. Стилі. Додавання символів і формул", short: "Стилі й шаблони", icon: "template" },
+    { title: "Структура сайту. Правила ергономічного розміщення відомостей на вебсторінці", short: "Структура сайту", icon: "sitemap" },
+    { title: "Етапи створення вебсайту. Автоматизовані засоби створення та публікації вебресурсів", short: "Створюємо сайт", icon: "web" },
+    { title: "Векторний графічний редактор", short: "Векторний редактор", icon: "vector" },
+    { title: "Особливості побудови й опрацювання векторних зображень", short: "Векторні зображення", icon: "shapes" },
+    { title: "Додавання тексту до графічних зображень та його форматування. Анімація. Редактори анімації", short: "Текст і анімація", icon: "font" },
+    { title: "Створення та зберігання анімацій у різних форматах", short: "Формати анімації", icon: "film" }
   ]},
-  { title: "4. Вирішення проблем. Програмування", hours: "8 год", lessons: [
-    { title: "Мова програмування. Середовище програмування. Величини. Змінні" },
-    { title: "Вказівка присвоювання. Поняття про модуль" },
-    { title: "Створення графічних примітивів. Текстові величини та операції над ними" },
-    { title: "Налагодження алгоритмів у середовищі програмування. Порівняння значень величин" },
-    { title: "Реалізація та налагодження розгалужених алгоритмів" },
-    { title: "Реалізація та налагодження циклічних алгоритмів" },
-    { title: "Реалізація та налагодження циклічних алгоритмів" },
-    { title: "Систематизація та повторення вивченого матеріалу" }
+  { title: "4. Вирішення проблем. Програмування", hours: "8 год", icon: "code", lessons: [
+    { title: "Мова програмування. Середовище програмування. Величини. Змінні", short: "Змінні", icon: "variable" },
+    { title: "Вказівка присвоювання. Поняття про модуль", short: "Присвоювання", icon: "code" },
+    { title: "Створення графічних примітивів. Текстові величини та операції над ними", short: "Примітиви й текст", icon: "turtle" },
+    { title: "Налагодження алгоритмів у середовищі програмування. Порівняння значень величин", short: "Порівняння", icon: "scales" },
+    { title: "Реалізація та налагодження розгалужених алгоритмів", short: "Розгалуження", icon: "branch" },
+    { title: "Реалізація та налагодження циклічних алгоритмів", short: "Цикли", icon: "loop" },
+    { title: "Реалізація та налагодження циклічних алгоритмів", short: "Цикли", icon: "loop" },
+    { title: "Систематизація та повторення вивченого матеріалу", short: "Повторення", icon: "check" }
   ]}
 ];
-
-const root = document.getElementById('plan');
-if(!PLAN.length){
-  root.innerHTML = `<div class="theme-card"><div class="theme-head"><h2>Курс готується</h2></div><p style="margin:0; color:var(--ink-soft);">Теми уроків з'являться тут найближчим часом.</p></div>`;
-}
-PLAN.forEach(theme=>{
-  const card = document.createElement('div');
-  card.className = 'theme-card';
-  const head = document.createElement('div');
-  head.className = 'theme-head';
-  head.innerHTML = `<h2>${theme.title}</h2><span class="theme-hours">${theme.hours}</span>`;
-  card.appendChild(head);
-
-  theme.lessons.forEach((lesson, i)=>{
-    const row = document.createElement('div');
-    row.className = 'lesson-row';
-    const action = (lesson.practice ? `<a class="btn-practice" href="${lesson.practice.link}" title="${lesson.practice.title}">Практикуємо</a>` : '')
-      + (lesson.link
-        ? `<a class="btn-open" href="${lesson.link}">Вчимося</a>`
-        : `<span class="tag-soon">Скоро</span>`);
-    row.innerHTML = `
-      <span class="lesson-num">${i+1}</span>
-      <div class="lesson-body"><div class="lesson-title">${lesson.title}</div></div>
-      <div class="lesson-action">${action}</div>`;
-    card.appendChild(row);
-  });
-  root.appendChild(card);
-});
 </script>
+<script src="../assets/topic-icons.js"></script>
+<script src="../assets/topics.js"></script>
 
 <script src="../assets/footer.js"></script>
 </body>

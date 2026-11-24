@@ -1,0 +1,102 @@
+/* Список тем класу: перемикач вигляду й вигляд «Картки» (острівці). Логіка — assets/topics.js. */
+
+/* шапка сторінки (sticky) — над картками, бо картки мають position і transform; у ній хлібні крихти й перемикач */
+.topbar{z-index:20;}
+.topbar-inner{max-width:772px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; gap:12px; min-height:34px;}
+.crumbs{display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-family:'Baloo 2',sans-serif; font-weight:600; font-size:14px;}
+.crumb-sep{color:var(--ink-soft); opacity:.6;}
+.crumb-here{color:var(--ink);}
+#plan{padding-top:28px;}
+
+/* ---------- перемикач, як у Google Диску ---------- */
+.view-bar{display:flex; justify-content:flex-end; max-width:820px; margin:-6px auto 16px; padding:0 24px; box-sizing:border-box;}
+.view-bar.in-slot{margin:0; padding:0; max-width:none;}
+.view-toggle{display:inline-flex; border:1px solid #747775; border-radius:999px; overflow:hidden; background:var(--surface,#fff);}
+.view-toggle button{display:inline-flex; align-items:center; justify-content:center; gap:2px; min-width:52px; height:32px; padding:0 12px; border:0; background:transparent; color:#1F1F1F; cursor:pointer; font:inherit;}
+.view-toggle button + button{border-left:1px solid #747775;}
+.view-toggle button:hover{background:rgba(31,31,31,.08);}
+.view-toggle button.on{background:#C2E7FF; color:#001D35;}
+.view-toggle .material-symbols-outlined{font-size:20px;}
+.view-toggle .chk{display:none; font-size:18px;}
+.view-toggle button.on .chk{display:inline-block;}
+.view-toggle button:focus-visible{outline:2px solid #0B57D0; outline-offset:-3px;}
+
+/* ---------- «Список»: доповнення до стилів сторінки ---------- */
+#plan .btn-test{background:#E2702B;} #plan .btn-test:hover{background:#B9561C;}   /* тематична робота */
+.lesson-note{font-size:13px; color:var(--ink-soft); line-height:1.45;}   /* note — короткий зміст */
+.lesson-note code{font-family:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace; font-size:12px; background:color-mix(in srgb, var(--c) 10%, #fff); color:color-mix(in srgb, var(--c) 75%, #000); padding:1px 5px; border-radius:5px;}
+.kind{display:inline-block; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:11px; line-height:1; padding:4px 8px; border-radius:999px; margin-right:6px; vertical-align:2px;}   /* kind — «Практикум» / «Проєкт» */
+.kind.practice, .lc-kind.practice{background:#FFF4CC; color:#7A5B00;}
+.kind.project, .lc-kind.project{background:#FDE3EC; color:#9B1D4C;}
+
+/* ---------- «Картки»: теми-острівці ---------- */
+.island{--c:#2D9CDB; position:relative; margin:0 0 46px; padding:20px 22px 24px; border-radius:34px;
+  background:color-mix(in srgb, var(--c) 9%, #fff);
+  border:2px solid color-mix(in srgb, var(--c) 22%, #fff);
+  box-shadow:0 7px 0 color-mix(in srgb, var(--c) 26%, #fff);}
+/* хвилі під острівцем */
+.island::after{content:""; position:absolute; left:12%; right:12%; bottom:-30px; height:12px; opacity:.55;
+  background:radial-gradient(circle at 10px -3px, transparent 8px, #9FD3F2 8.5px, #9FD3F2 10.5px, transparent 11px) 0 0 / 20px 12px repeat-x;}
+
+.isl-head{display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap;}
+.isl-badge{display:inline-flex; align-items:center; justify-content:center; width:46px; height:46px; flex-shrink:0; border-radius:50%;
+  background:var(--c); color:#fff; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:24px; line-height:1;
+  box-shadow:0 3px 0 color-mix(in srgb, var(--c) 70%, #000);}
+.isl-head h2{flex:1; min-width:0; font-size:21px; line-height:1.2;}
+.isl-hours{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; color:var(--ink-soft); background:#fff; border-radius:999px; padding:3px 10px; white-space:nowrap;}
+
+.isl-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(160px, 1fr)); gap:16px;}
+
+/* картка уроку */
+.lc{position:relative; display:flex; flex-direction:column; align-items:center; gap:8px; padding:18px 12px 14px; text-align:center;
+  background:#fff; border:2px solid color-mix(in srgb, var(--c) 28%, #fff); border-radius:24px;
+  box-shadow:0 5px 0 color-mix(in srgb, var(--c) 30%, #fff); transition:transform .15s ease, box-shadow .15s ease;}
+.lc-num{position:absolute; top:9px; left:11px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:13px; line-height:1;
+  color:color-mix(in srgb, var(--c) 80%, #000); background:color-mix(in srgb, var(--c) 14%, #fff); border-radius:999px; padding:5px 8px 4px;}
+.lc-ico{display:flex; align-items:center; justify-content:center; width:76px; height:76px; border-radius:50%;
+  background:color-mix(in srgb, var(--c) 14%, #fff); font-size:42px; line-height:1;}
+.lc-ico-svg svg{width:56px; height:56px; display:block;}
+.isl-badge-svg{background:#fff; border:2.5px solid var(--c); box-shadow:0 3px 0 color-mix(in srgb, var(--c) 45%, #fff);}
+.isl-badge-svg svg{width:32px; height:32px; display:block;}
+.lc.ready .lc-ico-svg svg, .lc.test .lc-ico-svg svg{transition:transform .2s ease;}
+.lc.ready:hover .lc-ico-svg svg, .lc.test:hover .lc-ico-svg svg{transform:rotate(-6deg) scale(1.08);}
+.lc-ico-num{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:32px; color:var(--c);}
+.lc-name{flex:1; display:flex; align-items:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:16.5px; line-height:1.2; color:var(--ink);}
+
+.lc-main{text-decoration:none;}
+.lc-main span, .lc-prac{display:block; box-sizing:border-box; width:128px; max-width:100%; text-align:center; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:14px; line-height:1.4; border-radius:999px; padding:6px 10px 5px; text-decoration:none;}
+.lc-main span{color:#fff; background:var(--c);}
+.lc-main::after{content:""; position:absolute; inset:0; border-radius:inherit;}   /* уся картка — посилання */
+.lc.ready:hover, .lc.test:hover{transform:translateY(-3px); box-shadow:0 8px 0 color-mix(in srgb, var(--c) 30%, #fff);}
+.lc.ready:active, .lc.test:active{transform:translateY(2px); box-shadow:0 2px 0 color-mix(in srgb, var(--c) 30%, #fff);}
+.lc-main:focus-visible{outline:none;}
+.lc:has(.lc-main:focus-visible){outline:3px solid var(--c); outline-offset:3px;}
+
+.lc-prac{position:relative; z-index:1; color:var(--p-ink, #2B2D42); background:var(--p, #FFB020); transition:filter .15s ease;}
+.lc-prac:hover{filter:brightness(.93);}
+.lc-prac:focus-visible{outline:3px solid var(--p); outline-offset:2px;}
+
+/* «Список»: «Вчимося» і «Практикуємо» однакової ширини, «Практикуємо» — контрастного кольору теми (--p) */
+#plan .lesson-action .btn-open, #plan .lesson-action .btn-practice{display:inline-block; box-sizing:border-box; width:118px; text-align:center; padding:7px 10px; border:0; font-size:13px;}
+#plan .btn-practice{background:var(--p, #FFB020); color:var(--p-ink, #2B2D42); transition:filter .15s ease;}
+#plan .btn-practice:hover{background:var(--p, #FFB020); filter:brightness(.93);}
+
+.lc.test{--c:#E2702B;}
+
+/* бейдж «Практикум» / «Проєкт» (kind) — у правому верхньому куті картки */
+.lc-kind{position:absolute; top:9px; right:10px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:11px; line-height:1; padding:5px 8px 4px; border-radius:999px;}
+
+
+.lc.soon{background:transparent; border-style:dashed; box-shadow:none;}
+.lc.soon .lc-ico{filter:saturate(.55); opacity:.6; background:color-mix(in srgb, var(--c) 7%, #fff);}
+.lc.soon .lc-name{color:var(--ink-soft); font-weight:600;}
+.lc.soon .lc-num{opacity:.7;}
+.lc-soon{font-family:'Baloo 2',sans-serif; font-weight:600; font-size:12.5px; color:var(--ink-soft); border:1px solid var(--line); background:#fff; border-radius:999px; padding:4px 12px 3px;}
+
+@media (max-width:560px){
+  .island{padding:16px 14px 18px; border-radius:26px;}
+  .isl-grid{grid-template-columns:repeat(2, 1fr); gap:12px;}
+  .lc-ico{width:62px; height:62px; font-size:34px;}
+  .lc-ico-svg svg{width:46px; height:46px;}
+  .lc-name{font-size:15px;}
+}
