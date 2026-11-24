@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Експедиція до Антарктиди — Форматування списків</title>
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#0B6E99,#7FD1F0); --accent:#0B6E99; --accent-dark:#074E6E; --accent-soft:#E3F3FA; --bg:#F4F9FC; --line:#D8E8F0; }
+  .p-hero p{max-width:none;}
+  .with-logo{display:flex; align-items:center; gap:12px;}
+  .with-logo .logo{width:1.6em; height:1.6em; flex-shrink:0; border-radius:50%;}
+  .ms{font-family:'Material Symbols Outlined'; font-weight:normal; font-style:normal; line-height:1; display:inline-block; -webkit-font-smoothing:antialiased;}
+  .ms.ic{font-size:19px; vertical-align:-5px; color:#444746; background:#EDF2FA; border-radius:4px; padding:1px;}
+  .kbd{display:inline-block; font-family:'Roboto',sans-serif; font-weight:500; font-size:.86em; line-height:1.2; padding:1px 6px; border:1px solid #C5C6DA; border-bottom-width:3px; border-radius:6px; background:#fff; white-space:nowrap;}
+
+  /* Що має вийти: аркуш A4, розміри — частки ширини аркуша */
+  .page-wrap{background:#E8EAED; border-radius:var(--radius-m); padding:18px; display:flex; justify-content:center;}
+  .page-box{width:100%; max-width:620px; container-type:inline-size;}
+  .page{background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.25); padding:8% 10% 7%; font-family:Arial,sans-serif; color:#000; font-size:2.45cqw; line-height:1.45;}
+  .page p{margin:0;}
+  .page .t{font-size:1.8em; font-weight:700; text-align:center; line-height:1.2;}
+  .page .st{font-style:italic; text-align:center; color:#555; margin-bottom:1em;}
+  .page .h{font-weight:700; margin-top:.9em;}
+  .page .li{position:relative; padding-left:calc(var(--lv,0) * 2.6em + 2.2em);}
+  .page .li::before{content:attr(data-m); position:absolute; left:calc(var(--lv,0) * 2.6em + .5em);}
+  .page .li.cb::before{content:''; width:.95em; height:.95em; top:.25em; border:.12em solid #5F6368; border-radius:.15em; box-sizing:border-box;}
+  .page .li.cb.on{text-decoration:line-through; color:#80868B;}
+  .page .li.cb.on::before{background:#1A73E8 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.2l2.4 2.4 4.6-5' fill='none' stroke='%23fff' stroke-width='1.8'/%3E%3C/svg%3E") center/100% no-repeat; border-color:#1A73E8;}
+  .page .mine{background:#FFF3BF; border-radius:.2em; padding:0 .3em; font-style:italic; color:#8A6D00;}
+  .page{-webkit-user-select:none; user-select:none; -webkit-touch-callout:none;}
+
+  .copy-row{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:6px 0 4px;}
+  .copy-btn{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; background:var(--accent); color:#fff; border:0; border-radius:999px; padding:8px 18px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;}
+  .copy-btn:hover{background:var(--accent-dark);}
+  .copy-msg{font-size:13.5px; font-weight:700;}
+  .fact{display:flex; gap:12px; align-items:flex-start; background:var(--accent-soft); border-radius:var(--radius-m); padding:12px 16px; font-size:14.5px; margin-top:14px;}
+  .fact b{color:var(--accent-dark);}
+  .fact .pg{font-size:30px; line-height:1;}
+</style>
+</head>
+<body data-hud="6 клас · Практична · Експедиція до Антарктиди">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 6 клас · Форматування списків</div>
+    <h1 class="with-logo"><img class="logo" src="images/uac-logo.png" alt="Емблема Національного антарктичного наукового центру">Експедиція до Антарктиди</h1>
+    <p>Ти — юний полярник. Склади в Google Документах план експедиції на українську станцію «Академік Вернадський»: що взяти, що робити й що перевірити перед виходом на кригу.</p>
+    <div class="meta"><span>⏱ 25–30 хв</span><span><img src="../../assets/logos/docs.svg" alt="">Google Документи</span></div>
+    <div class="fact"><span class="pg">❄️</span><span><b>Цікаво:</b> станція «Академік Вернадський» працює з 1996 року. Полярники живуть там цілий рік, а сусіди за вікном — пінгвіни.</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="page-wrap">
+      <div class="page-box">
+        <div class="page" id="sample">
+          <p class="t">Експедиція до Антарктиди</p>
+          <p class="st">План юного полярника</p>
+          <p class="h">Що взяти:</p>
+          <p class="li" data-m="❖">Одяг</p>
+          <p class="li" style="--lv:1" data-m="➢">Пуховик</p>
+          <p class="li" style="--lv:1" data-m="➢">Термобілизна</p>
+          <p class="li" data-m="❖">Прилади</p>
+          <p class="li" style="--lv:1" data-m="➢">Термометр</p>
+          <p class="li" style="--lv:1" data-m="➢">Фотоапарат</p>
+          <p class="li" data-m="❖">Розваги</p>
+          <p class="li" style="--lv:1" data-m="➢">Настільні ігри</p>
+          <p class="li" style="--lv:1" data-m="➢"><span class="mine">твоя річ</span></p>
+          <p class="h">План експедиції:</p>
+          <p class="li" data-m="1.">Виліт із Києва до Чилі</p>
+          <p class="li" data-m="2.">Переправа через протоку Дрейка</p>
+          <p class="li" data-m="3.">Прибуття на станцію «Академік Вернадський»</p>
+          <p class="li" data-m="4.">Дослідження</p>
+          <p class="li" style="--lv:1" data-m="a.">Порахувати пінгвінів</p>
+          <p class="li" style="--lv:1" data-m="b.">Виміряти товщину криги</p>
+          <p class="li" style="--lv:1" data-m="c.">Надіслати листівку зі станції</p>
+          <p class="li" data-m="5.">Повернення додому</p>
+          <p class="h">Перед виходом на кригу:</p>
+          <p class="li cb on">Рукавиці на руках</p>
+          <p class="li cb on">Рація заряджена</p>
+          <p class="li cb">Термос із чаєм</p>
+          <p class="li cb">Напарник знає, куди я йду</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи документ</h3>
+        <p>Обери один зі способів:</p>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Документи</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Документи</span> → <span class="menu">Порожній документ</span>.</li>
+              <li>Клацни «Документ без назви» і назви файл: <b>Антарктида — Прізвище</b>.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Встав текст</h3>
+        <div class="copy-row"><button type="button" class="copy-btn" id="copyBtn"><span class="ms" style="font-size:18px">content_copy</span>Скопіювати текст</button><span class="copy-msg" id="copyMsg"></span></div>
+        <ul>
+          <li>Встав у документ: <span class="kbd">Ctrl</span> + <span class="kbd">Shift</span> + <span class="kbd">V</span> — без чужого оформлення.</li>
+          <li>Кожен рядок — окремий абзац. Поки що списків немає.</li>
+        </ul>
+        <div class="check-val">Перевір себе: у документі 25 абзаців.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Оформи заголовки</h3>
+        <ul>
+          <li><b>Експедиція до Антарктиди</b> — по центру, напівжирний, розмір 20.</li>
+          <li><b>План юного полярника</b> — по центру, курсив.</li>
+          <li><b>Що взяти:</b>, <b>План експедиції:</b>, <b>Перед виходом на кригу:</b> — напівжирні.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Список речей з рівнями</h3>
+        <ol>
+          <li>Виділи рядки від «Одяг» до «Настільні ігри».</li>
+          <li>Натисни <span class="ms ic">format_list_bulleted</span> <b>Маркований список</b> (<span class="kbd">Ctrl</span> + <span class="kbd">Shift</span> + <span class="kbd">8</span>).</li>
+          <li>Виділи «Пуховик» і «Термобілизна» → <span class="kbd">Tab</span>.</li>
+          <li>Так само «Термометр» і «Фотоапарат», а тоді «Настільні ігри».</li>
+        </ol>
+        <div class="tip">Пункт поїхав не туди? <span class="kbd">Shift</span> + <span class="kbd">Tab</span> поверне його на рівень вище.</div>
+        <div class="check-val">Перевір себе: 3 пункти першого рівня (Одяг, Прилади, Розваги) і 5 вкладених.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Інші маркери</h3>
+        <ol>
+          <li>Клацни в будь-якому пункті списку речей.</li>
+          <li>Відкрий стрілочку <span class="ms ic">arrow_drop_down</span> біля кнопки маркованого списку.</li>
+          <li>Обери стиль <b>❖ ➢ ■</b> — або інший, який сподобається, тільки не звичайні кружечки.</li>
+        </ol>
+        <div class="tip">Те саме є в меню <span class="menu">Формат → Маркери та нумерація</span>.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Додай свою річ</h3>
+        <ol>
+          <li>Постав курсор у кінець пункту «Настільні ігри».</li>
+          <li>Натисни <span class="kbd">Enter</span> — з'явиться новий пункт того самого рівня.</li>
+          <li>Напиши, що ще ти взяв би з собою в Антарктиду.</li>
+        </ol>
+        <div class="check-val">Перевір себе: у «Розвагах» тепер 2 пункти.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">7</div>
+      <div>
+        <h3>План експедиції — по порядку</h3>
+        <ol>
+          <li>Виділи рядки від «Виліт із Києва до Чилі» до «Повернення додому».</li>
+          <li>Натисни <span class="ms ic">format_list_numbered</span> <b>Нумерований список</b> (<span class="kbd">Ctrl</span> + <span class="kbd">Shift</span> + <span class="kbd">7</span>).</li>
+          <li>Виділи три завдання від «Порахувати пінгвінів» до «Надіслати листівку зі станції» → <span class="kbd">Tab</span>.</li>
+        </ol>
+        <div class="tip">Спершу пунктів 8, а після <span class="kbd">Tab</span> — 5: список сам переставить номери.</div>
+        <div class="check-val">Перевір себе: номери 1–5, а під «Дослідження» — a, b, c.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">8</div>
+      <div>
+        <h3>Перевірка перед виходом</h3>
+        <ol>
+          <li>Виділи чотири останні рядки.</li>
+          <li>Натисни <span class="ms ic">checklist</span> <b>Контрольний список</b> (<span class="kbd">Ctrl</span> + <span class="kbd">Shift</span> + <span class="kbd">9</span>).</li>
+          <li>Постав позначки біля «Рукавиці на руках» і «Рація заряджена».</li>
+        </ol>
+        <div class="check-val">Перевір себе: два перші пункти закреслено, два інші — ні. Документ схожий на зразок.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Практична робота · «Форматування списків» · 6 клас</span></footer>
+
+<script src="../../assets/practice.js"></script>
+<script>
+  // Зразок: без виділення, копіювання й контекстного меню
+  const sample = document.getElementById('sample');
+  ['copy', 'cut', 'selectstart', 'contextmenu', 'dragstart'].forEach(t=>sample.addEventListener(t, e=>e.preventDefault()));
+
+  const TEXT = [
+    'Експедиція до Антарктиди', 'План юного полярника',
+    'Що взяти:', 'Одяг', 'Пуховик', 'Термобілизна', 'Прилади', 'Термометр', 'Фотоапарат', 'Розваги', 'Настільні ігри',
+    'План експедиції:', 'Виліт із Києва до Чилі', 'Переправа через протоку Дрейка', 'Прибуття на станцію «Академік Вернадський»',
+    'Дослідження', 'Порахувати пінгвінів', 'Виміряти товщину криги', 'Надіслати листівку зі станції', 'Повернення додому',
+    'Перед виходом на кригу:', 'Рукавиці на руках', 'Рація заряджена', 'Термос із чаєм', 'Напарник знає, куди я йду'
+  ].join('\n');
+
+  const msg = document.getElementById('copyMsg');
+  document.getElementById('copyBtn').addEventListener('click', async ()=>{
+    let ok = false;
+    try{ await navigator.clipboard.writeText(TEXT); ok = true; }
+    catch(e){
+      const ta = document.createElement('textarea');
+      ta.value = TEXT; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try{ ok = document.execCommand('copy'); }catch(_){}
+      ta.remove();
+    }
+    msg.style.color = ok ? '#137333' : '#B3261E';
+    msg.textContent = ok ? '✓ Скопійовано! Тепер встав у документ.' : 'Не вдалося скопіювати — спробуй ще раз.';
+  });
+</script>
+</body>
+</html>

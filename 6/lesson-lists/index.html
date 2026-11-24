@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Форматування списків — Урок</title>
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  /* Гама «туристична»: синій і малиновий */
+  :root{
+    --accent:#2F5BB7; --accent-dark:#1E3F86; --accent-soft:#E6EDFA;
+    --label:#D6336C;
+    --bg:#F5F7FC; --line:#DCE3F2;
+    --hud-bar:linear-gradient(90deg,#2F5BB7,#F06595);
+    /* інтерфейс Google */
+    --g-blue:#1A73E8; --g-ink:#1F1F1F; --g-soft:#444746; --g-line:#DADCE0; --g-bar:#EDF2FA; --g-canvas:#F9FBFD; --g-sel:#ACCEF7;
+  }
+
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em;}
+  .kbd{display:inline-block; font-family:'Roboto',sans-serif; font-weight:500; font-size:.86em; line-height:1.2; padding:2px 7px; border:1px solid #C5C6DA; border-bottom-width:3px; border-radius:6px; background:#fff; color:var(--ink); white-space:nowrap;}
+  .fb{font-size:14px; min-height:1.4em; margin-top:12px;}
+
+  /* ---------- Міні-макет Google Документа ---------- */
+  .md{position:relative; border:1px solid var(--g-line); border-radius:10px; background:var(--g-canvas); font-family:'Roboto',sans-serif; color:var(--g-ink); box-shadow:0 1px 6px rgba(0,0,0,.06); overflow:hidden; margin-bottom:10px;}
+  .md-head{display:flex; align-items:center; gap:7px; padding:6px 10px 0; font-size:13px; white-space:nowrap; overflow:hidden;}
+  .md-head img{width:13px; height:18px;}
+  .md-head .cap{margin-left:auto; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12.5px; color:var(--label); text-transform:uppercase; letter-spacing:.05em;}
+  .md .gd-tools{margin:5px 8px 0; padding:2px 6px;}
+  .md .gd-tools .tl{width:26px; height:26px; cursor:default;}
+  .md .gd-tools .tl .ms{font-size:18px;}
+  .md .gd-tools .tl.dd{width:13px; margin-left:-3px;}
+  .md .gd-tools .tl.dd .ms{font-size:16px;}
+  .md .gd-tools .tl:hover{background:none;}
+  .md .gd-tools .tl.on:hover{background:#D3E3FD;}
+  .md .gd-tools .tx{font-size:12.5px;}
+  .md-page{position:relative; background:#fff; margin:6px 8px 10px; border:1px solid var(--g-line); border-radius:3px; padding:12px 18px; font-family:Arial,sans-serif; font-size:13px; line-height:1.5; color:#000;}
+  .md-page p{margin:0; font-size:inherit; line-height:inherit; color:inherit;}
+  .md-page .h{font-weight:700; font-size:14px;}
+  .md .nb{position:relative; z-index:1;}
+  .nb{display:inline-flex; align-items:center; justify-content:center; width:19px; height:19px; border-radius:50%; background:var(--label); color:#fff; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:12px; line-height:1; flex-shrink:0; margin:0 3px; vertical-align:middle;}
+
+  /* пункти списку в макетах */
+  .li{position:relative; padding-left:calc(var(--lv,0) * 24px + 24px);}
+  .li .lm{position:absolute; left:calc(var(--lv,0) * 24px + 3px); top:0;}
+  .li .lm.cb{box-sizing:border-box; width:13px; height:13px; border:1.5px solid #5F6368; border-radius:2px; top:calc((1.5em - 13px) / 2);}
+  .li .lm.cb.on{background:var(--g-blue); border-color:var(--g-blue);}
+  .li .lm.cb.on::after{content:''; position:absolute; left:3.2px; top:.6px; width:3px; height:7px; border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg);}
+  .li.done{text-decoration:line-through; color:#80868B;}
+  .li .lvtag{position:absolute; right:0; top:1px; font-family:'Baloo 2',sans-serif; font-weight:700; font-size:11px; color:var(--label); background:#FFF0F6; border-radius:999px; padding:0 8px; line-height:1.6;}
+  .li.gone{background:#FDE6E1; text-decoration:line-through; color:#B3261E;}
+
+  /* меню бібліотеки маркерів у макеті */
+  .md-lib{position:absolute; top:52px; z-index:2; background:#fff; border-radius:8px; padding:8px; box-shadow:0 2px 6px 2px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.3); display:grid; grid-template-columns:repeat(3, 62px); gap:6px;}
+  .lib-tile{border:1px solid var(--g-line); border-radius:4px; padding:5px 6px; background:#fff; font-family:Arial,sans-serif; font-size:10px; line-height:1.55; color:#000;}
+  .lib-tile.hl{border-color:var(--g-blue); box-shadow:0 0 0 1px var(--g-blue); background:#E8F0FE;}
+  .lib-tile div{display:flex; align-items:center; gap:3px; white-space:nowrap;}
+  .lib-tile div::after{content:''; flex:1; height:3px; border-radius:2px; background:#BDC1C6;}
+  .lib-tile div:nth-child(2){padding-left:9px;}
+  .lib-tile div:nth-child(3){padding-left:18px;}
+
+  .legend{list-style:none; padding:0; margin:0 0 14px; display:grid; gap:7px;}
+  .legend li{display:flex; align-items:center; gap:8px; font-size:14.5px; flex-wrap:wrap;}
+  .legend .ms{color:var(--g-soft);}
+  .gallery{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; margin:12px 0 16px;}
+  .gallery figure{margin:0;}
+  .gallery .md{margin-bottom:6px;}
+  .gallery .md-page{font-size:12.5px;}
+  .gallery figcaption{font-size:13.5px; color:var(--ink-soft); padding:0 4px;}
+  .gallery figcaption b{display:flex; align-items:center; gap:5px; font-family:'Baloo 2',sans-serif; font-size:16px; color:var(--ink); line-height:1.25;}
+  .gallery figcaption b .ms{color:var(--accent);}
+  .libs{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:12px 0 16px;}
+  .libs .md-page{min-height:150px;}
+  .libs figure{margin:0;}
+  .libs figcaption{font-size:13.5px; color:var(--ink-soft); padding:0 4px;}
+  .ba{display:grid; grid-template-columns:1fr auto 1fr; gap:8px; align-items:center; margin-bottom:12px;}
+  .ba > .ms{color:var(--ink-soft); font-size:26px;}
+  .ba .md{margin:0;}
+  .ba .md-page{font-size:12.5px;}
+  .opt-ico .ms{font-size:24px; color:var(--g-soft);}
+  #kindPool{display:grid; grid-template-columns:repeat(3, 1fr); gap:8px;}
+  #kindPool .sort-chip{display:flex; align-items:center; justify-content:center; text-align:center; max-width:none; min-height:62px;}
+  @media (max-width:620px){ #kindPool{grid-template-columns:1fr 1fr;} }
+  /* крок 4: екранна клавіатура */
+  .kb{display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin-top:6px;}
+  .kb[hidden]{display:none;}
+  .key{font-family:'Roboto',sans-serif; font-weight:500; font-size:15px; min-width:64px; padding:10px 16px; border:1px solid #C5C6DA; border-bottom-width:4px; border-radius:9px; background:#fff; color:var(--ink); cursor:pointer;}
+  .key.wide{min-width:110px;}
+  .key:hover{border-color:var(--accent);}
+  .key:active{transform:translateY(2px); border-bottom-width:2px;}
+  .key.on{background:var(--accent-soft); border-color:var(--accent);}
+  .key.wrong-flash{background:#FDE6E1; border-color:var(--coral); animation:shakeX .35s ease;}
+  #keyEx:focus{outline:none;}
+  .caret{display:inline-block; width:1.5px; height:1.1em; background:#000; vertical-align:text-bottom; margin:0 -.75px; animation:caret 1s steps(1) infinite;}
+  @keyframes caret{50%{opacity:0;}}
+  .bucket-title .ms{color:var(--accent); margin-right:4px; vertical-align:-4px;}
+
+  /* ---------- Крок 5: емулятор Google Документа ---------- */
+  .task-card{display:flex; align-items:center; gap:14px; background:var(--accent-soft); border-radius:var(--radius-m); padding:14px 18px; margin-bottom:16px; min-height:64px;}
+  .task-card .tnum{font-family:'Baloo 2',sans-serif; font-weight:800; font-size:13px; color:var(--accent-dark); white-space:nowrap;}
+  .task-card .ttext{font-weight:700; font-size:16px;}
+  .gdoc{position:relative; border:1px solid var(--g-line); border-radius:var(--radius-m); background:var(--g-canvas); font-family:'Roboto',sans-serif; color:var(--g-ink); box-shadow:0 2px 10px rgba(0,0,0,.06);}
+  .gd-head{display:flex; align-items:center; gap:10px; padding:8px 12px 6px;}
+  .gd-head img{width:22px; height:30px;}
+  .gd-title{font-size:16px; color:var(--g-ink);}
+  .gd-title .ms{font-size:18px; color:var(--g-soft); margin-left:6px;}
+  .gd-menu{display:flex; gap:12px; font-size:13px; color:var(--g-ink); white-space:nowrap; overflow:hidden;}
+  .gd-tools{display:flex; align-items:center; gap:2px; margin:4px 10px 0; padding:4px 8px; background:var(--g-bar); border-radius:999px; white-space:nowrap; font-family:'Roboto',sans-serif; color:var(--g-ink); overflow-x:auto; scrollbar-width:none;}
+  .gd-tools::-webkit-scrollbar{display:none;}
+  .gd-tools .tl{width:30px; height:30px; border-radius:4px; display:inline-flex; align-items:center; justify-content:center; color:var(--g-soft); flex-shrink:0; border:0; background:none; padding:0; font:inherit; cursor:pointer;}
+  .gd-tools .tl.dd{width:16px; margin-left:-3px;}
+  .gd-tools .tl:hover{background:#DCE3EE;}
+  .gd-tools .tl.on{background:#D3E3FD; color:#041E49;}
+  .gd-tools .tl.hint{animation:tlPulse 1.3s ease-in-out infinite;}
+  @keyframes tlPulse{50%{background:#FFE8A3;}}
+  .gd-tools .tx{font-size:13.5px; color:var(--g-soft); padding:0 6px; flex-shrink:0;}
+  .gd-tools .size{border:1px solid #747775; border-radius:4px; padding:3px 6px; min-width:30px; text-align:center; color:var(--g-ink);}
+  .gd-tools .sep{width:1px; height:20px; background:#C7C7C7; margin:0 5px; flex-shrink:0;}
+  .gdoc .wrong-flash{background:#FDE6E1 !important; animation:shakeX .35s ease;}
+  .gpop{position:absolute; z-index:6; background:#fff; border-radius:8px; padding:8px; box-shadow:0 2px 6px 2px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.3); display:grid; grid-template-columns:repeat(3, 70px); gap:7px;}
+  .gpop[hidden]{display:none;}
+  .gpop .lib-tile{cursor:pointer; font-size:11px;}
+  .gpop .lib-tile:hover{background:#F1F3F4;}
+  .gpage{background:#fff; margin:10px 12px 14px; border:1px solid var(--g-line); border-radius:4px; box-shadow:0 1px 3px rgba(60,64,67,.15); padding:22px 26px; font-family:Arial,sans-serif; font-size:14.3px; line-height:1.55; color:#000; outline:none; caret-color:#000;}
+  .gpage ::selection{background:var(--g-sel);}
+  .gpage .gp{position:relative; transition:background .3s;}
+  .gpage .gp-title{font-size:21px; font-weight:700; margin-bottom:6px;}
+  .gpage .gp-h{font-weight:700; margin-top:10px;}
+  .gpage .gp.in-list{padding-left:calc(var(--lv,0) * 30px + 30px);}
+  .gpage .gp.in-list::before{content:attr(data-m); position:absolute; left:calc(var(--lv,0) * 30px + 5px); top:0; user-select:none; -webkit-user-select:none;}
+  .gpage .gp.chk::before{content:''; width:13px; height:13px; border:1.5px solid #5F6368; border-radius:2px; top:calc((1.55em - 13px) / 2); cursor:pointer; box-sizing:border-box;}
+  .gpage .gp.chk.on::before{background:var(--g-blue) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.2l2.4 2.4 4.6-5' fill='none' stroke='%23fff' stroke-width='1.8'/%3E%3C/svg%3E") center/100% no-repeat; border-color:var(--g-blue);}
+  .gpage .gp.chk.on{text-decoration:line-through; color:#80868B;}
+  .gpage .gp.chk.cue::before{animation:cbPulse 1.3s ease-in-out infinite;}
+  @keyframes cbPulse{50%{box-shadow:0 0 0 4px #FFE8A3;}}
+  .gpage .gp.good{background:#CDEFD6;}
+
+  @media (max-width:560px){
+    .ba{grid-template-columns:1fr;}
+    .ba > .ms{transform:rotate(90deg); justify-self:center;}
+    .libs{grid-template-columns:1fr;}
+    .gpage{padding:16px 14px;}
+  }
+</style>
+</head>
+<body data-lesson="lesson6-lists" data-hud="6 клас · Форматування списків">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Текстові документи</div>
+      <h1>Списки: пункт за пунктом</h1>
+      <p>Марковані, нумеровані й контрольні списки в Google Документах.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: аркуш зі списками — маркери, номери, позначка -->
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="72" r="56" fill="#E6EDFA"/>
+      <rect x="26" y="20" width="82" height="102" rx="10" fill="#fff" stroke="#2F5BB7" stroke-width="3"/>
+      <rect x="38" y="31" width="44" height="7" rx="3.5" fill="#1E3F86"/>
+      <!-- маркований -->
+      <circle cx="42" cy="51" r="3.5" fill="#2F5BB7"/><rect x="50" y="48.5" width="44" height="5" rx="2.5" fill="#C9D5EE"/>
+      <circle cx="42" cy="62" r="3.5" fill="#2F5BB7"/><rect x="50" y="59.5" width="34" height="5" rx="2.5" fill="#C9D5EE"/>
+      <!-- нумерований -->
+      <text x="38" y="80" font-family="Arial,sans-serif" font-weight="700" font-size="10" fill="#D6336C">1.</text><rect x="50" y="73.5" width="40" height="5" rx="2.5" fill="#C9D5EE"/>
+      <text x="38" y="91" font-family="Arial,sans-serif" font-weight="700" font-size="10" fill="#D6336C">2.</text><rect x="50" y="84.5" width="30" height="5" rx="2.5" fill="#C9D5EE"/>
+      <!-- контрольний -->
+      <rect x="37.5" y="98" width="10" height="10" rx="2" fill="#1A73E8"/>
+      <path d="M40 103 l2 2 4 -4.5" stroke="#fff" stroke-width="1.8" fill="none"/>
+      <rect x="50" y="100.5" width="38" height="5" rx="2.5" fill="#E0E3EA"/><rect x="49" y="102.3" width="40" height="1.4" fill="#80868B"/>
+      <!-- зірочка-маркер -->
+      <circle cx="110" cy="38" r="17" fill="#D6336C"/>
+      <path d="M110 27 l3.2 6.8 7.3 .8 -5.5 5 1.6 7.2 -6.6 -3.8 -6.6 3.8 1.6 -7.2 -5.5 -5 7.3 -.8z" fill="#fff"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Форматування абзаців</div>
+    <h2>Що ти вже знаєш</h2>
+    <p class="soft">Обери термін, а потім — його пояснення.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Види списків</div>
+    <h2>Три види списків</h2>
+    <p><b>Список</b> — кілька абзаців-пунктів з однаковим позначенням на початку. Кожен пункт — окремий абзац.</p>
+    <div class="gallery" id="kindCards"></div>
+    <p class="soft">Який список підійде? Клацни картку, а потім кошик.</p>
+    <div class="exercise">
+      <div class="sort-buckets three">
+        <div class="bucket" id="bkBul"><div class="bucket-title"><span class="ms">format_list_bulleted</span>Маркований</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkNum"><div class="bucket-title"><span class="ms">format_list_numbered</span>Нумерований</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkChk"><div class="bucket-title"><span class="ms">checklist</span>Контрольний</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="kindPool"></div>
+      <div class="progress-line" id="kindProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Створюємо список</div>
+    <h2>Виділи — і натисни кнопку</h2>
+    <p>Виділи абзаци, які стануть пунктами, і натисни кнопку на панелі інструментів:</p>
+    <div id="toolsDoc"></div>
+    <ul class="legend">
+      <li><b class="nb">1</b><span class="ms">checklist</span><b>Контрольний список</b> <span><span class="kbd">Ctrl</span> + <span class="kbd">Shift</span> + <span class="kbd">9</span></span></li>
+      <li><b class="nb">2</b><span class="ms">format_list_bulleted</span><b>Маркований список</b> <span><span class="kbd">Ctrl</span> + <span class="kbd">Shift</span> + <span class="kbd">8</span></span></li>
+      <li><b class="nb">3</b><span class="ms">format_list_numbered</span><b>Нумерований список</b> <span><span class="kbd">Ctrl</span> + <span class="kbd">Shift</span> + <span class="kbd">7</span></span></li>
+    </ul>
+    <p>Ще швидше: на початку рядка набери <b>«-»</b> або <b>«1.»</b> і натисни <span class="kbd">Пробіл</span> — список з'явиться сам.</p>
+    <div class="note">Не вписуй номери вручну. Додаси чи видалиш пункт — нумерований список сам переставить номери.</div>
+    <p class="soft">Який список застосували?</p>
+    <div id="btnList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Маркери й номери</div>
+    <h2>Бібліотека маркерів</h2>
+    <p>Стрілочка <span class="ms" style="color:var(--g-soft)">arrow_drop_down</span> біля кнопки списку відкриває бібліотеку: можна обрати інші маркери чи інший вигляд номерів. Те саме є в меню <b>Формат → Маркери та нумерація</b>.</p>
+    <div class="libs" id="libFigs"></div>
+    <p class="soft">Який номер з'явиться?</p>
+    <div id="numList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Рівні списку</div>
+    <h2>Пункт у пункті</h2>
+    <p>Пункт можна зробити <b>вкладеним</b>: він відсувається праворуч і отримує інший маркер. Так виходить <b>багаторівневий список</b>.</p>
+    <div id="levelDoc"></div>
+    <ul>
+      <li><span class="kbd">Tab</span> — пункт стає вкладеним, на рівень нижче.</li>
+      <li><span class="kbd">Shift</span> + <span class="kbd">Tab</span> — пункт повертається на рівень вище.</li>
+      <li><span class="kbd">Enter</span> у кінці пункту — новий пункт того самого рівня.</li>
+      <li><span class="kbd">Enter</span> у порожньому пункті — список закінчується.</li>
+      <li><span class="kbd">Backspace</span> на початку пункту — маркер зникає, а текст лишається.</li>
+    </ul>
+    <p class="soft">Подивись, де стояв курсор, і натисни клавішу, яка так змінила список. Можна й на справжній клавіатурі.</p>
+    <div class="exercise" id="keyEx" tabindex="0">
+      <div class="task-card"><span class="tnum" id="keyNum"></span><span class="ttext">Яку клавішу натиснули?</span></div>
+      <div id="keyBA"></div>
+      <div class="kb" id="keyKb"></div>
+      <div class="fb" id="keyFb"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Готуємося до походу</div>
+    <h2>Спробуй у Google Документі</h2>
+    <p>Оформи списки. Один пункт — <b>клацни</b> в ньому, кілька — <b>виділи</b> мишею.</p>
+    <div class="exercise" id="lsEx">
+      <div class="task-card"><span class="tnum" id="lsNum"></span><span class="ttext" id="lsTask"></span></div>
+      <div class="gdoc" id="lsDoc">
+        <div class="gd-head">
+          <img src="images/docs.svg" alt="">
+          <div>
+            <div class="gd-title">Похід до лісу<span class="ms">star</span><span class="ms">cloud_done</span></div>
+            <div class="gd-menu"><span>Файл</span><span>Редагувати</span><span>Вигляд</span><span>Вставлення</span><span>Формат</span><span>Інструменти</span></div>
+          </div>
+        </div>
+        <div class="gd-tools" id="lsTools"></div>
+        <div class="gpage" id="lsPage" contenteditable="true" inputmode="none" spellcheck="false"></div>
+        <div class="gpop" id="lsPop" hidden></div>
+      </div>
+      <div class="fb" id="lsFb"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Урок · «Форматування списків» · 6 клас</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+const ms = i=>`<span class="ms">${i}</span>`;
+const flash = (el, cls = 'wrong-flash')=>{ el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), 650); };
+const LIST_ICON = { chk:'checklist', bul:'format_list_bulleted', num:'format_list_numbered' };
+
+/* Бібліотеки стилів: маркери рівнів 1–3 */
+const BUL = { dot:['●', '○', '■'], diamond:['❖', '➢', '■'], arrow:['➔', '◆', '●'], star:['★', '○', '■'], square:['■', '◆', '○'], dash:['–', '–', '–'] };
+const NUM = { dec:['1.', 'a.', 'i.'], par:['1)', 'a)', 'i)'], up:['A.', 'a.', 'i.'], rom:['I.', 'A.', '1.'], dec2:['1.', '1)', 'a)'], low:['a.', 'i.', '1.'] };
+const ROMAN = n=>[['M',1000],['CM',900],['D',500],['CD',400],['C',100],['XC',90],['L',50],['XL',40],['X',10],['IX',9],['V',5],['IV',4],['I',1]]
+  .reduce((s, [r, v])=>{ while(n >= v){ s += r; n -= v; } return s; }, '');
+// Номер n у стилі зразка ('1.', 'a)', 'I.' …)
+function numMark(sample, n){
+  const k = sample.slice(0, -1), end = sample.slice(-1);
+  const v = k === '1' ? n : k === 'a' ? String.fromCharCode(96 + n) : k === 'A' ? String.fromCharCode(64 + n)
+    : k === 'i' ? ROMAN(n).toLowerCase() : ROMAN(n);
+  return v + end;
+}
+const libTile = (marks, hl = false, attr = '')=>`<div class="lib-tile${hl ? ' hl' : ''}" ${attr}>${marks.map(m=>`<div>${m}</div>`).join('')}</div>`;
+
+/* Міні-макет Google Документа.
+   tools: 'full' | 'lists' | false; on: яка кнопка списку натиснута; badges: номери 1–3; menu: розмітка відкритого меню */
+function toolbar({ on = '', badges = false, full = true } = {}){
+  const tl = (icon, isOn, cls = '')=>`<span class="tl${isOn ? ' on' : ''}${cls}">${ms(icon)}</span>`;
+  const nb = n=>badges ? `<b class="nb">${n}</b>` : '';
+  const sep = '<span class="sep"></span>';
+  const lists = `${nb(1)}${tl('checklist', on === 'chk')}${nb(2)}${tl('format_list_bulleted', on === 'bul')}${tl('arrow_drop_down', false, ' dd')}${nb(3)}${tl('format_list_numbered', on === 'num')}${tl('arrow_drop_down', false, ' dd')}${sep}${tl('format_indent_decrease')}${tl('format_indent_increase')}`;
+  if(!full) return `<div class="gd-tools">${lists}</div>`;
+  return `<div class="gd-tools">${tl('undo')}${tl('redo')}${sep}<span class="tx">Звичайний текст</span>${sep}<span class="tx" style="color:var(--g-ink)">Arial</span>${sep}<span class="tx size">11</span>${sep}${tl('format_bold')}${tl('format_italic')}${tl('format_underlined')}${sep}${tl('format_align_left')}${sep}${lists}</div>`;
+}
+function md({ name = 'Похід до лісу', tools = false, on = '', badges = false, menu = '', cap = '', body = '', page = '' } = {}){
+  const bar = tools ? toolbar({ on, badges, full:tools === 'full' }) : '';
+  return `<div class="md"><div class="md-head"><img src="images/docs.svg" alt="">${name}${cap ? `<span class="cap">${cap}</span>` : ''}</div>${bar}<div class="md-page" style="${page}">${body}</div>${menu}</div>`;
+}
+// Пункти: [текст, маркер ('box' | 'boxon' | текст), рівень, клас, бірка]
+const ul = rows=>rows.map(([t, m = '', lv = 0, cls = '', tag = ''])=>{
+  const mk = m === 'box' || m === 'boxon' ? `<span class="lm cb${m === 'boxon' ? ' on' : ''}"></span>` : `<span class="lm">${m}</span>`;
+  return `<div class="li ${cls}" style="--lv:${lv}">${mk}${t}${tag ? `<span class="lvtag">${tag}</span>` : ''}</div>`;
+}).join('');
+const plain = arr=>arr.map(t=>`<p>${t}</p>`).join('');
+const head = t=>`<p class="h">${t}</p>`;
+const bul = arr=>ul(arr.map(t=>[t, '●']));
+const num = (arr, st = '1.')=>ul(arr.map((t, i)=>[t, numMark(st, i + 1)]));
+const chk = (arr, done = [])=>ul(arr.map((t, i)=>[t, done.includes(i) ? 'boxon' : 'box', 0, done.includes(i) ? 'done' : '']));
+
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Абзац', desc:'Текст, введення якого завершили клавішею Enter' },
+  { name:'Вирівнювання за шириною', desc:'Рівні обидва краї абзацу' },
+  { name:'Вирівнювання по центру', desc:'Рядки однаково віддалені від обох країв — так оформлюють заголовки' },
+  { name:'Вирівнювання за правим краєм', desc:'Рядки притиснуто до правого краю — так оформлюють підписи й дати' },
+  { name:'Відступ першого рядка', desc:'Перший рядок починається правіше за інші' },
+  { name:'Виступ', desc:'Перший рядок починається лівіше за інші' },
+  { name:'Відступ зліва', desc:'Відсуває від лівого краю весь абзац' },
+  { name:'Лінійка', desc:'Смуга над сторінкою з маркерами відступів' },
+  { name:'Міжрядковий інтервал', desc:'Відстань між рядками всередині абзацу' }
+], 'recapProgress');
+
+/* ---------- КРОК 1: ВИДИ СПИСКІВ ---------- */
+(function(){
+  const fig = (icon, name, d, body)=>`<figure>${md({ body })}<figcaption><b>${ms(icon)}${name}</b>${d}</figcaption></figure>`;
+  document.getElementById('kindCards').innerHTML =
+      fig('format_list_bulleted', 'Маркований', 'Перед пунктом — значок-маркер. Коли порядок пунктів не важливий.',
+        head('Що взяти:') + bul(['Рюкзак', 'Дощовик', 'Пляшку води']))
+    + fig('format_list_numbered', 'Нумерований', 'Пункти мають номери. Коли важлива черговість або кількість.',
+        head('План дня:') + num(['Зустріч біля школи', 'Дорога до лісу', 'Обід біля озера']))
+    + fig('checklist', 'Контрольний', 'Перед пунктом — квадратик для позначки. Позначений пункт закреслюється.',
+        head('Перед виходом:') + chk(['Перевірити погоду', 'Зарядити телефон', 'Взяти ключі'], [0]));
+
+  makeSortBoard('kindPool', { bul:'bkBul', num:'bkNum', chk:'bkChk' }, [
+    { text:'Тварини, що живуть у нашому лісі', bucket:'bul' },
+    { text:'Улюблені мультфільми Марка', bucket:'bul' },
+    { text:'Фрукти, які росли в бабусиному саду', bucket:'bul' },
+    { text:'Як посадити деревце — дія за дією', bucket:'num' },
+    { text:'Найкращі команди турніру — від переможця', bucket:'num' },
+    { text:'Розклад уроків на понеділок', bucket:'num' },
+    { text:'Покупки: Оля в магазині відмічає те, що вже взяла', bucket:'chk' },
+    { text:'Справи на суботу — щоб бачити, що вже зроблено', bucket:'chk' },
+    { text:'Речі в похід: ставлю галочку, щойно поклав у рюкзак', bucket:'chk' }
+  ], 'kindProgress');
+})();
+
+/* ---------- КРОК 2: СТВОРЮЄМО СПИСОК ---------- */
+(function(){
+  document.getElementById('toolsDoc').innerHTML = md({ tools:'full', badges:true, on:'bul',
+    body:head('Що взяти:') + bul(['Рюкзак', 'Дощовик', 'Пляшку води']) });
+
+  const ba = (before, after)=>`<div class="ba">${md({ cap:'Було', body:before })}${ms('arrow_forward')}${md({ cap:'Стало', body:after })}</div>`;
+  const OPTS = [['chk', 'Контрольний'], ['bul', 'Маркований'], ['num', 'Нумерований']].map(([k, n])=>`<span class="opt-ico">${ms(LIST_ICON[k])}</span> ${n}`);
+  const I = { chk:0, bul:1, num:2 };
+  const A = ['Білка', 'Їжак', 'Лисиця'];
+  const S = ['Помий руки', 'Наріж хліб', 'Поклади сир'];
+  const D = ['Прибрати в кімнаті', 'Полити квіти', 'Вивчити вірш'];
+  makeClassify('btnList', [
+    { pre:ba(head('Тварини лісу') + plain(A), head('Тварини лісу') + bul(A), 'bul'), text:'Який список застосували?', correct:I.bul, why:'Перед пунктами — маркери.' },
+    { pre:ba(head('Бутерброд') + plain(S), head('Бутерброд') + num(S), 'num'), text:'Який список застосували?', correct:I.num, why:'Пункти отримали номери.' },
+    { pre:ba(head('Справи') + plain(D), head('Справи') + chk(D), 'chk'), text:'Який список застосували?', correct:I.chk, why:'З\'явилися квадратики для позначок.' },
+    { pre:ba(head('Бутерброд') + bul(S), head('Бутерброд') + num(S), 'num'), text:'Список уже був. Який список застосували?', correct:I.num, why:'Маркери змінилися на номери — список став нумерованим.' }
+  ], OPTS);
+})();
+
+/* ---------- КРОК 3: БІБЛІОТЕКА МАРКЕРІВ ---------- */
+(function(){
+  const libMenu = (lib, left, hl)=>`<div class="md-lib" style="left:${left}px">${Object.entries(lib).map(([k, m])=>libTile(m, k === hl)).join('')}</div>`;
+  const fig = (on, lib, left, hl, d)=>`<figure>${md({ tools:'lists', on, page:'min-height:170px', body:'', menu:libMenu(lib, left, hl) })}<figcaption>${d}</figcaption></figure>`;
+  document.getElementById('libFigs').innerHTML =
+      fig('bul', BUL, 24, 'dot', '<b>Маркери</b> — стрілочка біля кнопки маркованого списку.')
+    + fig('num', Object.fromEntries(Object.entries(NUM).map(([k, v])=>[k, v.map(s=>numMark(s, 1))])), 70, 'dec', '<b>Нумерація</b> — цифри, літери чи римські числа.');
+
+  const st = ['Історія', 'Математика', 'Музика', 'Природознавство'];
+  makeChoices('numList', [
+    { pre:md({ name:'Зміст', body:head('Зміст') + num(st.slice(0, 3), 'I.') + ul([[st[3], '?']]) }),
+      text:'Список пронумеровано римськими числами. Що буде замість «?»', opts:['IIII.', 'IV.', 'V.'], correct:1, why:'Римське 4 — IV.' },
+    { pre:md({ body:head('Що взяти:') + ul([['Одяг', '1.'], ['куртка', 'a.', 1], ['шапка', 'b.', 1], ['Їжа', '2.'], ['бутерброди', '?', 1]]) }),
+      text:'Що буде замість «?»', opts:['c.', 'a.', '3.'], correct:1, why:'Під новим пунктом «Їжа» вкладені пункти рахуються спочатку.' },
+    { pre:`<div class="ba">${md({ cap:'Було', body:ul([['Зустріч біля школи', '1.'], ['Перекус', '2.', 0, 'gone'], ['Дорога до лісу', '3.'], ['Обід біля озера', '4.']]) })}${ms('arrow_forward')}${md({ cap:'Стало', body:ul([['Зустріч біля школи', '1.'], ['Дорога до лісу', '?'], ['Обід біля озера', '?']]) })}</div>`,
+      text:'Пункт «Перекус» видалили. Які номери тепер в останніх двох пунктів?', opts:['3. і 4.', '2. і 3.', '2. і 4.'], correct:1, why:'Список сам переставив номери.' }
+  ]);
+})();
+
+/* ---------- КРОК 4: РІВНІ СПИСКУ ---------- */
+document.getElementById('levelDoc').innerHTML = md({ tools:'lists', on:'bul',
+  body:head('Що взяти:') + ul([['Одяг', '●', 0, '', '1-й рівень'], ['куртка', '○', 1, '', '2-й рівень'], ['шапка', '○', 1], ['Їжа', '●'], ['бутерброди', '○', 1], ['яблука', '○', 1]]) });
+(function(){
+  const C = '<span class="caret"></span>';
+  // Було / Стало: [текст, маркер, рівень, клас]; рядок без маркера з відступом — клас «bare»
+  const ROUNDS = [
+    { key:'tab', before:[['Одяг', '●'], [C + 'куртка', '●']], after:[['Одяг', '●'], [C + 'куртка', '○', 1]],
+      why:'Пункт відсунувся праворуч і став вкладеним.' },
+    { key:'enter', before:[['Рюкзак', '●'], ['Дощовик' + C, '●']], after:[['Рюкзак', '●'], ['Дощовик', '●'], [C, '●']],
+      why:'Курсор стояв у кінці пункту — з\'явився новий пункт.' },
+    { key:'stab', before:[['Їжа', '●'], ['бутерброди', '○', 1], [C + 'Аптечка', '○', 1]], after:[['Їжа', '●'], ['бутерброди', '○', 1], [C + 'Аптечка', '●']],
+      why:'«Аптечка» повернулася на рівень вище.' },
+    { key:'bs', before:[['Рюкзак', '●'], [C + 'Дощовик', '●']], after:[['Рюкзак', '●'], [C + 'Дощовик', '', 0]],
+      why:'Маркер зник, а текст лишився.' },
+    { key:'enter', before:[['Рюкзак', '●'], ['Дощовик', '●'], [C, '●']], after:[['Рюкзак', '●'], ['Дощовик', '●']], tail:C,
+      why:'Курсор стояв у порожньому пункті — список закінчився, далі звичайний абзац.' }
+  ];
+  const NAME = { tab:'Tab', stab:'Shift + Tab', enter:'Enter', bs:'Backspace' };
+  const WRONG = {
+    tab:'Tab відсунув би пункт праворуч, на рівень нижче.',
+    stab:'Shift + Tab повернув би пункт на рівень вище.',
+    enter:'Enter додав би новий пункт або закінчив би список.',
+    bs:'Backspace на початку пункту прибрав би маркер.'
+  };
+  const $ = id=>document.getElementById(id);
+  const ex = $('keyEx'), ba = $('keyBA'), kb = $('keyKb'), fb = $('keyFb'), num = $('keyNum');
+  const hit = trackTask(ex, ROUNDS.length, ROUNDS.length + 2);
+  let r = 0, shift = false, busy = false;
+  kb.innerHTML = `<button type="button" class="key wide" data-k="tab">Tab ⇥</button><button type="button" class="key wide" data-k="shift">⇧ Shift</button><button type="button" class="key" data-k="enter">Enter ↵</button><button type="button" class="key wide" data-k="bs">⌫ Backspace</button>`;
+  const shiftBtn = kb.querySelector('[data-k="shift"]');
+  const page = (rows, tail = '')=>head('Що взяти:') + ul(rows) + (tail ? `<p>${tail}</p>` : '');
+  const show = ()=>{
+    if(r >= ROUNDS.length){ num.textContent = '🎉'; ba.innerHTML = ''; kb.hidden = true; ex.querySelector('.ttext').textContent = 'Усі клавіші підібрано!'; return; }
+    const R = ROUNDS[r];
+    num.textContent = `Завдання ${r + 1} з ${ROUNDS.length}`;
+    ba.innerHTML = `<div class="ba">${md({ cap:'Було', body:page(R.before) })}${ms('arrow_forward')}${md({ cap:'Стало', body:page(R.after, R.tail) })}</div>`;
+  };
+  const setShift = v=>{ shift = v; shiftBtn.classList.toggle('on', v); };
+  const press = (k, btn)=>{
+    if(busy || r >= ROUNDS.length) return;
+    if(k === 'shift'){ setShift(!shift); return; }
+    if(k === 'tab' && shift) k = 'stab';
+    setShift(false);
+    const R = ROUNDS[r];
+    if(k !== R.key){
+      flash(btn || kb.querySelector(`[data-k="${k === 'stab' ? 'tab' : k}"]`));
+      fb.textContent = `🤔 ${WRONG[k]}` + (R.key === 'stab' && k === 'tab' ? ' Спробуй разом із Shift.' : '');
+      return;
+    }
+    busy = true;
+    addNeurons(1); hit();
+    fb.textContent = `✓ ${NAME[k]}. ${R.why}`;
+    setTimeout(()=>{
+      busy = false; r++;
+      if(r === ROUNDS.length){ addNeurons(2); fb.textContent = '🎉 Чудово! Ти знаєш усі клавіші списку.'; }
+      else fb.textContent = '';
+      show();
+    }, 1400);
+  };
+  kb.addEventListener('click', e=>{ const b = e.target.closest('[data-k]'); if(b) press(b.dataset.k, b); });
+  ex.addEventListener('keydown', e=>{
+    const k = { Tab:'tab', Enter:'enter', Backspace:'bs' }[e.key];
+    if(!k) return;
+    e.preventDefault();
+    if(k === 'tab' && e.shiftKey) setShift(true);
+    press(k);
+  });
+  show();
+})();
+
+/* ---------- КРОК 5: ЕМУЛЯТОР GOOGLE ДОКУМЕНТА ---------- */
+(function(){
+  const TEXT = {
+    t:'Похід до лісу', h1:'Що взяти:',
+    a1:'Рюкзак', a2:'Дощовик', a3:'Їжа', a4:'Бутерброди', a5:'Яблука',
+    h2:'План дня:',
+    b1:'Зустріч біля школи о 9:00', b2:'Дорога до лісу', b3:'Обід біля озера', b4:'Повернення додому о 16:00',
+    h3:'Перед виходом:',
+    c1:'Перевірити погоду', c2:'Зарядити телефон'
+  };
+  const ids = Object.keys(TEXT);
+  const A = ['a1', 'a2', 'a3', 'a4', 'a5'], B = ['b1', 'b2', 'b3', 'b4'], C = ['c1', 'c2'];
+  const KIND = { bul:'маркований', num:'нумерований', chk:'контрольний' };
+  const PROP = { list:'вид списку', lv:'рівень пункту', style:'вигляд маркерів' };
+  const TASKS = [
+    { T:A, prop:'list', val:'bul', t:'Виділи п\'ять речей — від «Рюкзак» до «Яблука» — і зроби маркований список.' },
+    { T:['a4', 'a5'], prop:'lv', val:1, part:true, t:'«Бутерброди» і «Яблука» — це їжа. Виділи їх і натисни Tab: вони стануть вкладеними в «Їжа».' },
+    { T:A, prop:'style', val:'star', part:true, t:'Зміни маркери на зірочки ★. Клацни в списку й відкрий стрілочку біля кнопки маркованого списку.' },
+    { T:B, prop:'list', val:'num', t:'Зроби з плану дня нумерований список.' },
+    { T:C, prop:'list', val:'chk', t:'Зроби з пунктів «Перед виходом» контрольний список.' },
+    { T:['c1'], prop:'checked', val:true, t:'Погоду вже перевірили — постав позначку в квадратику біля цього пункту.' }
+  ];
+  const $ = id=>document.getElementById(id);
+  const ex = $('lsEx'), gdoc = $('lsDoc'), page = $('lsPage'), tools = $('lsTools'), pop = $('lsPop');
+  const numEl = $('lsNum'), task = $('lsTask'), fb = $('lsFb');
+  page.innerHTML = ids.map(k=>`<div class="gp gp-${k === 't' ? 'title' : k[0] === 'h' ? 'h' : 'item'}" data-p="${k}">${TEXT[k]}</div>`).join('');
+  const els = {};
+  page.querySelectorAll('[data-p]').forEach(el=>els[el.dataset.p] = el);
+  const S = {};
+  ids.forEach(k=>S[k] = { list:null, lv:0, style:'', checked:false });
+  let sel = [], i = 0, busy = false;
+  const hit = trackTask(ex, TASKS.length, TASKS.length + 2);
+  const q = id=>`«${TEXT[id]}»`;
+
+  /* Панель інструментів */
+  const tl = (act, icon, title, extra = '', cls = '')=>`<button type="button" class="tl${cls}" data-act="${act}" ${extra} title="${title}">${ms(icon)}</button>`;
+  tools.innerHTML = `<span class="tl">${ms('undo')}</span><span class="tl">${ms('redo')}</span><span class="sep"></span>`
+    + `<span class="tx">Звичайний текст</span><span class="sep"></span><span class="tx" style="color:var(--g-ink)">Arial</span><span class="sep"></span>`
+    + `<span class="tx size">11</span><span class="sep"></span>`
+    + tl('char', 'format_bold', 'Напівжирний (Ctrl+B)') + tl('char', 'format_italic', 'Курсив (Ctrl+I)') + tl('char', 'format_underlined', 'Підкреслити (Ctrl+U)') + '<span class="sep"></span>'
+    + tl('char', 'format_align_left', 'Вирівняти за лівим краєм') + '<span class="sep"></span>'
+    + tl('list', 'checklist', 'Контрольний список (Ctrl+Shift+9)', 'data-t="chk"')
+    + tl('list', 'format_list_bulleted', 'Маркований список (Ctrl+Shift+8)', 'data-t="bul"')
+    + tl('lib', 'arrow_drop_down', 'Меню маркованого списку', 'data-t="bul"', ' dd')
+    + tl('list', 'format_list_numbered', 'Нумерований список (Ctrl+Shift+7)', 'data-t="num"')
+    + tl('lib', 'arrow_drop_down', 'Меню нумерованого списку', 'data-t="num"', ' dd') + '<span class="sep"></span>'
+    + tl('indent', 'format_indent_decrease', 'Зменшити відступ (Ctrl+[)', 'data-d="-1"') + tl('indent', 'format_indent_increase', 'Збільшити відступ (Ctrl+])', 'data-d="1"');
+
+  /* Малюємо маркери й номери */
+  const render = ()=>{
+    let cnt = [0, 0, 0], prev = null;
+    ids.forEach(id=>{
+      const s = S[id], el = els[id];
+      el.classList.toggle('in-list', !!s.list);
+      el.classList.toggle('chk', s.list === 'chk');
+      el.classList.toggle('on', s.list === 'chk' && s.checked);
+      el.classList.toggle('cue', s.list === 'chk' && i < TASKS.length && TASKS[i].prop === 'checked' && TASKS[i].T.includes(id) && !s.checked);
+      if(!s.list){ el.removeAttribute('data-m'); el.style.removeProperty('--lv'); cnt = [0, 0, 0]; prev = null; return; }
+      if(prev !== s.list) cnt = [0, 0, 0];
+      cnt[s.lv]++;
+      for(let l = s.lv + 1; l < 3; l++) cnt[l] = 0;
+      prev = s.list;
+      el.style.setProperty('--lv', s.lv);
+      el.dataset.m = s.list === 'bul' ? BUL[s.style][s.lv] : s.list === 'num' ? numMark(NUM[s.style][s.lv], cnt[s.lv]) : '';
+    });
+    tools.querySelectorAll('[data-act="list"]').forEach(b=>b.classList.toggle('on', !!sel.length && sel.every(id=>S[id].list === b.dataset.t)));
+    const tk = TASKS[i];
+    tools.querySelector('[data-act="lib"][data-t="bul"]').classList.toggle('hint', !!tk && tk.prop === 'style');
+  };
+  const show = ()=>{
+    if(i >= TASKS.length){ numEl.textContent = '🎉'; task.textContent = 'До походу все готово!'; return; }
+    numEl.textContent = `Завдання ${i + 1} з ${TASKS.length}`;
+    task.textContent = TASKS[i].t;
+  };
+  const closePop = ()=>{ pop.hidden = true; };
+  const say = (msg, el)=>{ if(el) flash(el); fb.textContent = msg; };
+
+  // Чи можна зараз виконати дію, що змінює prop? Якщо ні — хибна спроба й підказка
+  const guard = (prop, btn)=>{
+    if(busy || i >= TASKS.length) return false;
+    const tk = TASKS[i];
+    let msg = '';
+    const extra = sel.filter(id=>!tk.T.includes(id));
+    if(!sel.length) msg = 'Спершу виділи потрібні рядки або клацни в рядку — там з\'явиться курсор.';
+    else if(prop !== tk.prop) msg = `Ця дія змінює ${PROP[prop]}, а зараз потрібно змінити ${PROP[tk.prop] || 'інше'}.`;
+    else if(extra.length) msg = `Виділення зачіпає ${extra.map(q).join(', ')}. Зараз потрібні лише ${tk.T.length > 2 ? `рядки від ${q(tk.T[0])} до ${q(tk.T[tk.T.length - 1])}` : tk.T.map(q).join(' і ')}.`;
+    else if(!tk.part && sel.length < tk.T.length) msg = `Виділи всі пункти — від ${q(tk.T[0])} до ${q(tk.T[tk.T.length - 1])}.`;
+    if(!msg) return true;
+    closePop(); say('🤔 ' + msg, btn);
+    return false;
+  };
+  const doneNow = ()=>{
+    const tk = TASKS[i];
+    return tk.T.every(id=>S[id][tk.prop] === tk.val);
+  };
+  const check = ()=>{
+    const tk = TASKS[i];
+    if(!doneNow()){
+      if(tk.prop === 'lv'){
+        const ok = tk.T.filter(id=>S[id].lv === 1);
+        if(ok.length) fb.textContent = `👍 ${q(ok[0])} уже вкладений. Тепер ${tk.T.filter(id=>S[id].lv !== 1).map(q).join(' і ')}.`;
+      }
+      return;
+    }
+    busy = true;
+    addNeurons(1); hit();
+    fb.textContent = '✓ Готово!';
+    render();
+    tk.T.forEach(id=>els[id].classList.add('good'));
+    setTimeout(()=>{
+      tk.T.forEach(id=>els[id].classList.remove('good'));
+      busy = false; i++;
+      sel = []; const s = getSelection(); if(s && page.contains(s.anchorNode)) s.removeAllRanges();
+      if(i === TASKS.length){ addNeurons(2); fb.textContent = '🎉 Чудова робота!'; }
+      else fb.textContent = '';
+      render(); show();
+    }, 1100);
+  };
+
+  /* Дії */
+  const setList = (type, btn)=>{
+    if(!guard('list', btn)) return;
+    const tk = TASKS[i];
+    const off = sel.every(id=>S[id].list === type);
+    sel.forEach(id=>Object.assign(S[id], off ? { list:null, lv:0, style:'' } : { list:type, style:type === 'bul' ? 'dot' : type === 'num' ? 'dec' : '' }));
+    render();
+    if(off) return say(`🤔 Повторне натискання прибирає список. Потрібен ${KIND[tk.val]}.`, btn);
+    if(type !== tk.val) return say(`🤔 Це ${KIND[type]} список, а потрібен ${KIND[tk.val]}. Натисни іншу кнопку.`, btn);
+    fb.textContent = '';
+    check();
+  };
+  const setLevel = (d, btn)=>{
+    if(!guard('lv', btn)) return;
+    sel.forEach(id=>{ if(S[id].list) S[id].lv = Math.max(0, Math.min(2, S[id].lv + d)); });
+    render();
+    if(d < 0) return say('🤔 Shift + Tab повертає пункт на рівень вище. Щоб зробити вкладеним — Tab.', btn);
+    if(sel.some(id=>S[id].lv > 1)) return say('🤔 Забагато: пункт пішов ще на рівень нижче. Натисни Shift + Tab.', btn);
+    fb.textContent = '';
+    check();
+  };
+  // Стиль застосовується до всього списку, у якому стоїть курсор
+  const setStyle = (style, tile)=>{
+    closePop();
+    const btn = tools.querySelector('[data-act="lib"][data-t="bul"]');
+    if(!guard('style', btn)) return;
+    A.forEach(id=>{ if(S[id].list === 'bul') S[id].style = style; });
+    render();
+    if(style !== TASKS[i].val) return say('🤔 Це інші маркери. Потрібні зірочки ★.', btn);
+    fb.textContent = '';
+    check();
+  };
+  const openLib = (t, btn)=>{
+    if(!pop.hidden){ closePop(); return; }
+    if(!guard('style', btn)) return;
+    if(t !== 'bul') return say('🤔 Це меню нумерованого списку. Маркери — біля кнопки маркованого.', btn);
+    pop.innerHTML = Object.entries(BUL).map(([k, m])=>libTile(m, S[sel[0]].style === k, `data-style="${k}"`)).join('');
+    pop.hidden = false;
+    const r = btn.getBoundingClientRect(), g = gdoc.getBoundingClientRect();
+    pop.style.top = (r.bottom - g.top + 4) + 'px';
+    pop.style.left = Math.max(4, Math.min(r.left - g.left - 20, g.width - pop.offsetWidth - 4)) + 'px';
+  };
+
+  /* Виділення: абзаци, яких торкається курсор чи виділення */
+  const readSel = ()=>{
+    const s = getSelection();
+    if(!s || !s.rangeCount) return null;
+    const r = s.getRangeAt(0);
+    if(!page.contains(r.commonAncestorContainer) && r.commonAncestorContainer !== page) return null;
+    if(r.collapsed){
+      let n = r.startContainer;
+      if(n === page) n = page.children[Math.min(r.startOffset, page.children.length - 1)];
+      const p = n && (n.nodeType === 1 ? n : n.parentElement).closest('[data-p]');
+      return p ? [p.dataset.p] : null;
+    }
+    const out = ids.filter(id=>{
+      const el = els[id];
+      if(!r.intersectsNode(el)) return false;
+      const er = document.createRange(); er.selectNodeContents(el);
+      const ir = r.cloneRange();
+      if(ir.compareBoundaryPoints(Range.START_TO_START, er) < 0) ir.setStart(er.startContainer, er.startOffset);
+      if(ir.compareBoundaryPoints(Range.END_TO_END, er) > 0) ir.setEnd(er.endContainer, er.endOffset);
+      return ir.toString().trim().length > 0;
+    });
+    return out.length ? out : null;
+  };
+  document.addEventListener('selectionchange', ()=>{
+    if(busy) return;
+    const res = readSel();
+    if(!res) return;
+    if(res.join() !== sel.join()){ sel = res; closePop(); render(); }
+  });
+
+  /* Кнопки панелі й меню */
+  [tools, pop].forEach(el=>el.addEventListener('mousedown', e=>e.preventDefault()));
+  tools.addEventListener('click', e=>{
+    const btn = e.target.closest('[data-act]');
+    if(!btn) return;
+    e.stopPropagation();
+    const act = btn.dataset.act;
+    if(act === 'char'){ if(!busy && i < TASKS.length) say(`🤔 Ця кнопка змінює вигляд символів, а зараз потрібно змінити ${PROP[TASKS[i].prop] || 'інше'}.`, btn); return; }
+    if(act !== 'lib') closePop();
+    if(act === 'list') setList(btn.dataset.t, btn);
+    else if(act === 'indent') setLevel(+btn.dataset.d, btn);
+    else if(act === 'lib') openLib(btn.dataset.t, btn);
+  });
+  pop.addEventListener('click', e=>{
+    e.stopPropagation();
+    const t = e.target.closest('[data-style]');
+    if(t) setStyle(t.dataset.style, t);
+  });
+  document.addEventListener('click', e=>{ if(!pop.hidden && !pop.contains(e.target)) closePop(); });
+
+  /* Квадратики контрольного списку */
+  page.addEventListener('click', e=>{
+    const el = e.target.closest('[data-p]');
+    if(!el || busy || i >= TASKS.length) return;
+    const id = el.dataset.p, s = S[id];
+    if(s.list !== 'chk') return;
+    const pad = parseFloat(getComputedStyle(el).paddingLeft);
+    if(e.clientX - el.getBoundingClientRect().left > pad) return;
+    const tk = TASKS[i];
+    if(tk.prop !== 'checked') return say('🤔 Позначки поставимо пізніше — спершу виконай завдання.', el);
+    if(!tk.T.includes(id)) return say(`🤔 Телефон ще не заряджений 🙂 Позначка потрібна біля ${q(tk.T[0])}.`, el);
+    s.checked = !s.checked;
+    render();
+    if(!s.checked) return say('🤔 Позначку знято. Клацни ще раз.', el);
+    fb.textContent = '';
+    check();
+  });
+
+  /* Клавіатура: Tab, Shift+Tab, гарячі клавіші списків; текст змінювати не можна */
+  page.addEventListener('keydown', e=>{
+    const mod = e.ctrlKey || e.metaKey;
+    if(e.key === 'Tab'){ e.preventDefault(); setLevel(e.shiftKey ? -1 : 1, tools.querySelector(`[data-act="indent"][data-d="${e.shiftKey ? -1 : 1}"]`)); return; }
+    if(mod && e.shiftKey && !e.altKey){
+      const t = { Digit7:'num', Digit8:'bul', Digit9:'chk' }[e.code];
+      if(t){ e.preventDefault(); setList(t, tools.querySelector(`[data-act="list"][data-t="${t}"]`)); return; }
+    }
+    if(mod && !e.shiftKey && (e.code === 'BracketLeft' || e.code === 'BracketRight')){
+      e.preventDefault();
+      const d = e.code === 'BracketRight' ? 1 : -1;
+      setLevel(d, tools.querySelector(`[data-act="indent"][data-d="${d}"]`)); return;
+    }
+    if(mod && !e.shiftKey && ['KeyA', 'KeyC'].includes(e.code)) return;
+    if(/^(Arrow|Home|End|Page)/.test(e.key) || ['Shift', 'Control', 'Meta', 'Alt', 'CapsLock'].includes(e.key)) return;
+    e.preventDefault();
+    if(e.key.length === 1 || ['Enter', 'Backspace', 'Delete'].includes(e.key)) fb.textContent = '🙂 Текст уже набрано — сьогодні змінюємо лише вигляд списків.';
+  });
+  ['beforeinput', 'paste', 'drop', 'cut'].forEach(t=>page.addEventListener(t, e=>e.preventDefault()));
+
+  render(); show();
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Що таке список у текстовому документі?', opts:['Кілька абзаців-пунктів з однаковим позначенням на початку', 'Один довгий абзац тексту', 'Таблиця з номерами рядків'], correct:0 },
+  { q:'Який список найкраще підійде для рецепта, де дії виконують одна за одною?', opts:['Маркований', 'Нумерований', 'Контрольний'], correct:1 },
+  { q:'Що стається з пунктом контрольного списку, біля якого поставили позначку?', opts:['Він зникає', 'Він закреслюється', 'Він стає першим'], correct:1 },
+  { q:'Як зробити пункт списку вкладеним?', opts:['Натиснути Tab', 'Натиснути Enter', 'Поставити кілька пробілів'], correct:0 },
+  { q:'Як закінчити список і далі писати звичайний абзац?', opts:['Натиснути Tab', 'Натиснути Enter у порожньому пункті', 'Закрити документ'], correct:1 },
+  { q:'Чому номери краще не вписувати вручну?', opts:['Вручну цифри виходять меншими', 'Список сам переставить номери, якщо додати чи видалити пункт', 'Цифри не можна набирати в документі'], correct:1 },
+  { q:'Де обрати інші маркери, наприклад зірочки?', opts:['У стрілочці біля кнопки маркованого списку', 'У меню «Файл»', 'На лінійці над сторінкою'], correct:0 }
+], {summary:'Тепер ти вмієш робити марковані, нумеровані й контрольні списки та вкладати пункти один в один.'});
+</script>
+
+</body>
+</html>
