@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Кулінарна книга класу — Різновиди публікацій</title>
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#C2410C,#1D5FA8); --accent:#C2410C; --accent-dark:#9A3412; --accent-soft:#FFEDE3; --bg:#FBF7F1; --line:#EDE3D6; }
+  .p-hero p{max-width:none;}
+  .ms{font-family:'Material Symbols Outlined'; font-weight:normal; font-style:normal; line-height:1; display:inline-block; -webkit-font-smoothing:antialiased;}
+  .ms.ic{font-size:19px; vertical-align:-5px; color:#444746; background:#EDF2FA; border-radius:4px; padding:1px;}
+  .kbd{display:inline-block; font-family:'Roboto',sans-serif; font-weight:500; font-size:.86em; line-height:1.2; padding:1px 6px; border:1px solid #C5C6DA; border-bottom-width:3px; border-radius:6px; background:#fff; white-space:nowrap;}
+
+  /* Що має вийти: аркуш, розміри — частки ширини аркуша */
+  .page-wrap{background:#E8EAED; border-radius:var(--radius-m); padding:18px; display:flex; justify-content:center;}
+  .page-box{width:100%; max-width:560px; container-type:inline-size;}
+  .page{background:#fff; box-shadow:0 1px 4px rgba(0,0,0,.25); padding:8% 10% 7%; font-family:Arial,sans-serif; color:#000; font-size:2.7cqw; line-height:1.45; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none;}
+  .page p{margin:0;}
+  .page .t{font-family:'Lobster',cursive; font-size:2.6em; text-align:center; color:#C2410C; line-height:1.15;}
+  .page .st{font-style:italic; text-align:center; color:#555; margin-bottom:.8em;}
+  .page .photo{display:block; width:62%; margin:0 auto .9em; border-radius:.4em;}
+  .page .h{font-weight:700; font-size:1.25em; color:#1D5FA8; margin-top:.7em;}
+  .page .li{position:relative; padding-left:2.2em;}
+  .page .li::before{content:attr(data-m); position:absolute; left:.5em;}
+  .page .sign{text-align:right; font-style:italic; margin-top:1.2em;}
+  .page .mine{background:#FFF3BF; border-radius:.2em; padding:0 .3em; color:#8A6D00;}
+
+  .files{display:flex; flex-wrap:wrap; gap:10px; margin-top:12px;}
+  .file{display:flex; align-items:center; gap:8px; background:#fff; border:1.5px solid var(--line); border-radius:12px; padding:6px 12px 6px 8px; font-size:13.5px; font-weight:700;}
+  .file .ext{font-family:'Roboto',sans-serif; font-size:10.5px; font-weight:700; color:#fff; border-radius:4px; padding:3px 5px;}
+  .file small{font-weight:400; color:var(--ink-soft);}
+
+  .copy-row{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:6px 0 4px;}
+  .copy-btn{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; background:var(--accent); color:#fff; border:0; border-radius:999px; padding:8px 18px; cursor:pointer; display:inline-flex; align-items:center; gap:6px;}
+  .copy-btn:hover{background:var(--accent-dark);}
+  .copy-msg{font-size:13.5px; font-weight:700;}
+  .fact{display:flex; gap:12px; align-items:flex-start; background:var(--accent-soft); border-radius:var(--radius-m); padding:12px 16px; font-size:14.5px; margin-top:14px;}
+  .fact b{color:var(--accent-dark);}
+  .fact .pg{font-size:30px; line-height:1;}
+</style>
+</head>
+<body data-hud="7 клас · Практична · Кулінарна книга класу">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 7 клас · Різновиди публікацій</div>
+    <h1>Кулінарна книга класу</h1>
+    <p>Клас збирає свою кулінарну книгу. Зроби для неї сторінку з рецептом сирників у Google Документах. Потім збережи її для друку, для електронної книги й для подальшого редагування.</p>
+    <div class="meta"><span>⏱ 25–30 хв</span><span><img src="../../assets/logos/docs.svg" alt="">Google Документи</span></div>
+    <div class="fact"><span class="pg">📖</span><span><b>Зверни увагу:</b> рецепт — лінійний текст. Кроки читають і виконують лише по порядку, тому їх нумерують.</span></div>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <div class="page-wrap">
+      <div class="page-box">
+        <div class="page" id="sample">
+          <p class="t">Сирники</p>
+          <p class="st">Сніданок за 20 хвилин</p>
+          <svg class="photo" viewBox="0 0 240 140" aria-hidden="true">
+            <rect width="240" height="140" fill="#F4E6D2"/>
+            <ellipse cx="120" cy="82" rx="92" ry="40" fill="#fff" stroke="#D9CBB8" stroke-width="3"/>
+            <ellipse cx="120" cy="80" rx="70" ry="28" fill="#F7F1E8"/>
+            <g stroke="#9C5A1F" stroke-width="2">
+              <ellipse cx="92" cy="80" rx="24" ry="14" fill="#E3A15B"/>
+              <ellipse cx="148" cy="80" rx="24" ry="14" fill="#E3A15B"/>
+              <ellipse cx="120" cy="68" rx="24" ry="14" fill="#EBB06C"/>
+            </g>
+            <circle cx="120" cy="64" r="7" fill="#C62828"/><circle cx="131" cy="69" r="6" fill="#C62828"/>
+            <path d="M114 58q4-7 10-4" stroke="#2E7D32" stroke-width="3" fill="none"/>
+            <ellipse cx="190" cy="40" rx="20" ry="9" fill="#fff" stroke="#D9CBB8" stroke-width="2"/>
+            <ellipse cx="190" cy="38" rx="13" ry="5" fill="#FFF8E1"/>
+          </svg>
+          <p class="h">Інгредієнти</p>
+          <p class="li" data-m="●">Сир кисломолочний — 400 г</p>
+          <p class="li" data-m="●">Яйце — 1 шт.</p>
+          <p class="li" data-m="●">Борошно — 3 ст. ложки</p>
+          <p class="li" data-m="●">Цукор — 2 ст. ложки</p>
+          <p class="li" data-m="●">Олія для смаження</p>
+          <p class="h">Приготування</p>
+          <p class="li" data-m="1.">Розімни сир виделкою.</p>
+          <p class="li" data-m="2.">Додай яйце й цукор, перемішай.</p>
+          <p class="li" data-m="3.">Всип борошно й заміси тісто.</p>
+          <p class="li" data-m="4.">Зліпи невеликі кружечки й обваляй у борошні.</p>
+          <p class="li" data-m="5.">Обсмаж із двох боків до золотистого кольору разом із дорослими.</p>
+          <p class="sign">Рецепт додав(-ла): <span class="mine">Ім'я Прізвище</span></p>
+        </div>
+      </div>
+    </div>
+    <div class="files">
+      <span class="file"><span class="ext" style="background:#D93025">PDF</span>Сирники.pdf <small>для друку</small></span>
+      <span class="file"><span class="ext" style="background:#1E8E3E">EPUB</span>Сирники.epub <small>е-книга</small></span>
+      <span class="file"><span class="ext" style="background:#1A73E8">DOCX</span>Сирники.docx <small>для редагування</small></span>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи документ</h3>
+        <p>Обери один зі способів:</p>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🎓 Через Google Classroom</div>
+            <ol>
+              <li>Відкрий завдання → <span class="menu">Переглянути вказівки</span>.</li>
+              <li>У блоці «Ваша робота»: <span class="menu">Додати або створити → Документи</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Google Документи</span> → <span class="menu">Порожній документ</span>.</li>
+              <li>Клацни «Документ без назви» і назви файл: <b>Сирники</b>.</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Встав текст</h3>
+        <div class="copy-row"><button type="button" class="copy-btn" id="copyBtn"><span class="ms" style="font-size:18px">content_copy</span>Скопіювати текст</button><span class="copy-msg" id="copyMsg"></span></div>
+        <ul>
+          <li>Встав у документ: <span class="kbd">Ctrl</span> + <span class="kbd">Shift</span> + <span class="kbd">V</span>. Так текст вставиться без чужого оформлення.</li>
+          <li>В останньому рядку заміни «Ім'я Прізвище» на своє.</li>
+        </ul>
+        <div class="check-val">Перевір себе: у документі 15 абзаців.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Оформи заголовки</h3>
+        <ul>
+          <li><b>Сирники</b>: шрифт Lobster, розмір 36, по центру, помаранчевий колір.</li>
+          <li><b>Сніданок за 20 хвилин</b>: курсив, по центру.</li>
+          <li><b>Інгредієнти</b> і <b>Приготування</b>: напівжирні, розмір 14, синій колір.</li>
+          <li>Останній рядок: курсив, праворуч.</li>
+        </ul>
+        <div class="tip">Lobster немає в списку? <span class="menu">Шрифт → Інші шрифти</span> → знайди Lobster → <span class="menu">OK</span>.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Списки</h3>
+        <ol>
+          <li>Виділи п'ять інгредієнтів → <span class="ms ic">format_list_bulleted</span> <b>Маркований список</b>.</li>
+          <li>Виділи п'ять кроків приготування → <span class="ms ic">format_list_numbered</span> <b>Нумерований список</b>.</li>
+        </ol>
+        <div class="tip">Інгредієнти можна брати в будь-якому порядку, тому маркери. Кроки йдуть лише по черзі, тому номери.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">5</div>
+      <div>
+        <h3>Додай фото</h3>
+        <ol>
+          <li>Постав курсор у кінець рядка «Сніданок за 20 хвилин» і натисни <span class="kbd">Enter</span>.</li>
+          <li><span class="menu">Вставлення → Зображення → Пошук в Інтернеті</span> → введи <b>сирники</b> → обери фото → <span class="menu">Вставити</span>.</li>
+          <li>Зменш фото за кутовий маркер і постав по центру.</li>
+        </ol>
+        <div class="check-val">Перевір себе: уся сторінка вміщається на одному аркуші.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">6</div>
+      <div>
+        <h3>Збережи для різних читачів</h3>
+        <ol>
+          <li>Для друкованої книги: <span class="menu">Файл → Завантажити → Документ PDF (.pdf)</span>.</li>
+          <li>Для електронної книги: <span class="menu">Файл → Завантажити → Публікація EPUB (.epub)</span>.</li>
+          <li>Щоб інші могли редагувати у Word: <span class="menu">Файл → Завантажити → Microsoft Word (.docx)</span>.</li>
+        </ol>
+        <div class="check-val">Перевір себе: у папці «Завантаження» три файли «Сирники» — .pdf, .epub і .docx.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">7</div>
+      <div>
+        <h3>Порівняй</h3>
+        <ol>
+          <li>Відкрий <b>Сирники.pdf</b> і зміни розмір вікна. Сторінка лишається такою ж, як у документі.</li>
+          <li>Завантаж ще й <span class="menu">Звичайний текст (.txt)</span> і відкрий його.</li>
+        </ol>
+        <div class="check-val">Перевір себе: у TXT лишився лише текст. Немає ні фото, ні шрифту Lobster, ні кольорів.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Практична робота · «Різновиди публікацій. Формати документів» · 7 клас</span></footer>
+
+<script src="../../assets/practice.js"></script>
+<script>
+  // Зразок: без виділення, копіювання й контекстного меню
+  const sample = document.getElementById('sample');
+  ['copy', 'cut', 'selectstart', 'contextmenu', 'dragstart'].forEach(t=>sample.addEventListener(t, e=>e.preventDefault()));
+
+  const TEXT = [
+    'Сирники', 'Сніданок за 20 хвилин',
+    'Інгредієнти', 'Сир кисломолочний — 400 г', 'Яйце — 1 шт.', 'Борошно — 3 ст. ложки', 'Цукор — 2 ст. ложки', 'Олія для смаження',
+    'Приготування', 'Розімни сир виделкою.', 'Додай яйце й цукор, перемішай.', 'Всип борошно й заміси тісто.',
+    'Зліпи невеликі кружечки й обваляй у борошні.', 'Обсмаж із двох боків до золотистого кольору разом із дорослими.',
+    'Рецепт додав(-ла): Ім\'я Прізвище'
+  ].join('\n');
+
+  const msg = document.getElementById('copyMsg');
+  document.getElementById('copyBtn').addEventListener('click', async ()=>{
+    let ok = false;
+    try{ await navigator.clipboard.writeText(TEXT); ok = true; }
+    catch(e){
+      const ta = document.createElement('textarea');
+      ta.value = TEXT; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select();
+      try{ ok = document.execCommand('copy'); }catch(_){}
+      ta.remove();
+    }
+    msg.style.color = ok ? '#137333' : '#B3261E';
+    msg.textContent = ok ? '✓ Скопійовано! Тепер встав у документ.' : 'Не вдалося скопіювати — спробуй ще раз.';
+  });
+</script>
+</body>
+</html>
