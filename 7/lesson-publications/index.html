@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Різновиди публікацій. Лінійний і нелінійний текст. Формати документів — Урок</title>
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  /* Гама «папір і чорнило»: теракотовий акцент, синій для підписів */
+  :root{
+    --accent:#C2410C; --accent-dark:#9A3412; --accent-soft:#FFEDE3;
+    --label:#1D5FA8; --bg:#FBF7F1; --line:#EDE3D6;
+    --hud-bar:linear-gradient(90deg,#C2410C,#1D5FA8);
+    --pr:#C2410C; --pr-soft:#FFEDE3;      /* друковані */
+    --el:#1D5FA8; --el-soft:#E3EEFA;      /* електронні */
+    --g-blue:#1A73E8; --g-ink:#1F1F1F; --g-soft:#444746; --g-line:#DADCE0; --g-canvas:#F9FBFD;
+  }
+  .ms{font-family:'Material Symbols Outlined'; font-weight:400; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; letter-spacing:normal; text-transform:none; white-space:nowrap; direction:ltr; -webkit-font-smoothing:antialiased; font-feature-settings:'liga'; font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 20; overflow:hidden; width:1em;}
+  .wrong-flash{animation:flash .6s;}
+  @keyframes flash{30%{background:#FFE3E3; box-shadow:0 0 0 2px #E03131;}}
+
+  /* ---------- Крок 1: галерея видів публікацій ---------- */
+  .pub-gallery{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px;}
+  @media (max-width:720px){ .pub-gallery{grid-template-columns:repeat(2,minmax(0,1fr));} }
+  .pub-gallery .flip-card{height:200px;}
+  .pub-gallery .flip-front svg{width:74px; height:74px; margin-bottom:6px;}
+  .pub-gallery .name{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:17px; line-height:1.1;}
+  .pub-gallery .kind{font-size:11.5px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; margin-top:3px; color:var(--card-c);}
+  .pub-gallery .flip-back{font-size:13px; line-height:1.4; color:var(--ink);}
+  .pub-gallery .flip-back i{display:block; font-style:normal; font-size:12px; color:var(--ink-soft); margin-top:8px;}
+
+  /* ---------- Крок 2: схеми лінійного й нелінійного тексту ---------- */
+  .ln-schemes{display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:10px 0 16px;}
+  @media (max-width:640px){ .ln-schemes{grid-template-columns:1fr;} }
+  .ln-schemes figure{margin:0; background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:12px 12px 8px;}
+  .ln-schemes svg{width:100%; height:auto; display:block;}
+  .ln-schemes figcaption{font-size:13.5px; color:var(--ink-soft); text-align:center; margin-top:4px;}
+  .ln-schemes figcaption b{color:var(--ink); font-family:'Baloo 2',sans-serif; font-size:16px; display:block;}
+  .walker{offset-rotate:0deg; animation:walk 6s linear infinite;}
+  @keyframes walk{from{offset-distance:0%} to{offset-distance:100%}}
+
+  /* ---------- Крок 3: Космопедія ---------- */
+  .quest{display:flex; gap:10px; align-items:flex-start; background:var(--accent-soft); border-radius:var(--radius-m); padding:12px 14px; margin-bottom:12px;}
+  .quest .n{flex-shrink:0; background:var(--accent); color:#fff; font-family:'Baloo 2',sans-serif; font-weight:700; border-radius:999px; padding:2px 11px; font-size:14px;}
+  .quest b{font-family:'Baloo 2',sans-serif; font-size:17px; line-height:1.3;}
+  .quest small{display:block; color:var(--ink-soft); font-size:13px; margin-top:2px;}
+  .wiki{border:1px solid var(--g-line); border-radius:12px; overflow:hidden; background:#fff; font-family:'Roboto',sans-serif; box-shadow:0 2px 10px rgba(0,0,0,.06);}
+  .br-bar{display:flex; align-items:center; gap:6px; background:#EEF1F7; padding:7px 10px; border-bottom:1px solid var(--g-line);}
+  .br-bar button{border:0; background:none; width:30px; height:30px; border-radius:50%; cursor:pointer; color:#444746; display:flex; align-items:center; justify-content:center;}
+  .br-bar button:disabled{opacity:.35; cursor:default;}
+  .br-bar button:not(:disabled):hover{background:#DDE3EA;}
+  .br-url{flex:1; background:#fff; border-radius:999px; padding:6px 14px; font-size:13.5px; color:#444746; display:flex; align-items:center; gap:6px; white-space:nowrap; overflow:hidden;}
+  .br-url b{font-weight:400; color:#1F1F1F;}
+  .br-steps{font-size:12.5px; color:#444746; white-space:nowrap;}
+  .wk-head{display:flex; align-items:center; gap:10px; padding:10px 18px; border-bottom:1px solid #EEE; cursor:pointer; width:max-content;}
+  .wk-head svg{width:30px; height:30px;}
+  .wk-head span{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:19px; color:#2B2A5E;}
+  .wk-body{display:grid; grid-template-columns:120px 1fr; gap:18px; padding:16px 18px 20px; min-height:230px;}
+  @media (max-width:560px){ .wk-body{grid-template-columns:1fr;} .wk-pic{display:none;} }
+  .wk-pic svg{width:100%; height:auto;}
+  .wk-body h3{font-family:'Roboto',sans-serif; font-weight:500; font-size:22px; margin:0 0 8px; color:#1F1F1F; border-bottom:1px solid #E6E6E6; padding-bottom:6px;}
+  .wk-body p{font-size:15px; line-height:1.6; color:#202122; margin:0 0 10px;}
+  .wk-s{cursor:pointer; border-radius:4px; transition:background .15s;}
+  .wk-s:hover{background:#FFF4CC;}
+  .wk-s.found{background:#D3F9D8; box-shadow:0 0 0 2px #D3F9D8;}
+  .wk-s a{color:#0B57D0; text-decoration:none; font-weight:500;}
+  .wk-s a:hover{text-decoration:underline;}
+  .quest-fb{font-size:14px; min-height:1.4em; margin-top:10px;}
+
+  /* ---------- Крок 4: один документ у різних форматах ---------- */
+  .fmt-tabs{display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px;}
+  .fmt-tab{font-family:'Baloo 2',sans-serif; font-weight:700; font-size:15px; border:2px solid var(--line); background:var(--surface); border-radius:12px; padding:6px 14px 4px; cursor:pointer; display:flex; align-items:center; gap:8px; color:var(--ink);}
+  .fmt-tab i{font-style:normal; font-size:11px; color:#fff; background:var(--c); border-radius:5px; padding:1px 6px 0; letter-spacing:.04em;}
+  .fmt-tab.seen{border-color:color-mix(in srgb, var(--c) 45%, #fff);}
+  .fmt-tab.on{border-color:var(--c); background:color-mix(in srgb, var(--c) 10%, #fff);}
+  .fmt-stage{display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); gap:16px; align-items:start;}
+  @media (max-width:720px){ .fmt-stage{grid-template-columns:1fr;} }
+  .fmt-info h3{font-family:'Baloo 2',sans-serif; margin:0 0 6px; font-size:20px; color:var(--c);}
+  .fmt-info ul{margin:0; padding-left:0; list-style:none;}
+  .fmt-info li{display:flex; gap:8px; align-items:flex-start; margin-bottom:6px; font-size:14.5px;}
+  .fmt-info li .ms{font-size:19px; margin-top:1px;}
+  .fmt-info .yes .ms{color:#2F9E44;} .fmt-info .no .ms{color:#E03131;}
+  .fmt-info .when{background:var(--accent-soft); border-radius:10px; padding:8px 12px; font-size:14px; margin-top:10px;}
+  .win{border-radius:10px; overflow:hidden; border:1px solid #C9CDD3; background:#fff; box-shadow:0 2px 10px rgba(0,0,0,.08); font-family:'Roboto',sans-serif;}
+  .win-bar{display:flex; align-items:center; gap:8px; padding:6px 10px; font-size:12.5px; color:#fff; background:var(--wb, #2B579A);}
+  .win-bar .ms{font-size:16px;}
+  .win-bar .dots{margin-left:auto; letter-spacing:6px; opacity:.85;}
+  .win-sub{background:#F3F3F3; border-bottom:1px solid #E1E1E1; padding:5px 10px; font-size:11.5px; color:#444; display:flex; gap:12px; white-space:nowrap; overflow:hidden;}
+  .win-body{background:#E9EBEE; padding:14px; display:flex; justify-content:center;}
+  .sheet{background:#fff; width:100%; max-width:330px; aspect-ratio:1/1.3; box-shadow:0 1px 4px rgba(0,0,0,.18); padding:18px 20px; font-family:Arial,sans-serif; font-size:11.5px; line-height:1.45; color:#222; position:relative;}
+  .af-title{font-family:'Lobster',cursive; font-size:27px; color:#C2410C; text-align:center; line-height:1.1;}
+  .af-date{text-align:center; font-weight:700; color:#1D5FA8; margin:3px 0 8px;}
+  .af-pic{display:block; width:84px; height:56px; margin:0 auto 8px;}
+  .block .af-list{margin:4px 0 8px; padding-left:18px; font-size:inherit;}
+  .block .af-list li{margin:0;}
+  .af-foot{font-style:italic; color:#555; text-align:center;}
+  .lock{position:absolute; top:6px; right:6px; display:flex; align-items:center; gap:3px; font-size:10px; color:#666; background:#F1F3F4; border-radius:999px; padding:2px 7px;}
+  .lock .ms{font-size:12px;}
+  .txt-body{background:#fff; padding:10px 12px; font-family:Consolas,'JetBrains Mono',monospace; font-size:12.5px; line-height:1.5; white-space:pre-wrap; color:#111; min-height:230px; text-align:left; width:100%;}
+  .web-body{background:#fff; padding:16px 20px; font-family:Arial,sans-serif; font-size:13px; line-height:1.5; min-height:230px;}
+  .web-body .af-title{text-align:left;} .web-body .af-date{text-align:left;}
+  .web-body .af-pic{margin:0 0 8px;}
+  .phone{width:280px; max-width:100%; aspect-ratio:3/4; box-sizing:border-box; border:solid #3A3D44; border-width:14px 14px 26px; border-radius:16px; background:#FBF6EC; padding:10px 16px; font-family:Georgia,serif; font-size:12px; line-height:1.4; color:#2A2A2A; position:relative; display:flex; flex-direction:column;}
+  .phone .af-title{font-size:21px;}
+  .phone .af-date{margin:2px 0 6px;}
+  .phone .af-pic{width:64px; height:42px; margin-bottom:6px;}
+  .block .phone .af-list{margin:3px 0 6px;}
+  .phone .bar{display:flex; justify-content:space-between; font-family:Arial,sans-serif; font-size:9.5px; color:#888; margin-bottom:6px;}
+  .phone .pg-n{font-family:Arial,sans-serif; font-size:9.5px; color:#888; text-align:center; margin-top:auto;}
+
+  /* ---------- Крок 5: емулятор «Файл → Завантажити» ---------- */
+  .dl-tasks{list-style:none; padding:0; margin:0 0 12px; display:flex; flex-direction:column; gap:6px;}
+  .dl-tasks li{display:flex; gap:10px; align-items:flex-start; border:2px solid var(--line); background:var(--surface); border-radius:12px; padding:8px 12px; font-size:14.5px; color:var(--ink-soft);}
+  .dl-tasks li .ms{flex-shrink:0; font-size:20px;}
+  .dl-tasks li.next{border-color:var(--accent); background:var(--accent-soft); color:var(--ink); font-weight:600;}
+  .dl-tasks li.ok{color:var(--ink-soft);}
+  .dl-tasks li.ok .ms{color:#2F9E44; font-variation-settings:'FILL' 1;}
+  .gd{position:relative; border:1px solid var(--g-line); border-radius:12px; background:var(--g-canvas); font-family:'Roboto',sans-serif; color:var(--g-ink); overflow:hidden; min-height:550px;}
+  .gd-top{display:flex; align-items:center; gap:10px; padding:10px 14px 0;}
+  .gd-top img{width:22px; height:30px;}
+  .gd-top .nm{font-size:17px;}
+  .gd-top .ms{color:#444746;}
+  .gd-top .share{margin-left:auto; background:#C2E7FF; border-radius:999px; padding:7px 16px; font-size:13.5px; font-weight:500; display:flex; align-items:center; gap:6px; color:#001D35;}
+  .gd-menu{display:flex; gap:2px; padding:0 0 4px 44px; font-size:13.5px; flex-wrap:wrap;}
+  .gd-menu span{padding:3px 7px; border-radius:4px; color:#1F1F1F; cursor:default;}
+  .gd-menu span.file{cursor:pointer;}
+  .gd-menu span.file:hover, .gd-menu span.file.open{background:#E1E5EA;}
+  .gd-menu span.file.pulse{animation:gpulse 1.6s ease-in-out infinite;}
+  @keyframes gpulse{50%{background:#D3E3FD; box-shadow:0 0 0 2px #A8C7FA;}}
+  .gd-tools{display:flex; align-items:center; gap:4px; background:#EDF2FA; border-radius:999px; margin:2px 12px 0; padding:5px 12px; color:#444746; font-size:13px; overflow:hidden; white-space:nowrap;}
+  .gd-tools .ms{font-size:18px;}
+  .gd-tools .sep{width:1px; height:18px; background:#C4C7C5; margin:0 6px;}
+  .gd-page-wrap{padding:14px 12px 16px; display:flex; justify-content:center;}
+  .gd-page-wrap .sheet{max-width:300px; aspect-ratio:auto;}
+  .gd-drop{position:absolute; left:46px; top:66px; z-index:4; display:none; align-items:flex-start; gap:4px; flex-wrap:wrap; max-width:calc(100% - 56px);}
+  .gd-drop.show{display:flex;}
+  .gd-list{background:#fff; border-radius:8px; padding:6px 0; min-width:232px; box-shadow:0 2px 6px 2px rgba(60,64,67,.15),0 1px 2px rgba(60,64,67,.3); font-size:13.5px;}
+  .gd-list div{display:flex; align-items:center; gap:12px; padding:6px 14px 6px 12px; cursor:pointer; white-space:nowrap;}
+  .gd-list div:hover, .gd-list div.open{background:#EEF0F4;}
+  .gd-list div .ms{font-size:19px; color:#444746;}
+  .gd-list div .arr{margin-left:auto; font-size:18px;}
+  .gd-list div.pulse{animation:gpulse 1.6s ease-in-out infinite;}
+  .gd-list hr{border:0; border-top:1px solid var(--g-line); margin:5px 0;}
+  .gd-list .fx{font-size:11px; color:#5F6368; margin-left:auto; padding-left:10px;}
+  .gd-sub{margin-top:172px;}
+  .gd.narrow .gd-drop{left:12px; max-width:calc(100% - 24px);}
+  .gd.narrow .gd-sub{margin-top:0;}
+  .gd.narrow .gd-drop.subopen #gdMain{display:none;}
+  .gd-toast{position:absolute; left:12px; bottom:12px; z-index:6; background:#303030; color:#F2F2F2; border-radius:6px; padding:10px 14px; font-size:13.5px; max-width:calc(100% - 24px); display:none;}
+  .gd-toast.show{display:block;}
+  .dl-shelf{display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-top:10px; min-height:38px; font-size:13.5px; color:var(--ink-soft);}
+  .dl-file{display:flex; align-items:center; gap:7px; background:var(--surface); border:1.5px solid var(--line); border-radius:10px; padding:5px 11px 5px 6px; font-family:'Roboto',sans-serif; font-size:13px; color:var(--ink); animation:pop .35s;}
+  .dl-file i{font-style:normal; font-size:10.5px; font-weight:700; color:#fff; background:var(--c); border-radius:4px; padding:2px 5px;}
+  @keyframes pop{from{transform:scale(.6); opacity:0}}
+</style>
+</head>
+<body data-lesson="lesson7-publications" data-hud="7 клас · Публікації">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Тексти та публікації</div>
+      <h1>Публікації, гіпертекст і формати файлів</h1>
+      <p>Види публікацій, гіпертекст і формати файлів.</p>
+      <button class="btn-primary" onclick="document.getElementById('recap').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none">
+      <circle cx="70" cy="70" r="58" fill="#FFEDE3"/>
+      <!-- газета -->
+      <g transform="rotate(-8 50 72)">
+        <rect x="18" y="36" width="58" height="72" rx="4" fill="#fff" stroke="#3A2E2A" stroke-width="3"/>
+        <rect x="25" y="43" width="44" height="9" rx="2" fill="#C2410C"/>
+        <rect x="25" y="57" width="20" height="16" rx="2" fill="#F4C7A9"/>
+        <path d="M49 59h20M49 65h20M49 71h14M25 79h44M25 85h44M25 91h44M25 97h30" stroke="#3A2E2A" stroke-width="2.4" stroke-linecap="round"/>
+      </g>
+      <!-- планшет -->
+      <rect x="70" y="42" width="52" height="74" rx="8" fill="#23252B"/>
+      <rect x="75" y="49" width="42" height="58" rx="3" fill="#E3EEFA"/>
+      <circle cx="84" cy="60" r="5" fill="#1D5FA8"/>
+      <circle cx="108" cy="72" r="5" fill="#1D5FA8"/>
+      <circle cx="86" cy="94" r="5" fill="#1D5FA8"/>
+      <circle cx="106" cy="98" r="4" fill="#C2410C"/>
+      <path d="M88 62l15 8M85 65l1 24M104 76l1 18M91 94l11 3" stroke="#1D5FA8" stroke-width="2.4" stroke-linecap="round"/>
+      <circle cx="96" cy="111" r="1.8" fill="#666"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block" id="recap">
+    <div class="step-label recap">Повторення · Текстові документи (6 клас)</div>
+    <h2>Що ти вже знаєш</h2>
+    <p class="soft">Згадай терміни з 6 класу: клацни термін, а потім пояснення.</p>
+    <div class="exercise">
+      <div class="match-pool" id="recapPool"></div>
+      <div id="recapList"></div>
+      <div class="progress-line" id="recapProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 1 · Що таке публікація</div>
+    <h2>Текст, який читатимуть багато людей</h2>
+    <p><b>Публікація</b> — текст для багатьох читачів. Буває <b>друкованою</b> (на папері) й <b>електронною</b> (на екрані).</p>
+    <p class="soft">Переверни картки.</p>
+    <div class="exercise">
+      <div class="pub-gallery" id="pubGallery"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Лінійний і нелінійний текст</div>
+    <h2>Від початку до кінця — чи стрибками?</h2>
+    <ul>
+      <li><b>Лінійний</b> — читають по порядку від початку до кінця.<br>Приклади: оповідання, вірш, лист, рецепт, інструкція.</li>
+      <li><b>Нелінійний</b> — читач сам обирає, куди перейти.<br>Приклади: сайт, стаття Вікіпедії, енциклопедія, словник, меню застосунку.</li>
+      <li><b>Гіпертекст</b> — нелінійний текст із посиланнями.</li>
+    </ul>
+    <div class="ln-schemes">
+      <figure>
+        <svg viewBox="0 0 300 120">
+          <path id="lnPath" d="M30 60H270" stroke="#EDE3D6" stroke-width="4"/>
+          <g font-family="Baloo 2, sans-serif" font-weight="700" font-size="16" text-anchor="middle" fill="#fff">
+            <rect x="8" y="38" width="44" height="44" rx="8" fill="#C2410C"/><text x="30" y="66">1</text>
+            <rect x="80" y="38" width="44" height="44" rx="8" fill="#C2410C"/><text x="102" y="66">2</text>
+            <rect x="152" y="38" width="44" height="44" rx="8" fill="#C2410C"/><text x="174" y="66">3</text>
+            <rect x="224" y="38" width="44" height="44" rx="8" fill="#C2410C"/><text x="246" y="66">4</text>
+          </g>
+          <path d="M56 60h18M128 60h18M200 60h18" stroke="#3A2E2A" stroke-width="3" marker-end="url(#ah)"/>
+          <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#3A2E2A"/></marker></defs>
+          <circle r="7" fill="#FFC93C" stroke="#3A2E2A" stroke-width="2" class="walker" style="offset-path:path('M30 22H246')"/>
+        </svg>
+        <figcaption><b>Лінійний</b>Один шлях — по порядку</figcaption>
+      </figure>
+      <figure>
+        <svg viewBox="0 0 300 120">
+          <g stroke="#9DBDE3" stroke-width="3">
+            <path d="M150 60L60 26M150 60L64 96M150 60L240 24M150 60L244 94M60 26L64 96M240 24L244 94M64 96L244 94"/>
+          </g>
+          <g font-family="Baloo 2, sans-serif" font-weight="700" font-size="14" text-anchor="middle" fill="#fff">
+            <circle cx="150" cy="60" r="22" fill="#1D5FA8"/><text x="150" y="65">Головна</text>
+            <circle cx="60" cy="26" r="17" fill="#1D5FA8"/><text x="60" y="31">А</text>
+            <circle cx="64" cy="96" r="17" fill="#1D5FA8"/><text x="64" y="101">Б</text>
+            <circle cx="240" cy="24" r="17" fill="#1D5FA8"/><text x="240" y="29">В</text>
+            <circle cx="244" cy="94" r="17" fill="#1D5FA8"/><text x="244" y="99">Г</text>
+          </g>
+          <circle r="7" fill="#FFC93C" stroke="#3A2E2A" stroke-width="2" class="walker" style="offset-path:path('M150 60L240 24L244 94L64 96L60 26L150 60'); animation-duration:9s"/>
+        </svg>
+        <figcaption><b>Нелінійний</b>Багато шляхів — обираєш сам</figcaption>
+      </figure>
+    </div>
+    <div class="note">Нелінійний текст буває й на папері: енциклопедію чи словник читають з будь-якого місця.</div>
+    <div id="lnList"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Подорож гіпертекстом</div>
+    <h2>Детектив Космопедії</h2>
+    <p class="soft">Синє слово — посилання. Переходь ними й клацни речення з відповіддю.</p>
+    <div class="exercise" id="wikiEx">
+      <div class="quest" id="quest"></div>
+      <div class="wiki">
+        <div class="br-bar">
+          <button id="brBack" title="Назад"><span class="ms">arrow_back</span></button>
+          <button id="brHome" title="Головна"><span class="ms">home</span></button>
+          <div class="br-url"><span class="ms" style="font-size:16px">lock</span><b id="brUrl">kosmopedia.ua</b></div>
+          <span class="br-steps" id="brSteps"></span>
+        </div>
+        <div class="wk-head" id="wkHead">
+          <svg viewBox="0 0 30 30"><circle cx="15" cy="15" r="7" fill="#FFC93C"/><ellipse cx="15" cy="15" rx="13" ry="5" fill="none" stroke="#2B2A5E" stroke-width="2" transform="rotate(-20 15 15)"/><circle cx="26" cy="11" r="2.4" fill="#C2410C"/></svg>
+          <span>Космопедія</span>
+        </div>
+        <div class="wk-body"><div class="wk-pic" id="wkPic"></div><div id="wkText"></div></div>
+      </div>
+      <div class="quest-fb" id="questFb"></div>
+      <div class="progress-line" id="wikiProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Формати файлів</div>
+    <h2>Один документ — різні формати</h2>
+    <p><b>Формат</b> вирішує, що збережеться у файлі.</p>
+    <p class="soft">Відкрий афішу в кожному форматі.</p>
+    <div class="exercise" id="fmtEx">
+      <div class="fmt-tabs" id="fmtTabs"></div>
+      <div class="fmt-stage"><div id="fmtView"></div><div class="fmt-info" id="fmtInfo"></div></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Збережи правильно</div>
+    <h2>Файл → Завантажити</h2>
+    <p>Google Документ зберігається сам. Файл потрібного формату — через <b>Файл → Завантажити</b>.</p>
+    <p class="soft">Завантаж афішу для кожного прохання.</p>
+    <div class="exercise" id="dlEx">
+      <ol class="dl-tasks" id="dlTasks"></ol>
+      <div class="gd" id="gd"></div>
+      <div class="dl-shelf" id="dlShelf"><span class="ms">download</span>Завантаження:</div>
+    </div>
+    <div class="trivia">У Word: <b>Файл → Зберегти як</b> → «Тип файлу».</div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Урок · «Різновиди публікацій. Друковані та електронні публікації. Лінійний та нелінійний текст. Формування, форматування, збереження текстових документів та публікацій у різних форматах» · 7 клас</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+const ms = n=>`<span class="ms">${n}</span>`;
+
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeMatching('recapPool', 'recapList', [
+  { name:'Шрифт', desc:'Набір літер і знаків, намальованих в одному стилі' },
+  { name:'Накреслення', desc:'Жирний, курсивний чи підкреслений вигляд символів' },
+  { name:'Вирівнювання', desc:'Як рядки абзацу розташовані між лівим і правим краями' },
+  { name:'Відступ першого рядка', desc:'«Червоний рядок» на початку абзацу' },
+  { name:'Міжрядковий інтервал', desc:'Відстань між рядками всередині абзацу' },
+  { name:'Маркований список', desc:'Пункти, позначені значками, а не числами' }
+], 'recapProgress');
+
+/* ---------- КРОК 1: ГАЛЕРЕЯ ---------- */
+const S = (inner)=>`<svg viewBox="0 0 64 64" fill="none" stroke="#2A2320" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">${inner}</svg>`;
+const PUBS = [
+  { name:'Книга', kind:'p', icon:S(`<path d="M12 10h34a6 6 0 0 1 6 6v38H18a6 6 0 0 1-6-6z" fill="#E8590C"/><path d="M12 48a6 6 0 0 1 6-6h34" /><path d="M18 42v12" stroke="#fff"/><path d="M22 18h22M22 24h16" stroke="#fff"/>`),
+    back:'Великий цілісний твір.', ex:'«Тигролови», підручник з історії' },
+  { name:'Журнал', kind:'p', icon:S(`<rect x="13" y="8" width="38" height="50" rx="3" fill="#fff"/><rect x="13" y="8" width="38" height="12" fill="#D6336C"/><circle cx="32" cy="36" r="8" fill="#FFC9C9"/><path d="M20 54c2-8 22-8 24 0" fill="#FFC9C9"/>`),
+    back:'Регулярні номери зі статтями на одну тему.', ex:'журнал про науку, спорт чи моду' },
+  { name:'Газета', kind:'p', icon:S(`<rect x="8" y="12" width="48" height="40" rx="2" fill="#fff"/><path d="M14 19h36" stroke-width="4"/><rect x="14" y="26" width="15" height="12" fill="#ADB5BD"/><path d="M33 27h17M33 32h17M33 37h12M14 44h36M14 48h28"/>`),
+    back:'Свіжі новини, виходить часто.', ex:'міська чи шкільна газета' },
+  { name:'Каталог', kind:'p', icon:S(`<rect x="10" y="10" width="44" height="46" rx="3" fill="#fff"/><rect x="16" y="16" width="14" height="12" rx="2" fill="#74C0FC"/><rect x="34" y="16" width="14" height="12" rx="2" fill="#FFD43B"/><rect x="16" y="36" width="14" height="12" rx="2" fill="#8CE99A"/><rect x="34" y="36" width="14" height="12" rx="2" fill="#FFA8A8"/><path d="M17 32h8M35 32h8M17 52h8M35 52h8"/>`),
+    back:'Перелік товарів з фото й цінами.', ex:'каталог іграшок чи насіння' },
+  { name:'Е-книга', kind:'e', icon:S(`<rect x="14" y="6" width="36" height="52" rx="5" fill="#495057"/><rect x="18" y="11" width="28" height="38" rx="1" fill="#F1F3F5"/><path d="M22 17h20M22 22h20M22 27h20M22 32h14M22 37h20M22 42h16" stroke-width="2"/><circle cx="32" cy="53" r="1.5" fill="#fff" stroke="none"/>`),
+    back:'Книга у файлі для читалки чи телефона.', ex:'книга у форматі EPUB' },
+  { name:'Вебсайт', kind:'e', icon:S(`<rect x="6" y="12" width="52" height="40" rx="4" fill="#fff"/><path d="M6 21h52"/><circle cx="12" cy="16.5" r="1.4" fill="#FA5252" stroke="none"/><circle cx="17" cy="16.5" r="1.4" fill="#FAB005" stroke="none"/><circle cx="22" cy="16.5" r="1.4" fill="#40C057" stroke="none"/><rect x="12" y="27" width="16" height="19" rx="2" fill="#74C0FC"/><path d="M33 28h19M33 34h19M33 40h12" stroke="#1D5FA8"/>`),
+    back:'Сторінки в інтернеті, пов\'язані посиланнями.', ex:'сайт школи чи музею' },
+  { name:'Онлайн-журнал', kind:'e', icon:S(`<rect x="10" y="8" width="44" height="50" rx="6" fill="#343A40"/><rect x="14" y="13" width="36" height="40" rx="2" fill="#fff"/><rect x="14" y="13" width="36" height="9" fill="#D6336C"/><rect x="18" y="26" width="13" height="12" fill="#FFC9C9"/><path d="M35 27h11M35 32h11M18 43h28M18 48h20" stroke-width="2"/>`),
+    back:'Журнал, що виходить в інтернеті.', ex:'вебжурнал про технології' },
+  { name:'Блог', kind:'e', icon:S(`<path d="M8 12h40a4 4 0 0 1 4 4v24a4 4 0 0 1-4 4H26l-10 9v-9H8a4 4 0 0 1-4-4V16a4 4 0 0 1 4-4z" fill="#fff"/><path d="M12 22h30M12 28h30M12 34h18"/><path d="M44 50l12-12 4 4-12 12-6 2z" fill="#FFD43B"/>`),
+    back:'Регулярні записи одного автора з коментарями читачів.', ex:'блог про подорожі чи рецепти' }
+];
+(function(){
+  const grid = document.getElementById('pubGallery');
+  const hit = trackTask(grid, PUBS.length, 0);
+  PUBS.forEach(p=>{
+    const c = document.createElement('div');
+    c.className = 'flip-card';
+    c.style.setProperty('--card-c', p.kind === 'p' ? 'var(--pr)' : 'var(--el)');
+    c.style.setProperty('--card-c-light', p.kind === 'p' ? 'var(--pr-soft)' : 'var(--el-soft)');
+    c.innerHTML = `<div class="flip-inner">
+      <div class="flip-face flip-front">${p.icon}<div class="name">${p.name}</div><div class="kind">${p.kind === 'p' ? 'друкована' : 'електронна'}</div></div>
+      <div class="flip-face flip-back"><div>${p.back}</div><i>Приклад: ${p.ex}</i></div></div>`;
+    c.addEventListener('click', ()=>{ c.classList.toggle('flipped'); if(!c.dataset.seen){ c.dataset.seen = 1; hit(); } });
+    grid.appendChild(c);
+  });
+})();
+
+
+/* ---------- КРОК 2 ---------- */
+makeClassify('lnList', [
+  { logo:'📜', text:'Вірш у збірці: строфа за строфою.', correct:0 },
+  { logo:'🌐', text:'Стаття у Вікіпедії, де безліч синіх слів веде до інших статей.', correct:1 },
+  { logo:'🥧', text:'Рецепт пирога: крок 1, крок 2, … крок 6.', correct:0 },
+  { logo:'🏫', text:'Сайт школи: меню «Новини», «Розклад», «Гуртки» на кожній сторінці.', correct:1 },
+  { logo:'📕', text:'Словник: шукаєш потрібне слово й читаєш лише його пояснення.', correct:1, why:'Читаєш з будь-якого місця.' },
+  { logo:'🪑', text:'Інструкція, як зібрати шафу.', correct:0 }
+], ['Лінійний', 'Нелінійний']);
+
+/* ---------- КРОК 3: КОСМОПЕДІЯ ---------- */
+const PIC = {
+  home:`<svg viewBox="0 0 120 120"><rect width="120" height="120" rx="10" fill="#1B1B3A"/><circle cx="60" cy="60" r="13" fill="#FFC93C"/><g fill="none" stroke="#5C5F99" stroke-width="1.2"><circle cx="60" cy="60" r="26"/><circle cx="60" cy="60" r="38"/><circle cx="60" cy="60" r="52"/></g><circle cx="86" cy="60" r="4" fill="#4DABF7"/><circle cx="33" cy="38" r="3.5" fill="#E8590C"/><circle cx="80" cy="13" r="7" fill="#E6B98A"/></svg>`,
+  sun:`<svg viewBox="0 0 120 120"><rect width="120" height="120" rx="10" fill="#1B1B3A"/><g stroke="#FFC93C" stroke-width="4" stroke-linecap="round"><path d="M60 12v12M60 96v12M12 60h12M96 60h12M26 26l8 8M86 86l8 8M26 94l8-8M86 34l8-8"/></g><circle cx="60" cy="60" r="28" fill="#FFB020"/><circle cx="52" cy="54" r="5" fill="#FFD966"/></svg>`,
+  earth:`<svg viewBox="0 0 120 120"><rect width="120" height="120" rx="10" fill="#1B1B3A"/><circle cx="60" cy="60" r="36" fill="#339AF0"/><path d="M38 40c10-4 16 4 12 12s6 10 2 18-14 2-18-6 0-20 4-24zM70 34c8 0 16 8 14 16s-10 4-12 12-6 14-10 8 0-12 2-18 0-18 6-18z" fill="#51CF66"/><circle cx="100" cy="24" r="6" fill="#DEE2E6"/></svg>`,
+  moon:`<svg viewBox="0 0 120 120"><rect width="120" height="120" rx="10" fill="#1B1B3A"/><circle cx="60" cy="60" r="34" fill="#DEE2E6"/><circle cx="48" cy="48" r="7" fill="#ADB5BD"/><circle cx="72" cy="66" r="9" fill="#ADB5BD"/><circle cx="52" cy="78" r="5" fill="#ADB5BD"/><path d="M80 90l4-6 4 6M84 84v-8" stroke="#fff" stroke-width="2"/><rect x="84" y="76" width="8" height="5" fill="#4DABF7"/></svg>`,
+  mars:`<svg viewBox="0 0 120 120"><rect width="120" height="120" rx="10" fill="#1B1B3A"/><circle cx="60" cy="60" r="32" fill="#E8590C"/><path d="M44 66l10-14 10 14z" fill="#C2410C"/><circle cx="72" cy="46" r="5" fill="#FF8A3D"/><circle cx="20" cy="26" r="4" fill="#ADB5BD"/><circle cx="102" cy="92" r="3" fill="#ADB5BD"/></svg>`,
+  jupiter:`<svg viewBox="0 0 120 120"><rect width="120" height="120" rx="10" fill="#1B1B3A"/><circle cx="60" cy="60" r="40" fill="#E6B98A"/><path d="M22 46h76M20 58h80M22 72h76" stroke="#C58F5A" stroke-width="6"/><ellipse cx="74" cy="72" rx="9" ry="5" fill="#C2410C"/></svg>`
+};
+const WIKI = {
+  home:{ title:'Сонячна система', url:'', paras:[
+    ['Сонячна система — це [[sun|Сонце]] і все, що обертається навколо нього: планети, їхні супутники, астероїди й комети.', 'Навколо Сонця рухаються вісім планет.'],
+    ['Ми живемо на третій від Сонця планеті — [[earth|Землі]].', 'За нею йде [[mars|Марс]], а п\'ята планета — велетень [[jupiter|Юпітер]].']]},
+  sun:{ title:'Сонце', url:'/sonce', paras:[
+    ['Сонце — зоря, тобто велетенська куля розпеченого газу.', 'Воно приблизно в 109 разів ширше за [[earth|Землю]].'],
+    ['#1 Світло від Сонця долітає до Землі приблизно за 8 хвилин.', 'Без сонячного тепла й світла на Землі не було б життя.']]},
+  earth:{ title:'Земля', url:'/zemlia', paras:[
+    ['Земля — єдина відома планета, на якій є життя.', 'Близько 71 % її поверхні вкриває вода, тому з космосу вона здається блакитною.'],
+    ['Земля має один природний супутник — [[moon|Місяць]].', 'Повний оберт навколо [[sun|Сонця]] вона робить за рік.']]},
+  moon:{ title:'Місяць', url:'/misiats', paras:[
+    ['Місяць — природний супутник [[earth|Землі]].', 'Він завжди повернутий до нас одним і тим самим боком.'],
+    ['На Місяці немає повітря й вітру, тому сліди астронавтів лишаються там надовго.', '#3 Уперше люди ступили на Місяць у 1969 році.']]},
+  mars:{ title:'Марс', url:'/mars', paras:[
+    ['Марс називають Червоною планетою: його вкриває іржаво-червоний пил.', 'Там височіє вулкан Олімп — найвища гора Сонячної системи, приблизно в 2,5 раза вища за Еверест.'],
+    ['#2 Марс має два маленькі супутники — Фобос і Деймос.', 'Його досліджують марсоходи, якими керують із [[earth|Землі]].']]},
+  jupiter:{ title:'Юпітер', url:'/iupiter', paras:[
+    ['Юпітер — найбільша планета Сонячної системи.', '#4 Велика червона пляма на ньому — це буря, ширша за всю [[earth|Землю]].'],
+    ['Доба на Юпітері коротка: менше ніж 10 годин.', 'Учені знають понад 90 його супутників.']]}
+};
+const QUESTS = [
+  'За скільки часу світло від Сонця долітає до Землі?',
+  'Як звуть супутники Марса?',
+  'У якому році люди вперше ступили на Місяць?',
+  'Що таке Велика червона пляма?'
+];
+(function(){
+  const ex = document.getElementById('wikiEx');
+  const text = document.getElementById('wkText'), pic = document.getElementById('wkPic');
+  const back = document.getElementById('brBack'), url = document.getElementById('brUrl'), steps = document.getElementById('brSteps');
+  const quest = document.getElementById('quest'), fb = document.getElementById('questFb'), prog = document.getElementById('wikiProgress');
+  const hit = trackTask(ex, QUESTS.length, QUESTS.length + 2);
+  let q = 0, page = 'home', hist = [], jumps = 0;
+  function showQuest(){
+    if(q >= QUESTS.length){
+      quest.innerHTML = `<span class="n">✓</span><div><b>Усі відповіді знайдено!</b><small>Ти не читав усе підряд — це і є нелінійний текст.</small></div>`;
+      return;
+    }
+    quest.innerHTML = `<span class="n">${q + 1} / ${QUESTS.length}</span><div><b>${QUESTS[q]}</b></div>`;
+  }
+  function go(id, push = true){
+    if(push && id !== page){ hist.push(page); jumps++; }
+    page = id;
+    const P = WIKI[id];
+    pic.innerHTML = PIC[id];
+    url.textContent = 'kosmopedia.ua' + P.url;
+    back.disabled = !hist.length;
+    steps.textContent = jumps ? `Переходів: ${jumps}` : '';
+    text.innerHTML = `<h3>${P.title}</h3>` + P.paras.map(par=>'<p>' + par.map(s=>{
+      const m = s.match(/^#(\d) /);
+      const body = (m ? s.slice(3) : s).replace(/\[\[(\w+)\|([^\]]+)\]\]/g, '<a href="#" data-go="$1">$2</a>');
+      return `<span class="wk-s"${m ? ` data-a="${m[1]}"` : ''}>${body}</span>`;
+    }).join(' ') + '</p>').join('');
+  }
+  text.addEventListener('click', e=>{
+    const a = e.target.closest('a[data-go]');
+    if(a){ e.preventDefault(); go(a.dataset.go); return; }
+    const s = e.target.closest('.wk-s');
+    if(!s || q >= QUESTS.length) return;
+    if(s.dataset.a == q + 1){
+      s.classList.add('found');
+      addNeurons(1); hit();
+      fb.textContent = 'Правильно ✓ ' + s.textContent;
+      q++;
+      prog.textContent = `Знайдено відповідей: ${q} з ${QUESTS.length}`;
+      if(q === QUESTS.length) addNeurons(2);
+      showQuest();
+    } else {
+      s.classList.remove('wrong-flash'); void s.offsetWidth; s.classList.add('wrong-flash');
+      fb.textContent = 'У цьому реченні відповіді немає. Пошукай на іншій сторінці.';
+    }
+  });
+  back.addEventListener('click', ()=>{ if(hist.length){ jumps++; go(hist.pop(), false); } });
+  document.getElementById('brHome').addEventListener('click', ()=>go('home'));
+  document.getElementById('wkHead').addEventListener('click', ()=>go('home'));
+  showQuest(); go('home', false);
+  prog.textContent = `Знайдено відповідей: 0 з ${QUESTS.length}`;
+})();
+
+/* ---------- КРОК 4: ФОРМАТИ ---------- */
+const AF_PIC = `<svg class="af-pic" viewBox="0 0 84 56"><rect width="84" height="56" rx="6" fill="#FFF0E0"/><circle cx="26" cy="34" r="13" fill="#F76707"/><path d="M26 21c0-4 3-6 6-6" stroke="#2F9E44" stroke-width="3" fill="none"/><circle cx="52" cy="36" r="10" fill="#E03131"/><path d="M52 26l2-5" stroke="#5C3D2E" stroke-width="2.5"/><path d="M54 22c4-2 7 0 8 2-4 1-6 0-8-2z" fill="#2F9E44"/><path d="M64 46c2-6 8-8 12-6-2 5-6 8-12 6z" fill="#F59F00"/></svg>`;
+const AF_TXT = 'Осінній ярмарок\nСубота, 28 листопада · шкільне подвір\'я\n\nПриходьте всім класом! На вас чекають:\n* пиріжки й гарячий узвар\n* вироби з природних матеріалів\n* лотерея з призами\n\nУвесь виторг передамо притулку для тварин.';
+const afisha = ()=>`<div class="af-title">Осінній ярмарок</div><div class="af-date">Субота, 28 листопада · шкільне подвір'я</div>${AF_PIC}<div>Приходьте <b>всім класом</b>! На вас чекають:</div><ul class="af-list"><li>пиріжки й гарячий узвар</li><li>вироби з природних матеріалів</li><li>лотерея з призами</li></ul><div class="af-foot">Увесь виторг передамо притулку для тварин.</div>`;
+const FMTS = [
+  { ext:'docx', c:'#2B579A', title:'DOCX — документ Word',
+    view:()=>`<div class="win" style="--wb:#2B579A"><div class="win-bar">${ms('description')} Афіша.docx — Word<span class="dots">— ▢ ✕</span></div><div class="win-sub"><span>Файл</span><span><b>Основне</b></span><span>Вставлення</span><span>Макет</span><span>Рецензування</span></div><div class="win-body"><div class="sheet">${afisha()}</div></div></div>`,
+    yes:['Зберігає все: шрифти, кольори, картинки, списки', 'Можна далі змінювати'], no:['Вигляд може трохи змінитися в іншій програмі'],
+    when:'Коли документ ще редагуватимуть.' },
+  { ext:'pdf', c:'#D93025', title:'PDF — «електронний папір»',
+    view:()=>`<div class="win" style="--wb:#3C4043"><div class="win-bar">${ms('picture_as_pdf')} Афіша.pdf<span class="dots">− 100% +</span></div><div class="win-body"><div class="sheet">${afisha()}<span class="lock">${ms('lock')}лише перегляд</span></div></div></div>`,
+    yes:['На будь-якому пристрої виглядає точно так само', 'Готовий до друку'], no:['Змінити текст звичайними засобами не вийде'],
+    when:'Коли треба надіслати, надрукувати чи здати готову роботу.' },
+  { ext:'txt', c:'#5F6368', title:'TXT — звичайний текст',
+    view:()=>`<div class="win" style="--wb:#5F6368"><div class="win-bar">${ms('notes')} Афіша.txt — Блокнот<span class="dots">— ▢ ✕</span></div><div class="win-sub"><span>Файл</span><span>Редагування</span><span>Вигляд</span></div><div class="txt-body">${AF_TXT}</div></div>`,
+    yes:['Відкриє будь-яка програма на будь-якому пристрої', 'Файл дуже маленький'], no:['Зникли картинка, шрифти, кольори й жирний'],
+    when:'Коли потрібні лише слова, без оформлення.' },
+  { ext:'rtf', c:'#7048E8', title:'RTF — текст з форматуванням',
+    view:()=>`<div class="win" style="--wb:#7048E8"><div class="win-bar">${ms('article')} Афіша.rtf — WordPad<span class="dots">— ▢ ✕</span></div><div class="win-sub"><span>Файл</span><span><b>Основне</b></span><span>Вигляд</span></div><div class="win-body"><div class="sheet">${afisha()}</div></div></div>`,
+    yes:['Зберігає шрифти, кольори й картинки', 'Відкриють майже всі текстові редактори'], no:['Файл більший, ніж DOCX', 'Складне оформлення може «поїхати»'],
+    when:'Коли невідомо, яка програма в того, хто відкриє файл.' },
+  { ext:'html', c:'#E8590C', title:'HTML — вебсторінка',
+    view:()=>`<div class="win" style="--wb:#DEE1E6"><div class="win-bar" style="color:#3C4043">${ms('public')} Осінній ярмарок<span class="dots">— ▢ ✕</span></div><div class="win-sub" style="background:#fff">${ms('lock')} school.ua/afisha.html</div><div class="web-body">${afisha()}</div></div>`,
+    yes:['Відкривається в будь-якому браузері', 'Можна розмістити на сайті'], no:['Сторінок для друку немає — текст займає ширину вікна'],
+    when:'Коли документ має стати сторінкою сайту.' },
+  { ext:'epub', c:'#2F9E44', title:'EPUB — електронна книга',
+    view:()=>`<div class="win-body" style="border-radius:10px"><div class="phone"><div class="bar"><span>9:41</span><span>Афіша</span><span>🔋</span></div>${afisha()}<div class="pg-n">1 / 1</div></div></div>`,
+    yes:['Текст підлаштовується під будь-який екран', 'Шрифт можна збільшити'], no:['Для документів, які друкують, не годиться'],
+    when:'Коли публікацію читатимуть на е-читалці чи телефоні.' }
+];
+(function(){
+  const tabs = document.getElementById('fmtTabs'), view = document.getElementById('fmtView'), info = document.getElementById('fmtInfo');
+  const hit = trackTask(document.getElementById('fmtEx'), FMTS.length, 0);
+  FMTS.forEach((f, i)=>{
+    const b = document.createElement('button');
+    b.className = 'fmt-tab'; b.style.setProperty('--c', f.c);
+    b.innerHTML = `<i>.${f.ext.toUpperCase()}</i>Афіша.${f.ext}`;
+    b.addEventListener('click', ()=>show(i));
+    tabs.appendChild(b);
+  });
+  function show(i){
+    const f = FMTS[i];
+    [...tabs.children].forEach((b, j)=>b.classList.toggle('on', j === i));
+    const tab = tabs.children[i];
+    if(!tab.classList.contains('seen')){ tab.classList.add('seen'); hit(); }
+    view.innerHTML = f.view();
+    info.style.setProperty('--c', f.c);
+    info.innerHTML = `<h3>${f.title}</h3><ul>${f.yes.map(t=>`<li class="yes">${ms('check_circle')}<span>${t}</span></li>`).join('')}${f.no.map(t=>`<li class="no">${ms('cancel')}<span>${t}</span></li>`).join('')}</ul><div class="when"><b>Коли обирати:</b> ${f.when}</div>`;
+  }
+  show(0);
+})();
+
+/* ---------- КРОК 5: ЕМУЛЯТОР ЗАВАНТАЖЕННЯ ---------- */
+const DL_FMTS = [
+  { ext:'docx', label:'Microsoft Word (.docx)' },
+  { ext:'odt', label:'Формат OpenDocument (.odt)' },
+  { ext:'rtf', label:'Формат RTF (.rtf)' },
+  { ext:'pdf', label:'Документ PDF (.pdf)' },
+  { ext:'txt', label:'Звичайний текст (.txt)' },
+  { ext:'html', label:'Вебсторінка (.html, архів)' },
+  { ext:'epub', label:'Публікація EPUB (.epub)' }
+];
+const DL_TASKS = [
+  { text:'Надрукувати в копіцентрі точно як на екрані.', ext:'pdf' },
+  { text:'Учителька допише пункти в Microsoft Word.', ext:'docx' },
+  { text:'Сестрі потрібні лише слова, без картинки й оформлення.', ext:'txt' },
+  { text:'Розмістити як сторінку шкільного сайту.', ext:'html' },
+  { text:'Бабуся читатиме на е-читалці.', ext:'epub' }
+];
+const DL_WHY = {
+  docx:'DOCX — для подальшого редагування у Word.', odt:'ODT — формат безкоштовних офісних програм, як LibreOffice.',
+  rtf:'RTF — коли невідомо, яка програма в отримувача.', pdf:'PDF — щоб вигляд не змінився й для друку.',
+  txt:'TXT — лише слова, без оформлення.', html:'HTML — сторінка для браузера й сайту.', epub:'EPUB — книга для е-читалки.'
+};
+const EXT_C = { docx:'#2B579A', odt:'#1E88E5', rtf:'#7048E8', pdf:'#D93025', txt:'#5F6368', html:'#E8590C', epub:'#2F9E44' };
+(function(){
+  const gd = document.getElementById('gd'), list = document.getElementById('dlTasks'), shelf = document.getElementById('dlShelf');
+  const hit = trackTask(document.getElementById('dlEx'), DL_TASKS.length, DL_TASKS.length + 2);
+  let t = 0, toastTimer;
+  DL_TASKS.forEach(task=>{ const li = document.createElement('li'); li.innerHTML = `${ms('radio_button_unchecked')}<span>${task.text}</span>`; list.appendChild(li); });
+  const MAIN = [
+    ['note_add', 'Створити', 1], ['folder_open', 'Відкрити'], ['file_copy', 'Створити копію'], '-',
+    ['person_add', 'Надати доступ', 1], ['mail', 'Електронна пошта', 1], ['download', 'Завантажити', 1, 'dl'], '-',
+    ['drive_file_rename_outline', 'Перейменувати'], ['drive_file_move', 'Перемістити'], ['delete', 'Перемістити в кошик'], '-',
+    ['history', 'Історія версій', 1], '-', ['print', 'Друк']
+  ];
+  gd.innerHTML = `<div class="gd-top"><img src="images/docs.svg" alt=""><span class="nm">Афіша</span>${ms('star')}${ms('drive_file_move')}${ms('cloud_done')}<span class="share">${ms('lock')}Надати доступ</span></div>
+    <div class="gd-menu"><span class="file">Файл</span><span>Змінити</span><span>Вигляд</span><span>Вставлення</span><span>Формат</span><span>Інструменти</span><span>Розширення</span><span>Довідка</span></div>
+    <div class="gd-tools">${ms('search')}${ms('undo')}${ms('redo')}${ms('print')}<span class="sep"></span>100%<span class="sep"></span>Звичайний текст<span class="sep"></span>Arial<span class="sep"></span>${ms('format_bold')}${ms('format_italic')}${ms('format_underlined')}</div>
+    <div class="gd-page-wrap"><div class="sheet">${afisha()}</div></div>
+    <div class="gd-drop" id="gdDrop">
+      <div class="gd-list" id="gdMain">${MAIN.map(m=>m === '-' ? '<hr>' : `<div data-k="${m[3] || ''}">${ms(m[0])}${m[1]}${m[2] ? `<span class="ms arr">arrow_right</span>` : ''}</div>`).join('')}</div>
+      <div class="gd-list gd-sub" id="gdSub" hidden>${DL_FMTS.map(f=>`<div data-ext="${f.ext}">${f.label}</div>`).join('')}</div>
+    </div>
+    <div class="gd-toast" id="gdToast"></div>`;
+  const fileBtn = gd.querySelector('.file'), drop = gd.querySelector('#gdDrop'), sub = gd.querySelector('#gdSub'), dlItem = gd.querySelector('[data-k="dl"]'), toast = gd.querySelector('#gdToast');
+  function say(msg){ toast.textContent = msg; toast.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(()=>toast.classList.remove('show'), 3400); }
+  function close(){ drop.classList.remove('show', 'subopen'); sub.hidden = true; fileBtn.classList.remove('open'); dlItem.classList.remove('open'); hints(); }
+  function hints(){
+    const open = drop.classList.contains('show');
+    fileBtn.classList.toggle('pulse', t < DL_TASKS.length && !open && t === 0);
+    dlItem.classList.toggle('pulse', t === 0 && open && sub.hidden);
+  }
+  function mark(){
+    [...list.children].forEach((li, i)=>{
+      li.className = i < t ? 'ok' : i === t ? 'next' : '';
+      li.querySelector('.ms').textContent = i < t ? 'check_circle' : 'radio_button_unchecked';
+    });
+    hints();
+  }
+  fileBtn.addEventListener('click', e=>{ e.stopPropagation(); if(drop.classList.contains('show')) close(); else { gd.classList.toggle('narrow', gd.clientWidth < 560); drop.style.top = (fileBtn.offsetTop + fileBtn.offsetHeight + 2) + 'px'; drop.classList.add('show'); fileBtn.classList.add('open'); hints(); } });
+  gd.querySelector('#gdMain').addEventListener('click', e=>{
+    e.stopPropagation();
+    const it = e.target.closest('div[data-k]'); if(!it) return;
+    if(it.dataset.k === 'dl'){ sub.hidden = false; drop.classList.add('subopen'); dlItem.classList.add('open'); hints(); return; }
+    say('Цей пункт зараз не допоможе: потрібно завантажити файл.');
+  });
+  sub.addEventListener('click', e=>{
+    e.stopPropagation();
+    const it = e.target.closest('div[data-ext]'); if(!it || t >= DL_TASKS.length) return;
+    const ext = it.dataset.ext;
+    close();
+    if(ext === DL_TASKS[t].ext){
+      const f = document.createElement('span');
+      f.className = 'dl-file'; f.style.setProperty('--c', EXT_C[ext]);
+      f.innerHTML = `<i>${ext.toUpperCase()}</i>Афіша.${ext}`;
+      shelf.appendChild(f);
+      say(`Завантажено: Афіша.${ext} ✓`);
+      addNeurons(1); hit(); t++;
+      if(t === DL_TASKS.length){ addNeurons(2); say('Усі прохання виконано! 🎉'); }
+      mark();
+    } else {
+      const li = list.children[t];
+      li.classList.remove('wrong-flash'); void li.offsetWidth; li.classList.add('wrong-flash');
+      say('Не найкращий вибір. ' + DL_WHY[ext]);
+    }
+  });
+  document.addEventListener('click', e=>{ if(!gd.contains(e.target)) close(); });
+  gd.addEventListener('click', e=>{ if(!e.target.closest('.gd-drop') && !e.target.closest('.file')) close(); });
+  mark();
+})();
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Яка з цих публікацій — електронна?', opts:['Газета з кіоску', 'Блог про подорожі', 'Каталог у поштовій скриньці', 'Журнал з бібліотеки'], correct:1 },
+  { q:'Який із цих текстів нелінійний?', opts:['Вірш', 'Рецепт пирога з кроками', 'Сайт з меню й посиланнями', 'Оповідання'], correct:2, why:'Читач сам обирає, куди перейти.' },
+  { q:'Що робить гіпертекст нелінійним?', opts:['Великий шрифт', 'Посилання на інші частини тексту', 'Нумерація сторінок', 'Довжина тексту'], correct:1 },
+  { q:'У якому форматі надіслати роботу, щоб на будь-якому пристрої вона виглядала однаково?', opts:['TXT', 'PDF', 'HTML', 'EPUB'], correct:1 },
+  { q:'Що станеться з картинкою й жирним шрифтом, якщо зберегти документ у форматі TXT?', opts:['Нічого не зміниться', 'Зникнуть — лишаться тільки літери', 'Стануть посиланнями', 'Перетворяться на таблицю'], correct:1 },
+  { q:'Як отримати файл Word з Google Документа?', opts:['Файл → Завантажити → Microsoft Word (.docx)', 'Файл → Друк', 'Вставлення → Зображення', 'Формат → Текст'], correct:0 }
+], {summary:'Тепер ти розрізняєш друковані й електронні публікації, лінійний і нелінійний текст і знаєш, у якому форматі зберегти документ.'});
+</script>
+
+</body>
+</html>
