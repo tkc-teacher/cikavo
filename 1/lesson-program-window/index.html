@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Програма і вікно програми — Урок</title>
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<style>
+  /* Гама — тепла помаранчева (попередній урок «Робочий стіл» — синій) */
+  :root{
+    --accent:#E9761A; --accent-dark:#B4560B; --accent-soft:#FFEFDD;
+    --label:#D2670F; --bg:#FFF9F2; --line:#F2E1CD;
+    --hud-bar:linear-gradient(90deg,#E9761A,#FFC93C);
+    --ok:#3FAE58;
+  }
+
+  /* Першокласники тільки вчаться читати: мінімум тексту, великі картинки, пояснює вчитель */
+  .hero h1{font-size:44px;}
+  .block h2{font-size:30px; margin-bottom:0;}
+  .block .exercise{margin-top:12px; padding:16px 18px;}
+  .block{scroll-margin-top:70px;}   /* «Почати» прокручує до завдання під смужкою HUD */
+  .dots{margin-top:10px !important;}
+  .step-label{font-size:17px;} .hero-eyebrow{font-size:17px;} .restart{font-size:16px; padding:6px 16px;}
+  .btn-primary{font-size:19px; padding:14px 30px; border-radius:999px;}
+
+  .dots{display:flex; justify-content:center; gap:8px; margin-top:16px;}
+  .dots i{width:14px; height:14px; border-radius:50%; background:var(--line); transition:background .2s ease;}
+  .dots i.now{background:var(--accent-soft); box-shadow:0 0 0 2px var(--accent);}
+  .dots i.ok{background:var(--ok);}
+  @keyframes wob{25%{transform:translateX(-5px);} 75%{transform:translateX(5px);}}
+  @keyframes pop{from{transform:scale(.6); opacity:0;}}
+  .glow{animation:glow 1.2s ease-in-out infinite;}
+  @keyframes glow{50%{box-shadow:0 0 0 6px rgba(255,201,60,.85), 0 0 18px rgba(255,201,60,.9);}}
+
+  /* ---------- Робочий стіл (розміри в cqw — масштабується з шириною) ---------- */
+  .desk{position:relative; width:100%; aspect-ratio:16/10; container-type:inline-size; overflow:hidden; user-select:none; -webkit-user-select:none; touch-action:manipulation; font-family:'Nunito Sans',sans-serif;
+    background:linear-gradient(180deg,#7CC8FF 0%,#C9ECFF 58%,#7CCB7A 58.5%,#4DA857 100%);}
+  /* усе завдання (підпис, картка, стіл, крапки) має вміщатися в екран по висоті: ширина столу — від висоти вікна (--fix — що ще є в завданні) */
+  .desk-box{--fix:350px; max-width:max(280px, min(720px, calc((100vh - var(--fix)) * 1.6 + 20px))); max-width:max(280px, min(720px, calc((100svh - var(--fix)) * 1.6 + 20px))); margin:0 auto; border:10px solid #2B2D42; border-radius:16px; overflow:hidden; background:#2B2D42;}
+  /* крок «Яка кнопка?»: під столом ряд кнопок — стіл трохи менший, щоб завдання було тієї ж висоти, що й інші */
+  #guessDesk{--fix:388px; max-width:max(280px, min(662px, calc((100vh - var(--fix)) * 1.6 + 20px))); max-width:max(280px, min(662px, calc((100svh - var(--fix)) * 1.6 + 20px)));}
+  .desk .hill{position:absolute; border-radius:50%; pointer-events:none;}
+  .desk .h1{left:-12%; right:34%; top:48%; height:40%; background:#5DBA63;}
+  .desk .h2{left:46%; right:-14%; top:52%; height:36%; background:#6CC46F;}
+  .desk .sun{position:absolute; right:12%; top:9%; width:10cqw; height:10cqw; border-radius:50%; background:#FFD84D; box-shadow:0 0 0 2cqw rgba(255,216,77,.3); pointer-events:none;}
+  .desk .cloud{position:absolute; height:3.6cqw; background:#fff; border-radius:999px; opacity:.9; pointer-events:none;}
+  .desk .cloud::before{content:""; position:absolute; left:20%; top:-60%; width:45%; height:130%; background:#fff; border-radius:50%;}
+
+  /* піктограма */
+  .di{position:absolute; width:17cqw; padding:.8cqw .4cqw; display:flex; flex-direction:column; align-items:center; gap:.4cqw; border-radius:1cqw; border:.3cqw solid transparent; cursor:pointer; z-index:2;}
+  .di svg{width:7cqw; height:7cqw; display:block; filter:drop-shadow(0 .3cqw .4cqw rgba(0,0,0,.25)); pointer-events:none;}
+  .di b{font-size:max(2.8cqw, 11px); font-weight:700; color:#fff; text-align:center; line-height:1.15; text-shadow:0 1px 3px rgba(0,0,0,.75); pointer-events:none;}
+  .di:hover{background:rgba(255,255,255,.18);}
+  .di.sel{background:rgba(46,123,230,.45); border-color:rgba(255,255,255,.85);}
+  .di.miss{animation:wob .4s ease;}
+  .di.glow{animation:glow 1.2s ease-in-out infinite;}
+
+  /* панель завдань: Пуск, програми, що працюють (з'являються, коли вікно відкрите), годинник */
+  .d-bar{position:absolute; left:0; right:0; bottom:0; height:9cqw; z-index:100000; display:flex; align-items:center; justify-content:center; gap:1.6cqw; background:rgba(238,242,250,.96); border-top:1px solid rgba(0,0,0,.08);}
+  .d-start{display:grid; place-items:center; width:7.5cqw; height:7.5cqw; border-radius:1.5cqw;}
+  .d-start svg{width:5cqw; height:5cqw;}
+  .d-pin{display:grid; place-items:center; width:7.5cqw; height:7.5cqw; border-radius:1.4cqw; position:relative; cursor:pointer; animation:pop .25s ease;}
+  .d-pin svg{width:5cqw; height:5cqw; pointer-events:none;}
+  .d-pin:hover{background:rgba(0,0,0,.07);}
+  .d-pin::after{content:""; position:absolute; left:38%; right:38%; bottom:.2cqw; height:.6cqw; border-radius:1cqw; background:#8A9BB8; transition:left .2s ease, right .2s ease;}
+  .d-pin.act{background:rgba(255,255,255,.9);}
+  .d-pin.act::after{left:26%; right:26%; background:var(--accent);}
+  .d-pin.miss{animation:wob .4s ease;}
+  .d-pin.glow{animation:glow 1.2s ease-in-out infinite;}
+  .d-pin.hit{box-shadow:0 0 0 .5cqw var(--ok);}
+  .d-clock{position:absolute; right:1.5cqw; padding:.6cqw 1.2cqw; font-size:3.4cqw; font-weight:800; color:#333;}
+
+  /* ---------- ВІКНО ПРОГРАМИ ---------- */
+  .win{position:absolute; display:flex; flex-direction:column; background:#fff; border-radius:1.2cqw; overflow:hidden; border:.25cqw solid #C3CDDD; box-shadow:0 1.6cqw 4cqw rgba(0,0,0,.35);
+    transition:left .3s ease, top .3s ease, width .3s ease, height .3s ease, border-radius .3s ease;}
+  .win.max{left:0 !important; top:0 !important; width:100% !important; height:calc(100% - 9cqw) !important; border-radius:0; border-width:0;}
+  .win.drag{transition:none; box-shadow:0 2.4cqw 6cqw rgba(0,0,0,.45);}
+  .wt{display:flex; align-items:center; gap:1.2cqw; height:6.6cqw; flex-shrink:0; padding-left:1.6cqw; background:#F2F4F8; font-size:max(3cqw, 11px); font-weight:700; color:#333; touch-action:none;}
+  .wt > svg{width:4cqw; height:4cqw; flex-shrink:0; pointer-events:none;}
+  .wt .nm{flex:1; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; pointer-events:none;}
+  .wb{display:grid; place-items:center; width:7.6cqw; height:100%; flex-shrink:0; color:#333; cursor:pointer; transition:background .15s ease;}
+  .wb svg{width:2.6cqw; height:2.6cqw; pointer-events:none;}
+  .wb:hover{background:rgba(0,0,0,.09);}
+  .wb.x:hover{background:#E81123; color:#fff;}
+  .wb.glow{animation:glowIn 1.2s ease-in-out infinite;}
+  @keyframes glowIn{50%{background:#FFC93C; box-shadow:inset 0 0 0 .5cqw #F0A800;}}
+  .wb.miss{animation:wob .4s ease;}
+  .wb.hit{background:rgba(63,174,88,.45);}
+  .wbody{position:relative; flex:1; min-height:0; display:flex; align-items:center; justify-content:center;}
+  .wbody > svg.art{width:100%; height:100%; display:block; pointer-events:none;}
+  .wt.hit,.wbody.hit{box-shadow:inset 0 0 0 .7cqw var(--ok);}
+  .wt.hit{background:#D9F2DF;}
+  .wt.glow{animation:glowIn 1.2s ease-in-out infinite;}
+  .wt.miss,.wbody.miss{animation:wob .4s ease;}
+  .win.miss{animation:wob .4s ease;}
+  .desk.movable .wt{cursor:grab;}
+  .desk.movable .win.drag .wt{cursor:grabbing;}
+  .desk.watch .win{pointer-events:none;}
+  /* малюємо в робочій області Малювання */
+  .ink{position:absolute; inset:0; width:100%; height:100%; pointer-events:none;}
+  .ink path{fill:none; stroke-width:.9cqw; stroke-linecap:round; stroke-linejoin:round; vector-effect:non-scaling-stroke;}
+  .desk.movable .wbody{cursor:crosshair; touch-action:none;}
+  /* рамочка, куди перенести вікно */
+  .wframe{position:absolute; z-index:1; border:.6cqw dashed #FFC93C; border-radius:1.4cqw; background:rgba(255,248,225,.45); pointer-events:none; animation:slotPulse 1.4s ease-in-out infinite;}
+  .wframe.ok{border-style:solid; border-color:var(--ok); background:rgba(63,174,88,.25); animation:none;}
+  @keyframes slotPulse{50%{background:rgba(255,232,150,.7);}}
+
+  /* підпис завдання — по складах, як у букварі: кожен склад з дужкою внизу (syl()) */
+  .ask,.block p.ask{display:flex; flex-wrap:wrap; align-items:flex-end; justify-content:center; column-gap:.4em; row-gap:4px; min-height:56px; margin:0 0 12px; font-family:'Nunito Sans',sans-serif; font-weight:800; font-size:30px; line-height:1.3; color:var(--ink); text-align:center; letter-spacing:.02em;}
+  .ask .w{display:inline-flex; gap:3px; white-space:nowrap;}
+  .ask .s{padding:0 2px 5px; background:no-repeat bottom center/92% 9px url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 9' preserveAspectRatio='none'%3E%3Cpath d='M2 2 Q20 12 38 2' fill='none' stroke='%23F2B57E' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E");}
+  .ask b{font-weight:800; color:var(--accent-dark);}
+  .ask.done,.ask.done b{color:#2F8A47;}
+  .hero .ask{justify-content:flex-start; font-size:22px; min-height:0; margin:0 0 18px; color:var(--ink-soft);}
+  @media (max-width:520px){ .ask,.block p.ask{font-size:24px;} }
+
+  /* картка «що зробити» над робочим столом */
+  /* рядок «підпис + картка» сталої висоти й ширини: що б не показувала картка і скільки б рядків не мав підпис, стіл під ними не зсувається */
+  .task-head{display:grid; grid-template-columns:1fr 255px; align-items:center; column-gap:20px; height:112px; margin-bottom:12px;}
+  .task-head .ask{margin:0; min-height:0; flex-wrap:nowrap; overflow:hidden; padding-bottom:2px;}   /* підпис — завжди в один рядок (fitAsk зменшує шрифт, якщо треба) */
+  .want{display:flex; justify-content:center; align-items:center; gap:14px; height:108px;}
+  @media (max-width:600px){
+    .task-head{grid-template-columns:1fr; grid-template-rows:60px 108px; height:auto; row-gap:6px;}
+    .task-head .ask{font-size:21px;}
+  }
+  .want-card{display:grid; place-items:center; box-sizing:border-box; min-width:84px; height:100px; padding:6px 12px; border-radius:var(--radius-m); background:var(--surface); border:3px solid var(--accent); box-shadow:0 6px 0 var(--accent-soft); animation:pop .35s ease;}
+  .want-card > svg, .want-card .pair > svg{width:66px; height:66px; display:block;}
+  .want-card.miss{animation:wob .4s ease;}
+  .want-card.done{border-color:var(--ok); box-shadow:0 6px 0 #DDF3E1;}
+  /* успіх без слів: картка підстрибує, у куточку — зелена галочка */
+  .want-card{position:relative;}
+  .want-card.yay{animation:yay .45s ease;}
+  @keyframes yay{40%{transform:scale(1.1) rotate(-3deg);}}
+  .want-card.yay::after{content:""; position:absolute; top:-14px; right:-14px; width:34px; height:34px; border-radius:50%; animation:pop .3s ease;
+    background:var(--ok) no-repeat center/60% url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M4 10.5l4 4 8-9' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");}
+  .want-card .pair{display:flex; align-items:center; gap:12px;}
+  .want-card svg.arr{width:56px; height:34px; overflow:visible;}
+  .want-card svg.wcard{width:120px; height:80px;}
+  .q-box{display:grid; place-items:center; width:66px; height:66px; border:3.5px dashed #B9C3D3; border-radius:14px; font:800 40px/1 'Baloo 2',sans-serif; color:#9AA6BC;}
+  .sl-box{display:block; width:76px; height:58px; border:3.5px dashed #FFC93C; border-radius:10px; background:#FFF8E1;}
+  /* кнопка вікна на картці */
+  .tc-btn{display:grid; place-items:center; width:68px; height:54px; border-radius:10px; background:#F2F4F8; border:2.5px solid #D2DAE6; color:#333;}
+  .tc-btn svg{width:26px; height:26px;}
+  .tc-btn.close{background:#E81123; border-color:#C50F1F; color:#fff;}
+  /* панель завдань на картці: програма внизу, в жовтій рамці */
+  .tc-bar{display:flex; align-items:center; gap:10px; padding:8px 14px; border-radius:10px; background:#EEF2FA;}
+  .tc-bar .lg{width:28px; height:28px;}
+  .tc-bar .pn{position:relative; display:grid; place-items:center; width:52px; height:52px; border-radius:10px; background:#fff; box-shadow:0 0 0 3.5px #FFC93C;}
+  .tc-bar .pn svg{width:36px; height:36px;}
+  .tc-bar .pn::after{content:""; position:absolute; left:30%; right:30%; bottom:3px; height:4px; border-radius:2px; background:#8A9BB8;}
+  .tc-bar .clk{font-weight:800; font-size:15px; color:#333; margin-left:6px;}
+  /* миша з підсвіченою лівою кнопкою: hold — світиться, dbl — блимає двічі, click — раз */
+  .lmb{width:58px; height:auto; display:block; overflow:visible;}
+  .lmb.hold .btn{animation:lit 1.4s ease-in-out infinite;}
+  .lmb.dbl .btn{fill:#fff; animation:blink2 1.8s steps(1) infinite;}
+  .lmb.click .btn{fill:#fff; animation:blink1 1.8s steps(1) infinite;}
+  @keyframes blink2{0%{fill:#FFC93C;} 9%{fill:#fff;} 16%{fill:#FFC93C;} 25%{fill:#fff;}}
+  @keyframes blink1{0%{fill:#FFC93C;} 12%{fill:#fff;}}
+  @keyframes lit{50%{fill:#FFE38A;}}
+  @media (max-width:520px){ .want{gap:10px;} .lmb{width:44px;} .tc-btn{width:56px; height:46px;} }
+
+  /* Крок 6 · Яка кнопка? */
+  /* три кнопки-варіанти — точно по центру, кнопка «показати ще раз» — праворуч від них */
+  .pick{display:grid; grid-template-columns:1fr auto 1fr; align-items:center; margin-top:12px;}
+  .pick-opts{display:flex; gap:18px; grid-column:2;}
+  .pick .replay{grid-column:3; justify-self:center;}   /* посередині між правою кнопкою-варіантом і правим краєм столу */
+  #guessPick{margin:12px auto 0; max-width:max(280px, min(662px, calc((100vh - 388px) * 1.6 + 20px))); max-width:max(280px, min(662px, calc((100svh - 388px) * 1.6 + 20px)));}   /* ширина — як у столу, тож ↻ під його правим краєм */
+  .pick-btn{display:grid; place-items:center; width:104px; height:80px; padding:0; border-radius:16px; border:3px solid #D2DAE6; background:#F2F4F8; color:#333; cursor:pointer; box-shadow:0 5px 0 #D2DAE6; transition:transform .1s ease, background .15s ease;}
+  .pick-btn svg{width:36px; height:36px; pointer-events:none;}
+  .pick-btn:hover{background:#fff; transform:translateY(-2px);}
+  .pick-btn:active{transform:translateY(2px);}
+  .pick-btn.ok{background:#D9F2DF; border-color:var(--ok); box-shadow:0 5px 0 #A9DDB5;}
+  .pick-btn.miss{animation:wob .4s ease; background:#FDE6E1; border-color:#F2A595;}
+  .replay{display:grid; place-items:center; width:58px; height:58px; padding:0; border-radius:50%; border:3px solid var(--accent); background:#fff; color:var(--accent); cursor:pointer;}
+  .replay svg{width:28px; height:28px;}
+  .replay:hover{background:var(--accent-soft);}
+  @media (max-width:520px){ .pick-opts{gap:10px;} .pick-btn{width:78px; height:64px;} .pick-btn svg{width:28px; height:28px;} .replay{width:48px; height:48px;} }
+
+  /* заголовок частини уроку */
+  .part-head{display:flex; align-items:center; gap:16px; margin:36px 0 4px; padding:14px 20px; border-radius:var(--radius-l); background:var(--accent-soft); font-family:'Baloo 2',sans-serif; font-weight:800; font-size:30px; line-height:1.1; color:var(--accent-dark);}
+  .part-head small{display:block; font-size:17px; font-weight:700; color:var(--label);}
+  .part-ico{display:grid; place-items:center; width:64px; height:64px; flex-shrink:0; border-radius:50%; background:#fff;}
+  .part-ico svg{width:42px; height:42px;}
+
+  .confetti{position:absolute; top:-3cqw; width:1.4cqw; height:2.2cqw; z-index:900; border-radius:.3cqw; pointer-events:none; animation:confFall var(--t) cubic-bezier(.25,.6,.5,1) var(--d) forwards;}
+  @keyframes confFall{80%{opacity:1;} to{transform:translate(var(--x), 68cqw) rotate(var(--r)); opacity:0;}}
+  #finalQuiz .finish-box{display:none;}   /* урок завершується сам після гри «Парковка» */
+
+  /* Гра · Парковка: двір 6 × 6, машинки їздять лише вперед-назад; виїзд — праворуч у третьому ряду */
+  .pk-box{--fix:350px; position:relative; width:max(260px, min(470px, calc(100vh - var(--fix)), 100% - 40px)); width:max(260px, min(470px, calc(100svh - var(--fix)), 100% - 40px)); margin:10px auto 0;}
+  .pk{position:relative; aspect-ratio:1; container-type:inline-size; padding:3%; border-radius:22px; background:#C3CBD4; box-shadow:0 6px 0 #A3ADB8; user-select:none; -webkit-user-select:none;}
+  .pk-lot{position:relative; width:100%; height:100%; border-radius:2.5cqw; background:#5B6470;
+    background-image:linear-gradient(90deg, rgba(255,255,255,.13) 2px, transparent 2px), linear-gradient(rgba(255,255,255,.13) 2px, transparent 2px);
+    background-size:calc(100% / 6) calc(100% / 6); background-position:-1px -1px;}
+  /* виїзд: розрив у бордюрі й дорога зі стрілкою */
+  .pk-exit{position:absolute; left:calc(100% - 2cqw); top:calc(100% / 6 * 2); width:9cqw; height:calc(100% / 6); background:#5B6470; border-radius:0 2cqw 2cqw 0;}
+  .pk-exit::after{content:""; position:absolute; right:2.2cqw; top:50%; width:5cqw; height:5cqw; transform:translateY(-50%); opacity:.9;
+    background:no-repeat center/contain url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 3l8 7-8 7' fill='none' stroke='%23FFD84D' stroke-width='3.4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");}
+  .car{position:absolute; z-index:2; padding:1.1cqw; box-sizing:border-box; cursor:grab; touch-action:none; transition:left .18s ease, top .18s ease; border-radius:2cqw;}
+  .car svg{display:block; width:100%; height:100%; filter:drop-shadow(0 .5cqw .5cqw rgba(0,0,0,.3)); pointer-events:none;}
+  .car.drag{cursor:grabbing; transition:none; z-index:5;}
+  .car.drag svg{filter:drop-shadow(0 1.2cqw 1cqw rgba(0,0,0,.35));}
+  .car.in{animation:pop .3s ease backwards;}
+  .car.out{transition:transform .7s cubic-bezier(.5,0,.8,.4), opacity .3s ease .45s; transform:translateX(70cqw); opacity:0;}
+  .car.glow{animation:glow 1.2s ease-in-out infinite;}
+  .pk.yay{animation:yay .45s ease;}
+</style>
+</head>
+<body data-lesson="lesson1-program-window" data-hud="1 клас · Вікно програми">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Працюємо з комп'ютером</div>
+      <h1>Програма і вікно програми</h1>
+      <p class="ask" data-syl>Вчи|мо|ся ке|ру|ва|ти ві|кна|ми</p>
+      <button class="btn-primary" onclick="document.getElementById('s1').scrollIntoView()">Почати</button>
+    </div>
+    <!-- Маскот: вікно програми з кнопками керування й усміхненим малюнком, стрілка миші біля ✕ -->
+    <svg class="mascot" viewBox="0 0 140 140" fill="none" aria-hidden="true">
+      <circle cx="70" cy="72" r="60" fill="#FFEFDD"/>
+      <rect x="14" y="26" width="112" height="84" rx="9" fill="#fff" stroke="#C3CDDD" stroke-width="2.5"/>
+      <path d="M14 35a9 9 0 0 1 9-9h94a9 9 0 0 1 9 9v9H14z" fill="#F2F4F8"/>
+      <circle cx="25" cy="35" r="4.5" fill="#E9761A"/>
+      <rect x="34" y="32.5" width="30" height="5" rx="2.5" fill="#C9D1DE"/>
+      <path d="M78 36h8" stroke="#333" stroke-width="2.2" stroke-linecap="round"/>
+      <rect x="93" y="31.5" width="8" height="8" rx="1" stroke="#333" stroke-width="2"/>
+      <rect x="106" y="27.5" width="20" height="16" fill="#E81123"/><path d="M112 31.5l8 8M120 31.5l-8 8" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>
+      <rect x="15.3" y="44" width="109.4" height="64.7" fill="#FFF6E8"/>
+      <circle cx="70" cy="76" r="20" fill="#FFC93C"/>
+      <circle cx="63" cy="71" r="2.8" fill="#3B3D56"/><circle cx="77" cy="71" r="2.8" fill="#3B3D56"/>
+      <path d="M61 80 Q70 89 79 80" stroke="#3B3D56" stroke-width="3" stroke-linecap="round"/>
+      <path d="M112 48 L112 70 L117.5 65 L121.5 74 L125.5 72 L121.5 63 L128.5 62.5 Z" fill="#fff" stroke="#1B1B3A" stroke-width="2.4" stroke-linejoin="round"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <div class="part-head"><span class="part-ico"><svg viewBox="0 0 48 40" aria-hidden="true"><rect x="2" y="2" width="44" height="36" rx="4" fill="#fff" stroke="#8A9BB8" stroke-width="2.5"/><path d="M2 6a4 4 0 0 1 4-4h36a4 4 0 0 1 4 4v6H2z" fill="#E9761A"/><path d="M27 7h4" stroke="#fff" stroke-width="2" stroke-linecap="round"/><rect x="34" y="5" width="4" height="4" stroke="#fff" stroke-width="1.6" fill="none"/><path d="M41 5l3 3M44 5l-3 3" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><path d="M8 30 L18 20 L26 27 L32 22 L40 30Z" fill="#5DBA63"/><circle cx="36" cy="18" r="3" fill="#FFC93C"/></svg></span><span><small>Частина 1</small>Вікно програми</span></div>
+
+  <section class="block" id="s1">
+    <div class="step-label">Крок 1 · Вікно програми</div>
+    <h2>Запусти програму і керуй вікном</h2>
+    <div class="exercise">
+      <div class="task-head">
+        <div class="ask" id="partAsk"></div>
+        <div class="want" id="partWant"></div>
+      </div>
+      <div class="desk-box" id="partDesk"></div>
+      <div class="dots" id="partDots"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Переносимо вікно</div>
+    <h2>Перенеси вікно в рамочку</h2>
+    <div class="exercise">
+      <div class="task-head">
+        <div class="ask" id="moveAsk"></div>
+        <div class="want" id="moveWant"></div>
+      </div>
+      <div class="desk-box" id="moveDesk"></div>
+      <div class="dots" id="moveDots"></div>
+    </div>
+  </section>
+
+  <div class="part-head"><span class="part-ico"><svg viewBox="0 0 48 20" aria-hidden="true"><rect x="0" y="0" width="16" height="20" fill="#F2F4F8"/><path d="M4 10h8" stroke="#333" stroke-width="2.2" stroke-linecap="round"/><rect x="16" y="0" width="16" height="20" fill="#F2F4F8"/><rect x="20" y="6" width="8" height="8" stroke="#333" stroke-width="2" fill="none"/><rect x="32" y="0" width="16" height="20" fill="#E81123"/><path d="M36 6l8 8M44 6l-8 8" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg></span><span><small>Частина 2</small>Кнопки керування вікном</span></div>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Закрити</div>
+    <h2>Закрий вікна</h2>
+    <div class="exercise">
+      <div class="task-head">
+        <div class="ask" id="closeAsk"></div>
+        <div class="want" id="closeWant"></div>
+      </div>
+      <div class="desk-box" id="closeDesk"></div>
+      <div class="dots" id="closeDots"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Згорнути</div>
+    <h2>Сховай вікно і поверни</h2>
+    <div class="exercise">
+      <div class="task-head">
+        <div class="ask" id="minAsk"></div>
+        <div class="want" id="minWant"></div>
+      </div>
+      <div class="desk-box" id="minDesk"></div>
+      <div class="dots" id="minDots"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Розгорнути</div>
+    <h2>Велике й маленьке вікно</h2>
+    <div class="exercise">
+      <div class="task-head">
+        <div class="ask" id="maxAsk"></div>
+        <div class="want" id="maxWant"></div>
+      </div>
+      <div class="desk-box" id="maxDesk"></div>
+      <div class="dots" id="maxDots"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Яка кнопка?</div>
+    <h2>Яку кнопку натиснули?</h2>
+    <div class="exercise">
+      <p class="ask" id="guessAsk" data-syl>Я|ку кноп|ку на|тис|ну|ли?</p>
+      <div class="desk-box" id="guessDesk"></div>
+      <div class="pick" id="guessPick"></div>
+      <div class="dots" id="guessDots"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Гра · Наведи лад</div>
+    <h2>Наведи лад на робочому столі</h2>
+    <div class="exercise">
+      <div class="task-head">
+        <div class="ask" id="gameAsk"></div>
+        <div class="want" id="gameWant"></div>
+      </div>
+      <div class="desk-box" id="gameDesk"></div>
+      <div class="dots" id="gameDots"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Гра · Парковка</div>
+    <h2>Парковка</h2>
+    <div class="exercise">
+      <p class="ask" id="pkAsk"></p>
+      <div class="pk-box"><div class="pk" id="pk"><div class="pk-lot" id="pkLot"><div class="pk-exit"></div></div></div></div>
+      <div class="dots" id="pkDots"></div>
+    </div>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Урок · «Поняття програми. Вікно програми. Кнопки керування вікном» · 1 клас</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script>
+/* Над кожним завданням — короткий підпис по складах (діти читають по складах); озвучення немає — пояснює вчитель.
+   Що зробити — ще й картка-малюнок над робочим столом; якщо дитина довго не діє — потрібне підсвічується (idleHint). */
+
+/* ---------- ПІКТОГРАМИ (ті самі, що в уроці «Робочий стіл», 48×48) ---------- */
+const ICONS = {
+  bin:   { name:'Кошик', svg:`<path d="M11 15h26l-2.5 27a3 3 0 0 1-3 2.7H16.5a3 3 0 0 1-3-2.7z" fill="#DDE6F3" stroke="#8A9BB8" stroke-width="2"/>
+    <path d="M19 21v17M24 21v17M29 21v17" stroke="#8A9BB8" stroke-width="2" stroke-linecap="round"/><rect x="8" y="10" width="32" height="6" rx="2" fill="#B9C7DC" stroke="#8A9BB8" stroke-width="2"/><rect x="19" y="6" width="10" height="5" rx="1.5" fill="#B9C7DC" stroke="#8A9BB8" stroke-width="2"/>` },
+  folder:{ name:'Мої фото', svg:`<path d="M4 12a3 3 0 0 1 3-3h11l4 5h19a3 3 0 0 1 3 3v21a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z" fill="#E9A92F"/>
+    <rect x="9" y="12" width="26" height="18" rx="2" fill="#fff" transform="rotate(-6 22 21)"/><path d="M11 26l6-6 5 4 4-3 6 6z" fill="#5DBA63" transform="rotate(-6 22 21)"/>
+    <path d="M4 19h40v18a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3z" fill="#FFCF5C"/>` },
+  paint: { name:'Малювання', svg:`<path d="M24 5C12 5 4 13 4 23c0 10 8 19 18 19 4 0 5-3 3-6-2-3 0-6 4-6h6c7 0 9-5 9-9C44 12 35 5 24 5z" fill="#F7E3C3" stroke="#C89B5F" stroke-width="2"/>
+    <circle cx="14" cy="21" r="4" fill="#E8458B"/><circle cx="22" cy="13" r="4" fill="#3BA4F5"/><circle cx="32" cy="14" r="4" fill="#3FAE58"/><circle cx="14" cy="31" r="4" fill="#FFC93C"/>` },
+  music: { name:'Музика', svg:`<circle cx="24" cy="24" r="20" fill="#FF7A45"/><path d="M20 32V15l14-3v17" stroke="#fff" stroke-width="3" fill="none" stroke-linejoin="round"/><circle cx="17" cy="32" r="4" fill="#fff"/><circle cx="31" cy="29" r="4" fill="#fff"/>` },
+  calc:  { name:'Калькулятор', svg:`<rect x="9" y="4" width="30" height="40" rx="5" fill="#5B6B86"/><rect x="13" y="8" width="22" height="9" rx="2" fill="#CFF3D6"/>
+    ${[0, 1, 2].map(r=>[0, 1, 2].map(c=>`<rect x="${13 + c * 8}" y="${21 + r * 7.5}" width="6" height="5.5" rx="1.5" fill="${r === 2 && c === 2 ? '#FF9F43' : '#fff'}"/>`).join('')).join('')}` },
+  game:  { name:'Гра', svg:`<path d="M13 15h22c6 0 9 7 9 15 0 6-3 9-6 9-3 0-5-4-8-6H18c-3 2-5 6-8 6-3 0-6-3-6-9 0-8 3-15 9-15z" fill="#8E7CF0"/>
+    <path d="M11 26h8M15 22v8" stroke="#fff" stroke-width="3" stroke-linecap="round"/><circle cx="32" cy="23.5" r="2.6" fill="#FFC93C"/><circle cx="36.5" cy="28.5" r="2.6" fill="#FF6B8A"/>` },
+  web:   { name:'Інтернет', svg:`<circle cx="24" cy="24" r="19" fill="#3BA4F5"/><g stroke="#fff" stroke-width="2.2" fill="none"><ellipse cx="24" cy="24" rx="8" ry="19"/><path d="M5 24h38M8 14h32M8 34h32"/></g>` },
+  mail:  { name:'Пошта', svg:`<rect x="4" y="10" width="40" height="28" rx="4" fill="#fff" stroke="#3BA4F5" stroke-width="2.6"/><path d="M6 13l18 14 18-14" stroke="#3BA4F5" stroke-width="2.6" fill="none" stroke-linejoin="round"/>` },
+};
+const icon = k=>`<svg viewBox="0 0 48 48" fill="none">${ICONS[k].svg}</svg>`;
+
+/* що всередині вікна програми — робоча область (120×80); BG — колір тла, щоб вікно будь-якої форми було заповнене */
+const ART = {
+  paint: `<circle cx="98" cy="18" r="10" fill="#FFC93C"/><rect x="34" y="38" width="40" height="32" fill="#FF8C2E"/><path d="M28 40 L54 16 L80 40 Z" fill="#E8458B"/><rect x="48" y="52" width="12" height="18" fill="#7A4B2A"/><path d="M-60 72 H180" stroke="#3FAE58" stroke-width="6"/>
+    <path d="M92 64 l12 -22" stroke="#C89B5F" stroke-width="4" stroke-linecap="round"/><path d="M90 68 l3 -5 3 2z" fill="#3BA4F5"/>`,
+  music: `<circle cx="60" cy="32" r="22" fill="#FF7A45"/><path d="M55 42V24l13-3v16" stroke="#fff" stroke-width="3" fill="none"/><circle cx="52" cy="42" r="4" fill="#fff"/><circle cx="65" cy="38" r="4" fill="#fff"/>
+    <rect x="14" y="64" width="92" height="5" rx="2.5" fill="#F3D9CC"/><rect x="14" y="64" width="40" height="5" rx="2.5" fill="#FF7A45"/><circle cx="54" cy="66.5" r="4" fill="#FF7A45"/>
+    <path d="M90 14 v12 M90 14 l7 -2" stroke="#FFB08A" stroke-width="2.4" stroke-linecap="round"/><circle cx="87" cy="26" r="3" fill="#FFB08A"/><path d="M24 20 v10" stroke="#FFB08A" stroke-width="2.4" stroke-linecap="round"/><circle cx="21" cy="30" r="3" fill="#FFB08A"/>`,
+  calc: `<rect x="30" y="6" width="60" height="16" rx="3" fill="#CFF3D6"/><text x="85" y="19" text-anchor="end" font-family="Nunito Sans, sans-serif" font-weight="800" font-size="12" fill="#1B1B3A">2+3=5</text>
+    ${[0, 1, 2].map(r=>[0, 1, 2, 3].map(c=>`<rect x="${30 + c * 15.5}" y="${27 + r * 17}" width="13" height="14" rx="3" fill="${c === 3 ? '#FF9F43' : '#fff'}" stroke="#D3D9E4"/>`).join('')).join('')}`,
+  folder: `${[[8, 10], [44, 10], [80, 10], [8, 44], [44, 44], [80, 44]].map(([x, y], i)=>`<g transform="translate(${x} ${y})"><rect width="32" height="28" rx="3" fill="${['#9AD5FF', '#FFE08A', '#C8F0D0', '#FFD0DC', '#D8D0FF', '#FFE3C8'][i]}"/><path d="M0 24l10-10 8 7 6-5 8 8v4H0z" fill="#4CB873"/><circle cx="24" cy="8" r="3.5" fill="#FFD84D"/></g>`).join('')}`,
+  game: `${[0, 1, 2, 3, 4, 5].map(c=>[0, 1].map(r=>`<rect x="${8 + c * 18}" y="${8 + r * 9}" width="16" height="7" rx="2" fill="${['#FF6B8A', '#FFC93C', '#5BE37D', '#3BA4F5', '#8E7CF0', '#FF8C2E'][c]}"/>`).join('')).join('')}
+    <circle cx="70" cy="46" r="4" fill="#fff"/><rect x="48" y="68" width="28" height="5" rx="2.5" fill="#8E7CF0"/><path d="M58 64 l10 -16" stroke="#fff" stroke-width="1.4" stroke-dasharray="2 3" opacity=".6"/>`,
+  web: `<rect x="-60" width="240" height="12" fill="#E3EEFC"/><rect x="20" y="3" width="80" height="6" rx="3" fill="#fff"/>
+    <rect x="8" y="18" width="50" height="34" rx="3" fill="#9AD5FF"/><circle cx="33" cy="33" r="9" fill="#FFC93C"/><circle cx="30" cy="31" r="1.4" fill="#1B1B3A"/><circle cx="36" cy="31" r="1.4" fill="#1B1B3A"/><path d="M29 36 q4 3 8 0" stroke="#1B1B3A" stroke-width="1.4" fill="none"/>
+    <g fill="#D3DAE6"><rect x="64" y="20" width="48" height="5" rx="2"/><rect x="64" y="30" width="40" height="4" rx="2"/><rect x="64" y="38" width="44" height="4" rx="2"/><rect x="64" y="46" width="30" height="4" rx="2"/><rect x="8" y="58" width="104" height="4" rx="2"/><rect x="8" y="66" width="86" height="4" rx="2"/></g>`,
+  mail: `${[0, 1, 2, 3].map(i=>`<g transform="translate(10 ${8 + i * 18})"><rect width="100" height="14" rx="3" fill="${i ? '#fff' : '#E3F1FD'}" stroke="#D3DAE6"/>
+    <rect x="4" y="3" width="12" height="8" rx="1.5" fill="#fff" stroke="#3BA4F5" stroke-width="1.4"/><path d="M4.5 3.5l5.5 4 5.5-4" stroke="#3BA4F5" stroke-width="1.2" fill="none"/>
+    <rect x="22" y="4" width="${[40, 52, 34, 46][i]}" height="3" rx="1.5" fill="#9AA6BC"/><rect x="22" y="9" width="${[60, 44, 56, 38][i]}" height="2" rx="1" fill="#D3DAE6"/></g>`).join('')}`,
+};
+const BG = { paint:'#fff', music:'#FFF3EC', calc:'#EEF1F6', folder:'#fff', game:'#2B2560', web:'#fff', mail:'#F7F9FC' };
+const art = k=>`<svg class="art" viewBox="0 0 120 80" preserveAspectRatio="xMidYMid meet">${ART[k]}</svg>`;
+
+
+/* кнопки керування вікном (як у Windows): згорнути, розгорнути, відновити (зменшити), закрити */
+const GLYPH = {
+  min:     '<svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.1"><path d="M1 5.5H9"/></svg>',
+  max:     '<svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.1"><rect x="1.5" y="1.5" width="7" height="7" rx=".6"/></svg>',
+  restore: '<svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.1"><rect x="1" y="3" width="6" height="6" rx=".6"/><path d="M3 3V1.5a.5.5 0 0 1 .5-.5H8.5a.5.5 0 0 1 .5.5V6.5a.5.5 0 0 1-.5.5H7"/></svg>',
+  close:   '<svg viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round"><path d="M1.5 1.5l7 7M8.5 1.5l-7 7"/></svg>',
+};
+const tile = act=>`<div class="tc-btn${act === 'close' ? ' close' : ''}">${GLYPH[act]}</div>`;
+const LOGO = '<svg class="lg" viewBox="0 0 20 20"><rect x="1" y="1" width="8.4" height="8.4" rx="1" fill="#3A9BFF"/><rect x="10.6" y="1" width="8.4" height="8.4" rx="1" fill="#2F86EB"/><rect x="1" y="10.6" width="8.4" height="8.4" rx="1" fill="#2F86EB"/><rect x="10.6" y="10.6" width="8.4" height="8.4" rx="1" fill="#1F6FD1"/></svg>';
+// панель завдань на картці: програма внизу в жовтій рамці — «клацни тут»
+const tcBar = k=>`<div class="tc-bar">${LOGO}<span class="pn">${icon(k)}</span></div>`;
+// маленьке вікно на картці (150×100), жовтим виділено потрібну частину
+function winCard(part, k = 'paint', big = false){
+  const R = { title:[4, 4, 90, 18], body:[4, 22, 142, 74], min:[94, 4, 16, 18], max:[110, 4, 16, 18], restore:[110, 4, 16, 18], close:[126, 4, 20, 18] }[part];
+  return `<svg class="wcard" viewBox="0 0 150 100" fill="none">
+    <rect x="4" y="4" width="142" height="92" rx="5" fill="#fff" stroke="#B9C3D3" stroke-width="2"/>
+    <path d="M4 9a5 5 0 0 1 5-5h132a5 5 0 0 1 5 5v13H4z" fill="#F2F4F8"/>
+    <g transform="translate(9 7) scale(.25)">${ICONS[k].svg}</g>
+    <rect x="24" y="11" width="40" height="4" rx="2" fill="#9AA6BC"/>
+    <path d="M98 13.5h8" stroke="#333" stroke-width="1.4"/>${big ? '<rect x="114" y="11" width="6" height="6" rx=".6" stroke="#333" stroke-width="1.3"/><path d="M116 11V9.5h6v6h-2" stroke="#333" stroke-width="1.3"/>' : '<rect x="114.5" y="9.5" width="7" height="7" rx=".6" stroke="#333" stroke-width="1.3"/>'}<path d="M132.5 9.5l7 7M139.5 9.5l-7 7" stroke="#333" stroke-width="1.4" stroke-linecap="round"/>
+    <rect x="5" y="22" width="140" height="73" fill="${BG[k]}"/><svg x="5" y="23" width="140" height="72" viewBox="0 0 120 80">${ART[k]}</svg>
+    ${R ? `<rect x="${R[0]}" y="${R[1]}" width="${R[2]}" height="${R[3]}" rx="3" fill="rgba(255,201,60,.3)" stroke="#FFC93C" stroke-width="3.5"/>` : ''}
+  </svg>`;
+}
+const ARROW = '<svg class="arr" viewBox="0 0 60 36"><path d="M4 30 C12 2 40 8 54 18" fill="none" stroke="#E9761A" stroke-width="4" stroke-linecap="round" stroke-dasharray="1 8"/><path d="M45 11 L55 18 L44 23" fill="none" stroke="#E9761A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const lmb = mode=>`<svg class="lmb ${mode}" viewBox="0 0 64 90" aria-label="Ліва кнопка миші">
+  <path d="M32 4 C52 4 60 20 60 40 C60 66 48 86 32 86 C16 86 4 66 4 40 C4 20 12 4 32 4Z" fill="#fff" stroke="#3B3D56" stroke-width="4"/>
+  <path class="btn" d="M32 6 C15 6 7 19 6 36 H32 Z" fill="#FFC93C"/><path d="M32 4V36 M5 36H59" stroke="#3B3D56" stroke-width="3.5"/></svg>`;
+
+// назви програм по складах: хто? що? і кого? що?
+const NOM = { paint:'*Ма|лю|ван|ня*', music:'*Му|зи|ка*', calc:'*Каль|ку|ля|тор*', folder:'*Мо|ї* *фо|то*', game:'*Гра*', mail:'*Пош|та*', web:'*Ін|тер|нет*' };
+const ACC = { paint:'*Ма|лю|ван|ня*', music:'*Му|зи|ку*', calc:'*Каль|ку|ля|тор*', folder:'*Мо|ї* *фо|то*', game:'*Гру*', mail:'*Пош|ту*', web:'*Ін|тер|нет*' };
+
+const flick = (el, cls = 'miss')=>{ if(!el) return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); setTimeout(()=>el.classList.remove(cls), 600); };
+const glowOn = el=>{ document.querySelectorAll('.glow').forEach(g=>g.classList.remove('glow')); el?.classList.add('glow'); };
+// якщо дитина довго нічого не робить — підсвітити потрібне
+function idleHint(getTarget, ms = 8000){
+  let t = null;
+  const f = ()=>{ clearTimeout(t); glowOn(null); t = setTimeout(()=>{ const el = getTarget(); if(el && el.isConnected) glowOn(el); }, ms); };
+  f.stop = ()=>{ clearTimeout(t); glowOn(null); };
+  return f;
+}
+/* Текст по складах: склади ділимо «|», слова — пробілом, *…* — виділене слово. */
+function syl(t){
+  return t.trim().split(/\s+/).map(w=>{
+    const hl = /^\*.*\*[!?.,]?$/.test(w);
+    const inner = w.replace(/\*/g, '').split('|').map(x=>`<span class="s">${x}</span>`).join('');
+    return hl ? `<b class="w">${inner}</b>` : `<span class="w">${inner}</span>`;
+  }).join(' ');
+}
+document.querySelectorAll('[data-syl]').forEach(el=>{ el.innerHTML = syl(el.textContent); });
+// підпис у рядку з карткою — завжди в один рядок: якщо не вміщається, трохи зменшуємо шрифт
+function fitAsk(el){
+  if(!el.closest('.task-head')) return;
+  el.style.fontSize = '';
+  let f = parseFloat(getComputedStyle(el).fontSize);
+  while(el.scrollWidth > el.clientWidth + 1 && f > 16){ f -= 1; el.style.fontSize = f + 'px'; }
+}
+addEventListener('resize', ()=>document.querySelectorAll('.task-head .ask').forEach(fitAsk));
+function ask(el, t){ el.classList.remove('done'); el.innerHTML = syl(t); fitAsk(el); }
+// успіх після дії — без тексту й без зміни підпису: лише картка підстрибує й отримує зелену галочку; повертає паузу до наступного завдання
+function cheer(askEl, want, x, y){
+  want?.querySelector('.want-card')?.classList.add('done', 'yay');
+  return 1000;
+}
+function praise(el, t){ el.classList.add('done'); el.innerHTML = syl(t); fitAsk(el); }   // лише коли вправу виконано всю
+const dots = (el, n, k)=>{ el.innerHTML = Array.from({length:n}, (_, i)=>`<i class="${i < k ? 'ok' : i === k ? 'now' : ''}"></i>`).join(''); };
+const DONE_CARD = '<div class="want-card done"><span style="font-size:52px">👍</span></div>';
+// нараховує нейрончики лише за новий найкращий результат (повторне проходження нічого не додає)
+function scorer(el, n){
+  const hit = trackTask(el, n, n + 2);
+  let best = 0;
+  return k=>{ if(k <= best) return; best = k; addNeurons(1); hit(); if(best === n) addNeurons(2); };
+}
+
+/* ---------- РОБОЧИЙ СТІЛ ---------- */
+function makeDesk(root, icons = []){
+  root.innerHTML = `<div class="desk">
+      <span class="hill h1"></span><span class="hill h2"></span><span class="sun"></span>
+      <span class="cloud" style="left:40%; top:10%; width:12cqw"></span><span class="cloud" style="left:62%; top:22%; width:8cqw"></span>
+      ${icons.map(([k, x, y])=>`<div class="di" data-k="${k}" style="left:${x}%; top:${y}%">${icon(k)}<b>${ICONS[k].name}</b></div>`).join('')}
+      <div class="d-bar"><span class="d-start" aria-label="Пуск">${LOGO}</span><span class="d-clock">9:00</span></div>
+    </div>`;
+  const desk = root.querySelector('.desk');
+  return { desk, icon:k=>desk.querySelector(`.di[data-k="${k}"]`),
+    select(el){ desk.querySelectorAll('.di.sel').forEach(d=>d.classList.remove('sel')); el?.classList.add('sel'); } };
+}
+
+/* ---------- ВІКНА: відкрити, на передній план, згорнути, повернути, розгорнути, зменшити, закрити ----------
+   Для кожного відкритого вікна на панелі завдань — значок програми; активне вікно — довга риска під значком. */
+const PIN_ORDER = ['paint', 'music', 'calc', 'game', 'folder', 'mail', 'web'];
+function makeWM(desk){
+  const bar = desk.querySelector('.d-bar'), clock = bar.querySelector('.d-clock');
+  const W = {};
+  let z = 10;
+  const pin = k=>bar.querySelector(`.d-pin[data-k="${k}"]`);
+  const top = ()=>Object.keys(W).filter(k=>!W[k].min).sort((a, b)=>W[b].el.style.zIndex - W[a].el.style.zIndex)[0];
+  const sync = ()=>{ const t = top(); bar.querySelectorAll('.d-pin').forEach(p=>p.classList.toggle('act', p.dataset.k === t)); };
+  // куди летить вікно, коли згортається, — до свого значка на панелі завдань
+  function toPin(k){
+    const w = W[k].el.getBoundingClientRect(), p = pin(k).getBoundingClientRect();
+    return `translate(${p.left + p.width / 2 - (w.left + w.width / 2)}px, ${p.top + p.height / 2 - (w.top + w.height / 2)}px) scale(.06)`;
+  }
+  const M = {
+    W, pin, top,
+    open(k, [x, y, w, h], quiet = false){
+      const el = document.createElement('div');
+      el.className = 'win'; el.dataset.k = k;
+      Object.assign(el.style, { left:x + '%', top:y + '%', width:w + '%', height:h + '%', zIndex:++z });
+      el.innerHTML = `<div class="wt">${icon(k)}<span class="nm">${ICONS[k].name}</span>`
+        + `<span class="wb" data-act="min" aria-label="Згорнути">${GLYPH.min}</span><span class="wb" data-act="max" aria-label="Розгорнути">${GLYPH.max}</span><span class="wb x" data-act="close" aria-label="Закрити">${GLYPH.close}</span></div>`
+        + `<div class="wbody" style="background:${BG[k]}">${art(k)}</div>`;
+      desk.insertBefore(el, bar);
+      // значки на панелі — завжди в тому самому порядку (PIN_ORDER), щоб панель не «стрибала»
+      if(!pin(k)){ const after = [...bar.querySelectorAll('.d-pin')].find(p=>PIN_ORDER.indexOf(p.dataset.k) > PIN_ORDER.indexOf(k)); (after || clock).insertAdjacentHTML('beforebegin', `<span class="d-pin" data-k="${k}" aria-label="${ICONS[k].name}">${icon(k)}</span>`); }
+      W[k] = { el, min:false, max:false, anim:null };
+      if(!quiet) el.animate([{transform:'scale(.3)', opacity:0}, {transform:'none', opacity:1}], {duration:280, easing:'ease-out'});
+      sync();
+      return el;
+    },
+    front(k){ if(W[k] && !W[k].min){ W[k].el.style.zIndex = ++z; sync(); } },
+    close(k){
+      const w = W[k]; if(!w) return;
+      delete W[k]; pin(k)?.remove(); sync();
+      w.el.style.pointerEvents = 'none';
+      w.el.animate([{opacity:1, transform:'none'}, {opacity:0, transform:'scale(.5)'}], {duration:230, easing:'ease-in', fill:'forwards'}).onfinish = ()=>w.el.remove();
+    },
+    minimize(k, quiet = false){
+      const w = W[k]; if(!w || w.min) return;
+      w.anim?.cancel();
+      if(quiet){ w.min = true; w.el.style.visibility = 'hidden'; w.el.style.pointerEvents = 'none'; sync(); return; }
+      const to = toPin(k);
+      w.min = true; w.el.style.pointerEvents = 'none'; sync();
+      w.anim = w.el.animate([{transform:'none', opacity:1}, {transform:to, opacity:.3}], {duration:420, easing:'ease-in', fill:'forwards'});
+      w.anim.onfinish = ()=>{ if(w.min) w.el.style.visibility = 'hidden'; };
+    },
+    restore(k){
+      const w = W[k]; if(!w || !w.min) return;
+      w.anim?.cancel();
+      w.min = false; w.el.style.visibility = ''; w.el.style.pointerEvents = ''; w.el.style.zIndex = ++z;
+      w.anim = w.el.animate([{transform:toPin(k), opacity:.3}, {transform:'none', opacity:1}], {duration:380, easing:'ease-out'});
+      sync();
+    },
+    maximize(k){
+      const w = W[k]; if(!w) return;
+      w.max = true; w.el.classList.add('max'); M.front(k);
+      const b = w.el.querySelector('[data-act="max"]'); b.dataset.act = 'restore'; b.innerHTML = GLYPH.restore; b.setAttribute('aria-label', 'Відновити');
+    },
+    unmax(k){
+      const w = W[k]; if(!w) return;
+      w.max = false; w.el.classList.remove('max');
+      const b = w.el.querySelector('[data-act="restore"]'); b.dataset.act = 'max'; b.innerHTML = GLYPH.max; b.setAttribute('aria-label', 'Розгорнути');
+    },
+    btn:(k, act)=>W[k]?.el.querySelector(`[data-act="${act}"]`),
+    clear(){ Object.values(W).forEach(w=>{ w.anim?.cancel(); w.el.remove(); }); Object.keys(W).forEach(k=>delete W[k]); bar.querySelectorAll('.d-pin').forEach(p=>p.remove()); },
+    // що саме клацнули: кнопку вікна, рядок заголовка, робочу область чи значок на панелі завдань
+    info(e){
+      const p = e.target.closest('.d-pin');
+      if(p) return { k:p.dataset.k, act:'pin', el:p };
+      const win = e.target.closest('.win');
+      if(!win) return null;
+      const b = e.target.closest('[data-act]');
+      if(b) return { k:win.dataset.k, act:b.dataset.act, el:b };
+      if(e.target.closest('.wt')) return { k:win.dataset.k, act:'title', el:win.querySelector('.wt') };
+      return { k:win.dataset.k, act:'body', el:win.querySelector('.wbody') };
+    },
+  };
+  return M;
+}
+function confetti(desk){
+  const COLORS = ['#FFC93C', '#FF6B6B', '#4DABF7', '#51CF66', '#CC5DE8', '#FF922B'];
+  for(let n = 0; n < 70; n++){
+    const c = document.createElement('i');
+    c.className = 'confetti';
+    c.style.cssText = `left:${Math.random() * 100}%; background:${COLORS[n % COLORS.length]}; --x:${(Math.random() * 16 - 8).toFixed(1)}cqw; --r:${Math.round(Math.random() * 720 - 360)}deg; --t:${(1.6 + Math.random() * 1.2).toFixed(2)}s; --d:${(Math.random() * .6).toFixed(2)}s`;
+    desk.appendChild(c);
+  }
+  setTimeout(()=>desk.querySelectorAll('.confetti').forEach(c=>c.remove()), 3600);
+}
+// 4 вікна сходинками: заголовок і кнопки кожного видно з-під наступного
+const CASCADE = [[3, 3], [13, 16], [23, 29], [33, 42]].map(([x, y])=>[x, y, 56, 42]);
+
+/* ---------- КРОК 1 · ВІКНО ПРОГРАМИ ----------
+   Усе по порядку, як у житті: запустити програму (двічі клацнути піктограму) → знайти рядок заголовка й робочу область →
+   розгорнути вікно → зменшити → знову розгорнути → згорнути на панель завдань → повернути з панелі → закрити. Кнопки справді діють.
+   Картка-малюнок показує, де потрібна частина чи кнопка. Не та кнопка чи піктограма — хибна спроба, вікно нічого не робить.
+   «Почати знову» — те саме з іншою програмою. */
+(function(){
+  const want = document.getElementById('partWant'), dotsEl = document.getElementById('partDots'), askEl = document.getElementById('partAsk');
+  const D = makeDesk(document.getElementById('partDesk'), [['bin', 2, 3], ['folder', 2, 27], ['paint', 2, 51], ['music', 20, 3], ['calc', 20, 27], ['game', 20, 51]]);
+  const WM = makeWM(D.desk);
+  // розгорнути → зменшити → знову розгорнути → згорнути на панель → повернути → закрити
+  const SEQ = ['open', 'title', 'body', 'max', 'restore', 'max2', 'min', 'back', 'close'];
+  const ACT = s=>s === 'max2' ? 'max' : s;
+  const SAY = {
+    open:  [k=>`За|пус|ти ${ACC[k]}`],
+    title: [()=>'Знай|ди *ря|док* *за|го|лов|ка*'],
+    body:  [()=>'Знай|ди *ро|бо|чу* *об|ласть*'],
+    max:   [()=>'*Роз|гор|ни* ві|кно'],
+    restore:[()=>'*Змен|ши* ві|кно'],
+    max2:  [()=>'*Роз|гор|ни* ві|кно'],
+    min:   [()=>'*Згор|ни* ві|кно'],
+    back:  [()=>'*По|вер|ни* ві|кно'],
+    close: [()=>'*За|крий* ві|кно'],
+  };
+  const BTN = ['min', 'max', 'restore', 'close'];
+  const score = scorer(D.desk, SEQ.length);
+  let k = 'paint', i = 0, busy = false, gen = 0, last = { el:null, t:0 };
+  const step = ()=>SEQ[i];
+  const target = ()=>{
+    if(busy || i >= SEQ.length) return null;
+    const s = step(), w = WM.W[k]?.el;
+    return s === 'open' ? D.icon(k) : s === 'back' ? WM.pin(k) : s === 'title' ? w?.querySelector('.wt') : s === 'body' ? w?.querySelector('.wbody') : WM.btn(k, ACT(s));
+  };
+  const idle = idleHint(target, 9000);
+  function show(){
+    dots(dotsEl, SEQ.length, i);
+    if(i >= SEQ.length){ want.innerHTML = DONE_CARD; praise(askEl, 'Мо|ло|дець!'); idle.stop(); return; }
+    const s = step();
+    want.innerHTML = s === 'open' ? `<div class="want-card">${icon(k)}</div>${lmb('dbl')}`
+      : s === 'back' ? `<div class="want-card">${tcBar(k)}</div>${lmb('click')}`
+      : `<div class="want-card">${winCard(ACT(s), k, !!WM.W[k]?.max)}</div>${s === 'title' || s === 'body' ? '' : lmb('click')}`;
+    ask(askEl, SAY[s][0](k));
+    idle();
+  }
+  function ok(el, e){
+    idle.stop();
+    el?.classList.add('hit');
+    want.firstElementChild.classList.add('done');
+    const wait = cheer(askEl, want, e?.clientX, e?.clientY);
+    score(i + 1);
+    busy = true;
+    const g = gen;
+    setTimeout(()=>{ if(g !== gen) return; el?.classList.remove('hit'); busy = false; i++; show(); }, wait);
+  }
+  const wrong = el=>{ flick(el); flick(want.firstElementChild); idle(); };
+  D.desk.addEventListener('click', e=>{
+    if(busy || i >= SEQ.length) return;
+    const s = step();
+    // запуск: двічі клацнути піктограму (одне клацання лише виділяє)
+    if(s === 'open'){
+      const di = e.target.closest('.di');
+      if(!di){ D.select(null); return; }
+      const now = performance.now(), dbl = last.el === di && now - last.t < 500;
+      last = { el:di, t:now };
+      D.select(di);
+      if(!dbl) return;
+      last = { el:null, t:0 };
+      if(di.dataset.k !== k){ wrong(di); return; }
+      D.select(null);
+      WM.open(k, [12, 5, 70, 70]);
+      ok(null, e);
+      return;
+    }
+    const h = WM.info(e);
+    if(!h) return;
+    if(s === 'title' || s === 'body'){
+      if(h.act === s){ ok(h.el, e); return; }
+      if(h.act !== 'pin') wrong(h.el);
+      return;
+    }
+    if(s === 'back'){
+      if(h.act === 'pin' && h.k === k){ WM.restore(k); ok(null, e); }
+      else wrong(h.el);
+      return;
+    }
+    // кнопки керування: діє лише та, яку просять
+    if(h.act === 'title' || h.act === 'body') return;
+    if(h.act !== ACT(s)){ if(h.act === 'pin' || BTN.includes(h.act)) wrong(h.el); return; }
+    if(s === 'max' || s === 'max2') WM.maximize(k);
+    else if(s === 'restore') WM.unmax(k);
+    else if(s === 'min') WM.minimize(k);
+    else WM.close(k);
+    ok(null, e);
+  });
+  let first = true;
+  function reset(){
+    gen++; i = 0; busy = false; last = { el:null, t:0 };
+    WM.clear(); D.select(null);
+    // перший раз — Малювання, далі щоразу інша програма
+    if(!first){ const prev = k; k = shuffle(['paint', 'music', 'calc', 'folder', 'game'].filter(x=>x !== prev))[0]; }
+    first = false;
+    show();
+  }
+  reset();
+  addRestart(D.desk, reset);
+})();
+
+/* ---------- КРОК 2 · ПЕРЕНОСИМО ВІКНО ----------
+   Вікно переносимо, тримаючи за рядок заголовка, у жовту рамочку — 6 завдань: рамочка щоразу в іншому місці (далеко від вікна),
+   і щоразу вікно іншої програми (спершу Малювання). Якщо тягнути в робочій області — Малювання малює, інші програми нічого не роблять;
+   тоді рядок заголовка підсвічується як підказка. */
+(function(){
+  const want = document.getElementById('moveWant'), dotsEl = document.getElementById('moveDots'), askEl = document.getElementById('moveAsk');
+  const D = makeDesk(document.getElementById('moveDesk')), desk = D.desk;
+  desk.classList.add('movable');
+  const WM = makeWM(desk);
+  const SIZE = [56, 48], START = [22, 18];
+  // можливі місця рамочки: кути, середини країв, центр
+  const PLACES = [[2, 3], [42, 3], [2, 36], [42, 36], [22, 3], [22, 36], [2, 20], [42, 20], [22, 20]];
+  const PROGS = ['paint', 'music', 'calc', 'game', 'folder', 'mail'];
+  const ROUNDS = 6;
+  let SPOTS = [];
+  const score = scorer(desk, ROUNDS);
+  const INK = ['#E8458B', '#3BA4F5', '#3FAE58', '#FF8C2E', '#8E7CF0'];
+  let r = 0, busy = false, gen = 0, frame = null, win = null;
+  const idle = idleHint(()=>r < ROUNDS && !busy ? win?.querySelector('.wt') : null, 9000);
+  function show(){
+    dots(dotsEl, ROUNDS, r);
+    frame?.remove(); frame = null;
+    if(r >= ROUNDS){ want.innerHTML = DONE_CARD; praise(askEl, 'Мо|ло|дець!'); idle.stop(); return; }
+    const [x, y] = SPOTS[r];
+    desk.insertAdjacentHTML('afterbegin', `<div class="wframe" style="left:${x}%; top:${y}%; width:${SIZE[0]}%; height:${SIZE[1]}%"></div>`);
+    frame = desk.querySelector('.wframe');
+    want.innerHTML = `<div class="want-card">${winCard('title', PROGS[r])}</div>${lmb('hold')}`;
+    ask(askEl, 'Пе|ре|не|си ві|кно в *ра|моч|ку*');
+    idle();
+  }
+  function bind(){
+    const wt = win.querySelector('.wt'), body = win.querySelector('.wbody');
+    // тягнемо за рядок заголовка
+    wt.addEventListener('pointerdown', e=>{
+      if(busy || r >= ROUNDS || e.target.closest('[data-act]')) return;
+      e.preventDefault();
+      wt.setPointerCapture(e.pointerId);
+      const dr = desk.getBoundingClientRect(), wr = win.getBoundingClientRect();
+      const dx = e.clientX - wr.left, dy = e.clientY - wr.top;
+      const maxY = 100 - 9 / .625;   // над панеллю завдань
+      win.classList.add('drag'); glowOn(null);
+      const move = ev=>{
+        const x = Math.min(Math.max((ev.clientX - dx - dr.left) / dr.width * 100, 0), 100 - SIZE[0]);
+        const y = Math.min(Math.max((ev.clientY - dy - dr.top) / dr.height * 100, 0), maxY - SIZE[1]);
+        win.style.left = x + '%'; win.style.top = y + '%';
+        const near = Math.abs(x - SPOTS[r][0]) < 8 && Math.abs(y - SPOTS[r][1]) < 10;
+        frame.classList.toggle('ok', near);
+      };
+      const up = ev=>{
+        wt.removeEventListener('pointermove', move); wt.removeEventListener('pointerup', up); wt.removeEventListener('pointercancel', up);
+        win.classList.remove('drag');
+        if(!frame.classList.contains('ok')){ idle(); return; }
+        // точно в рамочку
+        idle.stop();
+        win.style.left = SPOTS[r][0] + '%'; win.style.top = SPOTS[r][1] + '%';
+        want.firstElementChild.classList.add('done');
+        const wait = cheer(askEl, want, ev.clientX, ev.clientY);
+        score(r + 1);
+        busy = true;
+        const g = gen;
+        setTimeout(()=>{ if(g !== gen) return; busy = false; r++; if(r < ROUNDS) place(PROGS[r], SPOTS[r - 1]); show(); }, wait);
+      };
+      wt.addEventListener('pointermove', move); wt.addEventListener('pointerup', up); wt.addEventListener('pointercancel', up);
+    });
+    // у робочій області Малювання — малюємо; вікно не рухається, тож підказуємо, за що тягнути
+    if(win.dataset.k !== 'paint'){
+      body.addEventListener('pointerdown', ()=>{ if(!busy && r < ROUNDS) glowOn(wt); });
+      return;
+    }
+    body.insertAdjacentHTML('beforeend', '<svg class="ink" viewBox="0 0 100 100" preserveAspectRatio="none"></svg>');
+    const ink = body.querySelector('.ink');
+    body.addEventListener('pointerdown', e=>{
+      e.preventDefault();
+      body.setPointerCapture(e.pointerId);
+      const br = body.getBoundingClientRect();
+      const pt = ev=>`${((ev.clientX - br.left) / br.width * 100).toFixed(1)} ${((ev.clientY - br.top) / br.height * 100).toFixed(1)}`;
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('stroke', INK[Math.floor(Math.random() * INK.length)]);
+      let d = 'M' + pt(e) + ' L' + pt(e);
+      path.setAttribute('d', d); ink.appendChild(path);
+      const move = ev=>{ d += ' L' + pt(ev); path.setAttribute('d', d); };
+      const up = ()=>{
+        body.removeEventListener('pointermove', move); body.removeEventListener('pointerup', up); body.removeEventListener('pointercancel', up);
+        if(!busy && r < ROUNDS) glowOn(wt);
+      };
+      body.addEventListener('pointermove', move); body.addEventListener('pointerup', up); body.addEventListener('pointercancel', up);
+    });
+  }
+  // вікно програми k на місці [x, y] (нове завдання — нова програма там, де стоїть вікно)
+  function place(k, [x, y]){ WM.clear(); win = WM.open(k, [x, y, ...SIZE]); bind(); }
+  // 6 місць рамочки: кожне далеко від попереднього (від того, де зараз вікно)
+  function route(){
+    for(;;){   // якщо зайшли в глухий кут — пробуємо ще раз
+      const out = [];
+      let at = START;
+      while(out.length < ROUNDS){
+        const ok = shuffle([...PLACES]).filter(p=>Math.abs(p[0] - at[0]) + Math.abs(p[1] - at[1]) >= 30 && !out.includes(p));
+        if(!ok.length) break;
+        at = ok[0]; out.push(at);
+      }
+      if(out.length === ROUNDS) return out;
+    }
+  }
+  function reset(){
+    gen++; r = 0; busy = false;
+    SPOTS = route();
+    place(PROGS[0], START);
+    show();
+  }
+  reset();
+  addRestart(desk, reset);
+})();
+
+/* ---------- КРОК 3 · ЗАКРИТИ ----------
+   4 вікна сходинками. Картка: яку програму закрити. Клацнути ✕ саме на її вікні.
+   ✕ чужого вікна чи інша кнопка — хибна спроба. Клацання по вікну піднімає його нагору (так можна). */
+(function(){
+  const want = document.getElementById('closeWant'), dotsEl = document.getElementById('closeDots'), askEl = document.getElementById('closeAsk');
+  const D = makeDesk(document.getElementById('closeDesk')), desk = D.desk;
+  const WM = makeWM(desk);
+  const KEYS = ['paint', 'music', 'calc', 'game'];
+  const score = scorer(desk, KEYS.length);
+  let order = [], r = 0, gen = 0;
+  const idle = idleHint(()=>r < KEYS.length ? WM.btn(order[r], 'close') : null, 9000);
+  function show(){
+    dots(dotsEl, KEYS.length, r);
+    if(r >= KEYS.length){ want.innerHTML = DONE_CARD; praise(askEl, 'Усі ві|кна за|кри|то!'); idle.stop(); return; }
+    want.innerHTML = `<div class="want-card"><div class="pair">${icon(order[r])}${tile('close')}</div></div>${lmb('click')}`;
+    ask(askEl, `За|крий ${ACC[order[r]]}`);
+    idle();
+  }
+  desk.addEventListener('click', e=>{
+    if(r >= KEYS.length) return;
+    const h = WM.info(e);
+    if(!h) return;
+    if(h.act === 'pin'){ WM.front(h.k); return; }
+    if(h.act === 'title' || h.act === 'body'){ WM.front(h.k); return; }
+    if(h.act !== 'close' || h.k !== order[r]){ flick(h.el); flick(want.firstElementChild); idle(); return; }
+    WM.close(h.k);
+    r++; score(r);
+    show();
+  });
+  function reset(){
+    gen++; r = 0; WM.clear();
+    shuffle([...KEYS]).forEach((k, i)=>WM.open(k, CASCADE[i], true));
+    order = shuffle([...KEYS]);
+    show();
+  }
+  reset();
+  addRestart(desk, reset);
+})();
+
+/* ---------- КРОК 4 · ЗГОРНУТИ ----------
+   Згорнути вікно (—) — воно «злітає» на свій значок на панелі завдань; потім клацнути значок — вікно повертається. 3 програми. */
+(function(){
+  const want = document.getElementById('minWant'), dotsEl = document.getElementById('minDots'), askEl = document.getElementById('minAsk');
+  const D = makeDesk(document.getElementById('minDesk')), desk = D.desk;
+  const WM = makeWM(desk);
+  const ROUNDS = 3;
+  const score = scorer(desk, ROUNDS);
+  let order = [], r = 0, state = 'open', busy = false, gen = 0;
+  const k = ()=>order[r];
+  const idle = idleHint(()=>busy || r >= ROUNDS ? null : state === 'open' ? WM.btn(k(), 'min') : WM.pin(k()), 9000);
+  function show(){
+    dots(dotsEl, ROUNDS, r);
+    if(r >= ROUNDS){ want.innerHTML = DONE_CARD; praise(askEl, 'Мо|ло|дець!'); idle.stop(); return; }
+    want.innerHTML = state === 'open' ? `<div class="want-card"><div class="pair">${icon(k())}${tile('min')}</div></div>${lmb('click')}`
+      : `<div class="want-card">${tcBar(k())}</div>${lmb('click')}`;
+    ask(askEl, state === 'open' ? `Згор|ни ${ACC[k()]}` : `По|вер|ни ${ACC[k()]}`);
+    idle();
+  }
+  function round(){
+    WM.clear(); state = 'open';
+    WM.open(k(), [18, 6, 60, 66]);
+    show();
+  }
+  desk.addEventListener('click', e=>{
+    if(busy || r >= ROUNDS) return;
+    const h = WM.info(e);
+    if(!h || h.act === 'title' || h.act === 'body') return;
+    if(state === 'open' && h.act === 'min'){
+      idle.stop(); WM.minimize(k()); state = 'hidden';
+      busy = true; const g = gen;
+      setTimeout(()=>{ if(g !== gen) return; busy = false; show(); }, 450);
+      return;
+    }
+    if(state === 'hidden' && h.act === 'pin' && h.k === k()){
+      idle.stop(); WM.restore(k());
+      want.firstElementChild.classList.add('done');
+      const wait = cheer(askEl, want, e.clientX, e.clientY);
+      score(r + 1);
+      busy = true; const g = gen;
+      setTimeout(()=>{ if(g !== gen) return; busy = false; r++; if(r < ROUNDS) round(); else { WM.clear(); show(); } }, wait);
+      return;
+    }
+    flick(h.el); flick(want.firstElementChild); idle();
+  });
+  function reset(){ gen++; r = 0; busy = false; order = shuffle(['music', 'paint', 'calc', 'folder', 'game']).slice(0, ROUNDS); round(); }
+  reset();
+  addRestart(desk, reset);
+})();
+
+/* ---------- КРОК 5 · РОЗГОРНУТИ І ЗМЕНШИТИ ----------
+   ☐ — вікно на весь екран, кнопка стає «два квадратики»; клацнути її — вікно знову маленьке. 3 програми. */
+(function(){
+  const want = document.getElementById('maxWant'), dotsEl = document.getElementById('maxDots'), askEl = document.getElementById('maxAsk');
+  const D = makeDesk(document.getElementById('maxDesk')), desk = D.desk;
+  const WM = makeWM(desk);
+  const ROUNDS = 3;
+  const score = scorer(desk, ROUNDS);
+  let order = [], r = 0, state = 'small', busy = false, gen = 0;
+  const k = ()=>order[r];
+  const idle = idleHint(()=>busy || r >= ROUNDS ? null : WM.btn(k(), state === 'small' ? 'max' : 'restore'), 9000);
+  function show(){
+    dots(dotsEl, ROUNDS, r);
+    if(r >= ROUNDS){ want.innerHTML = DONE_CARD; praise(askEl, 'Мо|ло|дець!'); idle.stop(); return; }
+    want.innerHTML = `<div class="want-card"><div class="pair">${icon(k())}${tile(state === 'small' ? 'max' : 'restore')}</div></div>${lmb('click')}`;
+    ask(askEl, state === 'small' ? `Роз|гор|ни ${ACC[k()]}` : `Змен|ши ${ACC[k()]}`);
+    idle();
+  }
+  function round(){ WM.clear(); state = 'small'; WM.open(k(), [24, 12, 52, 54]); show(); }
+  desk.addEventListener('click', e=>{
+    if(busy || r >= ROUNDS) return;
+    const h = WM.info(e);
+    if(!h || h.act === 'title' || h.act === 'body' || h.act === 'pin') return;
+    if(state === 'small' && h.act === 'max'){
+      idle.stop(); WM.maximize(k()); state = 'big';
+      busy = true; const g = gen;
+      setTimeout(()=>{ if(g !== gen) return; busy = false; show(); }, 600);
+      return;
+    }
+    if(state === 'big' && h.act === 'restore'){
+      idle.stop(); WM.unmax(k());
+      want.firstElementChild.classList.add('done');
+      const wait = cheer(askEl, want, e.clientX, e.clientY);
+      score(r + 1);
+      busy = true; const g = gen;
+      setTimeout(()=>{ if(g !== gen) return; busy = false; r++; if(r < ROUNDS) round(); else { WM.clear(); show(); } }, wait);
+      return;
+    }
+    flick(h.el); flick(want.firstElementChild); idle();
+  });
+  function reset(){ gen++; r = 0; busy = false; order = shuffle(['paint', 'game', 'web', 'folder', 'music']).slice(0, ROUNDS); round(); }
+  reset();
+  addRestart(desk, reset);
+})();
+
+/* ---------- КРОК 6 · ЯКА КНОПКА? ----------
+   Вікно саме щось робить: зникає, злітає на панель завдань чи розгортається на весь екран.
+   Дитина вгадує, яку кнопку натиснули: — ☐ ✕. Кнопка ▶ показує ще раз. 6 раундів. */
+(function(){
+  const desk = makeDesk(document.getElementById('guessDesk')).desk, pick = document.getElementById('guessPick'), dotsEl = document.getElementById('guessDots'), askEl = document.getElementById('guessAsk');
+  desk.classList.add('watch');
+  const WM = makeWM(desk);
+  const ACTS = ['min', 'max', 'close'];
+  const ROUNDS = 6;
+  const score = scorer(desk, ROUNDS);
+  const REPLAY = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 0 2.6-5.9"/><path d="M4 4v5h5"/></svg>';
+  pick.innerHTML = '<div class="pick-opts">' + ACTS.map(a=>`<button class="pick-btn" type="button" data-act="${a}" aria-label="${{min:'Згорнути', max:'Розгорнути', close:'Закрити'}[a]}">${GLYPH[a]}</button>`).join('') + '</div>'
+    + `<button class="replay" type="button" aria-label="Показати ще раз">${REPLAY}</button>`;
+  let order = [], prog = [], r = 0, played = false, busy = false, gen = 0, timer = null;
+  const k = ()=>prog[r];
+  function setWin(){ WM.clear(); WM.open(k(), [22, 10, 56, 60], true); }
+  function play(){
+    if(r >= ROUNDS) return;
+    clearTimeout(timer); setWin(); played = true;
+    const g = gen, a = order[r];
+    timer = setTimeout(()=>{
+      if(g !== gen) return;
+      if(a === 'min') WM.minimize(k()); else if(a === 'max') WM.maximize(k()); else WM.close(k());
+    }, 900);
+  }
+  function show(){
+    dots(dotsEl, ROUNDS, r);
+    pick.querySelectorAll('.pick-btn').forEach(b=>b.classList.remove('ok'));
+    if(r >= ROUNDS){ praise(askEl, 'Мо|ло|дець!'); return; }
+    ask(askEl, 'Я|ку кноп|ку на|тис|ну|ли?');
+  }
+  // показуємо, лише коли робочий стіл видно на екрані
+  const seen = ()=>{ const v = desk.getBoundingClientRect(); return v.top < innerHeight - v.height * .4 && v.bottom > v.height * .4; };
+  new IntersectionObserver(es=>{ if(es[0].isIntersecting && !played && !busy) play(); }, {threshold:.6}).observe(desk);
+  pick.addEventListener('click', e=>{
+    if(e.target.closest('.replay')){ if(!busy && r < ROUNDS) play(); return; }
+    const b = e.target.closest('.pick-btn');
+    if(!b || busy || r >= ROUNDS || !played) return;
+    if(b.dataset.act !== order[r]){ flick(b); return; }
+    b.classList.add('ok');
+    const wait = cheer(askEl, null, e.clientX, e.clientY);
+    score(r + 1);
+    busy = true; const g = gen;
+    setTimeout(()=>{ if(g !== gen) return; busy = false; r++; played = false; show(); if(r < ROUNDS){ setWin(); if(seen()) play(); } else WM.clear(); }, wait);
+  });
+  function reset(){
+    gen++; r = 0; busy = false; played = false; clearTimeout(timer);
+    // кожна дія двічі, сусідні раунди — різні дії
+    do order = shuffle([...ACTS, ...ACTS]); while(order.some((a, i)=>a === order[i + 1]));
+    prog = shuffle(['paint', 'music', 'calc', 'game', 'folder', 'mail']);
+    setWin(); show();
+    if(seen()) play();
+  }
+  reset();
+  addRestart(desk, reset);
+})();
+
+/* ---------- ГРА · НАВЕДИ ЛАД ----------
+   4 вікна. Картка: програма + кнопка (або значок на панелі завдань, якщо вікно згорнуте). 6 завдань поспіль, кожне —
+   із тим вікном, яке є зараз. Не та кнопка чи не те вікно — хибна спроба. */
+(function(){
+  const want = document.getElementById('gameWant'), dotsEl = document.getElementById('gameDots'), askEl = document.getElementById('gameAsk');
+  const D = makeDesk(document.getElementById('gameDesk')), desk = D.desk;
+  const WM = makeWM(desk);
+  const KEYS = ['paint', 'music', 'calc', 'game'];
+  const N = 6;
+  const score = scorer(desk, N);
+  const SAY = { close:'За|крий', min:'Згор|ни', max:'Роз|гор|ни', restore:'Змен|ши', back:'По|вер|ни' };
+  let i = 0, task = null, prev = null, gen = 0, busy = false;
+  // наступне завдання — з тих вікон, що є зараз; якщо одне вікно розгорнуте на весь екран — лише з ним
+  function nextTask(){
+    const open = Object.keys(WM.W), shown = open.filter(k=>!WM.W[k].min);
+    const big = shown.find(k=>WM.W[k].max);
+    const pool = [], from = big ? [big, ...open.filter(k=>WM.W[k].min)] : open;
+    const ks = from.length > 1 ? from.filter(k=>k !== prev) : from;
+    ks.forEach(k=>{
+      const w = WM.W[k];
+      if(w.min){ pool.push([k, 'back'], [k, 'back']); return; }
+      pool.push([k, 'min'], [k, w.max ? 'restore' : 'max']);
+      if(open.length > 2) pool.push([k, 'close']);
+    });
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  const target = ()=>!task || busy ? null : task[1] === 'back' ? WM.pin(task[0]) : WM.btn(task[0], task[1]);
+  const idle = idleHint(target, 10000);
+  function show(){
+    dots(dotsEl, N, i);
+    if(i >= N){ want.innerHTML = DONE_CARD; praise(askEl, 'Ла|ду лад!'); idle.stop(); return; }
+    task = nextTask();
+    const [k, a] = task;
+    want.innerHTML = `<div class="want-card">${a === 'back' ? tcBar(k) : `<div class="pair">${icon(k)}${tile(a)}</div>`}</div>${lmb('click')}`;
+    ask(askEl, `${SAY[a]} ${ACC[k]}`);
+    idle();
+  }
+  function done(e){
+    prev = task[0]; i++; score(i);
+    busy = true; const g = gen;
+    setTimeout(()=>{
+      if(g !== gen) return;
+      busy = false; show();
+      if(i >= N) confetti(desk);
+    }, 500);
+  }
+  desk.addEventListener('click', e=>{
+    if(busy || i >= N) return;
+    const h = WM.info(e);
+    if(!h) return;
+    const [k, a] = task;
+    if(h.act === 'title' || h.act === 'body'){ WM.front(h.k); return; }
+    if(h.act === 'pin'){
+      if(a === 'back' && h.k === k){ WM.restore(k); done(e); return; }
+      if(WM.W[h.k]?.min){ flick(h.el); flick(want.firstElementChild); idle(); return; }
+      WM.front(h.k); return;     // значок вікна, яке й так видно, — просто піднімає його нагору
+    }
+    if(h.k !== k || h.act !== a){ flick(h.el); flick(want.firstElementChild); idle(); return; }
+    if(a === 'close') WM.close(k); else if(a === 'min') WM.minimize(k); else if(a === 'max') WM.maximize(k); else WM.unmax(k);
+    done(e);
+  });
+  function reset(){
+    gen++; i = 0; prev = null; busy = false; WM.clear();
+    shuffle([...KEYS]).forEach((k, j)=>WM.open(k, CASCADE[j], true));
+    show();
+  }
+  reset();
+  addRestart(desk, reset);
+})();
+
+/* ---------- ГРА · ПАРКОВКА (логічна, 10 рівнів) ----------
+   Двір 6 × 6, машинки й вантажівки їздять лише вперед-назад (перетягуванням). Треба звільнити дорогу й вивести червону машинку
+   у виїзд праворуч. Хибних спроб немає; якщо дитина довго не діє, підсвічується машинка, яку варто посунути (розв'язок шукає BFS).
+   Рівні — від 2 до 12 ходів (найкоротший розв'язок перевірено). «Почати знову» — рівень спочатку. Після 10-го рівня урок завершується сам. */
+(function(){
+  const box = document.getElementById('pk'), lot = document.getElementById('pkLot'), dotsEl = document.getElementById('pkDots'), askEl = document.getElementById('pkAsk');
+  const S = 6, ER = 2;   // розмір двору й ряд виїзду
+  // A — червона машинка; інші літери — машинки (2 клітинки) і вантажівки чи автобуси (3)
+  const LEVELS = [
+    ['......', 'c.....', 'cAAb..', 'c..b.d', '...b.d', '......'],
+    ['...ccc', '..b...', 'AAb...', '..b...', '..ddd.', '......'],
+    ['....c.', '....cb', 'AA.dcb', '...d.b', '......', '......'],
+    ['......', '..ce.b', 'AAce.b', '..c..b', '......', '....dd'],
+    ['....c.', '...dc.', '.AAdc.', 'f..d..', 'fbbb..', '....ee'],
+    ['...d..', '.ffd.e', 'AAgd.e', '..g...', '...ccc', '...bbb'],
+    ['....c.', '..iic.', '.AA.c.', 'dffe..', 'dhhegg', 'd.bbb.'],
+    ['..dccc', '..diff', 'AAdi..', '.bbb.e', 'h....e', 'hgg.jj'],
+    ['.gg.bc', '...hbc', 'AAehbc', '..eijj', 'f..i..', 'f..ddd'],
+    ['...ee.', '..bjj.', 'AAb..c', 'hhbd.c', 'ig.d.c', 'igffkk'],
+  ];
+  const N = LEVELS.length;
+  const score = scorer(box, N);
+  const COLORS = ['#2F86EB', '#3FAE58', '#FFC020', '#8E5CD9', '#16A3A3', '#F06AA8', '#FF8A1F', '#6D7BE0', '#8BC34A', '#A0714F', '#25B8E8'];
+
+  // машинка згори; вертикальна — та сама, повернута
+  function carSVG(L, h, color, red){
+    const W = 100 * L, body = L === 2
+      ? `<rect x="26" y="4" width="30" height="14" rx="5" fill="#2B2D42"/><rect x="144" y="4" width="30" height="14" rx="5" fill="#2B2D42"/>
+         <rect x="26" y="82" width="30" height="14" rx="5" fill="#2B2D42"/><rect x="144" y="82" width="30" height="14" rx="5" fill="#2B2D42"/>
+         <rect x="6" y="12" width="188" height="76" rx="26" fill="${color}"/>
+         <path d="M128 22h14q14 0 16 14v28q-2 14-16 14h-14z" fill="#CFE9FF"/><path d="M48 24h10v52h-10q-8 0-8-10v-32q0-10 8-10z" fill="#CFE9FF"/>
+         <rect x="62" y="22" width="62" height="56" rx="10" fill="rgba(0,0,0,.12)"/>
+         <rect x="180" y="20" width="10" height="14" rx="4" fill="#FFF3B0"/><rect x="180" y="66" width="10" height="14" rx="4" fill="#FFF3B0"/>
+         ${red ? '<rect x="10" y="45" width="170" height="10" rx="5" fill="#fff" opacity=".85"/>' : ''}`
+      : `<rect x="40" y="4" width="34" height="14" rx="5" fill="#2B2D42"/><rect x="110" y="4" width="34" height="14" rx="5" fill="#2B2D42"/><rect x="236" y="4" width="34" height="14" rx="5" fill="#2B2D42"/>
+         <rect x="40" y="82" width="34" height="14" rx="5" fill="#2B2D42"/><rect x="110" y="82" width="34" height="14" rx="5" fill="#2B2D42"/><rect x="236" y="82" width="34" height="14" rx="5" fill="#2B2D42"/>
+         <rect x="6" y="10" width="206" height="80" rx="10" fill="${color}"/><rect x="18" y="22" width="182" height="56" rx="6" fill="#fff" opacity=".22"/>
+         <path d="M18 36h182M18 50h182M18 64h182" stroke="${color}" stroke-width="5"/>
+         <rect x="218" y="12" width="76" height="76" rx="18" fill="${color}"/><rect x="218" y="12" width="76" height="76" rx="18" fill="rgba(0,0,0,.1)"/>
+         <path d="M262 22h10q14 0 14 14v28q0 14-14 14h-10z" fill="#CFE9FF"/>
+         <rect x="284" y="18" width="8" height="12" rx="3" fill="#FFF3B0"/><rect x="284" y="70" width="8" height="12" rx="3" fill="#FFF3B0"/>`;
+    return h ? `<svg viewBox="0 0 ${W} 100">${body}</svg>`
+             : `<svg viewBox="0 0 100 ${W}"><g transform="translate(100 0) rotate(90)">${body}</g></svg>`;
+  }
+
+  let lv = 0, cars = [], busy = false, gen = 0;
+  const cell = 100 / S;
+  function place(c){ c.el.style.left = c.c * cell + '%'; c.el.style.top = c.r * cell + '%'; }
+  function build(){
+    lot.querySelectorAll('.car').forEach(c=>c.remove());
+    const rows = LEVELS[lv], seen = {};
+    cars = [];
+    rows.forEach((row, r)=>[...row].forEach((ch, c)=>{
+      if(ch === '.' || seen[ch]) return;
+      seen[ch] = true;
+      const h = row[c + 1] === ch, L = h ? row.slice(c).split('').filter((x, i)=>i < 3 && x === ch).length
+                                         : rows.slice(r).filter((x, i)=>i < 3 && x[c] === ch).length;
+      cars.push({ id:ch, r, c, L, h });
+    }));
+    cars.sort((a, b)=>(b.id === 'A') - (a.id === 'A'));   // червона — перша
+    cars.forEach((car, i)=>{
+      const el = document.createElement('div');
+      el.className = 'car in';
+      el.style.animationDelay = i * 40 + 'ms';
+      el.style.width = (car.h ? car.L : 1) * cell + '%';
+      el.style.height = (car.h ? 1 : car.L) * cell + '%';
+      el.innerHTML = carSVG(car.L, car.h, i ? COLORS[(i - 1 + lv * 3) % COLORS.length] : '#E53935', !i);
+      car.el = el; place(car);
+      lot.appendChild(el);
+      drag(car);
+    });
+  }
+  const grid = (skip)=>{ const g = Array.from({length:S}, ()=>Array(S).fill(null)); cars.forEach(c=>{ if(c === skip) return; for(let k = 0; k < c.L; k++) g[c.h ? c.r : c.r + k][c.h ? c.c + k : c.c] = c; }); return g; };
+  // скільки клітинок вільно назад і вперед
+  function room(car){
+    const g = grid(car), free = (r, c)=>r >= 0 && c >= 0 && r < S && c < S && !g[r][c];
+    let back = 0, fwd = 0;
+    if(car.h){ while(free(car.r, car.c - back - 1)) back++; while(free(car.r, car.c + car.L + fwd)) fwd++; }
+    else { while(free(car.r - back - 1, car.c)) back++; while(free(car.r + car.L + fwd, car.c)) fwd++; }
+    return [back, fwd];
+  }
+  function drag(car){
+    car.el.addEventListener('pointerdown', e=>{
+      if(busy) return;
+      e.preventDefault();
+      idle();
+      const [back, fwd] = room(car), px = lot.clientWidth / S, x0 = e.clientX, y0 = e.clientY;
+      car.el.setPointerCapture(e.pointerId);
+      car.el.classList.add('drag');
+      let d = 0;
+      const move = ev=>{
+        d = Math.max(-back, Math.min(fwd, ((car.h ? ev.clientX - x0 : ev.clientY - y0)) / px));
+        car.el.style.transform = car.h ? `translateX(${d * px}px)` : `translateY(${d * px}px)`;
+      };
+      const up = ()=>{
+        car.el.removeEventListener('pointermove', move);
+        car.el.removeEventListener('pointerup', up);
+        car.el.removeEventListener('pointercancel', up);
+        const k = Math.round(d);
+        // з поточного місця плавно доїжджає до клітинки
+        car.el.classList.remove('drag');
+        if(car.h) car.c += k; else car.r += k;
+        const off = (d - k) * px;
+        car.el.style.transform = '';
+        car.el.style.transition = 'none';
+        place(car);
+        car.el.style.transform = car.h ? `translateX(${off}px)` : `translateY(${off}px)`;
+        void car.el.offsetWidth;
+        car.el.style.transition = 'transform .15s ease';
+        car.el.style.transform = '';
+        setTimeout(()=>{ car.el.style.transition = ''; }, 160);
+        if(k) check();
+      };
+      car.el.addEventListener('pointermove', move);
+      car.el.addEventListener('pointerup', up);
+      car.el.addEventListener('pointercancel', up);
+    });
+  }
+  function check(){
+    const red = cars[0];
+    if(red.c + red.L < S) return;
+    idle.stop();
+    busy = true;
+    const g = gen;
+    setTimeout(()=>{ if(g === gen) red.el.classList.add('out'); }, 180);
+    setTimeout(()=>{
+      if(g !== gen) return;
+      box.classList.remove('yay'); void box.offsetWidth; box.classList.add('yay');
+      score(lv + 1);
+    }, 700);
+    setTimeout(()=>{
+      if(g !== gen) return;
+      busy = false; lv++; show();
+      if(lv >= N){
+        confetti(box);
+        setTimeout(()=>{ if(g === gen) document.querySelector('#finalQuiz .finish-btn')?.click(); }, 1800);
+      }
+    }, 1500);
+  }
+  // підказка: найкоротший розв'язок з поточного стану — яку машинку посунути першою
+  function hintEl(){
+    if(busy || lv >= N) return null;
+    const key = st=>st.join(','), start = cars.map(c=>c.h ? c.c : c.r);
+    const prev = new Map([[key(start), null]]), q = [start];
+    for(let qi = 0; qi < q.length; qi++){
+      const st = q[qi];
+      if(st[0] + cars[0].L >= S){
+        let s = key(st), first = null;
+        while(prev.get(s)){ first = prev.get(s); s = first.from; }
+        return first ? cars[first.i].el : cars[0].el;
+      }
+      const g = Array.from({length:S}, ()=>Array(S).fill(-1));
+      cars.forEach((c, i)=>{ for(let k = 0; k < c.L; k++) g[c.h ? c.r : st[i] + k][c.h ? st[i] + k : c.c] = i; });
+      cars.forEach((c, i)=>{
+        for(const dir of [-1, 1]) for(let k = 1; ; k++){
+          const p = st[i] + dir * k, edge = dir < 0 ? p : p + c.L - 1;
+          if(edge < 0 || edge >= S) break;
+          if((c.h ? g[c.r][edge] : g[edge][c.c]) !== -1) break;
+          const ns = st.slice(); ns[i] = p;
+          const kk = key(ns);
+          if(!prev.has(kk)){ prev.set(kk, { from:key(st), i }); q.push(ns); }
+        }
+      });
+    }
+    return null;
+  }
+  const idle = idleHint(hintEl, 15000);
+  function show(){
+    dots(dotsEl, N, lv);
+    if(lv >= N){ praise(askEl, 'Мо|ло|дець!'); idle.stop(); return; }
+    ask(askEl, 'Ви|ве|ди *чер|во|ну* ма|шин|ку');
+    build();
+    idle();
+  }
+  function restart(){
+    gen++; busy = false;
+    if(lv >= N) lv = 0;      // гру пройдено — з першого рівня; інакше — поточний рівень спочатку
+    show();
+  }
+  show();
+  addRestart(box, restart);
+})();
+
+/* ---------- ЗАВЕРШЕННЯ: тесту немає; екран завершення відкривається сам після гри «Парковка» ---------- */
+makeFinalQuiz('finalQuiz', [], {summary:'🎉'});
+</script>
+
+</body>
+</html>
