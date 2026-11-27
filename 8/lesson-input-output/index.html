@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Введення та виведення даних — Урок</title>
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../../assets/lesson.css">
+<link rel="stylesheet" href="../../assets/python.css">
+<style>
+  :root{
+    --accent:#2F8F5B; --accent-dark:#1F6B42; --accent-soft:#E4F4EA;
+    --label:#D2603A;
+    --bg:#F4F9F5; --line:#DCEBE1; --ink-soft:#4B5F55;
+    --sun:#FFB347; --sun-soft:#FFF3E0; --sun-ink:#7A4A00;
+    --hud-bar:linear-gradient(90deg, #2F8F5B, #FFB347);
+  }
+
+  /* --- Введення → опрацювання → виведення --- */
+  .ipo{display:grid; grid-template-columns:1fr auto 1fr auto 1fr; align-items:stretch; gap:10px; margin:16px 0;}
+  .ipo-card{background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:12px; text-align:center; display:flex; flex-direction:column; align-items:center; gap:6px;}
+  .ipo-card svg{width:64px; height:48px;}
+  .ipo-card b{font-family:'Baloo 2',sans-serif; font-size:17px; color:var(--accent-dark);}
+  .ipo-card span{font-size:14px; color:var(--ink-soft);}
+  .ipo-arrow{align-self:center; font-family:'Baloo 2',sans-serif; font-weight:800; font-size:26px; color:var(--label);}
+  @media (max-width:620px){ .ipo{grid-template-columns:1fr;} .ipo-arrow{transform:rotate(90deg); justify-self:center;} }
+
+  .sort-chip{font-family:var(--code-font); font-weight:600;}
+  #ipoPool{display:grid; grid-template-columns:repeat(3, 1fr);}
+  #ipoPool .sort-chip{max-width:none;}
+  @media (max-width:620px){ #ipoPool{grid-template-columns:1fr;} }
+
+  /* --- Три способи print --- */
+  .ways{display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; margin:14px 0;}
+  .way{background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:12px 14px;}
+  .way h3{margin:0 0 8px; font-family:'Baloo 2',sans-serif; font-size:17px; color:var(--accent-dark);}
+  .way pre.py-code{margin:0 0 8px; font-size:13.5px;}
+  .way p{margin:0; font-size:14.5px;}
+  @media (max-width:760px){ .ways{grid-template-columns:1fr;} }
+
+  /* --- Таблиця операторів --- */
+  .op-table{width:100%; border-collapse:collapse; margin:12px 0; background:var(--surface); border-radius:var(--radius-m); overflow:hidden;}
+  .op-table th, .op-table td{padding:8px 12px; border-bottom:1px solid var(--line); text-align:left;}
+  .op-table th{background:var(--accent-soft); font-family:'Baloo 2',sans-serif; color:var(--accent-dark);}
+  .op-table td:first-child, .op-table td:nth-child(3){font-family:var(--code-font); font-weight:600;}
+  .op-table tr.new td{background:var(--sun-soft);}
+
+  /* --- Цукерки: // і % --- */
+  .candy{display:block; width:100%; max-width:560px; height:auto; margin:8px auto;}
+
+  /* --- Обчисли по кроках --- */
+  .calc-wrap{display:flex; flex-direction:column; gap:12px;}
+  .calc-row{background:var(--surface); border:2px solid var(--line); border-radius:var(--radius-m); padding:12px 14px; transition:border-color .2s;}
+  .calc-row.done{border-color:var(--ok);}
+  .calc-hist{font-family:var(--code-font); font-size:15px; color:var(--ink-soft); margin-bottom:6px;}
+  .calc-hist div::before{content:'= '; color:var(--label);}
+  .calc-expr{display:flex; flex-wrap:wrap; gap:4px; align-items:center; font-family:var(--code-font); font-size:22px; font-weight:600; background:var(--code-bg); color:var(--code-ink); border-radius:var(--radius-s); padding:8px 12px; width:max-content; max-width:100%;}
+  .calc-expr .tk{padding:0 3px;}
+  .calc-expr .tk.n{color:#F78C6C;}
+  .calc-expr .tk.p{color:#89DDFF;}
+  .calc-expr button.tk{font:inherit; color:#FFD43B; background:#2D3346; border:1.5px solid #4A5270; border-radius:8px; padding:0 8px; cursor:pointer; transition:background .15s, transform .15s;}
+  .calc-expr button.tk:hover{background:#3C4560; transform:translateY(-1px);}
+  .calc-expr button.tk.wrong-flash{background:#8A2E2E; animation:shakeX .35s ease;}
+  .calc-expr.fin{background:var(--ok-soft); color:#256B36;}
+  .calc-expr.fin .tk.n{color:#256B36;}
+  .calc-msg{font-size:14px; color:var(--ink-soft); margin-top:6px; min-height:20px;}
+
+  #trace1 .tr-boxes{margin-bottom:0;}
+  .tr-console{margin-top:14px;}
+
+  /* --- Функції math --- */
+  .fn-grid{display:grid; grid-template-columns:repeat(2, 1fr); gap:8px 14px; margin:12px 0;}
+  .fn-grid div{background:var(--surface); border:1.5px solid var(--line); border-radius:var(--radius-s); padding:7px 12px; font-size:14.5px;}
+  .fn-grid code{font-weight:700;}
+  @media (max-width:620px){ .fn-grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body data-lesson="lesson8-input-output" data-hud="8 клас · Введення та виведення даних">
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-text">
+      <div class="hero-eyebrow">Інформатика · Розділ «Програмування»</div>
+      <h1>Введення та виведення даних</h1>
+      <p>Як програма розпитує користувача, рахує за нього і гарно показує результат. А ще — чим <code>//</code> відрізняється від <code>/</code>.</p>
+      <button class="btn-primary" onclick="document.getElementById('start').scrollIntoView()">Почати</button>
+    </div>
+    <svg class="mascot" viewBox="0 0 140 140" fill="none" aria-hidden="true">
+      <circle cx="70" cy="70" r="60" fill="#E4F4EA"/>
+      <!-- монітор -->
+      <rect x="26" y="26" width="88" height="62" rx="8" fill="#1F2433"/>
+      <rect x="32" y="32" width="76" height="50" rx="4" fill="#2A3045"/>
+      <text x="38" y="48" font-family="monospace" font-weight="700" font-size="10" fill="#FFB347">&gt;&gt;&gt; 17//5</text>
+      <text x="38" y="62" font-family="monospace" font-weight="700" font-size="10" fill="#C3E88D">3</text>
+      <rect x="38" y="68" width="7" height="9" fill="#C3E88D"><animate attributeName="opacity" values="1;0;1" dur="1.2s" repeatCount="indefinite"/></rect>
+      <rect x="62" y="88" width="16" height="10" fill="#1F6B42"/>
+      <rect x="48" y="97" width="44" height="5" rx="2.5" fill="#1F6B42"/>
+      <!-- клавіатура -->
+      <rect x="28" y="106" width="84" height="18" rx="4" fill="#2F8F5B"/>
+      <g fill="#E4F4EA">
+        <rect x="33" y="110" width="8" height="4" rx="1"/><rect x="44" y="110" width="8" height="4" rx="1"/><rect x="55" y="110" width="8" height="4" rx="1"/><rect x="66" y="110" width="8" height="4" rx="1"/><rect x="77" y="110" width="8" height="4" rx="1"/><rect x="88" y="110" width="8" height="4" rx="1"/><rect x="99" y="110" width="8" height="4" rx="1"/>
+        <rect x="44" y="117" width="52" height="4" rx="1"/>
+      </g>
+      <!-- стрілки введення / виведення -->
+      <path d="M120 112 C132 96 132 70 118 58" stroke="#D2603A" stroke-width="3" stroke-linecap="round" fill="none"/>
+      <path d="M113 60 L119 56 L121 63" stroke="#D2603A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </svg>
+  </div>
+</section>
+
+<div class="container">
+
+  <section class="block">
+    <div class="step-label">Повторення · Змінні та типи даних</div>
+    <h2>Розминка</h2>
+    <p>Запитання по одному — про програми, змінні й типи даних.</p>
+    <div class="exercise" id="warmup"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Повторення · Працюємо зі списками</div>
+    <h2>Згадаймо минулий урок</h2>
+    <p>Маємо список <code>pets = ["кіт", "пес", "рибка"]</code>. Що дасть кожна команда?</p>
+    <div class="exercise">
+      <p class="soft">Клацни команду, а потім — її результат.</p>
+      <div class="match-pool" id="repPool"></div>
+      <div id="repList"></div>
+      <div class="progress-line" id="repProgress"></div>
+    </div>
+  </section>
+
+  <section class="block" id="start">
+    <div class="step-label">Крок 1 · Три частини програми</div>
+    <h2>Введення → опрацювання → виведення</h2>
+    <p>Майже кожна програма отримує дані, щось із ними робить і показує результат.</p>
+    <div class="ipo">
+      <div class="ipo-card">
+        <svg viewBox="0 0 64 48"><rect x="4" y="14" width="56" height="26" rx="5" fill="#2F8F5B"/><g fill="#E4F4EA"><rect x="10" y="19" width="7" height="5" rx="1"/><rect x="20" y="19" width="7" height="5" rx="1"/><rect x="30" y="19" width="7" height="5" rx="1"/><rect x="40" y="19" width="7" height="5" rx="1"/><rect x="50" y="19" width="5" height="5" rx="1"/><rect x="16" y="29" width="32" height="5" rx="1"/></g></svg>
+        <b>Введення</b><span>дані від користувача: <code>input()</code></span>
+      </div>
+      <div class="ipo-arrow">→</div>
+      <div class="ipo-card">
+        <svg viewBox="0 0 64 48"><circle cx="32" cy="24" r="13" fill="none" stroke="#D2603A" stroke-width="6" stroke-dasharray="6 4"/><circle cx="32" cy="24" r="5" fill="#D2603A"/></svg>
+        <b>Опрацювання</b><span>обчислення: <code>+ - * /</code></span>
+      </div>
+      <div class="ipo-arrow">→</div>
+      <div class="ipo-card">
+        <svg viewBox="0 0 64 48"><rect x="8" y="4" width="48" height="32" rx="4" fill="#1F2433"/><rect x="14" y="12" width="22" height="4" rx="2" fill="#C3E88D"/><rect x="14" y="21" width="30" height="4" rx="2" fill="#FFB347"/><rect x="27" y="36" width="10" height="6" fill="#1F6B42"/><rect x="20" y="41" width="24" height="4" rx="2" fill="#1F6B42"/></svg>
+        <b>Виведення</b><span>результат на екран: <code>print()</code></span>
+      </div>
+    </div>
+    <div class="exercise">
+      <p class="soft">Що робить кожен рядок коду? Клацни рядок, а потім — частину програми.</p>
+      <div class="sort-buckets three">
+        <div class="bucket" id="bkIn"><div class="bucket-title">Введення</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkProc"><div class="bucket-title">Опрацювання</div><div class="bucket-items"></div></div>
+        <div class="bucket" id="bkOut"><div class="bucket-title">Виведення</div><div class="bucket-items"></div></div>
+      </div>
+      <div class="sort-pool" id="ipoPool"></div>
+      <div class="progress-line" id="ipoProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 2 · Виведення: print()</div>
+    <h2>Три способи вивести текст і число</h2>
+    <p>Змінна <code>score = 70</code> — рахунок гравця. Ось як показати його зрозуміло:</p>
+    <div class="ways">
+      <div class="way">
+        <h3>Через кому</h3>
+<pre class="py-code">print("Рахунок:", score)</pre>
+        <p>Пробіл між частинами <code>print</code> ставить сам.</p>
+      </div>
+      <div class="way">
+        <h3>Через +</h3>
+<pre class="py-code">print("Рахунок: " + str(score))</pre>
+        <p>Склеює лише рядки. Пробіл — самому, число — через <code>str()</code>.</p>
+      </div>
+      <div class="way">
+        <h3>f-рядок</h3>
+<pre class="py-code">print(f"Рахунок: {score}")</pre>
+        <p>Літера <code>f</code> перед лапками, змінна — у фігурних дужках.</p>
+      </div>
+    </div>
+    <div class="trivia">Склеюючи рядки через <code>+</code>, не забудь пробіл: <code>"100 метрів" + "спринт"</code> дасть <code>100 метрівспринт</code>.</div>
+    <div class="exercise">
+      <p class="soft">Що виведе програма?</p>
+      <div id="printList"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 3 · Введення: input()</div>
+    <h2>Розпитуємо користувача</h2>
+    <p>У дужках <code>input()</code> пишуть підказку — що саме ввести. Програма чекає, доки користувач надрукує відповідь і натисне Enter.</p>
+    <ul>
+      <li>текст: <code>name = input("Як тебе звати? ")</code></li>
+      <li>ціле число: <code>age = int(input("Вік: "))</code></li>
+      <li>дійсне число: <code>height = float(input("Зріст, м: "))</code></li>
+    </ul>
+    <div class="note">Пробіл у кінці підказки — щоб відповідь не прилипала до запитання.</div>
+    <div id="task1"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 4 · Арифметичні оператори</div>
+    <h2>Python як калькулятор</h2>
+    <table class="op-table">
+      <tr><th>Оператор</th><th>Дія</th><th>Приклад</th></tr>
+      <tr><td>+  -  *</td><td>додавання, віднімання, множення</td><td>7 * 2 → 14</td></tr>
+      <tr><td>/</td><td>ділення — завжди дійсне число</td><td>8 / 2 → 4.0</td></tr>
+      <tr class="new"><td>//</td><td>цілочисельне ділення: скільки цілих разів</td><td>17 // 5 → 3</td></tr>
+      <tr class="new"><td>%</td><td>залишок від ділення</td><td>17 % 5 → 2</td></tr>
+      <tr class="new"><td>**</td><td>піднесення до степеня</td><td>2 ** 3 → 8</td></tr>
+    </table>
+    <p>17 цукерок порівну на 5 друзів: кожному — <code>17 // 5</code>, а лишиться — <code>17 % 5</code>.</p>
+    <svg class="candy" id="candySvg" viewBox="0 0 560 110" aria-hidden="true"></svg>
+    <div class="exercise">
+      <p class="soft">Клацни вираз, а потім — його результат.</p>
+      <div class="match-pool" id="opsPool"></div>
+      <div id="opsList"></div>
+      <div class="progress-line" id="opsProgress"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 5 · Порядок дій</div>
+    <h2>Що Python рахує першим</h2>
+    <p>Порядок дій — як у математиці й у формулах Google Таблиць:</p>
+    <ol>
+      <li>дужки <code>( )</code>;</li>
+      <li>степінь <code>**</code>;</li>
+      <li>множення й ділення: <code>*  /  //  %</code> — зліва направо;</li>
+      <li>додавання й віднімання: <code>+  -</code> — зліва направо.</li>
+    </ol>
+    <div class="exercise">
+      <p class="soft">Клацай оператори в тому порядку, у якому Python їх виконає.</p>
+      <div class="calc-wrap" id="calc"></div>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 6 · Оператори присвоювання</div>
+    <h2>Коротший запис: += і подібні</h2>
+    <p>Щоб змінити значення змінної, її можна записати двічі: <code>score = score + 10</code>.<br>Коротше — <code>score += 10</code>.</p>
+    <div class="fn-grid">
+      <div><code>x += 5</code> — те саме, що <code>x = x + 5</code></div>
+      <div><code>x -= 5</code> — те саме, що <code>x = x - 5</code></div>
+      <div><code>x *= 2</code> — те саме, що <code>x = x * 2</code></div>
+      <div><code>x //= 2</code> — те саме, що <code>x = x // 2</code></div>
+    </div>
+    <p class="soft">Гравець проходить рівень. Виконуй програму рядок за рядком і стеж за рахунком.</p>
+    <div id="trace1"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 7 · Модуль math</div>
+    <h2>Готові математичні функції</h2>
+    <p>Деякі функції є в Python одразу, а інші лежать у <b>модулі</b> <code>math</code>.<br>Його підключають на початку програми: <code>import math</code>.</p>
+    <div class="fn-grid">
+      <div><code>math.sqrt(16)</code> → 4.0 — квадратний корінь</div>
+      <div><code>abs(-8)</code> → 8 — модуль числа</div>
+      <div><code>math.ceil(4.1)</code> → 5 — округлити вгору</div>
+      <div><code>round(3.14159, 2)</code> → 3.14 — округлити до 2 цифр</div>
+      <div><code>math.floor(4.9)</code> → 4 — округлити вниз</div>
+      <div><code>max(4, 9, 2)</code>, <code>min(…)</code> → найбільше, найменше</div>
+    </div>
+    <div class="exercise">
+      <p class="soft">Що виведе програма?</p>
+      <div id="mathList"></div>
+    </div>
+    <div id="task2"></div>
+  </section>
+
+  <section class="block">
+    <div class="step-label">Крок 8 · Коментарі</div>
+    <h2>Нотатки для людей</h2>
+    <p><b>Коментар</b> — пояснення після знака <code>#</code>, яке Python пропускає.</p>
+<pre class="py-code">
+import math
+r = 10    # радіус кола, см
+# площа кола: π · r²
+print(math.pi * r ** 2)
+</pre>
+    <p>Довгий пояснювальний текст на кілька рядків беруть у потрійні лапки <code>"""…"""</code>.</p>
+    <div class="exercise">
+      <p class="soft">Чи виконає Python цей рядок, тобто чи щось з'явиться в консолі?</p>
+      <div class="yn-grid" id="comList"></div>
+    </div>
+  </section>
+
+  <section class="block" id="finalQuizSection">
+    <div class="step-label">Підсумок</div>
+    <h2>Коротка перевірка</h2>
+    <div id="finalQuiz"></div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Урок · «Введення та виведення даних» · 8 клас</span></footer>
+
+<script src="../../assets/lesson.js"></script>
+<script src="../../assets/python.js"></script>
+<script>
+/* ---------- ПОВТОРЕННЯ ---------- */
+makeWarmup('warmup', [
+  { text:'Хто перекладає програму на Python і одразу виконує її рядок за рядком?', opts:['Компілятор', 'Інтерпретатор', 'Процесор'], correct:1 },
+  { text:'Яка назва змінної правильна?', opts:['<code>2nd_place</code>', '<code>best score</code>', '<code>best_score</code>'], correct:2, why:'Без пробілів і не з цифри на початку.' },
+  { text:'Якого типу значення <code>3.0</code>?', opts:['int', 'float', 'str'], correct:1, why:'Число з крапкою — float, навіть якщо після крапки 0.' },
+  { text:'Якого типу значення <code>"15"</code>?', opts:['int', 'str', 'bool'], correct:1, why:'Будь-що в лапках — рядок.' },
+  { pre:pyCode('x = 7\nx = x + 3\nprint(x)'), text:'Що виведе програма?', opts:['7', '10', 'x + 3'], correct:1 },
+  { pre:pyCode('print("ля" * 3)'), text:'Що виведе програма?', opts:['ляляля', 'ля3', 'Помилка'], correct:0, why:'Рядок, помножений на ціле число, повторюється.' },
+  { pre:pyCode('print("5" + "5")'), text:'Що виведе програма?', opts:['10', '55', 'Помилка'], correct:1, why:'Рядки склеюються.' },
+  { text:'Користувач увів <code>12</code>. Що повертає <code>input()</code>?', opts:['число 12', 'рядок "12"', 'True'], correct:1, why:'input() завжди повертає рядок.' },
+  { text:'Що поверне <code>int("8")</code>?', opts:['рядок "8"', 'число 8', '8.0'], correct:1 },
+  { pre:pyCode('t = True\nprint(type(t))'), text:'Що виведе програма?', opts:["&lt;class 'str'&gt;", "&lt;class 'bool'&gt;", "&lt;class 'int'&gt;"], correct:1, why:'True без лапок — логічне значення.' }
+]);
+
+makeMatching('repPool', 'repList', [
+  { name:'<code>pets[0]</code>', desc:'"кіт"' },
+  { name:'<code>pets[-1]</code>', desc:'"рибка"' },
+  { name:'<code>len(pets)</code>', desc:'3' },
+  { name:'<code>pets.append("папуга")</code>', desc:'Додає "папуга" в кінець списку' },
+  { name:'<code>pets.remove("пес")</code>', desc:'Видаляє "пес" зі списку' },
+  { name:'<code>pets[0:2]</code>', desc:'["кіт", "пес"]' }
+], 'repProgress');
+
+/* ---------- КРОК 1 ---------- */
+makeSortBoard('ipoPool', { i:'bkIn', p:'bkProc', o:'bkOut' }, [
+  { text:'name = input("Ім\'я? ")', bucket:'i' },
+  { text:'age = int(input())', bucket:'i' },
+  { text:'n = float(input("Ціна: "))', bucket:'i' },
+  { text:'total = a + b', bucket:'p' },
+  { text:'avg = s / 3', bucket:'p' },
+  { text:'area = w * h', bucket:'p' },
+  { text:'print(total)', bucket:'o' },
+  { text:'print("Привіт,", name)', bucket:'o' },
+  { text:'print(f"Бал: {avg}")', bucket:'o' }
+], 'ipoProgress');
+
+/* ---------- КРОК 2 ---------- */
+makeChoices('printList', [
+  { pre:pyCode('coins = 15\nprint("Монет:", coins)'), text:'Що з’явиться в консолі?', opts:['Монет:15', 'Монет: 15', 'Монет: coins'], correct:1, why:'Кома в print додає пробіл між частинами.' },
+  { pre:pyCode('sport = "спринт"\ndist = "100 метрів"\nprint(dist + sport)'), text:'А тут?', opts:['100 метрів спринт', '100 метрівспринт', 'Помилка'], correct:1, why:'+ склеює рядки впритул — пробіл треба додати самому: dist + " " + sport.' },
+  { pre:pyCode('lives = 3\nprint("Життів: " + lives)'), text:'А тут?', opts:['Життів: 3', 'Життів:3', 'Помилка'], correct:2, why:'+ не склеює рядок із числом. Треба str(lives) або кома.' },
+  { pre:pyCode('hero = "Нова"\nlevel = 7\nprint(f"{hero} на рівні {level}")'), text:'Що виведе f-рядок?', opts:['Нова на рівні 7', '{hero} на рівні {level}', 'hero на рівні level'], correct:0, why:'У f-рядку замість {назви} підставляється значення змінної.' }
+]);
+
+/* ---------- КРОК 3 ---------- */
+makeCodeTask('task1', {
+  task:'Програма «Анкета героя» зупиняється з помилкою.<br>Запусти її, введи ім’я й рівень героя, а потім виправ так, щоб рівень став числом.',
+  code:'hero = input("Ім\'я героя: ")\nlevel = input("Рівень: ")\nprint("Героя звати", hero)\nprint("Наступний рівень:", level + 1)',
+  file:'hero.py',
+  hint:'Перетвори відповідь на число одразу під час введення: level = int(input("Рівень: ")).',
+  check:(out, code)=>{
+    if(!/int\s*\(/.test(code)) return 'Рівень — це число. Перетвори відповідь за допомогою int().';
+    if(!/Наступний рівень:\s*-?\d+/.test(out)) return 'Програма має вивести рядок «Наступний рівень: …» з числом.';
+    return true;
+  }
+});
+
+/* ---------- КРОК 4 ---------- */
+(function candy(){
+  const svg = document.getElementById('candySvg');
+  const c = (x, y, col)=>`<g transform="translate(${x} ${y})"><path d="M-14 0 L-20 -6 L-20 6 Z M14 0 L20 -6 L20 6 Z" fill="${col}"/><ellipse rx="11" ry="8" fill="${col}"/><path d="M-5 -6 Q0 0 -5 6" stroke="#fff" stroke-width="2" fill="none" opacity=".6"/></g>`;
+  const COL = ['#E8743B', '#8E5BD8', '#2F8F5B', '#E04F7A', '#3A86C8'];
+  let s = '';
+  for(let g = 0; g < 5; g++){
+    const x0 = 8 + g * 92;
+    s += `<rect x="${x0}" y="8" width="84" height="70" rx="12" fill="#F4F9F5" stroke="#DCEBE1" stroke-width="2"/>`;
+    for(let k = 0; k < 3; k++) s += c(x0 + 42, 22 + k * 21, COL[g]);
+    s += `<text x="${x0 + 42}" y="100" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="700" font-size="14" fill="#4B5F55">друг ${g + 1}</text>`;
+  }
+  s += `<rect x="470" y="8" width="82" height="70" rx="12" fill="#FFF3E0" stroke="#FFB347" stroke-width="2" stroke-dasharray="6 4"/>`;
+  s += c(511, 30, '#FFB347') + c(511, 56, '#FFB347');
+  s += `<text x="511" y="100" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="700" font-size="14" fill="#D2603A">залишок 2</text>`;
+  svg.innerHTML = s;
+})();
+
+makeMatching('opsPool', 'opsList', [
+  { name:'<code>17 // 5</code>', desc:'3' },
+  { name:'<code>17 % 5</code>', desc:'2' },
+  { name:'<code>17 / 5</code>', desc:'3.4' },
+  { name:'<code>2 ** 5</code>', desc:'32' },
+  { name:'<code>20 // 3</code>', desc:'6' },
+  { name:'<code>3 ** 2</code>', desc:'9' },
+  { name:'<code>10 % 2</code>', desc:'0' }
+], 'opsProgress');
+
+/* ---------- КРОК 5: ОБЧИСЛИ ПО КРОКАХ ---------- */
+(function calc(){
+  const EXPRS = ['2 + 3 * 4', '(2 + 3) * 4', '10 - 2 ** 3', '17 // 5 + 17 % 5', '(8 + 4) / 3 * 2'];
+  const PRI = { '**':3, '*':2, '/':2, '//':2, '%':2, '+':1, '-':1 };
+  const tokenize = s=>s.match(/\*\*|\/\/|\d+(?:\.\d+)?|[-+*/%()]/g);
+  const fmt = v=>Number.isInteger(v.val) && !v.flt ? String(v.val) : (Number.isInteger(v.val) ? v.val + '.0' : String(+v.val.toFixed(10)));
+  function apply(a, op, b){
+    const x = a.val, y = b.val, flt = a.flt || b.flt;
+    switch(op){
+      case '+': return { val:x + y, flt };
+      case '-': return { val:x - y, flt };
+      case '*': return { val:x * y, flt };
+      case '/': return { val:x / y, flt:true };
+      case '//': return { val:Math.floor(x / y), flt };
+      case '%': return { val:((x % y) + y) % y, flt };
+      case '**': return { val:x ** y, flt };
+    }
+  }
+  // Індекс оператора, який Python виконає наступним
+  function nextOp(t){
+    let lo = 0, hi = t.length;
+    const close = t.findIndex(x=>x.t === ')');
+    if(close >= 0){ hi = close; for(let i = close; i >= 0; i--) if(t[i].t === '('){ lo = i + 1; break; } }
+    let best = -1;
+    for(let i = lo; i < hi; i++){
+      if(t[i].op && (best < 0 || PRI[t[i].t] > PRI[t[best].t])) best = i;
+    }
+    return best;
+  }
+  const total = EXPRS.reduce((n, e)=>n + tokenize(e).filter(x=>x in PRI).length, 0);
+  const box = document.getElementById('calc');
+  const hit = trackTask(box, total, total);
+  EXPRS.forEach(src=>{
+    let t = tokenize(src).map(x=>x in PRI ? { t:x, op:true } : /\d/.test(x) ? { t:x, num:{ val:+x, flt:x.includes('.') } } : { t:x });
+    const row = document.createElement('div');
+    row.className = 'calc-row';
+    row.innerHTML = '<div class="calc-hist"></div><div class="calc-expr"></div><div class="calc-msg"></div>';
+    const hist = row.querySelector('.calc-hist'), ex = row.querySelector('.calc-expr'), msg = row.querySelector('.calc-msg');
+    hist.hidden = true;
+    function draw(){
+      ex.innerHTML = '';
+      t.forEach((x, i)=>{
+        if(x.op){
+          const b = document.createElement('button');
+          b.className = 'tk'; b.type = 'button'; b.textContent = x.t;
+          b.addEventListener('click', ()=>pick(i, b));
+          ex.appendChild(b);
+        } else ex.insertAdjacentHTML('beforeend', `<span class="tk ${x.num ? 'n' : 'p'}">${x.t}</span>`);
+      });
+    }
+    function pick(i, b){
+      const want = nextOp(t);
+      if(i !== want){
+        b.classList.remove('wrong-flash'); void b.offsetWidth; b.classList.add('wrong-flash');
+        const w = t[want].t;
+        const inParen = k=>t.slice(0, k).filter(x=>x.t === '(').length > t.slice(0, k).filter(x=>x.t === ')').length;
+        msg.textContent = inParen(want) && !inParen(i)
+          ? 'Спершу — те, що в дужках.'
+          : PRI[w] > PRI[t[i].t] ? `Є дія важливіша: ${w === '**' ? 'степінь' : 'множення чи ділення'}.` : 'Однакові за важливістю дії виконуються зліва направо.';
+        return;
+      }
+      const r = apply(t[i - 1].num, t[i].t, t[i + 1].num);
+      t.splice(i - 1, 3, { t:fmt(r), num:r });
+      // Дужки навколо одного числа зникають
+      for(let k = 1; k < t.length - 1; k++) if(t[k - 1].t === '(' && t[k + 1].t === ')'){ t.splice(k + 1, 1); t.splice(k - 1, 1); break; }
+      hist.hidden = false;
+      hist.insertAdjacentHTML('beforeend', `<div>${t.map(x=>x.t).join(' ').replace(/\( /g, '(').replace(/ \)/g, ')')}</div>`);
+      msg.textContent = '';
+      addNeurons(1); hit();
+      if(t.length === 1){
+        hist.lastChild.remove();
+        ex.classList.add('fin'); row.classList.add('done');
+        ex.innerHTML = `<span class="tk">${src} = ${t[0].t}</span>`;
+        if(src.includes('/ 3')) msg.textContent = 'Після / виходить дійсне число, тому відповідь 8.0, а не 8.';
+        return;
+      }
+      draw();
+    }
+    draw();
+    box.appendChild(row);
+  });
+})();
+
+/* ---------- КРОК 6 ---------- */
+makeTrace('trace1', {
+  code:'score = 0\nscore += 10\nscore += 5\nscore *= 2\nscore -= 7\nprint("Рахунок:", score)',
+  steps:[
+    { line:1, set:{ score:'0' } },
+    { line:2, set:{ score:'10' } },
+    { line:3, set:{ score:'15' }, ask:{ q:'Скільки буде в <code>score</code> після рядка 3?', opts:['5', '15', '105'], correct:1, why:'10 + 5 = 15.' } },
+    { line:4, set:{ score:'30' }, ask:{ q:'Бонус: рахунок подвоюється. Що буде в <code>score</code>?', opts:['17', '30', '2'], correct:1, why:'score *= 2 — те саме, що score = score * 2, тобто 15 * 2.' } },
+    { line:5, set:{ score:'23' }, ask:{ q:'Штраф 7 балів. Що буде в <code>score</code>?', opts:['23', '-7', '7'], correct:0, why:'30 - 7 = 23.' } },
+    { line:6, out:'Рахунок: 23' }
+  ]
+});
+// Консоль — окремо від пам'яті, на всю ширину під кодом
+(function splitConsole(id){
+  const box = document.getElementById(id), side = box.querySelector('.tr-side');
+  const titles = side.querySelectorAll('.tr-title'), out = side.querySelector('.tr-out');
+  const con = document.createElement('div');
+  con.className = 'tr-side tr-console';
+  con.append(titles[1], out);
+  box.querySelector('.trace').after(con);
+})('trace1');
+
+/* ---------- КРОК 7 ---------- */
+makeChoices('mathList', [
+  { pre:pyCode('import math\nprint(math.sqrt(81))'), text:'Що з’явиться в консолі?', opts:['9.0', '40.5', '6561'], correct:0, why:'Квадратний корінь з 81 — 9; sqrt завжди повертає дійсне число.' },
+  { pre:pyCode('import math\nprint(math.ceil(7.2))'), text:'А тут?', opts:['7', '8', '7.2'], correct:1, why:'ceil округлює вгору.' },
+  { pre:pyCode('print(round(9.876, 1))'), text:'А тут?', opts:['9.8', '9.9', '10'], correct:1, why:'До однієї цифри після крапки: 9.876 ≈ 9.9.' },
+  { pre:pyCode('print(abs(3 - 10))'), text:'А тут?', opts:['-7', '7', '13'], correct:1, why:'3 - 10 = -7, а модуль числа — 7.' }
+]);
+
+makeCodeTask('task2', {
+  task:'Клас їде на екскурсію, в автобусі 30 місць. Програма рахує автобуси, але видає дріб.<br>Виправ її: автобусів має бути ціле число, і всім має вистачити місця.<br>Перевір на 61 учні — має вийти 3.',
+  code:'import math\nstudents = int(input("Скільки учнів? "))\nseats = 30\nbuses = students / seats\nprint("Потрібно автобусів:", buses)',
+  file:'bus.py',
+  hint:'Округлити треба вгору, навіть якщо лишився один учень: buses = math.ceil(students / seats).',
+  check:(out, code)=>{
+    if(/math\.floor|\/\/|round\s*\(/.test(code) && !/math\.ceil/.test(code)) return 'Якщо округлити вниз, частині учнів не вистачить автобуса. Округли вгору.';
+    if(!/math\.ceil/.test(code)) return 'Автобус не буває «пів автобуса». Округли результат вгору функцією з модуля math.';
+    if(!/Потрібно автобусів:\s*\d+\s*$/m.test(out)) return 'Програма має вивести «Потрібно автобусів: …» з цілим числом.';
+    return true;
+  }
+});
+
+/* ---------- КРОК 8 ---------- */
+makeYesNo('comList', [
+  { text:'<code># print("Привіт")</code>', correct:false, why:'Увесь рядок — коментар, бо починається з #.' },
+  { text:'<code>print("Привіт")  # вітаємось</code>', correct:true, why:'Команда виконається, коментар — лише після #.' },
+  { text:'<code>print("Ціна # 5")</code>', correct:true, why:'# у лапках — частина тексту, а не коментар. Виведе: Ціна # 5.' },
+  { text:'<code>#print(2 + 2)</code>', correct:false, why:'Навіть без пробілу після # це коментар.' },
+  { text:'<code>print(10 // 3)  # 3</code>', correct:true, why:'Виведе 3 — а коментар нагадує, що саме.' },
+  { text:'<code>"""print("Привіт")"""</code>', correct:false, why:'Усе в потрійних лапках — пояснювальний текст, тож print усередині не спрацює.' }
+], 'Виконає', 'Пропустить');
+
+/* ---------- ФІНАЛЬНИЙ ТЕСТ ---------- */
+makeFinalQuiz('finalQuiz', [
+  { q:'Яка команда отримує дані від користувача?', opts:['<code>print()</code>', '<code>input()</code>', '<code>int()</code>', '<code>type()</code>'], correct:1 },
+  { q:'Як отримати від користувача ціле число?', opts:['<code>input(int())</code>', '<code>int(input())</code>', '<code>input("int")</code>', '<code>int = input()</code>'], correct:1, why:'Спершу input() отримує рядок, а int() перетворює його на число.' },
+  { q:'Що виведе <code>print(19 // 4)</code>?', opts:['4.75', '4', '3', '5'], correct:1, why:'4 повних рази по 4 вміщується в 19.' },
+  { q:'Що виведе <code>print(19 % 4)</code>?', opts:['4', '3', '0.75', '15'], correct:1, why:'19 = 4 · 4 + 3, залишок — 3.' },
+  { q:'Що виведе <code>print(1 + 2 * 3 ** 2)</code>?', opts:['19', '81', '37', '27'], correct:0, why:'Спершу степінь: 9, потім множення: 18, потім додавання: 19.' },
+  { q:'Яке значення матиме <code>x</code>?' + pyCode('x = 4\nx *= 3\nx -= 2'), opts:['10', '12', '4', '6'], correct:0, why:'4 · 3 = 12, 12 − 2 = 10.' },
+  { q:'Що виведе програма?' + pyCode('name = "Ліна"\nprint("Привіт, " + name + "!")'), opts:['Привіт, Ліна!', 'Привіт,Ліна!', 'Привіт, name!', 'Помилка'], correct:0, why:'Пробіл уже є в рядку "Привіт, ".' },
+  { q:'Що робить <code>math.ceil(2.1)</code>?', opts:['Повертає 2', 'Повертає 3', 'Повертає 2.1', 'Повертає 4.41'], correct:1, why:'ceil округлює вгору.' }
+], {summary:'Тепер ти вмієш розпитувати користувача через input(), рахувати з //, % і **, знаєш порядок дій, оператори += і модуль math і гарно виводиш результат через print().', html:true});
+</script>
+
+</body>
+</html>

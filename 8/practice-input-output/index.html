@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Практична робота: Скільки летіти до Марса — Введення та виведення даних</title>
+<link rel="stylesheet" href="../../assets/fonts/fonts.css">
+<link rel="stylesheet" href="../../assets/practice.css">
+<style>
+  :root{ --hud-bar:linear-gradient(90deg,#2F8F5B,#FFB347); --accent:#2F8F5B; --accent-dark:#1F6B42; --accent-soft:#E4F4EA; --bg:#F4F9F5; --line:#DCEBE1; }
+
+  .ms{font-family:'Material Symbols Outlined'; font-weight:normal; font-style:normal; font-size:20px; line-height:1; display:inline-block; vertical-align:middle; -webkit-font-feature-settings:'liga'; font-feature-settings:'liga';}
+
+  /* Клітинки Colab */
+  .nb{background:#fff; border:1px solid #DADCE0; border-radius:10px; padding:10px 14px 12px 6px; font-family:Roboto, Arial, sans-serif; margin:10px 0 4px;}
+  .nb-head{display:flex; align-items:center; gap:8px; padding:0 0 8px 8px; margin-bottom:8px; border-bottom:1px solid #E8EAED; font-size:16px;}
+  .nb-head img{width:34px; height:34px;}
+  .cell{display:grid; grid-template-columns:38px 1fr; gap:2px 4px; margin:6px 0;}
+  .cell .run{color:#444746; font-size:28px; font-variation-settings:'FILL' 1; justify-self:center; margin-top:2px;}
+  .cell pre{margin:0; background:#F7F7F7; border-radius:6px; padding:8px 12px; font-family:'JetBrains Mono', monospace; font-variant-ligatures:none; font-size:13.5px; line-height:1.55; white-space:pre-wrap; color:#1F1F1F; overflow-x:auto;}
+  .cell .out{grid-column:2; font-family:'JetBrains Mono', monospace; font-variant-ligatures:none; font-size:13.5px; line-height:1.5; white-space:pre-wrap; padding:4px 12px 2px; color:#1F1F1F;}
+  .cell .out .in{color:#1A73E8;}
+  .k{color:#AF00DB;} .f{color:#795E26;} .s{color:#A31515;} .n{color:#098658;} .c{color:#008000;}
+  /* Рядки, які учень дописує на цьому кроці */
+  .cell pre .ln{display:block;}
+  .cell pre .ln.new{background:#FFF1C2; margin:0 -12px; padding:0 12px; box-shadow:inset 3px 0 0 #F2C94C;}
+  .cell pre .ln.old{opacity:.55;}
+  .legend{font-size:13.5px; color:var(--ink-soft, #555);}
+  .legend i{display:inline-block; width:14px; height:12px; background:#FFF1C2; box-shadow:inset 3px 0 0 #F2C94C; vertical-align:-1px; margin-right:4px;}
+
+  .ui{font-family:Roboto, Arial, sans-serif; font-weight:500; background:#F1F3F4; border-radius:6px; padding:0 6px; white-space:nowrap;}
+  .kbd{display:inline-block; font-family:Roboto, Arial, sans-serif; font-size:12.5px; font-weight:500; border:1px solid #C9CBD6; border-bottom-width:3px; border-radius:6px; padding:0 6px; background:#fff; color:#3C4043; white-space:nowrap;}
+
+  .trip{display:block; width:100%; max-width:640px; height:auto; margin:6px auto 0;}
+
+</style>
+</head>
+<body data-hud="8 клас · Практична · Скільки летіти до Марса">
+
+<div class="container">
+
+  <section class="p-hero">
+    <div class="p-eyebrow">Практична робота · 8 клас · Введення та виведення даних</div>
+    <h1>🚀 Скільки летіти до Марса</h1>
+    <p>Напиши в Google Colab програму для космічного туристичного агентства: пасажир вводить швидкість корабля, а програма рахує, скільки триватиме політ.</p>
+    <div class="meta"><span>⏱ 10–15 хв</span><span><img src="../../assets/logos/colab.svg" alt="">Google Colab</span></div>
+    <svg class="trip" viewBox="0 0 640 120" aria-hidden="true">
+      <g fill="#C9D6CE"><circle cx="160" cy="18" r="2"/><circle cx="250" cy="98" r="1.6"/><circle cx="330" cy="14" r="2.2"/><circle cx="420" cy="104" r="1.8"/><circle cx="470" cy="24" r="1.5"/><circle cx="210" cy="60" r="1.4"/></g>
+      <circle cx="70" cy="60" r="44" fill="#3A86C8"/>
+      <path d="M44 34 C60 40 58 56 72 58 C84 60 86 76 76 92 C64 96 50 90 40 78 C34 64 36 46 44 34 Z" fill="#2F8F5B"/>
+      <path d="M90 24 C100 30 108 40 110 52 C100 50 92 42 90 24 Z" fill="#2F8F5B"/>
+      <path d="M128 60 C230 -10 410 -10 512 60" fill="none" stroke="#FFB347" stroke-width="3" stroke-dasharray="8 8"/>
+      <path d="M507 47 L512 60 L498 60" fill="none" stroke="#FFB347" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <text x="320" y="44" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="700" font-size="15" fill="#1F6B42">225 000 000 км</text>
+      <circle cx="574" cy="60" r="34" fill="#D9603B"/>
+      <circle cx="560" cy="48" r="7" fill="#B8462A"/><circle cx="586" cy="70" r="9" fill="#B8462A"/><circle cx="584" cy="44" r="4" fill="#B8462A"/>
+      <text x="70" y="118" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="700" font-size="14" fill="#4B5F55">Земля</text>
+      <text x="574" y="112" text-anchor="middle" font-family="Baloo 2, sans-serif" font-weight="700" font-size="14" fill="#4B5F55">Марс</text>
+    </svg>
+  </section>
+
+  <section class="p-section">
+    <h2>Що має вийти</h2>
+    <p>Програма питає швидкість і виводить, скільки триватиме політ:</p>
+    <div class="nb">
+      <div class="nb-head"><img src="../../assets/logos/colab.svg" alt="">Марс — Прізвище.ipynb</div>
+      <div class="cell"><span class="ms run">play_circle</span>
+        <div class="out" style="grid-column:2">Швидкість корабля, км/год: <span class="in">40000</span>
+Відстань до Марса: 225000000 км
+Політ триватиме 5625 годин
+...</div></div>
+    </div>
+  </section>
+
+  <section class="p-section">
+    <h2>Покроково</h2>
+    <p class="legend">Усю програму пишемо в одному блоці. На кожному кроці <i></i>жовтим позначено нові рядки, які треба дописати.</p>
+
+    <div class="guide-card">
+      <div class="g-num">1</div>
+      <div>
+        <h3>Створи блокнот</h3>
+        <p>Обери один зі способів:</p>
+        <div class="variants">
+          <div class="variant">
+            <div class="v-title">🌐 Через сайт</div>
+            <ol>
+              <li>Відкрий <b>colab.research.google.com</b>.</li>
+              <li><span class="menu">+ New notebook</span>.</li>
+            </ol>
+          </div>
+          <div class="variant">
+            <div class="v-title">📁 Через Google Диск</div>
+            <ol>
+              <li><span class="menu">Створити → Більше → Google Colaboratory</span>.</li>
+            </ol>
+          </div>
+        </div>
+        <p>Клацни назву <span class="ui">Untitled0.ipynb</span> угорі й назви блокнот: <b>Марс — Прізвище</b>.</p>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">2</div>
+      <div>
+        <h3>Швидкість</h3>
+        <ol>
+          <li>Впиши в клітинку коду.</li>
+          <li>Запусти: <span class="kbd">Shift</span> + <span class="kbd">Enter</span>.</li>
+          <li>Введи <b>40000</b> і натисни <span class="kbd">Enter</span>.</li>
+        </ol>
+        <div class="cell"><span class="ms run">play_circle</span><pre class="hl" data-new="1-4"># Скільки летіти до Марса
+distance = 225000000
+speed = int(input("Швидкість корабля, км/год: "))
+print("Відстань до Марса:", distance, "км")</pre></div>
+        <div class="check-val">Перевір себе: «Відстань до Марса: 225000000 км».</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">3</div>
+      <div>
+        <h3>Скільки годин</h3>
+        <p>Час = відстань ÷ швидкість. Допиши в кінець і запусти знову:</p>
+        <div class="cell"><span class="ms run">play_circle</span><pre class="hl" data-new="5-6"># Скільки летіти до Марса
+distance = 225000000
+speed = int(input("Швидкість корабля, км/год: "))
+print("Відстань до Марса:", distance, "км")
+hours = distance / speed
+print("Політ триватиме", round(hours), "годин")</pre></div>
+        <div class="check-val">Перевір себе: для 40000 — 5625 годин.</div>
+      </div>
+    </div>
+
+    <div class="guide-card">
+      <div class="g-num">4</div>
+      <div>
+        <h3>Скільки днів</h3>
+        <p>У добі 24 години. Допиши в кінець:</p>
+        <div class="cell"><span class="ms run">play_circle</span><pre class="hl" data-new="7-8"># Скільки летіти до Марса
+distance = 225000000
+speed = int(input("Швидкість корабля, км/год: "))
+print("Відстань до Марса:", distance, "км")
+hours = distance / speed
+print("Політ триватиме", round(hours), "годин")
+days = round(hours / 24)
+print("Це", days, "днів")</pre></div>
+        <div class="check-val">Перевір себе: для 40000 — 234 дні.</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer><span class="page-name">Практична робота · «Введення та виведення даних» · 8 клас</span></footer>
+
+<script src="../../assets/practice.js"></script>
+<script>
+/* Підсвітка коду в стилі Colab; data-new="1,8-9" — рядки, дописані на цьому кроці (решта — бліді) */
+(()=>{
+  const KW = new Set('import from for in if else elif while def return and or not True False None'.split(' '));
+  const FN = new Set('print len sum max min round abs type int float input ceil'.split(' '));
+  const esc = s=>s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const hl = line=>line.replace(/(#.*)|("[^"\n]*"?)|(\b\d+(?:\.\d+)?\b)|(\b[A-Za-z_]\w*\b)|([^#"\w]+|\w+)/g, (m, c, s, n, w)=>{
+    if(c) return `<span class="c">${esc(c)}</span>`;
+    if(s) return `<span class="s">${esc(s)}</span>`;
+    if(n) return `<span class="n">${n}</span>`;
+    if(w) return KW.has(w) ? `<span class="k">${w}</span>` : FN.has(w) ? `<span class="f">${w}</span>` : w;
+    return esc(m);
+  });
+  document.querySelectorAll('pre.hl').forEach(pre=>{
+    const lines = pre.textContent.split('\n');
+    const fresh = new Set();
+    (pre.dataset.new || '').split(',').filter(Boolean).forEach(r=>{
+      const [a, b = a] = r.split('-').map(Number);
+      for(let i = a; i <= b; i++) fresh.add(i);
+    });
+    const all = fresh.size === lines.length;
+    pre.innerHTML = lines.map((l, i)=>{
+      const cls = !fresh.size || all ? '' : fresh.has(i + 1) ? ' new' : ' old';
+      return `<span class="ln${cls}">${hl(l) || ' '}</span>`;
+    }).join('');
+  });
+})();
+</script>
+</body>
+</html>
